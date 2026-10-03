@@ -3,7 +3,9 @@
 import os
 import time
 from collections.abc import Callable, Iterator
+from datetime import datetime
 from uuid import UUID, uuid4
+from zoneinfo import ZoneInfo
 
 import jwt
 import pytest
@@ -21,6 +23,13 @@ from app.main import create_app
 SERVER_URL = os.environ.get(
     "TEST_DATABASE_URL", "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
 )
+
+
+def local_today():
+    """Today in the test business's time zone, not the machine's (they differ in the evening)."""
+    return datetime.now(ZoneInfo(STUDIO["time_zone"])).date()
+
+
 STUDIO = {  # a typical first business
     "name": "Studio Flow",
     "vertical": "fitness",

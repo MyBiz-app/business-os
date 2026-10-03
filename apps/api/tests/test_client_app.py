@@ -1,10 +1,10 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from tests.conftest import STUDIO, AuthHeaders
+from tests.conftest import STUDIO, AuthHeaders, local_today
 from tests.test_bookings import book, new_client, new_session
 
 
@@ -39,7 +39,7 @@ def member(client: TestClient, auth: AuthHeaders, studio: dict, user: UUID) -> d
 
 
 def upcoming(client: TestClient, headers: dict) -> list:
-    start = (date.today() + timedelta(days=15)).isoformat()  # new_session() is 20 days out
+    start = (local_today() + timedelta(days=15)).isoformat()  # new_session() is 20 days out
     response = client.get("/client/sessions", params={"start": start, "days": 14}, headers=headers)
     assert response.status_code == 200, response.text
     return response.json()
@@ -202,7 +202,7 @@ def test_client_of_one_business_cannot_reach_another(
 def test_late_window_applies_to_clients(
     client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
 ) -> None:
-    soon = date.today() + timedelta(days=1)
+    soon = local_today() + timedelta(days=1)
     session_id = new_session(client, studio, on=soon)
     user = uuid4()
     member(client, auth, studio, user)

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.seed import seed
-from tests.conftest import AuthHeaders, add_member
+from tests.conftest import AuthHeaders, add_member, local_today
 
 
 def demo(engine: Engine, auth: AuthHeaders) -> dict:
@@ -24,7 +24,7 @@ def test_metrics_for_a_month_with_comparison(
     client: TestClient, engine: Engine, auth: AuthHeaders
 ) -> None:
     studio = demo(engine, auth)
-    end = date.today() - timedelta(days=1)
+    end = local_today() - timedelta(days=1)
     start = end - timedelta(days=29)
 
     response = client.get(
@@ -45,7 +45,7 @@ def test_weekly_series_fills_empty_weeks(
     client: TestClient, engine: Engine, auth: AuthHeaders
 ) -> None:
     studio = demo(engine, auth)
-    end = date.today()
+    end = local_today()
     start = end - timedelta(days=7 * 8)
 
     points = client.get(
@@ -71,7 +71,7 @@ def test_reports_need_permission_and_are_isolated(
     demo_studio = demo(engine, auth)
     desk = uuid4()
     add_member(engine, demo_studio["tenant_id"], desk, "front_desk")
-    params = {"start": date.today() - timedelta(days=30), "end": date.today()}
+    params = {"start": local_today() - timedelta(days=30), "end": local_today()}
 
     assert (
         client.get(

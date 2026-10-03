@@ -5,12 +5,12 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from tests.conftest import AuthHeaders, add_member
+from tests.conftest import AuthHeaders, add_member, local_today
 from tests.test_tenants import STUDIO
 
 
 def new_session(client: TestClient, studio: dict, capacity: int = 2, on: date | None = None) -> str:
-    on = on or date.today() + timedelta(days=20)
+    on = on or local_today() + timedelta(days=20)
     created = client.post(
         "/sessions",
         json={
@@ -162,8 +162,8 @@ def test_rejects_duplicates_bad_transitions_and_cancelled_sessions(
 def test_client_history(client: TestClient, studio: dict) -> None:
     headers = studio["headers"]
     dana = new_client(client, headers, "Dana")
-    soon = new_session(client, studio, on=date.today() + timedelta(days=3))
-    later = new_session(client, studio, on=date.today() + timedelta(days=10))
+    soon = new_session(client, studio, on=local_today() + timedelta(days=3))
+    later = new_session(client, studio, on=local_today() + timedelta(days=10))
     book(client, headers, soon, dana)
     book(client, headers, later, dana)
 

@@ -1,10 +1,10 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from tests.conftest import AuthHeaders, add_member
+from tests.conftest import AuthHeaders, add_member, local_today
 from tests.test_bookings import book, new_client, new_session, set_status
 
 
@@ -92,7 +92,7 @@ def test_punch_card_credits_are_used_and_returned(client: TestClient, studio: di
     dana = new_client(client, headers, "Dana")
     entitlement = sell(client, headers, dana, card(client, headers, credits=2)["id"])
     first, second, third = (
-        new_session(client, studio, on=date.today() + timedelta(days=d)) for d in (3, 4, 5)
+        new_session(client, studio, on=local_today() + timedelta(days=d)) for d in (3, 4, 5)
     )
 
     b1 = book(client, headers, first, dana).json()
@@ -118,7 +118,7 @@ def test_memberships_are_used_before_cards(client: TestClient, studio: dict) -> 
     sell(client, headers, dana, plans[0]["id"])  # monthly unlimited
 
     booking = book(
-        client, headers, new_session(client, studio, on=date.today() + timedelta(days=2)), dana
+        client, headers, new_session(client, studio, on=local_today() + timedelta(days=2)), dana
     ).json()
 
     assert booking["plan_name"] == plans[0]["name"]
@@ -127,7 +127,7 @@ def test_memberships_are_used_before_cards(client: TestClient, studio: dict) -> 
 def test_freeze_blocks_its_days_and_extends_the_end(client: TestClient, studio: dict) -> None:
     headers = studio["headers"]
     dana = new_client(client, headers, "Dana")
-    today = date.today()
+    today = local_today()
     entitlement = sell(
         client, headers, dana, card(client, headers, credits=5, validity_days=30)["id"]
     )
