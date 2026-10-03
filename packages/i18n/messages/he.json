@@ -104,5 +104,102 @@
     "manager": "מנהל/ת",
     "staff": "צוות",
     "front_desk": "קבלה"
+  },
+  "nav": {
+    "label": "ניווט ראשי",
+    "dashboard": "דשבורד",
+    "services": "שירותים",
+    "locations": "מיקומים"
+  },
+  "terms": {
+    "fitness": {
+      "client": "מתאמן/ת",
+      "clients": "מתאמנים",
+      "addClient": "הוספת מתאמן/ת",
+      "newClient": "מתאמן/ת חדש/ה",
+      "searchClients": "חיפוש מתאמנים",
+      "noClients": "עדיין אין מתאמנים",
+      "noResults": "לא נמצאו מתאמנים שמתאימים לחיפוש"
+    }
+  },
+  "clients": {
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "name": "שם",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "dateOfBirth": "תאריך לידה",
+    "notes": "הערות",
+    "status": "סטטוס",
+    "allStatuses": "כל הסטטוסים",
+    "statuses": {
+      "active": "פעיל/ה",
+      "inactive": "לא פעיל/ה",
+      "lead": "ליד"
+    },
+    "search": "חיפוש",
+    "save": "שמירה",
+    "create": "יצירה",
+    "cancel": "ביטול",
+    "edit": "עריכה",
+    "details": "פרטים",
+    "joined": "הצטרפות: {date}",
+    "total": "{count, plural, one {רשומה אחת} other {# רשומות}}",
+    "previous": "הקודם",
+    "next": "הבא",
+    "back": "חזרה לרשימה",
+    "saved": "נשמר.",
+    "errors": {
+      "email_taken": "האימייל הזה כבר בשימוש ברשומה אחרת.",
+      "invalid": "בדקו את הפרטים ונסו שוב."
+    }
+  },
+  "common": {
+    "save": "שמירה",
+    "create": "יצירה",
+    "cancel": "ביטול",
+    "saved": "נשמר.",
+    "active": "פעיל",
+    "inactive": "לא פעיל",
+    "back": "חזרה לרשימה",
+    "add": "הוספה",
+    "errors": {
+      "invalid": "בדקו את הפרטים ונסו שוב.",
+      "generic": "משהו השתבש. נסו שוב."
+    }
+  },
+  "services": {
+    "title": "שירותים",
+    "subtitle": "השיעורים והפגישות שהעסק מציע.",
+    "add": "הוספת שירות",
+    "new": "שירות חדש",
+    "empty": "עדיין אין שירותים. הוסיפו את השיעור או סוג הפגישה הראשון.",
+    "name": "שם",
+    "description": "תיאור",
+    "duration": "משך (בדקות)",
+    "capacity": "משתתפים בכל מפגש",
+    "capacityHint": "1 לפגישה אישית, יותר לשיעור קבוצתי.",
+    "price": "מחיר",
+    "color": "צבע ביומן",
+    "active": "זמין להזמנה",
+    "minutes": "{count} דק׳",
+    "participants": "{count, plural, one {אישי (1:1)} other {עד # משתתפים}}",
+    "free": "ללא תשלום"
+  },
+  "locations": {
+    "title": "מיקומים",
+    "subtitle": "איפה העסק פועל, והחדרים בכל מקום.",
+    "add": "הוספת מיקום",
+    "new": "מיקום חדש",
+    "empty": "עדיין אין מיקומים.",
+    "name": "שם",
+    "address": "כתובת",
+    "active": "פתוח",
+    "rooms": "חדרים",
+    "roomsCount": "{count, plural, =0 {אין חדרים} one {חדר אחד} other {# חדרים}}",
+    "roomName": "שם החדר",
+    "roomCapacity": "קיבולת",
+    "addRoom": "הוספת חדר",
+    "noRooms": "עדיין אין חדרים."
   }
 }

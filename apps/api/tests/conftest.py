@@ -47,7 +47,12 @@ def engine() -> Iterator[Engine]:
 @pytest.fixture(autouse=True)
 def clean_tables(engine: Engine) -> None:
     with engine.begin() as connection:
-        connection.execute(text("TRUNCATE app.tenant_members, app.tenants, app.users CASCADE"))
+        connection.execute(
+            text(
+                "TRUNCATE app.services, app.rooms, app.locations, app.clients, "
+                "app.tenant_members, app.tenants, app.users CASCADE"
+            )
+        )
 
 
 class StaticKeySource:
@@ -109,3 +114,16 @@ def auth(make_token: TokenFactory) -> AuthHeaders:
 @pytest.fixture
 def new_user_id() -> Callable[[], UUID]:
     return uuid4
+
+
+def add_member(engine: Engine, tenant_id: UUID | str, user_id: UUID, role: str) -> None:
+    """Adds a user to a tenant directly in the database (staff invites come later)."""
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING"),
+            {"id": user_id, "email": f"{user_id}@example.com"},
+        )
+        connection.execute(
+            text("INSERT INTO app.tenant_members (tenant_id, user_id, role) VALUES (:t, :u, :r)"),
+            {"t": tenant_id, "u": user_id, "r": role},
+        )

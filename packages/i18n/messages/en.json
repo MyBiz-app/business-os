@@ -104,5 +104,102 @@
     "manager": "Manager",
     "staff": "Staff",
     "front_desk": "Front desk"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "dashboard": "Dashboard",
+    "services": "Services",
+    "locations": "Locations"
+  },
+  "terms": {
+    "fitness": {
+      "client": "Member",
+      "clients": "Members",
+      "addClient": "Add member",
+      "newClient": "New member",
+      "searchClients": "Search members",
+      "noClients": "No members yet",
+      "noResults": "No members match your search"
+    }
+  },
+  "clients": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "dateOfBirth": "Date of birth",
+    "notes": "Notes",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "lead": "Lead"
+    },
+    "search": "Search",
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "details": "Details",
+    "joined": "Joined {date}",
+    "total": "{count, plural, one {# total} other {# total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "back": "Back to list",
+    "saved": "Saved.",
+    "errors": {
+      "email_taken": "Another record already uses this email.",
+      "invalid": "Please check the details and try again."
+    }
+  },
+  "common": {
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel",
+    "saved": "Saved.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "back": "Back to list",
+    "add": "Add",
+    "errors": {
+      "invalid": "Please check the details and try again.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "Classes and appointments you offer.",
+    "add": "Add service",
+    "new": "New service",
+    "empty": "No services yet. Add your first class or appointment type.",
+    "name": "Name",
+    "description": "Description",
+    "duration": "Duration (minutes)",
+    "capacity": "Participants per session",
+    "capacityHint": "1 for a personal appointment, more for a group class.",
+    "price": "Price",
+    "color": "Calendar color",
+    "active": "Available for booking",
+    "minutes": "{count} min",
+    "participants": "{count, plural, one {Personal (1:1)} other {Up to # participants}}",
+    "free": "Free"
+  },
+  "locations": {
+    "title": "Locations",
+    "subtitle": "Where your business operates, and the rooms in each place.",
+    "add": "Add location",
+    "new": "New location",
+    "empty": "No locations yet.",
+    "name": "Name",
+    "address": "Address",
+    "active": "Open",
+    "rooms": "Rooms",
+    "roomsCount": "{count, plural, =0 {No rooms} one {1 room} other {# rooms}}",
+    "roomName": "Room name",
+    "roomCapacity": "Capacity",
+    "addRoom": "Add room",
+    "noRooms": "No rooms yet."
   }
 }

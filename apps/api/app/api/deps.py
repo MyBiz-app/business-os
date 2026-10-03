@@ -1,4 +1,5 @@
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
+from dataclasses import dataclass
 from typing import Annotated
 from uuid import UUID
 
@@ -8,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser, get_current_user
 from app.core.db import EngineDep, open_session, session_scope, set_tenant
+from app.permissions import Permission, role_allows
 
 UserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
@@ -20,14 +22,38 @@ def get_session(user: UserDep, engine: EngineDep) -> Iterator[Session]:
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
-def get_tenant_session(
+@dataclass(frozen=True)
+class TenantContext:
+    session: Session
+    tenant_id: UUID
+    role: str
+
+
+def get_tenant_context(
     session: SessionDep, tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")]
-) -> Session:
-    """A session scoped to one tenant. Fails unless the user is a member of that tenant."""
+) -> TenantContext:
+    """Scopes the session to one tenant. Fails unless the user is a member of that tenant."""
     set_tenant(session, tenant_id)
-    if session.execute(text("SELECT app.current_tenant_id()")).scalar() is None:
+    role = session.execute(
+        text("""
+            SELECT role FROM app.tenant_members
+            WHERE tenant_id = app.current_tenant_id() AND user_id = app.current_user_id()
+        """)
+    ).scalar()
+    if role is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
-    return session
+    return TenantContext(session=session, tenant_id=tenant_id, role=role)
 
 
-TenantSessionDep = Annotated[Session, Depends(get_tenant_session)]
+TenantDep = Annotated[TenantContext, Depends(get_tenant_context)]
+
+
+def require(permission: Permission) -> Callable[[TenantContext], TenantContext]:
+    """Dependency that also checks the member's role grants `permission`."""
+
+    def check(context: TenantDep) -> TenantContext:
+        if not role_allows(context.role, permission):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
+        return context
+
+    return check

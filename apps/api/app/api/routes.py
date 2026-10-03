@@ -4,7 +4,7 @@ from fastapi import APIRouter, status
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.api.deps import SessionDep, TenantSessionDep, UserDep
+from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.schemas import Me, Membership, Tenant, TenantCreate
 from app.core.db import set_tenant
 
@@ -75,5 +75,5 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
 
 
 @router.get("/tenants/current", tags=["tenants"])
-def get_current_tenant(session: TenantSessionDep) -> Tenant:
-    return load_current_tenant(session)
+def get_current_tenant(context: TenantDep) -> Tenant:
+    return load_current_tenant(context.session)

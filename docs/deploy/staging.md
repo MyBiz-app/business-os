@@ -1,5 +1,8 @@
 # Staging deployment
 
+- Web: https://business-os-alpha-drab.vercel.app
+- API: https://business-os-api-staging.onrender.com (`/health`, `/docs`)
+
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|
 | Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main` (previews for every PR) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json) |

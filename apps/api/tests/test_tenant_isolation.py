@@ -100,3 +100,24 @@ def test_restricted_role_survives_commit(engine: Engine) -> None:
         assert session.execute(text("SELECT current_user")).scalar() == "app_api"
         session.commit()
         assert session.execute(text("SELECT current_user")).scalar() == "app_api"
+
+
+def test_database_isolates_clients(engine: Engine, two_tenants: dict[str, UUID]) -> None:
+    with engine.begin() as admin:
+        admin.execute(
+            text("INSERT INTO app.clients (tenant_id, first_name) VALUES (:t, 'Dana')"),
+            {"t": two_tenants["tenant_a"]},
+        )
+
+    # Bob claims tenant A: he sees none of A's clients and cannot add one there.
+    with open_session(engine, two_tenants["bob"], two_tenants["tenant_a"]) as session:
+        assert session.execute(text("SELECT count(*) FROM app.clients")).scalar() == 0
+        with pytest.raises(DBAPIError, match="row-level security"):
+            session.execute(
+                text("INSERT INTO app.clients (tenant_id, first_name) VALUES (:t, 'X')"),
+                {"t": two_tenants["tenant_a"]},
+            )
+
+    # Alice, a member of A, sees exactly her one client.
+    with open_session(engine, two_tenants["alice"], two_tenants["tenant_a"]) as session:
+        assert session.execute(text("SELECT count(*) FROM app.clients")).scalar() == 1
