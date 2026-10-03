@@ -1,4 +1,4 @@
-# Business OS — developer machine setup for Windows.
+# Business OS - developer machine setup for Windows.
 # Safe to run more than once: installs only what is missing.
 #
 # Usage (PowerShell):
@@ -78,7 +78,7 @@ Write-Step "Repository in $DevRoot"
 New-Item -ItemType Directory -Force -Path $DevRoot | Out-Null
 $repoPath = Join-Path $DevRoot "business-os"
 if (Test-Path (Join-Path $repoPath ".git")) {
-    Write-Ok "Already cloned at $repoPath — pulling latest"
+    Write-Ok "Already cloned at $repoPath - pulling latest"
     git -C $repoPath fetch origin
     git -C $repoPath checkout $Branch
     git -C $repoPath pull origin $Branch
