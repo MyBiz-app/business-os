@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "MyBiz",
+    "tagline": "לנהל את העסק במקום אחד, עם AI שעובד בשבילך."
+  },
+  "home": {
+    "status": "מצב המערכת",
+    "apiOnline": "השרת פעיל",
+    "apiOffline": "אין חיבור לשרת",
+    "comingSoon": "הרשמה ויצירת עסק מגיעים בשלב הבא."
+  },
+  "settings": {
+    "language": "שפה",
+    "theme": "ערכת נושא",
+    "themeLight": "בהיר",
+    "themeDark": "כהה",
+    "themeSystem": "לפי המערכת"
+  },
+  "locales": {
+    "he": "עברית",
+    "en": "English"
+  }
+}

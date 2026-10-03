@@ -9,7 +9,7 @@ in Hebrew and English, light and dark. Sprint length is flexible (owner capacity
 - [x] Owner approves `PROPOSED` decisions in `docs/DECISIONS.md` (delegated, 2026-10-03)
 - [x] Screen list and user flows per side → [08-screens-and-flows.md](08-screens-and-flows.md)
 - [ ] Finalize data model for Sprints 1–3 (done incrementally, per sprint)
-- [ ] Owner local environment ready (see below)
+- [x] Owner local environment ready (see below)
 
 ## Phase 1 — Prototype
 
@@ -33,6 +33,17 @@ production hardening (backups, monitoring, security review, legal docs).
 
 As in spec v1 §26: pilot with 1–3 businesses, platform billing, CRM, WhatsApp, finance, marketing,
 specialized agents, then additional vertical packs and markets (US, EU).
+
+## Sprint 1 progress
+
+- [x] Monorepo (pnpm + Turborepo), CI on pull requests
+- [x] API hello-world (FastAPI, `/health`, tests)
+- [x] Web hello-world (Next.js): he / en, RTL / LTR, light / dark, calls the API
+- [ ] Mobile hello-world (Expo) on the owner's iPhone
+- [ ] Supabase local + database migrations
+- [ ] Sign up / verify / log in
+- [ ] Create business (tenant) + tenant-isolation tests
+- [ ] Deploy to staging
 
 ## Owner setup checklist (Windows + iPhone)
 

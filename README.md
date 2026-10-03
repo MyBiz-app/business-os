@@ -12,4 +12,39 @@ performs confirmed actions.
 
 ## Status
 
-Phase 0: specification. See [`docs/spec/v2/`](docs/spec/v2/README.md) and [`docs/DECISIONS.md`](docs/DECISIONS.md).
+Phase 1, Sprint 1 (walking skeleton). Spec: [`docs/spec/v2/`](docs/spec/v2/README.md) ·
+Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md).
+
+## Repository layout
+
+| Path | What |
+|---|---|
+| `apps/web` | Business web app: Next.js, Tailwind, next-intl (he / en), light / dark |
+| `apps/api` | Backend API: Python 3.13, FastAPI, managed with uv |
+| `packages/` | Shared TypeScript packages (later: API client, UI, config) |
+| `docs/` | Spec and decision log |
+| `scripts/` | Developer machine setup |
+
+## Run locally
+
+Prerequisites: Git, Node.js 22+, pnpm, uv, Docker. On Windows, `scripts/setup-windows.ps1`
+installs what is missing.
+
+```bash
+pnpm install                        # JavaScript dependencies (all apps)
+cd apps/api && uv sync && cd ../..  # Python dependencies
+pnpm dev                            # starts API (port 8000) and web (port 3000)
+```
+
+Open http://localhost:3000. API docs: http://localhost:8000/docs.
+
+## Checks
+
+```bash
+pnpm lint        # ESLint + Ruff
+pnpm typecheck   # TypeScript
+pnpm test        # pytest
+pnpm build       # production build
+```
+
+CI runs all of them on every pull request.

@@ -39,6 +39,8 @@ When a decision changes, update the row and note the date — do not delete hist
 | T11 | Usage metering per tenant from day one. | DECIDED (2026-10-03, delegated) |
 | T12 | Naming: `tenant` in code/DB, "business" in UI copy. End customers are `client` in code; vertical packs rename them in UI (member / customer / patient). | DECIDED (2026-10-03, delegated) |
 | T13 | Identity: one global `user` (login) linked to many tenants as staff and/or client. A client record may exist without an app account (walk-ins). | DECIDED (2026-10-03, delegated) |
+| T14 | Web locale comes from the user's choice (cookie), then browser language, then Hebrew. App URLs are not locale-prefixed; public marketing / booking pages may add prefixes later. | DECIDED (2026-10-03, delegated) |
+| T15 | Tooling versions: Node 22+ (owner on 24), pnpm 12, Python 3.13 via uv, Next.js 16, Expo SDK 57. Line endings LF in the repo (`.gitattributes`). | DECIDED (2026-10-03, delegated) |
 
 ## Process
 

@@ -1,0 +1,23 @@
+{
+  "app": {
+    "name": "MyBiz",
+    "tagline": "Run your business in one place, with AI that works for you."
+  },
+  "home": {
+    "status": "System status",
+    "apiOnline": "API is online",
+    "apiOffline": "API is not reachable",
+    "comingSoon": "Sign up and business creation are coming next."
+  },
+  "settings": {
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System"
+  },
+  "locales": {
+    "he": "עברית",
+    "en": "English"
+  }
+}
