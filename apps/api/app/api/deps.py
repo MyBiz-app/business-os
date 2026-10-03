@@ -65,3 +65,24 @@ def require(permission: Permission) -> Callable[[TenantContext], TenantContext]:
         return context
 
     return check
+
+
+@dataclass(frozen=True)
+class ClientContext:
+    session: Session
+    tenant_id: UUID
+    client_id: UUID
+
+
+def get_client_context(
+    session: SessionDep, tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")]
+) -> ClientContext:
+    """Scopes the session to a business the user joined as a client (the client app)."""
+    set_tenant(session, tenant_id)
+    client_id = session.execute(text("SELECT app.current_client_id()")).scalar()
+    if client_id is None:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_client")
+    return ClientContext(session=session, tenant_id=tenant_id, client_id=client_id)
+
+
+ClientDep = Annotated[ClientContext, Depends(get_client_context)]

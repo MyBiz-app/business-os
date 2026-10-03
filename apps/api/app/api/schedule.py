@@ -138,18 +138,14 @@ SESSION_SELECT = """
     SELECT s.id, s.series_id, s.location_id, l.name AS location_name, s.room_id,
            r.name AS room_name, s.instructor_user_id, u.email AS instructor_email,
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
-           coalesce(bk.booked, 0) AS booked, coalesce(bk.waitlisted, 0) AS waitlisted,
+           bk.booked, bk.waitlisted,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
     LEFT JOIN app.users u ON u.id = s.instructor_user_id
-    LEFT JOIN LATERAL (
-        SELECT count(*) FILTER (WHERE b.status IN ('booked', 'checked_in', 'no_show')) AS booked,
-               count(*) FILTER (WHERE b.status = 'waitlisted') AS waitlisted
-        FROM app.bookings b WHERE b.session_id = s.id
-    ) bk ON true
+    CROSS JOIN LATERAL app.session_counts(s.id) bk
 """
 
 

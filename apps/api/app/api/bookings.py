@@ -24,9 +24,6 @@ ClientsReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_REA
 ManageDep = Annotated[TenantContext, Depends(require(Permission.BOOKINGS_MANAGE))]
 
 BookingStatus = Literal["booked", "waitlisted", "checked_in", "no_show", "cancelled"]
-# Statuses that hold one of the session's spots.
-OCCUPYING = ("booked", "checked_in", "no_show")
-OCCUPYING_SQL = "('booked', 'checked_in', 'no_show')"
 
 # Allowed status changes by staff. Re-booking a cancelled booking is a new booking.
 TRANSITIONS: dict[str, set[str]] = {
@@ -74,11 +71,7 @@ BOOKING_SELECT = """
     SELECT b.id, b.session_id, b.client_id,
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
            b.status, b.late_cancel, b.checked_in_at, b.cancelled_at, b.created_at,
-           CASE WHEN b.status = 'waitlisted' THEN (
-               SELECT count(*) FROM app.bookings w
-               WHERE w.session_id = b.session_id AND w.status = 'waitlisted'
-                 AND (w.waitlisted_at, w.id) <= (b.waitlisted_at, b.id)
-           ) END AS waitlist_position
+           app.waitlist_position(b.id) AS waitlist_position
     FROM app.bookings b
     JOIN app.clients c ON c.id = b.client_id
 """
@@ -100,12 +93,10 @@ def _conflict(detail: str) -> HTTPException:
 
 
 def lock_session(db: Session, session_id: UUID) -> dict:
+    """Locks the session row for this transaction (capacity checks, waitlist promotion)."""
     row = (
         db.execute(
-            text("""
-                SELECT id, capacity, status, starts_at FROM app.sessions
-                WHERE id = :id FOR UPDATE
-            """),
+            text("SELECT * FROM app.lock_session(:id)"),
             {"id": session_id},
         )
         .mappings()
@@ -116,43 +107,72 @@ def lock_session(db: Session, session_id: UUID) -> dict:
     return dict(row)
 
 
-def _taken(db: Session, session_id: UUID) -> int:
-    return db.execute(
-        text(f"""
-            SELECT count(*) FROM app.bookings
-            WHERE session_id = :id AND status IN {OCCUPYING_SQL}
-        """),
-        {"id": session_id},
-    ).scalar_one()
+def session_counts(db: Session, session_id: UUID) -> tuple[int, int]:
+    """(booked, waitlisted) across all clients, even when the caller is a client."""
+    booked, waitlisted = db.execute(
+        text("SELECT booked, waitlisted FROM app.session_counts(:id)"), {"id": session_id}
+    ).one()
+    return booked, waitlisted
 
 
 def promote_waitlist(db: Session, session_id: UUID) -> None:
     """Moves the earliest waitlisted clients into free spots of an upcoming session.
     The caller must hold the session lock (`lock_session`)."""
-    db.execute(
-        text(f"""
-            WITH target AS (
-                SELECT id, capacity FROM app.sessions
-                WHERE id = :id AND status = 'scheduled' AND starts_at > now()
-            ),
-            free AS (
-                SELECT greatest(t.capacity - (
-                    SELECT count(*) FROM app.bookings
-                    WHERE session_id = t.id AND status IN {OCCUPYING_SQL}
-                ), 0) AS spots
-                FROM target t
-            ),
-            next_up AS (
-                SELECT b.id FROM app.bookings b
-                WHERE b.session_id = :id AND b.status = 'waitlisted'
-                ORDER BY b.waitlisted_at, b.id
-                LIMIT (SELECT coalesce(max(spots), 0) FROM free)
-            )
-            UPDATE app.bookings SET status = 'booked', updated_at = now()
-            WHERE id IN (SELECT id FROM next_up)
+    db.execute(text("SELECT app.promote_waitlist(:id)"), {"id": session_id})
+
+
+def place_booking(db: Session, tenant_id: UUID, session_id: UUID, client_id: UUID) -> UUID:
+    """Books the client if a spot is free, otherwise adds them to the waitlist."""
+    session = lock_session(db, session_id)
+    if session["status"] == "cancelled":
+        raise _conflict("session_cancelled")
+    already = db.execute(
+        text("""
+            SELECT 1 FROM app.bookings
+            WHERE session_id = :session_id AND client_id = :client_id AND status <> 'cancelled'
         """),
-        {"id": session_id},
+        {"session_id": session_id, "client_id": client_id},
+    ).first()
+    if already:
+        raise _conflict("already_booked")
+
+    booked, _ = session_counts(db, session_id)
+    full = booked >= session["capacity"]
+    try:
+        return db.execute(
+            text("""
+                INSERT INTO app.bookings
+                    (tenant_id, session_id, client_id, status, waitlisted_at, created_by)
+                VALUES (:tenant_id, :session_id, :client_id, :status,
+                        CASE WHEN :full THEN now() END, app.current_user_id())
+                RETURNING id
+            """),
+            {
+                "tenant_id": tenant_id,
+                "session_id": session_id,
+                "client_id": client_id,
+                "status": "waitlisted" if full else "booked",
+                "full": full,
+            },
+        ).scalar_one()
+    except IntegrityError as error:
+        raise HTTPException(status_code=422, detail="invalid_reference") from error
+
+
+def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
+    """Cancels a booking (late if inside the business's window) and fills the freed spot."""
+    db.execute(
+        text("""
+            UPDATE app.bookings b
+            SET status = 'cancelled', cancelled_at = now(), updated_at = now(),
+                late_cancel = b.status <> 'waitlisted' AND now() > s.starts_at
+                    - make_interval(mins => t.cancellation_window_minutes)
+            FROM app.sessions s, app.tenants t
+            WHERE b.id = :id AND s.id = b.session_id AND t.id = b.tenant_id
+        """),
+        {"id": booking_id},
     )
+    promote_waitlist(db, session_id)
 
 
 @router.get("/sessions/{session_id}/bookings")
@@ -173,41 +193,8 @@ def list_bookings(session_id: UUID, context: ScheduleReadDep) -> list[Booking]:
 @router.post("/sessions/{session_id}/bookings", status_code=status.HTTP_201_CREATED)
 def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) -> Booking:
     """Books the client if a spot is free, otherwise adds them to the waitlist."""
-    db = context.session
-    session = lock_session(db, session_id)
-    if session["status"] == "cancelled":
-        raise _conflict("session_cancelled")
-    already = db.execute(
-        text("""
-            SELECT 1 FROM app.bookings
-            WHERE session_id = :session_id AND client_id = :client_id AND status <> 'cancelled'
-        """),
-        {"session_id": session_id, "client_id": body.client_id},
-    ).first()
-    if already:
-        raise _conflict("already_booked")
-
-    full = _taken(db, session_id) >= session["capacity"]
-    try:
-        booking_id = db.execute(
-            text("""
-                INSERT INTO app.bookings
-                    (tenant_id, session_id, client_id, status, waitlisted_at, created_by)
-                VALUES (:tenant_id, :session_id, :client_id, :status,
-                        CASE WHEN :full THEN now() END, app.current_user_id())
-                RETURNING id
-            """),
-            {
-                "tenant_id": context.tenant_id,
-                "session_id": session_id,
-                "client_id": body.client_id,
-                "status": "waitlisted" if full else "booked",
-                "full": full,
-            },
-        ).scalar_one()
-    except IntegrityError as error:
-        raise HTTPException(status_code=422, detail="invalid_reference") from error
-    return _load(db, booking_id)
+    booking_id = place_booking(context.session, context.tenant_id, session_id, body.client_id)
+    return _load(context.session, booking_id)
 
 
 @router.patch("/bookings/{booking_id}")
@@ -222,18 +209,7 @@ def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) ->
         raise _conflict("invalid_transition")
 
     if body.status == "cancelled":
-        db.execute(
-            text("""
-                UPDATE app.bookings b
-                SET status = 'cancelled', cancelled_at = now(), updated_at = now(),
-                    late_cancel = b.status <> 'waitlisted' AND now() > s.starts_at
-                        - make_interval(mins => t.cancellation_window_minutes)
-                FROM app.sessions s, app.tenants t
-                WHERE b.id = :id AND s.id = b.session_id AND t.id = b.tenant_id
-            """),
-            {"id": booking_id},
-        )
-        promote_waitlist(db, current.session_id)
+        cancel_booking(db, booking_id, current.session_id)
     else:
         db.execute(
             text("""

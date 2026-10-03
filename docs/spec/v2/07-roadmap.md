@@ -44,7 +44,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Supabase local + database migrations (Alembic) + RLS
 - [x] Sign up / verify email / log in / reset password (web)
 - [x] Create business (tenant) + dashboard shell + business switcher + tenant-isolation tests
-- [ ] Mobile sign in (moved to Sprint 3, with the client app)
+- [x] Mobile sign in (delivered in Sprint 3, with the client app)
 - [x] Deploy to staging: web https://business-os-alpha-drab.vercel.app · API https://business-os-api-staging.onrender.com
 
 ## Sprint 2 progress
@@ -63,7 +63,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Sessions: one-off and weekly series (expanded in the business time zone, DST-safe), edit or cancel one occurrence
 - [x] Weekly schedule screen (staff web), new-session form with room and instructor
 - [x] Bookings (staff web): book a client, capacity, FIFO waitlist with auto-promotion, late-cancellation window, check-in / no-show, client booking history
-- [ ] Client app: sign in, join a business, branded home, schedule, book / cancel
+- [x] Client app: email-code sign in, join a business by code / QR, branded home, schedule, book / waitlist / cancel, my bookings, profile (language, theme, switch business)
+- [x] Staff web: join code + printable QR; public join page
 - [ ] Background job to extend weekly series beyond their first 12–26 weeks
 
 ## Owner setup checklist (Windows + iPhone)

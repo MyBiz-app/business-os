@@ -259,6 +259,10 @@ otp_expiry = 3600
 subject = "Confirm your email · אימות כתובת אימייל"
 content_path = "./supabase/templates/confirmation.html"
 
+[auth.email.template.magic_link]
+subject = "Your sign-in code · קוד כניסה"
+content_path = "./supabase/templates/magic_link.html"
+
 [auth.email.template.recovery]
 subject = "Reset your password · איפוס סיסמה"
 content_path = "./supabase/templates/recovery.html"

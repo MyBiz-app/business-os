@@ -2041,6 +2041,370 @@
         }
       }
     },
+    "/public/businesses/{code}": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Business By Code",
+        "operationId": "business_by_code",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/businesses": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Businesses",
+        "description": "Every business the signed-in user has joined as a client.",
+        "operationId": "my_businesses",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClientBusiness"
+                  },
+                  "type": "array",
+                  "title": "Response My Businesses"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Join Business",
+        "operationId": "join_business",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/client/sessions": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Client Sessions",
+        "description": "Upcoming sessions in the window (past ones are left out).",
+        "operationId": "client_sessions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date (business time zone)",
+              "title": "Start"
+            },
+            "description": "First local date (business time zone)"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 14,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClientSession"
+                  },
+                  "title": "Response Client Sessions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/sessions/{session_id}/bookings": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Book Session",
+        "description": "Books the signed-in client, or puts them on the waitlist when the session is full.",
+        "operationId": "book_session",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientSession"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/bookings/{booking_id}/cancel": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Cancel My Booking",
+        "operationId": "cancel_my_booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientSession"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/bookings": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Bookings",
+        "description": "The client's bookings in this business, newest session first.",
+        "operationId": "my_bookings",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClientBooking"
+                  },
+                  "title": "Response My Bookings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tenants/current/logo": {
       "put": {
         "tags": [
@@ -2356,6 +2720,59 @@
         ],
         "title": "BookingUpdate"
       },
+      "BusinessProfile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "he",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "locale",
+          "primary_color",
+          "logo_url"
+        ],
+        "title": "BusinessProfile",
+        "description": "What anyone holding a join code may see before signing in."
+      },
       "Client": {
         "properties": {
           "id": {
@@ -2521,6 +2938,96 @@
         ],
         "title": "ClientBooking"
       },
+      "ClientBusiness": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "he",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "time_zone": {
+            "type": "string",
+            "title": "Time Zone"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "cancellation_window_minutes": {
+            "type": "integer",
+            "title": "Cancellation Window Minutes"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "locale",
+          "primary_color",
+          "logo_url",
+          "time_zone",
+          "currency",
+          "cancellation_window_minutes",
+          "client_id",
+          "first_name",
+          "last_name"
+        ],
+        "title": "ClientBusiness"
+      },
       "ClientCreate": {
         "properties": {
           "last_name": {
@@ -2626,6 +3133,95 @@
           "total"
         ],
         "title": "ClientPage"
+      },
+      "ClientSession": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "service": {
+            "$ref": "#/components/schemas/ServiceSummary"
+          },
+          "location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Name"
+          },
+          "room_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Name"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "spots_left": {
+            "type": "integer",
+            "title": "Spots Left"
+          },
+          "waitlisted": {
+            "type": "integer",
+            "title": "Waitlisted"
+          },
+          "my_booking": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MyBooking"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "service",
+          "location_name",
+          "room_name",
+          "starts_at",
+          "ends_at",
+          "status",
+          "capacity",
+          "spots_left",
+          "waitlisted",
+          "my_booking"
+        ],
+        "title": "ClientSession"
       },
       "ClientUpdate": {
         "properties": {
@@ -2987,6 +3583,21 @@
         ],
         "title": "InvitationPreview"
       },
+      "JoinRequest": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 16,
+            "minLength": 4,
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "JoinRequest"
+      },
       "Location": {
         "properties": {
           "id": {
@@ -3263,6 +3874,44 @@
           "role"
         ],
         "title": "Membership"
+      },
+      "MyBooking": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "booked",
+              "waitlisted",
+              "checked_in",
+              "no_show",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "waitlist_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Position"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "waitlist_position"
+        ],
+        "title": "MyBooking"
       },
       "OptionItem": {
         "properties": {
@@ -4268,6 +4917,11 @@
             "type": "integer",
             "title": "Cancellation Window Minutes"
           },
+          "join_code": {
+            "type": "string",
+            "title": "Join Code",
+            "description": "Code clients enter or scan to join this business"
+          },
           "role": {
             "type": "string",
             "enum": [
@@ -4290,6 +4944,7 @@
           "primary_color",
           "logo_url",
           "cancellation_window_minutes",
+          "join_code",
           "role"
         ],
         "title": "Tenant"

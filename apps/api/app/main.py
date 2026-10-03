@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.api import bookings, clients, locations, schedule, services, staff
+from app.api import bookings, client_app, clients, locations, schedule, services, staff
 from app.api import settings as business_settings
 from app.api.routes import router
 from app.core.config import get_settings
@@ -42,6 +42,8 @@ def create_app() -> FastAPI:
     app.include_router(staff.router)
     app.include_router(schedule.router)
     app.include_router(bookings.router)
+    app.include_router(client_app.public_router)
+    app.include_router(client_app.router)
     app.include_router(business_settings.router)
     app.include_router(business_settings.public_router)
 

@@ -357,5 +357,97 @@
       "not_found": "The booking was not found. Refresh and try again.",
       "generic": "Something went wrong. Try again."
     }
+  },
+  "client": {
+    "tabs": {
+      "home": "Home",
+      "schedule": "Schedule",
+      "bookings": "My bookings",
+      "profile": "Profile"
+    },
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Enter your email and we'll send you a 6-digit code. No password needed.",
+      "email": "Email",
+      "sendCode": "Send code",
+      "codeSent": "We sent a code to {email}. It's valid for one hour.",
+      "code": "6-digit code",
+      "verify": "Sign in",
+      "changeEmail": "Use a different email",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidCode": "That code is wrong or has expired.",
+      "tooMany": "Too many attempts. Wait a minute and try again.",
+      "generic": "Something went wrong. Try again."
+    },
+    "join": {
+      "title": "Join your studio",
+      "subtitle": "Enter the code your studio gave you (it's on their sign or QR code).",
+      "code": "Join code",
+      "continue": "Continue",
+      "preview": "You're joining this business. They'll see your name and email, and you'll be able to book their classes.",
+      "joinButton": "Join {name}",
+      "otherCode": "Use a different code",
+      "back": "Back",
+      "unknownCode": "We couldn't find a business with that code.",
+      "generic": "Something went wrong. Try again."
+    },
+    "home": {
+      "greeting": "Hi {name}",
+      "nextBooking": "Your next booking",
+      "noUpcoming": "No upcoming bookings yet.",
+      "today": "Today",
+      "bookClass": "Book a class"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "today": "Today",
+      "empty": "No classes on this day."
+    },
+    "bookings": {
+      "title": "My bookings",
+      "upcoming": "Upcoming",
+      "history": "History",
+      "noUpcoming": "Nothing booked yet."
+    },
+    "profile": {
+      "title": "Profile",
+      "signedInAs": "Signed in as {email}",
+      "business": "Business",
+      "joinAnother": "Join another business",
+      "signOut": "Sign out"
+    },
+    "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
+    "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",
+    "youreBooked": "You're booked",
+    "waitlistPosition": "On the waitlist · #{position}",
+    "sessionCancelled": "Cancelled by the studio",
+    "book": "Book",
+    "joinWaitlist": "Waitlist",
+    "cancelBooking": "Cancel",
+    "leaveWaitlist": "Leave",
+    "cancelTitle": "Cancel this booking?",
+    "cancelMessage": "Your spot will go to the next person on the waitlist.",
+    "cancelLateMessage": "This is a late cancellation: it's inside the studio's cancellation window and will be recorded as late.",
+    "cancelConfirm": "Yes, cancel",
+    "keep": "Keep it",
+    "errors": {
+      "session_started": "This class has already started.",
+      "already_booked": "You're already booked into this class.",
+      "session_cancelled": "This class was cancelled.",
+      "not_found": "This booking no longer exists. Pull down to refresh.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "join": {
+    "inviteToApp": "Invite to the app",
+    "staffHint": "Print this page for the front desk or share the link. Clients scan the code, sign in with their email and can book right away.",
+    "qrLabel": "QR code that opens the join page",
+    "codeLabel": "Join code",
+    "step1": "Install the MyBiz app.",
+    "step2": "Sign in with your email (you'll get a 6-digit code).",
+    "step3": "Enter the join code above.",
+    "title": "Join {name}",
+    "body": "Book classes, join waitlists and manage your bookings in the app.",
+    "openApp": "Open in the app"
   }
 }

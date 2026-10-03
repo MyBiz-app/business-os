@@ -438,6 +438,121 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/businesses/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Business By Code */
+        get: operations["business_by_code"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Businesses
+         * @description Every business the signed-in user has joined as a client.
+         */
+        get: operations["my_businesses"];
+        put?: never;
+        /** Join Business */
+        post: operations["join_business"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Sessions
+         * @description Upcoming sessions in the window (past ones are left out).
+         */
+        get: operations["client_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/sessions/{session_id}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book Session
+         * @description Books the signed-in client, or puts them on the waitlist when the session is full.
+         */
+        post: operations["book_session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/bookings/{booking_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel My Booking */
+        post: operations["cancel_my_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Bookings
+         * @description The client's bookings in this business, newest session first.
+         */
+        get: operations["my_bookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tenants/current/logo": {
         parameters: {
             query?: never;
@@ -549,6 +664,28 @@ export interface components {
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
         };
+        /**
+         * BusinessProfile
+         * @description What anyone holding a join code may see before signing in.
+         */
+        BusinessProfile: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Primary Color */
+            primary_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
+        };
         /** Client */
         Client: {
             /**
@@ -621,6 +758,40 @@ export interface components {
             /** Late Cancel */
             late_cancel: boolean;
         };
+        /** ClientBusiness */
+        ClientBusiness: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Primary Color */
+            primary_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
+            /** Time Zone */
+            time_zone: string;
+            /** Currency */
+            currency: string;
+            /** Cancellation Window Minutes */
+            cancellation_window_minutes: number;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+        };
         /** ClientCreate */
         ClientCreate: {
             /** Last Name */
@@ -648,6 +819,41 @@ export interface components {
             items: components["schemas"]["Client"][];
             /** Total */
             total: number;
+        };
+        /** ClientSession */
+        ClientSession: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            service: components["schemas"]["ServiceSummary"];
+            /** Location Name */
+            location_name: string | null;
+            /** Room Name */
+            room_name: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "scheduled" | "cancelled";
+            /** Capacity */
+            capacity: number;
+            /** Spots Left */
+            spots_left: number;
+            /** Waitlisted */
+            waitlisted: number;
+            my_booking: components["schemas"]["MyBooking"] | null;
         };
         /** ClientUpdate */
         ClientUpdate: {
@@ -789,6 +995,11 @@ export interface components {
              */
             status: "pending" | "expired" | "accepted";
         };
+        /** JoinRequest */
+        JoinRequest: {
+            /** Code */
+            code: string;
+        };
         /** Location */
         Location: {
             /**
@@ -891,6 +1102,21 @@ export interface components {
              * @enum {string}
              */
             role: "owner" | "manager" | "staff" | "front_desk";
+        };
+        /** MyBooking */
+        MyBooking: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+            /** Waitlist Position */
+            waitlist_position: number | null;
         };
         /** OptionItem */
         OptionItem: {
@@ -1218,6 +1444,11 @@ export interface components {
             logo_url: string | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
+            /**
+             * Join Code
+             * @description Code clients enter or scan to join this business
+             */
+            join_code: string;
             /**
              * Role
              * @enum {string}
@@ -2421,6 +2652,222 @@ export interface operations {
             path: {
                 client_id: string;
             };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBooking"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_by_code: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"][];
+                };
+            };
+        };
+    };
+    join_business: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_sessions: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_session: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_my_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_bookings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;

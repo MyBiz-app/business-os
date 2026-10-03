@@ -9,7 +9,8 @@ const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/check-email", "/forgot
 const AUTH_PAGES = new Set(["/", "/login", "/signup"]);
 
 function isPublic(pathname: string) {
-  return PUBLIC_PAGES.has(pathname) || pathname.startsWith("/auth/") || pathname.startsWith("/invite/");
+  return PUBLIC_PAGES.has(pathname) || pathname.startsWith("/auth/") || pathname.startsWith("/invite/") ||
+    pathname.startsWith("/join/");
 }
 
 /** Refreshes the session cookie and redirects based on whether the user is signed in. */

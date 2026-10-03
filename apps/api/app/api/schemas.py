@@ -87,4 +87,5 @@ class Tenant(BaseModel):
     primary_color: str | None
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
     cancellation_window_minutes: int
+    join_code: str = Field(description="Code clients enter or scan to join this business")
     role: Role

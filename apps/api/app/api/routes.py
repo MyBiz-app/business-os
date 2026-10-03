@@ -29,7 +29,7 @@ def load_current_tenant(session: Session) -> Tenant:
         session.execute(
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
-                       t.primary_color, t.cancellation_window_minutes, m.role,
+                       t.primary_color, t.cancellation_window_minutes, t.join_code, m.role,
                        CASE WHEN t.logo IS NULL THEN NULL
                             ELSE '/public/tenants/' || t.id || '/logo?v='
                                  || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url

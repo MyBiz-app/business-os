@@ -45,14 +45,19 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           <h1 className="text-3xl font-bold">{term("clients")}</h1>
           <p className="text-sm text-muted">{t("clients.total", { count: result.total })}</p>
         </div>
-        {canWriteClients(tenant.role) && (
-          <Link
-            href="/clients/new"
-            className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"
-          >
-            {term("addClient")}
+        <div className="flex flex-wrap gap-2">
+          <Link href="/clients/join" className="rounded-lg border border-border px-4 py-2.5 font-semibold">
+            {t("join.inviteToApp")}
           </Link>
-        )}
+          {canWriteClients(tenant.role) && (
+            <Link
+              href="/clients/new"
+              className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"
+            >
+              {term("addClient")}
+            </Link>
+          )}
+        </div>
       </div>
 
       <form role="search" className="flex flex-wrap items-end gap-3">
