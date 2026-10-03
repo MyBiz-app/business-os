@@ -6,9 +6,9 @@ in Hebrew and English, light and dark. Sprint length is flexible (owner capacity
 ## Phase 0 — Specification (now)
 
 - [x] Review spec v1, record decisions
-- [ ] Owner approves `PROPOSED` decisions in `docs/DECISIONS.md`
-- [ ] Screen list and user flows per side
-- [ ] Finalize data model for Sprints 1–3
+- [x] Owner approves `PROPOSED` decisions in `docs/DECISIONS.md` (delegated, 2026-10-03)
+- [x] Screen list and user flows per side → [08-screens-and-flows.md](08-screens-and-flows.md)
+- [ ] Finalize data model for Sprints 1–3 (done incrementally, per sprint)
 - [ ] Owner local environment ready (see below)
 
 ## Phase 1 — Prototype

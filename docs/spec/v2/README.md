@@ -12,6 +12,7 @@ Derived from the owner's Master Spec v1.1 ([`../v1/`](../v1/)) plus the decision
 | 05 | [Data model](05-data-model.md) | Core entities and conventions (ERD) |
 | 06 | [AI](06-ai.md) | LLM gateway, tools, pending actions, agents |
 | 07 | [Roadmap](07-roadmap.md) | Phases and sprints |
+| 08 | [Screens & flows](08-screens-and-flows.md) | Screen inventory per side, core user flows |
 
 ## Changes from v1 (summary)
 
