@@ -6,6 +6,7 @@ import type { getTenant } from "@/lib/tenant";
 import { Pill, type Tone } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 
+import { HEALTH_TONE } from "../../clients/[id]/health-section";
 import { bookClient, setBookingStatus } from "../actions";
 
 type Booking = components["schemas"]["Booking"];
@@ -45,7 +46,13 @@ type Props = {
 
 export async function Roster({ session, context, manageable, search, error }: Props) {
   const t = await getTranslations("bookings");
+  const tHealth = await getTranslations("health");
   const { api, scope } = context;
+  // Problems always show; a missing declaration only matters where the business requires one.
+  const showHealth = (state: Booking["health_state"]) =>
+    state === "needs_review" ||
+    state === "rejected" ||
+    (context.tenant.requires_health_declaration && state !== "ok");
   const bookings = unwrap(
     await api.GET("/sessions/{session_id}/bookings", {
       params: { ...scope, path: { session_id: session.id } },
@@ -78,6 +85,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
         </Link>
         <Pill tone={TONE[booking.status]}>{t(`statuses.${booking.status}`)}</Pill>
         {booking.late_cancel && <span className="text-xs text-danger">{t("lateCancel")}</span>}
+        {booking.status !== "cancelled" && showHealth(booking.health_state) && (
+          <Pill tone={HEALTH_TONE[booking.health_state]}>{tHealth(`states.${booking.health_state}`)}</Pill>
+        )}
         {booking.status !== "cancelled" &&
           (booking.plan_name ? (
             <span className="text-xs text-muted">{booking.plan_name}</span>

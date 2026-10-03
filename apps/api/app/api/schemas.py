@@ -66,6 +66,7 @@ class TenantUpdate(BaseModel):
     primary_color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
     cancellation_window_minutes: int | None = Field(default=None, ge=0, le=10080)
     booking_requires_plan: bool | None = None
+    requires_health_declaration: bool | None = None
 
     @field_validator("name")
     @classmethod
@@ -93,6 +94,9 @@ class Tenant(BaseModel):
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
     cancellation_window_minutes: int
     booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
+    requires_health_declaration: bool = Field(
+        description="Clients need a valid health declaration to book in the app"
+    )
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
     permissions: list[str] = Field(description="The current user's effective permissions")

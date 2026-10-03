@@ -22,6 +22,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           currency: value("currency"),
           cancellation_window_minutes: Number(value("cancellation_window_minutes")),
           booking_requires_plan: formData.get("booking_requires_plan") === "on",
+          requires_health_declaration: formData.get("requires_health_declaration") === "on",
         },
       }),
     );

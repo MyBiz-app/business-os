@@ -33,6 +33,7 @@ def load_current_tenant(session: Session) -> Tenant:
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
+                       t.requires_health_declaration,
                        t.join_code, m.role, r.name AS custom_role_name,
                        r.permissions AS custom_permissions,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)
@@ -66,12 +67,14 @@ def apply_vertical_pack(
     session.execute(
         text("""
             UPDATE app.tenants
-            SET cancellation_window_minutes = :minutes, booking_requires_plan = :requires_plan
+            SET cancellation_window_minutes = :minutes, booking_requires_plan = :requires_plan,
+                requires_health_declaration = :requires_health
             WHERE id = :id
         """),
         {
             "minutes": pack.cancellation_window_minutes,
             "requires_plan": pack.booking_requires_plan,
+            "requires_health": pack.requires_health_declaration,
             "id": tenant_id,
         },
     )

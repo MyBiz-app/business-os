@@ -10,6 +10,7 @@ import { getTenantFor } from "@/lib/tenant";
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
@@ -92,6 +93,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           readOnly={!writable}
         />
       </section>
+
+      <HealthSection clientId={client.id} context={context} />
 
       <PlansSection clientId={client.id} context={context} />
 

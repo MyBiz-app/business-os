@@ -42,7 +42,9 @@
     "requirePlan": "Clients need a valid plan to book in the app",
     "requirePlanHint": "Staff can always book from the roster (for example a walk-in who pays at the desk).",
     "modulesLink": "Modules and plan",
-    "modulesHint": "Turn features on or off and see the monthly price."
+    "modulesHint": "Turn features on or off and see the monthly price.",
+    "requireHealth": "Clients need a health declaration to book in the app",
+    "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book."
   },
   "locales": {
     "he": "עברית",
@@ -499,7 +501,30 @@
       "session_cancelled": "This class was cancelled.",
       "not_found": "This booking no longer exists. Pull down to refresh.",
       "generic": "Something went wrong. Try again.",
-      "no_valid_plan": "You need a valid membership or punch card to book. Ask the studio."
+      "no_valid_plan": "You need a valid membership or punch card to book. Ask the studio.",
+      "health_declaration_required": "Please fill in the health declaration before booking.",
+      "health_declaration_review": "The studio needs to approve your health declaration before you can book."
+    },
+    "health": {
+      "title": "Health declaration",
+      "intro": "Please answer each question. If you answer \"yes\" to any of them, the studio will review your declaration before you can book.",
+      "accept": "I have read and accept the statement",
+      "signedName": "Full name (your signature)",
+      "signedNameHint": "Typing your name is your signature.",
+      "sign": "Sign declaration",
+      "answerAll": "Please answer every question.",
+      "nameRequired": "Please type your full name.",
+      "acceptRequired": "Please accept the statement.",
+      "generic": "Something went wrong. Try again.",
+      "noForm": "This business doesn't use a health declaration.",
+      "reviewPending": "The studio is reviewing your health declaration. You can book once it's approved.",
+      "rejected": "The studio couldn't approve your declaration. Please contact them.",
+      "validUntil": "Valid until {date}.",
+      "update": "Sign a new declaration",
+      "back": "Back",
+      "fill": "Fill in health declaration",
+      "view": "View declaration",
+      "banner": "Before your first class, please fill in a short health declaration."
     }
   },
   "join": {
@@ -705,5 +730,28 @@
     "staff_manage_hint": "Invite, change roles, remove",
     "business_settings": "Business settings",
     "business_settings_hint": "Details, branding, modules and plan"
+  },
+  "health": {
+    "title": "Health declaration",
+    "states": {
+      "ok": "Health declaration valid",
+      "needs_review": "Health declaration awaiting approval",
+      "rejected": "Health declaration not approved",
+      "expired": "Health declaration expired",
+      "missing": "No health declaration"
+    },
+    "missing": "The client hasn't signed a health declaration.",
+    "missingRequired": "The client hasn't signed a health declaration yet, so they can't book in the app.",
+    "signed": "Signed by {name} on {date} · valid until {until}",
+    "allClear": "Answered \"no\" to every question.",
+    "answeredYes": "Answered \"yes\" to:",
+    "showAll": "All answers",
+    "yes": "Yes",
+    "no": "No",
+    "reviewNote": "Studio note: {note}",
+    "reviewHint": "The client can book in the app only after you approve. Approve once you're satisfied they can train safely (for example, with a doctor's letter).",
+    "note": "Note (optional)",
+    "approve": "Approve",
+    "reject": "Don't approve"
   }
 }

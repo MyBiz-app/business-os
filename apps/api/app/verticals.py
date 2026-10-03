@@ -24,6 +24,7 @@ class VerticalPack:
     cancellation_window_minutes: int  # default booking policy for new businesses
     booking_requires_plan: bool  # clients need a valid plan to book in the client app
     default_preset: str  # modules a new business starts with (app/modules.py PRESETS)
+    requires_health_declaration: bool = False  # clients sign app/health.py's form to book
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
 
 
@@ -33,6 +34,7 @@ FITNESS = VerticalPack(
     cancellation_window_minutes=120,
     booking_requires_plan=True,
     default_preset="growing",
+    requires_health_declaration=True,
     default_plans=(
         DefaultPlan(
             names={"he": "מנוי חודשי ללא הגבלה", "en": "Monthly unlimited"},
