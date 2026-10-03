@@ -21,7 +21,8 @@ Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 |---|---|
 | `apps/web` | Business web app: Next.js, Tailwind, next-intl (he / en), light / dark |
 | `apps/api` | Backend API: Python 3.13, FastAPI, managed with uv |
-| `packages/` | Shared TypeScript packages (later: API client, UI, config) |
+| `apps/mobile` | Mobile app: Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
+| `packages/i18n` | Shared translations (he / en) and locale helpers for web and mobile |
 | `docs/` | Spec and decision log |
 | `scripts/` | Developer machine setup |
 
@@ -37,6 +38,12 @@ pnpm dev                            # starts API (port 8000) and web (port 3000)
 ```
 
 Open http://localhost:3000. API docs: http://localhost:8000/docs.
+
+Mobile (in a second terminal), with the phone on the same Wi-Fi as the computer:
+
+```bash
+pnpm dev:mobile                     # scan the QR code with the iPhone camera → opens in Expo Go
+```
 
 ## Checks
 

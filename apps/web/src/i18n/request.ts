@@ -1,6 +1,8 @@
 import { cookies, headers } from "next/headers";
 import { getRequestConfig } from "next-intl/server";
 
+import { messages } from "@business-os/i18n";
+
 import { defaultLocale, isLocale, LOCALE_COOKIE, matchAcceptLanguage } from "./config";
 
 // Locale comes from the user's choice (cookie), then the browser, then the default.
@@ -13,6 +15,6 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: (await import(`../../messages/${locale}.json`)).default,
+    messages: messages[locale],
   };
 });

@@ -39,7 +39,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Monorepo (pnpm + Turborepo), CI on pull requests
 - [x] API hello-world (FastAPI, `/health`, tests)
 - [x] Web hello-world (Next.js): he / en, RTL / LTR, light / dark, calls the API
-- [ ] Mobile hello-world (Expo) on the owner's iPhone
+- [x] Mobile hello-world (Expo): he / en with RTL, light / dark, calls the API (owner to verify on iPhone)
+- [x] Shared translations package (`packages/i18n`) used by web and mobile
 - [ ] Supabase local + database migrations
 - [ ] Sign up / verify / log in
 - [ ] Create business (tenant) + tenant-isolation tests
