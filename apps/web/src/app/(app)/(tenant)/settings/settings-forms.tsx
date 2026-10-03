@@ -118,7 +118,7 @@ export function BrandColorForm({ color }: { color: string | null }) {
       </div>
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("preview")}</span>
-        <div style={brandStyle(useDefault ? null : preview)} className="flex items-center gap-3">
+        <div style={brandStyle(useDefault ? null : preview)} className="brand flex items-center gap-3">
           <span className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">{t("previewButton")}</span>
           <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">{t("color")}</span>
         </div>

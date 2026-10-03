@@ -21,11 +21,18 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, create_engine, text
 
+from app.api.modules import set_modules
 from app.api.routes import apply_vertical_pack
 from app.core.config import get_settings
+from app.modules import PRESETS
 from app.scheduling import local_to_utc
 
 TIME_ZONE = "Asia/Jerusalem"
+
+SOURCES = ("walk_in", "referral", "instagram", "facebook", "google", "website")
+SOURCE_WEIGHTS = (3, 4, 5, 2, 2, 1)
+CLIENTS = 170
+LEADS = 15  # the newest clients: interested, never bought
 
 FIRST_NAMES = [
     "נועה",
@@ -168,6 +175,7 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         {"t": tenant_id, "u": owner},
     )
     apply_vertical_pack(conn, tenant_id, "fitness", "he", "ILS")
+    set_modules(conn, tenant_id, dict.fromkeys(PRESETS["ai_powered"], 1))  # show everything
     plans = (
         conn.execute(
             text("""
@@ -291,7 +299,7 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
     clients: list[Client] = []
     client_rows: list[dict] = []
     total_days = (today - start).days
-    for index in range(170):
+    for index in range(CLIENTS):
         # The first 70 were members before the history starts, with staggered renewals.
         joined = (
             start - timedelta(days=rng.randrange(60))
@@ -303,14 +311,15 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         first, last = rng.choice(FIRST_NAMES), rng.choice(LAST_NAMES)
         status = (
             "lead"
-            if index % 23 == 0
+            if index >= CLIENTS - LEADS
             else ("inactive" if churns_on and churns_on < today else "active")
         )
         client = Client(
             id=uuid4(),
             joined=joined,
             churns_on=churns_on,
-            habit=rng.uniform(0.12, 0.45),
+            # Some members keep paying but stopped coming (a retention scenario).
+            habit=0.01 if rng.random() < 0.08 else rng.uniform(0.12, 0.45),
             favorite_hours=set(rng.sample([7, 8, 9, 10, 11, 12, 18, 19], k=rng.randint(2, 4))),
         )
         clients.append(client)
@@ -323,19 +332,21 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
                 "email": f"demo{index:03d}@example.invalid",
                 "phone": f"05{rng.randint(0, 9)}-{rng.randint(100, 999)}-{rng.randint(1000, 9999)}",
                 "status": status,
+                "source": rng.choices(SOURCES, weights=SOURCE_WEIGHTS)[0],
                 "created_at": local_to_utc(joined, time(12), TIME_ZONE),
             }
         )
     _insert(conn, """
         INSERT INTO app.clients (id, tenant_id, first_name, last_name, email, phone, status,
-                                 created_at, updated_at)
-        VALUES (:id, :tenant_id, :first_name, :last_name, :email, :phone, :status, :created_at,
-                :created_at)
+                                 source, created_at, updated_at)
+        VALUES (:id, :tenant_id, :first_name, :last_name, :email, :phone, :status, :source,
+                :created_at, :created_at)
     """, client_rows)  # fmt: skip
 
     # Plans: each client buys a membership or a card when they join and renews while active.
     entitlement_rows: list[dict] = []
     payment_rows: list[dict] = []
+    failed_rows: list[dict] = []
 
     def sell(client: Client, plan: dict, on: date) -> None:
         entitlement = Entitlement(
@@ -362,6 +373,16 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
                 "created_at": sold_at,
             }
         )
+        if rng.random() < 0.05:  # a declined card, then a successful retry
+            failed_rows.append(
+                {
+                    "tenant_id": tenant_id,
+                    "client_id": client.id,
+                    "amount": plan["price_amount"],
+                    "key": f"seed-failed-{entitlement.id}",
+                    "created_at": sold_at - timedelta(hours=2),
+                }
+            )
         payment_rows.append(
             {
                 "tenant_id": tenant_id,
@@ -373,11 +394,16 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
             }
         )
 
-    for client in clients[:-8]:  # the newest few are leads without a plan
+    decline_from, decline_to = today - timedelta(days=60), today - timedelta(days=30)
+    for client in clients[: CLIENTS - LEADS]:
         prefers = rng.choices([membership, card10, single], weights=[5, 4, 1])[0]
         day = client.joined
         last_day = min(client.churns_on or horizon, today + timedelta(days=3))
         while day <= last_day:
+            # A weak month: a third of the renewals two months ago did not happen.
+            if client.entitlements and decline_from <= day < decline_to and rng.random() < 0.35:
+                client.churns_on = day
+                break
             sell(client, prefers, day)
             current = client.entitlements[-1]
             # Renew when it ends (or soon after a card is used up, approximated below).
@@ -472,6 +498,12 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         VALUES (:tenant_id, :client_id, :entitlement_id, :amount, 'ILS', 'succeeded', 'simulated',
                 :key, :created_at)
     """, payment_rows)  # fmt: skip
+    _insert(conn, """
+        INSERT INTO app.payments
+            (tenant_id, client_id, amount, currency, status, provider, idempotency_key,
+             created_at)
+        VALUES (:tenant_id, :client_id, :amount, 'ILS', 'failed', 'simulated', :key, :created_at)
+    """, failed_rows)  # fmt: skip
     _insert(conn, """
         INSERT INTO app.bookings
             (id, tenant_id, session_id, client_id, entitlement_id, status, waitlisted_at,

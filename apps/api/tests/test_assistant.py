@@ -245,3 +245,34 @@ def test_tool_errors_go_back_to_the_model(client: TestClient, studio: dict, use_
     assert result["is_error"] is True
     assert "not a valid id" in result["content"]
     assert turns[-1]["text"].endswith("I couldn't find that client.")
+
+
+def test_marketing_and_retention_tools(
+    client: TestClient, engine: Engine, auth: AuthHeaders, use_provider
+) -> None:
+    import random
+
+    from app.seed import seed
+
+    owner = uuid4()
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": f"{owner}@example.com"},
+        )
+        tenant_id = seed(connection, f"{owner}@example.com", 3, random.Random(5))
+    provider = FakeProvider([
+        calls("client_sources", {"start_date": "2020-01-01", "end_date": "2030-12-31"}),
+        calls("inactive_members", {"days": 30}),
+        says("Done."),
+    ])  # fmt: skip
+    use_provider(provider)
+    headers = auth(owner, tenant_id)
+
+    ask(client, headers, conversation(client, headers), "Where do clients come from?")
+
+    sources = json.loads(provider.calls[1]["messages"][-1]["content"][0]["content"])
+    assert sum(s["new_clients"] for s in sources["sources"]) == 170
+    assert {s["source"] for s in sources["sources"]} >= {"instagram", "referral"}
+    inactive = json.loads(provider.calls[2]["messages"][-1]["content"][0]["content"])
+    assert inactive["members"], "the demo studio has paying members who stopped coming"

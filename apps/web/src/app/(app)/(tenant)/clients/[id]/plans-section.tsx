@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { Pill, type Tone } from "@/components/pill";
 import { todayIn } from "@/lib/dates";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -9,14 +10,14 @@ import type { getTenant } from "@/lib/tenant";
 import { cancelEntitlement, freezeEntitlement, sellPlan } from "./plan-actions";
 import { FreezeForm, SellPlanForm } from "./plan-forms";
 
-const TONE = {
-  active: "bg-success/15 text-success",
-  upcoming: "bg-primary/15 text-primary",
-  frozen: "bg-primary/15 text-primary",
-  used_up: "bg-border text-muted",
-  expired: "bg-border text-muted",
-  cancelled: "bg-border text-muted",
-} as const;
+const TONE: Record<string, Tone> = {
+  active: "success",
+  upcoming: "primary",
+  frozen: "primary",
+  used_up: "muted",
+  expired: "muted",
+  cancelled: "muted",
+};
 
 /** A fresh key per rendered form: resubmitting the same form can never sell twice. */
 function newSaleKey(): string {
@@ -56,9 +57,7 @@ export async function PlansSection({ clientId, context }: Props) {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="flex items-center gap-2">
                     <span className="font-semibold">{entitlement.name}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TONE[entitlement.state]}`}>
-                      {t(`states.${entitlement.state}`)}
-                    </span>
+                    <Pill tone={TONE[entitlement.state]}>{t(`states.${entitlement.state}`)}</Pill>
                   </span>
                   <span className="text-sm" dir="ltr">
                     {formatMoney(entitlement.price_amount, entitlement.price_currency, locale)}

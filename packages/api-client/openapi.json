@@ -4603,6 +4603,27 @@
             ],
             "title": "Status"
           },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "walk_in",
+                  "referral",
+                  "instagram",
+                  "facebook",
+                  "google",
+                  "website",
+                  "app",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -4624,6 +4645,7 @@
           "date_of_birth",
           "notes",
           "status",
+          "source",
           "created_at",
           "updated_at"
         ],
@@ -4844,6 +4866,27 @@
             ],
             "title": "Notes"
           },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "walk_in",
+                  "referral",
+                  "instagram",
+                  "facebook",
+                  "google",
+                  "website",
+                  "app",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
           "first_name": {
             "type": "string",
             "maxLength": 100,
@@ -5038,6 +5081,27 @@
               }
             ],
             "title": "Notes"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "walk_in",
+                  "referral",
+                  "instagram",
+                  "facebook",
+                  "google",
+                  "website",
+                  "app",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
           },
           "first_name": {
             "anyOf": [

@@ -18,8 +18,8 @@ export function SegmentedControl<T extends string>({ label, options, value, onCh
     <View style={styles.container}>
       <Text style={[styles.label, { color: palette.muted }]}>{label}</Text>
       <View
-        accessibilityRole="radiogroup"
-        accessibilityLabel={label}
+        role="radiogroup"
+        aria-label={label}
         style={[styles.group, { borderColor: palette.border, backgroundColor: palette.surface }]}
       >
         {options.map((option) => {
@@ -27,8 +27,8 @@ export function SegmentedControl<T extends string>({ label, options, value, onCh
           return (
             <Pressable
               key={option.value}
-              accessibilityRole="radio"
-              accessibilityState={{ selected }}
+              role="radio"
+              aria-checked={selected}
               onPress={() => onChange(option.value)}
               style={[styles.option, selected && { backgroundColor: palette.primary }]}
             >

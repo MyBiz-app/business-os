@@ -205,6 +205,18 @@
     "errors": {
       "email_taken": "Another record already uses this email.",
       "invalid": "Please check the details and try again."
+    },
+    "source": "Came from",
+    "sourceUnknown": "Not recorded",
+    "sources": {
+      "walk_in": "Walk-in",
+      "referral": "Referral",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "google": "Google",
+      "website": "Website",
+      "app": "Joined in the app",
+      "other": "Other"
     }
   },
   "common": {

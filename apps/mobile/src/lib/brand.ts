@@ -17,8 +17,28 @@ export function textOn(hex: string): string {
   return contrastRatio(hex, "#ffffff") >= contrastRatio(hex, "#18181b") ? "#ffffff" : "#18181b";
 }
 
+function mix(from: string, to: string, t: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(i, i + 2), 16);
+  return `#${[1, 3, 5]
+    .map((i) => Math.round(channel(from, i) + (channel(to, i) - channel(from, i)) * t))
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+/** Darkens (light theme) or lightens (dark theme) the brand color just enough to be readable
+ * as text on the surface (WCAG AA), as on the web. */
+function readableOn(hex: string, surface: string): string {
+  const toward = luminance(surface) > 0.5 ? "#000000" : "#ffffff";
+  for (let t = 0; t <= 1; t += 0.05) {
+    const color = mix(hex, toward, t);
+    if (contrastRatio(color, surface) >= 4.5) return color;
+  }
+  return toward;
+}
+
 /** The palette with the business's brand color as primary. */
 export function brandPalette(palette: Palette, color: string | null | undefined): Palette {
   if (!color) return palette;
-  return { ...palette, primary: color, onPrimary: textOn(color) };
+  const primary = readableOn(color, palette.surface);
+  return { ...palette, primary, onPrimary: textOn(primary) };
 }

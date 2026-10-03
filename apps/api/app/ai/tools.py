@@ -232,6 +232,61 @@ def list_plans(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def client_sources(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    start, end = _date(args["start_date"], "start_date"), _date(args["end_date"], "end_date")
+    rows = ctx.tenant.session.execute(
+        text("""
+            SELECT coalesce(c.source, 'unknown') AS source, count(*) AS new_clients,
+                   count(*) FILTER (WHERE EXISTS (
+                       SELECT 1 FROM app.entitlements e WHERE e.client_id = c.id
+                   )) AS bought_a_plan
+            FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
+            WHERE (c.created_at AT TIME ZONE t.time_zone)::date BETWEEN :start AND :end
+            GROUP BY 1 ORDER BY 2 DESC
+        """),
+        {"start": start, "end": end},
+    ).mappings()
+    return {"period": f"{start} to {end}", "sources": [dict(r) for r in rows]}
+
+
+def inactive_members(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    days = min(max(int(args["days"]), 7), 180)
+    rows = ctx.tenant.session.execute(
+        text("""
+            SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
+                   (SELECT max(s.starts_at) FROM app.bookings b
+                    JOIN app.sessions s ON s.id = b.session_id
+                    WHERE b.client_id = c.id AND b.status = 'checked_in') AS last_visit
+            FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
+            WHERE EXISTS (
+                SELECT 1 FROM app.entitlements e
+                WHERE e.client_id = c.id AND e.status = 'active'
+                  AND (now() AT TIME ZONE t.time_zone)::date BETWEEN e.starts_on AND e.ends_on
+            )
+            AND NOT EXISTS (
+                SELECT 1 FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+                WHERE b.client_id = c.id AND b.status = 'checked_in'
+                  AND s.starts_at > now() - make_interval(days => :days)
+            )
+            ORDER BY last_visit NULLS FIRST LIMIT :limit
+        """),
+        {"days": days, "limit": MAX_ROWS},
+    ).mappings()
+    return {
+        "members_with_a_valid_plan_and_no_visit_in_days": days,
+        "members": [
+            {
+                "client_id": str(r["id"]),
+                "name": r["name"],
+                "last_visit": _local(r["last_visit"], ctx.time_zone)[:10]
+                if r["last_visit"]
+                else None,
+            }
+            for r in rows
+        ],
+    }
+
+
 # --- Write tools: pending actions ------------------------------------------------------------
 
 
@@ -373,6 +428,22 @@ TOOLS: dict[str, Tool] = {
             },
             Permission.REPORTS_READ,
             get_metrics,
+        ),
+        Tool(
+            "client_sources",
+            "New clients in a period by where they came from (lead source), and how many of "
+            "them bought a plan.",
+            {"start_date": DATE, "end_date": DATE},
+            Permission.REPORTS_READ,
+            client_sources,
+        ),
+        Tool(
+            "inactive_members",
+            "Members who hold a valid plan but have not come in for at least `days` days "
+            "(7-180), longest absence first.",
+            {"days": {"type": "integer"}},
+            Permission.CLIENTS_READ,
+            inactive_members,
         ),
         Tool(
             "list_plans",

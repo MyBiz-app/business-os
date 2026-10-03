@@ -14,12 +14,16 @@ from app.permissions import Permission
 router = APIRouter(prefix="/clients", tags=["clients"])
 
 ClientStatus = Literal["active", "inactive", "lead"]
+ClientSource = Literal[
+    "walk_in", "referral", "instagram", "facebook", "google", "website", "app", "other"
+]
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
-    "id, first_name, last_name, email, phone, date_of_birth, notes, status, created_at, updated_at"
+    "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, created_at, "
+    "updated_at"
 )
 
 
@@ -29,8 +33,11 @@ class ClientFields(BaseModel):
     phone: str | None = Field(default=None, max_length=30)
     date_of_birth: date | None = None
     notes: str | None = Field(default=None, max_length=5000)
+    source: ClientSource | None = None
 
-    @field_validator("last_name", "email", "phone", "notes", "date_of_birth", mode="before")
+    @field_validator(
+        "last_name", "email", "phone", "notes", "date_of_birth", "source", mode="before"
+    )
     @classmethod
     def blank_is_missing(cls, value: object) -> object:
         return blank_to_none(value)
@@ -63,6 +70,7 @@ class Client(BaseModel):
     date_of_birth: date | None
     notes: str | None
     status: ClientStatus
+    source: ClientSource | None
     created_at: datetime
     updated_at: datetime
 
@@ -122,10 +130,10 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
                 text(f"""
                     INSERT INTO app.clients
                         (tenant_id, first_name, last_name, email, phone, date_of_birth, notes,
-                         status)
+                         status, source)
                     VALUES
                         (:tenant_id, :first_name, :last_name, :email, :phone, :date_of_birth,
-                         :notes, :status)
+                         :notes, :status, :source)
                     RETURNING {COLUMNS}
                 """),
                 {**body.model_dump(), "tenant_id": context.tenant_id},

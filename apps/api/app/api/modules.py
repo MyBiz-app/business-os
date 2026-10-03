@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
-from sqlalchemy import text
+from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.api.deps import TenantContext, TenantDep, UserDep, require
@@ -150,7 +150,7 @@ def enabled_modules(db: Session) -> dict[str, int]:
     )
 
 
-def set_modules(db: Session, tenant_id: object, selection: dict[str, int]) -> None:
+def set_modules(db: Session | Connection, tenant_id: object, selection: dict[str, int]) -> None:
     db.execute(text("DELETE FROM app.tenant_modules WHERE tenant_id = :t"), {"t": tenant_id})
     for key, quantity in selection.items():
         db.execute(

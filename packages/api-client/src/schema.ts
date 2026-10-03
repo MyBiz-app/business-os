@@ -1145,6 +1145,8 @@ export interface components {
              * @enum {string}
              */
             status: "active" | "inactive" | "lead";
+            /** Source */
+            source: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
             /**
              * Created At
              * Format: date-time
@@ -1239,6 +1241,8 @@ export interface components {
             date_of_birth?: string | null;
             /** Notes */
             notes?: string | null;
+            /** Source */
+            source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
             /** First Name */
             first_name: string;
             /**
@@ -1302,6 +1306,8 @@ export interface components {
             date_of_birth?: string | null;
             /** Notes */
             notes?: string | null;
+            /** Source */
+            source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
             /** First Name */
             first_name?: string | null;
             /** Status */

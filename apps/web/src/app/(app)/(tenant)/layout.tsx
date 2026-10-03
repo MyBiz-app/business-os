@@ -28,7 +28,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
 
   return (
     // The business's brand color replaces the product color inside its own area.
-    <div style={brandStyle(tenant.primary_color)} className="flex flex-1 flex-col md:flex-row">
+    <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
       <aside className="border-b border-border md:w-60 md:shrink-0 md:border-b-0 md:border-e">
         <div className="flex items-center gap-3 px-6 py-4">
           {logo ? (

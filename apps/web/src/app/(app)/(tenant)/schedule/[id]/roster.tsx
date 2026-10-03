@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import type { getTenant } from "@/lib/tenant";
+import { Pill, type Tone } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 
 import { bookClient, setBookingStatus } from "../actions";
@@ -17,12 +18,12 @@ type BookingErrorKey = (typeof ERRORS)[number];
 const isKnownError = (value: string | undefined): value is BookingErrorKey =>
   ERRORS.includes(value as BookingErrorKey);
 
-const TONE: Record<BookingStatus, string> = {
-  booked: "bg-primary/15 text-primary",
-  checked_in: "bg-success/15 text-success",
-  waitlisted: "bg-border text-foreground",
-  no_show: "bg-danger/15 text-danger",
-  cancelled: "bg-border text-muted",
+const TONE: Record<BookingStatus, Tone> = {
+  booked: "primary",
+  checked_in: "success",
+  waitlisted: "muted",
+  no_show: "danger",
+  cancelled: "muted",
 };
 
 // Which status buttons each booking offers, in display order.
@@ -73,9 +74,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
         <Link href={`/clients/${booking.client_id}`} dir="auto" className="font-medium underline-offset-4 hover:underline">
           {booking.client_name}
         </Link>
-        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${TONE[booking.status]}`}>
-          {t(`statuses.${booking.status}`)}
-        </span>
+        <Pill tone={TONE[booking.status]}>{t(`statuses.${booking.status}`)}</Pill>
         {booking.late_cancel && <span className="text-xs text-danger">{t("lateCancel")}</span>}
         {booking.status !== "cancelled" &&
           (booking.plan_name ? (

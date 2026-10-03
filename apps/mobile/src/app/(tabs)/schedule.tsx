@@ -44,7 +44,12 @@ export default function Schedule() {
       }}
     >
       <Heading palette={palette}>{t("title")}</Heading>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.days}>
+      <ScrollView
+        horizontal
+        accessibilityRole="tablist"
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={local.days}
+      >
         {days.map((value) => {
           const selected = value === day;
           return (

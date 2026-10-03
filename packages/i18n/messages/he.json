@@ -205,6 +205,18 @@
     "errors": {
       "email_taken": "האימייל הזה כבר בשימוש ברשומה אחרת.",
       "invalid": "בדקו את הפרטים ונסו שוב."
+    },
+    "source": "הגיע/ה דרך",
+    "sourceUnknown": "לא נרשם",
+    "sources": {
+      "walk_in": "הגיע/ה לסטודיו",
+      "referral": "המלצה",
+      "instagram": "אינסטגרם",
+      "facebook": "פייסבוק",
+      "google": "גוגל",
+      "website": "אתר",
+      "app": "הצטרף/ה באפליקציה",
+      "other": "אחר"
     }
   },
   "common": {

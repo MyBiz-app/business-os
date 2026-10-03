@@ -22,7 +22,7 @@ in Hebrew and English, light and dark. Sprint length is flexible (owner capacity
 | 5. Configurator & platform | Onboarding questionnaire + live pricing; module enablement; platform console (tenants, usage) |
 | 6. Dashboard & AI | KPI dashboard on metrics layer; AI Q&A via read tools; first pending action with confirmation |
 
-**Prototype done** = spec v1 §23 end-to-end scenario passes.
+**Prototype done** = spec v1 §23 end-to-end scenario passes. ✅ Automated in `e2e/dod.py` (with axe accessibility checks, Hebrew/light and English/dark); still open: the same run against staging with real email (needs the production email provider).
 
 ## Phase 2 — MVP (first real business)
 
