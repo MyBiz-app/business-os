@@ -12,14 +12,47 @@ export function contrastRatio(a: string, b: string): number {
 
 const WHITE = "#ffffff";
 const NEAR_BLACK = "#18181b";
+// The surfaces the brand color sits on (globals.css --surface, light and dark).
+const LIGHT_SURFACE = "#f4f4f5";
+const DARK_SURFACE = "#18181b";
+const AA = 4.5;
 
 /** Text color for content placed on a brand color: whichever of white/near-black reads better. */
 export function textOn(hex: string): string {
   return contrastRatio(hex, WHITE) >= contrastRatio(hex, NEAR_BLACK) ? WHITE : NEAR_BLACK;
 }
 
-/** CSS variables that apply a business's brand color to its area of the app. */
+/** Mixes two #rrggbb colors; t = 0 is `from`, t = 1 is `to`. */
+export function mix(from: string, to: string, t: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(i, i + 2), 16);
+  return `#${[1, 3, 5]
+    .map((i) => Math.round(channel(from, i) + (channel(to, i) - channel(from, i)) * t))
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+/** The brand color, darkened (light theme) or lightened (dark theme) just enough to be readable
+ * as text on the surface and on a 10% tint of itself (WCAG AA). */
+export function readableOn(hex: string, surface: string): string {
+  const toward = luminance(surface) > 0.5 ? "#000000" : WHITE;
+  for (let t = 0; t <= 1; t += 0.05) {
+    const color = mix(hex, toward, t);
+    const tint = mix(surface, color, 0.1);
+    if (contrastRatio(color, surface) >= AA && contrastRatio(color, tint) >= AA) return color;
+  }
+  return toward;
+}
+
+/** CSS variables for a business's brand color, read by the `.brand` class (globals.css), which
+ * picks the light or dark variant. */
 export function brandStyle(primary: string | null | undefined): React.CSSProperties | undefined {
   if (!primary) return undefined;
-  return { "--primary": primary, "--on-primary": textOn(primary) } as React.CSSProperties;
+  const light = readableOn(primary, LIGHT_SURFACE);
+  const dark = readableOn(primary, DARK_SURFACE);
+  return {
+    "--brand": light,
+    "--on-brand": textOn(light),
+    "--brand-dark": dark,
+    "--on-brand-dark": textOn(dark),
+  } as React.CSSProperties;
 }

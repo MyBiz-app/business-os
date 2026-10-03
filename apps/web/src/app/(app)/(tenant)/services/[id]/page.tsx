@@ -28,7 +28,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[id]"
         service={service}
         currency={service.price_currency}
         submitLabel={t("common.save")}
-        readOnly={!canWriteCatalog(tenant.role)}
+        readOnly={!canWriteCatalog(tenant)}
       />
     </main>
   );

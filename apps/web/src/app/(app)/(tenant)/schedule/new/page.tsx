@@ -13,7 +13,7 @@ import { SessionForm } from "../session-form";
 export default async function NewSessionPage({ searchParams }: PageProps<"/schedule/new">) {
   const t = await getTranslations("schedule");
   const { tenant, api, scope } = await getTenant();
-  if (!canWriteSchedule(tenant.role)) redirect("/schedule");
+  if (!canWriteSchedule(tenant)) redirect("/schedule");
   const { date } = await searchParams;
   const options = unwrap(await api.GET("/sessions/options", { params: scope }));
 

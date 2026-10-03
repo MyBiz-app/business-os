@@ -21,6 +21,7 @@ class Me(BaseModel):
     email: str
     full_name: str | None
     locale: Locale | None
+    platform_admin: bool
     memberships: list[Membership]
 
 
@@ -30,6 +31,9 @@ class TenantCreate(BaseModel):
     locale: Locale
     time_zone: str
     currency: str = Field(pattern=r"^[A-Z]{3}$")
+    modules: dict[str, int] | None = Field(
+        default=None, description="Modules to enable; defaults to the vertical pack's preset"
+    )
 
     @field_validator("name")
     @classmethod
@@ -60,6 +64,8 @@ class TenantUpdate(BaseModel):
     time_zone: str | None = None
     currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
     primary_color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
+    cancellation_window_minutes: int | None = Field(default=None, ge=0, le=10080)
+    booking_requires_plan: bool | None = None
 
     @field_validator("name")
     @classmethod
@@ -85,4 +91,10 @@ class Tenant(BaseModel):
     currency: str
     primary_color: str | None
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
+    cancellation_window_minutes: int
+    booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
+    join_code: str = Field(description="Code clients enter or scan to join this business")
+    modules: list[str] = Field(description="Enabled modules (features depend on them)")
+    permissions: list[str] = Field(description="The current user's effective permissions")
+    custom_role_name: str | None
     role: Role

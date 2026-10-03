@@ -1,11 +1,13 @@
 <div dir="rtl" lang="he">
   <h2>אימות כתובת האימייל</h2>
-  <p>לחצו על הקישור כדי לאמת את הכתובת ולהשלים את ההרשמה:</p>
+  <p>באפליקציה? הקלידו את הקוד: <strong style="font-size: 24px; letter-spacing: 4px">{{ .Token }}</strong></p>
+  <p>באתר? לחצו על הקישור כדי לאמת את הכתובת ולהשלים את ההרשמה:</p>
   <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">אימות האימייל</a></p>
 </div>
 <hr />
 <div dir="ltr" lang="en">
   <h2>Confirm your email</h2>
-  <p>Follow this link to confirm your address and finish signing up:</p>
+  <p>In the app? Enter this code: <strong style="font-size: 24px; letter-spacing: 4px">{{ .Token }}</strong></p>
+  <p>On the website? Follow this link to confirm your address and finish signing up:</p>
   <p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm your email</a></p>
 </div>

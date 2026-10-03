@@ -34,7 +34,15 @@
     "errors": {
       "logo_too_large": "התמונה גדולה מ-512KB.",
       "unsupported_image": "השתמשו בתמונה מסוג PNG,‏ JPG או WebP."
-    }
+    },
+    "cancellationWindow": "חלון ביטול מאוחר",
+    "cancellationNone": "ללא חלון",
+    "cancellationHours": "{hours, plural, one {שעה} two {שעתיים} other {# שעות}} לפני השיעור",
+    "cancellationWindowHint": "ביטול בתוך החלון עדיין משחרר את המקום, אבל נרשם כביטול מאוחר.",
+    "requirePlan": "לקוחות צריכים מנוי או כרטיסייה בתוקף כדי להירשם באפליקציה",
+    "requirePlanHint": "הצוות תמיד יכול לרשום מרשימת המשתתפים (למשל לקוח מזדמן שמשלם בדלפק).",
+    "modulesLink": "מודולים וחבילה",
+    "modulesHint": "הפעלה וכיבוי של יכולות, והמחיר החודשי."
   },
   "locales": {
     "he": "עברית",
@@ -106,7 +114,18 @@
     },
     "errors": {
       "invalid": "בדקו את הפרטים ונסו שוב."
-    }
+    },
+    "step": "שלב {step} מתוך {total}",
+    "questions": "כמה שאלות, כדי להמליץ על ההגדרה המתאימה",
+    "qClients": "לקוחות פעילים (בערך)",
+    "qStaff": "אנשי צוות",
+    "qLocations": "סניפים",
+    "qApp": "אני רוצה שהלקוחות יירשמו דרך אפליקציה",
+    "qAi": "אני רוצה עוזר AI שיכול גם לבצע פעולות (רישומים)",
+    "next": "המשך",
+    "back": "חזרה",
+    "planTitle": "החבילה שלך",
+    "planHint": "בחרנו לפי התשובות שלך. אפשר לשנות הכול, גם בהמשך דרך ההגדרות."
   },
   "dashboard": {
     "welcome": "ברוכים הבאים ל{name}",
@@ -115,7 +134,18 @@
     "emptyToday": "כאן יופיעו לוח הזמנים, הלקוחות והמכירות.",
     "business": "עסק",
     "switchBusiness": "החלפת עסק",
-    "newBusiness": "יצירת עסק נוסף"
+    "newBusiness": "יצירת עסק נוסף",
+    "kpis": "מספרים מרכזיים",
+    "period": "תקופה",
+    "lastDays": "{count} ימים אחרונים",
+    "vsPrevious": "לעומת התקופה הקודמת",
+    "points": "{value} נק׳",
+    "better": "שיפור",
+    "worse": "הרעה",
+    "weeklyRevenue": "הכנסות לפי שבוע",
+    "weeklyAttendance": "הגעות לפי שבוע",
+    "showTable": "הצגה כטבלה",
+    "weekOf": "שבוע של"
   },
   "roles": {
     "owner": "בעלים",
@@ -130,7 +160,9 @@
     "locations": "מיקומים",
     "team": "צוות",
     "settings": "הגדרות",
-    "schedule": "לוח שיעורים"
+    "schedule": "לוח שיעורים",
+    "plans": "מנויים וכרטיסיות",
+    "assistant": "עוזר AI"
   },
   "terms": {
     "fitness": {
@@ -173,6 +205,18 @@
     "errors": {
       "email_taken": "האימייל הזה כבר בשימוש ברשומה אחרת.",
       "invalid": "בדקו את הפרטים ונסו שוב."
+    },
+    "source": "הגיע/ה דרך",
+    "sourceUnknown": "לא נרשם",
+    "sources": {
+      "walk_in": "הגיע/ה לסטודיו",
+      "referral": "המלצה",
+      "instagram": "אינסטגרם",
+      "facebook": "פייסבוק",
+      "google": "גוגל",
+      "website": "אתר",
+      "app": "הצטרף/ה באפליקציה",
+      "other": "אחר"
     }
   },
   "common": {
@@ -249,8 +293,22 @@
       "only_owners_manage_owners": "רק בעלים יכולים לנהל בעלים.",
       "cannot_remove_self": "אי אפשר להסיר את עצמך.",
       "invalid": "בדקו את הפרטים ונסו שוב.",
-      "generic": "משהו השתבש. נסו שוב."
-    }
+      "generic": "משהו השתבש. נסו שוב.",
+      "cannot_change_own_role": "אי אפשר לשנות את התפקיד של עצמך.",
+      "exceeds_own_permissions": "אי אפשר להעניק הרשאות שאין לך בעצמך.",
+      "name_taken": "כבר יש תפקיד בשם הזה.",
+      "role_in_use": "התפקיד הזה עדיין מוקצה לחברי צוות. קודם משנים את התפקיד שלהם."
+    },
+    "manageRoles": "ניהול תפקידים והרשאות",
+    "rolesTitle": "תפקידים והרשאות",
+    "rolesSubtitle": "יוצרים תפקיד בהדלקה וכיבוי של הרשאות, ואז נותנים אותו לחברי צוות. אפשר להעניק רק הרשאות שיש גם לך.",
+    "newRole": "תפקיד חדש",
+    "roleName": "שם התפקיד",
+    "rolePermissions": "מה התפקיד הזה יכול לעשות",
+    "roleCreated": "התפקיד נוצר.",
+    "roleMembers": "{count, plural, =0 {אף אחד לא בתפקיד הזה.} one {אדם אחד בתפקיד הזה.} other {# אנשים בתפקיד הזה.}}",
+    "deleteRole": "מחיקת התפקיד",
+    "deleteRoleConfirm": "למחוק את התפקיד \"{name}\"?"
   },
   "invite": {
     "title": "הוזמנת להצטרף",
@@ -310,6 +368,339 @@
     "errors": {
       "invalid_reference": "אחד הפריטים שנבחרו אינו זמין. רעננו ונסו שוב.",
       "no_occurrences": "אין שיעורים שנופלים בימים שנבחרו בטווח הזה."
+    },
+    "waitlisted": "{count} ברשימת המתנה"
+  },
+  "bookings": {
+    "title": "הרשמות",
+    "roster": "רשימת משתתפים",
+    "summary": "{booked} מתוך {capacity} רשומים{waitlisted, plural, =0 {} other { · # בהמתנה}}",
+    "waitlist": "רשימת המתנה",
+    "empty": "עדיין אין רשומים.",
+    "cancelledCount": "{count, plural, one {ביטול אחד} other {# ביטולים}}",
+    "searchLabel": "חיפוש לקוח לרישום",
+    "searchPlaceholder": "חיפוש לפי שם, אימייל או טלפון",
+    "search": "חיפוש",
+    "results": "תוצאות חיפוש",
+    "noMatches": "אין לקוחות פעילים מתאימים שעוד לא רשומים.",
+    "book": "רישום",
+    "addToWaitlist": "הוספה להמתנה",
+    "lateCancel": "ביטול מאוחר",
+    "sessionCancelled": "השיעור בוטל",
+    "noneYet": "עדיין אין הרשמות.",
+    "upcoming": "קרובים",
+    "history": "היסטוריה",
+    "statuses": {
+      "booked": "רשום",
+      "waitlisted": "בהמתנה",
+      "checked_in": "הגיע",
+      "no_show": "לא הגיע",
+      "cancelled": "בוטל"
+    },
+    "actions": {
+      "booked": "ביטול סימון",
+      "checked_in": "צ'ק-אין",
+      "no_show": "לא הגיע",
+      "cancelled": "ביטול הרשמה"
+    },
+    "errors": {
+      "already_booked": "הלקוח כבר רשום לשיעור הזה.",
+      "session_cancelled": "השיעור הזה בוטל.",
+      "invalid_transition": "אי אפשר לבצע את השינוי הזה בהרשמה.",
+      "invalid_reference": "הלקוח לא זמין. רעננו ונסו שוב.",
+      "not_found": "ההרשמה לא נמצאה. רעננו ונסו שוב.",
+      "generic": "משהו השתבש. נסו שוב."
+    },
+    "noPlan": "ללא מנוי"
+  },
+  "client": {
+    "tabs": {
+      "home": "בית",
+      "schedule": "מערכת שעות",
+      "bookings": "ההרשמות שלי",
+      "profile": "פרופיל"
+    },
+    "signIn": {
+      "title": "כניסה",
+      "subtitle": "הזינו את כתובת האימייל ונשלח לכם קוד בן 6 ספרות. בלי סיסמה.",
+      "email": "אימייל",
+      "sendCode": "שליחת קוד",
+      "codeSent": "שלחנו קוד אל {email}. הוא תקף לשעה.",
+      "code": "קוד בן 6 ספרות",
+      "verify": "כניסה",
+      "changeEmail": "שימוש בכתובת אחרת",
+      "invalidEmail": "הזינו כתובת אימייל תקינה.",
+      "invalidCode": "הקוד שגוי או שפג תוקפו.",
+      "tooMany": "יותר מדי ניסיונות. המתינו דקה ונסו שוב.",
+      "generic": "משהו השתבש. נסו שוב."
+    },
+    "join": {
+      "title": "הצטרפות לסטודיו",
+      "subtitle": "הזינו את הקוד שקיבלתם מהסטודיו (מופיע בשלט או בקוד ה-QR שלהם).",
+      "code": "קוד הצטרפות",
+      "continue": "המשך",
+      "preview": "אתם מצטרפים לעסק הזה. העסק יראה את השם והאימייל שלכם, ותוכלו להירשם לשיעורים שלו.",
+      "joinButton": "הצטרפות ל{name}",
+      "otherCode": "קוד אחר",
+      "back": "חזרה",
+      "unknownCode": "לא מצאנו עסק עם הקוד הזה.",
+      "generic": "משהו השתבש. נסו שוב.",
+      "noApp": "העסק הזה עדיין לא מציע את האפליקציה. כדאי לשאול אותם."
+    },
+    "home": {
+      "greeting": "היי {name}",
+      "nextBooking": "השיעור הבא שלך",
+      "noUpcoming": "עדיין אין הרשמות קרובות.",
+      "today": "היום",
+      "bookClass": "הרשמה לשיעור"
+    },
+    "schedule": {
+      "title": "מערכת שעות",
+      "today": "היום",
+      "empty": "אין שיעורים ביום הזה."
+    },
+    "bookings": {
+      "title": "ההרשמות שלי",
+      "upcoming": "קרובות",
+      "history": "היסטוריה",
+      "noUpcoming": "עדיין לא נרשמת לשיעורים.",
+      "myPlans": "המנויים שלי",
+      "validUntil": "בתוקף עד {date}",
+      "entriesLeft": "{count, plural, one {נשארה כניסה אחת} other {נשארו # כניסות}}",
+      "noPlan": "עדיין אין לך מנוי או כרטיסייה פעילים. אפשר לבקש מהסטודיו אחד מאלה:"
+    },
+    "profile": {
+      "title": "פרופיל",
+      "signedInAs": "מחובר/ת בתור {email}",
+      "business": "עסק",
+      "joinAnother": "הצטרפות לעסק נוסף",
+      "signOut": "התנתקות"
+    },
+    "spotsLeft": "{count, plural, one {נשאר מקום אחד} other {נשארו # מקומות}}",
+    "full": "מלא{count, plural, =0 {} one { · ממתין אחד} other { · # ממתינים}}",
+    "youreBooked": "נרשמת",
+    "waitlistPosition": "ברשימת המתנה · מקום {position}",
+    "sessionCancelled": "השיעור בוטל על ידי הסטודיו",
+    "book": "הרשמה",
+    "joinWaitlist": "להמתנה",
+    "cancelBooking": "ביטול",
+    "leaveWaitlist": "יציאה",
+    "cancelTitle": "לבטל את ההרשמה?",
+    "cancelMessage": "המקום שלך יעבור לבא בתור ברשימת ההמתנה.",
+    "cancelLateMessage": "זה ביטול מאוחר: הוא בתוך חלון הביטול של הסטודיו ויירשם כביטול מאוחר.",
+    "cancelConfirm": "כן, לבטל",
+    "keep": "להשאיר",
+    "errors": {
+      "session_started": "השיעור כבר התחיל.",
+      "already_booked": "כבר נרשמת לשיעור הזה.",
+      "session_cancelled": "השיעור בוטל.",
+      "not_found": "ההרשמה כבר לא קיימת. משכו למטה לרענון.",
+      "generic": "משהו השתבש. נסו שוב.",
+      "no_valid_plan": "כדי להירשם צריך מנוי או כרטיסייה בתוקף. פנו לסטודיו."
     }
+  },
+  "join": {
+    "inviteToApp": "הזמנה לאפליקציה",
+    "staffHint": "הדפיסו את הדף לדלפק הקבלה או שתפו את הקישור. הלקוחות סורקים את הקוד, נכנסים עם האימייל ויכולים להירשם מיד.",
+    "qrLabel": "קוד QR שפותח את דף ההצטרפות",
+    "codeLabel": "קוד הצטרפות",
+    "step1": "מתקינים את אפליקציית MyBiz.",
+    "step2": "נכנסים עם האימייל (יגיע קוד בן 6 ספרות).",
+    "step3": "מזינים את קוד ההצטרפות שלמעלה.",
+    "title": "הצטרפות ל{name}",
+    "body": "הרשמה לשיעורים, רשימות המתנה וניהול ההרשמות שלכם באפליקציה.",
+    "openApp": "פתיחה באפליקציה"
+  },
+  "plans": {
+    "title": "מנויים וכרטיסיות",
+    "subtitle": "מנויים וכרטיסיות שהלקוחות שלך יכולים לקנות.",
+    "add": "הוספת מסלול",
+    "new": "מסלול חדש",
+    "empty": "עדיין אין מסלולים.",
+    "name": "שם",
+    "kind": "סוג",
+    "kinds": {
+      "membership": "מנוי",
+      "punch_card": "כרטיסייה"
+    },
+    "credits": "מספר כניסות",
+    "unlimited": "ללא הגבלת שיעורים בזמן התוקף.",
+    "validity": "תוקף (בימים)",
+    "validityHintMembership": "למשל 30 למנוי חודשי.",
+    "validityHintCard": "כמה זמן אפשר להשתמש בכרטיסייה מתאריך ההתחלה.",
+    "price": "מחיר",
+    "description": "תיאור",
+    "active": "זמין למכירה",
+    "editNote": "שינויים חלים על מכירות עתידיות. מסלולים שכבר נמכרו שומרים על התנאים שלהם.",
+    "creditsCount": "{count, plural, one {כניסה אחת} other {# כניסות}}",
+    "days": "{count, plural, one {יום אחד} other {# ימים}}",
+    "clientPlans": "מנויים וכרטיסיות",
+    "noPlans": "עדיין אין מנויים או כרטיסיות.",
+    "states": {
+      "active": "פעיל",
+      "upcoming": "יתחיל בהמשך",
+      "frozen": "מוקפא",
+      "used_up": "נוצל",
+      "expired": "פג תוקף",
+      "cancelled": "בוטל"
+    },
+    "creditsLeft": "נשארו {left} מתוך {total} כניסות",
+    "unlimitedUsed": "ללא הגבלה · {used} שיעורים",
+    "frozenRange": "הוקפא {from} – {to}",
+    "freeze": "הקפאה",
+    "freezeFrom": "מתאריך",
+    "freezeTo": "עד תאריך",
+    "freezeReason": "סיבה (לא חובה)",
+    "frozen": "הוקפא. תאריך הסיום הוארך.",
+    "cancelPlan": "ביטול המסלול",
+    "sellTitle": "מכירת מסלול",
+    "plan": "מסלול",
+    "startsOn": "תאריך התחלה",
+    "simulatedPayment": "התשלום מדומה באב-טיפוס; לא מתבצע חיוב.",
+    "sell": "מכירה",
+    "sold": "המסלול נמכר.",
+    "errors": {
+      "invalid": "בדקו את הפרטים ונסו שוב.",
+      "generic": "משהו השתבש. נסו שוב.",
+      "not_active": "המסלול כבר לא פעיל.",
+      "outside_validity": "ההקפאה צריכה להתחיל בזמן שהמסלול בתוקף.",
+      "overlapping_freeze": "יש חפיפה עם הקפאה קיימת."
+    },
+    "validityRange": "בתוקף {from} – {to}"
+  },
+  "metrics": {
+    "revenue": "הכנסות",
+    "active_clients": "מתאמנים פעילים",
+    "new_clients": "לקוחות חדשים",
+    "plans_sold": "מנויים שנמכרו",
+    "attendance": "הגעות",
+    "occupancy": "תפוסה",
+    "no_show_rate": "אחוז אי-הגעה",
+    "late_cancel_rate": "ביטולים מאוחרים",
+    "sessions_held": "שיעורים שהתקיימו"
+  },
+  "assistant": {
+    "title": "עוזר AI",
+    "subtitle": "שאלו על העסק במילים פשוטות. העוזר יכול גם להכין רישומים לשיעורים לאישורכם.",
+    "newConversation": "שיחה חדשה",
+    "notConfigured": "העוזר עדיין לא מוגדר: צריך להוסיף מפתח של ספק AI בשרת.",
+    "conversation": "שיחה",
+    "empty": "עדיין אין שיחות.",
+    "start": "התחלת שיחה",
+    "intro": "היי! אפשר לשאול אותי על מערכת השעות, המתאמנים, המנויים או המספרים.",
+    "you": "את/ה:",
+    "assistantLabel": "העוזר:",
+    "noAnswer": "לא הצלחתי לענות על זה. נסו לנסח אחרת.",
+    "history": "שיחות אחרונות",
+    "untitled": "שיחה חדשה",
+    "question": "השאלה שלך",
+    "placeholder": "לדוגמה: איך הייתה התפוסה בחודש שעבר?",
+    "send": "שליחה",
+    "thinking": "חושב…",
+    "suggestion1": "איך היה החודש שעבר?",
+    "suggestion2": "מה יש מחר במערכת?",
+    "suggestion3": "באילו שיעורים יש רשימת המתנה השבוע?",
+    "needsConfirmation": "דורש את אישורך",
+    "bookPreview": "לרשום את {client} ל{service}",
+    "cancelPreview": "לבטל את ההרשמה של {client} ל{service}",
+    "fullWaitlist": "השיעור מלא, ולכן הלקוח יתווסף לרשימת ההמתנה.",
+    "confirm": "אישור",
+    "reject": "לא לבצע",
+    "statuses": {
+      "pending": "ממתין לך",
+      "executed": "בוצע",
+      "rejected": "לא בוצע (דחית)",
+      "expired": "פג תוקף: אפשר לבקש שוב",
+      "failed": "לא ניתן לבצע: משהו השתנה. בקשו שוב."
+    },
+    "errors": {
+      "ai_not_configured": "העוזר עדיין לא מוגדר.",
+      "ai_busy": "העוזר עמוס כרגע. נסו שוב בעוד דקה.",
+      "ai_unavailable": "העוזר לא זמין כרגע. נסו שוב מאוחר יותר.",
+      "generic": "משהו השתבש. נסו שוב."
+    }
+  },
+  "modules": {
+    "title": "מודולים וחבילה",
+    "subtitle": "משלמים לפי מה שמשתמשים. מחיר הבסיס תלוי בלקוחות פעילים (כרגע: {count}).",
+    "core": "בסיס",
+    "coreTier": "עד {count} לקוחות פעילים",
+    "coreTierCustom": "מעל 1,000 לקוחות פעילים (מחיר מותאם)",
+    "aiTier": "עוזר AI",
+    "monthlyTotal": "סה״כ לחודש",
+    "comingSoon": "בקרוב",
+    "placeholderPrices": "אב-טיפוס: המחירים זמניים ולא מתבצע חיוב.",
+    "names": {
+      "none": "בלי AI",
+      "client_app": "אפליקציית לקוחות",
+      "ai_basic": "AI בסיסי",
+      "ai_pro": "AI מתקדם",
+      "crm": "CRM ולידים",
+      "analytics_pro": "אנליטיקה מתקדמת",
+      "agent_finance": "סוכן כספים",
+      "agent_marketing": "סוכן שיווק",
+      "whatsapp": "וואטסאפ",
+      "extra_location": "סניפים נוספים"
+    },
+    "descriptions": {
+      "none": "אפשר להוסיף בכל זמן.",
+      "client_app": "הלקוחות מצטרפים עם קוד או QR, נרשמים, מבטלים ונכנסים לרשימת המתנה באפליקציה הממותגת שלך.",
+      "ai_basic": "שאלות על העסק במילים פשוטות: מערכת שעות, מתאמנים, מספרים.",
+      "ai_pro": "כל מה שב-AI בסיסי, ובנוסף מכין רישומים וביטולים לאישורך.",
+      "extra_location": "{price} לכל סניף מעבר לראשון."
+    }
+  },
+  "platform": {
+    "title": "קונסולת פלטפורמה",
+    "subtitle": "כל העסקים בפלטפורמה, המודולים והשימוש שלהם.",
+    "businesses": "עסקים",
+    "activeClients": "לקוחות פעילים",
+    "bookings30d": "הרשמות (30 יום)",
+    "aiCredits30d": "קרדיטים של AI (30 יום)",
+    "aiCreditsPerDay": "קרדיטים של AI לפי יום",
+    "aiCredits": "קרדיטים של AI",
+    "day": "יום",
+    "businessesTitle": "עסקים",
+    "coreOnly": "בסיס בלבד",
+    "noUsage": "אין שימוש מדוד ב-90 הימים האחרונים.",
+    "columns": {
+      "name": "עסק",
+      "owner": "בעלים",
+      "modules": "מודולים",
+      "members": "צוות",
+      "clients": "לקוחות",
+      "activeClients": "פעילים",
+      "bookings30d": "הרשמות 30 יום",
+      "aiCredits30d": "קרדיטים 30 יום",
+      "created": "נוצר"
+    }
+  },
+  "permissions": {
+    "clients_read": "צפייה בלקוחות",
+    "clients_read_hint": "רשימת הלקוחות והפרופילים",
+    "clients_write": "עריכת לקוחות",
+    "clients_write_hint": "הוספה ושינוי של לקוחות",
+    "catalog_read": "צפייה בשירותים ובמסלולים",
+    "catalog_read_hint": "שירותים, סניפים ומסלולים",
+    "catalog_write": "עריכת שירותים ומסלולים",
+    "catalog_write_hint": "הוספה ושינוי",
+    "schedule_read": "צפייה במערכת השעות",
+    "schedule_read_hint": "שיעורים ורשימות משתתפים",
+    "schedule_write": "עריכת מערכת השעות",
+    "schedule_write_hint": "יצירה, הזזה וביטול של שיעורים",
+    "bookings_manage": "ניהול הרשמות",
+    "bookings_manage_hint": "רישום, צ'ק-אין וביטול עבור לקוחות",
+    "sales_manage": "מכירת מסלולים",
+    "sales_manage_hint": "מכירה, הקפאה וביטול של מנויים",
+    "reports_read": "צפייה בדוחות",
+    "reports_read_hint": "הכנסות ומספרים עסקיים",
+    "ai_use": "שימוש בעוזר ה-AI",
+    "ai_use_hint": "הכלים שלו עדיין כפופים להרשאות האחרות",
+    "staff_read": "צפייה בצוות",
+    "staff_read_hint": "חברי צוות ותפקידים",
+    "staff_manage": "ניהול הצוות",
+    "staff_manage_hint": "הזמנה, שינוי תפקיד והסרה",
+    "business_settings": "הגדרות העסק",
+    "business_settings_hint": "פרטים, מיתוג, מודולים וחבילה"
   }
 }

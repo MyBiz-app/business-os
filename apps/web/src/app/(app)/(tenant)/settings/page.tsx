@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { apiAssetUrl } from "@/lib/api";
@@ -12,7 +13,7 @@ import { BrandColorForm, DetailsForm, LogoForm } from "./settings-forms";
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
   const { tenant } = await getTenant();
-  if (!canManageSettings(tenant.role)) redirect("/dashboard");
+  if (!canManageSettings(tenant)) redirect("/dashboard");
   const logo = apiAssetUrl(tenant.logo_url);
 
   return (
@@ -21,6 +22,17 @@ export default async function SettingsPage() {
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <p className="text-sm text-muted">{t("subtitle")}</p>
       </div>
+
+      <Link
+        href="/settings/modules"
+        className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-6 hover:border-primary"
+      >
+        <span className="flex flex-col gap-1">
+          <span className="text-lg font-semibold">{t("modulesLink")}</span>
+          <span className="text-sm text-muted">{t("modulesHint")}</span>
+        </span>
+        <span aria-hidden="true" className="text-primary rtl:rotate-180">→</span>
+      </Link>
 
       <section aria-labelledby="details-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
         <h2 id="details-heading" className="text-lg font-semibold">

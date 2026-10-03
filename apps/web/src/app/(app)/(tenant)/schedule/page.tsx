@@ -38,7 +38,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("nextWeek")}
             </Link>
           </nav>
-          {canWriteSchedule(tenant.role) && (
+          {canWriteSchedule(tenant) && (
             <Link
               href={`/schedule/new?date=${start > today ? start : today}`}
               className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"
@@ -82,6 +82,9 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                           <span className="text-xs text-muted" aria-label={t("spotsLabel", { booked: session.booked, capacity: session.capacity })}>
                             {cancelled ? t("cancelled") : t("spots", { booked: session.booked, capacity: session.capacity })}
                           </span>
+                          {!cancelled && session.waitlisted > 0 && (
+                            <span className="text-xs text-muted">{t("waitlisted", { count: session.waitlisted })}</span>
+                          )}
                         </Link>
                       </li>
                     );

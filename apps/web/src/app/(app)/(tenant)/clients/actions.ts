@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 export type ClientFormState = { error?: "email_taken" | "invalid" | "generic"; saved?: boolean };
 
 type ClientStatus = components["schemas"]["ClientCreate"]["status"];
+type ClientSource = NonNullable<components["schemas"]["ClientCreate"]["source"]>;
 
 function readForm(formData: FormData) {
   const value = (name: string) => String(formData.get(name) ?? "");
@@ -21,6 +22,7 @@ function readForm(formData: FormData) {
     date_of_birth: value("date_of_birth") || null,
     notes: value("notes"),
     status: (value("status") || "active") as ClientStatus,
+    source: (value("source") || null) as ClientSource | null,
   };
 }
 

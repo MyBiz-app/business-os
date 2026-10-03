@@ -11,9 +11,14 @@ import { changeRole, inviteMember, removeMember, type TeamState } from "./action
 
 const ROLES = ["owner", "manager", "front_desk", "staff"] as const;
 
-function useRoleOptions(allowOwner: boolean) {
+export type CustomRoleOption = { id: string; name: string };
+
+function useRoleOptions(allowOwner: boolean, custom: CustomRoleOption[] = []) {
   const t = useTranslations("roles");
-  return ROLES.filter((role) => allowOwner || role !== "owner").map((value) => ({ value, label: t(value) }));
+  return [
+    ...ROLES.filter((role) => allowOwner || role !== "owner").map((value) => ({ value: value as string, label: t(value) })),
+    ...custom.map((role) => ({ value: `custom:${role.id}`, label: role.name })),
+  ];
 }
 
 function TeamError({ state }: { state: TeamState }) {
@@ -65,17 +70,22 @@ type MemberRowProps = {
   userId: string;
   email: string;
   role: (typeof ROLES)[number];
+  customRoleId: string | null;
   isSelf: boolean;
   allowOwner: boolean;
+  customRoles: CustomRoleOption[];
 };
 
-export function MemberRow({ userId, email, role, isSelf, allowOwner }: MemberRowProps) {
+export function MemberRow({ userId, email, role, customRoleId, isSelf, allowOwner, customRoles }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
   // A manager sees owners read-only; only owners can change or remove them.
   const locked = role === "owner" && !allowOwner;
-  const roleOptions = useRoleOptions(allowOwner || role === "owner");
+  // Only owners may change their own role (to step down); nobody else can.
+  const roleLocked = locked || (isSelf && !allowOwner);
+  const roleOptions = useRoleOptions(allowOwner || role === "owner", role === "owner" ? [] : customRoles);
+  const current = customRoleId ? `custom:${customRoleId}` : role;
 
   return (
     <li className="flex flex-col gap-2 border-t border-border px-4 py-3 first:border-t-0">
@@ -87,9 +97,9 @@ export function MemberRow({ userId, email, role, isSelf, allowOwner }: MemberRow
         <form action={roleAction}>
           <select
             name="role"
-            key={role}
-            defaultValue={role}
-            disabled={locked}
+            key={current}
+            defaultValue={current}
+            disabled={roleLocked}
             aria-label={`${t("team.role")}: ${email}`}
             onChange={(event) => event.currentTarget.form?.requestSubmit()}
             className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"

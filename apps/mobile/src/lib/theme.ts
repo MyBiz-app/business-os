@@ -8,8 +8,8 @@ export const colors = {
     muted: "#52525b",
     primary: "#4f46e5",
     onPrimary: "#ffffff",
-    success: "#16a34a",
-    danger: "#dc2626",
+    success: "#15803d",
+    danger: "#b91c1c",
   },
   dark: {
     background: "#09090b",

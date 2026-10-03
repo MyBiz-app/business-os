@@ -3,7 +3,9 @@
 import os
 import time
 from collections.abc import Callable, Iterator
+from datetime import datetime
 from uuid import UUID, uuid4
+from zoneinfo import ZoneInfo
 
 import jwt
 import pytest
@@ -21,6 +23,21 @@ from app.main import create_app
 SERVER_URL = os.environ.get(
     "TEST_DATABASE_URL", "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
 )
+
+
+def local_today():
+    """Today in the test business's time zone, not the machine's (they differ in the evening)."""
+    return datetime.now(ZoneInfo(STUDIO["time_zone"])).date()
+
+
+STUDIO = {  # a typical first business
+    "name": "Studio Flow",
+    "vertical": "fitness",
+    "locale": "he",
+    "time_zone": "Asia/Jerusalem",
+    "currency": "ILS",
+}
+
 TEST_DB_NAME = "business_os_test"
 API_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -129,3 +146,30 @@ def add_member(engine: Engine, tenant_id: UUID | str, user_id: UUID, role: str) 
             text("INSERT INTO app.tenant_members (tenant_id, user_id, role) VALUES (:t, :u, :r)"),
             {"t": tenant_id, "u": user_id, "r": role},
         )
+
+
+@pytest.fixture
+def studio(client: TestClient, auth: AuthHeaders, engine: Engine) -> dict:
+    owner = uuid4()
+    tenant_id = UUID(client.post("/tenants", json=STUDIO, headers=auth(owner)).json()["id"])
+    headers = auth(owner, tenant_id)
+    service = client.post(
+        "/services",
+        json={"name": "Pilates", "duration_minutes": 55, "capacity": 12},
+        headers=headers,
+    ).json()
+    location = client.post("/locations", json={"name": "Main"}, headers=headers).json()
+    room = client.post(
+        f"/locations/{location['id']}/rooms", json={"name": "Studio A"}, headers=headers
+    ).json()
+    coach = uuid4()
+    add_member(engine, tenant_id, coach, "staff")
+    return {
+        "owner": owner,
+        "tenant_id": tenant_id,
+        "headers": headers,
+        "service": service,
+        "location": location,
+        "room": room,
+        "coach": coach,
+    }

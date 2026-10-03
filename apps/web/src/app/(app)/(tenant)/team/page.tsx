@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
@@ -12,9 +13,12 @@ export default async function TeamPage() {
   const t = await getTranslations();
   const locale = await getLocale();
   const { me, tenant, api, scope } = await getTenant();
-  if (!canManageTeam(tenant.role)) redirect("/dashboard");
+  if (!canManageTeam(tenant)) redirect("/dashboard");
 
-  const team = unwrap(await api.GET("/staff", { params: scope }));
+  const [team, roles] = await Promise.all([
+    api.GET("/staff", { params: scope }).then(unwrap),
+    api.GET("/roles", { params: scope }).then(unwrap),
+  ]);
   const isOwner = tenant.role === "owner";
   const formatDate = (iso: string) =>
     new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone }).format(new Date(iso));
@@ -24,6 +28,9 @@ export default async function TeamPage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("team.title")}</h1>
         <p className="text-sm text-muted">{t("team.subtitle")}</p>
+        <Link href="/team/roles" className="mt-1 text-sm text-primary underline-offset-4 hover:underline">
+          {t("team.manageRoles")}
+        </Link>
       </div>
 
       <section aria-labelledby="members-heading" className="flex flex-col gap-3">
@@ -33,10 +40,12 @@ export default async function TeamPage() {
         <ul className="rounded-2xl border border-border bg-surface">
           {team.members.map((member) => (
             <MemberRow
-              key={`${member.user_id}-${member.role}`}
+              key={`${member.user_id}-${member.role}-${member.custom_role_id}`}
               userId={member.user_id}
               email={member.email}
               role={member.role}
+              customRoleId={member.custom_role_id}
+              customRoles={roles.custom.map(({ id, name }) => ({ id, name }))}
               isSelf={member.user_id === me.id}
               allowOwner={isOwner}
             />

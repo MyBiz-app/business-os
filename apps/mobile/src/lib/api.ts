@@ -1,15 +1,44 @@
-import Constants from "expo-constants";
+import { createApiClient, type ApiClient } from "@business-os/api-client";
 
-// On a phone, "localhost" is the phone itself. In development we reach the API on the
-// computer that runs the Expo dev server (same Wi-Fi), using the host Expo reports.
-function resolveApiUrl(): string {
-  const configured = process.env.EXPO_PUBLIC_API_URL;
-  if (configured) return configured;
-  const devHost = Constants.expoConfig?.hostUri?.split(":")[0];
-  return `http://${devHost ?? "localhost"}:8000`;
+import { API_URL } from "@/lib/env";
+import { supabase } from "@/lib/supabase";
+
+export { API_URL };
+
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    readonly detail: string | undefined,
+  ) {
+    super(`API ${status}: ${detail ?? "error"}`);
+  }
 }
 
-export const API_URL = resolveApiUrl();
+/** A typed API client that signs requests as the current user. */
+export function apiClient(): ApiClient {
+  const client = createApiClient({ baseUrl: API_URL });
+  client.use({
+    async onRequest({ request }) {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) request.headers.set("Authorization", `Bearer ${data.session.access_token}`);
+      return request;
+    },
+  });
+  return client;
+}
+
+/** Returns the data of an API call or throws an ApiError with the API's error code. */
+export function unwrap<T>(result: { data?: T; error?: unknown; response: Response }): T {
+  if (result.error !== undefined || result.data === undefined) {
+    const detail = (result.error as { detail?: unknown } | undefined)?.detail;
+    throw new ApiError(result.response.status, typeof detail === "string" ? detail : undefined);
+  }
+  return result.data;
+}
+
+export function assetUrl(path: string | null | undefined): string | null {
+  return path ? `${API_URL}${path}` : null;
+}
 
 export async function isApiHealthy(): Promise<boolean> {
   try {

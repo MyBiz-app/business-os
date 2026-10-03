@@ -22,7 +22,7 @@ in Hebrew and English, light and dark. Sprint length is flexible (owner capacity
 | 5. Configurator & platform | Onboarding questionnaire + live pricing; module enablement; platform console (tenants, usage) |
 | 6. Dashboard & AI | KPI dashboard on metrics layer; AI Q&A via read tools; first pending action with confirmation |
 
-**Prototype done** = spec v1 §23 end-to-end scenario passes.
+**Prototype done** = spec v1 §23 end-to-end scenario passes. ✅ Automated in `e2e/dod.py` (with axe accessibility checks, Hebrew/light and English/dark); still open: the same run against staging with real email (needs the production email provider).
 
 ## Phase 2 — MVP (first real business)
 
@@ -44,7 +44,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Supabase local + database migrations (Alembic) + RLS
 - [x] Sign up / verify email / log in / reset password (web)
 - [x] Create business (tenant) + dashboard shell + business switcher + tenant-isolation tests
-- [ ] Mobile sign in (moved to Sprint 3, with the client app)
+- [x] Mobile sign in (delivered in Sprint 3, with the client app)
 - [x] Deploy to staging: web https://business-os-alpha-drab.vercel.app · API https://business-os-api-staging.onrender.com
 
 ## Sprint 2 progress
@@ -54,7 +54,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Clients: list, search, create, edit, profile (vertical terminology, e.g. "members")
 - [x] Services (duration, capacity, price, color) and locations with rooms
 - [x] Staff: invite by link, roles, remove; last-owner and owner-only guards
-- [ ] Custom roles (permission toggles per business)
+- [x] Custom roles: API + role editor screen + role picker on the team page; the UI follows each member's effective permissions (navigation, dashboard, pages)
 - [ ] Real invitation emails (with the production email provider)
 - [x] Business settings (name, language, time zone, currency) and branding (color with contrast-safe text, logo)
 
@@ -62,9 +62,34 @@ specialized agents, then additional vertical packs and markets (US, EU).
 
 - [x] Sessions: one-off and weekly series (expanded in the business time zone, DST-safe), edit or cancel one occurrence
 - [x] Weekly schedule screen (staff web), new-session form with room and instructor
-- [ ] Bookings: book a client, capacity, waitlist, cancellation window, check-in
-- [ ] Client app: sign in, join a business, branded home, schedule, book / cancel
+- [x] Bookings (staff web): book a client, capacity, FIFO waitlist with auto-promotion, late-cancellation window, check-in / no-show, client booking history
+- [x] Client app: email-code sign in, join a business by code / QR, branded home, schedule, book / waitlist / cancel, my bookings, profile (language, theme, switch business)
+- [x] Staff web: join code + printable QR; public join page
 - [ ] Background job to extend weekly series beyond their first 12–26 weeks
+
+## Sprint 4 progress
+
+- [x] Plans catalog (memberships, punch cards) with vertical-pack defaults
+- [x] Sell a plan to a client (simulated, idempotent payment), freeze, cancel
+- [x] Bookings use entitlements (credits, validity, freezes); client app requires a valid plan
+- [x] Client app: "My plans" with remaining entries and validity
+- [x] Demo data generator (`python -m app.seed`) + "Create demo studio on staging" workflow
+- [ ] Client self-purchase in the app (needs a payment provider, O1)
+
+## Sprint 5 progress
+
+- [x] Modules catalog + Core tiers (placeholder prices), presets, dependency rules
+- [x] Onboarding questionnaire → recommended plan → configurator with live price
+- [x] Modules & plan page in settings; features gated by module (client app, AI, AI actions)
+- [x] Platform console: businesses, modules, usage (AI credits), per-business page
+- [ ] Platform billing (subscriptions, proration, price versions) and audited support access
+
+## Sprint 6 progress
+
+- [x] Metrics layer (`app/metrics.py`) + `/metrics` API with previous-period comparison and weekly series
+- [x] KPI dashboard (tiles, revenue and check-ins per week, today's sessions)
+- [x] AI assistant: Q&A through read tools + metrics; booking / cancelling as confirmable pending actions; audit log; AI usage metering
+- [ ] AI eval set (Hebrew + English business questions) run when prompts or models change
 
 ## Owner setup checklist (Windows + iPhone)
 

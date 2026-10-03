@@ -19,3 +19,7 @@ services:
         sync: false
       - key: API_JWKS_URL
         sync: false
+      # Optional: enables the AI assistant (Anthropic Console API key). Without it the
+      # assistant screen says it isn't set up yet.
+      - key: API_ANTHROPIC_API_KEY
+        sync: false

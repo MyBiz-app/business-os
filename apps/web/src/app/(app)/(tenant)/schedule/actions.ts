@@ -104,3 +104,51 @@ export async function setSessionStatus(sessionId: string, status: "scheduled" | 
   revalidatePath("/schedule");
   revalidatePath(`/schedule/${sessionId}`);
 }
+
+function bookingError(error: unknown): string {
+  if (error instanceof ApiError) {
+    const detail = (error.body as { detail?: unknown } | null)?.detail;
+    if (typeof detail === "string") return detail;
+  }
+  return "generic";
+}
+
+function refreshSession(sessionId: string) {
+  revalidatePath("/schedule");
+  revalidatePath(`/schedule/${sessionId}`);
+}
+
+export async function bookClient(sessionId: string, clientId: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(
+      await api.POST("/sessions/{session_id}/bookings", {
+        params: { ...scope, path: { session_id: sessionId } },
+        body: { client_id: clientId },
+      }),
+    );
+  } catch (error) {
+    redirect(`/schedule/${sessionId}?error=${bookingError(error)}`);
+  }
+  refreshSession(sessionId);
+  redirect(`/schedule/${sessionId}`);
+}
+
+export async function setBookingStatus(
+  sessionId: string,
+  bookingId: string,
+  status: "booked" | "checked_in" | "no_show" | "cancelled",
+): Promise<void> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(
+      await api.PATCH("/bookings/{booking_id}", {
+        params: { ...scope, path: { booking_id: bookingId } },
+        body: { status },
+      }),
+    );
+  } catch (error) {
+    redirect(`/schedule/${sessionId}?error=${bookingError(error)}`);
+  }
+  refreshSession(sessionId);
+}

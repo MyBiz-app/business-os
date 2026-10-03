@@ -12,8 +12,8 @@
   --muted: #52525b;
   --primary: #4f46e5;
   --on-primary: #ffffff;
-  --success: #16a34a;
-  --danger: #dc2626;
+  --success: #15803d;
+  --danger: #b91c1c;
 }
 
 .dark {
@@ -26,6 +26,17 @@
   --on-primary: #09090b;
   --success: #22c55e;
   --danger: #f87171;
+}
+
+/* A business's brand color (lib/brand.ts brandStyle), in its light or dark variant. */
+.brand {
+  --primary: var(--brand, #4f46e5);
+  --on-primary: var(--on-brand, #ffffff);
+}
+
+.dark .brand {
+  --primary: var(--brand-dark, #818cf8);
+  --on-primary: var(--on-brand-dark, #09090b);
 }
 
 @theme inline {

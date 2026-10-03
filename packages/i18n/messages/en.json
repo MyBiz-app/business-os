@@ -34,7 +34,15 @@
     "errors": {
       "logo_too_large": "The image is larger than 512 KB.",
       "unsupported_image": "Use a PNG, JPG or WebP image."
-    }
+    },
+    "cancellationWindow": "Late cancellation window",
+    "cancellationNone": "No window",
+    "cancellationHours": "{hours, plural, one {# hour} other {# hours}} before the session",
+    "cancellationWindowHint": "Cancelling inside this window still frees the spot, but is recorded as a late cancellation.",
+    "requirePlan": "Clients need a valid plan to book in the app",
+    "requirePlanHint": "Staff can always book from the roster (for example a walk-in who pays at the desk).",
+    "modulesLink": "Modules and plan",
+    "modulesHint": "Turn features on or off and see the monthly price."
   },
   "locales": {
     "he": "עברית",
@@ -106,7 +114,18 @@
     },
     "errors": {
       "invalid": "Please check the details and try again."
-    }
+    },
+    "step": "Step {step} of {total}",
+    "questions": "A few questions, to recommend the right setup",
+    "qClients": "Active clients (about)",
+    "qStaff": "Team members",
+    "qLocations": "Locations",
+    "qApp": "My clients should book in an app",
+    "qAi": "I want an AI assistant that can also take actions (bookings)",
+    "next": "Continue",
+    "back": "Back",
+    "planTitle": "Your plan",
+    "planHint": "We picked what fits your answers. Change anything; you can also change it later in Settings."
   },
   "dashboard": {
     "welcome": "Welcome to {name}",
@@ -115,7 +134,18 @@
     "emptyToday": "Your schedule, clients and sales will appear here.",
     "business": "Business",
     "switchBusiness": "Switch business",
-    "newBusiness": "Create another business"
+    "newBusiness": "Create another business",
+    "kpis": "Key numbers",
+    "period": "Period",
+    "lastDays": "Last {count} days",
+    "vsPrevious": "vs. the previous period",
+    "points": "{value} pts",
+    "better": "better",
+    "worse": "worse",
+    "weeklyRevenue": "Revenue per week",
+    "weeklyAttendance": "Check-ins per week",
+    "showTable": "Show as a table",
+    "weekOf": "Week of"
   },
   "roles": {
     "owner": "Owner",
@@ -130,7 +160,9 @@
     "locations": "Locations",
     "team": "Team",
     "settings": "Settings",
-    "schedule": "Schedule"
+    "schedule": "Schedule",
+    "plans": "Plans",
+    "assistant": "AI assistant"
   },
   "terms": {
     "fitness": {
@@ -173,6 +205,18 @@
     "errors": {
       "email_taken": "Another record already uses this email.",
       "invalid": "Please check the details and try again."
+    },
+    "source": "Came from",
+    "sourceUnknown": "Not recorded",
+    "sources": {
+      "walk_in": "Walk-in",
+      "referral": "Referral",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "google": "Google",
+      "website": "Website",
+      "app": "Joined in the app",
+      "other": "Other"
     }
   },
   "common": {
@@ -249,8 +293,22 @@
       "only_owners_manage_owners": "Only owners can manage owners.",
       "cannot_remove_self": "You cannot remove yourself.",
       "invalid": "Please check the details and try again.",
-      "generic": "Something went wrong. Please try again."
-    }
+      "generic": "Something went wrong. Please try again.",
+      "cannot_change_own_role": "You can't change your own role.",
+      "exceeds_own_permissions": "You can't grant permissions you don't have yourself.",
+      "name_taken": "A role with that name already exists.",
+      "role_in_use": "This role is still assigned to team members. Change their role first."
+    },
+    "manageRoles": "Manage roles and permissions",
+    "rolesTitle": "Roles and permissions",
+    "rolesSubtitle": "Create a role by switching permissions on or off, then give it to team members. You can only grant permissions you have yourself.",
+    "newRole": "New role",
+    "roleName": "Role name",
+    "rolePermissions": "What this role can do",
+    "roleCreated": "Role created.",
+    "roleMembers": "{count, plural, =0 {Nobody has this role.} one {1 person has this role.} other {# people have this role.}}",
+    "deleteRole": "Delete role",
+    "deleteRoleConfirm": "Delete the role \"{name}\"?"
   },
   "invite": {
     "title": "You're invited",
@@ -310,6 +368,339 @@
     "errors": {
       "invalid_reference": "One of the selected items is not available. Refresh and try again.",
       "no_occurrences": "No session falls on the chosen days in that period."
+    },
+    "waitlisted": "{count} on waitlist"
+  },
+  "bookings": {
+    "title": "Bookings",
+    "roster": "Roster",
+    "summary": "{booked} of {capacity} booked{waitlisted, plural, =0 {} other { · # on waitlist}}",
+    "waitlist": "Waitlist",
+    "empty": "No one is booked yet.",
+    "cancelledCount": "{count, plural, one {# cancellation} other {# cancellations}}",
+    "searchLabel": "Find a client to book",
+    "searchPlaceholder": "Search by name, email or phone",
+    "search": "Search",
+    "results": "Search results",
+    "noMatches": "No matching active clients who aren't already booked.",
+    "book": "Book",
+    "addToWaitlist": "Add to waitlist",
+    "lateCancel": "Late cancel",
+    "sessionCancelled": "Session cancelled",
+    "noneYet": "No bookings yet.",
+    "upcoming": "Upcoming",
+    "history": "History",
+    "statuses": {
+      "booked": "Booked",
+      "waitlisted": "Waitlisted",
+      "checked_in": "Checked in",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "booked": "Undo",
+      "checked_in": "Check in",
+      "no_show": "No-show",
+      "cancelled": "Cancel booking"
+    },
+    "errors": {
+      "already_booked": "This client is already booked into this session.",
+      "session_cancelled": "This session is cancelled.",
+      "invalid_transition": "That change isn't possible for this booking.",
+      "invalid_reference": "That client is not available. Refresh and try again.",
+      "not_found": "The booking was not found. Refresh and try again.",
+      "generic": "Something went wrong. Try again."
+    },
+    "noPlan": "No plan"
+  },
+  "client": {
+    "tabs": {
+      "home": "Home",
+      "schedule": "Schedule",
+      "bookings": "My bookings",
+      "profile": "Profile"
+    },
+    "signIn": {
+      "title": "Sign in",
+      "subtitle": "Enter your email and we'll send you a 6-digit code. No password needed.",
+      "email": "Email",
+      "sendCode": "Send code",
+      "codeSent": "We sent a code to {email}. It's valid for one hour.",
+      "code": "6-digit code",
+      "verify": "Sign in",
+      "changeEmail": "Use a different email",
+      "invalidEmail": "Enter a valid email address.",
+      "invalidCode": "That code is wrong or has expired.",
+      "tooMany": "Too many attempts. Wait a minute and try again.",
+      "generic": "Something went wrong. Try again."
+    },
+    "join": {
+      "title": "Join your studio",
+      "subtitle": "Enter the code your studio gave you (it's on their sign or QR code).",
+      "code": "Join code",
+      "continue": "Continue",
+      "preview": "You're joining this business. They'll see your name and email, and you'll be able to book their classes.",
+      "joinButton": "Join {name}",
+      "otherCode": "Use a different code",
+      "back": "Back",
+      "unknownCode": "We couldn't find a business with that code.",
+      "generic": "Something went wrong. Try again.",
+      "noApp": "This business doesn't offer the app yet. Ask them about it."
+    },
+    "home": {
+      "greeting": "Hi {name}",
+      "nextBooking": "Your next booking",
+      "noUpcoming": "No upcoming bookings yet.",
+      "today": "Today",
+      "bookClass": "Book a class"
+    },
+    "schedule": {
+      "title": "Schedule",
+      "today": "Today",
+      "empty": "No classes on this day."
+    },
+    "bookings": {
+      "title": "My bookings",
+      "upcoming": "Upcoming",
+      "history": "History",
+      "noUpcoming": "Nothing booked yet.",
+      "myPlans": "My plans",
+      "validUntil": "Valid until {date}",
+      "entriesLeft": "{count, plural, one {# entry left} other {# entries left}}",
+      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:"
+    },
+    "profile": {
+      "title": "Profile",
+      "signedInAs": "Signed in as {email}",
+      "business": "Business",
+      "joinAnother": "Join another business",
+      "signOut": "Sign out"
+    },
+    "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
+    "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",
+    "youreBooked": "You're booked",
+    "waitlistPosition": "On the waitlist · #{position}",
+    "sessionCancelled": "Cancelled by the studio",
+    "book": "Book",
+    "joinWaitlist": "Waitlist",
+    "cancelBooking": "Cancel",
+    "leaveWaitlist": "Leave",
+    "cancelTitle": "Cancel this booking?",
+    "cancelMessage": "Your spot will go to the next person on the waitlist.",
+    "cancelLateMessage": "This is a late cancellation: it's inside the studio's cancellation window and will be recorded as late.",
+    "cancelConfirm": "Yes, cancel",
+    "keep": "Keep it",
+    "errors": {
+      "session_started": "This class has already started.",
+      "already_booked": "You're already booked into this class.",
+      "session_cancelled": "This class was cancelled.",
+      "not_found": "This booking no longer exists. Pull down to refresh.",
+      "generic": "Something went wrong. Try again.",
+      "no_valid_plan": "You need a valid membership or punch card to book. Ask the studio."
     }
+  },
+  "join": {
+    "inviteToApp": "Invite to the app",
+    "staffHint": "Print this page for the front desk or share the link. Clients scan the code, sign in with their email and can book right away.",
+    "qrLabel": "QR code that opens the join page",
+    "codeLabel": "Join code",
+    "step1": "Install the MyBiz app.",
+    "step2": "Sign in with your email (you'll get a 6-digit code).",
+    "step3": "Enter the join code above.",
+    "title": "Join {name}",
+    "body": "Book classes, join waitlists and manage your bookings in the app.",
+    "openApp": "Open in the app"
+  },
+  "plans": {
+    "title": "Plans",
+    "subtitle": "Memberships and punch cards your clients can buy.",
+    "add": "Add plan",
+    "new": "New plan",
+    "empty": "No plans yet.",
+    "name": "Name",
+    "kind": "Type",
+    "kinds": {
+      "membership": "Membership",
+      "punch_card": "Punch card"
+    },
+    "credits": "Number of entries",
+    "unlimited": "Unlimited classes while valid.",
+    "validity": "Valid for (days)",
+    "validityHintMembership": "For example 30 for a monthly membership.",
+    "validityHintCard": "How long the card can be used after the start date.",
+    "price": "Price",
+    "description": "Description",
+    "active": "On sale",
+    "editNote": "Changes apply to future sales. Plans already sold keep their terms.",
+    "creditsCount": "{count, plural, one {# entry} other {# entries}}",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "clientPlans": "Plans",
+    "noPlans": "No plans yet.",
+    "states": {
+      "active": "Active",
+      "upcoming": "Starts later",
+      "frozen": "Frozen",
+      "used_up": "Used up",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "creditsLeft": "{left} of {total} entries left",
+    "unlimitedUsed": "Unlimited · {used} used",
+    "frozenRange": "Frozen {from} – {to}",
+    "freeze": "Freeze",
+    "freezeFrom": "From",
+    "freezeTo": "Until",
+    "freezeReason": "Reason (optional)",
+    "frozen": "Frozen. The end date was extended.",
+    "cancelPlan": "Cancel plan",
+    "sellTitle": "Sell a plan",
+    "plan": "Plan",
+    "startsOn": "Starts on",
+    "simulatedPayment": "Payment is simulated in this prototype; no card is charged.",
+    "sell": "Sell",
+    "sold": "Plan sold.",
+    "errors": {
+      "invalid": "Check the details and try again.",
+      "generic": "Something went wrong. Try again.",
+      "not_active": "This plan is no longer active.",
+      "outside_validity": "The freeze must start while the plan is valid.",
+      "overlapping_freeze": "That overlaps an existing freeze."
+    },
+    "validityRange": "Valid {from} – {to}"
+  },
+  "metrics": {
+    "revenue": "Revenue",
+    "active_clients": "Active members",
+    "new_clients": "New clients",
+    "plans_sold": "Plans sold",
+    "attendance": "Check-ins",
+    "occupancy": "Occupancy",
+    "no_show_rate": "No-show rate",
+    "late_cancel_rate": "Late cancellations",
+    "sessions_held": "Sessions held"
+  },
+  "assistant": {
+    "title": "AI assistant",
+    "subtitle": "Ask about your business in plain words. It can also prepare bookings for you to confirm.",
+    "newConversation": "New conversation",
+    "notConfigured": "The assistant isn't set up yet: an AI provider key needs to be added on the server.",
+    "conversation": "Conversation",
+    "empty": "No conversations yet.",
+    "start": "Start a conversation",
+    "intro": "Hi! Ask me about your schedule, members, plans or numbers.",
+    "you": "You:",
+    "assistantLabel": "Assistant:",
+    "noAnswer": "I couldn't answer that one. Try asking differently.",
+    "history": "Recent conversations",
+    "untitled": "New conversation",
+    "question": "Your question",
+    "placeholder": "For example: How was occupancy last month?",
+    "send": "Send",
+    "thinking": "Thinking…",
+    "suggestion1": "How did last month go?",
+    "suggestion2": "What's on the schedule tomorrow?",
+    "suggestion3": "Which classes have a waitlist this week?",
+    "needsConfirmation": "Needs your confirmation",
+    "bookPreview": "Book {client} into {service}",
+    "cancelPreview": "Cancel {client}'s booking for {service}",
+    "fullWaitlist": "The class is full, so this will add them to the waitlist.",
+    "confirm": "Confirm",
+    "reject": "Don't do it",
+    "statuses": {
+      "pending": "Waiting for you",
+      "executed": "Done",
+      "rejected": "Not done (you declined)",
+      "expired": "Expired: ask again if you still want it",
+      "failed": "Couldn't be done: things changed. Ask again."
+    },
+    "errors": {
+      "ai_not_configured": "The assistant isn't set up yet.",
+      "ai_busy": "The assistant is busy right now. Try again in a minute.",
+      "ai_unavailable": "The assistant is unavailable right now. Try again later.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "modules": {
+    "title": "Modules and plan",
+    "subtitle": "Priced by what you use. Core depends on active clients (now: {count}).",
+    "core": "Core",
+    "coreTier": "Up to {count} active clients",
+    "coreTierCustom": "1,000+ active clients (custom price)",
+    "aiTier": "AI assistant",
+    "monthlyTotal": "Monthly total",
+    "comingSoon": "Coming soon",
+    "placeholderPrices": "Prototype: prices are placeholders and nothing is charged.",
+    "names": {
+      "none": "No AI",
+      "client_app": "Client app",
+      "ai_basic": "AI Basic",
+      "ai_pro": "AI Pro",
+      "crm": "CRM & leads",
+      "analytics_pro": "Advanced analytics",
+      "agent_finance": "Finance agent",
+      "agent_marketing": "Marketing agent",
+      "whatsapp": "WhatsApp",
+      "extra_location": "Extra locations"
+    },
+    "descriptions": {
+      "none": "You can add it any time.",
+      "client_app": "Your clients join with a code or QR, book, cancel and join waitlists in your branded app.",
+      "ai_basic": "Ask about your business in plain words: schedule, members, numbers.",
+      "ai_pro": "Everything in AI Basic, and it prepares bookings and cancellations for you to confirm.",
+      "extra_location": "{price} per location beyond the first."
+    }
+  },
+  "platform": {
+    "title": "Platform console",
+    "subtitle": "All businesses on the platform, their modules and usage.",
+    "businesses": "Businesses",
+    "activeClients": "Active clients",
+    "bookings30d": "Bookings (30 days)",
+    "aiCredits30d": "AI credits (30 days)",
+    "aiCreditsPerDay": "AI credits per day",
+    "aiCredits": "AI credits",
+    "day": "Day",
+    "businessesTitle": "Businesses",
+    "coreOnly": "Core only",
+    "noUsage": "No metered usage in the last 90 days.",
+    "columns": {
+      "name": "Business",
+      "owner": "Owner",
+      "modules": "Modules",
+      "members": "Team",
+      "clients": "Clients",
+      "activeClients": "Active",
+      "bookings30d": "Bookings 30d",
+      "aiCredits30d": "AI credits 30d",
+      "created": "Created"
+    }
+  },
+  "permissions": {
+    "clients_read": "View clients",
+    "clients_read_hint": "Client list and profiles",
+    "clients_write": "Edit clients",
+    "clients_write_hint": "Add and change clients",
+    "catalog_read": "View services and plans",
+    "catalog_read_hint": "Services, locations and plans",
+    "catalog_write": "Edit services and plans",
+    "catalog_write_hint": "Add and change them",
+    "schedule_read": "View the schedule",
+    "schedule_read_hint": "Sessions and rosters",
+    "schedule_write": "Edit the schedule",
+    "schedule_write_hint": "Create, move and cancel sessions",
+    "bookings_manage": "Manage bookings",
+    "bookings_manage_hint": "Book, check in and cancel for clients",
+    "sales_manage": "Sell plans",
+    "sales_manage_hint": "Sell, freeze and cancel memberships",
+    "reports_read": "View reports",
+    "reports_read_hint": "Revenue and other business numbers",
+    "ai_use": "Use the AI assistant",
+    "ai_use_hint": "Its tools still follow the other permissions",
+    "staff_read": "View the team",
+    "staff_read_hint": "Members and roles",
+    "staff_manage": "Manage the team",
+    "staff_manage_hint": "Invite, change roles, remove",
+    "business_settings": "Business settings",
+    "business_settings_hint": "Details, branding, modules and plan"
   }
 }

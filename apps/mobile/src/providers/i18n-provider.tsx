@@ -9,7 +9,7 @@ import {
 import { getLocales } from "expo-localization";
 import { reloadAsync } from "expo-updates";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { I18nManager } from "react-native";
+import { DevSettings, I18nManager, Platform } from "react-native";
 import { IntlProvider } from "use-intl";
 
 import { loadLocale, saveLocale } from "@/lib/preferences";
@@ -26,12 +26,20 @@ function deviceLocale(): Locale {
 }
 
 // React Native applies RTL / LTR only at startup, so a direction change needs a reload.
+// On the web the document direction can simply be switched.
 async function ensureDirection(locale: Locale): Promise<void> {
   const rtl = localeDirection[locale] === "rtl";
+  if (Platform.OS === "web") {
+    document.documentElement.dir = rtl ? "rtl" : "ltr";
+    document.documentElement.lang = locale;
+    return;
+  }
   if (I18nManager.isRTL === rtl) return;
   I18nManager.allowRTL(rtl);
   I18nManager.forceRTL(rtl);
-  await reloadAsync();
+  // expo-updates can only reload release builds; Expo Go and dev builds use the dev reload.
+  if (__DEV__) DevSettings.reload();
+  else await reloadAsync();
 }
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {

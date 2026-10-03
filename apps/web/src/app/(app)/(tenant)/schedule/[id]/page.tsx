@@ -4,24 +4,28 @@ import { notFound } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
 import { dayOf, formatDay, formatTime } from "@/lib/dates";
-import { canWriteSchedule } from "@/lib/permissions";
+import { canManageBookings, canWriteSchedule } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { setSessionStatus, updateSession } from "../actions";
 import { SessionForm } from "../session-form";
+import { Roster } from "./roster";
 
-export default async function SessionPage({ params }: PageProps<"/schedule/[id]">) {
+export default async function SessionPage({ params, searchParams }: PageProps<"/schedule/[id]">) {
   const { id } = await params;
+  const query = await searchParams;
+  const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
   const t = await getTranslations("schedule");
   const tCommon = await getTranslations("common");
   const locale = await getLocale();
-  const { tenant, api, scope } = await getTenant();
+  const context = await getTenant();
+  const { tenant, api, scope } = context;
   const { data: session } = await api.GET("/sessions/{session_id}", {
     params: { ...scope, path: { session_id: id } },
   });
   if (!session) notFound();
 
-  const writable = canWriteSchedule(tenant.role);
+  const writable = canWriteSchedule(tenant);
   const options = writable
     ? unwrap(await api.GET("/sessions/options", { params: scope }))
     : { services: [{ id: session.service.id, name: session.service.name, duration_minutes: 0, capacity: 0 }], locations: [], rooms: [], instructors: [] };
@@ -45,6 +49,14 @@ export default async function SessionPage({ params }: PageProps<"/schedule/[id]"
         </p>
         {session.series_id && <p className="text-sm text-muted">{t("series")}</p>}
       </div>
+
+      <Roster
+        session={session}
+        context={context}
+        manageable={canManageBookings(tenant)}
+        search={(first(query.q) ?? "").trim()}
+        error={first(query.error)}
+      />
 
       <section aria-labelledby="details-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
         <h2 id="details-heading" className="text-lg font-semibold">

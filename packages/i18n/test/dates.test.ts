@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { addDays, dayOf, isDay, todayIn, toApiWeekday, weekStart } from "./dates.ts";
+import { addDays, dayOf, isDay, todayIn, toApiWeekday, weekStart } from "../src/dates.ts";
 
 test("today depends on the business time zone, not the server's", () => {
   const instant = new Date("2026-10-11T22:30:00Z"); // Sunday night in UTC, Monday in Israel
