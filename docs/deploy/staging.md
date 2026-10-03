@@ -2,10 +2,15 @@
 
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|
-| Web (`apps/web`) | Vercel | `main` (previews for every PR) | Vercel project settings |
+| Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main` (previews for every PR) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | — | Supabase dashboard |
 | Migrations | GitHub Actions | `main` (when migrations change) or by hand | [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
+
+All server-side parts run in Frankfurt: every page load makes several web → API → database
+round trips, so keeping them in one region matters more than the user's distance to it.
+Supabase and Render have no Israel region today; Frankfurt is close to Israel and inside the EU
+(GDPR; Israel and the EU recognize each other's data protection as adequate).
 
 The free Render plan sleeps after 15 minutes without traffic; the first request then takes
 up to about a minute.
