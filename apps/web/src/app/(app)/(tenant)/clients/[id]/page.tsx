@@ -37,7 +37,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const joined = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: tenant.time_zone }).format(
     new Date(client.created_at),
   );
-  const writable = canWriteClients(tenant.role);
+  const writable = canWriteClients(tenant);
   const bookings = unwrap(
     await api.GET("/clients/{client_id}/bookings", { params: { ...scope, path: { client_id: id } } }),
   );

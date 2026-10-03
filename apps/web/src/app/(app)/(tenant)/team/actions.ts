@@ -7,9 +7,18 @@ import { siteOrigin } from "@/lib/origin";
 import { getTenant } from "@/lib/tenant";
 
 type Role = "owner" | "manager" | "staff" | "front_desk";
-const TEAM_ERRORS = ["already_member", "last_owner", "only_owners_manage_owners", "cannot_remove_self"] as const;
+const TEAM_ERRORS = [
+  "already_member",
+  "last_owner",
+  "only_owners_manage_owners",
+  "cannot_remove_self",
+  "cannot_change_own_role",
+  "exceeds_own_permissions",
+  "name_taken",
+  "role_in_use",
+] as const;
 export type TeamError = (typeof TEAM_ERRORS)[number] | "invalid" | "generic";
-export type TeamState = { error?: TeamError; link?: string; email?: string };
+export type TeamState = { error?: TeamError; link?: string; email?: string; created?: boolean };
 
 function toError(error: unknown): TeamError {
   if (error instanceof ApiError) {
@@ -44,7 +53,8 @@ export async function changeRole(userId: string, _state: TeamState, formData: Fo
     unwrap(
       await api.PATCH("/staff/{user_id}", {
         params: { ...scope, path: { user_id: userId } },
-        body: { role: String(formData.get("role")) as Role },
+        // "custom:<id>" assigns a custom role; anything else is a system role.
+        body: assignment(String(formData.get("role"))),
       }),
     );
   } catch (error) {
@@ -52,6 +62,10 @@ export async function changeRole(userId: string, _state: TeamState, formData: Fo
   }
   revalidatePath("/team");
   return {};
+}
+
+function assignment(value: string): { role: Role } | { custom_role_id: string } {
+  return value.startsWith("custom:") ? { custom_role_id: value.slice("custom:".length) } : { role: value as Role };
 }
 
 export async function removeMember(userId: string, _state: TeamState): Promise<TeamState> {
@@ -70,4 +84,33 @@ export async function revokeInvitation(invitationId: string): Promise<void> {
     params: { ...scope, path: { invitation_id: invitationId } },
   });
   revalidatePath("/team");
+}
+
+export async function saveRole(roleId: string | null, _state: TeamState, formData: FormData): Promise<TeamState> {
+  const { api, scope } = await getTenant();
+  const body = {
+    name: String(formData.get("name") ?? ""),
+    permissions: formData.getAll("permissions").map(String) as never,
+  };
+  try {
+    if (roleId) {
+      unwrap(await api.PATCH("/roles/{role_id}", { params: { ...scope, path: { role_id: roleId } }, body }));
+    } else {
+      unwrap(await api.POST("/roles", { params: scope, body }));
+    }
+  } catch (error) {
+    return { error: toError(error) };
+  }
+  revalidatePath("/team", "layout");
+  return roleId ? {} : { created: true };
+}
+
+export async function deleteRole(roleId: string, _state: TeamState): Promise<TeamState> {
+  const { api, scope } = await getTenant();
+  const { response, error } = await api.DELETE("/roles/{role_id}", {
+    params: { ...scope, path: { role_id: roleId } },
+  });
+  if (!response.ok) return { error: toError(new ApiError(response.status, error)) };
+  revalidatePath("/team", "layout");
+  return {};
 }

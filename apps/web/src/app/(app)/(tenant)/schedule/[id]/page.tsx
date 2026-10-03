@@ -25,7 +25,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   });
   if (!session) notFound();
 
-  const writable = canWriteSchedule(tenant.role);
+  const writable = canWriteSchedule(tenant);
   const options = writable
     ? unwrap(await api.GET("/sessions/options", { params: scope }))
     : { services: [{ id: session.service.id, name: session.service.name, duration_minutes: 0, capacity: 0 }], locations: [], rooms: [], instructors: [] };
@@ -53,7 +53,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
       <Roster
         session={session}
         context={context}
-        manageable={canManageBookings(tenant.role)}
+        manageable={canManageBookings(tenant)}
         search={(first(query.q) ?? "").trim()}
         error={first(query.error)}
       />

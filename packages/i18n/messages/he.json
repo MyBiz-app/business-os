@@ -293,8 +293,22 @@
       "only_owners_manage_owners": "רק בעלים יכולים לנהל בעלים.",
       "cannot_remove_self": "אי אפשר להסיר את עצמך.",
       "invalid": "בדקו את הפרטים ונסו שוב.",
-      "generic": "משהו השתבש. נסו שוב."
-    }
+      "generic": "משהו השתבש. נסו שוב.",
+      "cannot_change_own_role": "אי אפשר לשנות את התפקיד של עצמך.",
+      "exceeds_own_permissions": "אי אפשר להעניק הרשאות שאין לך בעצמך.",
+      "name_taken": "כבר יש תפקיד בשם הזה.",
+      "role_in_use": "התפקיד הזה עדיין מוקצה לחברי צוות. קודם משנים את התפקיד שלהם."
+    },
+    "manageRoles": "ניהול תפקידים והרשאות",
+    "rolesTitle": "תפקידים והרשאות",
+    "rolesSubtitle": "יוצרים תפקיד בהדלקה וכיבוי של הרשאות, ואז נותנים אותו לחברי צוות. אפשר להעניק רק הרשאות שיש גם לך.",
+    "newRole": "תפקיד חדש",
+    "roleName": "שם התפקיד",
+    "rolePermissions": "מה התפקיד הזה יכול לעשות",
+    "roleCreated": "התפקיד נוצר.",
+    "roleMembers": "{count, plural, =0 {אף אחד לא בתפקיד הזה.} one {אדם אחד בתפקיד הזה.} other {# אנשים בתפקיד הזה.}}",
+    "deleteRole": "מחיקת התפקיד",
+    "deleteRoleConfirm": "למחוק את התפקיד \"{name}\"?"
   },
   "invite": {
     "title": "הוזמנת להצטרף",
@@ -660,5 +674,33 @@
       "aiCredits30d": "קרדיטים 30 יום",
       "created": "נוצר"
     }
+  },
+  "permissions": {
+    "clients_read": "צפייה בלקוחות",
+    "clients_read_hint": "רשימת הלקוחות והפרופילים",
+    "clients_write": "עריכת לקוחות",
+    "clients_write_hint": "הוספה ושינוי של לקוחות",
+    "catalog_read": "צפייה בשירותים ובמסלולים",
+    "catalog_read_hint": "שירותים, סניפים ומסלולים",
+    "catalog_write": "עריכת שירותים ומסלולים",
+    "catalog_write_hint": "הוספה ושינוי",
+    "schedule_read": "צפייה במערכת השעות",
+    "schedule_read_hint": "שיעורים ורשימות משתתפים",
+    "schedule_write": "עריכת מערכת השעות",
+    "schedule_write_hint": "יצירה, הזזה וביטול של שיעורים",
+    "bookings_manage": "ניהול הרשמות",
+    "bookings_manage_hint": "רישום, צ'ק-אין וביטול עבור לקוחות",
+    "sales_manage": "מכירת מסלולים",
+    "sales_manage_hint": "מכירה, הקפאה וביטול של מנויים",
+    "reports_read": "צפייה בדוחות",
+    "reports_read_hint": "הכנסות ומספרים עסקיים",
+    "ai_use": "שימוש בעוזר ה-AI",
+    "ai_use_hint": "הכלים שלו עדיין כפופים להרשאות האחרות",
+    "staff_read": "צפייה בצוות",
+    "staff_read_hint": "חברי צוות ותפקידים",
+    "staff_manage": "ניהול הצוות",
+    "staff_manage_hint": "הזמנה, שינוי תפקיד והסרה",
+    "business_settings": "הגדרות העסק",
+    "business_settings_hint": "פרטים, מיתוג, מודולים וחבילה"
   }
 }

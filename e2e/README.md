@@ -20,3 +20,5 @@ proposes a booking → confirmed and executed → a platform admin sees the busi
    `uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" python e2e/dod.py you@example.com`
 
 Screenshots are written to `e2e/screenshots/` (git-ignored).
+
+`roles.py` checks custom roles through the UI (create a role, assign it, access changes, in-use role is protected). Run it the same way, without arguments, against the normal API.

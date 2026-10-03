@@ -54,7 +54,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Clients: list, search, create, edit, profile (vertical terminology, e.g. "members")
 - [x] Services (duration, capacity, price, color) and locations with rooms
 - [x] Staff: invite by link, roles, remove; last-owner and owner-only guards
-- [x] Custom roles: API (create, edit, assign, no privilege escalation) · [ ] role editor screen and role picker on the team page
+- [x] Custom roles: API + role editor screen + role picker on the team page; the UI follows each member's effective permissions (navigation, dashboard, pages)
 - [ ] Real invitation emails (with the production email provider)
 - [x] Business settings (name, language, time zone, currency) and branding (color with contrast-safe text, logo)
 

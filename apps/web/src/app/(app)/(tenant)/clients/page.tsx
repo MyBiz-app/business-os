@@ -51,7 +51,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               {t("join.inviteToApp")}
             </Link>
           )}
-          {canWriteClients(tenant.role) && (
+          {canWriteClients(tenant) && (
             <Link
               href="/clients/new"
               className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"

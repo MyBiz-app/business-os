@@ -27,9 +27,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   // Completed days only, so the comparison with the previous period is fair.
   const end = addDays(today, -1);
   const start = addDays(end, -(PERIODS[period] - 1));
-  const reports = canReadReports(tenant.role);
+  const reports = canReadReports(tenant);
 
-  const todays = unwrap(await api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }));
+  const canSeeSchedule = tenant.permissions.includes("schedule.read");
+  const todays = canSeeSchedule
+    ? unwrap(await api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }))
+    : [];
   const [metrics, revenue, attendance] = reports
     ? await Promise.all([
         api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES] } } }).then(unwrap),
@@ -141,7 +144,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </section>
       )}
 
-      <section aria-labelledby="today-heading" className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
+      {canSeeSchedule && <section aria-labelledby="today-heading" className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
         <h2 id="today-heading" className="text-lg font-semibold">
           {t("dashboard.today")}
         </h2>
@@ -174,7 +177,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             ))}
           </ul>
         )}
-      </section>
+      </section>}
     </main>
   );
 }

@@ -17,7 +17,7 @@ export default async function LocationsPage() {
           <h1 className="text-3xl font-bold">{t("locations.title")}</h1>
           <p className="text-sm text-muted">{t("locations.subtitle")}</p>
         </div>
-        {canWriteCatalog(tenant.role) && (
+        {canWriteCatalog(tenant) && (
           <Link href="/locations/new" className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">
             {t("locations.add")}
           </Link>

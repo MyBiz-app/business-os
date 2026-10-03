@@ -26,7 +26,7 @@ export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
         plan={plan}
         currency={plan.price_currency}
         submitLabel={t("common.save")}
-        readOnly={!canWriteCatalog(tenant.role)}
+        readOnly={!canWriteCatalog(tenant)}
       />
     </main>
   );

@@ -10,7 +10,7 @@ import { PlanForm } from "../plan-form";
 export default async function NewPlanPage() {
   const t = await getTranslations();
   const { tenant } = await getTenant();
-  if (!canWriteCatalog(tenant.role)) redirect("/plans");
+  if (!canWriteCatalog(tenant)) redirect("/plans");
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">

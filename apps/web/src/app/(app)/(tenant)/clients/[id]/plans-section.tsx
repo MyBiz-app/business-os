@@ -35,7 +35,7 @@ export async function PlansSection({ clientId, context }: Props) {
     api.GET("/clients/{client_id}/entitlements", { params: { ...scope, path: { client_id: clientId } } }).then(unwrap),
     api.GET("/plans", { params: { ...scope, query: { active: true } } }).then(unwrap),
   ]);
-  const selling = canSell(tenant.role);
+  const selling = canSell(tenant);
   const today = todayIn(tenant.time_zone);
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" });
   const formatDate = (day: string) => date.format(new Date(`${day}T12:00:00Z`));

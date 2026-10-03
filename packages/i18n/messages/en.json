@@ -293,8 +293,22 @@
       "only_owners_manage_owners": "Only owners can manage owners.",
       "cannot_remove_self": "You cannot remove yourself.",
       "invalid": "Please check the details and try again.",
-      "generic": "Something went wrong. Please try again."
-    }
+      "generic": "Something went wrong. Please try again.",
+      "cannot_change_own_role": "You can't change your own role.",
+      "exceeds_own_permissions": "You can't grant permissions you don't have yourself.",
+      "name_taken": "A role with that name already exists.",
+      "role_in_use": "This role is still assigned to team members. Change their role first."
+    },
+    "manageRoles": "Manage roles and permissions",
+    "rolesTitle": "Roles and permissions",
+    "rolesSubtitle": "Create a role by switching permissions on or off, then give it to team members. You can only grant permissions you have yourself.",
+    "newRole": "New role",
+    "roleName": "Role name",
+    "rolePermissions": "What this role can do",
+    "roleCreated": "Role created.",
+    "roleMembers": "{count, plural, =0 {Nobody has this role.} one {1 person has this role.} other {# people have this role.}}",
+    "deleteRole": "Delete role",
+    "deleteRoleConfirm": "Delete the role \"{name}\"?"
   },
   "invite": {
     "title": "You're invited",
@@ -660,5 +674,33 @@
       "aiCredits30d": "AI credits 30d",
       "created": "Created"
     }
+  },
+  "permissions": {
+    "clients_read": "View clients",
+    "clients_read_hint": "Client list and profiles",
+    "clients_write": "Edit clients",
+    "clients_write_hint": "Add and change clients",
+    "catalog_read": "View services and plans",
+    "catalog_read_hint": "Services, locations and plans",
+    "catalog_write": "Edit services and plans",
+    "catalog_write_hint": "Add and change them",
+    "schedule_read": "View the schedule",
+    "schedule_read_hint": "Sessions and rosters",
+    "schedule_write": "Edit the schedule",
+    "schedule_write_hint": "Create, move and cancel sessions",
+    "bookings_manage": "Manage bookings",
+    "bookings_manage_hint": "Book, check in and cancel for clients",
+    "sales_manage": "Sell plans",
+    "sales_manage_hint": "Sell, freeze and cancel memberships",
+    "reports_read": "View reports",
+    "reports_read_hint": "Revenue and other business numbers",
+    "ai_use": "Use the AI assistant",
+    "ai_use_hint": "Its tools still follow the other permissions",
+    "staff_read": "View the team",
+    "staff_read_hint": "Members and roles",
+    "staff_manage": "Manage the team",
+    "staff_manage_hint": "Invite, change roles, remove",
+    "business_settings": "Business settings",
+    "business_settings_hint": "Details, branding, modules and plan"
   }
 }

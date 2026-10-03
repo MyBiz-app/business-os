@@ -13,7 +13,7 @@ import { BrandColorForm, DetailsForm, LogoForm } from "./settings-forms";
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
   const { tenant } = await getTenant();
-  if (!canManageSettings(tenant.role)) redirect("/dashboard");
+  if (!canManageSettings(tenant)) redirect("/dashboard");
   const logo = apiAssetUrl(tenant.logo_url);
 
   return (

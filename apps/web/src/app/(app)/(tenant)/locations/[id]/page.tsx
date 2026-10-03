@@ -17,7 +17,7 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
     params: { ...scope, path: { location_id: id } },
   });
   if (!location) notFound();
-  const readOnly = !canWriteCatalog(tenant.role);
+  const readOnly = !canWriteCatalog(tenant);
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">

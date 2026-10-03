@@ -4,7 +4,7 @@ import Image from "next/image";
 import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { brandStyle } from "@/lib/brand";
-import { canManageSettings, canManageTeam, canUseAssistant } from "@/lib/permissions";
+import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
@@ -12,19 +12,23 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
 
-  const items: NavItem[] = [
+  // Only what the user's permissions let them open.
+  const allowed = (permission: string) => tenant.permissions.includes(permission);
+  const candidates: (NavItem & { permission?: string })[] = [
     { href: "/dashboard", label: t("nav.dashboard") },
-    ...(canUseAssistant(tenant.role) && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")
-      ? [{ href: "/assistant", label: t("nav.assistant") }]
-      : []),
-    { href: "/schedule", label: t("nav.schedule") },
-    { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients") },
-    { href: "/services", label: t("nav.services") },
-    { href: "/plans", label: t("nav.plans") },
-    { href: "/locations", label: t("nav.locations") },
+    { href: "/assistant", label: t("nav.assistant"), permission: "ai.use" },
+    { href: "/schedule", label: t("nav.schedule"), permission: "schedule.read" },
+    { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), permission: "clients.read" },
+    { href: "/services", label: t("nav.services"), permission: "catalog.read" },
+    { href: "/plans", label: t("nav.plans"), permission: "catalog.read" },
+    { href: "/locations", label: t("nav.locations"), permission: "catalog.read" },
   ];
-  if (canManageTeam(tenant.role)) items.push({ href: "/team", label: t("nav.team") });
-  if (canManageSettings(tenant.role)) items.push({ href: "/settings", label: t("nav.settings") });
+  const items: NavItem[] = candidates
+    .filter((item) => !item.permission || allowed(item.permission))
+    .filter((item) => item.href !== "/assistant" || tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro"))
+    .map(({ href, label }) => ({ href, label }));
+  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team") });
+  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings") });
 
   return (
     // The business's brand color replaces the product color inside its own area.

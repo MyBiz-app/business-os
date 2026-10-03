@@ -12,7 +12,7 @@ export default async function ModulesPage() {
   const t = await getTranslations("modules");
   const tSettings = await getTranslations("settings");
   const { tenant, api, scope } = await getTenant();
-  if (!canManageSettings(tenant.role)) redirect("/dashboard");
+  if (!canManageSettings(tenant)) redirect("/dashboard");
   const [catalog, current] = await Promise.all([
     api.GET("/modules/catalog", { params: { query: { currency: tenant.currency } } }).then(unwrap),
     api.GET("/tenants/current/modules", { params: scope }).then(unwrap),

@@ -60,7 +60,7 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
   const t = await getTranslations("assistant");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenant();
-  if (!canUseAssistant(tenant.role) || !tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")) {
+  if (!canUseAssistant(tenant) || !tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")) {
     redirect("/dashboard");
   }
   const query = await searchParams;

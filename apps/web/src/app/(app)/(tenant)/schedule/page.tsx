@@ -38,7 +38,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("nextWeek")}
             </Link>
           </nav>
-          {canWriteSchedule(tenant.role) && (
+          {canWriteSchedule(tenant) && (
             <Link
               href={`/schedule/new?date=${start > today ? start : today}`}
               className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"
