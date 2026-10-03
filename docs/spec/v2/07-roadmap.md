@@ -52,7 +52,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Business navigation shell (side navigation)
 - [x] Permissions model (permission keys in code, system roles)
 - [x] Clients: list, search, create, edit, profile (vertical terminology, e.g. "members")
-- [ ] Services and locations
+- [x] Services (duration, capacity, price, color) and locations with rooms
 - [ ] Staff: invite, roles; custom roles
 - [ ] Branding
 

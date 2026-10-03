@@ -48,7 +48,10 @@ def engine() -> Iterator[Engine]:
 def clean_tables(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(
-            text("TRUNCATE app.clients, app.tenant_members, app.tenants, app.users CASCADE")
+            text(
+                "TRUNCATE app.services, app.rooms, app.locations, app.clients, "
+                "app.tenant_members, app.tenants, app.users CASCADE"
+            )
         )
 
 

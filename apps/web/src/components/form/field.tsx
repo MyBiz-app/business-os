@@ -62,3 +62,17 @@ export function SelectField({ label, options, ...selectProps }: SelectFieldProps
     </div>
   );
 }
+
+type CheckboxFieldProps = React.InputHTMLAttributes<HTMLInputElement> & { label: string };
+
+export function CheckboxField({ label, ...inputProps }: CheckboxFieldProps) {
+  const id = useId();
+  return (
+    <div className="flex items-center gap-2">
+      <input id={id} type="checkbox" className="size-4 accent-primary" {...inputProps} />
+      <label htmlFor={id} className="text-sm font-medium">
+        {label}
+      </label>
+    </div>
+  );
+}

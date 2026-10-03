@@ -7,6 +7,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
+from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
 
@@ -22,13 +23,6 @@ COLUMNS = (
 )
 
 
-def _blank_to_none(value: object) -> object:
-    if isinstance(value, str):
-        value = value.strip()
-        return value or None
-    return value
-
-
 class ClientFields(BaseModel):
     last_name: str | None = Field(default=None, max_length=100)
     email: EmailStr | None = None
@@ -39,7 +33,7 @@ class ClientFields(BaseModel):
     @field_validator("last_name", "email", "phone", "notes", "date_of_birth", mode="before")
     @classmethod
     def blank_is_missing(cls, value: object) -> object:
-        return _blank_to_none(value)
+        return blank_to_none(value)
 
 
 class ClientCreate(ClientFields):
@@ -154,7 +148,7 @@ def get_client(client_id: UUID, context: ReadDep) -> Client:
         .first()
     )
     if row is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+        raise not_found()
     return Client.model_validate(dict(row))
 
 
@@ -165,13 +159,11 @@ def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Cli
         raise HTTPException(status_code=422, detail="first_name must not be blank")
     if "status" in changes and changes["status"] is None:
         del changes["status"]
-    # Column names come from the model's fields, never from user input.
-    assignments = ", ".join(f"{column} = :{column}" for column in changes)
-    set_clause = f"{assignments}, updated_at = now()" if assignments else "updated_at = now()"
+    sql = f"UPDATE app.clients SET {set_clause(changes)} WHERE id = :id RETURNING {COLUMNS}"
     try:
         row = (
             context.session.execute(
-                text(f"UPDATE app.clients SET {set_clause} WHERE id = :id RETURNING {COLUMNS}"),
+                text(sql),
                 {**changes, "id": client_id},
             )
             .mappings()
@@ -180,5 +172,5 @@ def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Cli
     except IntegrityError as error:
         raise _email_taken(error) or error from error
     if row is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+        raise not_found()
     return Client.model_validate(dict(row))

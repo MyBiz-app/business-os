@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.api import clients
+from app.api import clients, locations, services
 from app.api.routes import router
 from app.core.config import get_settings
 
@@ -35,6 +35,8 @@ def create_app() -> FastAPI:
 
     app.include_router(router)
     app.include_router(clients.router)
+    app.include_router(services.router)
+    app.include_router(locations.router)
 
     return app
 

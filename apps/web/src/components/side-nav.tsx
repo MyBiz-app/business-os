@@ -12,6 +12,8 @@ export function SideNav({ clientsLabel }: Props) {
   const items = [
     { href: "/dashboard", label: t("dashboard") },
     { href: "/clients", label: clientsLabel },
+    { href: "/services", label: t("services") },
+    { href: "/locations", label: t("locations") },
   ];
 
   return (
