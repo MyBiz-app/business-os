@@ -46,6 +46,7 @@ When a decision changes, update the row and note the date — do not delete hist
 | T18 | Auth: Supabase Auth issues tokens (ES256); the API verifies them against Supabase's JWKS. Clients never query app tables directly; all data goes through the API. | DECIDED (2026-10-03, delegated) |
 | T19 | Background jobs: a Postgres-backed queue instead of Redis (one less service to run and pay for). Added when first needed. | DECIDED (2026-10-03, delegated) |
 | T20 | Typed API contract: `packages/api-client` is generated from FastAPI's OpenAPI schema; web (and later mobile) call the API only through it. | DECIDED (2026-10-03, delegated) |
+| T21 | Staging hosting: Vercel (web), Render free plan in Frankfurt (API, Docker), Supabase Central EU. Migrations via a GitHub Actions workflow. Revisit API host (e.g. Cloud Run) before production. | DECIDED (2026-10-03) |
 
 ## Process
 
