@@ -12,3 +12,9 @@ export function canWriteClients(role: Role): boolean {
 export function canWriteCatalog(role: Role): boolean {
   return CATALOG_WRITERS.has(role);
 }
+
+const TEAM_MANAGERS = new Set<Role>(["owner", "manager"]);
+
+export function canManageTeam(role: Role): boolean {
+  return TEAM_MANAGERS.has(role);
+}

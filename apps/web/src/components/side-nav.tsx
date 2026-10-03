@@ -4,17 +4,11 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type Props = { clientsLabel: string };
+export type NavItem = { href: string; label: string };
 
-export function SideNav({ clientsLabel }: Props) {
+export function SideNav({ items }: { items: NavItem[] }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
-  const items = [
-    { href: "/dashboard", label: t("dashboard") },
-    { href: "/clients", label: clientsLabel },
-    { href: "/services", label: t("services") },
-    { href: "/locations", label: t("locations") },
-  ];
 
   return (
     <nav aria-label={t("label")} className="border-b border-border md:border-b-0 md:border-e">

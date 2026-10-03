@@ -49,7 +49,7 @@ def clean_tables(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(
             text(
-                "TRUNCATE app.services, app.rooms, app.locations, app.clients, "
+                "TRUNCATE app.invitations, app.services, app.rooms, app.locations, app.clients, "
                 "app.tenant_members, app.tenants, app.users CASCADE"
             )
         )

@@ -1,6 +1,7 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { AUTH_NEXT_COOKIE, safeNext } from "@/lib/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 const OTP_TYPES = new Set<EmailOtpType>(["email", "signup", "recovery", "email_change", "invite"]);
@@ -15,9 +16,12 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
   const code = searchParams.get("code");
-  const next = searchParams.get("next");
-  // Only same-site paths, never an absolute URL from the query string.
-  const destination = next?.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  // Only same-site paths. Sign-up stores its destination in a cookie, because the email
+  // template's link does not carry it.
+  const destination =
+    safeNext(searchParams.get("next")) ??
+    safeNext(request.cookies.get(AUTH_NEXT_COOKIE)?.value) ??
+    "/dashboard";
 
   const supabase = await createClient();
   let verified = false;
@@ -28,5 +32,7 @@ export async function GET(request: NextRequest) {
   }
 
   const target = verified ? destination : "/login?error=link_invalid";
-  return NextResponse.redirect(new URL(target, request.url));
+  const response = NextResponse.redirect(new URL(target, request.url));
+  if (verified) response.cookies.delete(AUTH_NEXT_COOKIE);
+  return response;
 }

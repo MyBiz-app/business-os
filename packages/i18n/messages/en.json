@@ -109,7 +109,8 @@
     "label": "Main navigation",
     "dashboard": "Dashboard",
     "services": "Services",
-    "locations": "Locations"
+    "locations": "Locations",
+    "team": "Team"
   },
   "terms": {
     "fitness": {
@@ -201,5 +202,46 @@
     "roomCapacity": "Capacity",
     "addRoom": "Add room",
     "noRooms": "No rooms yet."
+  },
+  "team": {
+    "title": "Team",
+    "subtitle": "People who work in the business and what they can do.",
+    "members": "Members",
+    "email": "Email",
+    "role": "Role",
+    "joined": "Joined",
+    "you": "(you)",
+    "remove": "Remove",
+    "removeConfirm": "Remove {email} from the business?",
+    "invite": "Invite someone",
+    "inviteSubmit": "Create invite link",
+    "inviteCreated": "Invite link created. Send it to {email} — it works once and expires in 7 days.",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "pending": "Pending invitations",
+    "noPending": "No pending invitations.",
+    "expires": "Expires {date}",
+    "expired": "Expired",
+    "revoke": "Revoke",
+    "errors": {
+      "already_member": "This person is already a member.",
+      "last_owner": "The business must keep at least one owner.",
+      "only_owners_manage_owners": "Only owners can manage owners.",
+      "cannot_remove_self": "You cannot remove yourself.",
+      "invalid": "Please check the details and try again.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "invite": {
+    "title": "You're invited",
+    "body": "{business} invited you to join as {role}.",
+    "signedOutBody": "Log in or create an account to see and accept this invitation.",
+    "accept": "Join {business}",
+    "wrongEmail": "This invitation was sent to {invited}, but you are signed in as {current}. Sign out and sign in with the invited email.",
+    "expired": "This invitation has expired. Ask for a new one.",
+    "accepted": "This invitation was already used.",
+    "notFound": "This invitation link is invalid or was revoked.",
+    "login": "Log in",
+    "signup": "Create an account"
   }
 }

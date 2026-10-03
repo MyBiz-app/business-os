@@ -53,7 +53,9 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Permissions model (permission keys in code, system roles)
 - [x] Clients: list, search, create, edit, profile (vertical terminology, e.g. "members")
 - [x] Services (duration, capacity, price, color) and locations with rooms
-- [ ] Staff: invite, roles; custom roles
+- [x] Staff: invite by link, roles, remove; last-owner and owner-only guards
+- [ ] Custom roles (permission toggles per business)
+- [ ] Real invitation emails (with the production email provider)
 - [ ] Branding
 
 ## Owner setup checklist (Windows + iPhone)
