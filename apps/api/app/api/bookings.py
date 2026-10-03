@@ -8,13 +8,14 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
+from app.api.plans import usable_entitlement
 from app.permissions import Permission
 
 router = APIRouter(tags=["bookings"])
@@ -48,6 +49,7 @@ class Booking(BaseModel):
     session_id: UUID
     client_id: UUID
     client_name: str
+    plan_name: str | None = Field(description="The client's plan this booking uses, if any")
     status: BookingStatus
     waitlist_position: int | None
     late_cancel: bool
@@ -70,10 +72,12 @@ class ClientBooking(BaseModel):
 BOOKING_SELECT = """
     SELECT b.id, b.session_id, b.client_id,
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
+           e.name AS plan_name,
            b.status, b.late_cancel, b.checked_in_at, b.cancelled_at, b.created_at,
            app.waitlist_position(b.id) AS waitlist_position
     FROM app.bookings b
     JOIN app.clients c ON c.id = b.client_id
+    LEFT JOIN app.entitlements e ON e.id = b.entitlement_id
 """
 
 
@@ -121,8 +125,11 @@ def promote_waitlist(db: Session, session_id: UUID) -> None:
     db.execute(text("SELECT app.promote_waitlist(:id)"), {"id": session_id})
 
 
-def place_booking(db: Session, tenant_id: UUID, session_id: UUID, client_id: UUID) -> UUID:
-    """Books the client if a spot is free, otherwise adds them to the waitlist."""
+def place_booking(
+    db: Session, tenant_id: UUID, session_id: UUID, client_id: UUID, *, requires_plan: bool
+) -> UUID:
+    """Books the client if a spot is free, otherwise adds them to the waitlist. The booking
+    uses one of the client's plans when one is valid; with `requires_plan`, it must."""
     session = lock_session(db, session_id)
     if session["status"] == "cancelled":
         raise _conflict("session_cancelled")
@@ -136,14 +143,19 @@ def place_booking(db: Session, tenant_id: UUID, session_id: UUID, client_id: UUI
     if already:
         raise _conflict("already_booked")
 
+    entitlement_id = usable_entitlement(db, client_id, session_id)
+    if entitlement_id is None and requires_plan:
+        raise _conflict("no_valid_plan")
+
     booked, _ = session_counts(db, session_id)
     full = booked >= session["capacity"]
     try:
         return db.execute(
             text("""
                 INSERT INTO app.bookings
-                    (tenant_id, session_id, client_id, status, waitlisted_at, created_by)
-                VALUES (:tenant_id, :session_id, :client_id, :status,
+                    (tenant_id, session_id, client_id, entitlement_id, status, waitlisted_at,
+                     created_by)
+                VALUES (:tenant_id, :session_id, :client_id, :entitlement_id, :status,
                         CASE WHEN :full THEN now() END, app.current_user_id())
                 RETURNING id
             """),
@@ -151,6 +163,7 @@ def place_booking(db: Session, tenant_id: UUID, session_id: UUID, client_id: UUI
                 "tenant_id": tenant_id,
                 "session_id": session_id,
                 "client_id": client_id,
+                "entitlement_id": entitlement_id,
                 "status": "waitlisted" if full else "booked",
                 "full": full,
             },
@@ -193,7 +206,10 @@ def list_bookings(session_id: UUID, context: ScheduleReadDep) -> list[Booking]:
 @router.post("/sessions/{session_id}/bookings", status_code=status.HTTP_201_CREATED)
 def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) -> Booking:
     """Books the client if a spot is free, otherwise adds them to the waitlist."""
-    booking_id = place_booking(context.session, context.tenant_id, session_id, body.client_id)
+    # Staff may book without a plan (walk-ins pay at the desk); the roster shows it.
+    booking_id = place_booking(
+        context.session, context.tenant_id, session_id, body.client_id, requires_plan=False
+    )
     return _load(context.session, booking_id)
 
 

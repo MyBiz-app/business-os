@@ -31,6 +31,8 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
+# Hebrew letters are legitimate content (vertical packs, demo data), not look-alike characters.
+ignore = ["RUF001"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, status
-from sqlalchemy import text
+from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep, TenantDep, UserDep
@@ -29,7 +29,8 @@ def load_current_tenant(session: Session) -> Tenant:
         session.execute(
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
-                       t.primary_color, t.cancellation_window_minutes, t.join_code, m.role,
+                       t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
+                       t.join_code, m.role,
                        CASE WHEN t.logo IS NULL THEN NULL
                             ELSE '/public/tenants/' || t.id || '/logo?v='
                                  || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url
@@ -43,6 +44,42 @@ def load_current_tenant(session: Session) -> Tenant:
         .one()
     )
     return Tenant.model_validate(dict(row))
+
+
+def apply_vertical_pack(
+    session: Session | Connection, tenant_id: UUID, vertical: str, locale: str, currency: str
+) -> None:
+    """Gives a new business its vertical's defaults: booking policy and starter plans."""
+    pack = VERTICAL_PACKS[vertical]
+    session.execute(
+        text("""
+            UPDATE app.tenants
+            SET cancellation_window_minutes = :minutes, booking_requires_plan = :requires_plan
+            WHERE id = :id
+        """),
+        {
+            "minutes": pack.cancellation_window_minutes,
+            "requires_plan": pack.booking_requires_plan,
+            "id": tenant_id,
+        },
+    )
+    for plan in pack.default_plans:
+        session.execute(
+            text("""
+                INSERT INTO app.plans
+                    (tenant_id, name, kind, validity_days, credits, price_amount, price_currency)
+                VALUES (:tenant_id, :name, :kind, :validity_days, :credits, :price, :currency)
+            """),
+            {
+                "tenant_id": tenant_id,
+                "name": plan.names.get(locale, plan.names["en"]),
+                "kind": plan.kind,
+                "validity_days": plan.validity_days,
+                "credits": plan.credits,
+                "price": plan.prices.get(currency, 0),
+                "currency": currency,
+            },
+        )
 
 
 @router.get("/me", tags=["account"])
@@ -76,11 +113,7 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
         body.model_dump(),
     ).scalar_one()
     set_tenant(session, tenant_id)
-    pack = VERTICAL_PACKS[body.vertical]
-    session.execute(
-        text("UPDATE app.tenants SET cancellation_window_minutes = :minutes WHERE id = :id"),
-        {"minutes": pack.cancellation_window_minutes, "id": tenant_id},
-    )
+    apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
     return load_current_tenant(session)
 
 

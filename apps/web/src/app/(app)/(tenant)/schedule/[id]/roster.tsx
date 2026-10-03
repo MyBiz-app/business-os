@@ -77,6 +77,12 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           {t(`statuses.${booking.status}`)}
         </span>
         {booking.late_cancel && <span className="text-xs text-danger">{t("lateCancel")}</span>}
+        {booking.status !== "cancelled" &&
+          (booking.plan_name ? (
+            <span className="text-xs text-muted">{booking.plan_name}</span>
+          ) : (
+            <span className="rounded-full border border-danger/40 px-2 py-0.5 text-xs text-danger">{t("noPlan")}</span>
+          ))}
       </div>
       {manageable && (
         <div className="flex flex-wrap gap-2">

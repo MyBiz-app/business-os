@@ -18,8 +18,28 @@ def join(client: TestClient, auth: AuthHeaders, user: UUID, code: str) -> dict:
     return response.json()
 
 
+def give_plan(client: TestClient, studio: dict, client_id: str, name: str = "Monthly") -> dict:
+    """Sells the business's unlimited membership (a default plan of the fitness pack)."""
+    plans = client.get("/plans", headers=studio["headers"]).json()
+    membership = next(p for p in plans if p["kind"] == "membership")
+    sold = client.post(
+        f"/clients/{client_id}/entitlements",
+        json={"plan_id": membership["id"], "idempotency_key": f"sale-{uuid4()}"},
+        headers=studio["headers"],
+    )
+    assert sold.status_code == 201, sold.text
+    return sold.json()
+
+
+def member(client: TestClient, auth: AuthHeaders, studio: dict, user: UUID) -> dict:
+    """A client who joined through the app and holds a membership."""
+    joined = join(client, auth, user, join_code(client, studio))
+    give_plan(client, studio, joined["client_id"])
+    return joined
+
+
 def upcoming(client: TestClient, headers: dict) -> list:
-    start = (date.today() + timedelta(days=25)).isoformat()  # new_session() is 30 days out
+    start = (date.today() + timedelta(days=15)).isoformat()  # new_session() is 20 days out
     response = client.get("/client/sessions", params={"start": start, "days": 14}, headers=headers)
     assert response.status_code == 200, response.text
     return response.json()
@@ -77,9 +97,8 @@ def test_client_books_sees_spots_and_cancels(
 ) -> None:
     session_id = new_session(client, studio, capacity=1)
     alice, bob = uuid4(), uuid4()
-    code = join_code(client, studio)
-    join(client, auth, alice, code)
-    join(client, auth, bob, code)
+    member(client, auth, studio, alice)
+    member(client, auth, studio, bob)
     alice_headers = auth(alice, studio["tenant_id"])
     bob_headers = auth(bob, studio["tenant_id"])
 
@@ -179,7 +198,7 @@ def test_late_window_applies_to_clients(
     soon = date.today() + timedelta(days=1)
     session_id = new_session(client, studio, on=soon)
     user = uuid4()
-    join(client, auth, user, join_code(client, studio))
+    member(client, auth, studio, user)
     headers = auth(user, studio["tenant_id"])
     booking = client.post(f"/client/sessions/{session_id}/bookings", headers=headers).json()
     with engine.begin() as connection:  # starts in 30 minutes, inside the 2 h window
@@ -196,3 +215,21 @@ def test_late_window_applies_to_clients(
 
     [entry] = client.get("/client/bookings", headers=headers).json()
     assert entry["late_cancel"] is True
+
+
+def test_client_needs_a_valid_plan(client: TestClient, studio: dict, auth: AuthHeaders) -> None:
+    session_id = new_session(client, studio)
+    user = uuid4()
+    joined = join(client, auth, user, join_code(client, studio))
+    headers = auth(user, studio["tenant_id"])
+
+    refused = client.post(f"/client/sessions/{session_id}/bookings", headers=headers)
+    assert refused.status_code == 409
+    assert refused.json()["detail"] == "no_valid_plan"
+    assert len(client.get("/client/plans", headers=headers).json()) == 3  # pack defaults
+
+    give_plan(client, studio, joined["client_id"])
+    booked = client.post(f"/client/sessions/{session_id}/bookings", headers=headers)
+    assert booked.status_code == 201
+    [mine] = client.get("/client/entitlements", headers=headers).json()
+    assert mine["state"] == "active" and mine["credits_used"] == 1

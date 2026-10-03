@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { PlansSection } from "./plans-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
 function splitByNow<T extends { starts_at: string }>(bookings: T[]) {
@@ -25,7 +26,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const t = await getTranslations("clients");
   const tBookings = await getTranslations("bookings");
   const locale = await getLocale();
-  const { tenant, api, scope } = await getTenant();
+  const context = await getTenant();
+  const { tenant, api, scope } = context;
 
   const { data: client } = await api.GET("/clients/{client_id}", {
     params: { ...scope, path: { client_id: id } },
@@ -90,6 +92,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           readOnly={!writable}
         />
       </section>
+
+      <PlansSection clientId={client.id} context={context} />
 
       <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
         <h2 id="bookings-heading" className="text-lg font-semibold">

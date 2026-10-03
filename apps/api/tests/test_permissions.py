@@ -11,6 +11,7 @@ EXPECTED = {
         "schedule.read",
         "schedule.write",
         "bookings.manage",
+        "sales.manage",
     },
     "staff": {"clients.read", "catalog.read", "schedule.read", "bookings.manage"},
 }

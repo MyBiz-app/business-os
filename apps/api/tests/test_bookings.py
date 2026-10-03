@@ -10,7 +10,7 @@ from tests.test_tenants import STUDIO
 
 
 def new_session(client: TestClient, studio: dict, capacity: int = 2, on: date | None = None) -> str:
-    on = on or date.today() + timedelta(days=30)
+    on = on or date.today() + timedelta(days=20)
     created = client.post(
         "/sessions",
         json={
@@ -77,7 +77,7 @@ def test_cancel_promotes_first_waitlisted(client: TestClient, studio: dict) -> N
 
     assert cancelled.status_code == 200
     assert cancelled.json()["status"] == "cancelled"
-    assert cancelled.json()["late_cancel"] is False  # 30 days ahead, outside the 2h window
+    assert cancelled.json()["late_cancel"] is False  # 20 days ahead, outside the 2h window
     roster = {
         b["id"]: b for b in client.get(f"/sessions/{session_id}/bookings", headers=headers).json()
     }

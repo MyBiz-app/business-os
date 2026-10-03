@@ -17,6 +17,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/schedule", label: t("nav.schedule") },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients") },
     { href: "/services", label: t("nav.services") },
+    { href: "/plans", label: t("nav.plans") },
     { href: "/locations", label: t("nav.locations") },
   ];
   if (canManageTeam(tenant.role)) items.push({ href: "/team", label: t("nav.team") });

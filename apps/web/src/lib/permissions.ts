@@ -35,3 +35,9 @@ const BOOKING_MANAGERS = new Set<Role>(["owner", "manager", "front_desk", "staff
 export function canManageBookings(role: Role): boolean {
   return BOOKING_MANAGERS.has(role);
 }
+
+const SELLERS = new Set<Role>(["owner", "manager", "front_desk"]);
+
+export function canSell(role: Role): boolean {
+  return SELLERS.has(role);
+}

@@ -14,6 +14,7 @@ class Permission(StrEnum):
     SCHEDULE_READ = "schedule.read"
     SCHEDULE_WRITE = "schedule.write"
     BOOKINGS_MANAGE = "bookings.manage"  # book clients into sessions, check in, cancel
+    SALES_MANAGE = "sales.manage"  # sell, freeze and cancel clients' plans
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
@@ -30,6 +31,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.SCHEDULE_READ,
             Permission.SCHEDULE_WRITE,
             Permission.BOOKINGS_MANAGE,
+            Permission.SALES_MANAGE,
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
@@ -43,6 +45,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.SCHEDULE_READ,
             Permission.SCHEDULE_WRITE,
             Permission.BOOKINGS_MANAGE,
+            Permission.SALES_MANAGE,
         }
     ),
     "staff": frozenset(

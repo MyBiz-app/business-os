@@ -10,21 +10,31 @@ import { useLoad } from "@/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type Booking = components["schemas"]["ClientBooking"];
+type Entitlement = components["schemas"]["Entitlement"];
 
-/** Upcoming bookings (soonest first) and history. */
+const CURRENT = new Set<Entitlement["state"]>(["active", "upcoming", "frozen"]);
+
+/** The client's plans, upcoming bookings (soonest first) and history. */
 export default function Bookings() {
   const t = useTranslations("client.bookings");
   const tStatus = useTranslations("bookings");
+  const tPlans = useTranslations("plans");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
 
   const load = useCallback(async () => {
-    if (!business) return { upcoming: [], past: [] };
-    const all = unwrap(await api.GET("/client/bookings", { params: scope }));
+    if (!business) return null;
+    const [all, entitlements, plans] = await Promise.all([
+      api.GET("/client/bookings", { params: scope }).then(unwrap),
+      api.GET("/client/entitlements", { params: scope }).then(unwrap),
+      api.GET("/client/plans", { params: scope }).then(unwrap),
+    ]);
     const now = Date.now();
     return {
       upcoming: all.filter((b) => Date.parse(b.starts_at) >= now && b.status !== "cancelled").reverse(),
       past: all.filter((b) => Date.parse(b.starts_at) < now || b.status === "cancelled"),
+      current: entitlements.filter((e) => CURRENT.has(e.state)),
+      plans,
     };
   }, [api, scope, business]);
   const { data, loading, reload } = useLoad(load);
@@ -36,9 +46,12 @@ export default function Bookings() {
     month: "short",
     timeZone: business.time_zone,
   });
+  const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
+  const money = (amount: number, currency: string) =>
+    new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 2 }).format(amount / 100);
 
   const row = (booking: Booking) => (
-    <View key={booking.id} style={[local.row, { borderColor: palette.border }]}>
+    <View key={booking.id} style={local.row}>
       <View style={local.info}>
         <Text style={[local.name, { color: palette.foreground }]}>{booking.service_name}</Text>
         <Text style={[local.meta, { color: palette.muted }]}>
@@ -55,6 +68,42 @@ export default function Bookings() {
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <Heading palette={palette}>{t("title")}</Heading>
+
+      <Heading palette={palette} level={2}>
+        {t("myPlans")}
+      </Heading>
+      {data?.current.length ? (
+        <Card palette={palette}>
+          {data.current.map((entitlement) => (
+            <View key={entitlement.id} style={local.row}>
+              <View style={local.info}>
+                <Text style={[local.name, { color: palette.foreground }]}>{entitlement.name}</Text>
+                <Text style={[local.meta, { color: palette.muted }]}>
+                  {t("validUntil", { date: day.format(new Date(`${entitlement.ends_on}T12:00:00Z`)) })}
+                </Text>
+              </View>
+              <Text style={[local.status, { color: palette.primary }]}>
+                {entitlement.state !== "active"
+                  ? tPlans(`states.${entitlement.state}`)
+                  : entitlement.credits_remaining === null
+                    ? tPlans("kinds.membership")
+                    : t("entriesLeft", { count: entitlement.credits_remaining })}
+              </Text>
+            </View>
+          ))}
+        </Card>
+      ) : data ? (
+        <Card palette={palette}>
+          <Text style={[styles.muted, { color: palette.foreground }]}>{t("noPlan")}</Text>
+          {data.plans.map((plan) => (
+            <View key={plan.id} style={local.row}>
+              <Text style={[local.meta, local.info, { color: palette.foreground }]}>{plan.name}</Text>
+              <Text style={[local.meta, { color: palette.muted }]}>{money(plan.price_amount, plan.price_currency)}</Text>
+            </View>
+          ))}
+        </Card>
+      ) : null}
+
       <Heading palette={palette} level={2}>
         {t("upcoming")}
       </Heading>

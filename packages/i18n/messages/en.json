@@ -38,7 +38,9 @@
     "cancellationWindow": "Late cancellation window",
     "cancellationNone": "No window",
     "cancellationHours": "{hours, plural, one {# hour} other {# hours}} before the session",
-    "cancellationWindowHint": "Cancelling inside this window still frees the spot, but is recorded as a late cancellation."
+    "cancellationWindowHint": "Cancelling inside this window still frees the spot, but is recorded as a late cancellation.",
+    "requirePlan": "Clients need a valid plan to book in the app",
+    "requirePlanHint": "Staff can always book from the roster (for example a walk-in who pays at the desk)."
   },
   "locales": {
     "he": "עברית",
@@ -134,7 +136,8 @@
     "locations": "Locations",
     "team": "Team",
     "settings": "Settings",
-    "schedule": "Schedule"
+    "schedule": "Schedule",
+    "plans": "Plans"
   },
   "terms": {
     "fitness": {
@@ -356,7 +359,8 @@
       "invalid_reference": "That client is not available. Refresh and try again.",
       "not_found": "The booking was not found. Refresh and try again.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "noPlan": "No plan"
   },
   "client": {
     "tabs": {
@@ -407,7 +411,11 @@
       "title": "My bookings",
       "upcoming": "Upcoming",
       "history": "History",
-      "noUpcoming": "Nothing booked yet."
+      "noUpcoming": "Nothing booked yet.",
+      "myPlans": "My plans",
+      "validUntil": "Valid until {date}",
+      "entriesLeft": "{count, plural, one {# entry left} other {# entries left}}",
+      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:"
     },
     "profile": {
       "title": "Profile",
@@ -435,7 +443,8 @@
       "already_booked": "You're already booked into this class.",
       "session_cancelled": "This class was cancelled.",
       "not_found": "This booking no longer exists. Pull down to refresh.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "no_valid_plan": "You need a valid membership or punch card to book. Ask the studio."
     }
   },
   "join": {
@@ -449,5 +458,62 @@
     "title": "Join {name}",
     "body": "Book classes, join waitlists and manage your bookings in the app.",
     "openApp": "Open in the app"
+  },
+  "plans": {
+    "title": "Plans",
+    "subtitle": "Memberships and punch cards your clients can buy.",
+    "add": "Add plan",
+    "new": "New plan",
+    "empty": "No plans yet.",
+    "name": "Name",
+    "kind": "Type",
+    "kinds": {
+      "membership": "Membership",
+      "punch_card": "Punch card"
+    },
+    "credits": "Number of entries",
+    "unlimited": "Unlimited classes while valid.",
+    "validity": "Valid for (days)",
+    "validityHintMembership": "For example 30 for a monthly membership.",
+    "validityHintCard": "How long the card can be used after the start date.",
+    "price": "Price",
+    "description": "Description",
+    "active": "On sale",
+    "editNote": "Changes apply to future sales. Plans already sold keep their terms.",
+    "creditsCount": "{count, plural, one {# entry} other {# entries}}",
+    "days": "{count, plural, one {# day} other {# days}}",
+    "clientPlans": "Plans",
+    "noPlans": "No plans yet.",
+    "states": {
+      "active": "Active",
+      "upcoming": "Starts later",
+      "frozen": "Frozen",
+      "used_up": "Used up",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    },
+    "creditsLeft": "{left} of {total} entries left",
+    "unlimitedUsed": "Unlimited · {used} used",
+    "frozenRange": "Frozen {from} – {to}",
+    "freeze": "Freeze",
+    "freezeFrom": "From",
+    "freezeTo": "Until",
+    "freezeReason": "Reason (optional)",
+    "frozen": "Frozen. The end date was extended.",
+    "cancelPlan": "Cancel plan",
+    "sellTitle": "Sell a plan",
+    "plan": "Plan",
+    "startsOn": "Starts on",
+    "simulatedPayment": "Payment is simulated in this prototype; no card is charged.",
+    "sell": "Sell",
+    "sold": "Plan sold.",
+    "errors": {
+      "invalid": "Check the details and try again.",
+      "generic": "Something went wrong. Try again.",
+      "not_active": "This plan is no longer active.",
+      "outside_validity": "The freeze must start while the plan is valid.",
+      "overlapping_freeze": "That overlaps an existing freeze."
+    },
+    "validityRange": "Valid {from} – {to}"
   }
 }

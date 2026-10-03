@@ -21,6 +21,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           time_zone: value("time_zone"),
           currency: value("currency"),
           cancellation_window_minutes: Number(value("cancellation_window_minutes")),
+          booking_requires_plan: formData.get("booking_requires_plan") === "on",
         },
       }),
     );

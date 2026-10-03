@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_prefix="API_", extra="ignore")
 
     environment: str = "local"
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:8081"]  
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:8081"]
 
     # Local defaults match `supabase start`. Other environments set these explicitly.
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"

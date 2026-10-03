@@ -67,6 +67,15 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Staff web: join code + printable QR; public join page
 - [ ] Background job to extend weekly series beyond their first 12–26 weeks
 
+## Sprint 4 progress
+
+- [x] Plans catalog (memberships, punch cards) with vertical-pack defaults
+- [x] Sell a plan to a client (simulated, idempotent payment), freeze, cancel
+- [x] Bookings use entitlements (credits, validity, freezes); client app requires a valid plan
+- [x] Client app: "My plans" with remaining entries and validity
+- [x] Demo data generator (`python -m app.seed`) + "Create demo studio on staging" workflow
+- [ ] Client self-purchase in the app (needs a payment provider, O1)
+
 ## Owner setup checklist (Windows + iPhone)
 
 - [ ] Git — https://git-scm.com

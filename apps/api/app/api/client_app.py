@@ -23,6 +23,7 @@ from app.api.bookings import (
 )
 from app.api.common import not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
+from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
 from app.api.schedule import ServiceSummary
 from app.scheduling import local_to_utc
@@ -214,7 +215,17 @@ def _ensure_upcoming(context: ClientContext, session_id: UUID) -> None:
 def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
     """Books the signed-in client, or puts them on the waitlist when the session is full."""
     _ensure_upcoming(context, session_id)
-    place_booking(context.session, context.tenant_id, session_id, context.client_id)
+    requires_plan = context.session.execute(
+        text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),
+        {"id": context.tenant_id},
+    ).scalar_one()
+    place_booking(
+        context.session,
+        context.tenant_id,
+        session_id,
+        context.client_id,
+        requires_plan=requires_plan,
+    )
     return _load_session(context.session, session_id)
 
 
@@ -248,3 +259,17 @@ def my_bookings(context: ClientDep) -> list[ClientBooking]:
         """)
     ).mappings()
     return [ClientBooking.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/plans")
+def business_plans(context: ClientDep) -> list[Plan]:
+    """What the business sells (active plans), to show clients their options."""
+    rows = context.session.execute(
+        text(f"SELECT {PLAN_COLUMNS} FROM app.plans WHERE active ORDER BY kind, price_amount")
+    ).mappings()
+    return [Plan.model_validate(dict(row)) for row in rows]
+
+
+@router.get("/entitlements")
+def my_entitlements(context: ClientDep) -> list[Entitlement]:
+    return list_entitlements(context.session, context.client_id)

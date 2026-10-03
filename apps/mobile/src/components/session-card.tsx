@@ -11,7 +11,7 @@ import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];
 
-const KNOWN_ERRORS = ["session_started", "already_booked", "session_cancelled", "not_found"] as const;
+const KNOWN_ERRORS = ["session_started", "already_booked", "session_cancelled", "not_found", "no_valid_plan"] as const;
 
 type Props = { session: ClientSession; onChange: (session: ClientSession) => void };
 
