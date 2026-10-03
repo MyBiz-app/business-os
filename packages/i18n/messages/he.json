@@ -34,7 +34,11 @@
     "errors": {
       "logo_too_large": "התמונה גדולה מ-512KB.",
       "unsupported_image": "השתמשו בתמונה מסוג PNG,‏ JPG או WebP."
-    }
+    },
+    "cancellationWindow": "חלון ביטול מאוחר",
+    "cancellationNone": "ללא חלון",
+    "cancellationHours": "{hours, plural, one {שעה} two {שעתיים} other {# שעות}} לפני השיעור",
+    "cancellationWindowHint": "ביטול בתוך החלון עדיין משחרר את המקום, אבל נרשם כביטול מאוחר."
   },
   "locales": {
     "he": "עברית",
@@ -310,6 +314,48 @@
     "errors": {
       "invalid_reference": "אחד הפריטים שנבחרו אינו זמין. רעננו ונסו שוב.",
       "no_occurrences": "אין שיעורים שנופלים בימים שנבחרו בטווח הזה."
+    },
+    "waitlisted": "{count} ברשימת המתנה"
+  },
+  "bookings": {
+    "title": "הרשמות",
+    "roster": "רשימת משתתפים",
+    "summary": "{booked} מתוך {capacity} רשומים{waitlisted, plural, =0 {} other { · # בהמתנה}}",
+    "waitlist": "רשימת המתנה",
+    "empty": "עדיין אין רשומים.",
+    "cancelledCount": "{count, plural, one {ביטול אחד} other {# ביטולים}}",
+    "searchLabel": "חיפוש לקוח לרישום",
+    "searchPlaceholder": "חיפוש לפי שם, אימייל או טלפון",
+    "search": "חיפוש",
+    "results": "תוצאות חיפוש",
+    "noMatches": "אין לקוחות פעילים מתאימים שעוד לא רשומים.",
+    "book": "רישום",
+    "addToWaitlist": "הוספה להמתנה",
+    "lateCancel": "ביטול מאוחר",
+    "sessionCancelled": "השיעור בוטל",
+    "noneYet": "עדיין אין הרשמות.",
+    "upcoming": "קרובים",
+    "history": "היסטוריה",
+    "statuses": {
+      "booked": "רשום",
+      "waitlisted": "בהמתנה",
+      "checked_in": "הגיע",
+      "no_show": "לא הגיע",
+      "cancelled": "בוטל"
+    },
+    "actions": {
+      "booked": "ביטול סימון",
+      "checked_in": "צ'ק-אין",
+      "no_show": "לא הגיע",
+      "cancelled": "ביטול הרשמה"
+    },
+    "errors": {
+      "already_booked": "הלקוח כבר רשום לשיעור הזה.",
+      "session_cancelled": "השיעור הזה בוטל.",
+      "invalid_transition": "אי אפשר לבצע את השינוי הזה בהרשמה.",
+      "invalid_reference": "הלקוח לא זמין. רעננו ונסו שוב.",
+      "not_found": "ההרשמה לא נמצאה. רעננו ונסו שוב.",
+      "generic": "משהו השתבש. נסו שוב."
     }
   }
 }

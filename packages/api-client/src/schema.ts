@@ -377,6 +377,67 @@ export interface paths {
         patch: operations["update_session"];
         trace?: never;
     };
+    "/sessions/{session_id}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Bookings
+         * @description The session's roster: live bookings first, then the waitlist in order, then history.
+         */
+        get: operations["list_bookings"];
+        put?: never;
+        /**
+         * Create Booking
+         * @description Books the client if a spot is free, otherwise adds them to the waitlist.
+         */
+        post: operations["create_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{booking_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Booking */
+        patch: operations["update_booking"];
+        trace?: never;
+    };
+    "/clients/{client_id}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Client Bookings
+         * @description A client's bookings, newest session first.
+         */
+        get: operations["list_client_bookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tenants/current/logo": {
         parameters: {
             query?: never;
@@ -434,6 +495,60 @@ export interface components {
             /** File */
             file: string;
         };
+        /** Booking */
+        Booking: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+            /** Waitlist Position */
+            waitlist_position: number | null;
+            /** Late Cancel */
+            late_cancel: boolean;
+            /** Checked In At */
+            checked_in_at: string | null;
+            /** Cancelled At */
+            cancelled_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** BookingCreate */
+        BookingCreate: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** BookingUpdate */
+        BookingUpdate: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
         /** Client */
         Client: {
             /**
@@ -468,6 +583,43 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** ClientBooking */
+        ClientBooking: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Session Status
+             * @enum {string}
+             */
+            session_status: "scheduled" | "cancelled";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+            /** Late Cancel */
+            late_cancel: boolean;
         };
         /** ClientCreate */
         ClientCreate: {
@@ -857,6 +1009,8 @@ export interface components {
             capacity: number;
             /** Booked */
             booked: number;
+            /** Waitlisted */
+            waitlisted: number;
             /**
              * Status
              * @enum {string}
@@ -1062,6 +1216,8 @@ export interface components {
              * @description Public path of the logo on this API, if any
              */
             logo_url: string | null;
+            /** Cancellation Window Minutes */
+            cancellation_window_minutes: number;
             /**
              * Role
              * @enum {string}
@@ -1096,6 +1252,8 @@ export interface components {
             currency?: string | null;
             /** Primary Color */
             primary_color?: string | null;
+            /** Cancellation Window Minutes */
+            cancellation_window_minutes?: number | null;
         };
         /** ValidationError */
         ValidationError: {
@@ -2134,6 +2292,146 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScheduledSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_bookings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_client_bookings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBooking"][];
                 };
             };
             /** @description Validation Error */

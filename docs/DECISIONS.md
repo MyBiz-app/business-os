@@ -53,6 +53,7 @@ When a decision changes, update the row and note the date — do not delete hist
 | T25 | Prototype stores the business logo in Postgres (≤512 KB PNG/JPEG/WebP, type checked by file content, served publicly by the API with immutable caching). Moves to Supabase Storage when media grows beyond logos. | DECIDED (2026-10-03, delegated) |
 | T26 | Brand color replaces the product's primary color inside the business's area; text on it is black or white, whichever has the higher WCAG contrast. | DECIDED (2026-10-03, delegated) |
 | T27 | Schedule model: `sessions` are concrete occurrences (timestamptz, UTC); a weekly `session_series` stores local wall-clock time and is expanded in the business time zone when created (default 12 weeks, max 26) — editing one occurrence never touches the others. Composite foreign keys keep every reference inside the tenant. | DECIDED (2026-10-03, delegated) |
+| T28 | Bookings: one `bookings` row per client per session with status `booked` / `waitlisted` / `checked_in` / `no_show` / `cancelled` (cancelled rows are kept as history). Capacity is enforced under a row lock on the session; the waitlist is FIFO and is promoted automatically when a spot opens in an upcoming session (cancellation or more capacity). Cancelling inside the business's late-cancellation window (vertical-pack default: 2 h for fitness) still frees the spot but is flagged `late_cancel` for plans in Sprint 4. New permission `bookings.manage` for every system role, so instructors can check members in. | DECIDED (2026-10-03, delegated) |
 
 ## Process
 

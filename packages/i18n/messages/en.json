@@ -34,7 +34,11 @@
     "errors": {
       "logo_too_large": "The image is larger than 512 KB.",
       "unsupported_image": "Use a PNG, JPG or WebP image."
-    }
+    },
+    "cancellationWindow": "Late cancellation window",
+    "cancellationNone": "No window",
+    "cancellationHours": "{hours, plural, one {# hour} other {# hours}} before the session",
+    "cancellationWindowHint": "Cancelling inside this window still frees the spot, but is recorded as a late cancellation."
   },
   "locales": {
     "he": "עברית",
@@ -310,6 +314,48 @@
     "errors": {
       "invalid_reference": "One of the selected items is not available. Refresh and try again.",
       "no_occurrences": "No session falls on the chosen days in that period."
+    },
+    "waitlisted": "{count} on waitlist"
+  },
+  "bookings": {
+    "title": "Bookings",
+    "roster": "Roster",
+    "summary": "{booked} of {capacity} booked{waitlisted, plural, =0 {} other { · # on waitlist}}",
+    "waitlist": "Waitlist",
+    "empty": "No one is booked yet.",
+    "cancelledCount": "{count, plural, one {# cancellation} other {# cancellations}}",
+    "searchLabel": "Find a client to book",
+    "searchPlaceholder": "Search by name, email or phone",
+    "search": "Search",
+    "results": "Search results",
+    "noMatches": "No matching active clients who aren't already booked.",
+    "book": "Book",
+    "addToWaitlist": "Add to waitlist",
+    "lateCancel": "Late cancel",
+    "sessionCancelled": "Session cancelled",
+    "noneYet": "No bookings yet.",
+    "upcoming": "Upcoming",
+    "history": "History",
+    "statuses": {
+      "booked": "Booked",
+      "waitlisted": "Waitlisted",
+      "checked_in": "Checked in",
+      "no_show": "No-show",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "booked": "Undo",
+      "checked_in": "Check in",
+      "no_show": "No-show",
+      "cancelled": "Cancel booking"
+    },
+    "errors": {
+      "already_booked": "This client is already booked into this session.",
+      "session_cancelled": "This session is cancelled.",
+      "invalid_transition": "That change isn't possible for this booking.",
+      "invalid_reference": "That client is not available. Refresh and try again.",
+      "not_found": "The booking was not found. Refresh and try again.",
+      "generic": "Something went wrong. Try again."
     }
   }
 }

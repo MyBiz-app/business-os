@@ -10,6 +10,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.api.bookings import lock_session, promote_waitlist
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
@@ -96,6 +97,7 @@ class ScheduledSession(BaseModel):
     ends_at: datetime
     capacity: int
     booked: int
+    waitlisted: int
     status: SessionStatus
     notes: str | None
 
@@ -136,13 +138,18 @@ SESSION_SELECT = """
     SELECT s.id, s.series_id, s.location_id, l.name AS location_name, s.room_id,
            r.name AS room_name, s.instructor_user_id, u.email AS instructor_email,
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
-           0 AS booked,
+           coalesce(bk.booked, 0) AS booked, coalesce(bk.waitlisted, 0) AS waitlisted,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
     LEFT JOIN app.users u ON u.id = s.instructor_user_id
+    LEFT JOIN LATERAL (
+        SELECT count(*) FILTER (WHERE b.status IN ('booked', 'checked_in', 'no_show')) AS booked,
+               count(*) FILTER (WHERE b.status = 'waitlisted') AS waitlisted
+        FROM app.bookings b WHERE b.session_id = s.id
+    ) bk ON true
 """
 
 
@@ -329,6 +336,7 @@ def get_session(session_id: UUID, context: ReadDep) -> ScheduledSession:
 def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> ScheduledSession:
     """Changes one occurrence; the rest of its series is not affected."""
     db = context.session
+    lock_session(db, session_id)
     current = _load(db, session_id)
     changes = body.model_dump(exclude_unset=True)
 
@@ -363,4 +371,5 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
         )
     except IntegrityError as error:
         raise _invalid_reference() from error
+    promote_waitlist(db, session_id)  # more capacity (or a restored session) frees spots
     return _load(db, session_id)

@@ -1,38 +1,10 @@
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
 from tests.conftest import AuthHeaders, add_member
 from tests.test_tenants import STUDIO
-
-
-@pytest.fixture
-def studio(client: TestClient, auth: AuthHeaders, engine: Engine) -> dict:
-    owner = uuid4()
-    tenant_id = UUID(client.post("/tenants", json=STUDIO, headers=auth(owner)).json()["id"])
-    headers = auth(owner, tenant_id)
-    service = client.post(
-        "/services",
-        json={"name": "Pilates", "duration_minutes": 55, "capacity": 12},
-        headers=headers,
-    ).json()
-    location = client.post("/locations", json={"name": "Main"}, headers=headers).json()
-    room = client.post(
-        f"/locations/{location['id']}/rooms", json={"name": "Studio A"}, headers=headers
-    ).json()
-    coach = uuid4()
-    add_member(engine, tenant_id, coach, "staff")
-    return {
-        "owner": owner,
-        "tenant_id": tenant_id,
-        "headers": headers,
-        "service": service,
-        "location": location,
-        "room": room,
-        "coach": coach,
-    }
 
 
 def week(client: TestClient, headers: dict, start: str = "2026-10-11", days: int = 7) -> list:

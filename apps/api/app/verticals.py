@@ -10,8 +10,9 @@ from dataclasses import dataclass
 class VerticalPack:
     key: str
     client_term: str  # i18n key suffix for what the business calls its clients
+    cancellation_window_minutes: int  # default booking policy for new businesses
 
 
 VERTICAL_PACKS: dict[str, VerticalPack] = {
-    "fitness": VerticalPack(key="fitness", client_term="member"),
+    "fitness": VerticalPack(key="fitness", client_term="member", cancellation_window_minutes=120),
 }

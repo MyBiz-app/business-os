@@ -28,3 +28,10 @@ const SCHEDULE_WRITERS = new Set<Role>(["owner", "manager", "front_desk"]);
 export function canWriteSchedule(role: Role): boolean {
   return SCHEDULE_WRITERS.has(role);
 }
+
+// Instructors (staff) check members in to their classes, so every role can manage bookings.
+const BOOKING_MANAGERS = new Set<Role>(["owner", "manager", "front_desk", "staff"]);
+
+export function canManageBookings(role: Role): boolean {
+  return BOOKING_MANAGERS.has(role);
+}

@@ -18,6 +18,7 @@ type Tenant = components["schemas"]["Tenant"];
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 const DEFAULT_COLOR = "#4f46e5";
+const CANCELLATION_WINDOWS = [0, 60, 120, 180, 360, 720, 1440, 2880];
 
 export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: string[] }) {
   const t = useTranslations();
@@ -25,7 +26,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}`} className="grid gap-4 sm:grid-cols-2">
+      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}`} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
         </div>
@@ -49,6 +50,28 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
             defaultValue={tenant.time_zone}
             options={timeZones.map((value) => ({ value, label: value.replaceAll("_", " ") }))}
           />
+        </div>
+        <div className="sm:col-span-2">
+          <SelectField
+            label={t("settings.cancellationWindow")}
+            name="cancellation_window_minutes"
+            defaultValue={String(tenant.cancellation_window_minutes)}
+            aria-describedby="cancellation-window-hint"
+            options={[
+              ...new Set([...CANCELLATION_WINDOWS, tenant.cancellation_window_minutes]),
+            ]
+              .sort((a, b) => a - b)
+              .map((minutes) => ({
+                value: String(minutes),
+                label:
+                  minutes === 0
+                    ? t("settings.cancellationNone")
+                    : t("settings.cancellationHours", { hours: minutes / 60 }),
+              }))}
+          />
+          <p id="cancellation-window-hint" className="mt-1.5 text-xs text-muted">
+            {t("settings.cancellationWindowHint")}
+          </p>
         </div>
       </div>
       <div>

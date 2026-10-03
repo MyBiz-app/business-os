@@ -1780,6 +1780,267 @@
         }
       }
     },
+    "/sessions/{session_id}/bookings": {
+      "get": {
+        "tags": [
+          "bookings"
+        ],
+        "summary": "List Bookings",
+        "description": "The session's roster: live bookings first, then the waitlist in order, then history.",
+        "operationId": "list_bookings",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Booking"
+                  },
+                  "title": "Response List Bookings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "bookings"
+        ],
+        "summary": "Create Booking",
+        "description": "Books the client if a spot is free, otherwise adds them to the waitlist.",
+        "operationId": "create_booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bookings/{booking_id}": {
+      "patch": {
+        "tags": [
+          "bookings"
+        ],
+        "summary": "Update Booking",
+        "operationId": "update_booking",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookingUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients/{client_id}/bookings": {
+      "get": {
+        "tags": [
+          "bookings"
+        ],
+        "summary": "List Client Bookings",
+        "description": "A client's bookings, newest session first.",
+        "operationId": "list_client_bookings",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClientBooking"
+                  },
+                  "title": "Response List Client Bookings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tenants/current/logo": {
       "put": {
         "tags": [
@@ -1969,6 +2230,132 @@
         ],
         "title": "Body_upload_logo"
       },
+      "Booking": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "booked",
+              "waitlisted",
+              "checked_in",
+              "no_show",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "waitlist_position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Waitlist Position"
+          },
+          "late_cancel": {
+            "type": "boolean",
+            "title": "Late Cancel"
+          },
+          "checked_in_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked In At"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "session_id",
+          "client_id",
+          "client_name",
+          "status",
+          "waitlist_position",
+          "late_cancel",
+          "checked_in_at",
+          "cancelled_at",
+          "created_at"
+        ],
+        "title": "Booking"
+      },
+      "BookingCreate": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id"
+        ],
+        "title": "BookingCreate"
+      },
+      "BookingUpdate": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "booked",
+              "waitlisted",
+              "checked_in",
+              "no_show",
+              "cancelled"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "BookingUpdate"
+      },
       "Client": {
         "properties": {
           "id": {
@@ -2070,6 +2457,69 @@
           "updated_at"
         ],
         "title": "Client"
+      },
+      "ClientBooking": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "session_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Id"
+          },
+          "service_name": {
+            "type": "string",
+            "title": "Service Name"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "session_status": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "cancelled"
+            ],
+            "title": "Session Status"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "booked",
+              "waitlisted",
+              "checked_in",
+              "no_show",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "late_cancel": {
+            "type": "boolean",
+            "title": "Late Cancel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "session_id",
+          "service_name",
+          "starts_at",
+          "ends_at",
+          "session_status",
+          "status",
+          "late_cancel"
+        ],
+        "title": "ClientBooking"
       },
       "ClientCreate": {
         "properties": {
@@ -3150,6 +3600,10 @@
             "type": "integer",
             "title": "Booked"
           },
+          "waitlisted": {
+            "type": "integer",
+            "title": "Waitlisted"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -3185,6 +3639,7 @@
           "ends_at",
           "capacity",
           "booked",
+          "waitlisted",
           "status",
           "notes"
         ],
@@ -3809,6 +4264,10 @@
             "title": "Logo Url",
             "description": "Public path of the logo on this API, if any"
           },
+          "cancellation_window_minutes": {
+            "type": "integer",
+            "title": "Cancellation Window Minutes"
+          },
           "role": {
             "type": "string",
             "enum": [
@@ -3830,6 +4289,7 @@
           "currency",
           "primary_color",
           "logo_url",
+          "cancellation_window_minutes",
           "role"
         ],
         "title": "Tenant"
@@ -3938,6 +4398,19 @@
               }
             ],
             "title": "Primary Color"
+          },
+          "cancellation_window_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 10080.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancellation Window Minutes"
           }
         },
         "type": "object",

@@ -62,7 +62,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 
 - [x] Sessions: one-off and weekly series (expanded in the business time zone, DST-safe), edit or cancel one occurrence
 - [x] Weekly schedule screen (staff web), new-session form with room and instructor
-- [ ] Bookings: book a client, capacity, waitlist, cancellation window, check-in
+- [x] Bookings (staff web): book a client, capacity, FIFO waitlist with auto-promotion, late-cancellation window, check-in / no-show, client booking history
 - [ ] Client app: sign in, join a business, branded home, schedule, book / cancel
 - [ ] Background job to extend weekly series beyond their first 12–26 weeks
 

@@ -60,6 +60,7 @@ class TenantUpdate(BaseModel):
     time_zone: str | None = None
     currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
     primary_color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
+    cancellation_window_minutes: int | None = Field(default=None, ge=0, le=10080)
 
     @field_validator("name")
     @classmethod
@@ -85,4 +86,5 @@ class Tenant(BaseModel):
     currency: str
     primary_color: str | None
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
+    cancellation_window_minutes: int
     role: Role

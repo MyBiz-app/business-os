@@ -3,15 +3,7 @@ from uuid import uuid4
 from cryptography.hazmat.primitives.asymmetric import ec
 from fastapi.testclient import TestClient
 
-from tests.conftest import AuthHeaders, TokenFactory
-
-STUDIO = {
-    "name": "Studio Flow",
-    "vertical": "fitness",
-    "locale": "he",
-    "time_zone": "Asia/Jerusalem",
-    "currency": "ILS",
-}
+from tests.conftest import STUDIO, AuthHeaders, TokenFactory
 
 
 def test_create_tenant_makes_the_creator_its_owner(client: TestClient, auth: AuthHeaders) -> None:

@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.schemas import Me, Membership, Tenant, TenantCreate
 from app.core.db import set_tenant
+from app.verticals import VERTICAL_PACKS
 
 router = APIRouter()
 
@@ -28,7 +29,7 @@ def load_current_tenant(session: Session) -> Tenant:
         session.execute(
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
-                       t.primary_color, m.role,
+                       t.primary_color, t.cancellation_window_minutes, m.role,
                        CASE WHEN t.logo IS NULL THEN NULL
                             ELSE '/public/tenants/' || t.id || '/logo?v='
                                  || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url
@@ -75,6 +76,11 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
         body.model_dump(),
     ).scalar_one()
     set_tenant(session, tenant_id)
+    pack = VERTICAL_PACKS[body.vertical]
+    session.execute(
+        text("UPDATE app.tenants SET cancellation_window_minutes = :minutes WHERE id = :id"),
+        {"minutes": pack.cancellation_window_minutes, "id": tenant_id},
+    )
     return load_current_tenant(session)
 
 

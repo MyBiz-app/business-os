@@ -82,6 +82,9 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                           <span className="text-xs text-muted" aria-label={t("spotsLabel", { booked: session.booked, capacity: session.capacity })}>
                             {cancelled ? t("cancelled") : t("spots", { booked: session.booked, capacity: session.capacity })}
                           </span>
+                          {!cancelled && session.waitlisted > 0 && (
+                            <span className="text-xs text-muted">{t("waitlisted", { count: session.waitlisted })}</span>
+                          )}
                         </Link>
                       </li>
                     );
