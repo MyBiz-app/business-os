@@ -4,12 +4,12 @@ import Link from "next/link";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 export default async function PlansPage() {
   const t = await getTranslations();
   const locale = await getLocale();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("catalog.read");
   const plans = unwrap(await api.GET("/plans", { params: scope }));
 
   return (

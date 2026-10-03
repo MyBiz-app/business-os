@@ -2,14 +2,14 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { createLocation } from "../actions";
 import { LocationForm } from "../location-form";
 
 export default async function NewLocationPage() {
   const t = await getTranslations();
-  const { tenant } = await getTenant();
+  const { tenant } = await getTenantFor("catalog.read");
   if (!canWriteCatalog(tenant)) redirect("/locations");
 
   return (

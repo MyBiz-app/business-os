@@ -54,7 +54,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
   const live = bookings.filter((b) => b.status !== "waitlisted" && b.status !== "cancelled");
   const waitlist = bookings.filter((b) => b.status === "waitlisted");
   const cancelled = bookings.filter((b) => b.status === "cancelled");
-  const canBook = manageable && session.status === "scheduled";
+  // Searching clients needs clients.read on top of managing bookings.
+  const canBook =
+    manageable && session.status === "scheduled" && context.tenant.permissions.includes("clients.read");
 
   const bookedIds = new Set(bookings.filter((b) => b.status !== "cancelled").map((b) => b.client_id));
   const matches =

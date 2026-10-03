@@ -2,14 +2,14 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { canWriteClients } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { createClient } from "../actions";
 import { ClientForm } from "../client-form";
 
 export default async function NewClientPage() {
   const t = await getTranslations();
-  const { tenant } = await getTenant();
+  const { tenant } = await getTenantFor("clients.read");
   if (!canWriteClients(tenant)) redirect("/clients");
 
   return (

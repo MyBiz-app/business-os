@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { unwrap } from "@/lib/api";
 import { dayOf, formatDay, formatTime } from "@/lib/dates";
 import { canManageBookings, canWriteSchedule } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { setSessionStatus, updateSession } from "../actions";
 import { SessionForm } from "../session-form";
@@ -18,7 +18,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const t = await getTranslations("schedule");
   const tCommon = await getTranslations("common");
   const locale = await getLocale();
-  const context = await getTenant();
+  const context = await getTenantFor("schedule.read");
   const { tenant, api, scope } = context;
   const { data: session } = await api.GET("/sessions/{session_id}", {
     params: { ...scope, path: { session_id: id } },

@@ -4,12 +4,12 @@ import Link from "next/link";
 import { unwrap } from "@/lib/api";
 import { addDays, dayOf, formatDay, formatTime, isDay, todayIn, weekStart } from "@/lib/dates";
 import { canWriteSchedule } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
   const t = await getTranslations("schedule");
   const locale = await getLocale();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("schedule.read");
   const { week } = await searchParams;
 
   const today = todayIn(tenant.time_zone);

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { updateLocation } from "../actions";
 import { LocationForm } from "../location-form";
@@ -12,7 +12,7 @@ import { Rooms } from "../rooms";
 export default async function LocationPage({ params }: PageProps<"/locations/[id]">) {
   const { id } = await params;
   const t = await getTranslations();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("catalog.read");
   const { data: location } = await api.GET("/locations/{location_id}", {
     params: { ...scope, path: { location_id: id } },
   });

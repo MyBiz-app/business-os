@@ -36,3 +36,11 @@ export async function setActiveTenant(tenantId: string) {
     httpOnly: true,
   });
 }
+
+/** Like getTenant, but sends the user to the dashboard when their permissions don't cover this
+ * page (e.g. a custom role opening a link directly). The API would refuse anyway. */
+export async function getTenantFor(permission: string) {
+  const context = await getTenant();
+  if (!context.tenant.permissions.includes(permission)) redirect("/dashboard");
+  return context;
+}

@@ -3,11 +3,11 @@ import Link from "next/link";
 
 import { unwrap } from "@/lib/api";
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 export default async function LocationsPage() {
   const t = await getTranslations();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("catalog.read");
   const locations = unwrap(await api.GET("/locations", { params: scope }));
 
   return (

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { updatePlan } from "../actions";
 import { PlanForm } from "../plan-form";
@@ -11,7 +11,7 @@ import { PlanForm } from "../plan-form";
 export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
   const { id } = await params;
   const t = await getTranslations();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("catalog.read");
   const { data: plan } = await api.GET("/plans/{plan_id}", { params: { ...scope, path: { plan_id: id } } });
   if (!plan) notFound();
 

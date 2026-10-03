@@ -33,7 +33,9 @@ export async function PlansSection({ clientId, context }: Props) {
   const { tenant, api, scope } = context;
   const [entitlements, plans] = await Promise.all([
     api.GET("/clients/{client_id}/entitlements", { params: { ...scope, path: { client_id: clientId } } }).then(unwrap),
-    api.GET("/plans", { params: { ...scope, query: { active: true } } }).then(unwrap),
+    tenant.permissions.includes("catalog.read")
+      ? api.GET("/plans", { params: { ...scope, query: { active: true } } }).then(unwrap)
+      : Promise.resolve([]),
   ]);
   const selling = canSell(tenant);
   const today = todayIn(tenant.time_zone);
