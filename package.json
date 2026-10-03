@@ -1,0 +1,24 @@
+{
+  "name": "business-os",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:mobile": "pnpm --filter mobile start",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:migrate": "pnpm --filter api db:migrate",
+    "api:generate": "pnpm --filter @business-os/api-client generate",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "supabase": "2.119.0",
+    "turbo": "2.11.6"
+  },
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=22"
+  }
+}

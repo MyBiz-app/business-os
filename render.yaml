@@ -1,0 +1,21 @@
+# Render Blueprint: the API's staging service. Render reads this file when you create a
+# Blueprint from the repository. Secrets are marked `sync: false`; Render asks for them once.
+services:
+  - type: web
+    name: business-os-api-staging
+    runtime: docker
+    rootDir: apps/api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: free
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: API_ENVIRONMENT
+        value: staging
+      - key: API_DATABASE_URL
+        sync: false
+      - key: API_JWKS_URL
+        sync: false
