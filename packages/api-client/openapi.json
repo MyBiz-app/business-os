@@ -1381,6 +1381,227 @@
         }
       }
     },
+    "/roles": {
+      "get": {
+        "tags": [
+          "staff"
+        ],
+        "summary": "List Roles",
+        "operationId": "list_roles",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Roles"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "staff"
+        ],
+        "summary": "Create Role",
+        "operationId": "create_role",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleFields"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRole"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles/{role_id}": {
+      "patch": {
+        "tags": [
+          "staff"
+        ],
+        "summary": "Update Role",
+        "operationId": "update_role",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "role_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Role Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomRole"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "staff"
+        ],
+        "summary": "Delete Role",
+        "operationId": "delete_role",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "role_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Role Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/invitations/{token}": {
       "get": {
         "tags": [
@@ -5301,6 +5522,38 @@
         ],
         "title": "CreatedSessions"
       },
+      "CustomRole": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions"
+          },
+          "members": {
+            "type": "integer",
+            "title": "Members"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "permissions",
+          "members"
+        ],
+        "title": "CustomRole"
+      },
       "Entitlement": {
         "properties": {
           "id": {
@@ -5899,6 +6152,29 @@
             ],
             "title": "Role"
           },
+          "custom_role_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Role Id"
+          },
+          "custom_role_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Role Name"
+          },
           "joined_at": {
             "type": "string",
             "format": "date-time",
@@ -5911,6 +6187,8 @@
           "email",
           "full_name",
           "role",
+          "custom_role_id",
+          "custom_role_name",
           "joined_at"
         ],
         "title": "Member"
@@ -5918,21 +6196,38 @@
       "MemberUpdate": {
         "properties": {
           "role": {
-            "type": "string",
-            "enum": [
-              "owner",
-              "manager",
-              "staff",
-              "front_desk"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "owner",
+                  "manager",
+                  "staff",
+                  "front_desk"
+                ]
+              },
+              {
+                "type": "null"
+              }
             ],
             "title": "Role"
+          },
+          "custom_role_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Role Id"
           }
         },
         "type": "object",
-        "required": [
-          "role"
-        ],
-        "title": "MemberUpdate"
+        "title": "MemberUpdate",
+        "description": "Either a system role, or a custom role (the member's system role becomes `staff`)."
       },
       "Membership": {
         "properties": {
@@ -6661,6 +6956,126 @@
           "weekdays"
         ],
         "title": "Repeat"
+      },
+      "RoleFields": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "permissions": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "clients.read",
+                "clients.write",
+                "catalog.read",
+                "catalog.write",
+                "schedule.read",
+                "schedule.write",
+                "bookings.manage",
+                "sales.manage",
+                "reports.read",
+                "ai.use",
+                "staff.read",
+                "staff.manage",
+                "business.settings"
+              ]
+            },
+            "type": "array",
+            "maxItems": 13,
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "permissions"
+        ],
+        "title": "RoleFields"
+      },
+      "RoleUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "permissions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "clients.read",
+                    "clients.write",
+                    "catalog.read",
+                    "catalog.write",
+                    "schedule.read",
+                    "schedule.write",
+                    "bookings.manage",
+                    "sales.manage",
+                    "reports.read",
+                    "ai.use",
+                    "staff.read",
+                    "staff.manage",
+                    "business.settings"
+                  ]
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "title": "RoleUpdate"
+      },
+      "Roles": {
+        "properties": {
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions",
+            "description": "Every permission key, in display order"
+          },
+          "system": {
+            "items": {
+              "$ref": "#/components/schemas/SystemRole"
+            },
+            "type": "array",
+            "title": "System"
+          },
+          "custom": {
+            "items": {
+              "$ref": "#/components/schemas/CustomRole"
+            },
+            "type": "array",
+            "title": "Custom"
+          }
+        },
+        "type": "object",
+        "required": [
+          "permissions",
+          "system",
+          "custom"
+        ],
+        "title": "Roles"
       },
       "Room": {
         "properties": {
@@ -7599,6 +8014,33 @@
         "type": "object",
         "title": "SessionUpdate"
       },
+      "SystemRole": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "manager",
+              "staff",
+              "front_desk"
+            ],
+            "title": "Key"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "permissions"
+        ],
+        "title": "SystemRole"
+      },
       "Team": {
         "properties": {
           "members": {
@@ -7699,6 +8141,25 @@
             "title": "Modules",
             "description": "Enabled modules (features depend on them)"
           },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions",
+            "description": "The current user's effective permissions"
+          },
+          "custom_role_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Role Name"
+          },
           "role": {
             "type": "string",
             "enum": [
@@ -7724,6 +8185,8 @@
           "booking_requires_plan",
           "join_code",
           "modules",
+          "permissions",
+          "custom_role_name",
           "role"
         ],
         "title": "Tenant"

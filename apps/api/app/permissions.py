@@ -1,7 +1,7 @@
 """Permissions are fine-grained keys defined in code; roles are named bundles of them.
 
-System roles are fixed for now. Custom roles per business (a toggle UI over these keys)
-come later and will be stored in the database."""
+System roles are fixed bundles. A business can also define custom roles (switches over these
+keys, stored in app.tenant_roles); a member with a custom role has exactly its permissions."""
 
 from enum import StrEnum
 
@@ -65,5 +65,9 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
 }
 
 
-def role_allows(role: str, permission: Permission) -> bool:
-    return permission in ROLE_PERMISSIONS.get(role, frozenset())
+def effective_permissions(role: str, custom: list[str] | None) -> frozenset[str]:
+    """The permissions a member actually has. Owners always have everything."""
+    if custom is not None and role != "owner":
+        known = {p.value for p in Permission}
+        return frozenset(p for p in custom if p in known)
+    return frozenset(p.value for p in ROLE_PERMISSIONS.get(role, frozenset()))

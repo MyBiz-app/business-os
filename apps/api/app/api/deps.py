@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser, get_current_user
 from app.core.db import EngineDep, open_session, session_scope, set_tenant
-from app.permissions import Permission, role_allows
+from app.permissions import Permission, effective_permissions
 
 UserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
@@ -35,6 +35,8 @@ class TenantContext:
     session: Session
     tenant_id: UUID
     role: str
+    # Effective permissions: the custom role's switches, or the system role's bundle.
+    permissions: frozenset[str] = frozenset()
 
 
 def get_tenant_context(
@@ -42,15 +44,22 @@ def get_tenant_context(
 ) -> TenantContext:
     """Scopes the session to one tenant. Fails unless the user is a member of that tenant."""
     set_tenant(session, tenant_id)
-    role = session.execute(
+    member = session.execute(
         text("""
-            SELECT role FROM app.tenant_members
-            WHERE tenant_id = app.current_tenant_id() AND user_id = app.current_user_id()
+            SELECT m.role, r.permissions AS custom_permissions
+            FROM app.tenant_members m
+            LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
+            WHERE m.tenant_id = app.current_tenant_id() AND m.user_id = app.current_user_id()
         """)
-    ).scalar()
-    if role is None:
+    ).first()
+    if member is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
-    return TenantContext(session=session, tenant_id=tenant_id, role=role)
+    return TenantContext(
+        session=session,
+        tenant_id=tenant_id,
+        role=member.role,
+        permissions=effective_permissions(member.role, member.custom_permissions),
+    )
 
 
 TenantDep = Annotated[TenantContext, Depends(get_tenant_context)]
@@ -76,7 +85,7 @@ def require(permission: Permission) -> Callable[[TenantContext], TenantContext]:
     """Dependency that also checks the member's role grants `permission`."""
 
     def check(context: TenantDep) -> TenantContext:
-        if not role_allows(context.role, permission):
+        if permission not in context.permissions:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
         return context
 

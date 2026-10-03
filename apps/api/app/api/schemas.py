@@ -95,4 +95,6 @@ class Tenant(BaseModel):
     booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
+    permissions: list[str] = Field(description="The current user's effective permissions")
+    custom_role_name: str | None
     role: Role

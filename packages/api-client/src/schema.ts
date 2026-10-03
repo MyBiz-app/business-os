@@ -284,6 +284,42 @@ export interface paths {
         patch: operations["update_member"];
         trace?: never;
     };
+    "/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Roles */
+        get: operations["list_roles"];
+        put?: never;
+        /** Create Role */
+        post: operations["create_role"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles/{role_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Role */
+        delete: operations["delete_role"];
+        options?: never;
+        head?: never;
+        /** Update Role */
+        patch: operations["update_role"];
+        trace?: never;
+    };
     "/invitations/{token}": {
         parameters: {
             query?: never;
@@ -1389,6 +1425,20 @@ export interface components {
             /** Session Ids */
             session_ids: string[];
         };
+        /** CustomRole */
+        CustomRole: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Permissions */
+            permissions: string[];
+            /** Members */
+            members: number;
+        };
         /** Entitlement */
         Entitlement: {
             /**
@@ -1646,19 +1696,25 @@ export interface components {
              * @enum {string}
              */
             role: "owner" | "manager" | "staff" | "front_desk";
+            /** Custom Role Id */
+            custom_role_id: string | null;
+            /** Custom Role Name */
+            custom_role_name: string | null;
             /**
              * Joined At
              * Format: date-time
              */
             joined_at: string;
         };
-        /** MemberUpdate */
+        /**
+         * MemberUpdate
+         * @description Either a system role, or a custom role (the member's system role becomes `staff`).
+         */
         MemberUpdate: {
-            /**
-             * Role
-             * @enum {string}
-             */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            /** Role */
+            role?: ("owner" | "manager" | "staff" | "front_desk") | null;
+            /** Custom Role Id */
+            custom_role_id?: string | null;
         };
         /** Membership */
         Membership: {
@@ -1935,6 +1991,32 @@ export interface components {
             weekdays: number[];
             /** Ends On */
             ends_on?: string | null;
+        };
+        /** RoleFields */
+        RoleFields: {
+            /** Name */
+            name: string;
+            /** Permissions */
+            permissions: ("clients.read" | "clients.write" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
+        };
+        /** RoleUpdate */
+        RoleUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Permissions */
+            permissions?: ("clients.read" | "clients.write" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+        };
+        /** Roles */
+        Roles: {
+            /**
+             * Permissions
+             * @description Every permission key, in display order
+             */
+            permissions: string[];
+            /** System */
+            system: components["schemas"]["SystemRole"][];
+            /** Custom */
+            custom: components["schemas"]["CustomRole"][];
         };
         /** Room */
         Room: {
@@ -2231,6 +2313,16 @@ export interface components {
             /** Status */
             status?: ("scheduled" | "cancelled") | null;
         };
+        /** SystemRole */
+        SystemRole: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "owner" | "manager" | "staff" | "front_desk";
+            /** Permissions */
+            permissions: string[];
+        };
         /** Team */
         Team: {
             /** Members */
@@ -2282,6 +2374,13 @@ export interface components {
              * @description Enabled modules (features depend on them)
              */
             modules: string[];
+            /**
+             * Permissions
+             * @description The current user's effective permissions
+             */
+            permissions: string[];
+            /** Custom Role Name */
+            custom_role_name: string | null;
             /**
              * Role
              * @enum {string}
@@ -3167,6 +3266,140 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Member"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_roles: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Roles"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_role: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRole"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_role: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                role_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_role: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                role_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRole"];
                 };
             };
             /** @description Validation Error */

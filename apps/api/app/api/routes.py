@@ -9,6 +9,7 @@ from app.api.modules import check_selection, set_modules
 from app.api.schemas import Me, Membership, Tenant, TenantCreate
 from app.core.db import set_tenant
 from app.modules import PRESETS
+from app.permissions import effective_permissions
 from app.verticals import VERTICAL_PACKS
 
 router = APIRouter()
@@ -32,7 +33,8 @@ def load_current_tenant(session: Session) -> Tenant:
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
-                       t.join_code, m.role,
+                       t.join_code, m.role, r.name AS custom_role_name,
+                       r.permissions AS custom_permissions,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)
                                  FROM app.tenant_modules tm WHERE tm.tenant_id = t.id), '{}')
                            AS modules,
@@ -42,13 +44,18 @@ def load_current_tenant(session: Session) -> Tenant:
                 FROM app.tenants t
                 JOIN app.tenant_members m
                     ON m.tenant_id = t.id AND m.user_id = app.current_user_id()
+                LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
                 WHERE t.id = app.current_tenant_id()
             """)
         )
         .mappings()
         .one()
     )
-    return Tenant.model_validate(dict(row))
+    data = dict(row)
+    data["permissions"] = sorted(
+        effective_permissions(data["role"], data.pop("custom_permissions"))
+    )
+    return Tenant.model_validate(data)
 
 
 def apply_vertical_pack(

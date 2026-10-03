@@ -21,7 +21,7 @@ from app.api import plans as plans_api
 from app.api import schedule as schedule_api
 from app.api.deps import TenantContext
 from app.metrics import METRICS, compute, previous_period
-from app.permissions import Permission, role_allows
+from app.permissions import Permission
 
 PENDING_ACTION_TTL = dt.timedelta(minutes=15)
 MAX_ROWS = 25
@@ -473,19 +473,19 @@ TOOLS: dict[str, Tool] = {
 }
 
 
-def _allowed(tool: Tool, role: str, modules: set[str]) -> bool:
-    return role_allows(role, tool.permission) and (tool.module is None or tool.module in modules)
+def _allowed(tool: Tool, permissions: frozenset[str], modules: set[str]) -> bool:
+    return tool.permission in permissions and (tool.module is None or tool.module in modules)
 
 
-def tools_for(role: str, modules: set[str]) -> list[Tool]:
-    """Only the tools the user's role and the business's modules allow are offered."""
-    return [tool for tool in TOOLS.values() if _allowed(tool, role, modules)]
+def tools_for(permissions: frozenset[str], modules: set[str]) -> list[Tool]:
+    """Only the tools the user's permissions and the business's modules allow are offered."""
+    return [tool for tool in TOOLS.values() if _allowed(tool, permissions, modules)]
 
 
 def run_tool(ctx: ToolContext, name: str, args: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     """Runs a tool for the model. Returns (result, is_error); never raises for tool errors."""
     tool = TOOLS.get(name)
-    if tool is None or not _allowed(tool, ctx.tenant.role, ctx.modules):
+    if tool is None or not _allowed(tool, ctx.tenant.permissions, ctx.modules):
         return {"error": "this tool is not available to the user"}, True
     try:
         with ctx.tenant.session.begin_nested():  # a failed tool leaves no partial writes
