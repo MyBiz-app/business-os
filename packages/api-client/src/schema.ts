@@ -72,10 +72,126 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Clients */
+        get: operations["list_clients"];
+        put?: never;
+        /** Create Client */
+        post: operations["create_client"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Client */
+        get: operations["get_client"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Client */
+        patch: operations["update_client"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Client */
+        Client: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Date Of Birth */
+            date_of_birth: string | null;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "inactive" | "lead";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ClientCreate */
+        ClientCreate: {
+            /** Last Name */
+            last_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Date Of Birth */
+            date_of_birth?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** First Name */
+            first_name: string;
+            /**
+             * Status
+             * @default active
+             * @enum {string}
+             */
+            status: "active" | "inactive" | "lead";
+        };
+        /** ClientPage */
+        ClientPage: {
+            /** Items */
+            items: components["schemas"]["Client"][];
+            /** Total */
+            total: number;
+        };
+        /** ClientUpdate */
+        ClientUpdate: {
+            /** Last Name */
+            last_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Date Of Birth */
+            date_of_birth?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Status */
+            status?: ("active" | "inactive" | "lead") | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -274,6 +390,147 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_clients: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                status?: ("active" | "inactive" | "lead") | null;
+                limit?: number;
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
                 };
             };
             /** @description Validation Error */

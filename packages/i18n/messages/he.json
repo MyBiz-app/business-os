@@ -104,5 +104,52 @@
     "manager": "מנהל/ת",
     "staff": "צוות",
     "front_desk": "קבלה"
+  },
+  "nav": {
+    "label": "ניווט ראשי",
+    "dashboard": "דשבורד"
+  },
+  "terms": {
+    "fitness": {
+      "client": "מתאמן/ת",
+      "clients": "מתאמנים",
+      "addClient": "הוספת מתאמן/ת",
+      "newClient": "מתאמן/ת חדש/ה",
+      "searchClients": "חיפוש מתאמנים",
+      "noClients": "עדיין אין מתאמנים",
+      "noResults": "לא נמצאו מתאמנים שמתאימים לחיפוש"
+    }
+  },
+  "clients": {
+    "firstName": "שם פרטי",
+    "lastName": "שם משפחה",
+    "name": "שם",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "dateOfBirth": "תאריך לידה",
+    "notes": "הערות",
+    "status": "סטטוס",
+    "allStatuses": "כל הסטטוסים",
+    "statuses": {
+      "active": "פעיל/ה",
+      "inactive": "לא פעיל/ה",
+      "lead": "ליד"
+    },
+    "search": "חיפוש",
+    "save": "שמירה",
+    "create": "יצירה",
+    "cancel": "ביטול",
+    "edit": "עריכה",
+    "details": "פרטים",
+    "joined": "הצטרפות: {date}",
+    "total": "{count, plural, one {רשומה אחת} other {# רשומות}}",
+    "previous": "הקודם",
+    "next": "הבא",
+    "back": "חזרה לרשימה",
+    "saved": "נשמר.",
+    "errors": {
+      "email_taken": "האימייל הזה כבר בשימוש ברשומה אחרת.",
+      "invalid": "בדקו את הפרטים ונסו שוב."
+    }
   }
 }

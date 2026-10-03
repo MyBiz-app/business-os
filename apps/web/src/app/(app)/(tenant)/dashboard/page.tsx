@@ -1,22 +1,12 @@
 import { getTranslations } from "next-intl/server";
-import { redirect } from "next/navigation";
 
-import { getApi, unwrap } from "@/lib/api";
-import { getActiveMembership } from "@/lib/tenant";
+import { getTenant } from "@/lib/tenant";
 
 import { BusinessSwitcher } from "./business-switcher";
 
 export default async function DashboardPage() {
   const t = await getTranslations();
-  const { me, membership } = await getActiveMembership();
-  if (!membership) redirect("/onboarding");
-
-  const api = await getApi();
-  const tenant = unwrap(
-    await api.GET("/tenants/current", {
-      params: { header: { "X-Tenant-Id": membership.tenant_id } },
-    }),
-  );
+  const { me, tenant } = await getTenant();
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-10">

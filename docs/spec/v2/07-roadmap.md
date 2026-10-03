@@ -44,8 +44,17 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Supabase local + database migrations (Alembic) + RLS
 - [x] Sign up / verify email / log in / reset password (web)
 - [x] Create business (tenant) + dashboard shell + business switcher + tenant-isolation tests
-- [ ] Mobile sign in (moved to Sprint 2, with the client app)
-- [ ] Deploy to staging
+- [ ] Mobile sign in (moved to Sprint 3, with the client app)
+- [x] Deploy to staging: web https://business-os-alpha-drab.vercel.app · API https://business-os-api-staging.onrender.com
+
+## Sprint 2 progress
+
+- [x] Business navigation shell (side navigation)
+- [x] Permissions model (permission keys in code, system roles)
+- [x] Clients: list, search, create, edit, profile (vertical terminology, e.g. "members")
+- [ ] Services and locations
+- [ ] Staff: invite, roles; custom roles
+- [ ] Branding
 
 ## Owner setup checklist (Windows + iPhone)
 

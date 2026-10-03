@@ -104,5 +104,52 @@
     "manager": "Manager",
     "staff": "Staff",
     "front_desk": "Front desk"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "dashboard": "Dashboard"
+  },
+  "terms": {
+    "fitness": {
+      "client": "Member",
+      "clients": "Members",
+      "addClient": "Add member",
+      "newClient": "New member",
+      "searchClients": "Search members",
+      "noClients": "No members yet",
+      "noResults": "No members match your search"
+    }
+  },
+  "clients": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "dateOfBirth": "Date of birth",
+    "notes": "Notes",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "lead": "Lead"
+    },
+    "search": "Search",
+    "save": "Save",
+    "create": "Create",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "details": "Details",
+    "joined": "Joined {date}",
+    "total": "{count, plural, one {# total} other {# total}}",
+    "previous": "Previous",
+    "next": "Next",
+    "back": "Back to list",
+    "saved": "Saved.",
+    "errors": {
+      "email_taken": "Another record already uses this email.",
+      "invalid": "Please check the details and try again."
+    }
   }
 }

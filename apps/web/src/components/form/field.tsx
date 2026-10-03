@@ -1,5 +1,8 @@
 import { useId } from "react";
 
+const CONTROL =
+  "rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary";
+
 type FieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   hint?: string;
@@ -13,17 +16,26 @@ export function Field({ label, hint, ...inputProps }: FieldProps) {
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <input
-        id={id}
-        aria-describedby={hintId}
-        className="rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        {...inputProps}
-      />
+      <input id={id} aria-describedby={hintId} className={CONTROL} {...inputProps} />
       {hint && (
         <p id={hintId} className="text-xs text-muted">
           {hint}
         </p>
       )}
+    </div>
+  );
+}
+
+type TextAreaFieldProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string };
+
+export function TextAreaField({ label, ...textAreaProps }: TextAreaFieldProps) {
+  const id = useId();
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-sm font-medium">
+        {label}
+      </label>
+      <textarea id={id} rows={4} className={CONTROL} {...textAreaProps} />
     </div>
   );
 }
@@ -40,11 +52,7 @@ export function SelectField({ label, options, ...selectProps }: SelectFieldProps
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <select
-        id={id}
-        className="rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        {...selectProps}
-      >
+      <select id={id} className={CONTROL} {...selectProps}>
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

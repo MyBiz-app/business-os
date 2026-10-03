@@ -47,6 +47,8 @@ When a decision changes, update the row and note the date — do not delete hist
 | T19 | Background jobs: a Postgres-backed queue instead of Redis (one less service to run and pay for). Added when first needed. | DECIDED (2026-10-03, delegated) |
 | T20 | Typed API contract: `packages/api-client` is generated from FastAPI's OpenAPI schema; web (and later mobile) call the API only through it. | DECIDED (2026-10-03, delegated) |
 | T21 | Staging hosting: Vercel (web), Render free plan in Frankfurt (API, Docker), Supabase Central EU. Migrations via a GitHub Actions workflow. Revisit API host (e.g. Cloud Run) before production. | DECIDED (2026-10-03) |
+| T22 | Permissions: keys defined in code (`app/permissions.py`), system roles map to key sets; the API checks them per endpoint, the web mirrors them only to hide unavailable actions. Custom roles stored in the DB come later. | DECIDED (2026-10-03, delegated) |
+| T23 | Vertical terminology lives in translations under `terms.<vertical>.*` (e.g. fitness: "Members" / "מתאמנים"); screens pick the tenant's vertical, never branch on it. | DECIDED (2026-10-03, delegated) |
 
 ## Process
 
