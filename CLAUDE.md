@@ -1,0 +1,37 @@
+# CLAUDE.md — Business OS (codename)
+
+Modular, multi-tenant Business OS + AI Workforce for small and medium businesses.
+Israel first (Hebrew), then US/EU (American English). First vertical: boutique fitness studio.
+
+## Working agreement
+
+- **Conversation with the owner is in Hebrew.** Explain decisions clearly and simply; the owner is a
+  senior data engineer but new to app/product development.
+- **Everything in the codebase is in English**: identifiers, DB tables/columns, API fields, commits,
+  code comments, technical docs. Hebrew appears only in translation resources (`he` locale files)
+  and in user-entered content.
+- Before a significant product/architecture decision, propose it and wait for the owner's answer.
+  Record every decision in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+- Build small, vertical slices end-to-end (DB → API → Web → Mobile). Every slice must keep tenant
+  isolation, i18n/RTL, dark mode and accessibility intact.
+- Never paste or commit secrets. Secrets live in environment variables / provider secret stores.
+
+## Where things are
+
+| Path | What |
+|---|---|
+| `docs/spec/v1/` | Original owner spec (Hebrew + English .docx) |
+| `docs/spec/v2/` | Current working spec (source of truth) |
+| `docs/DECISIONS.md` | Decision log |
+
+## Non-negotiable principles
+
+1. **The backend is the authority, not the AI.** AI acts only through approved tools; sensitive
+   actions become server-side Pending Actions, re-validated on confirmation.
+2. **Tenant isolation**: every tenant-scoped row has `tenant_id`; enforced in the API and by Postgres RLS.
+3. **i18n by design**: no hard-coded user-facing strings; RTL/LTR via logical CSS properties.
+4. **Money** is stored as integer minor units + ISO currency code. **Time** is `timestamptz` (UTC)
+   plus the tenant's IANA time zone for display.
+5. **Usage is measurable**: every billable usage (AI, messages, storage) emits a usage event.
+6. **Vertical-agnostic core**: vertical-specific behavior lives in vertical packs (config), not in
+   `if vertical == ...` branches.
