@@ -58,6 +58,14 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [ ] Real invitation emails (with the production email provider)
 - [x] Business settings (name, language, time zone, currency) and branding (color with contrast-safe text, logo)
 
+## Sprint 3 progress
+
+- [x] Sessions: one-off and weekly series (expanded in the business time zone, DST-safe), edit or cancel one occurrence
+- [x] Weekly schedule screen (staff web), new-session form with room and instructor
+- [ ] Bookings: book a client, capacity, waitlist, cancellation window, check-in
+- [ ] Client app: sign in, join a business, branded home, schedule, book / cancel
+- [ ] Background job to extend weekly series beyond their first 12–26 weeks
+
 ## Owner setup checklist (Windows + iPhone)
 
 - [ ] Git — https://git-scm.com

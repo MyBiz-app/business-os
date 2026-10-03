@@ -129,7 +129,8 @@
     "services": "Services",
     "locations": "Locations",
     "team": "Team",
-    "settings": "Settings"
+    "settings": "Settings",
+    "schedule": "Schedule"
   },
   "terms": {
     "fitness": {
@@ -262,5 +263,53 @@
     "notFound": "This invitation link is invalid or was revoked.",
     "login": "Log in",
     "signup": "Create an account"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "thisWeek": "This week",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "newSession": "New session",
+    "noSessions": "No sessions",
+    "cancelled": "Cancelled",
+    "spots": "{booked}/{capacity}",
+    "spotsLabel": "{booked} of {capacity} booked",
+    "service": "Service",
+    "date": "Date",
+    "startTime": "Start time",
+    "duration": "Duration (minutes)",
+    "durationHint": "Leave empty to use the service's duration.",
+    "capacity": "Capacity",
+    "capacityHint": "Leave empty to use the service's capacity.",
+    "location": "Location",
+    "room": "Room",
+    "instructor": "Instructor",
+    "none": "—",
+    "notes": "Notes",
+    "repeat": "Repeat weekly",
+    "repeatOn": "On",
+    "repeatUntil": "Until",
+    "repeatUntilHint": "Up to 26 weeks. Leave empty for 12 weeks.",
+    "weekdays": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "create": "Create",
+    "createdMany": "{count} sessions created.",
+    "details": "Session details",
+    "cancelSession": "Cancel this session",
+    "restoreSession": "Restore this session",
+    "series": "Part of a weekly series. Changes here apply to this session only.",
+    "back": "Back to schedule",
+    "needService": "Add a service first, then you can schedule it.",
+    "errors": {
+      "invalid_reference": "One of the selected items is not available. Refresh and try again.",
+      "no_occurrences": "No session falls on the chosen days in that period."
+    }
   }
 }

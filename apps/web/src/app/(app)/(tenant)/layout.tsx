@@ -14,6 +14,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
 
   const items: NavItem[] = [
     { href: "/dashboard", label: t("nav.dashboard") },
+    { href: "/schedule", label: t("nav.schedule") },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients") },
     { href: "/services", label: t("nav.services") },
     { href: "/locations", label: t("nav.locations") },

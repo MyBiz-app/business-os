@@ -22,3 +22,9 @@ export function canManageTeam(role: Role): boolean {
 export function canManageSettings(role: Role): boolean {
   return TEAM_MANAGERS.has(role);
 }
+
+const SCHEDULE_WRITERS = new Set<Role>(["owner", "manager", "front_desk"]);
+
+export function canWriteSchedule(role: Role): boolean {
+  return SCHEDULE_WRITERS.has(role);
+}

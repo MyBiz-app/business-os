@@ -129,7 +129,8 @@
     "services": "שירותים",
     "locations": "מיקומים",
     "team": "צוות",
-    "settings": "הגדרות"
+    "settings": "הגדרות",
+    "schedule": "לוח שיעורים"
   },
   "terms": {
     "fitness": {
@@ -262,5 +263,53 @@
     "notFound": "קישור ההזמנה לא תקין או שבוטל.",
     "login": "התחברות",
     "signup": "יצירת חשבון"
+  },
+  "schedule": {
+    "title": "לוח שיעורים",
+    "thisWeek": "השבוע",
+    "previousWeek": "השבוע הקודם",
+    "nextWeek": "השבוע הבא",
+    "newSession": "שיעור חדש",
+    "noSessions": "אין שיעורים",
+    "cancelled": "בוטל",
+    "spots": "{booked}/{capacity}",
+    "spotsLabel": "{booked} מתוך {capacity} רשומים",
+    "service": "שירות",
+    "date": "תאריך",
+    "startTime": "שעת התחלה",
+    "duration": "משך (בדקות)",
+    "durationHint": "השאירו ריק כדי להשתמש במשך של השירות.",
+    "capacity": "מקומות",
+    "capacityHint": "השאירו ריק כדי להשתמש במספר המקומות של השירות.",
+    "location": "מיקום",
+    "room": "חדר",
+    "instructor": "מדריך/ה",
+    "none": "—",
+    "notes": "הערות",
+    "repeat": "חזרה שבועית",
+    "repeatOn": "בימים",
+    "repeatUntil": "עד תאריך",
+    "repeatUntilHint": "עד 26 שבועות. השאירו ריק ל-12 שבועות.",
+    "weekdays": {
+      "0": "א׳",
+      "1": "ב׳",
+      "2": "ג׳",
+      "3": "ד׳",
+      "4": "ה׳",
+      "5": "ו׳",
+      "6": "ש׳"
+    },
+    "create": "יצירה",
+    "createdMany": "נוצרו {count} שיעורים.",
+    "details": "פרטי השיעור",
+    "cancelSession": "ביטול השיעור",
+    "restoreSession": "החזרת השיעור",
+    "series": "חלק מסדרה שבועית. שינויים כאן חלים רק על השיעור הזה.",
+    "back": "חזרה ללוח",
+    "needService": "הוסיפו קודם שירות, ואז אפשר לתזמן אותו.",
+    "errors": {
+      "invalid_reference": "אחד הפריטים שנבחרו אינו זמין. רעננו ונסו שוב.",
+      "no_occurrences": "אין שיעורים שנופלים בימים שנבחרו בטווח הזה."
+    }
   }
 }
