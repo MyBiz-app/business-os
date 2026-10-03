@@ -38,6 +38,16 @@ if ($missing.Count -gt 0) {
 }
 Write-Ok ("node " + (node --version))
 
+# --- 1b. Allow locally installed CLI scripts (pnpm.ps1, npm.ps1) to run --------------------------
+Write-Step "PowerShell execution policy"
+$policy = Get-ExecutionPolicy -Scope CurrentUser
+if ($policy -in @("RemoteSigned", "Unrestricted", "Bypass")) {
+    Write-Ok "CurrentUser policy is $policy"
+} else {
+    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+    Write-Ok "CurrentUser policy set to RemoteSigned (was $policy)"
+}
+
 # --- 2. pnpm ----------------------------------------------------------------------------------
 Write-Step "pnpm (JavaScript package manager)"
 if (Test-Command "pnpm") {
