@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import field_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
     jwks_url: str = "http://127.0.0.1:54321/auth/v1/.well-known/jwks.json"
     jwt_audience: str = "authenticated"
+
+    # AI assistant. Without a key the assistant is shown as "not set up yet".
+    anthropic_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
+    )
+    ai_model: str = "claude-opus-5-5"
 
     @field_validator("database_url")
     @classmethod

@@ -47,3 +47,9 @@ const REPORT_READERS = new Set<Role>(["owner", "manager"]);
 export function canReadReports(role: Role): boolean {
   return REPORT_READERS.has(role);
 }
+
+const ASSISTANT_USERS = new Set<Role>(["owner", "manager", "front_desk"]);
+
+export function canUseAssistant(role: Role): boolean {
+  return ASSISTANT_USERS.has(role);
+}

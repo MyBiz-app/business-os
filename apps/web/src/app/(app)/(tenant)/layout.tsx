@@ -4,7 +4,7 @@ import Image from "next/image";
 import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { brandStyle } from "@/lib/brand";
-import { canManageSettings, canManageTeam } from "@/lib/permissions";
+import { canManageSettings, canManageTeam, canUseAssistant } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
@@ -14,6 +14,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
 
   const items: NavItem[] = [
     { href: "/dashboard", label: t("nav.dashboard") },
+    ...(canUseAssistant(tenant.role) ? [{ href: "/assistant", label: t("nav.assistant") }] : []),
     { href: "/schedule", label: t("nav.schedule") },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients") },
     { href: "/services", label: t("nav.services") },

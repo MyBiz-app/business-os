@@ -80,6 +80,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 
 - [x] Metrics layer (`app/metrics.py`) + `/metrics` API with previous-period comparison and weekly series
 - [x] KPI dashboard (tiles, revenue and check-ins per week, today's sessions)
+- [x] AI assistant: Q&A through read tools + metrics; booking / cancelling as confirmable pending actions; audit log; AI usage metering
+- [ ] AI eval set (Hebrew + English business questions) run when prompts or models change
 
 ## Owner setup checklist (Windows + iPhone)
 

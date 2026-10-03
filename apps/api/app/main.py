@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.api import (
+    assistant,
     bookings,
     client_app,
     clients,
@@ -54,6 +55,7 @@ def create_app() -> FastAPI:
     app.include_router(bookings.router)
     app.include_router(plans.router)
     app.include_router(reports.router)
+    app.include_router(assistant.router)
     app.include_router(client_app.public_router)
     app.include_router(client_app.router)
     app.include_router(business_settings.router)

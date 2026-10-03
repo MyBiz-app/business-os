@@ -148,7 +148,8 @@
     "team": "Team",
     "settings": "Settings",
     "schedule": "Schedule",
-    "plans": "Plans"
+    "plans": "Plans",
+    "assistant": "AI assistant"
   },
   "terms": {
     "fitness": {
@@ -537,5 +538,46 @@
     "no_show_rate": "No-show rate",
     "late_cancel_rate": "Late cancellations",
     "sessions_held": "Sessions held"
+  },
+  "assistant": {
+    "title": "AI assistant",
+    "subtitle": "Ask about your business in plain words. It can also prepare bookings for you to confirm.",
+    "newConversation": "New conversation",
+    "notConfigured": "The assistant isn't set up yet: an AI provider key needs to be added on the server.",
+    "conversation": "Conversation",
+    "empty": "No conversations yet.",
+    "start": "Start a conversation",
+    "intro": "Hi! Ask me about your schedule, members, plans or numbers.",
+    "you": "You:",
+    "assistantLabel": "Assistant:",
+    "noAnswer": "I couldn't answer that one. Try asking differently.",
+    "history": "Recent conversations",
+    "untitled": "New conversation",
+    "question": "Your question",
+    "placeholder": "For example: How was occupancy last month?",
+    "send": "Send",
+    "thinking": "Thinking…",
+    "suggestion1": "How did last month go?",
+    "suggestion2": "What's on the schedule tomorrow?",
+    "suggestion3": "Which classes have a waitlist this week?",
+    "needsConfirmation": "Needs your confirmation",
+    "bookPreview": "Book {client} into {service}",
+    "cancelPreview": "Cancel {client}'s booking for {service}",
+    "fullWaitlist": "The class is full, so this will add them to the waitlist.",
+    "confirm": "Confirm",
+    "reject": "Don't do it",
+    "statuses": {
+      "pending": "Waiting for you",
+      "executed": "Done",
+      "rejected": "Not done (you declined)",
+      "expired": "Expired: ask again if you still want it",
+      "failed": "Couldn't be done: things changed. Ask again."
+    },
+    "errors": {
+      "ai_not_configured": "The assistant isn't set up yet.",
+      "ai_busy": "The assistant is busy right now. Try again in a minute.",
+      "ai_unavailable": "The assistant is unavailable right now. Try again later.",
+      "generic": "Something went wrong. Try again."
+    }
   }
 }
