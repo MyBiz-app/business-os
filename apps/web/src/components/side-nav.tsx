@@ -11,8 +11,8 @@ export function SideNav({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label={t("label")} className="border-b border-border md:border-b-0 md:border-e">
-      <ul className="flex gap-1 overflow-x-auto p-3 md:w-56 md:flex-col">
+    <nav aria-label={t("label")}>
+      <ul className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col">
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           return (

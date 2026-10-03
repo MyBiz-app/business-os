@@ -22,6 +22,14 @@ def get_session(user: UserDep, engine: EngineDep) -> Iterator[Session]:
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
+def get_anonymous_session(engine: EngineDep) -> Iterator[Session]:
+    """A session for public endpoints: no user, no tenant; RLS hides all tenant data."""
+    yield from session_scope(open_session(engine, None))
+
+
+AnonymousSessionDep = Annotated[Session, Depends(get_anonymous_session)]
+
+
 @dataclass(frozen=True)
 class TenantContext:
     session: Session

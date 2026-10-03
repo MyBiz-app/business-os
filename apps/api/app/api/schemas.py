@@ -54,6 +54,28 @@ class TenantCreate(BaseModel):
         return value
 
 
+class TenantUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    locale: Locale | None = None
+    time_zone: str | None = None
+    currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
+    primary_color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("name must not be blank")
+        return value.strip() if value else value
+
+    @field_validator("time_zone")
+    @classmethod
+    def known_time_zone(cls, value: str | None) -> str | None:
+        if value is not None and value not in available_timezones():
+            raise ValueError("unknown time zone")
+        return value
+
+
 class Tenant(BaseModel):
     id: UUID
     name: str
@@ -61,4 +83,6 @@ class Tenant(BaseModel):
     locale: Locale
     time_zone: str
     currency: str
+    primary_color: str | None
+    logo_url: str | None = Field(description="Public path of the logo on this API, if any")
     role: Role

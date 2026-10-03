@@ -18,3 +18,7 @@ const TEAM_MANAGERS = new Set<Role>(["owner", "manager"]);
 export function canManageTeam(role: Role): boolean {
   return TEAM_MANAGERS.has(role);
 }
+
+export function canManageSettings(role: Role): boolean {
+  return TEAM_MANAGERS.has(role);
+}

@@ -16,7 +16,25 @@
     "theme": "Theme",
     "themeLight": "Light",
     "themeDark": "Dark",
-    "themeSystem": "System"
+    "themeSystem": "System",
+    "title": "Settings",
+    "subtitle": "Your business details and how it looks to clients.",
+    "details": "Business details",
+    "brand": "Brand",
+    "brandHint": "Your color and logo appear across your business area and, later, in the client app.",
+    "color": "Brand color",
+    "useDefault": "Use the default color",
+    "logo": "Logo",
+    "logoHint": "PNG, JPG or WebP, up to 512 KB. A square image works best.",
+    "uploadLogo": "Upload logo",
+    "removeLogo": "Remove logo",
+    "noLogo": "No logo yet",
+    "preview": "Preview",
+    "previewButton": "Book a class",
+    "errors": {
+      "logo_too_large": "The image is larger than 512 KB.",
+      "unsupported_image": "Use a PNG, JPG or WebP image."
+    }
   },
   "locales": {
     "he": "עברית",
@@ -110,7 +128,8 @@
     "dashboard": "Dashboard",
     "services": "Services",
     "locations": "Locations",
-    "team": "Team"
+    "team": "Team",
+    "settings": "Settings"
   },
   "terms": {
     "fitness": {

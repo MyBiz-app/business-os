@@ -48,7 +48,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
         {canWriteClients(tenant.role) && (
           <Link
             href="/clients/new"
-            className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-white dark:text-background"
+            className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"
           >
             {term("addClient")}
           </Link>

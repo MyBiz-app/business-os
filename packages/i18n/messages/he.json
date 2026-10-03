@@ -16,7 +16,25 @@
     "theme": "ערכת נושא",
     "themeLight": "בהיר",
     "themeDark": "כהה",
-    "themeSystem": "לפי המערכת"
+    "themeSystem": "לפי המערכת",
+    "title": "הגדרות",
+    "subtitle": "פרטי העסק ואיך הוא נראה ללקוחות.",
+    "details": "פרטי העסק",
+    "brand": "מיתוג",
+    "brandHint": "הצבע והלוגו יופיעו באזור העסק, ובהמשך גם באפליקציית הלקוחות.",
+    "color": "צבע המותג",
+    "useDefault": "שימוש בצבע ברירת המחדל",
+    "logo": "לוגו",
+    "logoHint": "PNG,‏ JPG או WebP, עד 512KB. תמונה ריבועית נראית הכי טוב.",
+    "uploadLogo": "העלאת לוגו",
+    "removeLogo": "הסרת הלוגו",
+    "noLogo": "עדיין אין לוגו",
+    "preview": "תצוגה מקדימה",
+    "previewButton": "הזמנת שיעור",
+    "errors": {
+      "logo_too_large": "התמונה גדולה מ-512KB.",
+      "unsupported_image": "השתמשו בתמונה מסוג PNG,‏ JPG או WebP."
+    }
   },
   "locales": {
     "he": "עברית",
@@ -110,7 +128,8 @@
     "dashboard": "דשבורד",
     "services": "שירותים",
     "locations": "מיקומים",
-    "team": "צוות"
+    "team": "צוות",
+    "settings": "הגדרות"
   },
   "terms": {
     "fitness": {

@@ -56,7 +56,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Staff: invite by link, roles, remove; last-owner and owner-only guards
 - [ ] Custom roles (permission toggles per business)
 - [ ] Real invitation emails (with the production email provider)
-- [ ] Branding
+- [x] Business settings (name, language, time zone, currency) and branding (color with contrast-safe text, logo)
 
 ## Owner setup checklist (Windows + iPhone)
 

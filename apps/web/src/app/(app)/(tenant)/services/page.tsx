@@ -20,7 +20,7 @@ export default async function ServicesPage() {
           <p className="text-sm text-muted">{t("services.subtitle")}</p>
         </div>
         {canWriteCatalog(tenant.role) && (
-          <Link href="/services/new" className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-white dark:text-background">
+          <Link href="/services/new" className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">
             {t("services.add")}
           </Link>
         )}

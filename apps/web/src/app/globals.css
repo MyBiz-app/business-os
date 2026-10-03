@@ -11,6 +11,7 @@
   --border: #e4e4e7;
   --muted: #52525b;
   --primary: #4f46e5;
+  --on-primary: #ffffff;
   --success: #16a34a;
   --danger: #dc2626;
 }
@@ -22,6 +23,7 @@
   --border: #27272a;
   --muted: #a1a1aa;
   --primary: #818cf8;
+  --on-primary: #09090b;
   --success: #22c55e;
   --danger: #f87171;
 }
@@ -33,6 +35,7 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --font-sans: var(--font-heebo), system-ui, sans-serif;
