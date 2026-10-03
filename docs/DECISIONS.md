@@ -50,6 +50,9 @@ When a decision changes, update the row and note the date — do not delete hist
 | T22 | Permissions: keys defined in code (`app/permissions.py`), system roles map to key sets; the API checks them per endpoint, the web mirrors them only to hide unavailable actions. Custom roles stored in the DB come later. | DECIDED (2026-10-03, delegated) |
 | T23 | Vertical terminology lives in translations under `terms.<vertical>.*` (e.g. fitness: "Members" / "מתאמנים"); screens pick the tenant's vertical, never branch on it. | DECIDED (2026-10-03, delegated) |
 | T24 | Staff invitations are one-time links (7 days, only a SHA-256 hash stored) that the inviter shares; accepting requires the signed-in email to match. Emailing them waits for the production email provider. | DECIDED (2026-10-03, delegated) |
+| T25 | Prototype stores the business logo in Postgres (≤512 KB PNG/JPEG/WebP, type checked by file content, served publicly by the API with immutable caching). Moves to Supabase Storage when media grows beyond logos. | DECIDED (2026-10-03, delegated) |
+| T26 | Brand color replaces the product's primary color inside the business's area; text on it is black or white, whichever has the higher WCAG contrast. | DECIDED (2026-10-03, delegated) |
+| T27 | Schedule model: `sessions` are concrete occurrences (timestamptz, UTC); a weekly `session_series` stores local wall-clock time and is expanded in the business time zone when created (default 12 weeks, max 26) — editing one occurrence never touches the others. Composite foreign keys keep every reference inside the tenant. | DECIDED (2026-10-03, delegated) |
 
 ## Process
 

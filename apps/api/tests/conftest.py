@@ -46,13 +46,15 @@ def engine() -> Iterator[Engine]:
 
 @pytest.fixture(autouse=True)
 def clean_tables(engine: Engine) -> None:
+    """Empties every app table before each test, including tables added later."""
     with engine.begin() as connection:
-        connection.execute(
+        tables = connection.execute(
             text(
-                "TRUNCATE app.invitations, app.services, app.rooms, app.locations, app.clients, "
-                "app.tenant_members, app.tenants, app.users CASCADE"
+                "SELECT string_agg(format('app.%I', tablename), ', ') FROM pg_tables "
+                "WHERE schemaname = 'app'"
             )
-        )
+        ).scalar_one()
+        connection.execute(text(f"TRUNCATE {tables} CASCADE"))
 
 
 class StaticKeySource:

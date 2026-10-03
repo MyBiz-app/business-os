@@ -1,0 +1,19 @@
+from app.permissions import ROLE_PERMISSIONS, Permission
+
+# The full matrix, written out so that any change to who-can-do-what is a visible diff.
+EXPECTED = {
+    "owner": set(Permission),
+    "manager": set(Permission),
+    "front_desk": {
+        "clients.read",
+        "clients.write",
+        "catalog.read",
+        "schedule.read",
+        "schedule.write",
+    },
+    "staff": {"clients.read", "catalog.read", "schedule.read"},
+}
+
+
+def test_role_permission_matrix() -> None:
+    assert {role: set(keys) for role, keys in ROLE_PERMISSIONS.items()} == EXPECTED

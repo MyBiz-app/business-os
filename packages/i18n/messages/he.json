@@ -16,7 +16,25 @@
     "theme": "ערכת נושא",
     "themeLight": "בהיר",
     "themeDark": "כהה",
-    "themeSystem": "לפי המערכת"
+    "themeSystem": "לפי המערכת",
+    "title": "הגדרות",
+    "subtitle": "פרטי העסק ואיך הוא נראה ללקוחות.",
+    "details": "פרטי העסק",
+    "brand": "מיתוג",
+    "brandHint": "הצבע והלוגו יופיעו באזור העסק, ובהמשך גם באפליקציית הלקוחות.",
+    "color": "צבע המותג",
+    "useDefault": "שימוש בצבע ברירת המחדל",
+    "logo": "לוגו",
+    "logoHint": "PNG,‏ JPG או WebP, עד 512KB. תמונה ריבועית נראית הכי טוב.",
+    "uploadLogo": "העלאת לוגו",
+    "removeLogo": "הסרת הלוגו",
+    "noLogo": "עדיין אין לוגו",
+    "preview": "תצוגה מקדימה",
+    "previewButton": "הזמנת שיעור",
+    "errors": {
+      "logo_too_large": "התמונה גדולה מ-512KB.",
+      "unsupported_image": "השתמשו בתמונה מסוג PNG,‏ JPG או WebP."
+    }
   },
   "locales": {
     "he": "עברית",
@@ -110,7 +128,9 @@
     "dashboard": "דשבורד",
     "services": "שירותים",
     "locations": "מיקומים",
-    "team": "צוות"
+    "team": "צוות",
+    "settings": "הגדרות",
+    "schedule": "לוח שיעורים"
   },
   "terms": {
     "fitness": {
@@ -243,5 +263,53 @@
     "notFound": "קישור ההזמנה לא תקין או שבוטל.",
     "login": "התחברות",
     "signup": "יצירת חשבון"
+  },
+  "schedule": {
+    "title": "לוח שיעורים",
+    "thisWeek": "השבוע",
+    "previousWeek": "השבוע הקודם",
+    "nextWeek": "השבוע הבא",
+    "newSession": "שיעור חדש",
+    "noSessions": "אין שיעורים",
+    "cancelled": "בוטל",
+    "spots": "{booked}/{capacity}",
+    "spotsLabel": "{booked} מתוך {capacity} רשומים",
+    "service": "שירות",
+    "date": "תאריך",
+    "startTime": "שעת התחלה",
+    "duration": "משך (בדקות)",
+    "durationHint": "השאירו ריק כדי להשתמש במשך של השירות.",
+    "capacity": "מקומות",
+    "capacityHint": "השאירו ריק כדי להשתמש במספר המקומות של השירות.",
+    "location": "מיקום",
+    "room": "חדר",
+    "instructor": "מדריך/ה",
+    "none": "—",
+    "notes": "הערות",
+    "repeat": "חזרה שבועית",
+    "repeatOn": "בימים",
+    "repeatUntil": "עד תאריך",
+    "repeatUntilHint": "עד 26 שבועות. השאירו ריק ל-12 שבועות.",
+    "weekdays": {
+      "0": "א׳",
+      "1": "ב׳",
+      "2": "ג׳",
+      "3": "ד׳",
+      "4": "ה׳",
+      "5": "ו׳",
+      "6": "ש׳"
+    },
+    "create": "יצירה",
+    "createdMany": "נוצרו {count} שיעורים.",
+    "details": "פרטי השיעור",
+    "cancelSession": "ביטול השיעור",
+    "restoreSession": "החזרת השיעור",
+    "series": "חלק מסדרה שבועית. שינויים כאן חלים רק על השיעור הזה.",
+    "back": "חזרה ללוח",
+    "needService": "הוסיפו קודם שירות, ואז אפשר לתזמן אותו.",
+    "errors": {
+      "invalid_reference": "אחד הפריטים שנבחרו אינו זמין. רעננו ונסו שוב.",
+      "no_occurrences": "אין שיעורים שנופלים בימים שנבחרו בטווח הזה."
+    }
   }
 }

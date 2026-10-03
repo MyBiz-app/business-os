@@ -11,6 +11,8 @@ class Permission(StrEnum):
     CLIENTS_WRITE = "clients.write"
     CATALOG_READ = "catalog.read"
     CATALOG_WRITE = "catalog.write"
+    SCHEDULE_READ = "schedule.read"
+    SCHEDULE_WRITE = "schedule.write"
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
@@ -24,15 +26,25 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.CLIENTS_WRITE,
             Permission.CATALOG_READ,
             Permission.CATALOG_WRITE,
+            Permission.SCHEDULE_READ,
+            Permission.SCHEDULE_WRITE,
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
         }
     ),
     "front_desk": frozenset(
-        {Permission.CLIENTS_READ, Permission.CLIENTS_WRITE, Permission.CATALOG_READ}
+        {
+            Permission.CLIENTS_READ,
+            Permission.CLIENTS_WRITE,
+            Permission.CATALOG_READ,
+            Permission.SCHEDULE_READ,
+            Permission.SCHEDULE_WRITE,
+        }
     ),
-    "staff": frozenset({Permission.CLIENTS_READ, Permission.CATALOG_READ}),
+    "staff": frozenset(
+        {Permission.CLIENTS_READ, Permission.CATALOG_READ, Permission.SCHEDULE_READ}
+    ),
 }
 
 

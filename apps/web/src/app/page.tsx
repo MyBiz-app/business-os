@@ -19,7 +19,7 @@ export default async function Home() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Link href="/signup" className="rounded-lg bg-primary px-5 py-2.5 font-semibold text-white dark:text-background">
+          <Link href="/signup" className="rounded-lg bg-primary px-5 py-2.5 font-semibold text-on-primary">
             {t("home.signup")}
           </Link>
           <Link href="/login" className="rounded-lg border border-border px-5 py-2.5 font-semibold">

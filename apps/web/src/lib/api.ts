@@ -19,6 +19,11 @@ export async function isApiHealthy(): Promise<boolean> {
   }
 }
 
+/** Absolute URL for a path served by the API (e.g. a tenant logo). */
+export function apiAssetUrl(path: string | null | undefined): string | null {
+  return path ? `${API_URL}${path}` : null;
+}
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -28,15 +33,29 @@ export class ApiError extends Error {
   }
 }
 
-/** A typed API client that calls the backend as the signed-in user. */
-export async function getApi(): Promise<ApiClient> {
+async function authHeaders(): Promise<Record<string, string>> {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
+  return session ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
 
-  const headers: Record<string, string> = {};
-  if (session) headers.Authorization = `Bearer ${session.access_token}`;
+/** Uploads a file (multipart) to the API as the signed-in user, scoped to a tenant. */
+export async function apiUpload(path: string, file: File, tenantId: string): Promise<Response> {
+  const body = new FormData();
+  body.set("file", file);
+  return fetch(`${API_URL}${path}`, {
+    method: "PUT",
+    headers: { ...(await authHeaders()), "X-Tenant-Id": tenantId },
+    body,
+    cache: "no-store",
+  });
+}
+
+/** A typed API client that calls the backend as the signed-in user. */
+export async function getApi(): Promise<ApiClient> {
+  const headers = await authHeaders();
 
   return createApiClient({
     baseUrl: API_URL,

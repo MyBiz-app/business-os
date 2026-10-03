@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { acceptInvitation } from "./actions";
 
-const BUTTON = "rounded-lg bg-primary px-4 py-2.5 text-center font-semibold text-white dark:text-background";
+const BUTTON = "rounded-lg bg-primary px-4 py-2.5 text-center font-semibold text-on-primary";
 
 export default async function InvitePage({ params }: PageProps<"/invite/[token]">) {
   const { token } = await params;
