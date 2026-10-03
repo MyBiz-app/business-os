@@ -2,13 +2,13 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
-import { apiFetch, type Me } from "@/lib/api";
+import { getApi, unwrap } from "@/lib/api";
 
 export const TENANT_COOKIE = "TENANT_ID";
 
 /** The signed-in user and the business they are working in (null if they have none yet). */
 export async function getActiveMembership() {
-  const me = await apiFetch<Me>("/me");
+  const me = unwrap(await (await getApi()).GET("/me"));
   const selected = (await cookies()).get(TENANT_COOKIE)?.value;
   const membership =
     me.memberships.find((m) => m.tenant_id === selected) ?? me.memberships[0] ?? null;

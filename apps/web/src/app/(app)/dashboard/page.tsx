@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
-import { apiFetch, type Tenant } from "@/lib/api";
+import { getApi, unwrap } from "@/lib/api";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { BusinessSwitcher } from "./business-switcher";
@@ -11,7 +11,12 @@ export default async function DashboardPage() {
   const { me, membership } = await getActiveMembership();
   if (!membership) redirect("/onboarding");
 
-  const tenant = await apiFetch<Tenant>("/tenants/current", { tenantId: membership.tenant_id });
+  const api = await getApi();
+  const tenant = unwrap(
+    await api.GET("/tenants/current", {
+      params: { header: { "X-Tenant-Id": membership.tenant_id } },
+    }),
+  );
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-10">

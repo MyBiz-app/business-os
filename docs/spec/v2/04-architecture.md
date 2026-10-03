@@ -5,42 +5,45 @@
 | Layer | Choice |
 |---|---|
 | Monorepo | pnpm workspaces + Turborepo (TS), uv (Python) |
-| Backend API | Python 3.12, FastAPI, SQLAlchemy 2, Alembic, Pydantic v2 |
-| Background jobs | ARQ (Redis) or a Postgres-backed queue — decided in Sprint 1 |
+| Backend API | Python 3.13, FastAPI, SQLAlchemy 2 (psycopg 3), Alembic (hand-written SQL migrations), Pydantic v2 |
+| Background jobs | Postgres-backed queue (no Redis); introduced when first needed (reminders / notifications, Sprint 3) |
 | Database | PostgreSQL (Supabase), Row-Level Security as defense-in-depth |
-| Auth | Supabase Auth (email + verification, password reset, Google/Apple, MFA). API verifies Supabase JWT |
+| Auth | Supabase Auth (email + verification, password reset; later Google/Apple, MFA). API verifies Supabase ES256 JWTs via JWKS |
 | Storage | Supabase Storage (logos, images, signed forms) |
 | Web | Next.js (App Router), TypeScript, Tailwind, shadcn/ui, next-intl |
 | Mobile | Expo, Expo Router, TypeScript; EAS for builds |
-| API contract | OpenAPI from FastAPI → generated TS client shared by web and mobile |
+| API contract | OpenAPI from FastAPI → `packages/api-client` (openapi-typescript + openapi-fetch); CI fails if it is out of date |
 | AI | LLM gateway in the API; Claude primary (see [06-ai](06-ai.md)) |
 | Email | Mailpit (dev), Resend or Postmark (prod) |
 | Observability | Sentry (errors), PostHog (product analytics, feature flags) |
 | CI/CD | GitHub Actions |
-| Hosting | Vercel (web), container host for API (Render / Fly / Cloud Run), Supabase (EU region) |
+| Hosting | Vercel (web), container host for API (`apps/api/Dockerfile`; provider chosen for staging), Supabase (EU region) |
 
-## Monorepo layout (target)
+## Monorepo layout
 
 ```
 apps/
-  web/            # Next.js: business dashboard, platform console, public booking pages
+  web/            # Next.js: business dashboard (later: platform console, public booking pages)
   mobile/         # Expo: client app (+ owner quick actions later)
-services/
-  api/            # FastAPI: domain, auth, tenancy, AI gateway, jobs
+  api/            # FastAPI: domain, auth, tenancy (later: AI gateway, jobs); Alembic migrations
 packages/
-  api-client/     # generated TS client from OpenAPI
-  i18n/           # shared translation resources (en, he) + vertical terminology
-  ui-tokens/      # design tokens: semantic colors, spacing, typography
-  config/         # shared eslint/tsconfig/prettier
+  api-client/     # TS client generated from the API's OpenAPI schema
+  i18n/           # shared translations (he, en) + locale helpers (later: vertical terminology)
+supabase/         # local Supabase config and email templates
 docs/
 ```
 
+Later, as needed: `packages/ui-tokens` (shared design tokens), `packages/config` (shared lint/TS config).
+
 ## Tenancy
 
-- Every tenant-scoped table has `tenant_id`. The API resolves the tenant from the request
-  (header / subdomain) and verifies the user's membership in it.
-- Each request sets `app.tenant_id` on the DB session; RLS policies filter on it.
-- Automated tests assert that tenant A can never read or write tenant B data.
+- Every tenant-scoped table has `tenant_id`. The API reads the tenant from the `X-Tenant-Id`
+  header and verifies the user's membership in it (403 otherwise).
+- Every transaction runs as role `app_api` (no RLS bypass) with `app.user_id` and
+  `app.tenant_id` set; `app.current_tenant_id()` only returns a tenant the user belongs to.
+- App tables live in schema `app`, which Supabase does not expose to browsers.
+- Automated tests assert that tenant A can never read or write tenant B data, through the API
+  and directly in Postgres.
 
 ## Internationalization, theming, accessibility
 

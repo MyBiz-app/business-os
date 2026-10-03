@@ -13,7 +13,12 @@ class HealthResponse(BaseModel):
 
 def create_app() -> FastAPI:
     settings = get_settings()
-    app = FastAPI(title="Business OS API", version="0.1.0")
+    app = FastAPI(
+        title="Business OS API",
+        version="0.1.0",
+        # Operation ids become method names in the generated client, so keep them short.
+        generate_unique_id_function=lambda route: route.name,
+    )
 
     app.add_middleware(
         CORSMiddleware,

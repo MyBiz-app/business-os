@@ -44,6 +44,8 @@ When a decision changes, update the row and note the date — do not delete hist
 | T16 | Database schema is owned by Alembic migrations (hand-written SQL) in `apps/api`. Supabase owns only its own schemas (auth, storage). App tables live in schema `app`, which Supabase does not expose to browsers. | DECIDED (2026-10-03, delegated) |
 | T17 | Tenant isolation: the API runs every transaction as role `app_api` (no RLS bypass) with `app.user_id` / `app.tenant_id` set per transaction. `app.current_tenant_id()` returns a tenant only if the user is a member, so a forged tenant id grants nothing. Isolation is tested at both API and database level. | DECIDED (2026-10-03, delegated) |
 | T18 | Auth: Supabase Auth issues tokens (ES256); the API verifies them against Supabase's JWKS. Clients never query app tables directly; all data goes through the API. | DECIDED (2026-10-03, delegated) |
+| T19 | Background jobs: a Postgres-backed queue instead of Redis (one less service to run and pay for). Added when first needed. | DECIDED (2026-10-03, delegated) |
+| T20 | Typed API contract: `packages/api-client` is generated from FastAPI's OpenAPI schema; web (and later mobile) call the API only through it. | DECIDED (2026-10-03, delegated) |
 
 ## Process
 

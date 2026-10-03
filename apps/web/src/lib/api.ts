@@ -1,13 +1,16 @@
 import "server-only";
 
+import { type ApiClient, createApiClient } from "@business-os/api-client";
+
 import { createClient } from "@/lib/supabase/server";
+
+export type { Me, Role, Tenant } from "@business-os/api-client";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export async function isApiHealthy(): Promise<boolean> {
   try {
-    const response = await fetch(`${API_URL}/health`, {
-      cache: "no-store",
+    const { response } = await createApiClient({ baseUrl: API_URL }).GET("/health", {
       signal: AbortSignal.timeout(2000),
     });
     return response.ok;
@@ -25,44 +28,25 @@ export class ApiError extends Error {
   }
 }
 
-/** Calls the backend API as the signed-in user. */
-export async function apiFetch<T>(
-  path: string,
-  init: RequestInit & { tenantId?: string } = {},
-): Promise<T> {
+/** A typed API client that calls the backend as the signed-in user. */
+export async function getApi(): Promise<ApiClient> {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  const headers = new Headers(init.headers);
-  headers.set("Content-Type", "application/json");
-  if (session) headers.set("Authorization", `Bearer ${session.access_token}`);
-  if (init.tenantId) headers.set("X-Tenant-Id", init.tenantId);
+  const headers: Record<string, string> = {};
+  if (session) headers.Authorization = `Bearer ${session.access_token}`;
 
-  const response = await fetch(`${API_URL}${path}`, { ...init, headers, cache: "no-store" });
-  if (!response.ok) {
-    throw new ApiError(response.status, await response.json().catch(() => null));
-  }
-  return (await response.json()) as T;
+  return createApiClient({
+    baseUrl: API_URL,
+    headers,
+    fetch: (request) => fetch(request, { cache: "no-store" }),
+  });
 }
 
-export type Role = "owner" | "manager" | "staff" | "front_desk";
-
-export type Me = {
-  id: string;
-  email: string;
-  full_name: string | null;
-  locale: "he" | "en" | null;
-  memberships: { tenant_id: string; tenant_name: string; role: Role }[];
-};
-
-export type Tenant = {
-  id: string;
-  name: string;
-  vertical: string;
-  locale: "he" | "en";
-  time_zone: string;
-  currency: string;
-  role: Role;
-};
+/** Returns the response data, or throws ApiError for any non-2xx response. */
+export function unwrap<T>(result: { data?: T; error?: unknown; response: Response }): T {
+  if (result.data === undefined) throw new ApiError(result.response.status, result.error);
+  return result.data;
+}
