@@ -34,10 +34,19 @@ installs what is missing.
 ```bash
 pnpm install                        # JavaScript dependencies (all apps)
 cd apps/api && uv sync && cd ../..  # Python dependencies
+pnpm db:start                       # local Supabase in Docker (first run downloads images)
+pnpm db:migrate                     # apply database migrations
 pnpm dev                            # starts API (port 8000) and web (port 3000)
 ```
 
-Open http://localhost:3000. API docs: http://localhost:8000/docs.
+| URL | What |
+|---|---|
+| http://localhost:3000 | Web app |
+| http://localhost:8000/docs | API docs |
+| http://127.0.0.1:54323 | Supabase Studio (browse the database) |
+| http://127.0.0.1:54324 | Test mailbox (sign-up and password-reset emails) |
+
+`pnpm db:stop` stops Supabase; data is kept for the next start.
 
 Mobile (in a second terminal), with the phone on the same Wi-Fi as the computer:
 
@@ -50,7 +59,7 @@ pnpm dev:mobile                     # scan the QR code with the iPhone camera â†
 ```bash
 pnpm lint        # ESLint + Ruff
 pnpm typecheck   # TypeScript
-pnpm test        # pytest
+pnpm test        # pytest (needs `pnpm db:start`) + translation checks
 pnpm build       # production build
 ```
 

@@ -7,7 +7,9 @@
     "status": "System status",
     "apiOnline": "API is online",
     "apiOffline": "API is not reachable",
-    "comingSoon": "Sign up and business creation are coming next."
+    "comingSoon": "Sign up and business creation are coming next.",
+    "login": "Log in",
+    "signup": "Create an account"
   },
   "settings": {
     "language": "Language",
@@ -19,5 +21,88 @@
   "locales": {
     "he": "עברית",
     "en": "English"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "newPassword": "New password",
+    "passwordHint": "At least 8 characters.",
+    "login": {
+      "title": "Log in",
+      "submit": "Log in",
+      "noAccount": "Don't have an account?",
+      "signupLink": "Sign up",
+      "forgot": "Forgot your password?"
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Start running your business in one place.",
+      "submit": "Create account",
+      "haveAccount": "Already have an account?",
+      "loginLink": "Log in"
+    },
+    "checkEmail": {
+      "title": "Check your inbox",
+      "body": "We sent a confirmation link to {email}. Open it to finish signing up.",
+      "devMailbox": "Local development: emails arrive at the test mailbox",
+      "backToLogin": "Back to log in"
+    },
+    "forgot": {
+      "title": "Reset your password",
+      "body": "Enter your email and we'll send you a link to choose a new password.",
+      "submit": "Send reset link",
+      "sent": "If an account exists for this email, a reset link is on its way.",
+      "backToLogin": "Back to log in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "submit": "Save password"
+    },
+    "signOut": "Sign out",
+    "errors": {
+      "invalid_credentials": "Wrong email or password.",
+      "email_not_confirmed": "Please confirm your email first. Check your inbox.",
+      "weak_password": "This password is too weak. Use at least 8 characters.",
+      "user_already_exists": "An account with this email already exists.",
+      "over_email_send_rate_limit": "Too many emails were sent. Please wait a minute and try again.",
+      "link_invalid": "This link is invalid or has expired. Please try again.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "onboarding": {
+    "title": "Create your business",
+    "subtitle": "You can change all of this later.",
+    "name": "Business name",
+    "vertical": "Type of business",
+    "locale": "Business language",
+    "timeZone": "Time zone",
+    "currency": "Currency",
+    "submit": "Create business",
+    "verticals": {
+      "fitness": "Fitness studio"
+    },
+    "currencies": {
+      "ILS": "Israeli shekel (₪)",
+      "USD": "US dollar ($)",
+      "EUR": "Euro (€)"
+    },
+    "errors": {
+      "invalid": "Please check the details and try again."
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome to {name}",
+    "yourRole": "Your role: {role}",
+    "today": "Today",
+    "emptyToday": "Your schedule, clients and sales will appear here.",
+    "business": "Business",
+    "switchBusiness": "Switch business",
+    "newBusiness": "Create another business"
+  },
+  "roles": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "staff": "Staff",
+    "front_desk": "Front desk"
   }
 }

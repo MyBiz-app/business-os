@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 
-import { LocaleSwitcher } from "@/components/locale-switcher";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { AppHeader } from "@/components/app-header";
 import { isApiHealthy } from "@/lib/api";
 
 export default async function Home() {
@@ -10,18 +10,21 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4">
-        <span className="text-lg font-bold">{t("app.name")}</span>
-        <div className="flex flex-wrap items-center gap-4">
-          <LocaleSwitcher />
-          <ThemeSwitcher />
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center gap-8 px-6 py-16">
         <div className="flex flex-col gap-3">
           <h1 className="text-4xl font-bold tracking-tight">{t("app.name")}</h1>
           <p className="text-lg text-muted">{t("app.tagline")}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Link href="/signup" className="rounded-lg bg-primary px-5 py-2.5 font-semibold text-white dark:text-background">
+            {t("home.signup")}
+          </Link>
+          <Link href="/login" className="rounded-lg border border-border px-5 py-2.5 font-semibold">
+            {t("home.login")}
+          </Link>
         </div>
 
         <section aria-labelledby="status-heading" className="rounded-xl border border-border bg-surface p-5">
@@ -36,8 +39,6 @@ export default async function Home() {
             {apiOnline ? t("home.apiOnline") : t("home.apiOffline")}
           </p>
         </section>
-
-        <p className="text-sm text-muted">{t("home.comingSoon")}</p>
       </main>
     </div>
   );

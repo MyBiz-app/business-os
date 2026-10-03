@@ -8,7 +8,8 @@
     "./messages/*.json": "./messages/*.json"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/messages.test.mjs"
   },
   "devDependencies": {
     "typescript": "^5"

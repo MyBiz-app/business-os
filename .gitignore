@@ -29,6 +29,8 @@ android/
 .env
 .env.*
 !.env.example
+# Local-only public defaults (see the file header)
+!apps/web/.env.development
 
 # OS / editor
 .DS_Store

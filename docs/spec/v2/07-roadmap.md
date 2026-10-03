@@ -42,8 +42,9 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Mobile hello-world (Expo): he / en with RTL, light / dark, calls the API (owner to verify on iPhone)
 - [x] Shared translations package (`packages/i18n`) used by web and mobile
 - [x] Supabase local + database migrations (Alembic) + RLS
-- [ ] Sign up / verify / log in
-- [ ] Create business (tenant) + tenant-isolation tests (API + tests done; web screens next)
+- [x] Sign up / verify email / log in / reset password (web)
+- [x] Create business (tenant) + dashboard shell + business switcher + tenant-isolation tests
+- [ ] Mobile sign in (moved to Sprint 2, with the client app)
 - [ ] Deploy to staging
 
 ## Owner setup checklist (Windows + iPhone)
