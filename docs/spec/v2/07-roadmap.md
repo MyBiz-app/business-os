@@ -38,7 +38,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 
 - [ ] Git — https://git-scm.com
 - [ ] Node.js LTS — https://nodejs.org, then `npm i -g pnpm`
-- [ ] Python 3.12 + uv — https://docs.astral.sh/uv
+- [ ] uv — https://docs.astral.sh/uv (installs Python 3.13 for the project)
+- Automated: `scripts/setup-windows.ps1` installs pnpm, uv, Python and clones the repo
 - [ ] Docker Desktop
 - [ ] VS Code
 - [ ] Expo Go on iPhone

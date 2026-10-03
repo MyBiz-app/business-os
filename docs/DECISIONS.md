@@ -28,7 +28,7 @@ When a decision changes, update the row and note the date — do not delete hist
 |---|---|---|
 | T1 | All code, identifiers, DB fields, commits and code docs in English. Hebrew only in translation resources and user content. | DECIDED |
 | T2 | Monorepo: pnpm + Turborepo (TypeScript), uv (Python). | DECIDED (2026-10-03, delegated) |
-| T3 | Backend: Python + FastAPI, SQLAlchemy 2, Alembic, Pydantic. OpenAPI → generated TS client. | DECIDED (2026-10-03, delegated) |
+| T3 | Backend: Python 3.13 (pinned per project via uv, no global Python needed) + FastAPI, SQLAlchemy 2, Alembic, Pydantic. OpenAPI → generated TS client. | DECIDED (2026-10-03, delegated) |
 | T4 | Supabase from day one for Postgres + Auth + Storage. Tenant isolation in the API and via Postgres RLS. | DECIDED (2026-10-03, delegated) |
 | T5 | Web: Next.js + TypeScript + Tailwind (logical properties) + shadcn/ui + next-intl. | DECIDED (2026-10-03, delegated) |
 | T6 | Mobile: Expo + Expo Router + TypeScript. iOS builds via EAS cloud (owner on Windows + iPhone). | DECIDED (2026-10-03, delegated) |
