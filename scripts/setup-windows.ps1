@@ -70,8 +70,9 @@ Write-Ok "Python $PythonVersion ready"
 
 # --- 5. Docker must be running for the local database ------------------------------------------
 Write-Step "Docker"
-docker info *> $null
-if ($LASTEXITCODE -eq 0) { Write-Ok "Docker is running" } else { Write-Warn "Docker Desktop is installed but not running. Start it before running the app." }
+$dockerRunning = $false
+try { docker info *> $null; $dockerRunning = ($LASTEXITCODE -eq 0) } catch { $dockerRunning = $false }
+if ($dockerRunning) { Write-Ok "Docker is running" } else { Write-Warn "Docker Desktop is installed but not running. Start it before running the app." }
 
 # --- 6. Clone the repository -------------------------------------------------------------------
 Write-Step "Repository in $DevRoot"
