@@ -347,7 +347,7 @@
     "repeat": "Repeat weekly",
     "repeatOn": "On",
     "repeatUntil": "Until",
-    "repeatUntilHint": "Up to 26 weeks. Leave empty for 12 weeks.",
+    "repeatUntilHint": "Leave empty to keep repeating (new weeks are added automatically).",
     "weekdays": {
       "0": "Sun",
       "1": "Mon",
@@ -369,7 +369,10 @@
       "invalid_reference": "One of the selected items is not available. Refresh and try again.",
       "no_occurrences": "No session falls on the chosen days in that period."
     },
-    "waitlisted": "{count} on waitlist"
+    "waitlisted": "{count} on waitlist",
+    "seriesOpen": "It keeps repeating; new weeks are added automatically.",
+    "endSeries": "Stop repeating after this session",
+    "seriesEnded": "Repeating stopped. {cancelled, plural, one {# later session was} other {# later sessions were}} cancelled{kept, plural, =0 {.} one { and # was kept because clients are booked: handle it yourself.} other { and # were kept because clients are booked: handle them yourself.}}"
   },
   "bookings": {
     "title": "Bookings",

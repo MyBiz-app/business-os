@@ -2001,6 +2001,75 @@
         }
       }
     },
+    "/series/{series_id}/end": {
+      "post": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "End Series",
+        "description": "Stops a weekly series after a date: no more occurrences are generated, and later\nsessions without bookings are cancelled. Sessions with bookings stay, to be handled\none by one (the business must tell those clients).",
+        "operationId": "end_series",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Series Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesEnd"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesEnded"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/bookings": {
       "get": {
         "tags": [
@@ -7403,6 +7472,18 @@
             "type": "integer",
             "title": "Waitlisted"
           },
+          "series_open_ended": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Open Ended",
+            "description": "For a session in a weekly series: whether the series keeps going"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -7439,6 +7520,7 @@
           "capacity",
           "booked",
           "waitlisted",
+          "series_open_ended",
           "status",
           "notes"
         ],
@@ -7472,6 +7554,41 @@
           "modules"
         ],
         "title": "Selection"
+      },
+      "SeriesEnd": {
+        "properties": {
+          "last_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Last Date",
+            "description": "Last local date with sessions; later ones end"
+          }
+        },
+        "type": "object",
+        "required": [
+          "last_date"
+        ],
+        "title": "SeriesEnd"
+      },
+      "SeriesEnded": {
+        "properties": {
+          "cancelled": {
+            "type": "integer",
+            "title": "Cancelled",
+            "description": "Later sessions cancelled (they had no bookings)"
+          },
+          "kept": {
+            "type": "integer",
+            "title": "Kept",
+            "description": "Later sessions kept because clients are booked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cancelled",
+          "kept"
+        ],
+        "title": "SeriesEnded"
       },
       "Service": {
         "properties": {

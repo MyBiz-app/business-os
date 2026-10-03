@@ -152,3 +152,15 @@ export async function setBookingStatus(
   }
   refreshSession(sessionId);
 }
+
+export async function endSeries(seriesId: string, sessionId: string, lastDate: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  const result = unwrap(
+    await api.POST("/series/{series_id}/end", {
+      params: { ...scope, path: { series_id: seriesId } },
+      body: { last_date: lastDate },
+    }),
+  );
+  revalidatePath("/schedule");
+  redirect(`/schedule/${sessionId}?ended=${result.cancelled}-${result.kept}`);
+}

@@ -413,6 +413,28 @@ export interface paths {
         patch: operations["update_session"];
         trace?: never;
     };
+    "/series/{series_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Series
+         * @description Stops a weekly series after a date: no more occurrences are generated, and later
+         *     sessions without bookings are cancelled. Sessions with bookings stay, to be handled
+         *     one by one (the business must tell those clients).
+         */
+        post: operations["end_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/bookings": {
         parameters: {
             query?: never;
@@ -2136,6 +2158,11 @@ export interface components {
             /** Waitlisted */
             waitlisted: number;
             /**
+             * Series Open Ended
+             * @description For a session in a weekly series: whether the series keeps going
+             */
+            series_open_ended: boolean | null;
+            /**
              * Status
              * @enum {string}
              */
@@ -2149,6 +2176,28 @@ export interface components {
             modules: {
                 [key: string]: number;
             };
+        };
+        /** SeriesEnd */
+        SeriesEnd: {
+            /**
+             * Last Date
+             * Format: date
+             * @description Last local date with sessions; later ones end
+             */
+            last_date: string;
+        };
+        /** SeriesEnded */
+        SeriesEnded: {
+            /**
+             * Cancelled
+             * @description Later sessions cancelled (they had no bookings)
+             */
+            cancelled: number;
+            /**
+             * Kept
+             * @description Later sessions kept because clients are booked
+             */
+            kept: number;
         };
         /** Service */
         Service: {
@@ -3635,6 +3684,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScheduledSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesEnd"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesEnded"];
                 };
             };
             /** @description Validation Error */

@@ -247,8 +247,8 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
             text("""
                 INSERT INTO app.session_series
                     (tenant_id, service_id, location_id, room_id, instructor_user_id, capacity,
-                     weekdays, start_time, duration_minutes, starts_on, ends_on)
-                VALUES (:t, :s, :l, :r, :i, :c, :w, :at, :m, :from, :to) RETURNING id
+                     weekdays, start_time, duration_minutes, starts_on, ends_on, open_ended)
+                VALUES (:t, :s, :l, :r, :i, :c, :w, :at, :m, :from, :to, true) RETURNING id
             """),
             {
                 "t": tenant_id,

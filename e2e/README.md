@@ -22,3 +22,5 @@ proposes a booking → confirmed and executed → a platform admin sees the busi
 Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `roles.py` checks custom roles through the UI (create a role, assign it, access changes, in-use role is protected). Run it the same way, without arguments, against the normal API.
+
+`series.py` creates an open-ended weekly series and stops it from one of its sessions.

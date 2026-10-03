@@ -98,6 +98,9 @@ class ScheduledSession(BaseModel):
     capacity: int
     booked: int
     waitlisted: int
+    series_open_ended: bool | None = Field(
+        description="For a session in a weekly series: whether the series keeps going"
+    )
     status: SessionStatus
     notes: str | None
 
@@ -138,13 +141,14 @@ SESSION_SELECT = """
     SELECT s.id, s.series_id, s.location_id, l.name AS location_name, s.room_id,
            r.name AS room_name, s.instructor_user_id, u.email AS instructor_email,
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
-           bk.booked, bk.waitlisted,
+           bk.booked, bk.waitlisted, ss.open_ended AS series_open_ended,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
     LEFT JOIN app.users u ON u.id = s.instructor_user_id
+    LEFT JOIN app.session_series ss ON ss.id = s.series_id
     CROSS JOIN LATERAL app.session_counts(s.id) bk
 """
 
@@ -280,10 +284,12 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
                 text("""
                     INSERT INTO app.session_series
                         (tenant_id, service_id, location_id, room_id, instructor_user_id,
-                         capacity, weekdays, start_time, duration_minutes, starts_on, ends_on)
+                         capacity, weekdays, start_time, duration_minutes, starts_on, ends_on,
+                         open_ended)
                     VALUES
                         (:tenant_id, :service_id, :location_id, :room_id, :instructor_user_id,
-                         :capacity, :weekdays, :start_time, :duration, :starts_on, :ends_on)
+                         :capacity, :weekdays, :start_time, :duration, :starts_on, :ends_on,
+                         :open_ended)
                     RETURNING id
                 """),
                 {
@@ -293,6 +299,8 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
                     "duration": duration,
                     "starts_on": body.date,
                     "ends_on": ends_on,
+                    # Without an end date the series keeps going (app.jobs extends it).
+                    "open_ended": body.repeat.ends_on is None,
                 },
             ).scalar_one()
         ids = (
@@ -369,3 +377,58 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
         raise _invalid_reference() from error
     promote_waitlist(db, session_id)  # more capacity (or a restored session) frees spots
     return _load(db, session_id)
+
+
+class SeriesEnd(BaseModel):
+    last_date: dt.date = Field(description="Last local date with sessions; later ones end")
+
+
+class SeriesEnded(BaseModel):
+    cancelled: int = Field(description="Later sessions cancelled (they had no bookings)")
+    kept: int = Field(description="Later sessions kept because clients are booked")
+
+
+@router.post("/series/{series_id}/end")
+def end_series(series_id: UUID, body: SeriesEnd, context: WriteDep) -> SeriesEnded:
+    """Stops a weekly series after a date: no more occurrences are generated, and later
+    sessions without bookings are cancelled. Sessions with bookings stay, to be handled
+    one by one (the business must tell those clients)."""
+    db = context.session
+    series = db.execute(
+        text("SELECT starts_on FROM app.session_series WHERE id = :id FOR UPDATE"),
+        {"id": series_id},
+    ).first()
+    if series is None:
+        raise not_found()
+    if body.last_date < series.starts_on:
+        raise HTTPException(status_code=422, detail="before_series_start")
+    time_zone = _time_zone(db)
+    after = local_to_utc(body.last_date + timedelta(days=1), time.min, time_zone)
+    db.execute(
+        text("""
+            UPDATE app.session_series SET open_ended = false, ends_on = :last_date
+            WHERE id = :id
+        """),
+        {"id": series_id, "last_date": body.last_date},
+    )
+    counts = db.execute(
+        text("""
+            WITH later AS (
+                SELECT s.id, EXISTS (
+                    SELECT 1 FROM app.bookings b
+                    WHERE b.session_id = s.id AND b.status <> 'cancelled'
+                ) AS booked
+                FROM app.sessions s
+                WHERE s.series_id = :id AND s.starts_at >= :after AND s.status = 'scheduled'
+            ),
+            cancelled AS (
+                UPDATE app.sessions SET status = 'cancelled', updated_at = now()
+                WHERE id IN (SELECT id FROM later WHERE NOT booked)
+                RETURNING id
+            )
+            SELECT (SELECT count(*) FROM cancelled) AS cancelled,
+                   (SELECT count(*) FROM later WHERE booked) AS kept
+        """),
+        {"id": series_id, "after": after},
+    ).one()
+    return SeriesEnded(cancelled=counts.cancelled, kept=counts.kept)
