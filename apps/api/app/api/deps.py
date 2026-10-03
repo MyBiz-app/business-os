@@ -56,6 +56,22 @@ def get_tenant_context(
 TenantDep = Annotated[TenantContext, Depends(get_tenant_context)]
 
 
+def has_module(session: Session, *keys: str) -> bool:
+    """Whether the current business has any of the modules (works for staff and clients)."""
+    return bool(
+        session.execute(
+            text("""
+                SELECT EXISTS (
+                    SELECT 1 FROM app.tenant_modules
+                    WHERE tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid
+                      AND module_key = ANY(:keys)
+                )
+            """),
+            {"keys": list(keys)},
+        ).scalar_one()
+    )
+
+
 def require(permission: Permission) -> Callable[[TenantContext], TenantContext]:
     """Dependency that also checks the member's role grants `permission`."""
 
@@ -82,6 +98,8 @@ def get_client_context(
     client_id = session.execute(text("SELECT app.current_client_id()")).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_client")
+    if not has_module(session, "client_app"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
     return ClientContext(session=session, tenant_id=tenant_id, client_id=client_id)
 
 

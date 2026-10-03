@@ -14,12 +14,20 @@ from sqlalchemy.orm import Session
 from app.ai import actions, assistant
 from app.ai.gateway import LLMProvider, get_provider
 from app.api.common import not_found
-from app.api.deps import TenantContext, UserDep, require
+from app.api.deps import TenantContext, UserDep, has_module, require
 from app.permissions import Permission
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
-AIDep = Annotated[TenantContext, Depends(require(Permission.AI_USE))]
+
+def require_ai(context: Annotated[TenantContext, Depends(require(Permission.AI_USE))]):
+    """The assistant needs an AI module (AI Basic: questions; AI Pro: also actions)."""
+    if not has_module(context.session, "ai_basic", "ai_pro"):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+    return context
+
+
+AIDep = Annotated[TenantContext, Depends(require_ai)]
 ProviderDep = Annotated[LLMProvider | None, Depends(get_provider)]
 
 

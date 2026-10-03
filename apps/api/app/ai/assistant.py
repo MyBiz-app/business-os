@@ -11,7 +11,7 @@ from sqlalchemy import text
 
 from app.ai.gateway import LLMProvider, LLMResponse, credits
 from app.ai.tools import ToolContext, run_tool, tools_for
-from app.api.deps import TenantContext
+from app.api.deps import TenantContext, has_module
 
 MAX_STEPS = 8  # model calls per user message
 
@@ -104,9 +104,10 @@ def ask(
             ],
         }
     )
-    tools = tools_for(tenant.role)
+    modules = {key for key in ("ai_basic", "ai_pro") if has_module(db, key)}
+    tools = tools_for(tenant.role, modules)
     definitions = [tool.definition() for tool in tools]
-    ctx = ToolContext(tenant, user_id, conversation_id, row["time_zone"])
+    ctx = ToolContext(tenant, user_id, conversation_id, row["time_zone"], modules)
 
     for _ in range(MAX_STEPS):
         response = provider.create(SYSTEM_PROMPT, messages, definitions)

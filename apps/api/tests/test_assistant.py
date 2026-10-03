@@ -60,6 +60,15 @@ def use_provider(client: TestClient):
     client.app.dependency_overrides.pop(get_provider, None)  # type: ignore[attr-defined]
 
 
+def enable_ai_pro(client: TestClient, studio: dict) -> None:
+    response = client.put(
+        "/tenants/current/modules",
+        json={"modules": {"client_app": 1, "ai_pro": 1}},
+        headers=studio["headers"],
+    )
+    assert response.status_code == 200, response.text
+
+
 def conversation(client: TestClient, headers: dict) -> str:
     created = client.post("/ai/conversations", headers=headers)
     assert created.status_code == 201
@@ -118,6 +127,7 @@ def test_answers_with_metrics_and_records_usage(
 def test_booking_is_proposed_then_confirmed_once(
     client: TestClient, studio: dict, use_provider, engine: Engine
 ) -> None:
+    enable_ai_pro(client, studio)
     headers = studio["headers"]
     session_id = new_session(client, studio)
     dana = new_client(client, headers, "Dana")
@@ -153,6 +163,7 @@ def test_booking_is_proposed_then_confirmed_once(
 def test_reject_expired_and_other_users(
     client: TestClient, studio: dict, use_provider, engine: Engine, auth: AuthHeaders
 ) -> None:
+    enable_ai_pro(client, studio)
     headers = studio["headers"]
     session_id = new_session(client, studio)
     dana = new_client(client, headers, "Dana")
@@ -198,6 +209,7 @@ def test_reject_expired_and_other_users(
 def test_tools_follow_the_users_permissions(
     client: TestClient, studio: dict, use_provider, engine: Engine, auth: AuthHeaders
 ) -> None:
+    enable_ai_pro(client, studio)
     desk = uuid4()
     add_member(engine, studio["tenant_id"], desk, "front_desk")
     provider = FakeProvider([

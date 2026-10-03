@@ -5,8 +5,10 @@ from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep, TenantDep, UserDep
+from app.api.modules import check_selection, set_modules
 from app.api.schemas import Me, Membership, Tenant, TenantCreate
 from app.core.db import set_tenant
+from app.modules import PRESETS
 from app.verticals import VERTICAL_PACKS
 
 router = APIRouter()
@@ -31,6 +33,9 @@ def load_current_tenant(session: Session) -> Tenant:
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
                        t.join_code, m.role,
+                       coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)
+                                 FROM app.tenant_modules tm WHERE tm.tenant_id = t.id), '{}')
+                           AS modules,
                        CASE WHEN t.logo IS NULL THEN NULL
                             ELSE '/public/tenants/' || t.id || '/logo?v='
                                  || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url
@@ -87,7 +92,10 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
     ensure_profile(session, user.id, user.email)
     profile = (
         session.execute(
-            text("SELECT id, email, full_name, locale FROM app.users WHERE id = :id"),
+            text("""
+                SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin
+                FROM app.users WHERE id = :id
+            """),
             {"id": user.id},
         )
         .mappings()
@@ -108,12 +116,19 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
 @router.post("/tenants", status_code=status.HTTP_201_CREATED, tags=["tenants"])
 def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Tenant:
     ensure_profile(session, user.id, user.email)
+    modules = (
+        body.modules
+        if body.modules is not None
+        else dict.fromkeys(PRESETS[VERTICAL_PACKS[body.vertical].default_preset], 1)
+    )
+    check_selection(modules)
     tenant_id: UUID = session.execute(
         text("SELECT app.create_tenant(:name, :vertical, :locale, :time_zone, :currency)"),
-        body.model_dump(),
+        body.model_dump(exclude={"modules"}),
     ).scalar_one()
     set_tenant(session, tenant_id)
     apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
+    set_modules(session, tenant_id, modules)
     return load_current_tenant(session)
 
 

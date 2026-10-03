@@ -46,9 +46,15 @@ class BusinessProfile(BaseModel):
     locale: Literal["he", "en"]
     primary_color: str | None
     logo_url: str | None
+    client_app: bool = Field(description="Whether the business offers the client app")
 
 
-class ClientBusiness(BusinessProfile):
+class ClientBusiness(BaseModel):
+    id: UUID
+    name: str
+    locale: Literal["he", "en"]
+    primary_color: str | None
+    logo_url: str | None
     time_zone: str
     currency: str
     cancellation_window_minutes: int
@@ -86,7 +92,8 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
     row = (
         session.execute(
             text(f"""
-                SELECT t.id, t.name, t.locale, t.primary_color, {LOGO_URL.format(t="t")} AS logo_url
+                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app,
+                       {LOGO_URL.format(t="t")} AS logo_url
                 FROM app.business_by_join_code(:code) t
             """),
             {"code": code},
@@ -118,6 +125,11 @@ def my_businesses(session: SessionDep) -> list[ClientBusiness]:
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
 def join_business(body: JoinRequest, user: UserDep, session: SessionDep) -> ClientBusiness:
     ensure_profile(session, user.id, user.email)
+    offers_app = session.execute(
+        text("SELECT client_app FROM app.business_by_join_code(:code)"), {"code": body.code}
+    ).scalar()
+    if offers_app is False:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
     client_id = session.execute(
         text("SELECT app.join_business(:code)"), {"code": body.code}
     ).scalar()

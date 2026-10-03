@@ -40,7 +40,9 @@
     "cancellationHours": "{hours, plural, one {# hour} other {# hours}} before the session",
     "cancellationWindowHint": "Cancelling inside this window still frees the spot, but is recorded as a late cancellation.",
     "requirePlan": "Clients need a valid plan to book in the app",
-    "requirePlanHint": "Staff can always book from the roster (for example a walk-in who pays at the desk)."
+    "requirePlanHint": "Staff can always book from the roster (for example a walk-in who pays at the desk).",
+    "modulesLink": "Modules and plan",
+    "modulesHint": "Turn features on or off and see the monthly price."
   },
   "locales": {
     "he": "עברית",
@@ -112,7 +114,18 @@
     },
     "errors": {
       "invalid": "Please check the details and try again."
-    }
+    },
+    "step": "Step {step} of {total}",
+    "questions": "A few questions, to recommend the right setup",
+    "qClients": "Active clients (about)",
+    "qStaff": "Team members",
+    "qLocations": "Locations",
+    "qApp": "My clients should book in an app",
+    "qAi": "I want an AI assistant that can also take actions (bookings)",
+    "next": "Continue",
+    "back": "Back",
+    "planTitle": "Your plan",
+    "planHint": "We picked what fits your answers. Change anything; you can also change it later in Settings."
   },
   "dashboard": {
     "welcome": "Welcome to {name}",
@@ -405,7 +418,8 @@
       "otherCode": "Use a different code",
       "back": "Back",
       "unknownCode": "We couldn't find a business with that code.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "noApp": "This business doesn't offer the app yet. Ask them about it."
     },
     "home": {
       "greeting": "Hi {name}",
@@ -578,6 +592,61 @@
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
+    }
+  },
+  "modules": {
+    "title": "Modules and plan",
+    "subtitle": "Priced by what you use. Core depends on active clients (now: {count}).",
+    "core": "Core",
+    "coreTier": "Up to {count} active clients",
+    "coreTierCustom": "1,000+ active clients (custom price)",
+    "aiTier": "AI assistant",
+    "monthlyTotal": "Monthly total",
+    "comingSoon": "Coming soon",
+    "placeholderPrices": "Prototype: prices are placeholders and nothing is charged.",
+    "names": {
+      "none": "No AI",
+      "client_app": "Client app",
+      "ai_basic": "AI Basic",
+      "ai_pro": "AI Pro",
+      "crm": "CRM & leads",
+      "analytics_pro": "Advanced analytics",
+      "agent_finance": "Finance agent",
+      "agent_marketing": "Marketing agent",
+      "whatsapp": "WhatsApp",
+      "extra_location": "Extra locations"
+    },
+    "descriptions": {
+      "none": "You can add it any time.",
+      "client_app": "Your clients join with a code or QR, book, cancel and join waitlists in your branded app.",
+      "ai_basic": "Ask about your business in plain words: schedule, members, numbers.",
+      "ai_pro": "Everything in AI Basic, and it prepares bookings and cancellations for you to confirm.",
+      "extra_location": "{price} per location beyond the first."
+    }
+  },
+  "platform": {
+    "title": "Platform console",
+    "subtitle": "All businesses on the platform, their modules and usage.",
+    "businesses": "Businesses",
+    "activeClients": "Active clients",
+    "bookings30d": "Bookings (30 days)",
+    "aiCredits30d": "AI credits (30 days)",
+    "aiCreditsPerDay": "AI credits per day",
+    "aiCredits": "AI credits",
+    "day": "Day",
+    "businessesTitle": "Businesses",
+    "coreOnly": "Core only",
+    "noUsage": "No metered usage in the last 90 days.",
+    "columns": {
+      "name": "Business",
+      "owner": "Owner",
+      "modules": "Modules",
+      "members": "Team",
+      "clients": "Clients",
+      "activeClients": "Active",
+      "bookings30d": "Bookings 30d",
+      "aiCredits30d": "AI credits 30d",
+      "created": "Created"
     }
   }
 }

@@ -1,0 +1,37 @@
+name: Grant platform admin on staging
+
+# Makes an existing staging user a platform admin (sees the platform console). Platform
+# admins are never granted through the API. Started by hand from the Actions tab.
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: Email of the staging user (must have signed in once)
+        required: true
+        type: string
+
+jobs:
+  grant:
+    name: Grant platform admin
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - name: Install the PostgreSQL client
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Grant
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          EMAIL: ${{ inputs.email }}
+        run: |
+          granted=$(psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v email="$EMAIL" -tA <<'SQL'
+          INSERT INTO app.platform_admins (user_id)
+          SELECT id FROM app.users WHERE lower(email) = lower(:'email')
+          ON CONFLICT DO NOTHING
+          RETURNING user_id;
+          SQL
+          )
+          if [ -z "$granted" ]; then
+            echo "::warning::No new grant: the user does not exist yet or is already an admin."
+          fi

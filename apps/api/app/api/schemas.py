@@ -21,6 +21,7 @@ class Me(BaseModel):
     email: str
     full_name: str | None
     locale: Locale | None
+    platform_admin: bool
     memberships: list[Membership]
 
 
@@ -30,6 +31,9 @@ class TenantCreate(BaseModel):
     locale: Locale
     time_zone: str
     currency: str = Field(pattern=r"^[A-Z]{3}$")
+    modules: dict[str, int] | None = Field(
+        default=None, description="Modules to enable; defaults to the vertical pack's preset"
+    )
 
     @field_validator("name")
     @classmethod
@@ -90,4 +94,5 @@ class Tenant(BaseModel):
     cancellation_window_minutes: int
     booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
     join_code: str = Field(description="Code clients enter or scan to join this business")
+    modules: list[str] = Field(description="Enabled modules (features depend on them)")
     role: Role

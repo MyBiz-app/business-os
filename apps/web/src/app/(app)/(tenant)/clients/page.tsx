@@ -46,9 +46,11 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           <p className="text-sm text-muted">{t("clients.total", { count: result.total })}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/clients/join" className="rounded-lg border border-border px-4 py-2.5 font-semibold">
-            {t("join.inviteToApp")}
-          </Link>
+          {tenant.modules.includes("client_app") && (
+            <Link href="/clients/join" className="rounded-lg border border-border px-4 py-2.5 font-semibold">
+              {t("join.inviteToApp")}
+            </Link>
+          )}
           {canWriteClients(tenant.role) && (
             <Link
               href="/clients/new"

@@ -13,7 +13,7 @@ from sqlalchemy import text
 
 from app.ai.tools import TOOLS, payload_hash
 from app.api.bookings import cancel_booking, lock_session, place_booking
-from app.api.deps import TenantContext
+from app.api.deps import TenantContext, has_module
 from app.permissions import role_allows
 
 
@@ -90,6 +90,8 @@ def decide(tenant: TenantContext, user_id: UUID, action_id: UUID, confirm: bool)
         return
 
     tool = TOOLS[action["tool_name"]]
+    if tool.module and not has_module(db, tool.module):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
     if not role_allows(tenant.role, tool.permission):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
     if payload_hash(action["tool_name"], action["payload"]) != action["payload_hash"]:

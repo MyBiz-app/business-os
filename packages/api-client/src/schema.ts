@@ -678,6 +678,115 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/modules/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catalog */
+        get: operations["catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/modules/recommend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recommend Modules */
+        post: operations["recommend_modules"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/modules/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Quote Modules */
+        post: operations["quote_modules"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/current/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tenant Modules */
+        get: operations["get_tenant_modules"];
+        /**
+         * Put Tenant Modules
+         * @description Replaces the business's modules (billing is simulated in the prototype).
+         */
+        put: operations["put_tenant_modules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Businesses */
+        get: operations["businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Usage
+         * @description Usage per day and meter, for one business or the whole platform.
+         */
+        get: operations["usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/businesses/{code}": {
         parameters: {
             query?: never;
@@ -972,6 +1081,45 @@ export interface components {
             primary_color: string | null;
             /** Logo Url */
             logo_url: string | null;
+            /**
+             * Client App
+             * @description Whether the business offers the client app
+             */
+            client_app: boolean;
+        };
+        /** Catalog */
+        Catalog: {
+            /** Currency */
+            currency: string;
+            /** Core */
+            core: components["schemas"]["CoreTier"][];
+            /** Modules */
+            modules: components["schemas"]["CatalogModule"][];
+            /** Presets */
+            presets: {
+                [key: string]: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
+            };
+        };
+        /** CatalogModule */
+        CatalogModule: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location";
+            /**
+             * Price
+             * @description Monthly, minor units (per unit when per_unit)
+             */
+            price: number;
+            /** Available */
+            available: boolean;
+            /** Per Unit */
+            per_unit: boolean;
+            /** Requires Any */
+            requires_any: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
+            /** Requires All */
+            requires_all: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
         };
         /** Client */
         Client: {
@@ -1188,6 +1336,13 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** CoreTier */
+        CoreTier: {
+            /** Up To Clients */
+            up_to_clients: number | null;
+            /** Price */
+            price: number;
         };
         /** CreatedInvitation */
         CreatedInvitation: {
@@ -1464,6 +1619,8 @@ export interface components {
             full_name: string | null;
             /** Locale */
             locale: ("he" | "en") | null;
+            /** Platform Admin */
+            platform_admin: boolean;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
         };
@@ -1671,6 +1828,43 @@ export interface components {
             /** Active */
             active?: boolean | null;
         };
+        /** PlatformBusiness */
+        PlatformBusiness: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Vertical */
+            vertical: string;
+            /** Locale */
+            locale: string;
+            /** Currency */
+            currency: string;
+            /** Time Zone */
+            time_zone: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Members */
+            members: number;
+            /** Clients */
+            clients: number;
+            /** Active Clients */
+            active_clients: number;
+            /** Modules */
+            modules: string[];
+            /** Ai Credits 30D */
+            ai_credits_30d: number;
+            /** Bookings 30D */
+            bookings_30d: number;
+            /** Owner Email */
+            owner_email: string | null;
+        };
         /** Point */
         Point: {
             /**
@@ -1685,6 +1879,46 @@ export interface components {
         Question: {
             /** Text */
             text: string;
+        };
+        /** QuestionnaireIn */
+        QuestionnaireIn: {
+            /** Active Clients */
+            active_clients: number;
+            /** Staff */
+            staff: number;
+            /** Locations */
+            locations: number;
+            /** Wants Client App */
+            wants_client_app: boolean;
+            /** Wants Ai Actions */
+            wants_ai_actions: boolean;
+        };
+        /** QuoteOut */
+        QuoteOut: {
+            /** Currency */
+            currency: string;
+            /** Core */
+            core: number;
+            /** Core Tier */
+            core_tier: number | null;
+            /** Lines */
+            lines: {
+                [key: string]: number;
+            };
+            /** Total */
+            total: number;
+        };
+        /** Recommendation */
+        Recommendation: {
+            /**
+             * Preset
+             * @enum {string}
+             */
+            preset: "starter" | "growing" | "ai_powered";
+            /** Modules */
+            modules: {
+                [key: string]: number;
+            };
         };
         /** Repeat */
         Repeat: {
@@ -1820,6 +2054,13 @@ export interface components {
             status: "scheduled" | "cancelled";
             /** Notes */
             notes: string | null;
+        };
+        /** Selection */
+        Selection: {
+            /** Modules */
+            modules: {
+                [key: string]: number;
+            };
         };
         /** Service */
         Service: {
@@ -2031,6 +2272,11 @@ export interface components {
              */
             join_code: string;
             /**
+             * Modules
+             * @description Enabled modules (features depend on them)
+             */
+            modules: string[];
+            /**
              * Role
              * @enum {string}
              */
@@ -2051,6 +2297,23 @@ export interface components {
             time_zone: string;
             /** Currency */
             currency: string;
+            /**
+             * Modules
+             * @description Modules to enable; defaults to the vertical pack's preset
+             */
+            modules?: {
+                [key: string]: number;
+            } | null;
+        };
+        /** TenantModules */
+        TenantModules: {
+            /** Modules */
+            modules: {
+                [key: string]: number;
+            };
+            /** Active Clients */
+            active_clients: number;
+            quote: components["schemas"]["QuoteOut"];
         };
         /** TenantUpdate */
         TenantUpdate: {
@@ -2083,6 +2346,18 @@ export interface components {
              * @default []
              */
             pending_actions: components["schemas"]["PendingAction"][];
+        };
+        /** UsagePoint */
+        UsagePoint: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Meter */
+            meter: string;
+            /** Quantity */
+            quantity: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -3842,6 +4117,224 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PendingAction"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    catalog: {
+        parameters: {
+            query?: {
+                currency?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalog"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommend_modules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionnaireIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Recommendation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quote_modules: {
+        parameters: {
+            query?: {
+                currency?: string;
+                active_clients?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Selection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tenant_modules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantModules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_tenant_modules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Selection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantModules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBusiness"][];
+                };
+            };
+        };
+    };
+    usage: {
+        parameters: {
+            query?: {
+                tenant_id?: string | null;
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsagePoint"][];
                 };
             };
             /** @description Validation Error */

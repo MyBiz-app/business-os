@@ -45,6 +45,10 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
   const bar = Math.min(MAX_BAR, slot * 0.6);
   const y = (value: number) => HEIGHT - (value / max) * HEIGHT;
   const current = active === null ? null : columns[active];
+  // At most ~8 axis labels; the last one only when it doesn't crowd its neighbour.
+  const step = Math.ceil(columns.length / 8);
+  const last = columns.length - 1;
+  const showLabel = (index: number) => index % step === 0 ? index <= last - step / 2 || index === last : index === last && last % step >= step / 2;
 
   return (
     <figure className="flex flex-col gap-3" aria-labelledby={`${id}-title`}>
@@ -52,7 +56,7 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
         {title}
       </figcaption>
       <div className="relative" dir="ltr">
-        <svg viewBox={`0 0 ${width} ${HEIGHT + 28}`} className="h-auto w-full overflow-visible" role="img" aria-label={title}>
+        <svg viewBox={`0 0 ${width} ${HEIGHT + 28}`} className="h-auto w-full max-w-[720px] overflow-visible" role="img" aria-label={title}>
           {ticks.map((tick) => (
             <g key={tick}>
               <line x1={AXIS} x2={width} y1={y(tick)} y2={y(tick)} className="stroke-border" strokeWidth={1} />
@@ -86,7 +90,7 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
                     className={active === index ? "fill-primary" : "fill-primary/80"}
                   />
                 )}
-                {(index % Math.ceil(columns.length / 8) === 0 || index === columns.length - 1) && (
+                {showLabel(index) && (
                   <text x={x + bar / 2} y={HEIGHT + 20} textAnchor="middle" className="fill-muted text-[15px]">
                     {column.label}
                   </text>

@@ -77,7 +77,11 @@ export default function Join() {
             <Text style={[styles.muted, { color: palette.muted }]}>{t("preview")}</Text>
           </Card>
           <ErrorText message={error} palette={palette} />
-          <Button label={t("joinButton", { name: profile.name })} palette={palette} busy={busy} onPress={() => void confirmJoin()} />
+          {profile.client_app ? (
+            <Button label={t("joinButton", { name: profile.name })} palette={palette} busy={busy} onPress={() => void confirmJoin()} />
+          ) : (
+            <Text style={[styles.muted, { color: palette.foreground }]}>{t("noApp")}</Text>
+          )}
           <Button label={t("otherCode")} variant="secondary" palette={palette} onPress={() => setProfile(null)} />
         </>
       ) : (

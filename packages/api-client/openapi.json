@@ -3149,6 +3149,379 @@
         }
       }
     },
+    "/modules/catalog": {
+      "get": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Catalog",
+        "operationId": "catalog",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "default": "ILS",
+              "title": "Currency"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/modules/recommend": {
+      "post": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Recommend Modules",
+        "operationId": "recommend_modules",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestionnaireIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recommendation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/modules/quote": {
+      "post": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Quote Modules",
+        "operationId": "quote_modules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{3}$",
+              "default": "ILS",
+              "title": "Currency"
+            }
+          },
+          {
+            "name": "active_clients",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Active Clients"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Selection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuoteOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/current/modules": {
+      "get": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Get Tenant Modules",
+        "operationId": "get_tenant_modules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantModules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Put Tenant Modules",
+        "description": "Replaces the business's modules (billing is simulated in the prototype).",
+        "operationId": "put_tenant_modules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Selection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantModules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Businesses",
+        "operationId": "businesses",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformBusiness"
+                  },
+                  "type": "array",
+                  "title": "Response Businesses"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/usage": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Usage",
+        "description": "Usage per day and meter, for one business or the whole platform.",
+        "operationId": "usage",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsagePoint"
+                  },
+                  "title": "Response Usage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/businesses/{code}": {
       "get": {
         "tags": [
@@ -3999,6 +4372,11 @@
               }
             ],
             "title": "Logo Url"
+          },
+          "client_app": {
+            "type": "boolean",
+            "title": "Client App",
+            "description": "Whether the business offers the client app"
           }
         },
         "type": "object",
@@ -4007,10 +4385,147 @@
           "name",
           "locale",
           "primary_color",
-          "logo_url"
+          "logo_url",
+          "client_app"
         ],
         "title": "BusinessProfile",
         "description": "What anyone holding a join code may see before signing in."
+      },
+      "Catalog": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "core": {
+            "items": {
+              "$ref": "#/components/schemas/CoreTier"
+            },
+            "type": "array",
+            "title": "Core"
+          },
+          "modules": {
+            "items": {
+              "$ref": "#/components/schemas/CatalogModule"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "presets": {
+            "additionalProperties": {
+              "items": {
+                "type": "string",
+                "enum": [
+                  "client_app",
+                  "ai_basic",
+                  "ai_pro",
+                  "crm",
+                  "analytics_pro",
+                  "agent_finance",
+                  "agent_marketing",
+                  "whatsapp",
+                  "extra_location"
+                ]
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "enum": [
+                "starter",
+                "growing",
+                "ai_powered"
+              ]
+            },
+            "type": "object",
+            "title": "Presets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "core",
+          "modules",
+          "presets"
+        ],
+        "title": "Catalog"
+      },
+      "CatalogModule": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "client_app",
+              "ai_basic",
+              "ai_pro",
+              "crm",
+              "analytics_pro",
+              "agent_finance",
+              "agent_marketing",
+              "whatsapp",
+              "extra_location"
+            ],
+            "title": "Key"
+          },
+          "price": {
+            "type": "integer",
+            "title": "Price",
+            "description": "Monthly, minor units (per unit when per_unit)"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "per_unit": {
+            "type": "boolean",
+            "title": "Per Unit"
+          },
+          "requires_any": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ]
+            },
+            "type": "array",
+            "title": "Requires Any"
+          },
+          "requires_all": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ]
+            },
+            "type": "array",
+            "title": "Requires All"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "price",
+          "available",
+          "per_unit",
+          "requires_any",
+          "requires_all"
+        ],
+        "title": "CatalogModule"
       },
       "Client": {
         "properties": {
@@ -4609,6 +5124,31 @@
           "updated_at"
         ],
         "title": "ConversationSummary"
+      },
+      "CoreTier": {
+        "properties": {
+          "up_to_clients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Up To Clients"
+          },
+          "price": {
+            "type": "integer",
+            "title": "Price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "up_to_clients",
+          "price"
+        ],
+        "title": "CoreTier"
       },
       "CreatedInvitation": {
         "properties": {
@@ -5240,6 +5780,10 @@
             ],
             "title": "Locale"
           },
+          "platform_admin": {
+            "type": "boolean",
+            "title": "Platform Admin"
+          },
           "memberships": {
             "items": {
               "$ref": "#/components/schemas/Membership"
@@ -5254,6 +5798,7 @@
           "email",
           "full_name",
           "locale",
+          "platform_admin",
           "memberships"
         ],
         "title": "Me"
@@ -5765,6 +6310,96 @@
         "title": "PlanUpdate",
         "description": "The kind and credits are fixed once a plan exists; create a new plan instead."
       },
+      "PlatformBusiness": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "vertical": {
+            "type": "string",
+            "title": "Vertical"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "time_zone": {
+            "type": "string",
+            "title": "Time Zone"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "members": {
+            "type": "integer",
+            "title": "Members"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients"
+          },
+          "active_clients": {
+            "type": "integer",
+            "title": "Active Clients"
+          },
+          "modules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "ai_credits_30d": {
+            "type": "number",
+            "title": "Ai Credits 30D"
+          },
+          "bookings_30d": {
+            "type": "integer",
+            "title": "Bookings 30D"
+          },
+          "owner_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "vertical",
+          "locale",
+          "currency",
+          "time_zone",
+          "created_at",
+          "members",
+          "clients",
+          "active_clients",
+          "modules",
+          "ai_credits_30d",
+          "bookings_30d",
+          "owner_email"
+        ],
+        "title": "PlatformBusiness"
+      },
       "Point": {
         "properties": {
           "bucket": {
@@ -5798,6 +6433,140 @@
           "text"
         ],
         "title": "Question"
+      },
+      "QuestionnaireIn": {
+        "properties": {
+          "active_clients": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "minimum": 0.0,
+            "title": "Active Clients"
+          },
+          "staff": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Staff"
+          },
+          "locations": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Locations"
+          },
+          "wants_client_app": {
+            "type": "boolean",
+            "title": "Wants Client App"
+          },
+          "wants_ai_actions": {
+            "type": "boolean",
+            "title": "Wants Ai Actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active_clients",
+          "staff",
+          "locations",
+          "wants_client_app",
+          "wants_ai_actions"
+        ],
+        "title": "QuestionnaireIn"
+      },
+      "QuoteOut": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "core": {
+            "type": "integer",
+            "title": "Core"
+          },
+          "core_tier": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Core Tier"
+          },
+          "lines": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ]
+            },
+            "type": "object",
+            "title": "Lines"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "core",
+          "core_tier",
+          "lines",
+          "total"
+        ],
+        "title": "QuoteOut"
+      },
+      "Recommendation": {
+        "properties": {
+          "preset": {
+            "type": "string",
+            "enum": [
+              "starter",
+              "growing",
+              "ai_powered"
+            ],
+            "title": "Preset"
+          },
+          "modules": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ]
+            },
+            "type": "object",
+            "title": "Modules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "preset",
+          "modules"
+        ],
+        "title": "Recommendation"
       },
       "Repeat": {
         "properties": {
@@ -6195,6 +6964,35 @@
           "notes"
         ],
         "title": "ScheduledSession"
+      },
+      "Selection": {
+        "properties": {
+          "modules": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ]
+            },
+            "type": "object",
+            "title": "Modules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "modules"
+        ],
+        "title": "Selection"
       },
       "Service": {
         "properties": {
@@ -6829,6 +7627,14 @@
             "title": "Join Code",
             "description": "Code clients enter or scan to join this business"
           },
+          "modules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modules",
+            "description": "Enabled modules (features depend on them)"
+          },
           "role": {
             "type": "string",
             "enum": [
@@ -6853,6 +7659,7 @@
           "cancellation_window_minutes",
           "booking_requires_plan",
           "join_code",
+          "modules",
           "role"
         ],
         "title": "Tenant"
@@ -6885,6 +7692,21 @@
             "type": "string",
             "pattern": "^[A-Z]{3}$",
             "title": "Currency"
+          },
+          "modules": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Modules",
+            "description": "Modules to enable; defaults to the vertical pack's preset"
           }
         },
         "type": "object",
@@ -6896,6 +7718,44 @@
           "currency"
         ],
         "title": "TenantCreate"
+      },
+      "TenantModules": {
+        "properties": {
+          "modules": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ]
+            },
+            "type": "object",
+            "title": "Modules"
+          },
+          "active_clients": {
+            "type": "integer",
+            "title": "Active Clients"
+          },
+          "quote": {
+            "$ref": "#/components/schemas/QuoteOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "modules",
+          "active_clients",
+          "quote"
+        ],
+        "title": "TenantModules"
       },
       "TenantUpdate": {
         "properties": {
@@ -7019,6 +7879,30 @@
           "text"
         ],
         "title": "Turn"
+      },
+      "UsagePoint": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "meter": {
+            "type": "string",
+            "title": "Meter"
+          },
+          "quantity": {
+            "type": "number",
+            "title": "Quantity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "meter",
+          "quantity"
+        ],
+        "title": "UsagePoint"
       },
       "ValidationError": {
         "properties": {

@@ -33,6 +33,7 @@ class ToolContext:
     user_id: UUID
     conversation_id: UUID
     time_zone: str
+    modules: set[str]
 
 
 class ToolError(Exception):
@@ -46,6 +47,7 @@ class Tool:
     properties: dict[str, Any]
     permission: Permission
     run: Callable[[ToolContext, dict[str, Any]], dict[str, Any]]
+    module: str | None = None  # extra module the tool needs (actions need AI Pro)
 
     def definition(self) -> dict[str, Any]:
         return {
@@ -386,6 +388,7 @@ TOOLS: dict[str, Tool] = {
             {"session_id": ID, "client_id": ID},
             Permission.BOOKINGS_MANAGE,
             book_client,
+            module="ai_pro",
         ),
         Tool(
             "cancel_booking",
@@ -393,20 +396,25 @@ TOOLS: dict[str, Tool] = {
             {"booking_id": ID},
             Permission.BOOKINGS_MANAGE,
             cancel_booking,
+            module="ai_pro",
         ),
     )
 }
 
 
-def tools_for(role: str) -> list[Tool]:
-    """Only the tools the user's role may use are offered to the model."""
-    return [tool for tool in TOOLS.values() if role_allows(role, tool.permission)]
+def _allowed(tool: Tool, role: str, modules: set[str]) -> bool:
+    return role_allows(role, tool.permission) and (tool.module is None or tool.module in modules)
+
+
+def tools_for(role: str, modules: set[str]) -> list[Tool]:
+    """Only the tools the user's role and the business's modules allow are offered."""
+    return [tool for tool in TOOLS.values() if _allowed(tool, role, modules)]
 
 
 def run_tool(ctx: ToolContext, name: str, args: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     """Runs a tool for the model. Returns (result, is_error); never raises for tool errors."""
     tool = TOOLS.get(name)
-    if tool is None or not role_allows(ctx.tenant.role, tool.permission):
+    if tool is None or not _allowed(tool, ctx.tenant.role, ctx.modules):
         return {"error": "this tool is not available to the user"}, True
     try:
         with ctx.tenant.session.begin_nested():  # a failed tool leaves no partial writes

@@ -52,7 +52,14 @@ def test_public_profile_by_join_code(client: TestClient, studio: dict) -> None:
 
     assert profile.status_code == 200
     assert profile.json()["name"] == STUDIO["name"]
-    assert set(profile.json()) == {"id", "name", "locale", "primary_color", "logo_url"}
+    assert set(profile.json()) == {
+        "id",
+        "name",
+        "locale",
+        "primary_color",
+        "logo_url",
+        "client_app",
+    }
     assert client.get("/public/businesses/NOPE2345").status_code == 404
 
 

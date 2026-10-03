@@ -76,6 +76,14 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Demo data generator (`python -m app.seed`) + "Create demo studio on staging" workflow
 - [ ] Client self-purchase in the app (needs a payment provider, O1)
 
+## Sprint 5 progress
+
+- [x] Modules catalog + Core tiers (placeholder prices), presets, dependency rules
+- [x] Onboarding questionnaire → recommended plan → configurator with live price
+- [x] Modules & plan page in settings; features gated by module (client app, AI, AI actions)
+- [x] Platform console: businesses, modules, usage (AI credits), per-business page
+- [ ] Platform billing (subscriptions, proration, price versions) and audited support access
+
 ## Sprint 6 progress
 
 - [x] Metrics layer (`app/metrics.py`) + `/metrics` API with previous-period comparison and weekly series

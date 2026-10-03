@@ -14,7 +14,9 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
 
   const items: NavItem[] = [
     { href: "/dashboard", label: t("nav.dashboard") },
-    ...(canUseAssistant(tenant.role) ? [{ href: "/assistant", label: t("nav.assistant") }] : []),
+    ...(canUseAssistant(tenant.role) && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")
+      ? [{ href: "/assistant", label: t("nav.assistant") }]
+      : []),
     { href: "/schedule", label: t("nav.schedule") },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients") },
     { href: "/services", label: t("nav.services") },

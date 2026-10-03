@@ -8,7 +8,9 @@ from app.api import (
     client_app,
     clients,
     locations,
+    modules,
     plans,
+    platform,
     reports,
     schedule,
     services,
@@ -56,6 +58,8 @@ def create_app() -> FastAPI:
     app.include_router(plans.router)
     app.include_router(reports.router)
     app.include_router(assistant.router)
+    app.include_router(modules.router)
+    app.include_router(platform.router)
     app.include_router(client_app.public_router)
     app.include_router(client_app.router)
     app.include_router(business_settings.router)
