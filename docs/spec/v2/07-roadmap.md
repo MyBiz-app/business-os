@@ -76,6 +76,11 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Demo data generator (`python -m app.seed`) + "Create demo studio on staging" workflow
 - [ ] Client self-purchase in the app (needs a payment provider, O1)
 
+## Sprint 6 progress
+
+- [x] Metrics layer (`app/metrics.py`) + `/metrics` API with previous-period comparison and weekly series
+- [x] KPI dashboard (tiles, revenue and check-ins per week, today's sessions)
+
 ## Owner setup checklist (Windows + iPhone)
 
 - [ ] Git — https://git-scm.com

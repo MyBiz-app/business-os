@@ -2547,6 +2547,220 @@
         }
       }
     },
+    "/metrics": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Metrics",
+        "description": "Each metric for the period and for the period of the same length just before it.",
+        "operationId": "get_metrics",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date",
+              "title": "Start"
+            },
+            "description": "First local date"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Last local date (inclusive)",
+              "title": "End"
+            },
+            "description": "Last local date (inclusive)"
+          },
+          {
+            "name": "keys",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "revenue",
+                      "active_clients",
+                      "new_clients",
+                      "plans_sold",
+                      "attendance",
+                      "occupancy",
+                      "no_show_rate",
+                      "late_cancel_rate",
+                      "sessions_held"
+                    ],
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Keys"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MetricValue"
+                  },
+                  "title": "Response Get Metrics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics/{key}/series": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Series",
+        "operationId": "get_series",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "revenue",
+                "active_clients",
+                "new_clients",
+                "plans_sold",
+                "attendance",
+                "occupancy",
+                "no_show_rate",
+                "late_cancel_rate",
+                "sessions_held"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "grain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ],
+              "type": "string",
+              "default": "week",
+              "title": "Grain"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Point"
+                  },
+                  "title": "Response Get Series"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/businesses/{code}": {
       "get": {
         "tags": [
@@ -4687,6 +4901,69 @@
         ],
         "title": "Membership"
       },
+      "MetricValue": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "revenue",
+              "active_clients",
+              "new_clients",
+              "plans_sold",
+              "attendance",
+              "occupancy",
+              "no_show_rate",
+              "late_cancel_rate",
+              "sessions_held"
+            ],
+            "title": "Key"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "money",
+              "count",
+              "percent"
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "higher_is_better": {
+            "type": "boolean",
+            "title": "Higher Is Better"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "unit",
+          "value",
+          "previous",
+          "higher_is_better"
+        ],
+        "title": "MetricValue"
+      },
       "MyBooking": {
         "properties": {
           "id": {
@@ -4977,6 +5254,25 @@
         "type": "object",
         "title": "PlanUpdate",
         "description": "The kind and credits are fixed once a plan exists; create a new plan instead."
+      },
+      "Point": {
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "format": "date",
+            "title": "Bucket"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bucket",
+          "value"
+        ],
+        "title": "Point"
       },
       "Repeat": {
         "properties": {

@@ -121,7 +121,18 @@
     "emptyToday": "כאן יופיעו לוח הזמנים, הלקוחות והמכירות.",
     "business": "עסק",
     "switchBusiness": "החלפת עסק",
-    "newBusiness": "יצירת עסק נוסף"
+    "newBusiness": "יצירת עסק נוסף",
+    "kpis": "מספרים מרכזיים",
+    "period": "תקופה",
+    "lastDays": "{count} ימים אחרונים",
+    "vsPrevious": "לעומת התקופה הקודמת",
+    "points": "{value} נק׳",
+    "better": "שיפור",
+    "worse": "הרעה",
+    "weeklyRevenue": "הכנסות לפי שבוע",
+    "weeklyAttendance": "הגעות לפי שבוע",
+    "showTable": "הצגה כטבלה",
+    "weekOf": "שבוע של"
   },
   "roles": {
     "owner": "בעלים",
@@ -515,5 +526,16 @@
       "overlapping_freeze": "יש חפיפה עם הקפאה קיימת."
     },
     "validityRange": "בתוקף {from} – {to}"
+  },
+  "metrics": {
+    "revenue": "הכנסות",
+    "active_clients": "מתאמנים פעילים",
+    "new_clients": "לקוחות חדשים",
+    "plans_sold": "מנויים שנמכרו",
+    "attendance": "הגעות",
+    "occupancy": "תפוסה",
+    "no_show_rate": "אחוז אי-הגעה",
+    "late_cancel_rate": "ביטולים מאוחרים",
+    "sessions_held": "שיעורים שהתקיימו"
   }
 }

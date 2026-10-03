@@ -121,7 +121,18 @@
     "emptyToday": "Your schedule, clients and sales will appear here.",
     "business": "Business",
     "switchBusiness": "Switch business",
-    "newBusiness": "Create another business"
+    "newBusiness": "Create another business",
+    "kpis": "Key numbers",
+    "period": "Period",
+    "lastDays": "Last {count} days",
+    "vsPrevious": "vs. the previous period",
+    "points": "{value} pts",
+    "better": "better",
+    "worse": "worse",
+    "weeklyRevenue": "Revenue per week",
+    "weeklyAttendance": "Check-ins per week",
+    "showTable": "Show as a table",
+    "weekOf": "Week of"
   },
   "roles": {
     "owner": "Owner",
@@ -515,5 +526,16 @@
       "overlapping_freeze": "That overlaps an existing freeze."
     },
     "validityRange": "Valid {from} – {to}"
+  },
+  "metrics": {
+    "revenue": "Revenue",
+    "active_clients": "Active members",
+    "new_clients": "New clients",
+    "plans_sold": "Plans sold",
+    "attendance": "Check-ins",
+    "occupancy": "Occupancy",
+    "no_show_rate": "No-show rate",
+    "late_cancel_rate": "Late cancellations",
+    "sessions_held": "Sessions held"
   }
 }

@@ -161,7 +161,7 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
             VALUES ('סטודיו פלואו (דמו)', 'fitness', 'he', :tz, 'ILS', '#0f766e', :created)
             RETURNING id
         """),
-        {"tz": TIME_ZONE, "created": local_to_utc(start, time(9), TIME_ZONE)},
+        {"tz": TIME_ZONE, "created": local_to_utc(start - timedelta(days=90), time(9), TIME_ZONE)},
     ).scalar_one()
     conn.execute(
         text("INSERT INTO app.tenant_members (tenant_id, user_id, role) VALUES (:t, :u, 'owner')"),
@@ -292,7 +292,12 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
     client_rows: list[dict] = []
     total_days = (today - start).days
     for index in range(170):
-        joined = start + timedelta(days=0 if index < 70 else rng.randrange(total_days))
+        # The first 70 were members before the history starts, with staggered renewals.
+        joined = (
+            start - timedelta(days=rng.randrange(60))
+            if index < 70
+            else start + timedelta(days=rng.randrange(total_days))
+        )
         churns = rng.random() < 0.18
         churns_on = joined + timedelta(days=rng.randrange(30, 120)) if churns else None
         first, last = rng.choice(FIRST_NAMES), rng.choice(LAST_NAMES)

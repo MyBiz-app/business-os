@@ -538,6 +538,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Metrics
+         * @description Each metric for the period and for the period of the same length just before it.
+         */
+        get: operations["get_metrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/{key}/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Series */
+        get: operations["get_series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/businesses/{code}": {
         parameters: {
             query?: never;
@@ -1337,6 +1374,25 @@ export interface components {
              */
             role: "owner" | "manager" | "staff" | "front_desk";
         };
+        /** MetricValue */
+        MetricValue: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held";
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "money" | "count" | "percent";
+            /** Value */
+            value: number | null;
+            /** Previous */
+            previous: number | null;
+            /** Higher Is Better */
+            higher_is_better: boolean;
+        };
         /** MyBooking */
         MyBooking: {
             /**
@@ -1448,6 +1504,16 @@ export interface components {
             validity_days?: number | null;
             /** Active */
             active?: boolean | null;
+        };
+        /** Point */
+        Point: {
+            /**
+             * Bucket
+             * Format: date
+             */
+            bucket: string;
+            /** Value */
+            value: number;
         };
         /** Repeat */
         Repeat: {
@@ -3287,6 +3353,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_metrics: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                /** @description Last local date (inclusive) */
+                end: string;
+                keys?: ("revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held")[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricValue"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_series: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+                grain?: "day" | "week" | "month";
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                key: "revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Point"][];
                 };
             };
             /** @description Validation Error */

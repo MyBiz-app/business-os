@@ -41,3 +41,9 @@ const SELLERS = new Set<Role>(["owner", "manager", "front_desk"]);
 export function canSell(role: Role): boolean {
   return SELLERS.has(role);
 }
+
+const REPORT_READERS = new Set<Role>(["owner", "manager"]);
+
+export function canReadReports(role: Role): boolean {
+  return REPORT_READERS.has(role);
+}
