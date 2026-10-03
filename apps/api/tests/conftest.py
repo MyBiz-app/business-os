@@ -1,0 +1,111 @@
+"""Test fixtures: a fresh database migrated with Alembic, and locally signed access tokens."""
+
+import os
+import time
+from collections.abc import Callable, Iterator
+from uuid import UUID, uuid4
+
+import jwt
+import pytest
+from alembic import command
+from alembic.config import Config
+from cryptography.hazmat.primitives.asymmetric import ec
+from fastapi.testclient import TestClient
+from sqlalchemy import Engine, create_engine, make_url, text
+
+from app.core.auth import get_key_source
+from app.core.db import get_engine
+from app.main import create_app
+
+# Defaults to the local Supabase database server; CI points this at its Postgres service.
+SERVER_URL = os.environ.get(
+    "TEST_DATABASE_URL", "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
+)
+TEST_DB_NAME = "business_os_test"
+API_DIR = os.path.dirname(os.path.dirname(__file__))
+
+
+@pytest.fixture(scope="session")
+def engine() -> Iterator[Engine]:
+    server = create_engine(SERVER_URL, isolation_level="AUTOCOMMIT")
+    with server.connect() as connection:
+        connection.execute(text(f"DROP DATABASE IF EXISTS {TEST_DB_NAME} WITH (FORCE)"))
+        connection.execute(text(f"CREATE DATABASE {TEST_DB_NAME}"))
+    server.dispose()
+
+    url = make_url(SERVER_URL).set(database=TEST_DB_NAME)
+    config = Config(os.path.join(API_DIR, "alembic.ini"))
+    config.set_main_option("script_location", os.path.join(API_DIR, "migrations"))
+    config.attributes["database_url"] = url.render_as_string(hide_password=False)
+    command.upgrade(config, "head")
+
+    test_engine = create_engine(url)
+    yield test_engine
+    test_engine.dispose()
+
+
+@pytest.fixture(autouse=True)
+def clean_tables(engine: Engine) -> None:
+    with engine.begin() as connection:
+        connection.execute(text("TRUNCATE app.tenant_members, app.tenants, app.users CASCADE"))
+
+
+class StaticKeySource:
+    def __init__(self, key: object) -> None:
+        self.key = key
+
+    def key_for(self, token: str) -> object:
+        return self.key
+
+
+@pytest.fixture(scope="session")
+def signing_key() -> ec.EllipticCurvePrivateKey:
+    return ec.generate_private_key(ec.SECP256R1())
+
+
+TokenFactory = Callable[..., str]
+
+
+@pytest.fixture
+def make_token(signing_key: ec.EllipticCurvePrivateKey) -> TokenFactory:
+    def factory(user_id: UUID, email: str = "", key: object = signing_key) -> str:
+        now = int(time.time())
+        claims = {
+            "sub": str(user_id),
+            "email": email or f"{user_id}@example.com",
+            "aud": "authenticated",
+            "role": "authenticated",
+            "iat": now,
+            "exp": now + 300,
+        }
+        return jwt.encode(claims, key, algorithm="ES256")
+
+    return factory
+
+
+@pytest.fixture
+def client(engine: Engine, signing_key: ec.EllipticCurvePrivateKey) -> Iterator[TestClient]:
+    app = create_app()
+    app.dependency_overrides[get_engine] = lambda: engine
+    app.dependency_overrides[get_key_source] = lambda: StaticKeySource(signing_key.public_key())
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+AuthHeaders = Callable[..., dict[str, str]]
+
+
+@pytest.fixture
+def auth(make_token: TokenFactory) -> AuthHeaders:
+    def headers(user_id: UUID, tenant_id: UUID | str | None = None) -> dict[str, str]:
+        result = {"Authorization": f"Bearer {make_token(user_id)}"}
+        if tenant_id:
+            result["X-Tenant-Id"] = str(tenant_id)
+        return result
+
+    return headers
+
+
+@pytest.fixture
+def new_user_id() -> Callable[[], UUID]:
+    return uuid4

@@ -41,9 +41,9 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Web hello-world (Next.js): he / en, RTL / LTR, light / dark, calls the API
 - [x] Mobile hello-world (Expo): he / en with RTL, light / dark, calls the API (owner to verify on iPhone)
 - [x] Shared translations package (`packages/i18n`) used by web and mobile
-- [ ] Supabase local + database migrations
+- [x] Supabase local + database migrations (Alembic) + RLS
 - [ ] Sign up / verify / log in
-- [ ] Create business (tenant) + tenant-isolation tests
+- [ ] Create business (tenant) + tenant-isolation tests (API + tests done; web screens next)
 - [ ] Deploy to staging
 
 ## Owner setup checklist (Windows + iPhone)

@@ -10,4 +10,6 @@ allowBuilds:
   "@parcel/watcher": false
   "@swc/core": false
   sharp: false
+  # Downloads the Supabase CLI binary.
+  supabase: true
   unrs-resolver: false

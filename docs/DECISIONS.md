@@ -41,6 +41,9 @@ When a decision changes, update the row and note the date — do not delete hist
 | T13 | Identity: one global `user` (login) linked to many tenants as staff and/or client. A client record may exist without an app account (walk-ins). | DECIDED (2026-10-03, delegated) |
 | T14 | Web locale comes from the user's choice (cookie), then browser language, then Hebrew. App URLs are not locale-prefixed; public marketing / booking pages may add prefixes later. | DECIDED (2026-10-03, delegated) |
 | T15 | Tooling versions: Node 22+ (owner on 24), pnpm 12, Python 3.13 via uv, Next.js 16, Expo SDK 57. Line endings LF in the repo (`.gitattributes`). | DECIDED (2026-10-03, delegated) |
+| T16 | Database schema is owned by Alembic migrations (hand-written SQL) in `apps/api`. Supabase owns only its own schemas (auth, storage). App tables live in schema `app`, which Supabase does not expose to browsers. | DECIDED (2026-10-03, delegated) |
+| T17 | Tenant isolation: the API runs every transaction as role `app_api` (no RLS bypass) with `app.user_id` / `app.tenant_id` set per transaction. `app.current_tenant_id()` returns a tenant only if the user is a member, so a forged tenant id grants nothing. Isolation is tested at both API and database level. | DECIDED (2026-10-03, delegated) |
+| T18 | Auth: Supabase Auth issues tokens (ES256); the API verifies them against Supabase's JWKS. Clients never query app tables directly; all data goes through the API. | DECIDED (2026-10-03, delegated) |
 
 ## Process
 

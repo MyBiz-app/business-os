@@ -3,12 +3,22 @@
   "ui": "stream",
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
     },
     "lint": {},
     "typecheck": {},
-    "test": {},
+    "test": {
+      "passThroughEnv": [
+        "TEST_DATABASE_URL"
+      ]
+    },
     "dev": {
       "cache": false,
       "persistent": true
