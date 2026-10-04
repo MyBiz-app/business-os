@@ -96,8 +96,13 @@ class AnthropicProvider:
 
 
 def get_provider() -> LLMProvider | None:
-    """The configured provider, or None when the assistant is not set up (no API key)."""
+    """The configured provider. Without an API key: demo mode when enabled (a prototype without
+    paid services, decision T53), otherwise None (the assistant is not set up)."""
     settings = get_settings()
     if settings.anthropic_api_key is None:
+        if settings.ai_demo:
+            from app.ai.demo import DemoProvider
+
+            return DemoProvider()
         return None
     return AnthropicProvider(settings.anthropic_api_key.get_secret_value(), settings.ai_model)

@@ -1,4 +1,5 @@
 import type { components } from "@business-os/api-client";
+import { FlaskConical } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -89,6 +90,13 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
           </button>
         </form>
       </div>
+
+      {status.demo && (
+        <p role="note" className="flex items-start gap-2 rounded-2xl border border-warning/50 bg-warning/10 p-4 text-sm">
+          <FlaskConical aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          {t("demoMode")}
+        </p>
+      )}
 
       {!status.enabled && (
         <p role="status" className="rounded-2xl border border-dashed border-border p-6 text-muted">

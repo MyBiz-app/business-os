@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     jwt_audience: str = "authenticated"
 
     # AI assistant. Without a key the assistant is shown as "not set up yet".
+    # Without an API key, answer common questions in demo mode instead of being unavailable.
+    ai_demo: bool = True
     anthropic_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
     )

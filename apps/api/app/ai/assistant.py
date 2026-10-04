@@ -36,13 +36,15 @@ Style: answer in the language the user writes in (Hebrew or English). Be brief a
 lead with the answer, then the few numbers that support it. Use short lists, no tables."""
 
 
-def _context_block(tenant: TenantContext, time_zone: str, business: str) -> dict[str, Any]:
+def _context_block(
+    tenant: TenantContext, time_zone: str, business: str, currency: str
+) -> dict[str, Any]:
     now = dt.datetime.now(ZoneInfo(time_zone))
     return {
         "type": "text",
         "text": (
             f"<context>Today is {now:%A %Y-%m-%d}, local time {now:%H:%M} ({time_zone}). "
-            f"Business: {json.dumps(business, ensure_ascii=False)}. "
+            f"Business: {json.dumps(business, ensure_ascii=False)}, currency {currency}. "
             f"The user's role: {tenant.role}.</context>"
         ),
     }
@@ -85,7 +87,7 @@ def ask(
     row = (
         db.execute(
             text("""
-                SELECT c.messages, t.time_zone, t.name
+                SELECT c.messages, t.time_zone, t.name, t.currency
                 FROM app.ai_conversations c JOIN app.tenants t ON t.id = c.tenant_id
                 WHERE c.id = :id FOR UPDATE OF c
             """),
@@ -99,7 +101,7 @@ def ask(
         {
             "role": "user",
             "content": [
-                _context_block(tenant, row["time_zone"], row["name"]),
+                _context_block(tenant, row["time_zone"], row["name"], row["currency"]),
                 {"type": "text", "text": question},
             ],
         }

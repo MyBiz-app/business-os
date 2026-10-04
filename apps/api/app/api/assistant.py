@@ -33,6 +33,7 @@ ProviderDep = Annotated[LLMProvider | None, Depends(get_provider)]
 
 class AIStatus(BaseModel):
     enabled: bool
+    demo: bool = Field(default=False, description="Demo mode: scripted answers, no AI key")
 
 
 class Question(BaseModel):
@@ -138,7 +139,7 @@ def _load(db: Session, conversation_id: UUID) -> Conversation:
 
 @router.get("/status")
 def ai_status(_context: AIDep, provider: ProviderDep) -> AIStatus:
-    return AIStatus(enabled=provider is not None)
+    return AIStatus(enabled=provider is not None, demo=getattr(provider, "model", None) == "demo")
 
 
 @router.get("/conversations")

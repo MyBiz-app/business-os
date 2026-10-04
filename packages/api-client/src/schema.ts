@@ -1505,6 +1505,12 @@ export interface components {
         AIStatus: {
             /** Enabled */
             enabled: boolean;
+            /**
+             * Demo
+             * @description Demo mode: scripted answers, no AI key
+             * @default false
+             */
+            demo: boolean;
         };
         /** AcceptInvitation */
         AcceptInvitation: {

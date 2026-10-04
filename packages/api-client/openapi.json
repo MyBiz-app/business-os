@@ -6199,6 +6199,12 @@
           "enabled": {
             "type": "boolean",
             "title": "Enabled"
+          },
+          "demo": {
+            "type": "boolean",
+            "title": "Demo",
+            "description": "Demo mode: scripted answers, no AI key",
+            "default": false
           }
         },
         "type": "object",

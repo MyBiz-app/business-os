@@ -781,7 +781,8 @@
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything."
   },
   "modules": {
     "title": "Modules and plan",
