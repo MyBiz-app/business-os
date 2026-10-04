@@ -25,16 +25,20 @@ export default async function SettingsPage() {
         <p className="text-sm text-muted">{t("subtitle")}</p>
       </div>
 
-      <Link
-        href="/settings/modules"
-        className="flex items-center justify-between gap-3 card card-hover p-6"
-      >
-        <span className="flex flex-col gap-1">
-          <span className="text-lg font-semibold">{t("modulesLink")}</span>
-          <span className="text-sm text-muted">{t("modulesHint")}</span>
-        </span>
-        <span aria-hidden="true" className="text-primary rtl:rotate-180">→</span>
-      </Link>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {[
+          { href: "/settings/modules", title: t("modulesLink"), hint: t("modulesHint") },
+          { href: "/settings/billing", title: t("billingLink"), hint: t("billingHint") },
+        ].map((link) => (
+          <Link key={link.href} href={link.href} className="flex items-center justify-between gap-3 card card-hover p-6">
+            <span className="flex flex-col gap-1">
+              <span className="text-lg font-semibold">{link.title}</span>
+              <span className="text-sm text-muted">{link.hint}</span>
+            </span>
+            <span aria-hidden="true" className="text-primary rtl:rotate-180">→</span>
+          </Link>
+        ))}
+      </div>
 
       <section aria-labelledby="details-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="details-heading" className="text-lg font-semibold">

@@ -24,6 +24,7 @@ from sqlalchemy import Connection, create_engine, text
 
 from app.api.modules import set_modules
 from app.api.routes import apply_vertical_pack
+from app.billing import bill_businesses
 from app.core.config import get_settings
 from app.health import FITNESS_FORM
 from app.modules import PRESETS
@@ -166,8 +167,9 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
     tenant_id = conn.execute(
         text("""
             INSERT INTO app.tenants (name, vertical, locale, time_zone, currency, primary_color,
-                                     created_at)
-            VALUES ('סטודיו פלואו (דמו)', 'fitness', 'he', :tz, 'ILS', '#0f766e', :created)
+                                     created_at, trial_ends_at)
+            VALUES ('סטודיו פלואו (דמו)', 'fitness', 'he', :tz, 'ILS', '#0f766e', :created,
+                    CAST(:created AS timestamptz) + interval '14 days')
             RETURNING id
         """),
         {"tz": TIME_ZONE, "created": local_to_utc(start - timedelta(days=90), time(9), TIME_ZONE)},
@@ -552,6 +554,17 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
                 :waitlisted_at, :cancelled_at, :late_cancel, :checked_in_at, :created_at,
                 :created_at)
     """, booking_rows)  # fmt: skip
+
+    # MyBiz's own (simulated) billing: a test card on file, monthly invoices since the trial.
+    conn.execute(
+        text("""
+            INSERT INTO app.billing_accounts
+                (tenant_id, billing_name, billing_email, card_brand, card_last4, card_exp)
+            VALUES (:t, 'סטודיו פלואו בע״מ', :email, 'visa', '4242', '12/29')
+        """),
+        {"t": tenant_id, "email": owner_email},
+    )
+    bill_businesses(conn, tenant_id=tenant_id)
 
     lead_count = _seed_leads(conn, tenant_id, [owner, *instructors], clients, today, rng)
 

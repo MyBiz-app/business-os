@@ -4,6 +4,7 @@
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
+    uv run python -m app.jobs bill-businesses (simulated platform billing; see app/billing.py)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
@@ -14,6 +15,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, create_engine, text
 
+from app.billing import bill_businesses
 from app.core.config import get_settings
 from app.email import send_emails, sender_from_settings
 from app.scheduling import weekly_occurrences
@@ -170,6 +172,7 @@ JOBS = {
     "remind-sessions": remind_sessions,
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
+    "bill-businesses": bill_businesses,
 }
 
 
