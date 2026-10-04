@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export type { Me, Role, Tenant } from "@business-os/api-client";
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000";
 
 export async function isApiHealthy(): Promise<boolean> {
   try {

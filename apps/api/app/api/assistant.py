@@ -5,14 +5,13 @@ import json
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-import anthropic
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.ai import actions, assistant
-from app.ai.gateway import LLMProvider, get_provider
+from app.ai.gateway import LLMProvider, ProviderBusy, ProviderUnavailable, get_provider
 from app.api.common import not_found
 from app.api.deps import TenantContext, UserDep, has_module, require
 from app.permissions import Permission
@@ -188,9 +187,9 @@ def send_message(
     _load(context.session, conversation_id)  # 404 unless it is the user's conversation
     try:
         assistant.ask(provider, context, user.id, conversation_id, body.text)
-    except anthropic.RateLimitError as error:
+    except ProviderBusy as error:
         raise HTTPException(status_code=429, detail="ai_busy") from error
-    except anthropic.APIError as error:
+    except ProviderUnavailable as error:
         raise HTTPException(status_code=502, detail="ai_unavailable") from error
     return _load(context.session, conversation_id)
 
