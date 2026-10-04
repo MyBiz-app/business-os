@@ -97,6 +97,13 @@ def list_clients(
     context: ReadDep,
     search: Annotated[str | None, Query(max_length=100)] = None,
     client_status: Annotated[ClientStatus | None, Query(alias="status")] = None,
+    plan: Annotated[
+        Literal["valid", "none"] | None,
+        Query(description="valid: holds a plan valid today; none: doesn't"),
+    ] = None,
+    absent_days: Annotated[
+        int | None, Query(ge=1, le=365, description="No check-in in this many days")
+    ] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 25,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> ClientPage:
@@ -109,6 +116,21 @@ def list_clients(
     if client_status:
         where += " AND status = :status"
         params["status"] = client_status
+    if plan:
+        # "Today" in the business's time zone, like everywhere plans are checked.
+        valid = """EXISTS (
+            SELECT 1 FROM app.entitlements e JOIN app.tenants t ON t.id = e.tenant_id
+            WHERE e.client_id = app.clients.id AND e.status = 'active'
+              AND (now() AT TIME ZONE t.time_zone)::date BETWEEN e.starts_on AND e.ends_on
+        )"""
+        where += f" AND {'' if plan == 'valid' else 'NOT '}{valid}"
+    if absent_days:
+        where += """ AND NOT EXISTS (
+            SELECT 1 FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+            WHERE b.client_id = app.clients.id AND b.status = 'checked_in'
+              AND s.starts_at > now() - make_interval(days => :absent_days)
+        )"""
+        params["absent_days"] = absent_days
 
     session = context.session
     total = session.execute(text(f"SELECT count(*) FROM app.clients {where}"), params).scalar_one()

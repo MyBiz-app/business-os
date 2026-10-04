@@ -10,6 +10,9 @@ import { StatusBadge } from "./status-badge";
 const PAGE_SIZE = 25;
 const STATUSES = ["active", "lead", "inactive"] as const;
 type Status = (typeof STATUSES)[number];
+const PLANS = ["valid", "none"] as const;
+type PlanFilter = (typeof PLANS)[number];
+const ABSENCES = [14, 30, 60] as const;
 
 export default async function ClientsPage({ searchParams }: PageProps<"/clients">) {
   const t = await getTranslations();
@@ -18,13 +21,22 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
 
   const search = typeof params.q === "string" ? params.q : "";
   const status = STATUSES.find((s) => s === params.status) as Status | undefined;
+  const plan = PLANS.find((p) => p === params.plan) as PlanFilter | undefined;
+  const absent = ABSENCES.find((d) => String(d) === params.absent);
   const page = Math.max(1, Number(params.page) || 1);
 
   const result = unwrap(
     await api.GET("/clients", {
       params: {
         ...scope,
-        query: { search: search || undefined, status, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE },
+        query: {
+          search: search || undefined,
+          status,
+          plan,
+          absent_days: absent,
+          limit: PAGE_SIZE,
+          offset: (page - 1) * PAGE_SIZE,
+        },
       },
     }),
   );
@@ -34,6 +46,8 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     const query = new URLSearchParams();
     if (search) query.set("q", search);
     if (status) query.set("status", status);
+    if (plan) query.set("plan", plan);
+    if (absent) query.set("absent", String(absent));
     query.set("page", String(target));
     return `/clients?${query}`;
   };
@@ -93,6 +107,28 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
             ))}
           </select>
         </label>
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
+          {t("clients.planFilter")}
+          <select name="plan" defaultValue={plan ?? ""} className="rounded-lg border border-border bg-background px-3 py-2 font-normal">
+            <option value="">{t("clients.planAny")}</option>
+            {PLANS.map((value) => (
+              <option key={value} value={value}>
+                {t(`clients.plans.${value}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex flex-col gap-1.5 text-sm font-medium">
+          {t("clients.absentFilter")}
+          <select name="absent" defaultValue={absent ?? ""} className="rounded-lg border border-border bg-background px-3 py-2 font-normal">
+            <option value="">{t("clients.absentAny")}</option>
+            {ABSENCES.map((days) => (
+              <option key={days} value={days}>
+                {t("clients.absentDays", { days })}
+              </option>
+            ))}
+          </select>
+        </label>
         <button type="submit" className="rounded-lg border border-border px-4 py-2 font-medium">
           {t("clients.search")}
         </button>
@@ -100,7 +136,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
 
       {result.items.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">
-          {search || status ? term("noResults") : term("noClients")}
+          {search || status || plan || absent ? term("noResults") : term("noClients")}
         </p>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-border">

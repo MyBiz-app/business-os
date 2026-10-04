@@ -223,7 +223,16 @@
       "website": "אתר",
       "app": "הצטרף/ה באפליקציה",
       "other": "אחר"
-    }
+    },
+    "planFilter": "מנוי",
+    "planAny": "הכל",
+    "plans": {
+      "valid": "עם מנוי בתוקף",
+      "none": "בלי מנוי בתוקף"
+    },
+    "absentFilter": "ביקור אחרון",
+    "absentAny": "בכל זמן",
+    "absentDays": "לא הגיעו {days} ימים"
   },
   "common": {
     "save": "שמירה",

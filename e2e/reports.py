@@ -41,4 +41,13 @@ with sync_playwright() as p:
     page.get_by_role("link", name="90 הימים האחרונים").click(); page.wait_for_url("**period=90"); h.ready(page)
     expect(page.get_by_role("link", name="90 הימים האחרונים")).to_have_attribute("aria-current", "page")
     print("reports: ok | a11y:", serious or "ok")
+
+    page.goto(f"{h.BASE}/clients"); h.ready(page)
+    page.locator("select[name=plan]").select_option("none")
+    page.locator("select[name=absent]").select_option("30")
+    page.get_by_role("button", name="חיפוש", exact=True).click()
+    page.wait_for_url("**plan=none**"); h.ready(page)
+    expect(page.locator("select[name=plan]")).to_have_value("none")
+    expect(page.locator("main table tbody tr").first).to_be_visible()
+    print("client filters (no valid plan, absent 30 days): ok")
     b.close()

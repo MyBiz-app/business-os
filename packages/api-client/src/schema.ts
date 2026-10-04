@@ -3581,6 +3581,10 @@ export interface operations {
             query?: {
                 search?: string | null;
                 status?: ("active" | "inactive" | "lead") | null;
+                /** @description valid: holds a plan valid today; none: doesn't */
+                plan?: ("valid" | "none") | null;
+                /** @description No check-in in this many days */
+                absent_days?: number | null;
                 limit?: number;
                 offset?: number;
             };

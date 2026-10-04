@@ -312,6 +312,48 @@
             }
           },
           {
+            "name": "plan",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "valid",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "valid: holds a plan valid today; none: doesn't",
+              "title": "Plan"
+            },
+            "description": "valid: holds a plan valid today; none: doesn't"
+          },
+          {
+            "name": "absent_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 365,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "No check-in in this many days",
+              "title": "Absent Days"
+            },
+            "description": "No check-in in this many days"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,

@@ -223,7 +223,16 @@
       "website": "Website",
       "app": "Joined in the app",
       "other": "Other"
-    }
+    },
+    "planFilter": "Plan",
+    "planAny": "Any",
+    "plans": {
+      "valid": "Has a valid plan",
+      "none": "No valid plan"
+    },
+    "absentFilter": "Last visit",
+    "absentAny": "Any time",
+    "absentDays": "Not in {days} days"
   },
   "common": {
     "save": "Save",

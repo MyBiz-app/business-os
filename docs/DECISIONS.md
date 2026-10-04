@@ -83,6 +83,7 @@ When a decision changes, update the row and note the date — do not delete hist
 |---|---|---|
 | X1 | Prototype first: pricing details are not a blocker. Build the prototype on the decisions above and revisit pricing when the product is more mature. | DECIDED (2026-10-03) |
 | X2 | Owner delegates day-to-day technical and product choices to Claude; significant changes are still proposed and logged here. | DECIDED (2026-10-03) |
+| X3 | Claude opens and merges its own pull requests once CI is green (owner's standing permission); the owner reviews the result on staging and sends fixes. | DECIDED (2026-10-04) |
 
 ## Open
 
