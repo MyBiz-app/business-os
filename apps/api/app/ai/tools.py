@@ -90,8 +90,9 @@ def find_clients(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         text("""
             SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name, c.status
             FROM app.clients c
-            WHERE c.first_name || ' ' || coalesce(c.last_name, '') ILIKE :p
-               OR c.email ILIKE :p OR c.phone ILIKE :p
+            WHERE c.erased_at IS NULL
+              AND (c.first_name || ' ' || coalesce(c.last_name, '') ILIKE :p
+                   OR c.email ILIKE :p OR c.phone ILIKE :p)
             ORDER BY c.first_name, c.last_name LIMIT :limit
         """),
         {"p": pattern, "limit": MAX_ROWS},

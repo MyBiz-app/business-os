@@ -126,6 +126,43 @@ export interface paths {
         patch: operations["update_client"];
         trace?: never;
     };
+    "/clients/{client_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Client
+         * @description Everything the business holds about the client, as one JSON document.
+         */
+        get: operations["export_client"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/erase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Erase Client */
+        post: operations["erase_client"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/services": {
         parameters: {
             query?: never;
@@ -1323,6 +1360,11 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /**
+             * Erased At
+             * @description Personal data erased on request (privacy)
+             */
+            erased_at: string | null;
         };
         /** ClientBooking */
         ClientBooking: {
@@ -1707,6 +1749,21 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** EraseRequest */
+        EraseRequest: {
+            /**
+             * Confirm
+             * @description Must be true: erasing cannot be undone
+             */
+            confirm: boolean;
+        };
+        /** EraseResult */
+        EraseResult: {
+            /** Cancelled Bookings */
+            cancelled_bookings: number;
+            /** Removed Health Declarations */
+            removed_health_declarations: number;
         };
         /** Form */
         Form: {
@@ -2315,14 +2372,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
         };
         /** Roles */
         Roles: {
@@ -3140,6 +3197,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    erase_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EraseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EraseResult"];
                 };
             };
             /** @description Validation Error */

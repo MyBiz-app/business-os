@@ -12,6 +12,7 @@ import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
+import { PrivacySection } from "./privacy-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
 function splitByNow<T extends { starts_at: string }>(bookings: T[]) {
@@ -26,6 +27,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const { id } = await params;
   const t = await getTranslations("clients");
   const tBookings = await getTranslations("bookings");
+  const tPrivacy = await getTranslations("privacy");
   const locale = await getLocale();
   const context = await getTenantFor("clients.read");
   const { tenant, api, scope } = context;
@@ -38,7 +40,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const joined = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: tenant.time_zone }).format(
     new Date(client.created_at),
   );
-  const writable = canWriteClients(tenant);
+  const erased = client.erased_at !== null;
+  const writable = canWriteClients(tenant) && !erased;
   const bookings = unwrap(
     await api.GET("/clients/{client_id}/bookings", { params: { ...scope, path: { client_id: id } } }),
   );
@@ -81,6 +84,15 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         <StatusBadge status={client.status} />
       </div>
       <p className="text-sm text-muted">{t("joined", { date: joined })}</p>
+      {client.erased_at && (
+        <p role="status" className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
+          {tPrivacy("erasedOn", {
+            date: new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: tenant.time_zone }).format(
+              new Date(client.erased_at),
+            ),
+          })}
+        </p>
+      )}
 
       <section aria-labelledby="details-heading" className="rounded-2xl border border-border bg-surface p-6">
         <h2 id="details-heading" className="mb-4 text-lg font-semibold">
@@ -94,9 +106,9 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         />
       </section>
 
-      <HealthSection clientId={client.id} context={context} />
+      {!erased && <HealthSection clientId={client.id} context={context} />}
 
-      <PlansSection clientId={client.id} context={context} />
+      <PlansSection clientId={client.id} context={context} locked={erased} />
 
       <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
         <h2 id="bookings-heading" className="text-lg font-semibold">
@@ -116,6 +128,13 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           </div>
         )}
       </section>
+
+      {!erased && tenant.permissions.includes("clients.privacy") && (
+        <PrivacySection
+          clientId={client.id}
+          name={[client.first_name, client.last_name].filter(Boolean).join(" ")}
+        />
+      )}
     </main>
   );
 }

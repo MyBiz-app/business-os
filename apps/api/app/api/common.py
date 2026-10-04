@@ -1,8 +1,11 @@
 """Small helpers shared by the tenant-scoped CRUD endpoints."""
 
 from typing import Any
+from uuid import UUID
 
 from fastapi import HTTPException, status
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 
 def blank_to_none(value: object) -> object:
@@ -22,3 +25,12 @@ def set_clause(changes: dict[str, Any]) -> str:
     user input, because they become column names."""
     assignments = [f"{column} = :{column}" for column in changes]
     return ", ".join([*assignments, "updated_at = now()"])
+
+
+def ensure_not_erased(db: Session, client_id: UUID) -> None:
+    """Erased clients (privacy requests) keep their history but get nothing new."""
+    erased = db.execute(
+        text("SELECT erased_at IS NOT NULL FROM app.clients WHERE id = :id"), {"id": client_id}
+    ).scalar()
+    if erased:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="client_erased")

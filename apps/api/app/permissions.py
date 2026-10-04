@@ -9,6 +9,7 @@ from enum import StrEnum
 class Permission(StrEnum):
     CLIENTS_READ = "clients.read"
     CLIENTS_WRITE = "clients.write"
+    CLIENTS_PRIVACY = "clients.privacy"  # export or erase a client's personal data (owners)
     CATALOG_READ = "catalog.read"
     CATALOG_WRITE = "catalog.write"
     SCHEDULE_READ = "schedule.read"
@@ -25,7 +26,7 @@ class Permission(StrEnum):
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
     "owner": frozenset(Permission),
     "manager": frozenset(
-        {
+        {  # everything except privacy requests
             Permission.CLIENTS_READ,
             Permission.CLIENTS_WRITE,
             Permission.CATALOG_READ,

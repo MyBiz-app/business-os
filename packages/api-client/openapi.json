@@ -549,6 +549,135 @@
         }
       }
     },
+    "/clients/{client_id}/export": {
+      "get": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Export Client",
+        "description": "Everything the business holds about the client, as one JSON document.",
+        "operationId": "export_client",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Export Client"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients/{client_id}/erase": {
+      "post": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Erase Client",
+        "operationId": "erase_client",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EraseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EraseResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/services": {
       "get": {
         "tags": [
@@ -5317,6 +5446,19 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "erased_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Erased At",
+            "description": "Personal data erased on request (privacy)"
           }
         },
         "type": "object",
@@ -5331,7 +5473,8 @@
           "status",
           "source",
           "created_at",
-          "updated_at"
+          "updated_at",
+          "erased_at"
         ],
         "title": "Client"
       },
@@ -6305,6 +6448,38 @@
           "created_at"
         ],
         "title": "Entitlement"
+      },
+      "EraseRequest": {
+        "properties": {
+          "confirm": {
+            "type": "boolean",
+            "title": "Confirm",
+            "description": "Must be true: erasing cannot be undone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "confirm"
+        ],
+        "title": "EraseRequest"
+      },
+      "EraseResult": {
+        "properties": {
+          "cancelled_bookings": {
+            "type": "integer",
+            "title": "Cancelled Bookings"
+          },
+          "removed_health_declarations": {
+            "type": "integer",
+            "title": "Removed Health Declarations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cancelled_bookings",
+          "removed_health_declarations"
+        ],
+        "title": "EraseResult"
       },
       "Form": {
         "properties": {
@@ -7907,6 +8082,7 @@
               "enum": [
                 "clients.read",
                 "clients.write",
+                "clients.privacy",
                 "catalog.read",
                 "catalog.write",
                 "schedule.read",
@@ -7921,7 +8097,7 @@
               ]
             },
             "type": "array",
-            "maxItems": 13,
+            "maxItems": 14,
             "title": "Permissions"
           }
         },
@@ -7955,6 +8131,7 @@
                   "enum": [
                     "clients.read",
                     "clients.write",
+                    "clients.privacy",
                     "catalog.read",
                     "catalog.write",
                     "schedule.read",

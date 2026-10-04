@@ -24,10 +24,15 @@ function newSaleKey(): string {
   return `sale-${crypto.randomUUID()}`;
 }
 
-type Props = { clientId: string; context: Awaited<ReturnType<typeof getTenant>> };
+type Props = {
+  clientId: string;
+  context: Awaited<ReturnType<typeof getTenant>>;
+  /** History only (an erased client): no new sales, freezes or cancellations. */
+  locked?: boolean;
+};
 
 /** The client's plans (entitlements): sell, freeze, cancel. Payment is simulated for now. */
-export async function PlansSection({ clientId, context }: Props) {
+export async function PlansSection({ clientId, context, locked = false }: Props) {
   const t = await getTranslations("plans");
   const locale = await getLocale();
   const { tenant, api, scope } = context;
@@ -37,7 +42,7 @@ export async function PlansSection({ clientId, context }: Props) {
       ? api.GET("/plans", { params: { ...scope, query: { active: true } } }).then(unwrap)
       : Promise.resolve([]),
   ]);
-  const selling = canSell(tenant);
+  const selling = canSell(tenant) && !locked;
   const today = todayIn(tenant.time_zone);
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" });
   const formatDate = (day: string) => date.format(new Date(`${day}T12:00:00Z`));

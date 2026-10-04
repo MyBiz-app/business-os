@@ -12,6 +12,7 @@ from app.api import (
     modules,
     plans,
     platform,
+    privacy,
     reports,
     schedule,
     services,
@@ -53,6 +54,7 @@ def create_app() -> FastAPI:
     app.include_router(router)
     app.include_router(client_import.router)
     app.include_router(clients.router)
+    app.include_router(privacy.router)
     app.include_router(services.router)
     app.include_router(locations.router)
     app.include_router(staff.router)

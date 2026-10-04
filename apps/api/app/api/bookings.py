@@ -13,7 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.api.common import not_found
+from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.plans import usable_entitlement
@@ -134,6 +134,7 @@ def place_booking(
 ) -> UUID:
     """Books the client if a spot is free, otherwise adds them to the waitlist. The booking
     uses one of the client's plans when one is valid; with `requires_plan`, it must."""
+    ensure_not_erased(db, client_id)
     session = lock_session(db, session_id)
     if session["status"] == "cancelled":
         raise _conflict("session_cancelled")
