@@ -6,6 +6,7 @@ from app.api import (
     assistant,
     bookings,
     client_app,
+    client_import,
     clients,
     locations,
     modules,
@@ -50,6 +51,7 @@ def create_app() -> FastAPI:
         return HealthResponse(status="ok", environment=settings.environment)
 
     app.include_router(router)
+    app.include_router(client_import.router)
     app.include_router(clients.router)
     app.include_router(services.router)
     app.include_router(locations.router)

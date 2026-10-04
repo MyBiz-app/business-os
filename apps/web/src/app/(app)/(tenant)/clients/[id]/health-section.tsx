@@ -12,6 +12,7 @@ type HealthState = components["schemas"]["ClientHealth"]["state"];
 
 export const HEALTH_TONE: Record<HealthState, Tone> = {
   ok: "success",
+  expiring: "primary",
   needs_review: "danger",
   rejected: "danger",
   expired: "muted",

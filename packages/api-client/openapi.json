@@ -202,6 +202,64 @@
         }
       }
     },
+    "/clients/import": {
+      "post": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Import Clients",
+        "operationId": "import_clients",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_import_clients"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/clients": {
       "get": {
         "tags": [
@@ -4738,6 +4796,59 @@
         ],
         "title": "Answer"
       },
+      "Body_import_clients": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          },
+          "mapping": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mapping",
+            "description": "JSON list: a field (or null) per column"
+          },
+          "commit": {
+            "type": "boolean",
+            "title": "Commit",
+            "description": "false: preview only",
+            "default": false
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "walk_in",
+                  "referral",
+                  "instagram",
+                  "facebook",
+                  "google",
+                  "website",
+                  "app",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_clients"
+      },
       "Body_upload_logo": {
         "properties": {
           "file": {
@@ -4847,6 +4958,7 @@
               "expired",
               "needs_review",
               "rejected",
+              "expiring",
               "ok"
             ],
             "title": "Health State",
@@ -5491,6 +5603,7 @@
               "expired",
               "needs_review",
               "rejected",
+              "expiring",
               "ok"
             ],
             "title": "State"
@@ -6338,6 +6451,189 @@
         ],
         "title": "HealthResponse"
       },
+      "ImportIssue": {
+        "properties": {
+          "line": {
+            "type": "integer",
+            "title": "Line",
+            "description": "Row number in the file (the header is row 1)"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "missing_name",
+              "invalid_email",
+              "invalid_date",
+              "invalid_status",
+              "duplicate"
+            ],
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "line",
+          "field",
+          "code"
+        ],
+        "title": "ImportIssue"
+      },
+      "ImportResult": {
+        "properties": {
+          "columns": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Columns",
+            "description": "Header of each column in the file"
+          },
+          "mapping": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "first_name",
+                    "last_name",
+                    "full_name",
+                    "email",
+                    "phone",
+                    "date_of_birth",
+                    "notes",
+                    "status"
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Mapping",
+            "description": "Field for each column, if any"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Examples",
+            "description": "First non-empty value of each column"
+          },
+          "rows": {
+            "type": "integer",
+            "title": "Rows"
+          },
+          "ready": {
+            "type": "integer",
+            "title": "Ready",
+            "description": "New clients the import adds (or added)"
+          },
+          "duplicates": {
+            "type": "integer",
+            "title": "Duplicates"
+          },
+          "invalid": {
+            "type": "integer",
+            "title": "Invalid"
+          },
+          "imported": {
+            "type": "boolean",
+            "title": "Imported"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/ImportIssue"
+            },
+            "type": "array",
+            "title": "Issues",
+            "description": "The first 50 problems"
+          },
+          "sample": {
+            "items": {
+              "$ref": "#/components/schemas/ImportedClient"
+            },
+            "type": "array",
+            "title": "Sample",
+            "description": "The first new clients"
+          }
+        },
+        "type": "object",
+        "required": [
+          "columns",
+          "mapping",
+          "examples",
+          "rows",
+          "ready",
+          "duplicates",
+          "invalid",
+          "imported",
+          "issues",
+          "sample"
+        ],
+        "title": "ImportResult"
+      },
+      "ImportedClient": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "phone"
+        ],
+        "title": "ImportedClient"
+      },
       "InstructorOption": {
         "properties": {
           "user_id": {
@@ -6939,6 +7235,7 @@
               "expired",
               "needs_review",
               "rejected",
+              "expiring",
               "ok"
             ],
             "title": "State"

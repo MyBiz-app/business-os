@@ -26,3 +26,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `series.py` creates an open-ended weekly series and stops it from one of its sessions.
 
 `health.py` walks the health declaration: booking blocked without one, a "yes" waits for the studio, the studio approves on the client profile, then the member books. Run it like `roles.py`.
+
+`client_import.py` imports a Hebrew Windows-1255 CSV: recognized columns, a column mapped by hand, preview with a duplicate and an invalid row, then the import.
