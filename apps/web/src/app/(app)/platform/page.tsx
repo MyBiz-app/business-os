@@ -14,9 +14,10 @@ export default async function PlatformPage() {
   const { me } = await getActiveMembership();
   if (!me.platform_admin) notFound();
   const api = await getApi();
-  const [businesses, usage] = await Promise.all([
+  const [businesses, usage, leads] = await Promise.all([
     api.GET("/platform/businesses").then(unwrap),
     api.GET("/platform/usage", { params: { query: { days: 30 } } }).then(unwrap),
+    api.GET("/platform/contact-requests").then(unwrap),
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
@@ -115,6 +116,43 @@ export default async function PlatformPage() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section aria-labelledby="leads-heading" className="flex flex-col gap-3">
+        <h2 id="leads-heading" className="text-lg font-semibold">
+          {t("platform.leads")}
+        </h2>
+        {leads.length === 0 ? (
+          <p className="text-muted">{t("platform.noLeads")}</p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {leads.map((lead) => (
+              <li key={lead.id} className="card flex flex-col gap-2 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-semibold" dir="auto">
+                    {lead.name}
+                    {lead.business && <span className="font-normal text-muted"> · {lead.business}</span>}
+                  </span>
+                  <span className="text-sm text-muted">{date.format(new Date(lead.created_at))}</span>
+                </div>
+                <p className="flex flex-wrap gap-3 text-sm" dir="ltr">
+                  <a href={`mailto:${lead.email}`} className="text-primary underline-offset-4 hover:underline">
+                    {lead.email}
+                  </a>
+                  {lead.phone && <span>{lead.phone}</span>}
+                </p>
+                {lead.vertical && (
+                  <p className="text-sm text-muted">{t(`marketing.contact.verticals.${lead.vertical as "fitness"}`)}</p>
+                )}
+                {lead.message && (
+                  <p className="whitespace-pre-wrap text-sm" dir="auto">
+                    {lead.message}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </main>
   );

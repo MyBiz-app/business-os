@@ -8,9 +8,11 @@ import { supabaseConfig } from "./env";
 const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/check-email", "/forgot-password"]);
 const AUTH_PAGES = new Set(["/", "/login", "/signup"]);
 
+// The marketing site and the public pages around sign-in and joining.
+const PUBLIC_PREFIXES = ["/auth/", "/invite/", "/join/", "/features", "/industries/", "/pricing", "/about", "/contact", "/legal/"];
+
 function isPublic(pathname: string) {
-  return PUBLIC_PAGES.has(pathname) || pathname.startsWith("/auth/") || pathname.startsWith("/invite/") ||
-    pathname.startsWith("/join/");
+  return PUBLIC_PAGES.has(pathname) || PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 }
 
 /** Refreshes the session cookie and redirects based on whether the user is signed in. */
