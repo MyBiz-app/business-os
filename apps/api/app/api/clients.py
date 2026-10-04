@@ -7,7 +7,7 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from app.api.common import blank_to_none, not_found, set_clause
+from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
 
@@ -23,7 +23,7 @@ WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, created_at, "
-    "updated_at"
+    "updated_at, erased_at"
 )
 
 
@@ -73,6 +73,7 @@ class Client(BaseModel):
     source: ClientSource | None
     created_at: datetime
     updated_at: datetime
+    erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
 
 
 class ClientPage(BaseModel):
@@ -162,6 +163,7 @@ def get_client(client_id: UUID, context: ReadDep) -> Client:
 
 @router.patch("/{client_id}")
 def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Client:
+    ensure_not_erased(context.session, client_id)
     changes = body.model_dump(exclude_unset=True)
     if "first_name" in changes and not changes["first_name"]:
         raise HTTPException(status_code=422, detail="first_name must not be blank")

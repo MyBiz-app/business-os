@@ -731,7 +731,9 @@
     "staff_manage": "Manage the team",
     "staff_manage_hint": "Invite, change roles, remove",
     "business_settings": "Business settings",
-    "business_settings_hint": "Details, branding, modules and plan"
+    "business_settings_hint": "Details, branding, modules and plan",
+    "clients_privacy": "Privacy requests",
+    "clients_privacy_hint": "Export or erase a client's personal data"
   },
   "health": {
     "title": "Health declaration",
@@ -810,5 +812,19 @@
     },
     "viewClients": "See the client list",
     "importMore": "Import another file"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "intro": "When a client asks, you can give them a copy of their data or erase their personal details.",
+    "export": "Download the client's data (JSON)",
+    "erase": "Erase personal details",
+    "eraseExplain": "Name, email, phone, date of birth and notes are erased, health declarations are deleted, upcoming bookings are cancelled and the client app account is unlinked. Bookings, plans and payments stay (payments must be kept for accounting), under \"Deleted client\". This can't be undone.",
+    "eraseConfirm": "I understand that {name}'s personal details will be erased for good",
+    "eraseButton": "Erase personal details",
+    "erasedOn": "This client's personal details were erased on {date}. Their bookings, plans and payments are kept.",
+    "errors": {
+      "confirm": "Tick the box to confirm.",
+      "generic": "Something went wrong. Try again."
+    }
   }
 }

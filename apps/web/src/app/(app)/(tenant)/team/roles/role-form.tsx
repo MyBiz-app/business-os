@@ -9,7 +9,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { deleteRole, saveRole, type TeamState } from "../actions";
 
-type PermissionKey = "clients_read" | "clients_write" | "catalog_read" | "catalog_write" | "schedule_read"
+type PermissionKey = "clients_read" | "clients_write" | "clients_privacy" | "catalog_read" | "catalog_write" | "schedule_read"
   | "schedule_write" | "bookings_manage" | "sales_manage" | "reports_read" | "ai_use" | "staff_read"
   | "staff_manage" | "business_settings";
 const key = (permission: string) => permission.replace(".", "_") as PermissionKey;

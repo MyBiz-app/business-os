@@ -28,3 +28,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `health.py` walks the health declaration: booking blocked without one, a "yes" waits for the studio, the studio approves on the client profile, then the member books. Run it like `roles.py`.
 
 `client_import.py` imports a Hebrew Windows-1255 CSV: recognized columns, a column mapped by hand, preview with a duplicate and an invalid row, then the import.
+
+`privacy.py` downloads a client's data export, then erases their personal details.

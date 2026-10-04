@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.api.common import blank_to_none, not_found, set_clause
+from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
 
@@ -330,6 +330,7 @@ def client_entitlements(client_id: UUID, context: ClientsReadDep) -> list[Entitl
 def sell_plan(client_id: UUID, body: Sale, context: SalesDep) -> Entitlement:
     """Sells a plan to a client. Payment is simulated until a payment provider is connected."""
     db = context.session
+    ensure_not_erased(db, client_id)
     payment_id = db.execute(
         text("""
             INSERT INTO app.payments
