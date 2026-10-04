@@ -3238,6 +3238,158 @@
         }
       }
     },
+    "/metrics/breakdown/{dimension}": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Breakdown",
+        "description": "Attendance metrics of sessions that took place, per service, instructor or time slot.",
+        "operationId": "get_breakdown",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dimension",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "service",
+                "instructor",
+                "time_slot"
+              ],
+              "type": "string",
+              "title": "Dimension"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BreakdownItem"
+                  },
+                  "title": "Response Get Breakdown"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics/members-at-risk": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Members At Risk",
+        "description": "Members with a valid plan who haven't come in `days`, or whose plan ends within `days`\nwith no renewal.",
+        "operationId": "get_members_at_risk",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 180,
+              "minimum": 7,
+              "default": 14,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberAtRisk"
+                  },
+                  "title": "Response Get Members At Risk"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ai/status": {
       "get": {
         "tags": [
@@ -5250,6 +5402,68 @@
           "status"
         ],
         "title": "BookingUpdate"
+      },
+      "BreakdownItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "Service id, instructor user id ('' = none) or 'isodow-hour'"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "attended": {
+            "type": "integer",
+            "title": "Attended"
+          },
+          "occupancy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupancy",
+            "description": "Percent of capacity taken"
+          },
+          "no_show_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Show Rate",
+            "description": "Percent of expected clients who didn't come"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "sessions",
+          "attended",
+          "occupancy",
+          "no_show_rate"
+        ],
+        "title": "BreakdownItem"
       },
       "BusinessProfile": {
         "properties": {
@@ -7378,6 +7592,59 @@
           "joined_at"
         ],
         "title": "Member"
+      },
+      "MemberAtRisk": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "inactive",
+              "plan_ending"
+            ],
+            "title": "Reason"
+          },
+          "last_visit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Visit"
+          },
+          "plan_ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Ends On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "name",
+          "reason",
+          "last_visit",
+          "plan_ends_on"
+        ],
+        "title": "MemberAtRisk"
       },
       "MemberUpdate": {
         "properties": {

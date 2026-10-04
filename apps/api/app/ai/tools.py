@@ -20,7 +20,7 @@ from app.api import bookings as bookings_api
 from app.api import plans as plans_api
 from app.api import schedule as schedule_api
 from app.api.deps import TenantContext
-from app.metrics import METRICS, compute, previous_period
+from app.metrics import METRICS, compute, members_at_risk, previous_period
 from app.permissions import Permission
 
 PENDING_ACTION_TTL = dt.timedelta(minutes=15)
@@ -252,38 +252,18 @@ def client_sources(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
 
 def inactive_members(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     days = min(max(int(args["days"]), 7), 180)
-    rows = ctx.tenant.session.execute(
-        text("""
-            SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
-                   (SELECT max(s.starts_at) FROM app.bookings b
-                    JOIN app.sessions s ON s.id = b.session_id
-                    WHERE b.client_id = c.id AND b.status = 'checked_in') AS last_visit
-            FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
-            WHERE EXISTS (
-                SELECT 1 FROM app.entitlements e
-                WHERE e.client_id = c.id AND e.status = 'active'
-                  AND (now() AT TIME ZONE t.time_zone)::date BETWEEN e.starts_on AND e.ends_on
-            )
-            AND NOT EXISTS (
-                SELECT 1 FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
-                WHERE b.client_id = c.id AND b.status = 'checked_in'
-                  AND s.starts_at > now() - make_interval(days => :days)
-            )
-            ORDER BY last_visit NULLS FIRST LIMIT :limit
-        """),
-        {"days": days, "limit": MAX_ROWS},
-    ).mappings()
+    members = [
+        m for m in members_at_risk(ctx.tenant.session, days, limit=500) if m.reason == "inactive"
+    ][:MAX_ROWS]
     return {
         "members_with_a_valid_plan_and_no_visit_in_days": days,
         "members": [
             {
-                "client_id": str(r["id"]),
-                "name": r["name"],
-                "last_visit": _local(r["last_visit"], ctx.time_zone)[:10]
-                if r["last_visit"]
-                else None,
+                "client_id": m.client_id,
+                "name": m.name,
+                "last_visit": m.last_visit.isoformat() if m.last_visit else None,
             }
-            for r in rows
+            for m in members
         ],
     }
 

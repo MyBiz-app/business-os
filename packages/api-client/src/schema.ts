@@ -687,6 +687,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/metrics/breakdown/{dimension}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Breakdown
+         * @description Attendance metrics of sessions that took place, per service, instructor or time slot.
+         */
+        get: operations["get_breakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/members-at-risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Members At Risk
+         * @description Members with a valid plan who haven't come in `days`, or whose plan ends within `days`
+         *     with no renewal.
+         */
+        get: operations["get_members_at_risk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/status": {
         parameters: {
             query?: never;
@@ -1296,6 +1337,30 @@ export interface components {
              * @enum {string}
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
+        /** BreakdownItem */
+        BreakdownItem: {
+            /**
+             * Key
+             * @description Service id, instructor user id ('' = none) or 'isodow-hour'
+             */
+            key: string;
+            /** Label */
+            label: string | null;
+            /** Sessions */
+            sessions: number;
+            /** Attended */
+            attended: number;
+            /**
+             * Occupancy
+             * @description Percent of capacity taken
+             */
+            occupancy: number | null;
+            /**
+             * No Show Rate
+             * @description Percent of expected clients who didn't come
+             */
+            no_show_rate: number | null;
         };
         /**
          * BusinessProfile
@@ -2109,6 +2174,22 @@ export interface components {
              * Format: date-time
              */
             joined_at: string;
+        };
+        /** MemberAtRisk */
+        MemberAtRisk: {
+            /** Client Id */
+            client_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "inactive" | "plan_ending";
+            /** Last Visit */
+            last_visit: string | null;
+            /** Plan Ends On */
+            plan_ends_on: string | null;
         };
         /**
          * MemberUpdate
@@ -4759,6 +4840,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Point"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_breakdown: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                dimension: "service" | "instructor" | "time_slot";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BreakdownItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_members_at_risk: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAtRisk"][];
                 };
             };
             /** @description Validation Error */

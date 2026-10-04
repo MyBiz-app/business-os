@@ -85,3 +85,54 @@ def test_reports_need_permission_and_are_isolated(
         "/metrics", params={"start": "2026-02-01", "end": "2026-01-01"}, headers=studio["headers"]
     )
     assert bad.status_code == 422
+
+
+def test_breakdowns_add_up_to_the_metrics(
+    client: TestClient, engine: Engine, auth: AuthHeaders
+) -> None:
+    studio = demo(engine, auth)
+    end = local_today() - timedelta(days=1)
+    start = end - timedelta(days=29)
+    period = {"start": start, "end": end}
+    metrics = {
+        m["key"]: m["value"]
+        for m in client.get("/metrics", params=period, headers=studio["headers"]).json()
+    }
+
+    by_service = client.get(
+        "/metrics/breakdown/service", params=period, headers=studio["headers"]
+    ).json()
+    by_instructor = client.get(
+        "/metrics/breakdown/instructor", params=period, headers=studio["headers"]
+    ).json()
+    by_slot = client.get(
+        "/metrics/breakdown/time_slot", params=period, headers=studio["headers"]
+    ).json()
+
+    for rows in (by_service, by_instructor, by_slot):
+        assert sum(r["attended"] for r in rows) == metrics["attendance"]
+        assert sum(r["sessions"] for r in rows) == metrics["sessions_held"]
+    assert len(by_service) == 5 and all(r["label"] for r in by_service)
+    assert all(0 <= r["occupancy"] <= 100 for r in by_service)
+    weekday, hour = by_slot[0]["key"].split("-")
+    assert 1 <= int(weekday) <= 7 and 0 <= int(hour) <= 23
+
+
+def test_members_at_risk(client: TestClient, engine: Engine, auth: AuthHeaders) -> None:
+    studio = demo(engine, auth)
+
+    members = client.get(
+        "/metrics/members-at-risk", params={"days": 14}, headers=studio["headers"]
+    ).json()
+
+    reasons = {m["reason"] for m in members}
+    assert reasons == {"inactive", "plan_ending"}  # the demo has both scenarios
+    cutoff = local_today() - timedelta(days=14)
+    for member in members:
+        if member["reason"] == "inactive":
+            assert member["last_visit"] is None or date.fromisoformat(member["last_visit"]) < cutoff
+        else:
+            ends = date.fromisoformat(member["plan_ends_on"])
+            assert ends < local_today() + timedelta(days=14)
+    bad = client.get("/metrics/members-at-risk", params={"days": 3}, headers=studio["headers"])
+    assert bad.status_code == 422

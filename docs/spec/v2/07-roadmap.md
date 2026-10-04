@@ -33,6 +33,7 @@ production hardening (backups, monitoring, security review, legal docs).
 - [x] Client import from CSV / Excel with column mapping and preview (T40)
 - [x] Privacy requests: export a client's data, erase their personal details (T41)
 - [x] Client notifications in the app (waitlist promotion, studio bookings and cancellations, class changes, health review) (T43)
+- [x] Reports: by class, instructor and hour; members to reach out to (T44)
 - [ ] Payment provider (O1), invoicing provider (O2), real email provider (then email / push for the same notifications)
 - [x] Security baseline guarded by tests (RLS on every table, pinned search_path, no public grants) and security headers (T42)
 - [ ] Production hardening: backups, monitoring, full security review, privacy policy and terms

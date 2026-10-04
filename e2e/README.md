@@ -32,3 +32,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `privacy.py` downloads a client's data export, then erases their personal details.
 
 `notifications.py`: the studio books a member and cancels the class; the member sees both under Updates, with an unread badge that clears once read.
+
+`reports.py` seeds a demo studio for a new owner and checks the reports page (breakdowns, members to reach out to, period switch).
