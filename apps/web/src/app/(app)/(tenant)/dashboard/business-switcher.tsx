@@ -23,7 +23,7 @@ export function BusinessSwitcher({ current, memberships }: Props) {
               name="tenant_id"
               defaultValue={current}
               onChange={(event) => event.currentTarget.form?.requestSubmit()}
-              className="rounded-md border border-border bg-surface px-2 py-1"
+              className="control px-2 py-1"
             >
               {memberships.map((m) => (
                 <option key={m.tenant_id} value={m.tenant_id}>

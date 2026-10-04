@@ -1,5 +1,6 @@
 "use client";
 
+import { Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -14,10 +15,11 @@ export function LocaleSwitcher() {
   const [pending, startTransition] = useTransition();
 
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <span className="text-muted">{t("settings.language")}</span>
+    <label className="relative flex items-center text-sm">
+      <span className="sr-only">{t("settings.language")}</span>
+      <Languages aria-hidden="true" className="pointer-events-none absolute start-2.5 size-4 text-muted" />
       <select
-        className="rounded-md border border-border bg-surface px-2 py-1"
+        className="control h-9 ps-8 pe-2"
         value={current}
         disabled={pending}
         onChange={(event) => {

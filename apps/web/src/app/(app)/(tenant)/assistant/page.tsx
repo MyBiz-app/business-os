@@ -37,12 +37,12 @@ async function ActionCard({ action }: { action: PendingAction }) {
       {action.status === "pending" ? (
         <div className="flex gap-2">
           <form action={decideAction.bind(null, action.id, "confirm")}>
-            <button type="submit" className="rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-on-primary">
+            <button type="submit" className="btn-primary px-3 py-1.5 text-sm">
               {t("confirm")}
             </button>
           </form>
           <form action={decideAction.bind(null, action.id, "reject")}>
-            <button type="submit" className="rounded-lg border border-border px-3 py-1.5 text-sm">
+            <button type="submit" className="btn-secondary px-3 py-1.5 text-sm font-medium">
               {t("reject")}
             </button>
           </form>
@@ -77,14 +77,14 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short", timeZone: tenant.time_zone });
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("title")}</h1>
           <p className="text-sm text-muted">{t("subtitle")}</p>
         </div>
         <form action={newConversation}>
-          <button type="submit" className="rounded-lg border border-border px-4 py-2.5 font-semibold">
+          <button type="submit" className="btn-secondary px-4 py-2.5">
             {t("newConversation")}
           </button>
         </form>
@@ -97,7 +97,7 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_16rem]">
-        <section aria-label={t("conversation")} className="flex min-h-96 flex-col gap-4 rounded-2xl border border-border bg-surface p-5">
+        <section aria-label={t("conversation")} className="flex min-h-96 flex-col gap-4 card p-5">
           {!conversation ? (
             <p className="text-muted">{t("empty")}</p>
           ) : (
@@ -135,7 +135,7 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
           )}
           {!conversation && status.enabled && (
             <form action={newConversation}>
-              <button type="submit" className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">
+              <button type="submit" className="btn-primary px-4 py-2.5">
                 {t("start")}
               </button>
             </form>

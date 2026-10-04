@@ -38,7 +38,7 @@ export async function HealthSection({ clientId, context }: Props) {
   const reviewable = latest?.status === "needs_review" && canWriteClients(tenant);
 
   return (
-    <section aria-labelledby="health-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+    <section aria-labelledby="health-heading" className="flex flex-col gap-4 card p-6">
       <div className="flex flex-wrap items-center gap-3">
         <h2 id="health-heading" className="text-lg font-semibold">
           {t("title")}
@@ -99,7 +99,7 @@ export async function HealthSection({ clientId, context }: Props) {
             <input
               name="note"
               maxLength={2000}
-              className="w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="w-full min-w-0 control px-3 py-2"
             />
           </label>
           <div className="flex flex-wrap gap-2">
@@ -107,7 +107,7 @@ export async function HealthSection({ clientId, context }: Props) {
               type="submit"
               name="decision"
               value="approve"
-              className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary"
+              className="btn-primary px-4 py-2 text-sm"
             >
               {t("approve")}
             </button>
@@ -115,7 +115,7 @@ export async function HealthSection({ clientId, context }: Props) {
               type="submit"
               name="decision"
               value="reject"
-              className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-danger"
+              className="btn-secondary px-4 py-2 text-sm text-danger"
             >
               {t("reject")}
             </button>

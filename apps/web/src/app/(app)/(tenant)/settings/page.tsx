@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   const logo = apiAssetUrl(tenant.logo_url);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <p className="text-sm text-muted">{t("subtitle")}</p>
@@ -27,7 +27,7 @@ export default async function SettingsPage() {
 
       <Link
         href="/settings/modules"
-        className="flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-6 hover:border-primary"
+        className="flex items-center justify-between gap-3 card card-hover p-6"
       >
         <span className="flex flex-col gap-1">
           <span className="text-lg font-semibold">{t("modulesLink")}</span>
@@ -36,14 +36,14 @@ export default async function SettingsPage() {
         <span aria-hidden="true" className="text-primary rtl:rotate-180">→</span>
       </Link>
 
-      <section aria-labelledby="details-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="details-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="details-heading" className="text-lg font-semibold">
           {t("details")}
         </h2>
         <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
       </section>
 
-      <section aria-labelledby="brand-heading" className="flex flex-col gap-6 rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="brand-heading" className="flex flex-col gap-6 card p-6">
         <div className="flex flex-col gap-1">
           <h2 id="brand-heading" className="text-lg font-semibold">
             {t("brand")}

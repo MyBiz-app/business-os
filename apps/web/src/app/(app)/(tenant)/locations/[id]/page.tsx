@@ -20,7 +20,7 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
   const readOnly = !canWriteCatalog(tenant);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
       <Link href="/locations" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
@@ -31,7 +31,7 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
         submitLabel={t("common.save")}
         readOnly={readOnly}
       />
-      <section aria-labelledby="rooms-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="rooms-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="rooms-heading" className="text-lg font-semibold">
           {t("locations.rooms")}
         </h2>

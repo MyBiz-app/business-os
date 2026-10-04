@@ -18,7 +18,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[id]"
   if (!service) notFound();
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
       <Link href="/services" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>

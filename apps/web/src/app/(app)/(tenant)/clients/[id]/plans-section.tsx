@@ -48,7 +48,7 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
   const formatDate = (day: string) => date.format(new Date(`${day}T12:00:00Z`));
 
   return (
-    <section aria-labelledby="plans-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+    <section aria-labelledby="plans-heading" className="flex flex-col gap-4 card p-6">
       <h2 id="plans-heading" className="text-lg font-semibold">
         {t("clientPlans")}
       </h2>

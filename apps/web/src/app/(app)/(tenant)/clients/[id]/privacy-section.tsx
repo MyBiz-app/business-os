@@ -14,7 +14,7 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
   const [state, action, pending] = useActionState<EraseState, FormData>(eraseClient.bind(null, clientId), {});
 
   return (
-    <section aria-labelledby="privacy-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+    <section aria-labelledby="privacy-heading" className="flex flex-col gap-4 card p-6">
       <div className="flex flex-col gap-1">
         <h2 id="privacy-heading" className="text-lg font-semibold">
           {t("title")}
@@ -25,7 +25,7 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
         <a
           href={`/clients/${clientId}/export`}
           download
-          className="inline-block rounded-lg border border-border px-4 py-2.5 font-semibold"
+          className="btn-secondary px-4 py-2.5"
         >
           {t("export")}
         </a>

@@ -22,6 +22,11 @@ def chromium() -> str | None:
 
 def ready(page) -> None:
     page.wait_for_load_state("networkidle")
+    # Entrance animations fade content in; accessibility checks need it fully opaque.
+    page.wait_for_function(
+        "document.getAnimations().every(a => a.effect?.getTiming().iterations === Infinity"
+        " || a.playState !== 'running')"
+    )
 
 
 def _message(email: str) -> dict:

@@ -15,7 +15,7 @@ export default async function RolesPage() {
   const roles = unwrap(await api.GET("/roles", { params: scope }));
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
       <Link href="/team" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("title")}
       </Link>

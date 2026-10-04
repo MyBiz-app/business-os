@@ -18,7 +18,7 @@ export function CopyWeek({ weekStart, nextWeek }: { weekStart: string; nextWeek:
         disabled={pending}
         aria-busy={pending}
         title={t("copyWeekHint")}
-        className="rounded-lg border border-border px-3 py-2 text-sm disabled:opacity-60"
+        className="btn-secondary px-3 py-2 text-sm font-medium"
       >
         {t("copyWeek")}
       </button>

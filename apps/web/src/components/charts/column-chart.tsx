@@ -30,6 +30,7 @@ function niceMax(value: number): number {
  * table view. One series, so the title names it and there is no legend. */
 export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props) {
   const id = useId();
+  const gradient = `${id.replace(/:/g, "")}-fill`;
   const locale = useLocale();
   const compact = new Intl.NumberFormat(locale, {
     notation: "compact",
@@ -60,9 +61,15 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
       </figcaption>
       <div className="relative" dir="ltr">
         <svg viewBox={`0 0 ${width} ${HEIGHT + 28}`} className="h-auto w-full max-w-[720px] overflow-visible" role="img" aria-label={title}>
+          <defs>
+            <linearGradient id={gradient} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="var(--primary)" />
+              <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.55} />
+            </linearGradient>
+          </defs>
           {ticks.map((tick) => (
             <g key={tick}>
-              <line x1={AXIS} x2={width} y1={y(tick)} y2={y(tick)} className="stroke-border" strokeWidth={1} />
+              <line x1={AXIS} x2={width} y1={y(tick)} y2={y(tick)} className="stroke-border" strokeWidth={1} strokeDasharray={tick === 0 ? undefined : "4 4"} />
               <text x={AXIS - 8} y={y(tick)} textAnchor="end" dominantBaseline="middle" className="fill-muted text-[15px]">
                 {formatTick(tick)}
               </text>
@@ -90,7 +97,11 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
                 {h > 0 && (
                   <path
                     d={`M${x},${HEIGHT} V${top + r} Q${x},${top} ${x + r},${top} H${x + bar - r} Q${x + bar},${top} ${x + bar},${top + r} V${HEIGHT} Z`}
-                    className={active === index ? "fill-primary" : "fill-primary/80"}
+                    fill={`url(#${gradient})`}
+                    className={`origin-bottom transition-opacity duration-200 [animation:grow_700ms_cubic-bezier(0.22,1,0.36,1)_both] [transform-box:fill-box] ${
+                      active === null || active === index ? "opacity-100" : "opacity-45"
+                    }`}
+                    style={{ animationDelay: `${index * 35}ms` }}
                   />
                 )}
                 {showLabel(index) && (
@@ -105,7 +116,7 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
         {current && active !== null && (
           <div
             role="status"
-            className="pointer-events-none absolute -top-2 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs shadow-sm"
+            className="pointer-events-none absolute -top-2 rounded-xl border border-border bg-surface px-2.5 py-1.5 text-xs shadow-lg"
             style={{ left: `${((AXIS + slot * active + slot / 2) / width) * 100}%`, transform: "translate(-50%, -100%)" }}
           >
             <span className="text-muted">{current.label}</span> · <span className="font-semibold">{current.display}</span>

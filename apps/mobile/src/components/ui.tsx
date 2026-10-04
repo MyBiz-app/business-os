@@ -1,7 +1,6 @@
-import { useId } from "react";
+import { Children, useId } from "react";
 import {
   ActivityIndicator,
-  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -12,7 +11,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { FadeIn, PressableScale } from "@/components/motion";
+import { tint } from "@/lib/brand";
 import type { Palette } from "@/lib/theme";
+
+/** Soft layered shadows for raised surfaces (same feel as the web app's cards). */
+export const elevation = {
+  card: { boxShadow: "0px 1px 2px rgba(24, 24, 40, 0.06), 0px 4px 14px rgba(24, 24, 40, 0.06)" },
+  raised: { boxShadow: "0px 2px 4px rgba(24, 24, 40, 0.08), 0px 10px 24px rgba(24, 24, 40, 0.12)" },
+} as const;
 
 type ButtonProps = {
   label: string;
@@ -28,22 +35,22 @@ export function Button({ label, onPress, palette, variant = "primary", busy, dis
   const primary = variant === "primary";
   const color = primary ? palette.onPrimary : variant === "danger" ? palette.danger : palette.foreground;
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityState={{ disabled: disabled || busy, busy }}
       disabled={disabled || busy}
       onPress={onPress}
-      style={({ pressed }) => [
+      style={[
         styles.button,
         primary
-          ? { backgroundColor: palette.primary }
-          : { borderWidth: 1, borderColor: palette.border, backgroundColor: palette.background },
-        (pressed || disabled) && { opacity: 0.6 },
+          ? { backgroundColor: palette.primary, boxShadow: `0px 6px 16px ${tint(palette.primary, 0.35)}` }
+          : { borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface },
+        disabled && { opacity: 0.6 },
       ]}
     >
       {busy ? <ActivityIndicator color={color} /> : <Text style={[styles.buttonText, { color }]}>{label}</Text>}
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -62,7 +69,7 @@ export function Field({ label, palette, hint, style, ...inputProps }: FieldProps
         placeholderTextColor={palette.muted}
         style={[
           styles.input,
-          { color: palette.foreground, borderColor: palette.border, backgroundColor: palette.background },
+          { color: palette.foreground, borderColor: palette.border, backgroundColor: palette.surface },
           style,
         ]}
         {...inputProps}
@@ -97,14 +104,23 @@ export function Screen({ palette, children, refreshing, onRefresh }: ScreenProps
         keyboardShouldPersistTaps="handled"
         refreshControl={onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} /> : undefined}
       >
-        {children}
+        {/* Each block of the screen rises in, one after another. */}
+        {Children.toArray(children).map((child, index) => (
+          <FadeIn key={index} index={index} style={styles.block}>
+            {child}
+          </FadeIn>
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 export function Card({ palette, children }: { palette: Palette; children: React.ReactNode }) {
-  return <View style={[styles.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>{children}</View>;
+  return (
+    <View style={[styles.card, elevation.card, { backgroundColor: palette.surface, borderColor: palette.border }]}>
+      {children}
+    </View>
+  );
 }
 
 export function Heading({ children, palette, level = 1 }: { children: React.ReactNode; palette: Palette; level?: 1 | 2 }) {
@@ -121,14 +137,15 @@ export function Heading({ children, palette, level = 1 }: { children: React.Reac
 export const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 20, gap: 16, paddingBottom: 40 },
-  button: { minHeight: 48, borderRadius: 12, paddingHorizontal: 16, alignItems: "center", justifyContent: "center" },
+  block: { gap: 16 },
+  button: { minHeight: 48, borderRadius: 14, paddingHorizontal: 16, alignItems: "center", justifyContent: "center" },
   buttonText: { fontSize: 16, fontWeight: "600" },
   field: { gap: 6 },
   label: { fontSize: 14, fontWeight: "600", textAlign: "left" },
-  input: { minHeight: 48, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, fontSize: 17 },
+  input: { minHeight: 48, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, fontSize: 17 },
   hint: { fontSize: 13, textAlign: "left" },
   error: { fontSize: 14, textAlign: "left" },
-  card: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 10 },
+  card: { borderWidth: 1, borderRadius: 20, padding: 16, gap: 10 },
   h1: { fontSize: 28, fontWeight: "700", textAlign: "left" },
   h2: { fontSize: 18, fontWeight: "600", textAlign: "left" },
   muted: { fontSize: 15, textAlign: "left" },

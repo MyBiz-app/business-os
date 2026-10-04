@@ -119,7 +119,7 @@ export function BrandColorForm({ color }: { color: string | null }) {
           value={preview}
           disabled={useDefault}
           onChange={(event) => setPreview(event.target.value)}
-          className="h-11 w-20 cursor-pointer rounded-lg border border-border bg-background p-1"
+          className="control h-11 w-20 cursor-pointer p-1"
         />
         <CheckboxField
           label={t("useDefault")}
@@ -131,7 +131,7 @@ export function BrandColorForm({ color }: { color: string | null }) {
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("preview")}</span>
         <div style={brandStyle(useDefault ? null : preview)} className="brand flex items-center gap-3">
-          <span className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">{t("previewButton")}</span>
+          <span className="btn-primary px-4 py-2.5">{t("previewButton")}</span>
           <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">{t("color")}</span>
         </div>
       </div>

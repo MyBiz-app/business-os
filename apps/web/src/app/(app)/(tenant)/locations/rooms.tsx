@@ -12,7 +12,7 @@ import { addRoom, updateRoom } from "./actions";
 
 type Room = components["schemas"]["Room"];
 
-const INPUT = "rounded-lg border border-border bg-background px-3 py-2";
+const INPUT = "control px-3 py-2";
 
 function RoomRow({ room, readOnly }: { room: Room; readOnly: boolean }) {
   const t = useTranslations();

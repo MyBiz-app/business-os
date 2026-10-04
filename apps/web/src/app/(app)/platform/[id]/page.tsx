@@ -29,7 +29,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const grant = me.support_access.find((g) => g.tenant_id === business.id);
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
       <Link href="/platform" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("platform.title")}
       </Link>
@@ -41,7 +41,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           <span dir="ltr">{business.owner_email}</span> · {business.time_zone} · {business.currency}
         </p>
       </div>
-      <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4">
+      <section className="flex flex-wrap items-center justify-between gap-3 card p-4">
         {grant ? (
           <>
             <p className="text-sm">
@@ -52,7 +52,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
               })}
             </p>
             <form action={openAsSupport.bind(null, business.id)}>
-              <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary">
+              <button type="submit" className="btn-primary px-4 py-2 text-sm">
                 {t("support.open")}
               </button>
             </form>
@@ -70,13 +70,13 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
             ["aiCredits30d", business.ai_credits_30d],
           ] as const
         ).map(([key, value]) => (
-          <div key={key} className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4">
+          <div key={key} className="flex flex-col gap-1 card p-4">
             <dt className="text-sm text-muted">{t(`platform.columns.${key}`)}</dt>
             <dd className="text-2xl font-semibold">{number.format(value)}</dd>
           </div>
         ))}
       </dl>
-      <section className="flex flex-col gap-2 rounded-2xl border border-border bg-surface p-6">
+      <section className="flex flex-col gap-2 card p-6">
         <h2 className="font-semibold">{t("platform.columns.modules")}</h2>
         <p>
           {business.modules.length === 0
@@ -84,7 +84,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
             : business.modules.map((m) => t(`modules.names.${m as "client_app"}`)).join(" · ")}
         </p>
       </section>
-      <section className="rounded-2xl border border-border bg-surface p-6">
+      <section className="card p-6">
         {credits.length === 0 ? (
           <p className="text-muted">{t("platform.noUsage")}</p>
         ) : (

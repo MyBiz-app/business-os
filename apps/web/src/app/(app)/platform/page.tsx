@@ -36,7 +36,7 @@ export default async function PlatformPage() {
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("platform.title")}</h1>
         <p className="text-sm text-muted">{t("platform.subtitle")}</p>
@@ -51,14 +51,14 @@ export default async function PlatformPage() {
             ["aiCredits30d", totals.credits],
           ] as const
         ).map(([key, value]) => (
-          <li key={key} className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4">
+          <li key={key} className="flex flex-col gap-1 card p-4">
             <span className="text-sm text-muted">{t(`platform.${key}`)}</span>
             <span className="text-3xl font-semibold">{number.format(value)}</span>
           </li>
         ))}
       </ul>
 
-      <section className="rounded-2xl border border-border bg-surface p-6">
+      <section className="card p-6">
         <ColumnChart
           title={t("platform.aiCreditsPerDay")}
           unit={{ kind: "count" }}

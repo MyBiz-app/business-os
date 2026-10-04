@@ -116,7 +116,7 @@ export function ModulePicker({ catalog, initial, activeClients, name }: Props) {
           value={selection.extra_location ?? 0}
           onChange={(event) => set("extra_location", Math.max(0, Math.min(50, Number(event.target.value) || 0)))}
           aria-label={t("names.extra_location")}
-          className="w-20 rounded-lg border border-border bg-surface px-2 py-1.5 text-center"
+          className="control w-20 px-2 py-1.5 text-center"
         />
       </label>
 

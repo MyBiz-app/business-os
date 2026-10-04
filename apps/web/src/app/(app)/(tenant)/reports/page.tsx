@@ -58,7 +58,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   );
 
   const table = (id: string, title: string, nameHeader: string, rows: Row[], name: (row: Row) => string) => (
-    <section aria-labelledby={id} className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
+    <section aria-labelledby={id} className="flex flex-col gap-3 card p-6">
       <h2 id={id} className="text-lg font-semibold">
         {title}
       </h2>
@@ -96,19 +96,19 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("title")}</h1>
           <p className="text-muted">{t("intro")}</p>
         </div>
-        <nav aria-label={t("period")} className="flex gap-1 rounded-lg border border-border bg-surface p-1 text-sm">
+        <nav aria-label={t("period")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm">
           {(Object.keys(PERIODS) as Period[]).map((value) => (
             <Link
               key={value}
               href={`/reports?period=${value}`}
               aria-current={value === period ? "page" : undefined}
-              className={`rounded-md px-3 py-1 ${value === period ? "bg-primary text-on-primary" : "hover:bg-background"}`}
+              className={`whitespace-nowrap rounded-lg px-3 py-1 transition-colors ${value === period ? "bg-primary text-on-primary shadow-sm" : "hover:bg-foreground/5"}`}
             >
               {t("lastDays", { count: PERIODS[value] })}
             </Link>
@@ -119,7 +119,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
       {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
       {table("by-slot", t("bySlot"), t("slot"), slots, (row) => slotLabel(row.key))}
-      <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 card p-6">
         <div className="flex flex-col gap-1">
           <h2 id="at-risk-heading" className="text-lg font-semibold">
             {t("atRisk", { count: atRisk.length })}

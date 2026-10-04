@@ -20,7 +20,7 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
   return (
     <div className="brand flex flex-1 flex-col" style={brandStyle(business.primary_color)}>
       <AppHeader />
-      <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-6 py-12 text-center">
+      <main className="enter mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-6 py-12 text-center">
         {logo ? (
           <Image src={logo} alt="" width={80} height={80} unoptimized className="size-20 rounded-2xl border border-border object-contain" />
         ) : (
@@ -41,7 +41,7 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
         </ol>
         <a
           href={`mybiz://join?code=${encodeURIComponent(joinCode)}`}
-          className="w-full rounded-lg bg-primary px-4 py-3 font-semibold text-on-primary"
+          className="w-full btn-primary px-4 py-3"
         >
           {t("openApp")}
         </a>
