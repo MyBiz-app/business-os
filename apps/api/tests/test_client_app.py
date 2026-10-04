@@ -280,3 +280,27 @@ def test_client_edits_own_name_and_phone_only(
     profile = client.get(f"/clients/{joined['client_id']}", headers=studio["headers"]).json()
     assert profile["last_name"] == "Levi" and profile["notes"] == "VIP"  # notes untouched
     assert blank.status_code == 422
+
+
+def test_client_sees_closed_days_of_their_business(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    day = (local_today() + timedelta(days=3)).isoformat()
+    client.post("/closed-days", json={"day": day, "reason": "Holiday"}, headers=studio["headers"])
+    other_owner = uuid4()
+    other = client.post("/tenants", json=STUDIO, headers=auth(other_owner)).json()["id"]
+    closed_elsewhere = client.post(
+        "/closed-days", json={"day": day, "reason": "Elsewhere"}, headers=auth(other_owner, other)
+    )
+    assert closed_elsewhere.status_code == 201, closed_elsewhere.text
+    user = uuid4()
+    join(client, auth, user, join_code(client, studio))
+
+    response = client.get(
+        "/client/closed-days",
+        params={"start": local_today().isoformat(), "days": 14},
+        headers=auth(user, studio["tenant_id"]),
+    )
+
+    assert response.status_code == 200, response.text
+    assert [(d["day"], d["reason"]) for d in response.json()] == [(day, "Holiday")]

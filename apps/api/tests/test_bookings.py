@@ -215,3 +215,25 @@ def test_desk_roles_can_book(
     dana = new_client(client, studio["headers"], "Dana")
 
     assert book(client, auth(user, studio["tenant_id"]), session_id, dana).status_code == 201
+
+
+def test_filter_by_plan_and_absence(client: TestClient, studio: dict) -> None:
+    from tests.test_client_app import give_plan
+
+    headers = studio["headers"]
+    member = new_client(client, headers, "Member")
+    regular = new_client(client, headers, "Regular")
+    new_client(client, headers, "Lead")
+    give_plan(client, studio, member)
+    give_plan(client, studio, regular)
+    yesterday = new_session(client, studio, on=local_today() - timedelta(days=1))
+    booking = book(client, headers, yesterday, regular).json()
+    set_status(client, headers, booking["id"], "checked_in")
+
+    def names(**params) -> list[str]:
+        items = client.get("/clients", params=params, headers=headers).json()["items"]
+        return sorted(c["first_name"] for c in items)
+
+    assert names(plan="valid") == ["Member", "Regular"]
+    assert names(plan="none") == ["Lead"]
+    assert names(plan="valid", absent_days=14) == ["Member"]

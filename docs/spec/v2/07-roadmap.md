@@ -76,6 +76,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Staff web: join code + printable QR; public join page
 - [x] Background job keeps open-ended weekly series 12 weeks ahead (daily on staging); "stop repeating after this session"
 - [x] Change a series from a session onward; copy a week's one-off sessions to the next week (T45)
+- [x] Closed days (holidays): cancel that day's classes, series skip it (T51)
 
 ## Sprint 4 progress
 

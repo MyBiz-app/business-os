@@ -532,6 +532,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/closed-days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Closed Days
+         * @description Closed days from `start` (default: today, local) on.
+         */
+        get: operations["list_closed_days"];
+        put?: never;
+        /**
+         * Close Day
+         * @description Marks a day closed and cancels its scheduled sessions; booked clients are told.
+         */
+        post: operations["close_day"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/closed-days/{closed_day_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Reopen Day
+         * @description Opens the day again for new sessions; sessions cancelled when it closed stay cancelled.
+         */
+        delete: operations["reopen_day"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/bookings": {
         parameters: {
             query?: never;
@@ -1075,6 +1119,26 @@ export interface paths {
          * @description Upcoming sessions in the window (past ones are left out).
          */
         get: operations["client_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/closed-days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Closed Days
+         * @description Days the business is closed in the window (no classes; usually a holiday).
+         */
+        get: operations["client_closed_days"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1837,6 +1901,37 @@ export interface components {
             first_name?: string | null;
             /** Status */
             status?: ("active" | "inactive" | "lead") | null;
+        };
+        /** ClosedDay */
+        ClosedDay: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Reason */
+            reason: string | null;
+        };
+        /** ClosedDayCreate */
+        ClosedDayCreate: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** ClosedDayCreated */
+        ClosedDayCreated: {
+            closed_day: components["schemas"]["ClosedDay"];
+            /** Cancelled Sessions */
+            cancelled_sessions: number;
         };
         /** Conversation */
         Conversation: {
@@ -3581,6 +3676,10 @@ export interface operations {
             query?: {
                 search?: string | null;
                 status?: ("active" | "inactive" | "lead") | null;
+                /** @description valid: holds a plan valid today; none: doesn't */
+                plan?: ("valid" | "none") | null;
+                /** @description No check-in in this many days */
+                absent_days?: number | null;
                 limit?: number;
                 offset?: number;
             };
@@ -4537,6 +4636,8 @@ export interface operations {
                 /** @description First local date (business time zone) */
                 start: string;
                 days?: number;
+                /** @description Only sessions the user teaches */
+                mine?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -4768,6 +4869,105 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["WeekCopied"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_closed_days: {
+        parameters: {
+            query?: {
+                start?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDay"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_day: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClosedDayCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDayCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_day: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                closed_day_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -6026,6 +6226,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_closed_days: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDay"][];
                 };
             };
             /** @description Validation Error */

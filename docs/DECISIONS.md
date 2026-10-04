@@ -76,6 +76,7 @@ When a decision changes, update the row and note the date — do not delete hist
 | T48 | Class reminders (and plan-ending reminders, 3 days before a client's last valid plan ends with nothing bought after it, once per plan): a daily morning job notifies each client booked into a class later that day (business-local date), once per booking (`bookings.reminded_at`); it shows in the app's Updates and goes out by email when email is on. Staff invitation emails are deferred: the invitation token is stored only as a hash, and the email job runs outside the API, so they will come with a worker that sends right when the invitation is created. | DECIDED (2026-10-04, delegated) |
 | T49 | Clients edit their own first name, last name and phone in the client app (per business). Because clients share the API's database role with staff, the change goes through `app.update_my_profile` (SECURITY DEFINER), which touches only those fields of the caller's own, non-erased client record. Email stays the sign-in identity and is not editable here. | DECIDED (2026-10-04, delegated) |
 | T50 | Audited support access: only the owner can let platform support in, for 24 hours at a time (revocable). While a grant is active, a platform admin's requests resolve `app.current_tenant_id()` for that business (so its row policies apply); the API gives them the read-only `support` role (clients, catalog, schedule, reports, team: read), switches each such transaction to READ ONLY at the database level after writing a `support.view` audit entry (path and the admin's email), and the owner sees those visits in Settings. Support can never manage grants, settings or the assistant. Platform admins see open grants in the console and enter a business from there, with a "support mode" banner. | DECIDED (2026-10-04, delegated) |
+| T51 | Closed days (holidays): staff with `schedule.write` close a business-local date with an optional reason. Closing cancels that day's scheduled sessions (booked clients of upcoming sessions get a "class cancelled" notification), and weekly series, both when created and when the daily job extends them, skip closed days. Reopening only removes the mark; cancelled sessions stay cancelled. The client app marks closed days in its schedule, with the reason. | DECIDED (2026-10-04, delegated) |
 
 ## Process
 
@@ -83,6 +84,7 @@ When a decision changes, update the row and note the date — do not delete hist
 |---|---|---|
 | X1 | Prototype first: pricing details are not a blocker. Build the prototype on the decisions above and revisit pricing when the product is more mature. | DECIDED (2026-10-03) |
 | X2 | Owner delegates day-to-day technical and product choices to Claude; significant changes are still proposed and logged here. | DECIDED (2026-10-03) |
+| X3 | Claude opens and merges its own pull requests once CI is green (owner's standing permission); the owner reviews the result on staging and sends fixes. | DECIDED (2026-10-04) |
 
 ## Open
 

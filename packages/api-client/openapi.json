@@ -312,6 +312,48 @@
             }
           },
           {
+            "name": "plan",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "valid",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "valid: holds a plan valid today; none: doesn't",
+              "title": "Plan"
+            },
+            "description": "valid: holds a plan valid today; none: doesn't"
+          },
+          {
+            "name": "absent_days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 365,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "No check-in in this many days",
+              "title": "Absent Days"
+            },
+            "description": "No check-in in this many days"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -1969,6 +2011,18 @@
             }
           },
           {
+            "name": "mine",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Only sessions the user teaches",
+              "default": false,
+              "title": "Mine"
+            },
+            "description": "Only sessions the user teaches"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -2371,6 +2425,185 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/closed-days": {
+      "get": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "List Closed Days",
+        "description": "Closed days from `start` (default: today, local) on.",
+        "operationId": "list_closed_days",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClosedDay"
+                  },
+                  "title": "Response List Closed Days"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Close Day",
+        "description": "Marks a day closed and cancels its scheduled sessions; booked clients are told.",
+        "operationId": "close_day",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClosedDayCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClosedDayCreated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/closed-days/{closed_day_id}": {
+      "delete": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Reopen Day",
+        "description": "Opens the day again for new sessions; sessions cancelled when it closed stay cancelled.",
+        "operationId": "reopen_day",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "closed_day_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Closed Day Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -4683,6 +4916,83 @@
         }
       }
     },
+    "/client/closed-days": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Client Closed Days",
+        "description": "Days the business is closed in the window (no classes; usually a holiday).",
+        "operationId": "client_closed_days",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date (business time zone)",
+              "title": "Start"
+            },
+            "description": "First local date (business time zone)"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 14,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClosedDay"
+                  },
+                  "title": "Response Client Closed Days"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/sessions/{session_id}/bookings": {
       "post": {
         "tags": [
@@ -6946,6 +7256,81 @@
         },
         "type": "object",
         "title": "ClientUpdate"
+      },
+      "ClosedDay": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "day",
+          "reason"
+        ],
+        "title": "ClosedDay"
+      },
+      "ClosedDayCreate": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day"
+        ],
+        "title": "ClosedDayCreate"
+      },
+      "ClosedDayCreated": {
+        "properties": {
+          "closed_day": {
+            "$ref": "#/components/schemas/ClosedDay"
+          },
+          "cancelled_sessions": {
+            "type": "integer",
+            "title": "Cancelled Sessions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "closed_day",
+          "cancelled_sessions"
+        ],
+        "title": "ClosedDayCreated"
       },
       "Conversation": {
         "properties": {

@@ -149,7 +149,8 @@
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
-    "weekOf": "Week of"
+    "weekOf": "Week of",
+    "myClassesToday": "{count, plural, one {Your class today} other {Your # classes today}}"
   },
   "roles": {
     "owner": "Owner",
@@ -223,7 +224,16 @@
       "website": "Website",
       "app": "Joined in the app",
       "other": "Other"
-    }
+    },
+    "planFilter": "Plan",
+    "planAny": "Any",
+    "plans": {
+      "valid": "Has a valid plan",
+      "none": "No valid plan"
+    },
+    "absentFilter": "Last visit",
+    "absentAny": "Any time",
+    "absentDays": "Not in {days} days"
   },
   "common": {
     "save": "Save",
@@ -384,7 +394,23 @@
     "copyWeek": "Copy week to next week",
     "copyWeekHint": "Copies this week's one-off classes. Weekly series repeat on their own.",
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
-    "copyWeekError": "Couldn't copy the week. Try again."
+    "copyWeekError": "Couldn't copy the week. Try again.",
+    "closedDays": "Closed days",
+    "closedDay": "Closed",
+    "closeDay": "Close a day",
+    "closedDate": "Date",
+    "closedReason": "Reason (optional)",
+    "closedReasonHint": "For example: Rosh Hashanah",
+    "closedHint": "Classes that day are cancelled and booked clients are told. Weekly series won't add classes on this day.",
+    "closedDone": "{count, plural, =0 {Day closed. There were no classes that day.} one {Day closed. # class was cancelled.} other {Day closed. # classes were cancelled.}}",
+    "upcomingClosed": "Upcoming closed days",
+    "noClosedDays": "No closed days ahead.",
+    "reopenDay": "Reopen",
+    "closedErrors": {
+      "already_closed": "This day is already closed.",
+      "invalid": "Please choose a date.",
+      "generic": "Something went wrong. Try again."
+    }
   },
   "bookings": {
     "title": "Bookings",
@@ -474,7 +500,10 @@
     "schedule": {
       "title": "Schedule",
       "today": "Today",
-      "empty": "No classes on this day."
+      "empty": "No classes on this day.",
+      "closed": "The studio is closed on this day.",
+      "closedReason": "The studio is closed on this day ({reason}).",
+      "closedShort": "Closed"
     },
     "bookings": {
       "title": "My bookings",

@@ -45,6 +45,12 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
         target = local_today + timedelta(days=HORIZON_DAYS)
         if row["ends_on"] >= target:
             continue
+        closed = set(
+            conn.execute(
+                text("SELECT day FROM app.closed_days WHERE tenant_id = :t AND day > :after"),
+                {"t": row["tenant_id"], "after": row["ends_on"]},
+            ).scalars()
+        )
         starts = list(
             weekly_occurrences(
                 row["ends_on"] + timedelta(days=1),
@@ -52,6 +58,7 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
                 set(row["weekdays"]),
                 row["start_time"],
                 row["time_zone"],
+                skip=closed,
             )
         )
         if starts:

@@ -149,7 +149,8 @@
     "weeklyRevenue": "הכנסות לפי שבוע",
     "weeklyAttendance": "הגעות לפי שבוע",
     "showTable": "הצגה כטבלה",
-    "weekOf": "שבוע של"
+    "weekOf": "שבוע של",
+    "myClassesToday": "{count, plural, one {השיעור שלך היום} other {# השיעורים שלך היום}}"
   },
   "roles": {
     "owner": "בעלים",
@@ -223,7 +224,16 @@
       "website": "אתר",
       "app": "הצטרף/ה באפליקציה",
       "other": "אחר"
-    }
+    },
+    "planFilter": "מנוי",
+    "planAny": "הכל",
+    "plans": {
+      "valid": "עם מנוי בתוקף",
+      "none": "בלי מנוי בתוקף"
+    },
+    "absentFilter": "ביקור אחרון",
+    "absentAny": "בכל זמן",
+    "absentDays": "לא הגיעו {days} ימים"
   },
   "common": {
     "save": "שמירה",
@@ -384,7 +394,23 @@
     "copyWeek": "העתקת השבוע לשבוע הבא",
     "copyWeekHint": "מעתיק את השיעורים החד-פעמיים של השבוע. סדרות שבועיות חוזרות מעצמן.",
     "copyWeekDone": "{created, plural, =0 {אין שיעורים חדשים להעתקה} one {הועתק שיעור אחד} other {הועתקו # שיעורים}}{skipped, plural, =0 {} one { (אחד כבר קיים)} other { (# כבר קיימים)}}.",
-    "copyWeekError": "לא הצלחנו להעתיק את השבוע. נסו שוב."
+    "copyWeekError": "לא הצלחנו להעתיק את השבוע. נסו שוב.",
+    "closedDays": "ימים סגורים",
+    "closedDay": "סגור",
+    "closeDay": "סגירת יום",
+    "closedDate": "תאריך",
+    "closedReason": "סיבה (לא חובה)",
+    "closedReasonHint": "לדוגמה: ראש השנה",
+    "closedHint": "השיעורים באותו יום יבוטלו, והרשומים יקבלו עדכון. סדרות שבועיות לא יוסיפו שיעורים ביום הזה.",
+    "closedDone": "{count, plural, =0 {היום נסגר. לא היו שיעורים באותו יום.} one {היום נסגר. בוטל שיעור אחד.} other {היום נסגר. בוטלו # שיעורים.}}",
+    "upcomingClosed": "ימים סגורים קרובים",
+    "noClosedDays": "אין ימים סגורים קרובים.",
+    "reopenDay": "פתיחה מחדש",
+    "closedErrors": {
+      "already_closed": "היום הזה כבר סגור.",
+      "invalid": "יש לבחור תאריך.",
+      "generic": "משהו השתבש. נסו שוב."
+    }
   },
   "bookings": {
     "title": "הרשמות",
@@ -474,7 +500,10 @@
     "schedule": {
       "title": "מערכת שעות",
       "today": "היום",
-      "empty": "אין שיעורים ביום הזה."
+      "empty": "אין שיעורים ביום הזה.",
+      "closed": "הסטודיו סגור ביום הזה.",
+      "closedReason": "הסטודיו סגור ביום הזה ({reason}).",
+      "closedShort": "סגור"
     },
     "bookings": {
       "title": "ההרשמות שלי",

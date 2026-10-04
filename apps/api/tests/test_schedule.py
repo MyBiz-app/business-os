@@ -1,9 +1,10 @@
+from datetime import timedelta
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
-from tests.conftest import AuthHeaders, add_member
+from tests.conftest import AuthHeaders, add_member, local_today
 from tests.test_tenants import STUDIO
 
 
@@ -197,3 +198,27 @@ def test_options_for_the_session_form(
     ]
     assert len(options["instructors"]) == 3  # owner, coach, front desk
     assert staff_view.status_code == 403
+
+
+def test_instructors_list_only_their_sessions(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    day = (local_today() + timedelta(days=3)).isoformat()
+    for instructor in (str(studio["coach"]), None):
+        client.post(
+            "/sessions",
+            json={
+                "service_id": studio["service"]["id"],
+                "date": day,
+                "start_time": "18:00" if instructor else "19:00",
+                "instructor_user_id": instructor,
+            },
+            headers=studio["headers"],
+        )
+    coach = auth(studio["coach"], studio["tenant_id"])
+
+    mine = client.get("/sessions", params={"start": day, "days": 1, "mine": True}, headers=coach)
+    everything = client.get("/sessions", params={"start": day, "days": 1}, headers=coach)
+
+    assert [s["instructor_user_id"] for s in mine.json()] == [str(studio["coach"])]
+    assert len(everything.json()) == 2

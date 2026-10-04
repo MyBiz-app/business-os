@@ -317,3 +317,51 @@ def test_clients_hear_once_when_their_last_plan_ends_soon(
     [(client_id, payload)] = notified
     assert client_id == ending
     assert payload["ends_on"] == (local_today() + timedelta(days=2)).isoformat()
+
+
+def test_closed_day_cancels_its_sessions_and_series_skip_it(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    series = create_series(client, studio)
+    first = client.get(f"/sessions/{series['session_ids'][1]}", headers=studio["headers"]).json()
+    closed = datetime.fromisoformat(first["starts_at"]).astimezone(ZoneInfo("Asia/Jerusalem"))
+    booked = new_client(client, studio["headers"], "Dana")
+    book(client, studio["headers"], first["id"], booked)
+
+    response = client.post(
+        "/closed-days",
+        json={"day": closed.date().isoformat(), "reason": "Holiday"},
+        headers=studio["headers"],
+    )
+    again = client.post(
+        "/closed-days", json={"day": closed.date().isoformat()}, headers=studio["headers"]
+    )
+
+    assert response.status_code == 201, response.text
+    assert response.json()["cancelled_sessions"] == 1
+    assert again.status_code == 409
+    session = client.get(f"/sessions/{first['id']}", headers=studio["headers"]).json()
+    assert session["status"] == "cancelled"
+    with engine.connect() as connection:
+        kinds = connection.execute(text("SELECT kind FROM app.notifications")).scalars().all()
+    assert "session_cancelled" in kinds  # Dana was booked
+    listed = client.get("/closed-days", headers=studio["headers"]).json()
+    assert [d["reason"] for d in listed] == ["Holiday"]
+
+    # A closed day far ahead: the daily job doesn't create a session on it.
+    far = local_today() + timedelta(days=HORIZON_DAYS + 14)
+    while far.weekday() not in (0, 3):
+        far += timedelta(days=1)
+    client.post("/closed-days", json={"day": far.isoformat()}, headers=studio["headers"])
+    with engine.begin() as connection:
+        extend_series(connection, datetime.now(UTC) + timedelta(days=28))
+    on_far = client.get(
+        "/sessions", params={"start": far.isoformat(), "days": 1}, headers=studio["headers"]
+    ).json()
+    assert on_far == []
+
+
+def test_closing_days_needs_schedule_write(client: TestClient, studio: dict, auth) -> None:
+    coach = auth(studio["coach"], studio["tenant_id"])
+    response = client.post("/closed-days", json={"day": local_today().isoformat()}, headers=coach)
+    assert response.status_code == 403

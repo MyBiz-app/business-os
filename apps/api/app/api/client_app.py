@@ -26,7 +26,7 @@ from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionD
 from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
-from app.api.schedule import ServiceSummary
+from app.api.schedule import ClosedDay, ServiceSummary
 from app.scheduling import local_to_utc
 
 public_router = APIRouter(tags=["client"])
@@ -245,6 +245,23 @@ def client_sessions(
         {"from": window_start, "to": window_end},
     ).mappings()
     return [_to_session(row) for row in rows]
+
+
+@router.get("/closed-days")
+def client_closed_days(
+    context: ClientDep,
+    start: Annotated[dt.date, Query(description="First local date (business time zone)")],
+    days: Annotated[int, Query(ge=1, le=14)] = 7,
+) -> list[ClosedDay]:
+    """Days the business is closed in the window (no classes; usually a holiday)."""
+    rows = context.session.execute(
+        text("""
+            SELECT id, day, reason FROM app.closed_days
+            WHERE day >= :start AND day < :end ORDER BY day
+        """),
+        {"start": start, "end": start + timedelta(days=days)},
+    ).mappings()
+    return [ClosedDay.model_validate(dict(row)) for row in rows]
 
 
 def _ensure_upcoming(context: ClientContext, session_id: UUID) -> None:
