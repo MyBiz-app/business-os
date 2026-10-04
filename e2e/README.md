@@ -23,7 +23,7 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `roles.py` checks custom roles through the UI (create a role, assign it, access changes, in-use role is protected). Run it the same way, without arguments, against the normal API.
 
-`series.py` creates an open-ended weekly series and stops it from one of its sessions.
+`series.py` creates an open-ended weekly series, changes its time from one session on, stops it, and copies a week's one-off class to the next week.
 
 `health.py` walks the health declaration: booking blocked without one, a "yes" waits for the studio, the studio approves on the client profile, then the member books. Run it like `roles.py`.
 

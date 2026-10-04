@@ -489,6 +489,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/series/{series_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Series
+         * @description Changes time, length, capacity, place, instructor and notes of this and all later
+         *     sessions of a series; new occurrences the daily job adds follow the new settings.
+         *     Bookings stay; booked clients are told when the time changes.
+         */
+        patch: operations["update_series"];
+        trace?: never;
+    };
+    "/sessions/copy-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Week
+         * @description Copies the one-off sessions of a week (7 days from from_date) to another week, at the
+         *     same local weekday and time. Weekly series are left out: they repeat on their own.
+         */
+        post: operations["copy_week"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/bookings": {
         parameters: {
             query?: never;
@@ -2712,6 +2755,40 @@ export interface components {
              */
             kept: number;
         };
+        /** SeriesUpdate */
+        SeriesUpdate: {
+            /** Location Id */
+            location_id?: string | null;
+            /** Room Id */
+            room_id?: string | null;
+            /** Instructor User Id */
+            instructor_user_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * From Date
+             * Format: date
+             * @description Local date of the first session to change
+             */
+            from_date: string;
+            /**
+             * Start Time
+             * Format: time
+             */
+            start_time: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Capacity */
+            capacity: number;
+        };
+        /** SeriesUpdated */
+        SeriesUpdated: {
+            /**
+             * Updated
+             * @description Sessions changed (scheduled, on or after from_date)
+             */
+            updated: number;
+        };
         /** Service */
         Service: {
             /**
@@ -3045,6 +3122,31 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WeekCopied */
+        WeekCopied: {
+            /** Created */
+            created: number;
+            /**
+             * Skipped
+             * @description Already in the target week (same class and time)
+             */
+            skipped: number;
+        };
+        /** WeekCopy */
+        WeekCopy: {
+            /**
+             * From Date
+             * Format: date
+             * @description First local date of the week to copy
+             */
+            from_date: string;
+            /**
+             * To Date
+             * Format: date
+             * @description First local date of the target week
+             */
+            to_date: string;
         };
     };
     responses: never;
@@ -4348,6 +4450,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SeriesEnded"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesUpdated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_week: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WeekCopy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekCopied"];
                 };
             };
             /** @description Validation Error */

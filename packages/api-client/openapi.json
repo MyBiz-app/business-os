@@ -2257,6 +2257,134 @@
         }
       }
     },
+    "/series/{series_id}": {
+      "patch": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Update Series",
+        "description": "Changes time, length, capacity, place, instructor and notes of this and all later\nsessions of a series; new occurrences the daily job adds follow the new settings.\nBookings stay; booked clients are told when the time changes.",
+        "operationId": "update_series",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Series Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesUpdated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/copy-week": {
+      "post": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Copy Week",
+        "description": "Copies the one-off sessions of a week (7 days from from_date) to another week, at the\nsame local weekday and time. Weekly series are left out: they repeat on their own.",
+        "operationId": "copy_week",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeekCopy"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekCopied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/bookings": {
       "get": {
         "tags": [
@@ -9105,6 +9233,103 @@
         ],
         "title": "SeriesEnded"
       },
+      "SeriesUpdate": {
+        "properties": {
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id"
+          },
+          "instructor_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor User Id"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "from_date": {
+            "type": "string",
+            "format": "date",
+            "title": "From Date",
+            "description": "Local date of the first session to change"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Start Time"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "maximum": 1440.0,
+            "minimum": 5.0,
+            "title": "Duration Minutes"
+          },
+          "capacity": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Capacity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_date",
+          "start_time",
+          "duration_minutes",
+          "capacity"
+        ],
+        "title": "SeriesUpdate"
+      },
+      "SeriesUpdated": {
+        "properties": {
+          "updated": {
+            "type": "integer",
+            "title": "Updated",
+            "description": "Sessions changed (scheduled, on or after from_date)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "updated"
+        ],
+        "title": "SeriesUpdated"
+      },
       "Service": {
         "properties": {
           "id": {
@@ -10119,6 +10344,47 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WeekCopied": {
+        "properties": {
+          "created": {
+            "type": "integer",
+            "title": "Created"
+          },
+          "skipped": {
+            "type": "integer",
+            "title": "Skipped",
+            "description": "Already in the target week (same class and time)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "created",
+          "skipped"
+        ],
+        "title": "WeekCopied"
+      },
+      "WeekCopy": {
+        "properties": {
+          "from_date": {
+            "type": "string",
+            "format": "date",
+            "title": "From Date",
+            "description": "First local date of the week to copy"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date",
+            "title": "To Date",
+            "description": "First local date of the target week"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_date",
+          "to_date"
+        ],
+        "title": "WeekCopy"
       }
     },
     "securitySchemes": {

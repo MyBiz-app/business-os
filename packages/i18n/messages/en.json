@@ -375,7 +375,13 @@
     "waitlisted": "{count} on waitlist",
     "seriesOpen": "It keeps repeating; new weeks are added automatically.",
     "endSeries": "Stop repeating after this session",
-    "seriesEnded": "Repeating stopped. {cancelled, plural, one {# later session was} other {# later sessions were}} cancelled{kept, plural, =0 {.} one { and # was kept because clients are booked: handle it yourself.} other { and # were kept because clients are booked: handle them yourself.}}"
+    "seriesEnded": "Repeating stopped. {cancelled, plural, one {# later session was} other {# later sessions were}} cancelled{kept, plural, =0 {.} one { and # was kept because clients are booked: handle it yourself.} other { and # were kept because clients are booked: handle them yourself.}}",
+    "applyToSeries": "Apply to this and all following classes in the series",
+    "applyToSeriesHint": "Time, length, capacity, place, instructor and notes change from this date on. Booked clients are told about a new time.",
+    "copyWeek": "Copy week to next week",
+    "copyWeekHint": "Copies this week's one-off classes. Weekly series repeat on their own.",
+    "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
+    "copyWeekError": "Couldn't copy the week. Try again."
   },
   "bookings": {
     "title": "Bookings",
