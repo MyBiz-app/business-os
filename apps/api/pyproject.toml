@@ -8,6 +8,7 @@ dependencies = [
     "anthropic>=1.11.0",
     "email-validator>=2.3.0",
     "fastapi>=0.142.2",
+    "openpyxl>=3.1.5",
     "psycopg[binary]>=3.3.6",
     "pydantic-settings>=2.15.0",
     "pyjwt[crypto]>=2.15.1",

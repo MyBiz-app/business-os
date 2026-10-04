@@ -753,5 +753,59 @@
     "note": "Note (optional)",
     "approve": "Approve",
     "reject": "Don't approve"
+  },
+  "clientImport": {
+    "button": "Import from file",
+    "title": "Import clients",
+    "intro": "Bring your client list from a spreadsheet or another system. You'll see a preview before anything is saved.",
+    "file": "CSV or Excel file",
+    "fileHint": "Up to 5,000 rows and 2 MB. The first row should hold the column names (Hebrew or English).",
+    "working": "Reading the file…",
+    "columns": "Columns",
+    "columnsHint": "We matched the columns we recognized. Change any that are wrong; columns set to \"Don't import\" are left out.",
+    "noHeader": "Column {number}",
+    "example": "For example: {value}",
+    "fieldFor": "Field for column {column}",
+    "ignore": "Don't import",
+    "fields": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "full_name": "Full name (first and last)",
+      "email": "Email",
+      "phone": "Phone",
+      "date_of_birth": "Date of birth",
+      "notes": "Notes",
+      "status": "Status"
+    },
+    "preview": "Preview",
+    "rows": "{count, plural, one {# row} other {# rows}} in the file",
+    "ready": "{count, plural, =0 {No new clients} one {# new client} other {# new clients}}",
+    "duplicates": "{count, plural, =0 {No duplicates} one {# already exists} other {# already exist}}",
+    "invalid": "{count, plural, =0 {No problems} one {# row with a problem} other {# rows with problems}}",
+    "sample": "First new clients",
+    "issues": "Rows that won't be imported",
+    "issue": "Row {line}: {problem}",
+    "problems": {
+      "missing_name": "no name",
+      "invalid_email": "the email address isn't valid",
+      "invalid_date": "the date of birth isn't a valid date",
+      "invalid_status": "unknown status (use active, inactive or lead)",
+      "duplicate": "already exists (same email, phone or name)"
+    },
+    "source": "Where these clients came from (optional)",
+    "sourceNone": "Not specified",
+    "import": "{count, plural, =0 {Nothing to import} one {Import # client} other {Import # clients}}",
+    "done": "{count, plural, one {# client imported.} other {# clients imported.}}",
+    "doneSkipped": "{count, plural, one {# row was skipped.} other {# rows were skipped.}}",
+    "errors": {
+      "file_too_large": "The file is larger than 2 MB.",
+      "empty_file": "The file has no rows to import.",
+      "too_many_rows": "The file has more than 5,000 rows. Split it and import each part.",
+      "unreadable_file": "We couldn't read this file. Save it as CSV (UTF-8) or Excel (.xlsx) and try again.",
+      "email_taken": "Someone added one of these clients meanwhile. Preview again and import.",
+      "generic": "Something went wrong. Try again."
+    },
+    "viewClients": "See the client list",
+    "importMore": "Import another file"
   }
 }

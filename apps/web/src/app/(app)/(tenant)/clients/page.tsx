@@ -52,6 +52,11 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
             </Link>
           )}
           {canWriteClients(tenant) && (
+            <Link href="/clients/import" className="rounded-lg border border-border px-4 py-2.5 font-semibold">
+              {t("clientImport.button")}
+            </Link>
+          )}
+          {canWriteClients(tenant) && (
             <Link
               href="/clients/new"
               className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary"

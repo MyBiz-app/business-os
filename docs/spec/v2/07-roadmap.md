@@ -29,6 +29,11 @@ in Hebrew and English, light and dark. Sprint length is flexible (owner capacity
 Payment provider, invoicing provider, real email, data import, health declaration + signature,
 production hardening (backups, monitoring, security review, legal docs).
 
+- [x] Health declaration with typed signature, yearly validity, staff review of any "yes" (T39)
+- [x] Client import from CSV / Excel with column mapping and preview (T40)
+- [ ] Payment provider (O1), invoicing provider (O2), real email provider
+- [ ] Production hardening: backups, monitoring, security review, privacy policy and terms
+
 ## Phase 3+ — Pilot → 10 businesses → modules → AI Workforce → scale
 
 As in spec v1 §26: pilot with 1–3 businesses, platform billing, CRM, WhatsApp, finance, marketing,

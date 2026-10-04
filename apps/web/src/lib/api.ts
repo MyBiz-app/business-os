@@ -53,6 +53,15 @@ export async function apiUpload(path: string, file: File, tenantId: string): Pro
   });
 }
 
+/** A raw API request as the signed-in user, for bodies the typed client can't send (files). */
+export async function apiFetch(path: string, init: RequestInit, tenantId: string): Promise<Response> {
+  return fetch(`${API_URL}${path}`, {
+    ...init,
+    headers: { ...(await authHeaders()), "X-Tenant-Id": tenantId },
+    cache: "no-store",
+  });
+}
+
 /** A typed API client that calls the backend as the signed-in user. */
 export async function getApi(): Promise<ApiClient> {
   const headers = await authHeaders();

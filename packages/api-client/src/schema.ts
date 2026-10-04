@@ -73,6 +73,23 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/clients/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Clients */
+        post: operations["import_clients"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients": {
         parameters: {
             query?: never;
@@ -1121,6 +1138,24 @@ export interface components {
             /** Answer */
             answer: boolean;
         };
+        /** Body_import_clients */
+        Body_import_clients: {
+            /** File */
+            file: string;
+            /**
+             * Mapping
+             * @description JSON list: a field (or null) per column
+             */
+            mapping?: string | null;
+            /**
+             * Commit
+             * @description false: preview only
+             * @default false
+             */
+            commit: boolean;
+            /** Source */
+            source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+        };
         /** Body_upload_logo */
         Body_upload_logo: {
             /** File */
@@ -1735,6 +1770,73 @@ export interface components {
             status: string;
             /** Environment */
             environment: string;
+        };
+        /** ImportIssue */
+        ImportIssue: {
+            /**
+             * Line
+             * @description Row number in the file (the header is row 1)
+             */
+            line: number;
+            /** Field */
+            field: string | null;
+            /**
+             * Code
+             * @enum {string}
+             */
+            code: "missing_name" | "invalid_email" | "invalid_date" | "invalid_status" | "duplicate";
+        };
+        /** ImportResult */
+        ImportResult: {
+            /**
+             * Columns
+             * @description Header of each column in the file
+             */
+            columns: string[];
+            /**
+             * Mapping
+             * @description Field for each column, if any
+             */
+            mapping: (("first_name" | "last_name" | "full_name" | "email" | "phone" | "date_of_birth" | "notes" | "status") | null)[];
+            /**
+             * Examples
+             * @description First non-empty value of each column
+             */
+            examples: string[];
+            /** Rows */
+            rows: number;
+            /**
+             * Ready
+             * @description New clients the import adds (or added)
+             */
+            ready: number;
+            /** Duplicates */
+            duplicates: number;
+            /** Invalid */
+            invalid: number;
+            /** Imported */
+            imported: boolean;
+            /**
+             * Issues
+             * @description The first 50 problems
+             */
+            issues: components["schemas"]["ImportIssue"][];
+            /**
+             * Sample
+             * @description The first new clients
+             */
+            sample: components["schemas"]["ImportedClient"][];
+        };
+        /** ImportedClient */
+        ImportedClient: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
         };
         /** InstructorOption */
         InstructorOption: {
@@ -2862,6 +2964,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_clients: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_clients"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportResult"];
                 };
             };
             /** @description Validation Error */
