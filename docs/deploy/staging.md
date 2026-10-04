@@ -6,6 +6,7 @@
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|
 | Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main` (previews for every PR) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json) |
+| Client app on the web (`apps/mobile`) | Vercel, static site | `main` | [`apps/mobile/vercel.json`](../../apps/mobile/vercel.json), [`apps/mobile/README.md`](../../apps/mobile/README.md) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | — | Supabase dashboard |
 | Migrations | GitHub Actions | `main` (when migrations change) or by hand | [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
@@ -29,6 +30,9 @@ up to about a minute.
 | Vercel | `NEXT_PUBLIC_SUPABASE_KEY` | Supabase **publishable** key |
 | Vercel | `NEXT_PUBLIC_API_URL` | Render service URL, e.g. `https://business-os-api-staging.onrender.com` |
 | Vercel | `ENABLE_EXPERIMENTAL_COREPACK` | `1` (use the pnpm version pinned in `package.json`) |
+| Vercel (web) | `NEXT_PUBLIC_CLIENT_APP_URL` | Optional: the client app's web address; the QR join page then offers "open in the browser" |
+| Vercel (client app project) | `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` | Same values as the web's API URL, Supabase URL and publishable key |
+| Render → service → Environment | `API_CORS_ORIGINS` | `["https://<client app address>"]`: the browser app calls the API directly |
 
 Use the session pooler (IPv4, supports `SET LOCAL ROLE`), not the direct connection (IPv6
 only) and not the transaction pooler (port 6543).

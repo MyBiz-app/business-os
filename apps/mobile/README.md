@@ -26,3 +26,15 @@ EXPO_PUBLIC_SUPABASE_KEY=<the project's publishable / anon key>
 These are public client values (the same ones the website uses), not secrets.
 The staging Supabase project's "Magic link" and "Confirm signup" email templates must include
 `{{ .Token }}` so emails contain the code (see `supabase/templates/`).
+
+## Publish as a web app (staging)
+
+The same app runs in a phone's browser, so people can try it without installing anything.
+It is a static site (`expo export -p web`), deployed by a second Vercel project:
+
+1. Vercel → *Add New → Project* → this repository, **Root Directory** `apps/mobile`
+   (build settings come from [`vercel.json`](vercel.json)).
+2. Environment variables: `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`,
+   `EXPO_PUBLIC_SUPABASE_KEY` (the staging values above) and `ENABLE_EXPERIMENTAL_COREPACK=1`.
+3. Deploy, then allow the app's address on the API: Render → service → Environment →
+   `API_CORS_ORIGINS` = `["https://<the app's vercel address>"]`.

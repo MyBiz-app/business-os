@@ -51,13 +51,13 @@ with sync_playwright() as p:
             JOIN app.users u ON u.id = m.user_id WHERE u.email = %s
         """, (owner_email,)).fetchone()[0]
     member = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, has_touch=True).new_page()
-    member.goto(h.APP); member.wait_for_url("**/sign-in", timeout=60000)
+    # The member opens the studio's join link before signing in: sign-in first, then the
+    # join screen already knows the code.
+    member.goto(f"{h.APP}/join?code={code}"); member.wait_for_url("**/sign-in**", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
     member.get_by_label("קוד בן 6 ספרות").fill(h.otp(member_email))
-    member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join")
-    member.get_by_label("קוד הצטרפות").fill(code)
-    member.get_by_role("button", name="המשך").click()
+    member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join**")
     member.get_by_role("button", name="הצטרפות לסטודיו עדכונים").click(); member.wait_for_url("**/home")
     member.goto(f"{h.APP}/updates")
     expect(member.get_by_text("אין עדכונים עדיין")).to_be_visible(timeout=30000)

@@ -646,7 +646,8 @@
     "step3": "Enter the join code above.",
     "title": "Join {name}",
     "body": "Book classes, join waitlists and manage your bookings in the app.",
-    "openApp": "Open in the app"
+    "openApp": "Open in the app",
+    "openInBrowser": "Open in the browser, no install"
   },
   "plans": {
     "title": "Plans",

@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text } from "react-native";
 import { useTranslations } from "use-intl";
@@ -13,6 +13,8 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export default function SignIn() {
   const t = useTranslations("client.signIn");
   const { palette } = useTheme();
+  // Set when a join link sent the user here first.
+  const { code: joinCode } = useLocalSearchParams<{ code?: string }>();
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export default function SignIn() {
     const { error: failed } = await supabase.auth.verifyOtp({ email: sentTo, token: code.trim(), type: "email" });
     setBusy(false);
     if (failed) return setError(t("invalidCode"));
-    router.replace("/");
+    router.replace(joinCode ? { pathname: "/join", params: { code: joinCode } } : "/");
   };
 
   return (
