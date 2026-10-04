@@ -44,7 +44,13 @@ export default function Profile() {
           <Text style={[styles.h2, { color: palette.foreground }]}>{t("client.health.title")}</Text>
           <Text style={[styles.muted, { color: palette.muted }]}>{t(`health.states.${health.state}`)}</Text>
           <Button
-            label={health.state === "ok" ? t("client.health.view") : t("client.health.fill")}
+            label={
+              health.state === "ok"
+                ? t("client.health.view")
+                : health.state === "expiring"
+                  ? t("client.health.update")
+                  : t("client.health.fill")
+            }
             variant={health.state === "ok" ? "secondary" : "primary"}
             palette={palette}
             onPress={() => router.push("/health")}

@@ -4958,6 +4958,7 @@
               "expired",
               "needs_review",
               "rejected",
+              "expiring",
               "ok"
             ],
             "title": "Health State",
@@ -5602,6 +5603,7 @@
               "expired",
               "needs_review",
               "rejected",
+              "expiring",
               "ok"
             ],
             "title": "State"
@@ -7233,6 +7235,7 @@
               "expired",
               "needs_review",
               "rejected",
+              "expiring",
               "ok"
             ],
             "title": "State"

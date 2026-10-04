@@ -198,3 +198,22 @@ def test_review_needs_clients_write(
 
     assert as_coach.status_code == 403
     assert as_desk.status_code == 200
+
+
+def test_declaration_ending_soon_is_expiring_but_still_books(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
+) -> None:
+    _, headers = joined_with_plan(client, auth, studio)
+    sign_health(client, headers)
+    with engine.begin() as connection:
+        connection.execute(
+            text("UPDATE app.health_declarations SET valid_until = :d"),
+            {"d": local_today() + timedelta(days=10)},
+        )
+    session_id = new_session(client, studio)
+
+    assert client.get("/client/health-declaration", headers=headers).json()["state"] == "expiring"
+    assert book(client, headers, session_id).status_code == 201
+    roster = client.get(f"/sessions/{session_id}/bookings", headers=studio["headers"]).json()
+    assert roster[0]["health_state"] == "expiring"
+    assert sign_health(client, headers)["state"] == "ok"  # renewed

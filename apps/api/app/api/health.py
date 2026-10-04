@@ -2,7 +2,9 @@
 declarations that answered "yes" to any question.
 
 A client's current state comes from their latest declaration:
-missing (none), expired, needs_review, rejected, or ok (all "no", or approved by staff)."""
+missing (none), expired, needs_review, rejected, ok (all "no", or approved by staff), or
+expiring (ok, but ends within EXPIRING_DAYS: time to sign a new one). Clients may book while
+ok or expiring."""
 
 import json
 from datetime import date, datetime
@@ -25,16 +27,21 @@ client_router = APIRouter(prefix="/client", tags=["client"])
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
-HealthState = Literal["missing", "expired", "needs_review", "rejected", "ok"]
+HealthState = Literal["missing", "expired", "needs_review", "rejected", "expiring", "ok"]
+VALID_STATES = ("ok", "expiring")  # the client may book
+EXPIRING_DAYS = 30  # "expiring" this many days before the last valid date
 DeclarationStatus = Literal["valid", "needs_review", "approved", "rejected"]
 Locale = Literal["he", "en"]
 
 # The client's state from their latest declaration. Needs `c` (app.clients) and `t`
 # (app.tenants) in scope; "today" is the business's local date.
-HEALTH_STATE_SQL = """
+HEALTH_STATE_SQL = f"""
     coalesce((
         SELECT CASE
                    WHEN d.valid_until < (now() AT TIME ZONE t.time_zone)::date THEN 'expired'
+                   WHEN d.status IN ('valid', 'approved')
+                        AND d.valid_until < (now() AT TIME ZONE t.time_zone)::date + {EXPIRING_DAYS}
+                        THEN 'expiring'
                    WHEN d.status IN ('valid', 'approved') THEN 'ok'
                    ELSE d.status
                END
@@ -134,7 +141,7 @@ def ensure_may_book(db: Session, tenant_id: UUID, client_id: UUID) -> None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="health_declaration_review"
         )
-    if state != "ok":
+    if state not in VALID_STATES:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail="health_declaration_required"
         )

@@ -2,7 +2,7 @@ import { dayOf, todayIn } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useCallback } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
 import { Button, Card, Heading, Screen, styles } from "@/components/ui";
@@ -16,6 +16,9 @@ export default function Home() {
   const t = useTranslations("client.home");
   const tHealth = useTranslations("client.health");
   const health = useHealth();
+  const locale = useLocale();
+  const formatDay = (day: string) =>
+    new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
   const { api, scope, business, palette } = useBusiness();
 
   const load = useCallback(async () => {
@@ -51,10 +54,16 @@ export default function Home() {
           <Text style={[styles.muted, { color: palette.foreground }]}>
             {health.state === "needs_review" || health.state === "rejected"
               ? tHealth("reviewPending")
-              : tHealth("banner")}
+              : health.state === "expiring" && health.current
+                ? tHealth("expiringBanner", { date: formatDay(health.current.valid_until) })
+                : tHealth("banner")}
           </Text>
           {health.state !== "needs_review" && health.state !== "rejected" && (
-            <Button label={tHealth("fill")} palette={palette} onPress={() => router.push("/health")} />
+            <Button
+              label={health.state === "expiring" ? tHealth("update") : tHealth("fill")}
+              palette={palette}
+              onPress={() => router.push("/health")}
+            />
           )}
         </Card>
       )}

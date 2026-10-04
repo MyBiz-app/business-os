@@ -84,7 +84,9 @@ export default function Health() {
               ? t("reviewPending")
               : health.state === "rejected"
                 ? t("rejected")
-                : t("validUntil", { date: dateFormat.format(new Date(`${current.valid_until}T12:00:00Z`)) })}
+                : health.state === "expiring"
+                  ? t("expiringSoon", { date: dateFormat.format(new Date(`${current.valid_until}T12:00:00Z`)) })
+                  : t("validUntil", { date: dateFormat.format(new Date(`${current.valid_until}T12:00:00Z`)) })}
           </Text>
           {current.review_note && (
             <Text style={[styles.muted, { color: palette.foreground }]}>{tHealth("reviewNote", { note: current.review_note })}</Text>

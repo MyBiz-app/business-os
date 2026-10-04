@@ -524,7 +524,9 @@
       "back": "Back",
       "fill": "Fill in health declaration",
       "view": "View declaration",
-      "banner": "Before your first class, please fill in a short health declaration."
+      "banner": "Before your first class, please fill in a short health declaration.",
+      "expiringBanner": "Your health declaration ends on {date}. Please sign a new one so you can keep booking.",
+      "expiringSoon": "Valid until {date}. It ends soon, so please sign a new one."
     }
   },
   "join": {
@@ -738,7 +740,8 @@
       "needs_review": "Health declaration awaiting approval",
       "rejected": "Health declaration not approved",
       "expired": "Health declaration expired",
-      "missing": "No health declaration"
+      "missing": "No health declaration",
+      "expiring": "Health declaration expiring soon"
     },
     "missing": "The client hasn't signed a health declaration.",
     "missingRequired": "The client hasn't signed a health declaration yet, so they can't book in the app.",

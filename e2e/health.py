@@ -120,6 +120,18 @@ with sync_playwright() as p:
     member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
     expect(member.get_by_text("נרשמת")).to_be_visible()
     print("5. member books after approval: ok")
+
+    with psycopg.connect(h.DATABASE_URL) as conn:
+        conn.execute("""
+            UPDATE app.health_declarations d SET valid_until = current_date + 10
+            FROM app.clients c WHERE c.id = d.client_id AND c.email = %s
+        """, (member_email,))
+    member.goto(f"{h.APP}/home")
+    expect(member.get_by_text("הצהרת הבריאות שלך בתוקף עד")).to_be_visible(timeout=30000)
+    member.get_by_role("button", name="חתימה על הצהרה חדשה").click(); member.wait_for_url("**/health")
+    expect(member.get_by_text("התוקף מסתיים בקרוב")).to_be_visible()
+    member.screenshot(path=f"{h.OUT}/health-expiring.png", full_page=True)
+    print("6. expiring declaration: reminder on home, renew from there: ok")
     b.close()
 
 print("accessibility:", "ok" if not problems else "\n  " + "\n  ".join(problems))

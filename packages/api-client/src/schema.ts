@@ -1208,7 +1208,7 @@ export interface components {
              * @description The client's health declaration state
              * @enum {string}
              */
-            health_state: "missing" | "expired" | "needs_review" | "rejected" | "ok";
+            health_state: "missing" | "expired" | "needs_review" | "rejected" | "expiring" | "ok";
         };
         /** BookingCreate */
         BookingCreate: {
@@ -1424,7 +1424,7 @@ export interface components {
              * State
              * @enum {string}
              */
-            state: "missing" | "expired" | "needs_review" | "rejected" | "ok";
+            state: "missing" | "expired" | "needs_review" | "rejected" | "expiring" | "ok";
             /**
              * Declarations
              * @description Newest first
@@ -2071,7 +2071,7 @@ export interface components {
              * State
              * @enum {string}
              */
-            state: "missing" | "expired" | "needs_review" | "rejected" | "ok";
+            state: "missing" | "expired" | "needs_review" | "rejected" | "expiring" | "ok";
             /** @description The form to sign; null if the business has none */
             form: components["schemas"]["Form"] | null;
             current: components["schemas"]["Declaration"] | null;
