@@ -637,6 +637,155 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{user_id}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Staff Hours */
+        get: operations["get_staff_hours"];
+        /**
+         * Set Staff Hours
+         * @description Replaces the staff member's weekly working hours (blocks may not overlap).
+         */
+        put: operations["set_staff_hours"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/appointments/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Staff For Appointments */
+        get: operations["staff_for_appointments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/appointments/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Slots */
+        get: operations["slots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book Appointment
+         * @description Books a client into a free time with a staff member (staff may book without a plan).
+         */
+        post: operations["book_appointment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/appointments/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Staff For Appointments */
+        get: operations["my_staff_for_appointments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/appointments/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Slots */
+        get: operations["my_slots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/appointments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book My Appointment
+         * @description The signed-in client books a free time (the business's booking rules apply).
+         */
+        post: operations["book_my_appointment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/appointments/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Appointment Services
+         * @description What the client can book as a personal appointment.
+         */
+        get: operations["my_appointment_services"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/plans": {
         parameters: {
             query?: never;
@@ -1591,6 +1740,59 @@ export interface components {
             /** Answer */
             answer: boolean;
         };
+        /** AppointmentCreate */
+        AppointmentCreate: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Staff User Id
+             * Format: uuid
+             */
+            staff_user_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** AppointmentService */
+        AppointmentService: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /** Color */
+            color: string | null;
+        };
+        /** AppointmentStaff */
+        AppointmentStaff: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
+        };
         /** Body_import_clients */
         Body_import_clients: {
             /** File */
@@ -1861,6 +2063,24 @@ export interface components {
              */
             erased_at: string | null;
         };
+        /** ClientAppointmentCreate */
+        ClientAppointmentCreate: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Staff User Id
+             * Format: uuid
+             */
+            staff_user_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+        };
         /** ClientBooking */
         ClientBooking: {
             /**
@@ -1907,6 +2127,11 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+            /**
+             * Vertical
+             * @description The business's industry (terms in the app follow it)
+             */
+            vertical: string;
             /**
              * Locale
              * @enum {string}
@@ -2446,6 +2671,24 @@ export interface components {
             status: string;
             /** Environment */
             environment: string;
+        };
+        /** HoursBlock */
+        HoursBlock: {
+            /**
+             * Weekday
+             * @description 0 = Monday … 6 = Sunday
+             */
+            weekday: number;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             */
+            ends: string;
         };
         /** ImportIssue */
         ImportIssue: {
@@ -3267,6 +3510,17 @@ export interface components {
             status: "scheduled" | "cancelled";
             /** Notes */
             notes: string | null;
+            /**
+             * Booking Mode
+             * @description appointment: a one-to-one booking with the instructor
+             * @enum {string}
+             */
+            booking_mode: "class" | "appointment";
+            /**
+             * Appointment Client
+             * @description For an appointment: who it is with
+             */
+            appointment_client: string | null;
         };
         /** Selection */
         Selection: {
@@ -3346,6 +3600,11 @@ export interface components {
             duration_minutes: number;
             /** Capacity */
             capacity: number;
+            /**
+             * Booking Mode
+             * @enum {string}
+             */
+            booking_mode: "class" | "appointment";
             /** Price Amount */
             price_amount: number;
             /** Price Currency */
@@ -3380,6 +3639,12 @@ export interface components {
              * @default 1
              */
             capacity: number;
+            /**
+             * Booking Mode
+             * @default class
+             * @enum {string}
+             */
+            booking_mode: "class" | "appointment";
             /**
              * Price Amount
              * @description Price in minor units (agorot, cents)
@@ -3435,6 +3700,8 @@ export interface components {
             duration_minutes?: number | null;
             /** Capacity */
             capacity?: number | null;
+            /** Booking Mode */
+            booking_mode?: ("class" | "appointment") | null;
             /** Price Amount */
             price_amount?: number | null;
             /** Active */
@@ -3493,6 +3760,36 @@ export interface components {
             capacity?: number | null;
             /** Status */
             status?: ("scheduled" | "cancelled") | null;
+        };
+        /** Slot */
+        Slot: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Staff User Id
+             * Format: uuid
+             */
+            staff_user_id: string;
+            /** Staff Name */
+            staff_name: string;
+        };
+        /** StaffHours */
+        StaffHours: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Blocks */
+            blocks: components["schemas"]["HoursBlock"][];
         };
         /** SupportAccess */
         SupportAccess: {
@@ -5352,6 +5649,309 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientBooking"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_staff_hours: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_staff_hours: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HoursBlock"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    staff_for_appointments: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentStaff"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    slots: {
+        parameters: {
+            query: {
+                service_id: string;
+                date: string;
+                staff_user_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Slot"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_appointment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AppointmentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_staff_for_appointments: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentStaff"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_slots: {
+        parameters: {
+            query: {
+                service_id: string;
+                date: string;
+                staff_user_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Slot"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_my_appointment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientAppointmentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_appointment_services: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AppointmentService"][];
                 };
             };
             /** @description Validation Error */

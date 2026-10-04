@@ -63,7 +63,7 @@ def load_current_tenant(session: Session) -> Tenant:
 def apply_vertical_pack(
     session: Session | Connection, tenant_id: UUID, vertical: str, locale: str, currency: str
 ) -> None:
-    """Gives a new business its vertical's defaults: booking policy and starter plans."""
+    """Gives a new business its vertical's defaults: booking policy, services and plans."""
     pack = VERTICAL_PACKS[vertical]
     session.execute(
         text("""
@@ -79,6 +79,25 @@ def apply_vertical_pack(
             "id": tenant_id,
         },
     )
+    for service in pack.default_services:
+        session.execute(
+            text("""
+                INSERT INTO app.services
+                    (tenant_id, name, duration_minutes, capacity, booking_mode, price_amount,
+                     price_currency, color)
+                VALUES (:tenant_id, :name, :minutes, :capacity, :mode, :price, :currency, :color)
+            """),
+            {
+                "tenant_id": tenant_id,
+                "name": service.names.get(locale, service.names["en"]),
+                "minutes": service.duration_minutes,
+                "capacity": service.capacity,
+                "mode": service.booking_mode,
+                "price": service.prices.get(currency, 0),
+                "currency": currency,
+                "color": service.color,
+            },
+        )
     for plan in pack.default_plans:
         session.execute(
             text("""

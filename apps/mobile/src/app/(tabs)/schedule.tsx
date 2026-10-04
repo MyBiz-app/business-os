@@ -1,12 +1,16 @@
 import { addDays, dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { router } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
+import { PressableScale } from "@/components/motion";
 import { type ClientSession, SessionCard } from "@/components/session-card";
-import { Heading, Screen, styles } from "@/components/ui";
+import { Heading, Screen, elevation, styles } from "@/components/ui";
 import { unwrap } from "@/lib/api";
 import { useLoad } from "@/lib/use-load";
+import { verticalOf } from "@/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 const DAYS = 14;
@@ -14,19 +18,22 @@ const DAYS = 14;
 /** The next two weeks, one day at a time. */
 export default function Schedule() {
   const t = useTranslations("client.schedule");
+  const tAppointment = useTranslations("client.appointment");
+  const tTerms = useTranslations("terms");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const today = business ? todayIn(business.time_zone) : "";
   const [day, setDay] = useState(today);
 
   const load = useCallback(async () => {
-    if (!business) return { sessions: [], closed: [] };
+    if (!business) return { sessions: [], closed: [], appointments: [] };
     const query = { start: todayIn(business.time_zone), days: DAYS };
-    const [sessions, closed] = await Promise.all([
+    const [sessions, closed, appointments] = await Promise.all([
       api.GET("/client/sessions", { params: { ...scope, query } }),
       api.GET("/client/closed-days", { params: { ...scope, query } }),
+      api.GET("/client/appointments/services", { params: scope }),
     ]);
-    return { sessions: unwrap(sessions), closed: unwrap(closed) };
+    return { sessions: unwrap(sessions), closed: unwrap(closed), appointments: appointments.data ?? [] };
   }, [api, scope, business]);
   const { data, loading, reload } = useLoad(load);
   const [overrides, setOverrides] = useState<Record<string, ClientSession>>({});
@@ -49,6 +56,20 @@ export default function Schedule() {
       }}
     >
       <Heading palette={palette}>{t("title")}</Heading>
+      {(data?.appointments.length ?? 0) > 0 && (
+        <PressableScale
+          accessibilityRole="button"
+          onPress={() => router.push("/appointment")}
+          style={[local.cta, elevation.raised, { backgroundColor: palette.primary }]}
+        >
+          <Ionicons name="calendar-number-outline" size={28} color={palette.onPrimary} />
+          <View style={local.ctaText}>
+            <Text style={[local.ctaTitle, { color: palette.onPrimary }]}>{tAppointment("cta")}</Text>
+            <Text style={[local.ctaSub, { color: palette.onPrimary }]}>{tAppointment("ctaText")}</Text>
+          </View>
+          <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={22} color={palette.onPrimary} />
+        </PressableScale>
+      )}
       <ScrollView
         horizontal
         accessibilityRole="tablist"
@@ -94,7 +115,7 @@ export default function Schedule() {
       )}
 
       {closed && sessions.length === 0 ? null : sessions.length === 0 ? (
-        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("empty")}</Text>
+        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : tTerms(`${verticalOf(business)}.appEmpty`)}</Text>
       ) : (
         <View style={local.list}>
           {sessions.map((session) => (
@@ -117,4 +138,8 @@ const local = StyleSheet.create({
   date: { fontSize: 18, fontWeight: "700" },
   closed: { fontSize: 11, fontWeight: "600" },
   list: { gap: 12 },
+  cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 18 },
+  ctaText: { flex: 1, gap: 2 },
+  ctaTitle: { fontSize: 18, fontWeight: "800", textAlign: "left" },
+  ctaSub: { fontSize: 14, opacity: 0.9, textAlign: "left" },
 });

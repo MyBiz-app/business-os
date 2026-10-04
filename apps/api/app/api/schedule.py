@@ -104,6 +104,10 @@ class ScheduledSession(BaseModel):
     )
     status: SessionStatus
     notes: str | None
+    booking_mode: Literal["class", "appointment"] = Field(
+        description="appointment: a one-to-one booking with the instructor"
+    )
+    appointment_client: str | None = Field(description="For an appointment: who it is with")
 
 
 class OptionItem(BaseModel):
@@ -143,7 +147,14 @@ SESSION_SELECT = """
            r.name AS room_name, s.instructor_user_id, u.email AS instructor_email,
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
            bk.booked, bk.waitlisted, ss.open_ended AS series_open_ended,
-           sv.id AS service_id, sv.name AS service_name, sv.color AS service_color
+           sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
+           sv.booking_mode,
+           CASE WHEN sv.booking_mode = 'appointment' THEN (
+               SELECT trim(c.first_name || ' ' || coalesce(c.last_name, ''))
+               FROM app.bookings b JOIN app.clients c ON c.id = b.client_id
+               WHERE b.session_id = s.id AND b.status <> 'cancelled'
+               ORDER BY b.created_at LIMIT 1
+           ) END AS appointment_client
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
@@ -233,7 +244,12 @@ def list_sessions(
     window_start = local_to_utc(start, time.min, time_zone)
     window_end = local_to_utc(start + timedelta(days=days), time.min, time_zone)
     teaching = "AND s.instructor_user_id = app.current_user_id()" if mine else ""
-    in_window = f"WHERE s.starts_at >= :from AND s.starts_at < :to {teaching} ORDER BY s.starts_at"
+    # An appointment whose booking was cancelled frees the time; it is not shown.
+    in_window = (
+        f"WHERE s.starts_at >= :from AND s.starts_at < :to {teaching}"
+        " AND (sv.booking_mode = 'class' OR bk.booked + bk.waitlisted > 0)"
+        " ORDER BY s.starts_at"
+    )
     rows = context.session.execute(
         text(f"{SESSION_SELECT} {in_window}"),
         {"from": window_start, "to": window_end},

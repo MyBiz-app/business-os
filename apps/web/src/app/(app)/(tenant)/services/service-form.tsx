@@ -3,9 +3,9 @@
 import type { components } from "@business-os/api-client";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
-import { CheckboxField, Field, TextAreaField } from "@/components/form/field";
+import { CheckboxField, Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
@@ -24,6 +24,7 @@ type Props = {
 export function ServiceForm({ action, service, currency, submitLabel, readOnly = false }: Props) {
   const t = useTranslations();
   const [state, formAction] = useActionState(action, {});
+  const [mode, setMode] = useState<Service["booking_mode"]>(service?.booking_mode ?? "class");
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -43,16 +44,27 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
           required
           defaultValue={service?.duration_minutes ?? 60}
         />
-        <Field
-          label={t("services.capacity")}
-          hint={t("services.capacityHint")}
-          name="capacity"
-          type="number"
-          min={1}
-          max={1000}
-          required
-          defaultValue={service?.capacity ?? 1}
+        <SelectField
+          label={t("services.bookingMode")}
+          name="booking_mode"
+          value={mode}
+          onChange={(event) => setMode(event.target.value as Service["booking_mode"])}
+          options={(["class", "appointment"] as const).map((value) => ({ value, label: t(`services.modes.${value}`) }))}
         />
+        {mode === "class" ? (
+          <Field
+            label={t("services.capacity")}
+            hint={t("services.capacityHint")}
+            name="capacity"
+            type="number"
+            min={1}
+            max={1000}
+            required
+            defaultValue={service?.capacity ?? 1}
+          />
+        ) : (
+          <input type="hidden" name="capacity" value={1} />
+        )}
         <Field
           label={`${t("services.price")} (${currency})`}
           name="price"

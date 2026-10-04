@@ -3,6 +3,7 @@ import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, type ColorValue, View } from "react-native";
 import { useTranslations } from "use-intl";
 
+import { verticalOf } from "@/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { InboxProvider, useInbox } from "@/providers/inbox-provider";
 import { useSession } from "@/providers/session-provider";
@@ -37,7 +38,8 @@ export default function TabsLayout() {
 
 function BusinessTabs() {
   const t = useTranslations("client.tabs");
-  const { palette } = useBusiness();
+  const { palette, business } = useBusiness();
+  const tTerms = useTranslations("terms");
   const { inbox } = useInbox();
   const unread = inbox?.unread ?? 0;
 
@@ -52,7 +54,13 @@ function BusinessTabs() {
       }}
     >
       <Tabs.Screen name="home" options={{ title: t("home"), tabBarIcon: icon("home-outline") }} />
-      <Tabs.Screen name="schedule" options={{ title: t("schedule"), tabBarIcon: icon("calendar-outline") }} />
+      <Tabs.Screen
+        name="schedule"
+        options={{
+          title: business ? tTerms(`${verticalOf(business)}.appTab`) : t("schedule"),
+          tabBarIcon: icon("calendar-outline"),
+        }}
+      />
       <Tabs.Screen name="bookings" options={{ title: t("bookings"), tabBarIcon: icon("checkmark-done-outline") }} />
       <Tabs.Screen
         name="updates"

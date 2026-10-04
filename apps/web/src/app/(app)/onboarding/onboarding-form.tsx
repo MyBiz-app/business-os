@@ -11,7 +11,7 @@ import { locales } from "@/i18n/config";
 
 import { createBusiness, type OnboardingState, recommendModules } from "./actions";
 
-const VERTICALS = ["fitness"] as const;
+const VERTICALS = ["fitness", "beauty", "clinic", "garage"] as const;
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 
 type Props = { timeZones: string[]; catalogs: Record<string, Catalog> };
