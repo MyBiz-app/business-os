@@ -19,6 +19,7 @@ from app.api import (
     schedule,
     services,
     staff,
+    support,
 )
 from app.api import health as health_declarations
 from app.api import settings as business_settings
@@ -76,6 +77,7 @@ def create_app() -> FastAPI:
     app.include_router(assistant.router)
     app.include_router(modules.router)
     app.include_router(platform.router)
+    app.include_router(support.router)
     app.include_router(client_app.public_router)
     app.include_router(client_app.router)
     app.include_router(checkouts.router)

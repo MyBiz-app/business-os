@@ -983,6 +983,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/support-access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Support Status */
+        get: operations["support_status"];
+        put?: never;
+        /**
+         * Grant Support
+         * @description Lets platform support see the business (read-only) for the given hours.
+         */
+        post: operations["grant_support"];
+        /** Revoke Support */
+        delete: operations["revoke_support"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/businesses/{code}": {
         parameters: {
             query?: never;
@@ -2098,6 +2120,32 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** Grant */
+        Grant: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
+        /** GrantCreate */
+        GrantCreate: {
+            /**
+             * Hours
+             * @description How long support may look in
+             */
+            hours: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -2331,6 +2379,11 @@ export interface components {
             platform_admin: boolean;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
+            /**
+             * Support Access
+             * @description Businesses that let platform support in (platform admins only)
+             */
+            support_access: components["schemas"]["SupportAccess"][];
         };
         /** Member */
         Member: {
@@ -3101,6 +3154,42 @@ export interface components {
             /** Status */
             status?: ("scheduled" | "cancelled") | null;
         };
+        /** SupportAccess */
+        SupportAccess: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Tenant Name */
+            tenant_name: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
+        /** SupportStatus */
+        SupportStatus: {
+            active: components["schemas"]["Grant"] | null;
+            /**
+             * Visits
+             * @description The latest 50 support requests
+             */
+            visits: components["schemas"]["SupportVisit"][];
+        };
+        /** SupportVisit */
+        SupportVisit: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Actor Email */
+            actor_email: string | null;
+            /** Path */
+            path: string | null;
+        };
         /** SystemRole */
         SystemRole: {
             /**
@@ -3181,9 +3270,9 @@ export interface components {
             custom_role_name: string | null;
             /**
              * Role
-             * @enum {string}
+             * @description 'support': platform support with read-only access the owner granted
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: ("owner" | "manager" | "staff" | "front_desk") | "support";
         };
         /** TenantCreate */
         TenantCreate: {
@@ -5686,6 +5775,103 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UsagePoint"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    support_status: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grant_support: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_support: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatus"];
                 };
             };
             /** @description Validation Error */

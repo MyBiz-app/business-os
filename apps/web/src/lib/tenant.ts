@@ -12,8 +12,13 @@ export const TENANT_COOKIE = "TENANT_ID";
 export const getActiveMembership = cache(async () => {
   const me = unwrap(await (await getApi()).GET("/me"));
   const selected = (await cookies()).get(TENANT_COOKIE)?.value;
+  // Platform support inside a business that granted access (read-only, audited by the API).
+  const support = me.support_access.find((g) => g.tenant_id === selected);
   const membership =
-    me.memberships.find((m) => m.tenant_id === selected) ?? me.memberships[0] ?? null;
+    me.memberships.find((m) => m.tenant_id === selected) ??
+    (support ? { tenant_id: support.tenant_id, tenant_name: support.tenant_name, role: "support" as const } : null) ??
+    me.memberships[0] ??
+    null;
   return { me, membership };
 });
 
@@ -43,4 +48,8 @@ export async function getTenantFor(permission: string) {
   const context = await getTenant();
   if (!context.tenant.permissions.includes(permission)) redirect("/dashboard");
   return context;
+}
+
+export async function clearActiveTenant() {
+  (await cookies()).delete(TENANT_COOKIE);
 }

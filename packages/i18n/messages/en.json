@@ -155,7 +155,8 @@
     "owner": "Owner",
     "manager": "Manager",
     "staff": "Staff",
-    "front_desk": "Front desk"
+    "front_desk": "Front desk",
+    "support": "Platform support (read-only)"
   },
   "nav": {
     "label": "Main navigation",
@@ -930,5 +931,18 @@
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking classes."
     }
+  },
+  "support": {
+    "title": "Support access",
+    "intro": "Let the MyBiz support team look at your business to help you. Access is read-only, ends automatically after 24 hours, and every page they open is listed here.",
+    "grant": "Allow support for 24 hours",
+    "activeUntil": "Support can look in until {date}.",
+    "revoke": "End support access now",
+    "visits": "{count, plural, one {# page support opened} other {# pages support opened}}",
+    "banner": "Support mode: read-only. Every page you open is logged for the business owner.",
+    "leave": "Leave support mode",
+    "grantedUntil": "The owner allowed support access until {date}.",
+    "open": "Open as support (read-only)",
+    "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access."
   }
 }

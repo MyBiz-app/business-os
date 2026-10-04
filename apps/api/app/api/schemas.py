@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 from uuid import UUID
 from zoneinfo import available_timezones
@@ -16,6 +17,12 @@ class Membership(BaseModel):
     role: Role
 
 
+class SupportAccess(BaseModel):
+    tenant_id: UUID
+    tenant_name: str
+    expires_at: datetime
+
+
 class Me(BaseModel):
     id: UUID
     email: str
@@ -23,6 +30,9 @@ class Me(BaseModel):
     locale: Locale | None
     platform_admin: bool
     memberships: list[Membership]
+    support_access: list[SupportAccess] = Field(
+        description="Businesses that let platform support in (platform admins only)"
+    )
 
 
 class TenantCreate(BaseModel):
@@ -103,4 +113,6 @@ class Tenant(BaseModel):
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
     permissions: list[str] = Field(description="The current user's effective permissions")
     custom_role_name: str | None
-    role: Role
+    role: Role | Literal["support"] = Field(
+        description="'support': platform support with read-only access the owner granted"
+    )
