@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import Link from "next/link";
 
 import { Pill, type Tone } from "@/components/pill";
 import { todayIn } from "@/lib/dates";
@@ -34,6 +35,7 @@ type Props = {
 /** The client's plans (entitlements): sell, freeze, cancel. Payment is simulated for now. */
 export async function PlansSection({ clientId, context, locked = false }: Props) {
   const t = await getTranslations("plans");
+  const tReceipts = await getTranslations("receipts");
   const locale = await getLocale();
   const { tenant, api, scope } = context;
   const [entitlements, plans] = await Promise.all([
@@ -66,8 +68,13 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                     <span className="font-semibold">{entitlement.name}</span>
                     <Pill tone={TONE[entitlement.state]}>{t(`states.${entitlement.state}`)}</Pill>
                   </span>
-                  <span className="text-sm" dir="ltr">
-                    {formatMoney(entitlement.price_amount, entitlement.price_currency, locale)}
+                  <span className="flex items-center gap-3 text-sm">
+                    {entitlement.receipt_id && (
+                      <Link href={`/receipts/${entitlement.receipt_id}`} className="text-primary underline-offset-4 hover:underline">
+                        {tReceipts("short", { number: entitlement.receipt_number ?? "" })}
+                      </Link>
+                    )}
+                    <span dir="ltr">{formatMoney(entitlement.price_amount, entitlement.price_currency, locale)}</span>
                   </span>
                 </div>
                 <p className="text-sm text-muted">

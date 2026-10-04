@@ -12,7 +12,7 @@ from sqlalchemy.exc import DBAPIError
 
 from app.api.common import not_found
 from app.api.deps import ClientDep
-from app.api.plans import Entitlement, load_entitlement
+from app.api.plans import Entitlement, issue_receipts_now, load_entitlement
 from app.payments import provider_for_business
 
 router = APIRouter(prefix="/client", tags=["client"])
@@ -104,6 +104,7 @@ def simulate_payment(checkout_id: UUID, context: ClientDep) -> CheckoutPaid:
             entitlement_id = db.execute(
                 text("SELECT app.complete_checkout(:id)"), {"id": checkout_id}
             ).scalar_one()
+            issue_receipts_now(db)
     except DBAPIError as error:
         if getattr(error.orig, "sqlstate", None) == "P0002":
             raise not_found() from error

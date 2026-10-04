@@ -8,7 +8,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 export async function AppHeader({ children }: { children?: React.ReactNode }) {
   const t = await getTranslations("app");
   return (
-    <header className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-4 border-b border-border/70 bg-background/75 px-6 py-3 backdrop-blur-xl md:h-16 md:py-0">
+    <header className="sticky top-0 z-30 flex print:hidden flex-wrap items-center justify-between gap-4 border-b border-border/70 bg-background/75 px-6 py-3 backdrop-blur-xl md:h-16 md:py-0">
       <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
         <span
           aria-hidden="true"

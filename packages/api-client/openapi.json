@@ -5444,6 +5444,256 @@
         }
       }
     },
+    "/receipts": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "List Receipts",
+        "description": "Newest first; for one client when `client_id` is given.",
+        "operationId": "list_receipts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Receipt"
+                  },
+                  "title": "Response List Receipts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/receipts/{receipt_id}": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Get Receipt",
+        "operationId": "get_receipt",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/receipts": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Receipts",
+        "operationId": "my_receipts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Receipt"
+                  },
+                  "title": "Response My Receipts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/receipts/{receipt_id}": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Receipt",
+        "operationId": "my_receipt",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "receipt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Receipt Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Receipt"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/notifications": {
       "get": {
         "tags": [
@@ -7766,6 +8016,30 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "receipt_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Id",
+            "description": "The receipt of the payment for this plan"
+          },
+          "receipt_number": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Receipt Number"
           }
         },
         "type": "object",
@@ -7784,7 +8058,9 @@
           "price_amount",
           "price_currency",
           "freezes",
-          "created_at"
+          "created_at",
+          "receipt_id",
+          "receipt_number"
         ],
         "title": "Entitlement"
       },
@@ -9556,6 +9832,92 @@
         ],
         "title": "QuoteOut"
       },
+      "Receipt": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "client_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Email"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount",
+            "description": "Minor units"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "card",
+              "cash",
+              "transfer",
+              "other"
+            ],
+            "title": "Method"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated",
+            "description": "A sample from a test payment, not a tax document"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "issued_at",
+          "business_name",
+          "client_id",
+          "client_name",
+          "client_email",
+          "description",
+          "amount",
+          "currency",
+          "method",
+          "simulated"
+        ],
+        "title": "Receipt"
+      },
       "Recommendation": {
         "properties": {
           "preset": {
@@ -9916,6 +10278,17 @@
             "type": "string",
             "format": "uuid",
             "title": "Plan Id"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "card",
+              "cash",
+              "transfer",
+              "other"
+            ],
+            "title": "Method",
+            "default": "card"
           },
           "starts_on": {
             "anyOf": [

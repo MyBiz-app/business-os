@@ -553,7 +553,9 @@
       "buyConfirm": "רכישה",
       "buyCancel": "לא עכשיו",
       "bought": "בוצע! {plan} נוסף למנויים שלך.",
-      "buyFailed": "הרכישה לא הושלמה. נסו שוב."
+      "buyFailed": "הרכישה לא הושלמה. נסו שוב.",
+      "receipts": "קבלות",
+      "noReceipts": "עדיין אין קבלות."
     },
     "profile": {
       "title": "פרופיל",
@@ -634,6 +636,28 @@
         "session_reminder": "תזכורת: נרשמת ל{service} היום, {when}.",
         "plan_ending": "ה{plan} שלך מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם."
       }
+    },
+    "pay": {
+      "title": "תשלום",
+      "testMode": "מצב בדיקה: לא יחויב כסף. אין צורך להזין כרטיס – זהו כרטיס בדיקה.",
+      "testCard": "כרטיס בדיקה",
+      "cardHolder": "בעל/ת הכרטיס",
+      "plan": "מסלול",
+      "total": "לתשלום",
+      "payNow": "תשלום {amount}",
+      "processing": "מעבד את התשלום…",
+      "success": "התשלום התקבל!",
+      "successBody": "{plan} נוסף למנויים שלך.",
+      "receiptNumber": "קבלה מס׳ {number}",
+      "viewReceipt": "צפייה בקבלה",
+      "toMyPlans": "למנויים שלי",
+      "failed": "התשלום לא הושלם. נסו שוב.",
+      "cancel": "ביטול",
+      "secure": "תשלום מאובטח"
+    },
+    "receipt": {
+      "title": "קבלה",
+      "back": "חזרה"
     }
   },
   "join": {
@@ -704,7 +728,8 @@
       "outside_validity": "ההקפאה צריכה להתחיל בזמן שהמסלול בתוקף.",
       "overlapping_freeze": "יש חפיפה עם הקפאה קיימת."
     },
-    "validityRange": "בתוקף {from} – {to}"
+    "validityRange": "בתוקף {from} – {to}",
+    "paymentMethod": "אמצעי תשלום"
   },
   "metrics": {
     "revenue": "הכנסות",
@@ -1005,5 +1030,25 @@
     "grantedUntil": "בעל העסק אישר גישת תמיכה עד {date}.",
     "open": "כניסה כתמיכה (צפייה בלבד)",
     "notGranted": "בעל העסק לא אישר גישת תמיכה. אפשר לעשות זאת בהגדרות ← גישת תמיכה."
+  },
+  "receipts": {
+    "title": "קבלה מס׳ {number}",
+    "short": "קבלה {number}",
+    "sample": "מסמך לדוגמה – תשלום בדיקה, לא מסמך חשבונאי",
+    "issuedAt": "תאריך",
+    "to": "לכבוד",
+    "item": "פריט",
+    "amount": "סכום",
+    "total": "סה״כ",
+    "method": "אמצעי תשלום",
+    "methods": {
+      "card": "כרטיס אשראי",
+      "cash": "מזומן",
+      "transfer": "העברה בנקאית",
+      "other": "אחר"
+    },
+    "print": "הדפסה",
+    "back": "חזרה לכרטיס הלקוח",
+    "thanks": "תודה!"
   }
 }

@@ -113,10 +113,16 @@ class Entitlement(BaseModel):
     price_currency: str
     freezes: list[Freeze]
     created_at: datetime
+    receipt_id: UUID | None = Field(description="The receipt of the payment for this plan")
+    receipt_number: int | None
+
+
+PaymentMethod = Literal["card", "cash", "transfer", "other"]
 
 
 class Sale(BaseModel):
     plan_id: UUID
+    method: PaymentMethod = "card"
     starts_on: dt.date | None = Field(default=None, description="Defaults to today (local)")
     idempotency_key: str = Field(
         min_length=8, max_length=80, description="Same key, same sale: retries never double-sell"
@@ -150,9 +156,14 @@ ENTITLEMENT_SELECT = f"""
                    'id', f.id, 'starts_on', f.starts_on, 'ends_on', f.ends_on, 'reason', f.reason
                ) ORDER BY f.starts_on)
                FROM app.entitlement_freezes f WHERE f.entitlement_id = e.id
-           ), '[]') AS freezes
+           ), '[]') AS freezes,
+           receipt.id AS receipt_id, receipt.number AS receipt_number
     FROM app.entitlements e
     JOIN app.tenants t ON t.id = e.tenant_id
+    LEFT JOIN LATERAL (
+        SELECT r.id, r.number FROM app.receipts r
+        WHERE r.entitlement_id = e.id ORDER BY r.number LIMIT 1
+    ) receipt ON true
     CROSS JOIN LATERAL (
         SELECT count(*)::int AS count FROM app.bookings b
         WHERE b.entitlement_id = e.id AND {CREDIT_USED}
@@ -181,6 +192,12 @@ def to_entitlement(row: Any) -> Entitlement:
         state = "active"
     data["state"] = state
     return Entitlement.model_validate(data)
+
+
+def issue_receipts_now(db: Session) -> None:
+    """Receipts are issued when the transaction commits (migration 0025); this issues them
+    right away, once the payment is linked to its plan, so the response can include them."""
+    db.execute(text("SET CONSTRAINTS app.payments_issue_receipt IMMEDIATE"))
 
 
 def load_entitlement(db: Session, entitlement_id: UUID) -> Entitlement:
@@ -334,10 +351,10 @@ def sell_plan(client_id: UUID, body: Sale, context: SalesDep) -> Entitlement:
     payment_id = db.execute(
         text("""
             INSERT INTO app.payments
-                (tenant_id, client_id, amount, currency, status, provider, idempotency_key,
-                 created_by)
+                (tenant_id, client_id, amount, currency, status, provider, method,
+                 idempotency_key, created_by)
             SELECT :tenant_id, c.id, p.price_amount, p.price_currency, 'succeeded', 'simulated',
-                   :key, app.current_user_id()
+                   :method, :key, app.current_user_id()
             FROM app.plans p, app.clients c
             WHERE p.id = :plan_id AND p.active AND c.id = :client_id
             ON CONFLICT (tenant_id, idempotency_key) DO NOTHING
@@ -348,6 +365,7 @@ def sell_plan(client_id: UUID, body: Sale, context: SalesDep) -> Entitlement:
             "plan_id": body.plan_id,
             "client_id": client_id,
             "key": body.idempotency_key,
+            "method": body.method,
         },
     ).scalar()
     if payment_id is None:
@@ -382,6 +400,7 @@ def sell_plan(client_id: UUID, body: Sale, context: SalesDep) -> Entitlement:
         text("UPDATE app.payments SET entitlement_id = :entitlement_id WHERE id = :id"),
         {"entitlement_id": entitlement_id, "id": payment_id},
     )
+    issue_receipts_now(db)
     return load_entitlement(db, entitlement_id)
 
 

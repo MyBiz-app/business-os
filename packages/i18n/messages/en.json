@@ -553,7 +553,9 @@
       "buyConfirm": "Buy",
       "buyCancel": "Not now",
       "bought": "Done! {plan} is now in your plans.",
-      "buyFailed": "The purchase didn't go through. Try again."
+      "buyFailed": "The purchase didn't go through. Try again.",
+      "receipts": "Receipts",
+      "noReceipts": "No receipts yet."
     },
     "profile": {
       "title": "Profile",
@@ -634,6 +636,28 @@
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
         "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
       }
+    },
+    "pay": {
+      "title": "Payment",
+      "testMode": "Test mode: no money is charged. No card needed – this is a test card.",
+      "testCard": "Test card",
+      "cardHolder": "Card holder",
+      "plan": "Plan",
+      "total": "Total",
+      "payNow": "Pay {amount}",
+      "processing": "Processing your payment…",
+      "success": "Payment received!",
+      "successBody": "{plan} was added to your plans.",
+      "receiptNumber": "Receipt no. {number}",
+      "viewReceipt": "View receipt",
+      "toMyPlans": "My plans",
+      "failed": "The payment didn't go through. Please try again.",
+      "cancel": "Cancel",
+      "secure": "Secure payment"
+    },
+    "receipt": {
+      "title": "Receipt",
+      "back": "Back"
     }
   },
   "join": {
@@ -704,7 +728,8 @@
       "outside_validity": "The freeze must start while the plan is valid.",
       "overlapping_freeze": "That overlaps an existing freeze."
     },
-    "validityRange": "Valid {from} – {to}"
+    "validityRange": "Valid {from} – {to}",
+    "paymentMethod": "Payment method"
   },
   "metrics": {
     "revenue": "Revenue",
@@ -1005,5 +1030,25 @@
     "grantedUntil": "The owner allowed support access until {date}.",
     "open": "Open as support (read-only)",
     "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access."
+  },
+  "receipts": {
+    "title": "Receipt no. {number}",
+    "short": "Receipt {number}",
+    "sample": "Sample document – test payment, not a tax document",
+    "issuedAt": "Date",
+    "to": "To",
+    "item": "Item",
+    "amount": "Amount",
+    "total": "Total",
+    "method": "Payment method",
+    "methods": {
+      "card": "Credit card",
+      "cash": "Cash",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    },
+    "print": "Print",
+    "back": "Back to the client",
+    "thanks": "Thank you!"
   }
 }

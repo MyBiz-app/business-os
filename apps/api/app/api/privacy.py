@@ -121,6 +121,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "receipts": _rows(
+            db,
+            """
+            SELECT number, issued_at, description, amount, currency, method, simulated
+            FROM app.receipts WHERE client_id = :id ORDER BY number
+            """,
+            client_id,
+        ),
         "health_declarations": _rows(
             db,
             """
@@ -190,6 +198,12 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
                 erased_at = now(), updated_at = now()
             WHERE id = :id
         """),
+        {"name": ERASED_NAME.get(locale, ERASED_NAME["en"]), "id": client_id},
+    )
+    db.execute(
+        text(
+            "UPDATE app.receipts SET client_name = :name, client_email = NULL WHERE client_id = :id"
+        ),
         {"name": ERASED_NAME.get(locale, ERASED_NAME["en"]), "id": client_id},
     )
     result = EraseResult(cancelled_bookings=len(upcoming), removed_health_declarations=removed)

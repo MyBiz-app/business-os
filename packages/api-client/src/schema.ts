@@ -1299,6 +1299,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Receipts
+         * @description Newest first; for one client when `client_id` is given.
+         */
+        get: operations["list_receipts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/receipts/{receipt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Receipt */
+        get: operations["get_receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Receipts */
+        get: operations["my_receipts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/receipts/{receipt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Receipt */
+        get: operations["my_receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/notifications": {
         parameters: {
             query?: never;
@@ -2148,6 +2219,13 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Receipt Id
+             * @description The receipt of the payment for this plan
+             */
+            receipt_id: string | null;
+            /** Receipt Number */
+            receipt_number: number | null;
         };
         /** EraseRequest */
         EraseRequest: {
@@ -2838,6 +2916,51 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Receipt */
+        Receipt: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /** Client Email */
+            client_email: string | null;
+            /** Description */
+            description: string;
+            /**
+             * Amount
+             * @description Minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
+            /**
+             * Simulated
+             * @description A sample from a test payment, not a tax document
+             */
+            simulated: boolean;
+        };
         /** Recommendation */
         Recommendation: {
             /**
@@ -2950,6 +3073,12 @@ export interface components {
              * Format: uuid
              */
             plan_id: string;
+            /**
+             * Method
+             * @default card
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
             /**
              * Starts On
              * @description Defaults to today (local)
@@ -6521,6 +6650,137 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CheckoutPaid"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_receipts: {
+        parameters: {
+            query?: {
+                client_id?: string | null;
+                limit?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_receipt: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_receipts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_receipt: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
                 };
             };
             /** @description Validation Error */

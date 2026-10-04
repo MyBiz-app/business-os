@@ -30,6 +30,7 @@ type SellProps = {
 
 export function SellPlanForm({ action, plans, today, idempotencyKey }: SellProps) {
   const t = useTranslations("plans");
+  const tReceipts = useTranslations("receipts");
   const [state, formAction] = useActionState(action, {});
   return (
     <form action={formAction} className="flex flex-col gap-3">
@@ -39,6 +40,14 @@ export function SellPlanForm({ action, plans, today, idempotencyKey }: SellProps
       <div className="grid gap-3 sm:grid-cols-2">
         <SelectField label={t("plan")} name="plan_id" required options={plans} />
         <Field label={t("startsOn")} name="starts_on" type="date" defaultValue={today} required />
+        <SelectField
+          label={t("paymentMethod")}
+          name="method"
+          options={(["card", "cash", "transfer", "other"] as const).map((method) => ({
+            value: method,
+            label: tReceipts(`methods.${method}`),
+          }))}
+        />
       </div>
       <p className="text-xs text-muted">{t("simulatedPayment")}</p>
       <div>
