@@ -9,7 +9,26 @@
     "apiOffline": "API is not reachable",
     "comingSoon": "Sign up and business creation are coming next.",
     "login": "Log in",
-    "signup": "Create an account"
+    "signup": "Create an account",
+    "eyebrow": "For your studio, gym and business",
+    "features": {
+      "schedule": {
+        "title": "Smart schedule",
+        "text": "Recurring classes, waitlists and holidays, no spreadsheets."
+      },
+      "clients": {
+        "title": "Members and plans",
+        "text": "Every member, pass and visit in one place."
+      },
+      "app": {
+        "title": "Your branded app",
+        "text": "Members book, buy and get updates on their own."
+      },
+      "ai": {
+        "title": "AI assistant",
+        "text": "Ask in plain words, get answers and actions, always with your approval."
+      }
+    }
   },
   "settings": {
     "language": "Language",
@@ -150,7 +169,18 @@
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
     "weekOf": "Week of",
-    "myClassesToday": "{count, plural, one {Your class today} other {Your # classes today}}"
+    "myClassesToday": "{count, plural, one {Your class today} other {Your # classes today}}",
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "night": "Good night"
+    },
+    "classesToday": "{count, plural, =0 {No classes today} one {One class today} other {# classes today}}",
+    "bookedToday": "{count, plural, one {one booking} other {# bookings}}",
+    "openSchedule": "Open schedule",
+    "now": "Now",
+    "done": "Done"
   },
   "roles": {
     "owner": "Owner",
@@ -247,7 +277,8 @@
     "errors": {
       "invalid": "Please check the details and try again.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "loading": "Loading…"
   },
   "services": {
     "title": "Services",

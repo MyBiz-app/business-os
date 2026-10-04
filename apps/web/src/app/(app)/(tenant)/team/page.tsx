@@ -24,7 +24,7 @@ export default async function TeamPage() {
     new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone }).format(new Date(iso));
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("team.title")}</h1>
         <p className="text-sm text-muted">{t("team.subtitle")}</p>
@@ -37,7 +37,7 @@ export default async function TeamPage() {
         <h2 id="members-heading" className="text-lg font-semibold">
           {t("team.members")}
         </h2>
-        <ul className="rounded-2xl border border-border bg-surface">
+        <ul className="card">
           {team.members.map((member) => (
             <MemberRow
               key={`${member.user_id}-${member.role}-${member.custom_role_id}`}
@@ -53,7 +53,7 @@ export default async function TeamPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="invite-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="invite-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="invite-heading" className="text-lg font-semibold">
           {t("team.invite")}
         </h2>

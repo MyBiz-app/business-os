@@ -18,7 +18,7 @@ const FIELDS: ImportField[] = [
 ];
 const SOURCES = ["walk_in", "referral", "instagram", "facebook", "google", "website", "app", "other"] as const;
 const CONTROL =
-  "w-full min-w-0 rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary";
+  "w-full min-w-0 control px-3 py-2";
 
 /** Upload a file, check how its columns map, preview, then import. */
 export function ImportForm() {
@@ -63,7 +63,7 @@ export function ImportForm() {
 
   if (result?.imported) {
     return (
-      <div role="status" className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
+      <div role="status" className="flex flex-col gap-3 card p-6">
         <p className="text-lg font-semibold">{t("done", { count: result.ready })}</p>
         {result.duplicates + result.invalid > 0 && (
           <p className="text-sm text-muted">{t("doneSkipped", { count: result.duplicates + result.invalid })}</p>
@@ -86,7 +86,7 @@ export function ImportForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6">
+      <section className="flex flex-col gap-3 card p-6">
         <label htmlFor={fileId} className="font-semibold">
           {t("file")}
         </label>
@@ -112,7 +112,7 @@ export function ImportForm() {
 
       {result && file && (
         <>
-          <section aria-labelledby="columns-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+          <section aria-labelledby="columns-heading" className="flex flex-col gap-4 card p-6">
             <div className="flex flex-col gap-1">
               <h2 id="columns-heading" className="text-lg font-semibold">
                 {t("columns")}
@@ -151,7 +151,7 @@ export function ImportForm() {
             </ul>
           </section>
 
-          <section aria-labelledby="preview-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+          <section aria-labelledby="preview-heading" className="flex flex-col gap-4 card p-6">
             <h2 id="preview-heading" className="text-lg font-semibold">
               {t("preview")}
             </h2>
@@ -205,7 +205,7 @@ export function ImportForm() {
                 disabled={pending || result.ready === 0}
                 aria-busy={pending}
                 onClick={() => send(file, result.mapping, true)}
-                className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary disabled:opacity-60"
+                className="btn-primary px-4 py-2.5"
               >
                 {t("import", { count: result.ready })}
               </button>

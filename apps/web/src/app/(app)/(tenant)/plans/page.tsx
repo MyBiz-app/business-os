@@ -13,14 +13,14 @@ export default async function PlansPage() {
   const plans = unwrap(await api.GET("/plans", { params: scope }));
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("plans.title")}</h1>
           <p className="text-sm text-muted">{t("plans.subtitle")}</p>
         </div>
         {canWriteCatalog(tenant) && (
-          <Link href="/plans/new" className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">
+          <Link href="/plans/new" className="btn-primary px-4 py-2.5">
             {t("plans.add")}
           </Link>
         )}
@@ -34,7 +34,7 @@ export default async function PlansPage() {
             <li key={plan.id}>
               <Link
                 href={`/plans/${plan.id}`}
-                className={`flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4 hover:border-primary ${plan.active ? "" : "opacity-60"}`}
+                className={`flex flex-col gap-1 card card-hover p-4 ${plan.active ? "" : "opacity-60"}`}
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="font-semibold">{plan.name}</span>

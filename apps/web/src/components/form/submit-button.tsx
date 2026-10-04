@@ -9,7 +9,7 @@ export function SubmitButton({ children }: { children: React.ReactNode }) {
       type="submit"
       disabled={pending}
       aria-busy={pending}
-      className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary disabled:opacity-60"
+      className="btn-primary px-4 py-2.5"
     >
       {children}
     </button>

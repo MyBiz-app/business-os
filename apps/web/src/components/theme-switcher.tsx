@@ -1,11 +1,15 @@
 "use client";
 
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
 
-const themes = ["light", "dark", "system"] as const;
-const labelKeys = { light: "themeLight", dark: "themeDark", system: "themeSystem" } as const;
+const themes = [
+  { value: "light", label: "themeLight", Icon: Sun },
+  { value: "dark", label: "themeDark", Icon: Moon },
+  { value: "system", label: "themeSystem", Icon: Monitor },
+] as const;
 
 // True only after hydration; the stored theme is unknown on the server.
 function useMounted() {
@@ -20,21 +24,25 @@ export function ThemeSwitcher() {
   const t = useTranslations("settings");
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
+  const current = mounted ? theme : "system";
 
   return (
-    <label className="flex items-center gap-2 text-sm">
-      <span className="text-muted">{t("theme")}</span>
-      <select
-        className="rounded-md border border-border bg-surface px-2 py-1"
-        value={mounted ? theme : "system"}
-        onChange={(event) => setTheme(event.target.value)}
-      >
-        {themes.map((value) => (
-          <option key={value} value={value}>
-            {t(labelKeys[value])}
-          </option>
-        ))}
-      </select>
-    </label>
+    <div role="group" aria-label={t("theme")} className="flex items-center gap-0.5 rounded-xl border border-border bg-surface p-0.5">
+      {themes.map(({ value, label, Icon }) => (
+        <button
+          key={value}
+          type="button"
+          aria-label={t(label)}
+          aria-pressed={current === value}
+          title={t(label)}
+          onClick={() => setTheme(value)}
+          className={`flex size-8 items-center justify-center rounded-lg transition-colors ${
+            current === value ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"
+          }`}
+        >
+          <Icon aria-hidden="true" className="size-4" />
+        </button>
+      ))}
+    </div>
   );
 }

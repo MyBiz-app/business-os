@@ -17,31 +17,31 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   // Only what the user's permissions let them open.
   const allowed = (permission: string) => tenant.permissions.includes(permission);
   const candidates: (NavItem & { permission?: string })[] = [
-    { href: "/dashboard", label: t("nav.dashboard") },
-    { href: "/reports", label: t("nav.reports"), permission: "reports.read" },
-    { href: "/assistant", label: t("nav.assistant"), permission: "ai.use" },
-    { href: "/schedule", label: t("nav.schedule"), permission: "schedule.read" },
-    { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), permission: "clients.read" },
-    { href: "/services", label: t("nav.services"), permission: "catalog.read" },
-    { href: "/plans", label: t("nav.plans"), permission: "catalog.read" },
-    { href: "/locations", label: t("nav.locations"), permission: "catalog.read" },
+    { href: "/dashboard", label: t("nav.dashboard"), icon: "dashboard" },
+    { href: "/reports", label: t("nav.reports"), icon: "reports", permission: "reports.read" },
+    { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use" },
+    { href: "/schedule", label: t("nav.schedule"), icon: "schedule", permission: "schedule.read" },
+    { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
+    { href: "/services", label: t("nav.services"), icon: "services", permission: "catalog.read" },
+    { href: "/plans", label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
+    { href: "/locations", label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
   ];
   const items: NavItem[] = candidates
     .filter((item) => !item.permission || allowed(item.permission))
     .filter((item) => item.href !== "/assistant" || tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro"))
-    .map(({ href, label }) => ({ href, label }));
-  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team") });
-  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings") });
+    .map(({ href, label, icon }) => ({ href, label, icon }));
+  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team" });
+  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings" });
 
   return (
     // The business's brand color replaces the product color inside its own area.
     <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
-      <aside className="border-b border-border md:w-60 md:shrink-0 md:border-b-0 md:border-e">
-        <div className="flex items-center gap-3 px-6 py-4">
+      <aside className="border-b border-border bg-surface/60 backdrop-blur md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-e">
+        <div className="mx-3 my-3 flex items-center gap-3 rounded-2xl px-3 py-3">
           {logo ? (
-            <Image src={logo} alt="" width={36} height={36} unoptimized className="size-9 rounded-lg object-contain" />
+            <Image src={logo} alt="" width={36} height={36} unoptimized className="size-10 rounded-xl object-contain shadow-sm" />
           ) : (
-            <span aria-hidden="true" className="flex size-9 items-center justify-center rounded-lg bg-primary font-bold text-on-primary">
+            <span aria-hidden="true" className="btn-primary size-10 text-lg">
               {tenant.name.slice(0, 1)}
             </span>
           )}

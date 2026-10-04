@@ -102,7 +102,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
               <button
                 type="submit"
                 aria-label={`${t(`actions.${next}`)} – ${booking.client_name}`}
-                className={`rounded-lg border border-border px-2.5 py-1 text-xs font-medium hover:bg-surface ${next === "cancelled" ? "text-danger" : ""}`}
+                className={`btn-secondary px-2.5 py-1 text-xs font-medium ${next === "cancelled" ? "text-danger" : ""}`}
               >
                 {t(`actions.${next}`)}
               </button>
@@ -114,7 +114,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
   );
 
   return (
-    <section aria-labelledby="roster-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+    <section aria-labelledby="roster-heading" className="flex flex-col gap-4 card p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 id="roster-heading" className="text-lg font-semibold">
           {t("roster")}
@@ -142,9 +142,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
               type="search"
               defaultValue={search}
               placeholder={t("searchPlaceholder")}
-              className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="min-w-0 flex-1 control px-3 py-2"
             />
-            <button type="submit" className="rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-background">
+            <button type="submit" className="btn-secondary px-3 py-2 text-sm">
               {t("search")}
             </button>
           </form>
@@ -160,7 +160,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                       <button
                         type="submit"
                         aria-label={`${full ? t("addToWaitlist") : t("book")} – ${name}`}
-                        className="rounded-lg bg-primary px-3 py-1 text-xs font-medium text-on-primary"
+                        className="btn-primary px-3 py-1 text-xs"
                       >
                         {full ? t("addToWaitlist") : t("book")}
                       </button>

@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Avatar } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
@@ -75,12 +76,15 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
       <Link href="/clients" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
       <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold">{[client.first_name, client.last_name].filter(Boolean).join(" ")}</h1>
+        <div className="flex items-center gap-4">
+          <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} size="lg" />
+          <h1 className="text-3xl font-bold">{[client.first_name, client.last_name].filter(Boolean).join(" ")}</h1>
+        </div>
         <StatusBadge status={client.status} />
       </div>
       <p className="text-sm text-muted">{t("joined", { date: joined })}</p>
@@ -94,7 +98,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         </p>
       )}
 
-      <section aria-labelledby="details-heading" className="rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="details-heading" className="card p-6">
         <h2 id="details-heading" className="mb-4 text-lg font-semibold">
           {t("details")}
         </h2>
@@ -110,7 +114,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
 
       <PlansSection clientId={client.id} context={context} locked={erased} />
 
-      <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+      <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="bookings-heading" className="text-lg font-semibold">
           {tBookings("title")}
         </h2>

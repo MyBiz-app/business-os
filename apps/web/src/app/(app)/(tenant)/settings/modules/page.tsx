@@ -19,7 +19,7 @@ export default async function ModulesPage() {
   ]);
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
       <Link href="/settings" className="text-sm text-primary underline-offset-4 hover:underline">
         {tSettings("title")}
       </Link>
@@ -27,7 +27,7 @@ export default async function ModulesPage() {
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <p className="text-sm text-muted">{t("subtitle", { count: current.active_clients })}</p>
       </div>
-      <section className="rounded-2xl border border-border bg-surface p-6">
+      <section className="card p-6">
         <ModulesForm catalog={catalog} selection={current.modules} activeClients={current.active_clients} />
       </section>
     </main>

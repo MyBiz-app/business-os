@@ -103,7 +103,7 @@ export function OnboardingForm({ timeZones, catalogs }: Props) {
           type="button"
           onClick={() => void next()}
           disabled={busy}
-          className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary disabled:opacity-60"
+          className="btn-primary px-4 py-2.5"
         >
           {t("onboarding.next")}
         </button>

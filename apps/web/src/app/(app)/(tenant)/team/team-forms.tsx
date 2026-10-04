@@ -48,14 +48,14 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
         <div className="flex flex-col gap-2">
           <FormNotice message={t("inviteCreated", { email: state.email ?? "" })} />
           <div className="flex gap-2">
-            <input readOnly value={state.link} dir="ltr" aria-label={t("copy")} className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm" />
+            <input readOnly value={state.link} dir="ltr" aria-label={t("copy")} className="min-w-0 flex-1 control px-3 py-2 text-sm" />
             <button
               type="button"
               onClick={async () => {
                 await navigator.clipboard.writeText(state.link ?? "");
                 setCopied(true);
               }}
-              className="rounded-lg border border-border px-3 py-2 text-sm font-medium"
+              className="btn-secondary px-3 py-2 text-sm"
             >
               {copied ? t("copied") : t("copy")}
             </button>
@@ -102,7 +102,7 @@ export function MemberRow({ userId, email, role, customRoleId, isSelf, allowOwne
             disabled={roleLocked}
             aria-label={`${t("team.role")}: ${email}`}
             onChange={(event) => event.currentTarget.form?.requestSubmit()}
-            className="rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
+            className="control px-2 py-1.5 text-sm"
           >
             {roleOptions.map((option) => (
               <option key={option.value} value={option.value}>

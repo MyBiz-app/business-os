@@ -13,14 +13,14 @@ export default async function ServicesPage() {
   const services = unwrap(await api.GET("/services", { params: scope }));
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("services.title")}</h1>
           <p className="text-sm text-muted">{t("services.subtitle")}</p>
         </div>
         {canWriteCatalog(tenant) && (
-          <Link href="/services/new" className="rounded-lg bg-primary px-4 py-2.5 font-semibold text-on-primary">
+          <Link href="/services/new" className="btn-primary px-4 py-2.5">
             {t("services.add")}
           </Link>
         )}
@@ -34,7 +34,7 @@ export default async function ServicesPage() {
             <li key={service.id}>
               <Link
                 href={`/services/${service.id}`}
-                className={`flex gap-3 rounded-2xl border border-border bg-surface p-4 hover:border-primary ${service.active ? "" : "opacity-60"}`}
+                className={`flex gap-3 card card-hover p-4 ${service.active ? "" : "opacity-60"}`}
               >
                 <span aria-hidden="true" className="mt-1 size-3 shrink-0 rounded-full" style={{ backgroundColor: service.color ?? "var(--primary)" }} />
                 <span className="flex flex-1 flex-col gap-1">

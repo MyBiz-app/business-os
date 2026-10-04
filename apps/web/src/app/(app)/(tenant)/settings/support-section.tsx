@@ -14,7 +14,7 @@ export async function SupportSection({ context }: { context: Awaited<ReturnType<
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: tenant.time_zone });
 
   return (
-    <section aria-labelledby="support-heading" className="flex flex-col gap-4 rounded-2xl border border-border bg-surface p-6">
+    <section aria-labelledby="support-heading" className="flex flex-col gap-4 card p-6">
       <div className="flex flex-col gap-1">
         <h2 id="support-heading" className="text-lg font-semibold">
           {t("title")}
@@ -25,14 +25,14 @@ export async function SupportSection({ context }: { context: Awaited<ReturnType<
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm font-medium">{t("activeUntil", { date: when.format(new Date(status.active.expires_at)) })}</p>
           <form action={revokeSupport}>
-            <button type="submit" className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-danger">
+            <button type="submit" className="btn-secondary px-4 py-2 text-sm text-danger">
               {t("revoke")}
             </button>
           </form>
         </div>
       ) : (
         <form action={grantSupport}>
-          <button type="submit" className="rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary">
+          <button type="submit" className="btn-primary px-4 py-2.5 text-sm">
             {t("grant")}
           </button>
         </form>

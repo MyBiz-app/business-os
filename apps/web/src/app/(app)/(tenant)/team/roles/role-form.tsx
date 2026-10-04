@@ -29,7 +29,7 @@ export function RoleForm({ role, permissions, grantable }: Props) {
   const error = state.error ?? removed.error;
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5">
+    <div className="flex flex-col gap-3 card p-5">
       <form action={action} className="flex flex-col gap-4" key={state.created ? "created" : (role?.id ?? "new")}>
         <FormError message={error && t(`team.errors.${error}`)} />
         <Field label={t("team.roleName")} name="name" required maxLength={60} defaultValue={role?.name ?? ""} />
