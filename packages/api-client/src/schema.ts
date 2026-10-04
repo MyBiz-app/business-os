@@ -1276,6 +1276,98 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Billing */
+        get: operations["get_billing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Details */
+        put: operations["set_details"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/payment-method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Test Card
+         * @description Adds a test card (no card number is ever entered in the prototype).
+         */
+        post: operations["add_test_card"];
+        /** Remove Card */
+        delete: operations["remove_card"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/invoices/{invoice_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Invoice */
+        get: operations["get_invoice"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/billing/invoices/{invoice_id}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pay Invoice
+         * @description Charges an open invoice to the business's (test) card.
+         */
+        post: operations["pay_invoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/pricing": {
         parameters: {
             query?: never;
@@ -1362,6 +1454,26 @@ export interface paths {
          * @description Businesses that wrote in through the marketing site, newest first.
          */
         get: operations["contact_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Billing Summary
+         * @description What MyBiz billed businesses, per month and currency (simulated charges).
+         */
+        get: operations["billing_summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1963,6 +2075,66 @@ export interface components {
             user_id: string;
             /** Name */
             name: string;
+        };
+        /** Billing */
+        Billing: {
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+            /** In Trial */
+            in_trial: boolean;
+            /** Trial Days Left */
+            trial_days_left: number;
+            /**
+             * Next Invoice On
+             * Format: date
+             * @description When the current period ends and is invoiced
+             */
+            next_invoice_on: string;
+            /** @description The current monthly price (modules and clients now) */
+            estimate: components["schemas"]["QuoteOut"];
+            payment_method: components["schemas"]["PaymentMethod"] | null;
+            details: components["schemas"]["BillingDetails"];
+            /** Invoices */
+            invoices: components["schemas"]["InvoiceSummary"][];
+            /**
+             * Balance Due
+             * @description Sum of open invoices, minor units
+             */
+            balance_due: number;
+        };
+        /** BillingDetails */
+        BillingDetails: {
+            /** Billing Name */
+            billing_name?: string | null;
+            /** Billing Email */
+            billing_email?: string | null;
+            /** Tax Id */
+            tax_id?: string | null;
+        };
+        /** BillingMonth */
+        BillingMonth: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** Currency */
+            currency: string;
+            /** Invoices */
+            invoices: number;
+            /**
+             * Paid
+             * @description Minor units
+             */
+            paid: number;
+            /**
+             * Open
+             * @description Minor units
+             */
+            open: number;
         };
         /** Body_import_clients */
         Body_import_clients: {
@@ -3031,6 +3203,101 @@ export interface components {
              */
             status: "pending" | "expired" | "accepted";
         };
+        /** Invoice */
+        Invoice: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Currency */
+            currency: string;
+            /** Total */
+            total: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "paid" | "void";
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Paid At */
+            paid_at: string | null;
+            /** Business Name */
+            business_name: string;
+            billing: components["schemas"]["BillingDetails"];
+            /** Active Clients */
+            active_clients: number;
+            /** Lines */
+            lines: components["schemas"]["InvoiceLine"][];
+            /** Card Last4 */
+            card_last4: string | null;
+            /** Simulated */
+            simulated: boolean;
+        };
+        /** InvoiceLine */
+        InvoiceLine: {
+            /**
+             * Key
+             * @description "core" or a module key
+             */
+            key: string;
+            /** Quantity */
+            quantity: number;
+            /** Amount */
+            amount: number;
+        };
+        /** InvoiceSummary */
+        InvoiceSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Currency */
+            currency: string;
+            /** Total */
+            total: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "paid" | "void";
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Paid At */
+            paid_at: string | null;
+        };
         /** JoinRequest */
         JoinRequest: {
             /** Code */
@@ -3451,6 +3718,23 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /** PaymentMethod */
+        PaymentMethod: {
+            /**
+             * Brand
+             * @enum {string}
+             */
+            brand: "visa" | "mastercard" | "amex";
+            /** Last4 */
+            last4: string;
+            /**
+             * Exp
+             * @description MM/YY
+             */
+            exp: string;
+            /** Simulated */
+            simulated: boolean;
         };
         /** PendingAction */
         PendingAction: {
@@ -4367,6 +4651,15 @@ export interface components {
             requires_health_declaration?: boolean | null;
             /** Online Sales */
             online_sales?: boolean | null;
+        };
+        /** TestCardRequest */
+        TestCardRequest: {
+            /**
+             * Brand
+             * @default visa
+             * @enum {string}
+             */
+            brand: "visa" | "mastercard" | "amex";
         };
         /** Turn */
         Turn: {
@@ -7530,6 +7823,202 @@ export interface operations {
             };
         };
     };
+    get_billing: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Billing"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_details: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingDetails"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingDetails"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_test_card: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestCardRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentMethod"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_card: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_invoice: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invoice"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pay_invoice: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invoice"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     public_pricing: {
         parameters: {
             query?: {
@@ -7662,6 +8151,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContactRequest"][];
+                };
+            };
+        };
+    };
+    billing_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMonth"][];
                 };
             };
         };

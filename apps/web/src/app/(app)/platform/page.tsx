@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ColumnChart } from "@/components/charts/column-chart";
 import { getApi, unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
+import { formatMoney } from "@/lib/money";
 import { getActiveMembership } from "@/lib/tenant";
 
 /** Platform console (P-1, P-3): every business on the platform and AI usage. */
@@ -14,10 +15,11 @@ export default async function PlatformPage() {
   const { me } = await getActiveMembership();
   if (!me.platform_admin) notFound();
   const api = await getApi();
-  const [businesses, usage, leads] = await Promise.all([
+  const [businesses, usage, leads, billing] = await Promise.all([
     api.GET("/platform/businesses").then(unwrap),
     api.GET("/platform/usage", { params: { query: { days: 30 } } }).then(unwrap),
     api.GET("/platform/contact-requests").then(unwrap),
+    api.GET("/platform/billing").then(unwrap),
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
@@ -116,6 +118,41 @@ export default async function PlatformPage() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section aria-labelledby="billing-heading" className="flex flex-col gap-3">
+        <div className="flex flex-col gap-0.5">
+          <h2 id="billing-heading" className="text-lg font-semibold">
+            {t("platform.billing")}
+          </h2>
+          <p className="text-sm text-muted">{t("platform.billingHint")}</p>
+        </div>
+        {billing.length === 0 ? (
+          <p className="text-muted">{t("platform.noBilling")}</p>
+        ) : (
+          <div className="overflow-x-auto card">
+            <table className="w-full text-sm">
+              <thead className="text-muted">
+                <tr className="border-b border-border">
+                  <th scope="col" className="px-4 py-3 text-start font-medium">{t("platform.month")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("platform.invoices")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("platform.paid")}</th>
+                  <th scope="col" className="px-4 py-3 text-end font-medium">{t("platform.open")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {billing.map((row) => (
+                  <tr key={`${row.month}-${row.currency}`} className="border-b border-border last:border-0">
+                    <td className="px-4 py-3">{formatDay(row.month, locale, { month: "long", year: "numeric" })}</td>
+                    <td className="px-4 py-3 text-end tabular-nums">{number.format(row.invoices)}</td>
+                    <td className="px-4 py-3 text-end tabular-nums"><bdi>{formatMoney(row.paid, row.currency, locale)}</bdi></td>
+                    <td className="px-4 py-3 text-end tabular-nums"><bdi>{formatMoney(row.open, row.currency, locale)}</bdi></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </section>
 
       <section aria-labelledby="leads-heading" className="flex flex-col gap-3">

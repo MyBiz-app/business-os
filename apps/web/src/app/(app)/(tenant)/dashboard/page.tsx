@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, Gauge, Minus, UserPlus, Users, UserX } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, CreditCard, Gauge, Minus, UserPlus, Users, UserX } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -8,7 +8,7 @@ import { CountUp } from "@/components/motion/count-up";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
-import { canReadReports } from "@/lib/permissions";
+import { canManageSettings, canReadReports } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { BusinessSwitcher } from "./business-switcher";
@@ -56,6 +56,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         api.GET("/metrics/{key}/series", { params: { ...scope, path: { key: "attendance" }, query: { start: addDays(end, -83), end, grain: "week" } } }).then(unwrap),
       ])
     : [[], [], []];
+
+  // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
+  // invoice is unpaid.
+  const billing = canManageSettings(tenant) ? (await api.GET("/billing", { params: scope })).data : undefined;
+  const billingNotice = !billing
+    ? null
+    : billing.balance_due > 0
+      ? t("billing.dashboardDue", { amount: formatMoney(billing.balance_due, billing.estimate.currency, locale) })
+      : billing.in_trial && !billing.payment_method && billing.trial_days_left <= 7
+        ? t("billing.dashboardTrial", { days: billing.trial_days_left })
+        : null;
 
   const number = new Intl.NumberFormat(locale);
   // Rounded, with a sign; never "-0".
@@ -114,6 +125,16 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
 
   return (
     <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
+      {billingNotice && (
+        <Link
+          href="/settings/billing"
+          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
+        >
+          <CreditCard aria-hidden="true" className="size-5 shrink-0" />
+          <span className="flex-1">{billingNotice}</span>
+          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+        </Link>
+      )}
       <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-6 sm:p-8">
         <div
           aria-hidden="true"

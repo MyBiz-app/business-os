@@ -5,7 +5,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -83,3 +83,18 @@ def contact_requests(db: AdminDep) -> list[ContactRequest]:
     """Businesses that wrote in through the marketing site, newest first."""
     rows = db.execute(text("SELECT * FROM app.platform_contact_requests()")).mappings()
     return [ContactRequest.model_validate(dict(row)) for row in rows]
+
+
+class BillingMonth(BaseModel):
+    month: dt.date
+    currency: str
+    invoices: int
+    paid: int = Field(description="Minor units")
+    open: int = Field(description="Minor units")
+
+
+@router.get("/billing")
+def billing_summary(db: AdminDep) -> list[BillingMonth]:
+    """What MyBiz billed businesses, per month and currency (simulated charges)."""
+    rows = db.execute(text("SELECT * FROM app.platform_billing_summary()")).mappings()
+    return [BillingMonth.model_validate(dict(row)) for row in rows]

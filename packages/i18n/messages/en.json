@@ -65,7 +65,9 @@
     "requireHealth": "Clients need a health declaration to book in the app",
     "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book.",
     "onlineSales": "Clients can buy plans in the app",
-    "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged."
+    "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged.",
+    "billingLink": "MyBiz billing",
+    "billingHint": "Trial, payment method and invoices."
   },
   "locales": {
     "he": "עברית",
@@ -938,7 +940,14 @@
       "business": "Business",
       "vertical": "Industry",
       "message": "Message"
-    }
+    },
+    "billing": "Billing revenue",
+    "billingHint": "Monthly invoices to businesses (simulated charges in the prototype).",
+    "noBilling": "No invoices yet.",
+    "month": "Month",
+    "invoices": "Invoices",
+    "paid": "Paid",
+    "open": "Open"
   },
   "permissions": {
     "clients_read": "View clients",
@@ -1639,5 +1648,62 @@
       "too_many_requests": "We've already received a few messages from you. Please try again later.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "billing": {
+    "title": "Billing",
+    "subtitle": "Your MyBiz subscription: plan, payment method and invoices.",
+    "simulated": "Prototype: charges are simulated. Don't enter a real card; no money moves.",
+    "trialLeft": "{days, plural, one {1 day} other {# days}} left in your trial",
+    "trialProgress": "Trial progress",
+    "active": "Your subscription is active",
+    "firstInvoice": "Your first invoice will be issued on {date}",
+    "nextInvoice": "Your next invoice will be issued on {date}",
+    "balanceDue": "Balance due: {amount}. You can pay below.",
+    "plan": "Your plan",
+    "changeModules": "Change modules",
+    "perMonth": "Per month",
+    "paymentMethod": "Payment method",
+    "noCard": "No payment method yet. In the prototype you add a test card with one click.",
+    "brand": "Card type",
+    "addTestCard": "Add a test card",
+    "removeCard": "Remove card",
+    "testCard": "Test",
+    "brands": {
+      "visa": "Visa",
+      "mastercard": "Mastercard",
+      "amex": "American Express"
+    },
+    "details": "Invoice details",
+    "billingName": "Name on invoices",
+    "billingEmail": "Billing email",
+    "taxId": "Tax ID",
+    "saveDetails": "Save details",
+    "invoices": "Invoices",
+    "noInvoices": "No invoices yet. The first one is issued at the end of the first month after your trial.",
+    "number": "Number",
+    "period": "Period",
+    "status": "Status",
+    "total": "Total",
+    "actions": "Actions",
+    "pay": "Pay",
+    "view": "View",
+    "viewInvoice": "View invoice {number}",
+    "statuses": {
+      "open": "Due",
+      "paid": "Paid",
+      "void": "Void"
+    },
+    "back": "Back to billing",
+    "print": "Print",
+    "sample": "Sample invoice — simulated charge in the prototype",
+    "invoiceTitle": "Invoice {number}",
+    "issuedAt": "Date",
+    "to": "Billed to",
+    "item": "Item",
+    "amount": "Amount",
+    "activeClients": "{count} active clients at the end of the period",
+    "paidWith": "Paid with the card ending {last4} on {date}",
+    "dashboardTrial": "{days, plural, one {1 day} other {# days}} left in your trial. Add a payment method to keep going without a break.",
+    "dashboardDue": "You have an open MyBiz invoice of {amount}."
   }
 }

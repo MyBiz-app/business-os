@@ -6,7 +6,7 @@ import { ApiError, unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
-import { PrintButton } from "./print-button";
+import { PrintButton } from "@/components/print-button";
 
 /** A payment's receipt, laid out as a printable document. */
 export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]">) {

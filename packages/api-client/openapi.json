@@ -5645,6 +5645,327 @@
         }
       }
     },
+    "/billing": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Get Billing",
+        "operationId": "get_billing",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Billing"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/details": {
+      "put": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Set Details",
+        "operationId": "set_details",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingDetails"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/payment-method": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Add Test Card",
+        "description": "Adds a test card (no card number is ever entered in the prototype).",
+        "operationId": "add_test_card",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestCardRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentMethod"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Remove Card",
+        "operationId": "remove_card",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/invoices/{invoice_id}": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Get Invoice",
+        "operationId": "get_invoice",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Invoice Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/billing/invoices/{invoice_id}/pay": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Pay Invoice",
+        "description": "Charges an open invoice to the business's (test) card.",
+        "operationId": "pay_invoice",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Invoice Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invoice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/pricing": {
       "get": {
         "tags": [
@@ -5850,6 +6171,37 @@
                   },
                   "type": "array",
                   "title": "Response Contact Requests"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/billing": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Billing Summary",
+        "description": "What MyBiz billed businesses, per month and currency (simulated charges).",
+        "operationId": "billing_summary",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BillingMonth"
+                  },
+                  "type": "array",
+                  "title": "Response Billing Summary"
                 }
               }
             }
@@ -7825,6 +8177,149 @@
           "name"
         ],
         "title": "AppointmentStaff"
+      },
+      "Billing": {
+        "properties": {
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          },
+          "in_trial": {
+            "type": "boolean",
+            "title": "In Trial"
+          },
+          "trial_days_left": {
+            "type": "integer",
+            "title": "Trial Days Left"
+          },
+          "next_invoice_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Next Invoice On",
+            "description": "When the current period ends and is invoiced"
+          },
+          "estimate": {
+            "$ref": "#/components/schemas/QuoteOut",
+            "description": "The current monthly price (modules and clients now)"
+          },
+          "payment_method": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaymentMethod"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "details": {
+            "$ref": "#/components/schemas/BillingDetails"
+          },
+          "invoices": {
+            "items": {
+              "$ref": "#/components/schemas/InvoiceSummary"
+            },
+            "type": "array",
+            "title": "Invoices"
+          },
+          "balance_due": {
+            "type": "integer",
+            "title": "Balance Due",
+            "description": "Sum of open invoices, minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trial_ends_at",
+          "in_trial",
+          "trial_days_left",
+          "next_invoice_on",
+          "estimate",
+          "payment_method",
+          "details",
+          "invoices",
+          "balance_due"
+        ],
+        "title": "Billing"
+      },
+      "BillingDetails": {
+        "properties": {
+          "billing_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 160
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Name"
+          },
+          "billing_email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Billing Email"
+          },
+          "tax_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tax Id"
+          }
+        },
+        "type": "object",
+        "title": "BillingDetails"
+      },
+      "BillingMonth": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "title": "Month"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "invoices": {
+            "type": "integer",
+            "title": "Invoices"
+          },
+          "paid": {
+            "type": "integer",
+            "title": "Paid",
+            "description": "Minor units"
+          },
+          "open": {
+            "type": "integer",
+            "title": "Open",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "currency",
+          "invoices",
+          "paid",
+          "open"
+        ],
+        "title": "BillingMonth"
       },
       "Body_import_clients": {
         "properties": {
@@ -10525,6 +11020,209 @@
         ],
         "title": "InvitationPreview"
       },
+      "Invoice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "paid",
+              "void"
+            ],
+            "title": "Status"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          },
+          "business_name": {
+            "type": "string",
+            "title": "Business Name"
+          },
+          "billing": {
+            "$ref": "#/components/schemas/BillingDetails"
+          },
+          "active_clients": {
+            "type": "integer",
+            "title": "Active Clients"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/InvoiceLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "card_last4": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Last4"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "period_start",
+          "period_end",
+          "currency",
+          "total",
+          "status",
+          "issued_at",
+          "paid_at",
+          "business_name",
+          "billing",
+          "active_clients",
+          "lines",
+          "card_last4",
+          "simulated"
+        ],
+        "title": "Invoice"
+      },
+      "InvoiceLine": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "\"core\" or a module key"
+          },
+          "quantity": {
+            "type": "integer",
+            "title": "Quantity"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "quantity",
+          "amount"
+        ],
+        "title": "InvoiceLine"
+      },
+      "InvoiceSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "paid",
+              "void"
+            ],
+            "title": "Status"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "paid_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "period_start",
+          "period_end",
+          "currency",
+          "total",
+          "status",
+          "issued_at",
+          "paid_at"
+        ],
+        "title": "InvoiceSummary"
+      },
       "JoinRequest": {
         "properties": {
           "code": {
@@ -11871,6 +12569,40 @@
           "name"
         ],
         "title": "OptionItem"
+      },
+      "PaymentMethod": {
+        "properties": {
+          "brand": {
+            "type": "string",
+            "enum": [
+              "visa",
+              "mastercard",
+              "amex"
+            ],
+            "title": "Brand"
+          },
+          "last4": {
+            "type": "string",
+            "title": "Last4"
+          },
+          "exp": {
+            "type": "string",
+            "title": "Exp",
+            "description": "MM/YY"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "brand",
+          "last4",
+          "exp",
+          "simulated"
+        ],
+        "title": "PaymentMethod"
       },
       "PendingAction": {
         "properties": {
@@ -14491,6 +15223,22 @@
         },
         "type": "object",
         "title": "TenantUpdate"
+      },
+      "TestCardRequest": {
+        "properties": {
+          "brand": {
+            "type": "string",
+            "enum": [
+              "visa",
+              "mastercard",
+              "amex"
+            ],
+            "title": "Brand",
+            "default": "visa"
+          }
+        },
+        "type": "object",
+        "title": "TestCardRequest"
       },
       "Turn": {
         "properties": {

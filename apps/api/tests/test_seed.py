@@ -69,3 +69,13 @@ def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
         ).scalar_one()
     assert set(stages) == {"new", "contacted", "trial", "offer", "won", "lost"}
     assert won_without_client == 0  # won leads are clients
+    with engine.connect() as connection:
+        invoices = (
+            connection.execute(
+                text("SELECT status FROM app.platform_invoices WHERE tenant_id = :t"),
+                {"t": tenant_id},
+            )
+            .scalars()
+            .all()
+        )
+    assert len(invoices) >= 4 and set(invoices) == {"paid"}  # 2 months of data + 90 days before

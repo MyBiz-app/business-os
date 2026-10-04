@@ -42,3 +42,9 @@ jobs:
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
         run: uv run python -m app.jobs remind-plans
+
+      - name: Invoice businesses for MyBiz (simulated charges)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs bill-businesses
