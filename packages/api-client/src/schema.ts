@@ -990,6 +990,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public Pricing
+         * @description The price list for the marketing site (no sign-in).
+         */
+        get: operations["public_pricing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Contact */
+        post: operations["contact"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/businesses": {
         parameters: {
             query?: never;
@@ -1019,6 +1056,26 @@ export interface paths {
          * @description Usage per day and meter, for one business or the whole platform.
          */
         get: operations["usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/contact-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Contact Requests
+         * @description Businesses that wrote in through the marketing site, newest first.
+         */
+        get: operations["contact_requests"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2009,6 +2066,59 @@ export interface components {
             closed_day: components["schemas"]["ClosedDay"];
             /** Cancelled Sessions */
             cancelled_sessions: number;
+        };
+        /** ContactCreate */
+        ContactCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** Phone */
+            phone?: string | null;
+            /** Business */
+            business?: string | null;
+            /** Vertical */
+            vertical?: ("fitness" | "beauty" | "clinic" | "garage" | "other") | null;
+            /** Message */
+            message?: string | null;
+            /**
+             * Locale
+             * @default he
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Website */
+            website?: string | null;
+        };
+        /** ContactRequest */
+        ContactRequest: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Email */
+            email: string;
+            /** Phone */
+            phone: string | null;
+            /** Business */
+            business: string | null;
+            /** Vertical */
+            vertical: string | null;
+            /** Message */
+            message: string | null;
+            /** Locale */
+            locale: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** Conversation */
         Conversation: {
@@ -6071,6 +6181,70 @@ export interface operations {
             };
         };
     };
+    public_pricing: {
+        parameters: {
+            query?: {
+                currency?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalog"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     businesses: {
         parameters: {
             query?: never;
@@ -6119,6 +6293,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    contact_requests: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactRequest"][];
                 };
             };
         };

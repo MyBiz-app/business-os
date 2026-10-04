@@ -64,3 +64,22 @@ def usage(
         {"tenant_id": tenant_id, "days": days},
     ).mappings()
     return [UsagePoint.model_validate(dict(row)) for row in rows]
+
+
+class ContactRequest(BaseModel):
+    id: UUID
+    name: str
+    email: str
+    phone: str | None
+    business: str | None
+    vertical: str | None
+    message: str | None
+    locale: str
+    created_at: dt.datetime
+
+
+@router.get("/contact-requests")
+def contact_requests(db: AdminDep) -> list[ContactRequest]:
+    """Businesses that wrote in through the marketing site, newest first."""
+    rows = db.execute(text("SELECT * FROM app.platform_contact_requests()")).mappings()
+    return [ContactRequest.model_validate(dict(row)) for row in rows]

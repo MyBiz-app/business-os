@@ -22,6 +22,7 @@ from app.modules import (
 from app.permissions import Permission
 
 router = APIRouter(tags=["modules"])
+public_router = APIRouter(tags=["public"])
 
 SettingsDep = Annotated[TenantContext, Depends(require(Permission.BUSINESS_SETTINGS))]
 Currency = Annotated[str, Query(pattern=r"^[A-Z]{3}$")]
@@ -81,6 +82,16 @@ class TenantModules(BaseModel):
 
 @router.get("/modules/catalog")
 def catalog(_user: UserDep, currency: Currency = "ILS") -> Catalog:
+    return build_catalog(currency)
+
+
+@public_router.get("/public/pricing")
+def public_pricing(currency: Currency = "ILS") -> Catalog:
+    """The price list for the marketing site (no sign-in)."""
+    return build_catalog(currency)
+
+
+def build_catalog(currency: str) -> Catalog:
     return Catalog(
         currency=currency,
         core=[

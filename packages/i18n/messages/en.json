@@ -837,6 +837,16 @@
       "bookings30d": "Bookings 30d",
       "aiCredits30d": "AI credits 30d",
       "created": "Created"
+    },
+    "leads": "Contact requests",
+    "noLeads": "No requests yet.",
+    "leadColumns": {
+      "when": "When",
+      "name": "Name",
+      "contact": "Contact",
+      "business": "Business",
+      "vertical": "Industry",
+      "message": "Message"
     }
   },
   "permissions": {
@@ -1051,5 +1061,340 @@
     "print": "Print",
     "back": "Back to the client",
     "thanks": "Thank you!"
+  },
+  "marketing": {
+    "nav": {
+      "features": "Features",
+      "industries": "Industries",
+      "pricing": "Pricing",
+      "about": "About",
+      "contact": "Contact",
+      "login": "Log in",
+      "start": "Start free",
+      "menu": "Menu",
+      "close": "Close",
+      "dashboard": "Go to dashboard"
+    },
+    "hero": {
+      "eyebrow": "Business management + an AI workforce for small businesses",
+      "title": "Your business, organized.",
+      "titleAccent": "Finally.",
+      "subtitle": "Calendar, clients, memberships, payments and a branded client app – all in one place, with an AI assistant that answers questions and prepares actions for your approval.",
+      "ctaPrimary": "Start free",
+      "ctaSecondary": "See how it works",
+      "note": "No credit card · Set up in minutes · Hebrew and English"
+    },
+    "mock": {
+      "title": "Overview",
+      "revenue": "Revenue this month",
+      "members": "Active clients",
+      "occupancy": "Occupancy",
+      "today": "Today",
+      "classes": [
+        "Reformer Pilates",
+        "Yoga Flow",
+        "HIIT"
+      ],
+      "ai": "Who hasn't come in for two weeks?",
+      "aiAnswer": "4 active members. I drafted a reminder for your approval."
+    },
+    "trust": {
+      "items": [
+        "Full Hebrew and English, RTL and LTR",
+        "Every business's data separated and secured",
+        "No commitment, cancel anytime",
+        "Real human support"
+      ]
+    },
+    "features": {
+      "title": "Everything a small business needs. Without ten systems.",
+      "subtitle": "Start with what matters to you and add modules as you grow.",
+      "items": {
+        "schedule": {
+          "title": "Calendar & bookings",
+          "text": "Group classes, recurring series, waitlists, closed days and holidays – no spreadsheets."
+        },
+        "clients": {
+          "title": "Clients in one place",
+          "text": "A full client profile: visits, plans, forms, notes, and import from your existing file."
+        },
+        "plans": {
+          "title": "Memberships & passes",
+          "text": "Monthly memberships, class passes, freezes and renewals – counted for you."
+        },
+        "app": {
+          "title": "Branded client app",
+          "text": "Clients book, buy and get updates in an app with your logo and colors."
+        },
+        "ai": {
+          "title": "AI assistant",
+          "text": "Ask in plain words, get answers from your own data. Actions only with your approval."
+        },
+        "reports": {
+          "title": "Reports that make sense",
+          "text": "Revenue, occupancy, no-shows and who to reach out to – at a glance."
+        },
+        "team": {
+          "title": "Team & permissions",
+          "text": "Everyone sees just what they need. Ready-made or custom roles."
+        },
+        "payments": {
+          "title": "Payments & receipts",
+          "text": "Sell at the desk or in the app, with a numbered receipt for every payment."
+        }
+      }
+    },
+    "steps": {
+      "title": "Get started in three steps",
+      "items": [
+        {
+          "title": "Create an account",
+          "text": "Answer a few questions and get a setup tailored to your business."
+        },
+        {
+          "title": "Set up your business",
+          "text": "Services, prices, team and logo. Or import your clients from a file."
+        },
+        {
+          "title": "Invite your clients",
+          "text": "Share a code or QR, and clients sign up in the app on their own."
+        }
+      ]
+    },
+    "industries": {
+      "title": "Made for your industry",
+      "subtitle": "The same powerful system, with each industry's terms, forms and settings.",
+      "more": "Learn more",
+      "soon": "Coming soon",
+      "items": {
+        "fitness": {
+          "name": "Studios & gyms",
+          "tagline": "Classes, memberships and health forms.",
+          "points": [
+            "Group classes and waitlists",
+            "Memberships, passes and freezes",
+            "Digital health declaration"
+          ],
+          "heroTitle": "A full studio. No chaos.",
+          "heroText": "Class schedule, waitlists, memberships and passes, health declarations and a branded app for your members."
+        },
+        "beauty": {
+          "name": "Barbers & beauty salons",
+          "tagline": "Appointments, staff and reminders.",
+          "points": [
+            "Appointments by staff and service",
+            "Automatic client reminders",
+            "Treatment history and preferences"
+          ],
+          "heroTitle": "Full chairs, a tidy calendar.",
+          "heroText": "Appointments by barber or stylist, reminders that cut no-shows, and a treatment history for every client."
+        },
+        "clinic": {
+          "name": "Clinics & therapists",
+          "tagline": "Patients, forms and records.",
+          "points": [
+            "Calendar by practitioner and room",
+            "Digital intake and consent forms",
+            "Strict privacy and permissions"
+          ],
+          "heroTitle": "More time for patients.",
+          "heroText": "A calendar by practitioner and room, digital intake and consent forms, and permissions that protect patient privacy."
+        },
+        "garage": {
+          "name": "Garages & car services",
+          "tagline": "Vehicles, work orders and updates.",
+          "points": [
+            "A vehicle card for every client",
+            "Bookings by bay and service",
+            "A heads-up when the car is ready"
+          ],
+          "heroTitle": "Every car, every job, under control.",
+          "heroText": "A vehicle card for every client, bookings by bay, and an automatic update when the car is ready."
+        }
+      }
+    },
+    "ai": {
+      "eyebrow": "AI workforce",
+      "title": "An assistant that knows your business",
+      "text": "Ask the way you talk – \"How much did we make this month?\", \"Who hasn't come in for two weeks?\" – and get answers from your real data. When something needs doing, the assistant prepares it and you approve with one click.",
+      "points": [
+        "Answers from your data, not guesses",
+        "Nothing happens without your approval",
+        "In Hebrew and English"
+      ],
+      "q": "How did this month compare to last month?",
+      "a": "This month: $12,340 (+18%). Occupancy rose to 71%. Most popular: Reformer Pilates on Tuesday evenings."
+    },
+    "app": {
+      "eyebrow": "Client app",
+      "title": "Your app, with your logo",
+      "text": "Clients join with a code or QR, see the schedule, book, cancel, buy a plan and get updates – no phone calls.",
+      "points": [
+        "Book and cancel in one tap",
+        "Waitlist with automatic promotion",
+        "Buy and pay inside the app"
+      ],
+      "phoneTitle": "Schedule",
+      "book": "Book",
+      "booked": "Booked ✓"
+    },
+    "pricing": {
+      "title": "Pay only for what you need",
+      "subtitle": "A base price by business size, plus modules you add when you want. No surprises.",
+      "from": "From ",
+      "perMonth": "/month",
+      "core": "Base",
+      "coreText": "Calendar, clients, memberships, team, reports and payments.",
+      "upTo": "Up to {count} active clients",
+      "custom": "Over 1,000 active clients",
+      "customPrice": "Custom price",
+      "modulesTitle": "Modules",
+      "presetsTitle": "Recommended plans",
+      "presets": {
+        "starter": "Starter",
+        "growing": "Growing",
+        "ai_powered": "AI-powered"
+      },
+      "presetText": {
+        "starter": "The full base, for a business just starting.",
+        "growing": "Base + client app + AI assistant.",
+        "ai_powered": "Base + client app + AI that takes actions."
+      },
+      "popular": "Most popular",
+      "cta": "Start free",
+      "seeAll": "See all prices",
+      "note": "Launch prices, subject to change.",
+      "currency": "Currency"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "q": "How long does it take to get started?",
+          "a": "A few minutes. Answer a few questions, set up services and prices, and import your clients from an existing spreadsheet."
+        },
+        {
+          "q": "Is there a commitment?",
+          "a": "No. Pay month to month and cancel anytime."
+        },
+        {
+          "q": "Is my data secure?",
+          "a": "Yes. Every business's data is separated at the database level, every access is logged, and you can export or erase a client's data on request."
+        },
+        {
+          "q": "Do my clients need to download an app?",
+          "a": "Not necessarily. The app also works in the phone's browser, with nothing to install."
+        },
+        {
+          "q": "Can the AI assistant do things without approval?",
+          "a": "No. The assistant only answers and prepares actions. Every booking, cancellation or change waits for your approval."
+        },
+        {
+          "q": "Is it right for my business?",
+          "a": "It is built for small and medium businesses: studios, barbers, clinics, garages and more. Tell us about yours and we will tailor the setup."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready for a more organized business?",
+      "text": "Create a free account and start working today.",
+      "button": "Start free",
+      "contact": "Talk to us"
+    },
+    "footer": {
+      "tagline": "Business management and an AI workforce for small businesses.",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal",
+      "terms": "Terms of use",
+      "privacy": "Privacy policy",
+      "accessibility": "Accessibility",
+      "rights": "© {year} MyBiz. All rights reserved.",
+      "status": "System status"
+    },
+    "about": {
+      "title": "Building the system small businesses deserve",
+      "intro": "Small businesses run their days between a phone calendar, spreadsheets, WhatsApp and a notebook. MyBiz brings it all into one place – and adds an AI workforce that does the busywork.",
+      "valuesTitle": "What guides us",
+      "values": [
+        {
+          "title": "Truly simple",
+          "text": "Every screen is built so that even non-\"techy\" people get it on day one."
+        },
+        {
+          "title": "You stay in control",
+          "text": "The AI suggests and prepares; the decisions are yours. Nothing happens without approval."
+        },
+        {
+          "title": "Privacy first",
+          "text": "Every business's data is separated and protected, and you decide who sees what."
+        },
+        {
+          "title": "Built for real markets",
+          "text": "Hebrew and English, local currencies, holidays and taxes – from the ground up, not as a translation."
+        }
+      ]
+    },
+    "contact": {
+      "title": "Let's talk",
+      "subtitle": "Tell us a little about your business and we'll get back to you soon.",
+      "name": "Full name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "business": "Business name (optional)",
+      "vertical": "Industry",
+      "verticals": {
+        "fitness": "Studio / gym",
+        "beauty": "Barber / beauty",
+        "clinic": "Clinic / therapy",
+        "garage": "Garage / car",
+        "other": "Other"
+      },
+      "message": "How can we help?",
+      "send": "Send",
+      "sent": "Thank you! We got your message and will get back to you soon.",
+      "errors": {
+        "invalid": "Check the details and try again.",
+        "too_many_requests": "You sent several messages in a row. Try again in an hour.",
+        "generic": "Something went wrong. Please try again."
+      },
+      "other": "Or write to us directly",
+      "website": "Website (leave empty)"
+    },
+    "legal": {
+      "draft": "Draft – this document is in progress and will be finalized before launch.",
+      "terms": {
+        "title": "Terms of use",
+        "body": [
+          "Use of MyBiz is subject to these terms. The business owner is responsible for the information they enter about their clients and for obtaining consent as required by law.",
+          "The service is a monthly subscription and can be cancelled at any time. Launch prices are temporary.",
+          "AI features provide answers and suggestions only; any action is carried out only after the user approves it."
+        ]
+      },
+      "privacy": {
+        "title": "Privacy policy",
+        "body": [
+          "We keep only the information needed to run the service. Every business's data is separated and protected at the database level.",
+          "The business owner can export or erase any client's data on request, and every support access is logged and requires the owner's approval.",
+          "Servers are located in the European Union (Frankfurt), whose data protection Israel and the EU mutually recognize."
+        ]
+      },
+      "accessibility": {
+        "title": "Accessibility statement",
+        "body": [
+          "We work to make the site and the system accessible according to Israeli Standard 5568 and WCAG 2.2 level AA.",
+          "The site supports keyboard navigation, screen readers, text zoom and dark mode, and respects the reduced-motion setting.",
+          "Ran into a problem? Write to us through the contact page and we will fix it soon."
+        ]
+      }
+    },
+    "meta": {
+      "home": "MyBiz – Business management and an AI workforce for small businesses",
+      "features": "Features",
+      "pricing": "Pricing",
+      "about": "About",
+      "contact": "Contact",
+      "industries": "Industries"
+    }
   }
 }

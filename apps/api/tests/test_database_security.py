@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 # Tables without tenant_id that are still protected by RLS (their own policies).
-GLOBAL_TABLES = {"tenants", "users", "platform_admins"}
+GLOBAL_TABLES = {"tenants", "users", "platform_admins", "contact_requests"}
 
 
 def _query(engine: Engine, sql: str) -> list:
