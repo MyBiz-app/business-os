@@ -17,7 +17,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const today = todayIn(tenant.time_zone);
   const start = weekStart(isDay(week) ? week : today);
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
-  const sessions = unwrap(await api.GET("/sessions", { params: { ...scope, query: { start, days: 7 } } }));
+  const [sessions, closedDays] = await Promise.all([
+    api.GET("/sessions", { params: { ...scope, query: { start, days: 7 } } }).then(unwrap),
+    api.GET("/closed-days", { params: { ...scope, query: { start } } }).then(unwrap),
+  ]);
+  const closed = new Map(closedDays.map((d) => [d.day, d]));
   const byDay = new Map(days.map((day) => [day, sessions.filter((s) => dayOf(s.starts_at, tenant.time_zone) === day)]));
   const range = `${formatDay(days[0], locale, { day: "numeric", month: "short" })} – ${formatDay(days[6], locale, { day: "numeric", month: "short", year: "numeric" })}`;
 
@@ -40,6 +44,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("nextWeek")}
             </Link>
           </nav>
+          {canWriteSchedule(tenant) && (
+            <Link href="/schedule/closed" className="rounded-lg border border-border px-3 py-2 text-sm">
+              {t("closedDays")}
+            </Link>
+          )}
           {canWriteSchedule(tenant) && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {canWriteSchedule(tenant) && (
             <Link
@@ -64,6 +73,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               <div className={`px-1 text-sm font-semibold ${day === today ? "text-primary" : ""}`}>
                 {formatDay(day, locale, { weekday: "short", day: "numeric" })}
               </div>
+              {closed.has(day) && (
+                <p className="rounded-lg bg-surface px-2 py-1 text-xs font-medium" dir="auto">
+                  {t("closedDay")}
+                  {closed.get(day)?.reason && ` · ${closed.get(day)?.reason}`}
+                </p>
+              )}
               {daySessions.length === 0 ? (
                 <p className="px-1 text-xs text-muted">{t("noSessions")}</p>
               ) : (

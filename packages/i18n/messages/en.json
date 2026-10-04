@@ -394,7 +394,23 @@
     "copyWeek": "Copy week to next week",
     "copyWeekHint": "Copies this week's one-off classes. Weekly series repeat on their own.",
     "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
-    "copyWeekError": "Couldn't copy the week. Try again."
+    "copyWeekError": "Couldn't copy the week. Try again.",
+    "closedDays": "Closed days",
+    "closedDay": "Closed",
+    "closeDay": "Close a day",
+    "closedDate": "Date",
+    "closedReason": "Reason (optional)",
+    "closedReasonHint": "For example: Rosh Hashanah",
+    "closedHint": "Classes that day are cancelled and booked clients are told. Weekly series won't add classes on this day.",
+    "closedDone": "{count, plural, =0 {Day closed. There were no classes that day.} one {Day closed. # class was cancelled.} other {Day closed. # classes were cancelled.}}",
+    "upcomingClosed": "Upcoming closed days",
+    "noClosedDays": "No closed days ahead.",
+    "reopenDay": "Reopen",
+    "closedErrors": {
+      "already_closed": "This day is already closed.",
+      "invalid": "Please choose a date.",
+      "generic": "Something went wrong. Try again."
+    }
   },
   "bookings": {
     "title": "Bookings",

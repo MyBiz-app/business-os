@@ -270,9 +270,20 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
     series_id: UUID | None = None
     if body.repeat:
         ends_on = body.repeat.ends_on or body.date + timedelta(days=DEFAULT_SERIES_DAYS)
+        closed = set(
+            db.execute(
+                text("SELECT day FROM app.closed_days WHERE day BETWEEN :from AND :to"),
+                {"from": body.date, "to": ends_on},
+            ).scalars()
+        )
         starts = list(
             weekly_occurrences(
-                body.date, ends_on, set(body.repeat.weekdays), body.start_time, time_zone
+                body.date,
+                ends_on,
+                set(body.repeat.weekdays),
+                body.start_time,
+                time_zone,
+                skip=closed,
             )
         )
     else:
@@ -611,3 +622,101 @@ def copy_week(body: WeekCopy, context: WriteDep) -> WeekCopied:
         .one()
     )
     return WeekCopied(created=result["created"], skipped=result["skipped"])
+
+
+class ClosedDay(BaseModel):
+    id: UUID
+    day: dt.date
+    reason: str | None
+
+
+class ClosedDayCreate(BaseModel):
+    day: dt.date
+    reason: str | None = Field(default=None, max_length=120)
+
+    @field_validator("reason", mode="before")
+    @classmethod
+    def blank_reason(cls, value: object) -> object:
+        return blank_to_none(value)
+
+
+class ClosedDayCreated(BaseModel):
+    closed_day: ClosedDay
+    cancelled_sessions: int
+
+
+@router.get("/closed-days")
+def list_closed_days(
+    context: ReadDep, start: Annotated[dt.date | None, Query()] = None
+) -> list[ClosedDay]:
+    """Closed days from `start` (default: today, local) on."""
+    db = context.session
+    rows = db.execute(
+        text("""
+            SELECT id, day, reason FROM app.closed_days
+            WHERE day >= coalesce(CAST(:start AS date),
+                                  (SELECT (now() AT TIME ZONE time_zone)::date
+                                   FROM app.tenants WHERE id = app.current_tenant_id()))
+            ORDER BY day LIMIT 200
+        """),
+        {"start": start},
+    ).mappings()
+    return [ClosedDay.model_validate(dict(row)) for row in rows]
+
+
+@router.post("/closed-days", status_code=status.HTTP_201_CREATED)
+def close_day(body: ClosedDayCreate, context: WriteDep) -> ClosedDayCreated:
+    """Marks a day closed and cancels its scheduled sessions; booked clients are told."""
+    db = context.session
+    try:
+        row = (
+            db.execute(
+                text("""
+                    INSERT INTO app.closed_days (tenant_id, day, reason, created_by)
+                    VALUES (:tenant_id, :day, :reason, app.current_user_id())
+                    RETURNING id, day, reason
+                """),
+                {"tenant_id": context.tenant_id, "day": body.day, "reason": body.reason},
+            )
+            .mappings()
+            .one()
+        )
+    except IntegrityError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="already_closed"
+        ) from error
+    time_zone = _time_zone(db)
+    sessions = db.execute(
+        text("""
+            UPDATE app.sessions SET status = 'cancelled', updated_at = now()
+            WHERE status = 'scheduled' AND starts_at >= :from AND starts_at < :to
+            RETURNING id, starts_at
+        """),
+        {
+            "from": local_to_utc(body.day, time.min, time_zone),
+            "to": local_to_utc(body.day + timedelta(days=1), time.min, time_zone),
+        },
+    ).all()
+    now = datetime.now(dt.UTC)
+    for session_id, starts_at in sessions:
+        if starts_at > now:
+            notify(
+                db,
+                context.tenant_id,
+                live_clients(db, session_id),
+                "session_cancelled",
+                session_snapshot(db, session_id),
+            )
+    return ClosedDayCreated(
+        closed_day=ClosedDay.model_validate(dict(row)), cancelled_sessions=len(sessions)
+    )
+
+
+@router.delete("/closed-days/{closed_day_id}", status_code=status.HTTP_204_NO_CONTENT)
+def reopen_day(closed_day_id: UUID, context: WriteDep) -> None:
+    """Opens the day again for new sessions; sessions cancelled when it closed stay cancelled."""
+    deleted = context.session.execute(
+        text("DELETE FROM app.closed_days WHERE id = :id"), {"id": closed_day_id}
+    ).rowcount
+    if not deleted:
+        raise not_found()
