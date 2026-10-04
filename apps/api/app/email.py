@@ -90,6 +90,12 @@ def _when(value: Any, time_zone: str) -> str:
     return instant.astimezone(ZoneInfo(time_zone)).strftime("%d/%m %H:%M")
 
 
+def _day(value: Any) -> str:
+    if not value:
+        return ""
+    return datetime.fromisoformat(str(value)).strftime("%d/%m")
+
+
 def render(
     messages: dict[str, Any], kind: str, payload: dict[str, Any], row: dict[str, Any]
 ) -> tuple[str, str]:
@@ -102,6 +108,8 @@ def render(
         "when": _when(payload.get("starts_at"), row["time_zone"]),
         "previous": _when(payload.get("previous_starts_at"), row["time_zone"]),
         "note": str(payload.get("note") or ""),
+        "plan": str(payload.get("plan_name", "")),
+        "date": _day(payload.get("ends_on")),
     }
     subject = _fill(messages["subject"][kind], values)
     lines = [_fill(messages["greeting"], values), "", _fill(messages["body"][kind], values)]

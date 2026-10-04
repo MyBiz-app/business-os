@@ -562,7 +562,8 @@
         "session_moved": "השיעור {service} הועבר מ{previous} ל{when}.",
         "health_approved": "הסטודיו אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים.",
         "health_rejected": "הסטודיו לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור איתם קשר.",
-        "session_reminder": "תזכורת: נרשמת ל{service} היום, {when}."
+        "session_reminder": "תזכורת: נרשמת ל{service} היום, {when}.",
+        "plan_ending": "ה{plan} שלך מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם."
       }
     }
   },
@@ -906,7 +907,8 @@
       "session_moved": "שעה חדשה: {service} ב-{when}",
       "health_approved": "הצהרת הבריאות שלך אושרה",
       "health_rejected": "לגבי הצהרת הבריאות שלך",
-      "session_reminder": "היום: {service} ב-{when}"
+      "session_reminder": "היום: {service} ב-{when}",
+      "plan_ending": "המנוי שלך מסתיים ב-{date}"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -917,7 +919,8 @@
       "session_moved": "השיעור {service} הועבר מ-{previous} ל-{when}. ההרשמה שלך עברה איתו.",
       "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים באפליקציה.",
       "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם הסטודיו.",
-      "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום."
+      "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום.",
+      "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם לשיעורים."
     }
   }
 }

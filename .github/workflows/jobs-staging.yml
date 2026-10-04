@@ -36,3 +36,9 @@ jobs:
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
         run: uv run python -m app.jobs remind-sessions
+
+      - name: Remind clients whose plan ends soon
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs remind-plans

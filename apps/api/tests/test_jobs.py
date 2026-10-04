@@ -275,3 +275,45 @@ def test_todays_booked_clients_are_reminded_once(
 
     assert first == 1 and again == 0
     assert kinds == [later_today]
+
+
+def test_clients_hear_once_when_their_last_plan_ends_soon(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import remind_plans
+    from tests.test_client_app import give_plan
+
+    ending = new_client(client, studio["headers"], "Dana")
+    renewed = new_client(client, studio["headers"], "Noa")
+    give_plan(client, studio, ending)
+    give_plan(client, studio, renewed)
+    with engine.begin() as connection:
+        connection.execute(
+            text("UPDATE app.entitlements SET ends_on = :d"),
+            {"d": local_today() + timedelta(days=2)},
+        )
+    later = client.get("/plans", headers=studio["headers"]).json()[0]
+    client.post(
+        f"/clients/{renewed}/entitlements",
+        json={
+            "plan_id": later["id"],
+            "starts_on": (local_today() + timedelta(days=3)).isoformat(),
+            "idempotency_key": "renewal-0001",
+        },
+        headers=studio["headers"],
+    )
+
+    with engine.begin() as connection:
+        first = remind_plans(connection)
+    with engine.begin() as connection:
+        again = remind_plans(connection)
+        notified = connection.execute(
+            text(
+                "SELECT client_id::text, payload FROM app.notifications WHERE kind = 'plan_ending'"
+            )
+        ).all()
+
+    assert first == 1 and again == 0
+    [(client_id, payload)] = notified
+    assert client_id == ending
+    assert payload["ends_on"] == (local_today() + timedelta(days=2)).isoformat()

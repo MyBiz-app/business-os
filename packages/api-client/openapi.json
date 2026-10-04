@@ -8292,7 +8292,8 @@
               "session_moved",
               "health_approved",
               "health_rejected",
-              "session_reminder"
+              "session_reminder",
+              "plan_ending"
             ],
             "title": "Kind"
           },
@@ -8300,7 +8301,7 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Payload",
-            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind)"
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on"
           },
           "created_at": {
             "type": "string",

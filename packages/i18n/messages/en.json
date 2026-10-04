@@ -562,7 +562,8 @@
         "session_moved": "{service} moved from {previous} to {when}.",
         "health_approved": "The studio approved your health declaration. You can book classes.",
         "health_rejected": "The studio couldn't approve your health declaration. Please contact them.",
-        "session_reminder": "Reminder: you're booked into {service} today, {when}."
+        "session_reminder": "Reminder: you're booked into {service} today, {when}.",
+        "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
       }
     }
   },
@@ -906,7 +907,8 @@
       "session_moved": "New time: {service} on {when}",
       "health_approved": "Your health declaration was approved",
       "health_rejected": "About your health declaration",
-      "session_reminder": "Today: {service} at {when}"
+      "session_reminder": "Today: {service} at {when}",
+      "plan_ending": "Your plan ends on {date}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -917,7 +919,8 @@
       "session_moved": "{service} moved from {previous} to {when}. Your booking moved with it.",
       "health_approved": "{business} approved your health declaration. You can book classes in the app.",
       "health_rejected": "{business} couldn't approve your health declaration. Please contact the studio.",
-      "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot."
+      "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
+      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking classes."
     }
   }
 }

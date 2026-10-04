@@ -2,6 +2,7 @@
 
     uv run python -m app.jobs extend-series [--database-url URL]
     uv run python -m app.jobs remind-sessions
+    uv run python -m app.jobs remind-plans
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
@@ -112,6 +113,44 @@ def remind_sessions(conn: Connection, now: datetime | None = None) -> int:
     ).rowcount
 
 
+PLAN_ENDING_DAYS = 3
+
+
+def remind_plans(conn: Connection, now: datetime | None = None) -> int:
+    """Notifies clients whose last valid plan ends within PLAN_ENDING_DAYS (business-local
+    dates) with nothing bought after it; once per plan. Returns how many were notified."""
+    now = now or datetime.now(UTC)
+    return conn.execute(
+        text("""
+            WITH local AS (
+                SELECT id AS tenant_id,
+                       (CAST(:now AS timestamptz) AT TIME ZONE time_zone)::date AS today
+                FROM app.tenants
+            ),
+            due AS (
+                UPDATE app.entitlements e SET ending_notified_at = :now
+                FROM local l, app.clients c
+                WHERE l.tenant_id = e.tenant_id AND c.id = e.client_id
+                  AND c.erased_at IS NULL
+                  AND e.status = 'active' AND e.ending_notified_at IS NULL
+                  AND e.ends_on BETWEEN l.today AND l.today + :days
+                  AND NOT EXISTS (
+                      SELECT 1 FROM app.entitlements later
+                      WHERE later.client_id = e.client_id AND later.status = 'active'
+                        AND later.id <> e.id AND later.ends_on > e.ends_on
+                  )
+                RETURNING e.id, e.tenant_id, e.client_id, e.name, e.ends_on
+            )
+            INSERT INTO app.notifications (tenant_id, client_id, kind, payload)
+            SELECT tenant_id, client_id, 'plan_ending',
+                   jsonb_build_object('plan_name', name, 'ends_on', ends_on,
+                                      'entitlement_id', id)
+            FROM due
+        """),
+        {"now": now, "days": PLAN_ENDING_DAYS},
+    ).rowcount
+
+
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
     if sender is None:
@@ -122,6 +161,7 @@ def send_notification_emails(conn: Connection) -> dict[str, int] | str:
 JOBS = {
     "extend-series": extend_series,
     "remind-sessions": remind_sessions,
+    "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
 }
 
