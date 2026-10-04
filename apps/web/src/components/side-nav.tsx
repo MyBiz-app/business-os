@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   MapPin,
   Settings,
+  Target,
   Users,
   UsersRound,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const ICONS = {
   assistant: Bot,
   schedule: CalendarDays,
   clients: Users,
+  leads: Target,
   services: Dumbbell,
   plans: CreditCard,
   locations: MapPin,

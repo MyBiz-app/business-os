@@ -298,3 +298,24 @@ def test_demo_mode_answers_from_real_data_without_a_key(
     assert texts[1].startswith("🧪 Demo mode") and "₪" in texts[1]
     last = [turn["text"] for turn in help_.json()["turns"] if turn["role"] == "assistant"][-1]
     assert "אפשר לשאול" in last
+
+
+def test_demo_mode_answers_about_leads(client: TestClient, studio: dict, use_provider) -> None:
+    from app.ai.demo import DemoProvider
+
+    use_provider(DemoProvider())
+    headers = studio["headers"]
+    client.put(
+        "/tenants/current/modules", json={"modules": {"ai_pro": 1, "crm": 1}}, headers=headers
+    )
+    client.post(
+        "/leads",
+        json={"first_name": "Yael", "phone": "050-9999999", "follow_up_on": "2020-01-01"},
+        headers=headers,
+    )
+    conversation_id = conversation(client, headers)
+
+    answer = ask(client, headers, conversation_id, "למי צריך לחזור מהלידים?")
+
+    texts = [turn["text"] for turn in answer.json()["turns"] if turn["role"] == "assistant"]
+    assert "חדש: 1" in texts[-1] and "Yael (050-9999999)" in texts[-1]

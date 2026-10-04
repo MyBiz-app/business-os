@@ -48,6 +48,9 @@ class BusinessProfile(BaseModel):
     primary_color: str | None
     logo_url: str | None
     client_app: bool = Field(description="Whether the business offers the client app")
+    inquiries: bool = Field(
+        default=False, description="Whether its public inquiry form is open (CRM module)"
+    )
 
 
 class ClientBusiness(BaseModel):
@@ -108,7 +111,8 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
         session.execute(
             text(f"""
                 SELECT t.id, t.name, t.locale, t.primary_color, t.client_app,
-                       {LOGO_URL.format(t="t")} AS logo_url
+                       {LOGO_URL.format(t="t")} AS logo_url,
+                       app.accepts_inquiries(:code) AS inquiries
                 FROM app.business_by_join_code(:code) t
             """),
             {"code": code},

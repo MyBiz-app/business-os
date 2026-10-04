@@ -177,7 +177,8 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         {"t": tenant_id, "u": owner},
     )
     apply_vertical_pack(conn, tenant_id, "fitness", "he", "ILS")
-    set_modules(conn, tenant_id, dict.fromkeys(PRESETS["ai_powered"], 1))  # show everything
+    # Show everything: the richest preset plus the CRM.
+    set_modules(conn, tenant_id, {**dict.fromkeys(PRESETS["ai_powered"], 1), "crm": 1})
     plans = (
         conn.execute(
             text("""
@@ -552,11 +553,107 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
                 :created_at)
     """, booking_rows)  # fmt: skip
 
+    lead_count = _seed_leads(conn, tenant_id, [owner, *instructors], clients, today, rng)
+
     print(
-        f"Created demo business {tenant_id}: {len(clients)} clients, {len(sessions)} sessions, "
+        f"Created demo business {tenant_id}: {len(clients)} clients, {lead_count} leads, "
+        f"{len(sessions)} sessions, "
         f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings."
     )
     return tenant_id
+
+
+LEAD_INTERESTS = (
+    "פילאטיס מכשירים למתחילים",
+    "שיעורי בוקר לפני העבודה",
+    "יוגה אחרי לידה",
+    "כרטיסייה לחברה ואני",
+    "מה המחיר למנוי חודשי?",
+    "אימון כוח פעמיים בשבוע",
+    None,
+)
+LEAD_NOTES = (
+    "לא ענה/תה, לנסות שוב מחר",
+    "מעוניין/ת בשיעור ניסיון ביום ראשון",
+    "שלחתי מחירון בוואטסאפ",
+    "הגיע/ה לשיעור ניסיון, נהנה/תה",
+    "מתלבט/ת בין כרטיסייה למנוי",
+)
+
+
+def _seed_leads(
+    conn: Connection,
+    tenant_id: UUID,
+    team: list[UUID],
+    clients: list[Client],
+    today: date,
+    rng: random.Random,
+) -> int:
+    """A CRM pipeline: open leads in every stage, and recent ones that were won or lost."""
+    recent = sorted((c for c in clients if c.joined > today - timedelta(days=60)),
+                    key=lambda c: c.joined)[-8:]  # fmt: skip
+    plan: list[tuple[str, Client | None]] = [
+        *(
+            (stage, None)
+            for stage in ["new"] * 7 + ["contacted"] * 5 + ["trial"] * 4 + ["offer"] * 3
+        ),
+        *(("won", client) for client in recent),
+        *(("lost", None) for _ in range(5)),
+    ]
+    lead_rows: list[dict] = []
+    activity_rows: list[dict] = []
+    path = ["new", "contacted", "trial", "offer"]
+    for stage, client in plan:
+        lead_id = uuid4()
+        age = rng.randint(1, 50) if stage in ("won", "lost") else rng.randint(0, 25)
+        created = datetime.combine(today - timedelta(days=age), time(rng.randint(8, 20)),
+                                   ZoneInfo(TIME_ZONE))  # fmt: skip
+        changed = created + timedelta(days=rng.randint(0, max(age - 1, 0)), hours=2)
+        first, last = rng.choice(FIRST_NAMES), rng.choice(LAST_NAMES)
+        source = rng.choices(("form", "instagram", "referral", "walk_in", "facebook", "google"),
+                             weights=(5, 5, 3, 2, 2, 1))[0]  # fmt: skip
+        open_lead = stage not in ("won", "lost")
+        lead_rows.append({
+            "id": lead_id, "tenant_id": tenant_id, "first_name": first, "last_name": last,
+            "email": f"lead-{lead_id.hex[:6]}@example.invalid",
+            "phone": f"05{rng.randint(0, 9)}-{rng.randint(100, 999)}-{rng.randint(1000, 9999)}",
+            "interest": rng.choice(LEAD_INTERESTS), "source": source, "stage": stage,
+            "lost_reason": rng.choice(("רחוק מהבית", "יקר מדי", "בחר/ה מקום אחר"))
+            if stage == "lost" else None,
+            "follow_up_on": today + timedelta(days=rng.randint(-2, 6))
+            if open_lead and rng.random() < 0.6 else None,
+            "owner_user_id": rng.choice(team) if rng.random() < 0.8 else None,
+            "client_id": client.id if client else None,
+            "created_at": created, "stage_changed_at": changed,
+        })  # fmt: skip
+        activity_rows.append({"tenant_id": tenant_id, "lead_id": lead_id, "kind": "created",
+                              "note": None, "to_stage": "new", "at": created})  # fmt: skip
+        steps = path[1 : path.index(stage) + 1] if stage in path else path[1:3]
+        for step_index, step in enumerate(steps):
+            at = created + (changed - created) * (step_index + 1) / (len(steps) + 1)
+            activity_rows.append({"tenant_id": tenant_id, "lead_id": lead_id, "kind": "call",
+                                  "note": rng.choice(LEAD_NOTES), "to_stage": None,
+                                  "at": at - timedelta(minutes=5)})  # fmt: skip
+            activity_rows.append({"tenant_id": tenant_id, "lead_id": lead_id, "kind": "stage",
+                                  "note": None, "to_stage": step, "at": at})  # fmt: skip
+        if not open_lead:
+            activity_rows.append({"tenant_id": tenant_id, "lead_id": lead_id,
+                                  "kind": "converted" if stage == "won" else "stage",
+                                  "note": None, "to_stage": stage, "at": changed})  # fmt: skip
+    _insert(conn, """
+        INSERT INTO app.leads
+            (id, tenant_id, first_name, last_name, email, phone, interest, source, stage,
+             lost_reason, follow_up_on, owner_user_id, client_id, created_at, updated_at,
+             stage_changed_at)
+        VALUES (:id, :tenant_id, :first_name, :last_name, :email, :phone, :interest, :source,
+                :stage, :lost_reason, :follow_up_on, :owner_user_id, :client_id, :created_at,
+                :stage_changed_at, :stage_changed_at)
+    """, lead_rows)  # fmt: skip
+    _insert(conn, """
+        INSERT INTO app.lead_activities (tenant_id, lead_id, kind, note, to_stage, occurred_at)
+        VALUES (:tenant_id, :lead_id, :kind, :note, :to_stage, :at)
+    """, activity_rows)  # fmt: skip
+    return len(lead_rows)
 
 
 def main() -> None:

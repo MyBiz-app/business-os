@@ -163,6 +163,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Leads
+         * @description The pipeline: open leads, plus won and lost ones closed recently.
+         */
+        get: operations["list_leads"];
+        put?: never;
+        /** Create Lead */
+        post: operations["create_lead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leads/owners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lead Owners
+         * @description Team members a lead can be assigned to.
+         */
+        get: operations["lead_owners"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leads/{lead_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Lead */
+        get: operations["get_lead"];
+        put?: never;
+        post?: never;
+        /** Delete Lead */
+        delete: operations["delete_lead"];
+        options?: never;
+        head?: never;
+        /** Update Lead */
+        patch: operations["update_lead"];
+        trace?: never;
+    };
+    "/leads/{lead_id}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change Stage
+         * @description Moves the lead to another stage. "won" is reached by converting it to a client.
+         */
+        post: operations["change_stage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leads/{lead_id}/activities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Activity */
+        post: operations["add_activity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/leads/{lead_id}/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Convert Lead
+         * @description Wins the lead: links the client with the same email, or creates the client.
+         */
+        post: operations["convert_lead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/businesses/{code}/inquiries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Submit Inquiry
+         * @description Someone interested leaves their details; the business sees them as a new lead.
+         */
+        post: operations["submit_inquiry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/services": {
         parameters: {
             query?: never;
@@ -1731,6 +1868,40 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** Activity */
+        Activity: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "note" | "call" | "message" | "meeting" | "stage" | "created" | "converted";
+            /** Note */
+            note: string | null;
+            /** To Stage */
+            to_stage: ("new" | "contacted" | "trial" | "offer" | "won" | "lost") | null;
+            /** Actor Name */
+            actor_name: string | null;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+        };
+        /** ActivityCreate */
+        ActivityCreate: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "note" | "call" | "message" | "meeting";
+            /** Note */
+            note: string;
+        };
         /** Answer */
         Answer: {
             /** Id */
@@ -1931,6 +2102,12 @@ export interface components {
              * @description Whether the business offers the client app
              */
             client_app: boolean;
+            /**
+             * Inquiries
+             * @description Whether its public inquiry form is open (CRM module)
+             * @default false
+             */
+            inquiries: boolean;
         };
         /** Catalog */
         Catalog: {
@@ -2767,6 +2944,21 @@ export interface components {
              */
             items: components["schemas"]["Notification"][];
         };
+        /** InquiryCreate */
+        InquiryCreate: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Interest */
+            interest?: string | null;
+            /** Website */
+            website?: string | null;
+        };
         /** InstructorOption */
         InstructorOption: {
             /**
@@ -2843,6 +3035,195 @@ export interface components {
         JoinRequest: {
             /** Code */
             code: string;
+        };
+        /** Lead */
+        Lead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Interest */
+            interest: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other";
+            /** Campaign */
+            campaign: string | null;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "new" | "contacted" | "trial" | "offer" | "won" | "lost";
+            /** Lost Reason */
+            lost_reason: string | null;
+            /** Follow Up On */
+            follow_up_on: string | null;
+            /** Owner User Id */
+            owner_user_id: string | null;
+            /** Owner Name */
+            owner_name: string | null;
+            /** Client Id */
+            client_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Stage Changed At
+             * Format: date-time
+             */
+            stage_changed_at: string;
+        };
+        /** LeadBoard */
+        LeadBoard: {
+            /** Items */
+            items: components["schemas"]["Lead"][];
+            /** Counts */
+            counts: components["schemas"]["StageCount"][];
+            /** New Last 30 Days */
+            new_last_30_days: number;
+            /** Won Last 30 Days */
+            won_last_30_days: number;
+            /**
+             * Conversion Rate
+             * @description Won ÷ (won + lost) among leads closed in the last 90 days
+             */
+            conversion_rate: number | null;
+            /**
+             * Follow Ups Due
+             * @description Open leads with a follow-up date today or earlier
+             */
+            follow_ups_due: number;
+        };
+        /** LeadCreate */
+        LeadCreate: {
+            /** Last Name */
+            last_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Interest */
+            interest?: string | null;
+            /** Campaign */
+            campaign?: string | null;
+            /** Follow Up On */
+            follow_up_on?: string | null;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            /** First Name */
+            first_name: string;
+            /**
+             * Source
+             * @default manual
+             * @enum {string}
+             */
+            source: "manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other";
+        };
+        /** LeadDetail */
+        LeadDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Interest */
+            interest: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other";
+            /** Campaign */
+            campaign: string | null;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "new" | "contacted" | "trial" | "offer" | "won" | "lost";
+            /** Lost Reason */
+            lost_reason: string | null;
+            /** Follow Up On */
+            follow_up_on: string | null;
+            /** Owner User Id */
+            owner_user_id: string | null;
+            /** Owner Name */
+            owner_name: string | null;
+            /** Client Id */
+            client_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Stage Changed At
+             * Format: date-time
+             */
+            stage_changed_at: string;
+            /** Activities */
+            activities: components["schemas"]["Activity"][];
+        };
+        /** LeadOwner */
+        LeadOwner: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
+        };
+        /** LeadUpdate */
+        LeadUpdate: {
+            /** Last Name */
+            last_name?: string | null;
+            /** Email */
+            email?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Interest */
+            interest?: string | null;
+            /** Campaign */
+            campaign?: string | null;
+            /** Follow Up On */
+            follow_up_on?: string | null;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Source */
+            source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
         };
         /** Location */
         Location: {
@@ -3791,6 +4172,28 @@ export interface components {
             /** Blocks */
             blocks: components["schemas"]["HoursBlock"][];
         };
+        /** StageChange */
+        StageChange: {
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "new" | "contacted" | "trial" | "offer" | "won" | "lost";
+            /** Lost Reason */
+            lost_reason?: string | null;
+            /** Note */
+            note?: string | null;
+        };
+        /** StageCount */
+        StageCount: {
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "new" | "contacted" | "trial" | "offer" | "won" | "lost";
+            /** Count */
+            count: number;
+        };
         /** SupportAccess */
         SupportAccess: {
             /**
@@ -4417,6 +4820,352 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EraseResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_leads: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
+                owner_user_id?: string | null;
+                /** @description Won / lost leads closed in this many days */
+                closed_days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_lead: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lead_owners: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadOwner"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_lead: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_lead: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_lead: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    change_stage: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_activity: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivityCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    convert_lead: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                lead_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_inquiry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InquiryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

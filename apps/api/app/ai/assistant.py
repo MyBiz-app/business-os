@@ -106,7 +106,7 @@ def ask(
             ],
         }
     )
-    modules = {key for key in ("ai_basic", "ai_pro") if has_module(db, key)}
+    modules = {key for key in ("ai_basic", "ai_pro", "crm") if has_module(db, key)}
     tools = tools_for(tenant.permissions, modules)
     definitions = [tool.definition() for tool in tools]
     ctx = ToolContext(tenant, user_id, conversation_id, row["time_zone"], modules)

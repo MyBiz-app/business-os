@@ -268,6 +268,37 @@ def inactive_members(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def lead_pipeline(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
+    """Open leads by stage, and who is due a follow-up (CRM module)."""
+    db = ctx.tenant.session
+    stages = db.execute(
+        text("""
+            SELECT stage, count(*) AS leads FROM app.leads
+            WHERE stage NOT IN ('won', 'lost') OR stage_changed_at > now() - interval '30 days'
+            GROUP BY 1
+        """)
+    ).mappings()
+    due = db.execute(
+        text("""
+            SELECT l.id AS lead_id, trim(l.first_name || ' ' || coalesce(l.last_name, '')) AS name,
+                   l.stage, l.follow_up_on, l.interest, l.phone
+            FROM app.leads l JOIN app.tenants t ON t.id = l.tenant_id
+            WHERE l.stage NOT IN ('won', 'lost')
+              AND l.follow_up_on <= (now() AT TIME ZONE t.time_zone)::date
+            ORDER BY l.follow_up_on LIMIT :limit
+        """),
+        {"limit": MAX_ROWS},
+    ).mappings()
+    return {
+        "leads_by_stage": [dict(r) for r in stages],
+        "note": "Open stages count every open lead; won and lost count the last 30 days.",
+        "follow_ups_due_today_or_overdue": [
+            {**dict(r), "lead_id": str(r["lead_id"]), "follow_up_on": str(r["follow_up_on"])}
+            for r in due
+        ],
+    }
+
+
 # --- Write tools: pending actions ------------------------------------------------------------
 
 
@@ -425,6 +456,15 @@ TOOLS: dict[str, Tool] = {
             {"days": {"type": "integer"}},
             Permission.CLIENTS_READ,
             inactive_members,
+        ),
+        Tool(
+            "lead_pipeline",
+            "The CRM pipeline: how many leads are in each stage (new, contacted, trial, offer, "
+            "won, lost) and which open leads are due a follow-up call today or overdue.",
+            {},
+            Permission.CLIENTS_READ,
+            lead_pipeline,
+            module="crm",
         ),
         Tool(
             "list_plans",

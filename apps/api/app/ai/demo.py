@@ -16,6 +16,7 @@ MODEL = "demo"
 
 INTENTS: dict[str, tuple[str, ...]] = {
     "book": ("רשמ", "רשום", "תרשום", "להירשם", "book", "sign up", "enroll"),
+    "leads": ("ליד", "מתעניינ", "פניות", "לחזור", "lead", "pipeline", "follow up", "inquir"),
     "inactive": ("לא הגיע", "לא הגיעו", "נעדר", "לפנות", "נטש", "inactive", "haven't come",
                  "not come", "at risk", "absent"),
     "sessions": ("היום", "מחר", "שיעור", "לוח", "today", "tomorrow", "class", "schedule"),
@@ -33,6 +34,7 @@ TEXT = {
             "- אילו שיעורים יש היום / מחר?\n"
             "- מי לא הגיע כבר שבועיים?\n"
             "- מה המחירים של המנויים?\n"
+            "- למי צריך לחזור מהלידים?\n"
             "- תרשום את דנה לשיעור מחר\n"
             "כשיוגדר מפתח AI, אענה על כל שאלה."
         ),
@@ -59,6 +61,17 @@ TEXT = {
         "book_no_session": "אין שיעור פנוי מחר.",
         "book_ready": "הכנתי רישום של {name} ל{service} ב-{time}. אשרו אותו בכרטיס למטה.",
         "book_off": "רישום דרך העוזר זמין בחבילת AI Pro.",
+        "leads": "הלידים לפי שלב:",
+        "leads_due": "צריך לחזור היום אל:",
+        "no_leads_due": "אין לידים שמחכים לחזרה היום.",
+        "stages": {
+            "new": "חדש",
+            "contacted": "נוצר קשר",
+            "trial": "ניסיון",
+            "offer": "הצעה",
+            "won": "הצלחה (30 יום)",
+            "lost": "לא רלוונטי (30 יום)",
+        },
     },
     "en": {
         "label": "🧪 Demo mode (no real AI)",
@@ -68,6 +81,7 @@ TEXT = {
             "- Which classes are on today / tomorrow?\n"
             "- Who hasn't come in for two weeks?\n"
             "- What do the plans cost?\n"
+            "- Which leads need a follow-up?\n"
             "- Book Dana into tomorrow's class\n"
             "With an AI key set up, I can answer anything."
         ),
@@ -94,6 +108,17 @@ TEXT = {
         "book_no_session": "There is no open class tomorrow.",
         "book_ready": "I prepared booking {name} into {service} at {time}. Confirm it on the card.",
         "book_off": "Booking through the assistant comes with the AI Pro plan.",
+        "leads": "Leads by stage:",
+        "leads_due": "Follow up today with:",
+        "no_leads_due": "No leads are waiting for a follow-up today.",
+        "stages": {
+            "new": "New",
+            "contacted": "Contacted",
+            "trial": "Trial",
+            "offer": "Offer",
+            "won": "Won (30 days)",
+            "lost": "Lost (30 days)",
+        },
     },
 }
 
@@ -225,6 +250,19 @@ class DemoProvider:
                 lines.append(
                     f"- {s['starts'][-5:]} {s['service']}: {s['booked']}/{s['capacity']}{state}"
                 )
+            return _text("\n".join(lines))
+
+        if intent == "leads" and "lead_pipeline" in available:
+            if not results:
+                return _tool("lead_pipeline", {}, step)
+            result = results[-1]
+            by_stage = {r["stage"]: r["leads"] for r in result.get("leads_by_stage", [])}
+            lines = [t["leads"]]
+            lines += [f"- {name}: {by_stage[key]}" for key, name in t["stages"].items()
+                      if key in by_stage]  # fmt: skip
+            due = result.get("follow_ups_due_today_or_overdue", [])
+            lines += ["", t["leads_due"] if due else t["no_leads_due"]]
+            lines += [f"- {d['name']}" + (f" ({d['phone']})" if d["phone"] else "") for d in due]
             return _text("\n".join(lines))
 
         if intent == "inactive" and "inactive_members" in available:
