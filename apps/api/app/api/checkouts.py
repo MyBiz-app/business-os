@@ -113,4 +113,3 @@ def simulate_payment(checkout_id: UUID, context: ClientDep) -> CheckoutPaid:
     return CheckoutPaid(
         checkout=_load(context, checkout_id), entitlement=load_entitlement(db, entitlement_id)
     )
-
