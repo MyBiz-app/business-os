@@ -70,6 +70,30 @@ Mobile (in a second terminal), with the phone on the same Wi-Fi as the computer:
 pnpm dev:mobile                     # scan the QR code with the iPhone camera → opens in Expo Go
 ```
 
+## Troubleshooting
+
+**The sign-in code doesn't arrive (client app) / no confirmation email.** Local emails never
+leave your computer: open the test mailbox at http://127.0.0.1:54324. The email texts (a
+6-digit code for the client app) are applied when Supabase starts, so after pulling changes
+restart it: `pnpm db:stop` then `pnpm db:start`.
+
+**Windows: `pnpm db:start` fails with `spawn UNKNOWN`.** Smart App Control blocks the
+unsigned `supabase.exe`. Keep Smart App Control on (it can't be turned back on without
+reinstalling Windows) and run the Supabase CLI from WSL instead; Docker Desktop is shared:
+
+1. PowerShell (once): `wsl --install -d Ubuntu`, restart, open "Ubuntu" and create a user.
+2. Docker Desktop → Settings → Resources → WSL integration → enable Ubuntu.
+3. In Ubuntu:
+
+   ```bash
+   mkdir -p ~/bin
+   curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz -C ~/bin supabase
+   cd /mnt/c/dev/business-os
+   ~/bin/supabase start     # ~/bin/supabase stop to stop
+   ```
+
+Everything else (`pnpm db:migrate`, `pnpm dev`, `pnpm dev:app`) runs in PowerShell as usual.
+
 ## Checks
 
 ```bash

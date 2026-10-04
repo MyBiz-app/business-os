@@ -1255,6 +1255,22 @@
         "payments": {
           "title": "Payments & receipts",
           "text": "Sell at the desk or in the app, with a numbered receipt for every payment."
+        },
+        "appointments": {
+          "title": "Online appointments",
+          "text": "Clients pick a service, a staff member and a free time — within the hours you set."
+        },
+        "crm": {
+          "title": "Leads and sales",
+          "text": "A shareable inquiry form, a lead pipeline, follow-up reminders and one-click conversion."
+        },
+        "messages": {
+          "title": "WhatsApp & SMS",
+          "text": "Broadcasts to the right audience, personal templates and a direct WhatsApp link on every card."
+        },
+        "records": {
+          "title": "Professional records",
+          "text": "The car at a garage, treatment notes at a clinic, coach notes at a gym — by business type."
         }
       }
     },

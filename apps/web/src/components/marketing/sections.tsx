@@ -5,12 +5,16 @@ import {
   CalendarDays,
   Car,
   Check,
+  CalendarClock,
   CreditCard,
   Dumbbell,
+  MessageCircle,
+  NotebookPen,
   Receipt,
   Scissors,
   Smartphone,
   Stethoscope,
+  Target,
   Users,
   UsersRound,
 } from "lucide-react";
@@ -26,6 +30,10 @@ export const FEATURES = [
   { key: "reports", Icon: BarChart3 },
   { key: "team", Icon: UsersRound },
   { key: "payments", Icon: Receipt },
+  { key: "appointments", Icon: CalendarClock },
+  { key: "crm", Icon: Target },
+  { key: "messages", Icon: MessageCircle },
+  { key: "records", Icon: NotebookPen },
 ] as const;
 
 export const INDUSTRIES = [
