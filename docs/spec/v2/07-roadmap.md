@@ -33,7 +33,8 @@ production hardening (backups, monitoring, security review, legal docs).
 - [x] Client import from CSV / Excel with column mapping and preview (T40)
 - [x] Privacy requests: export a client's data, erase their personal details (T41)
 - [ ] Payment provider (O1), invoicing provider (O2), real email provider
-- [ ] Production hardening: backups, monitoring, security review, privacy policy and terms
+- [x] Security baseline guarded by tests (RLS on every table, pinned search_path, no public grants) and security headers (T42)
+- [ ] Production hardening: backups, monitoring, full security review, privacy policy and terms
 
 ## Phase 3+ — Pilot → 10 businesses → modules → AI Workforce → scale
 
