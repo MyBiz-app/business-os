@@ -107,7 +107,7 @@ def get_client(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         db.execute(
             text("""
             SELECT trim(first_name || ' ' || coalesce(last_name, '')) AS name, status,
-                   created_at::date AS joined
+                   created_at::date AS joined, custom_fields
             FROM app.clients WHERE id = :id
         """),
             {"id": client_id},
@@ -136,10 +136,19 @@ def get_client(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         """),
         {"id": client_id},
     ).mappings()
+    notes = db.execute(
+        text("""
+            SELECT body, created_at::date AS day FROM app.client_notes
+            WHERE client_id = :id ORDER BY created_at DESC LIMIT 5
+        """),
+        {"id": client_id},
+    ).mappings()
     return {
         "name": row["name"],
         "status": row["status"],
         "joined": str(row["joined"]),
+        "profile (the industry's extra fields)": row["custom_fields"],
+        "latest_visit_notes": [{"day": str(n["day"]), "note": n["body"]} for n in notes],
         "plans": plans,
         "recent_bookings": [
             {
@@ -408,7 +417,8 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "get_client",
-            "A client's status, plans (memberships, punch cards) and 10 most recent bookings.",
+            "A client's status, profile details (e.g. their car at a garage), latest visit notes, "
+            "plans (memberships, punch cards) and 10 most recent bookings.",
             {"client_id": ID},
             Permission.CLIENTS_READ,
             get_client,

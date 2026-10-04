@@ -10,6 +10,7 @@ from app.api import (
     checkouts,
     client_app,
     client_import,
+    client_notes,
     clients,
     leads,
     locations,
@@ -71,6 +72,7 @@ def create_app() -> FastAPI:
     app.include_router(router)
     app.include_router(client_import.router)
     app.include_router(clients.router)
+    app.include_router(client_notes.router)
     app.include_router(privacy.router)
     app.include_router(leads.router)
     app.include_router(leads.public_router)
