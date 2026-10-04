@@ -1,6 +1,7 @@
 """Background jobs, run on a schedule (see .github/workflows/jobs-staging.yml).
 
     uv run python -m app.jobs extend-series [--database-url URL]
+    uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
@@ -83,6 +84,34 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
     return added
 
 
+def remind_sessions(conn: Connection, now: datetime | None = None) -> int:
+    """Notifies booked clients of today's classes (in each business's local date) that haven't
+    started yet; once per booking. Run early each morning. Returns how many were reminded."""
+    now = now or datetime.now(UTC)
+    return conn.execute(
+        text("""
+            WITH due AS (
+                UPDATE app.bookings b SET reminded_at = :now
+                FROM app.sessions s, app.tenants t
+                WHERE s.id = b.session_id AND t.id = b.tenant_id
+                  AND b.status = 'booked' AND b.reminded_at IS NULL
+                  AND s.status = 'scheduled' AND s.starts_at > :now
+                  AND (s.starts_at AT TIME ZONE t.time_zone)::date
+                      = (CAST(:now AS timestamptz) AT TIME ZONE t.time_zone)::date
+                RETURNING b.id, b.tenant_id, b.client_id, b.session_id
+            )
+            INSERT INTO app.notifications (tenant_id, client_id, kind, payload)
+            SELECT d.tenant_id, d.client_id, 'session_reminder',
+                   jsonb_build_object('session_id', s.id, 'service_name', sv.name,
+                                      'starts_at', s.starts_at, 'booking_id', d.id)
+            FROM due d
+            JOIN app.sessions s ON s.id = d.session_id
+            JOIN app.services sv ON sv.id = s.service_id
+        """),
+        {"now": now},
+    ).rowcount
+
+
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
     if sender is None:
@@ -90,7 +119,11 @@ def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     return send_emails(conn, sender)
 
 
-JOBS = {"extend-series": extend_series, "send-emails": send_notification_emails}
+JOBS = {
+    "extend-series": extend_series,
+    "remind-sessions": remind_sessions,
+    "send-emails": send_notification_emails,
+}
 
 
 def main() -> None:

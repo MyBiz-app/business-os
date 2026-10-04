@@ -2,7 +2,7 @@ from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine
+from sqlalchemy import Engine, text
 
 from app.jobs import HORIZON_DAYS, extend_series
 from tests.conftest import local_today
@@ -226,3 +226,52 @@ def test_series_change_and_copy_need_schedule_write(client: TestClient, studio: 
         headers=coach,
     )
     assert change.status_code == 403 and copy.status_code == 403
+
+
+def test_todays_booked_clients_are_reminded_once(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import remind_sessions
+    from app.scheduling import local_to_utc
+
+    today = local_today()
+    later_today = client.post(
+        "/sessions",
+        json={
+            "service_id": studio["service"]["id"],
+            "date": today.isoformat(),
+            "start_time": "23:30",
+        },
+        headers=studio["headers"],
+    ).json()["session_ids"][0]
+    tomorrow = client.post(
+        "/sessions",
+        json={
+            "service_id": studio["service"]["id"],
+            "date": (today + timedelta(days=1)).isoformat(),
+            "start_time": "07:00",
+        },
+        headers=studio["headers"],
+    ).json()["session_ids"][0]
+    dana = new_client(client, studio["headers"], "Dana")
+    book(client, studio["headers"], later_today, dana)
+    book(client, studio["headers"], tomorrow, dana)
+    morning = local_to_utc(today, datetime.min.time().replace(hour=5), "Asia/Jerusalem")
+
+    with engine.begin() as connection:
+        first = remind_sessions(connection, morning)
+    with engine.begin() as connection:
+        again = remind_sessions(connection, morning)
+        kinds = (
+            connection.execute(
+                text(
+                    "SELECT payload->>'session_id' FROM app.notifications "
+                    "WHERE kind = 'session_reminder'"
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+    assert first == 1 and again == 0
+    assert kinds == [later_today]

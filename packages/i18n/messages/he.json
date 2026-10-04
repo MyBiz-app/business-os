@@ -561,7 +561,8 @@
         "session_cancelled": "השיעור {service} ב{when} בוטל.",
         "session_moved": "השיעור {service} הועבר מ{previous} ל{when}.",
         "health_approved": "הסטודיו אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים.",
-        "health_rejected": "הסטודיו לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור איתם קשר."
+        "health_rejected": "הסטודיו לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור איתם קשר.",
+        "session_reminder": "תזכורת: נרשמת ל{service} היום, {when}."
       }
     }
   },
@@ -904,7 +905,8 @@
       "session_cancelled": "השיעור בוטל: {service} ב-{when}",
       "session_moved": "שעה חדשה: {service} ב-{when}",
       "health_approved": "הצהרת הבריאות שלך אושרה",
-      "health_rejected": "לגבי הצהרת הבריאות שלך"
+      "health_rejected": "לגבי הצהרת הבריאות שלך",
+      "session_reminder": "היום: {service} ב-{when}"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -914,7 +916,8 @@
       "session_cancelled": "השיעור {service} ב-{when} בוטל. מצטערים על השינוי.",
       "session_moved": "השיעור {service} הועבר מ-{previous} ל-{when}. ההרשמה שלך עברה איתו.",
       "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים באפליקציה.",
-      "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם הסטודיו."
+      "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם הסטודיו.",
+      "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום."
     }
   }
 }

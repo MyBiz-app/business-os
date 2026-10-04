@@ -20,6 +20,7 @@ NotificationKind = Literal[
     "session_moved",
     "health_approved",
     "health_rejected",
+    "session_reminder",
 ]
 
 

@@ -8291,7 +8291,8 @@
               "session_cancelled",
               "session_moved",
               "health_approved",
-              "health_rejected"
+              "health_rejected",
+              "session_reminder"
             ],
             "title": "Kind"
           },
