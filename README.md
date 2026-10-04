@@ -12,7 +12,7 @@ performs confirmed actions.
 
 ## Status
 
-Phase 1, Sprint 1 (walking skeleton). Spec: [`docs/spec/v2/`](docs/spec/v2/README.md) ·
+Prototype complete (Phase 1); Phase 2 (MVP) in progress. Spec: [`docs/spec/v2/`](docs/spec/v2/README.md) ·
 Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ## Repository layout
@@ -47,6 +47,22 @@ pnpm dev                            # starts API (port 8000) and web (port 3000)
 | http://127.0.0.1:54324 | Test mailbox (sign-up and password-reset emails) |
 
 `pnpm db:stop` stops Supabase; data is kept for the next start.
+
+Demo data: sign up at http://localhost:3000 (the confirmation email arrives in the test
+mailbox), then fill your account with a demo studio with months of history:
+
+```bash
+pnpm db:seed --owner-email you@example.com
+```
+
+Without an AI key the assistant runs in demo mode; payments are simulated (test card) and
+receipts are samples.
+
+The client app in the browser (second terminal), at http://localhost:8081:
+
+```bash
+pnpm dev:app
+```
 
 Mobile (in a second terminal), with the phone on the same Wi-Fi as the computer:
 
