@@ -59,3 +59,16 @@ def test_credits_are_cents_of_model_cost() -> None:
     # 1M input tokens of Opus 5.5 cost $4 = 400 credits.
     assert credits("claude-opus-5-5", Usage(input_tokens=1_000_000)) == 400
     assert credits("claude-opus-5-5", Usage(output_tokens=1_000)) == 2
+
+
+def test_the_app_starts_without_loading_the_sdk() -> None:
+    """Some locked-down Windows machines block the SDK's native extensions (jiter); without an
+    API key the API must still start (demo mode), so the SDK is imported only when used."""
+    import subprocess
+    import sys
+
+    check = "import sys, app.main; print('anthropic' in sys.modules)"
+    result = subprocess.run([sys.executable, "-c", check], capture_output=True, text=True)
+
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "False"
