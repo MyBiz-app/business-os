@@ -489,6 +489,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/series/{series_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Series
+         * @description Changes time, length, capacity, place, instructor and notes of this and all later
+         *     sessions of a series; new occurrences the daily job adds follow the new settings.
+         *     Bookings stay; booked clients are told when the time changes.
+         */
+        patch: operations["update_series"];
+        trace?: never;
+    };
+    "/sessions/copy-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Week
+         * @description Copies the one-off sessions of a week (7 days from from_date) to another week, at the
+         *     same local weekday and time. Weekly series are left out: they repeat on their own.
+         */
+        post: operations["copy_week"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/bookings": {
         parameters: {
             query?: never;
@@ -679,6 +722,47 @@ export interface paths {
         };
         /** Get Series */
         get: operations["get_series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/breakdown/{dimension}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Breakdown
+         * @description Attendance metrics of sessions that took place, per service, instructor or time slot.
+         */
+        get: operations["get_breakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/members-at-risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Members At Risk
+         * @description Members with a valid plan who haven't come in `days`, or whose plan ends within `days`
+         *     with no renewal.
+         */
+        get: operations["get_members_at_risk"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1051,6 +1135,98 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/checkouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Checkout
+         * @description Starts buying a plan at its current price.
+         */
+        post: operations["start_checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts/{checkout_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Checkout */
+        get: operations["get_checkout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts/{checkout_id}/simulate-payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate Payment
+         * @description Completes a simulated checkout: records a test payment and creates the plan. Calling it
+         *     again returns the same plan.
+         */
+        post: operations["simulate_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Notifications */
+        get: operations["my_notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Read */
+        post: operations["mark_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/health-declarations": {
         parameters: {
             query?: never;
@@ -1263,6 +1439,30 @@ export interface components {
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
         };
+        /** BreakdownItem */
+        BreakdownItem: {
+            /**
+             * Key
+             * @description Service id, instructor user id ('' = none) or 'isodow-hour'
+             */
+            key: string;
+            /** Label */
+            label: string | null;
+            /** Sessions */
+            sessions: number;
+            /** Attended */
+            attended: number;
+            /**
+             * Occupancy
+             * @description Percent of capacity taken
+             */
+            occupancy: number | null;
+            /**
+             * No Show Rate
+             * @description Percent of expected clients who didn't come
+             */
+            no_show_rate: number | null;
+        };
         /**
          * BusinessProfile
          * @description What anyone holding a join code may see before signing in.
@@ -1323,6 +1523,61 @@ export interface components {
             requires_any: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
             /** Requires All */
             requires_all: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
+        };
+        /** Checkout */
+        Checkout: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Plan Name */
+            plan_name: string;
+            /**
+             * Amount
+             * @description Minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "paid" | "cancelled" | "failed";
+            /**
+             * Simulated
+             * @description Test payment: no money is charged
+             */
+            simulated: boolean;
+            /**
+             * Pay Url
+             * @description Where to pay (real providers only)
+             */
+            pay_url: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CheckoutCreate */
+        CheckoutCreate: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+        };
+        /** CheckoutPaid */
+        CheckoutPaid: {
+            checkout: components["schemas"]["Checkout"];
+            entitlement: components["schemas"]["Entitlement"];
         };
         /** Client */
         Client: {
@@ -1427,6 +1682,11 @@ export interface components {
             currency: string;
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
+            /**
+             * Online Sales
+             * @description The client can buy plans in the app
+             */
+            online_sales: boolean;
             /**
              * Client Id
              * Format: uuid
@@ -1895,6 +2155,16 @@ export interface components {
             /** Phone */
             phone: string | null;
         };
+        /** Inbox */
+        Inbox: {
+            /** Unread */
+            unread: number;
+            /**
+             * Items
+             * @description The latest 50, newest first
+             */
+            items: components["schemas"]["Notification"][];
+        };
         /** InstructorOption */
         InstructorOption: {
             /**
@@ -2014,6 +2284,14 @@ export interface components {
             /** Active */
             active?: boolean | null;
         };
+        /** MarkRead */
+        MarkRead: {
+            /**
+             * Ids
+             * @description Omit to mark all as read
+             */
+            ids?: string[] | null;
+        };
         /** Me */
         Me: {
             /**
@@ -2057,6 +2335,22 @@ export interface components {
              * Format: date-time
              */
             joined_at: string;
+        };
+        /** MemberAtRisk */
+        MemberAtRisk: {
+            /** Client Id */
+            client_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "inactive" | "plan_ending";
+            /** Last Visit */
+            last_visit: string | null;
+            /** Plan Ends On */
+            plan_ends_on: string | null;
         };
         /**
          * MemberUpdate
@@ -2132,6 +2426,33 @@ export interface components {
             /** @description The form to sign; null if the business has none */
             form: components["schemas"]["Form"] | null;
             current: components["schemas"]["Declaration"] | null;
+        };
+        /** Notification */
+        Notification: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected";
+            /**
+             * Payload
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind)
+             */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Read At */
+            read_at: string | null;
         };
         /** OptionItem */
         OptionItem: {
@@ -2552,6 +2873,40 @@ export interface components {
              */
             kept: number;
         };
+        /** SeriesUpdate */
+        SeriesUpdate: {
+            /** Location Id */
+            location_id?: string | null;
+            /** Room Id */
+            room_id?: string | null;
+            /** Instructor User Id */
+            instructor_user_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * From Date
+             * Format: date
+             * @description Local date of the first session to change
+             */
+            from_date: string;
+            /**
+             * Start Time
+             * Format: time
+             */
+            start_time: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Capacity */
+            capacity: number;
+        };
+        /** SeriesUpdated */
+        SeriesUpdated: {
+            /**
+             * Updated
+             * @description Sessions changed (scheduled, on or after from_date)
+             */
+            updated: number;
+        };
         /** Service */
         Service: {
             /**
@@ -2772,6 +3127,11 @@ export interface components {
              */
             requires_health_declaration: boolean;
             /**
+             * Online Sales
+             * @description Clients can buy plans in the app
+             */
+            online_sales: boolean;
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -2845,6 +3205,8 @@ export interface components {
             booking_requires_plan?: boolean | null;
             /** Requires Health Declaration */
             requires_health_declaration?: boolean | null;
+            /** Online Sales */
+            online_sales?: boolean | null;
         };
         /** Turn */
         Turn: {
@@ -2885,6 +3247,31 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WeekCopied */
+        WeekCopied: {
+            /** Created */
+            created: number;
+            /**
+             * Skipped
+             * @description Already in the target week (same class and time)
+             */
+            skipped: number;
+        };
+        /** WeekCopy */
+        WeekCopy: {
+            /**
+             * From Date
+             * Format: date
+             * @description First local date of the week to copy
+             */
+            from_date: string;
+            /**
+             * To Date
+             * Format: date
+             * @description First local date of the target week
+             */
+            to_date: string;
         };
     };
     responses: never;
@@ -4201,6 +4588,78 @@ export interface operations {
             };
         };
     };
+    update_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesUpdated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_week: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WeekCopy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekCopied"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_bookings: {
         parameters: {
             query?: never;
@@ -4680,6 +5139,75 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Point"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_breakdown: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                dimension: "service" | "instructor" | "time_slot";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BreakdownItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_members_at_risk: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAtRisk"][];
                 };
             };
             /** @description Validation Error */
@@ -5405,6 +5933,173 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Entitlement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_payment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutPaid"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_notifications: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_read: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkRead"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
                 };
             };
             /** @description Validation Error */

@@ -1,16 +1,18 @@
 import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Card, Heading, Screen, styles } from "@/components/ui";
+import { Button, Card, Heading, Screen, styles } from "@/components/ui";
 import { unwrap } from "@/lib/api";
+import { confirm } from "@/lib/confirm";
 import { useLoad } from "@/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type Booking = components["schemas"]["ClientBooking"];
 type Entitlement = components["schemas"]["Entitlement"];
+type Plan = components["schemas"]["Plan"];
 
 const CURRENT = new Set<Entitlement["state"]>(["active", "upcoming", "frozen"]);
 
@@ -38,6 +40,31 @@ export default function Bookings() {
     };
   }, [api, scope, business]);
   const { data, loading, reload } = useLoad(load);
+  const [buying, setBuying] = useState<string | null>(null);
+  const [purchase, setPurchase] = useState<{ ok: boolean; message: string } | null>(null);
+
+  const buy = async (plan: Plan) => {
+    if (!business) return;
+    const price = money(plan.price_amount, plan.price_currency);
+    const ok = await confirm(t("buyConfirmTitle", { plan: plan.name }), t("buyConfirmSimulated", { price }), t("buyConfirm"), t("buyCancel"));
+    if (!ok) return;
+    setBuying(plan.id);
+    setPurchase(null);
+    try {
+      const checkout = unwrap(await api.POST("/client/checkouts", { params: scope, body: { plan_id: plan.id } }));
+      unwrap(
+        await api.POST("/client/checkouts/{checkout_id}/simulate-payment", {
+          params: { ...scope, path: { checkout_id: checkout.id } },
+        }),
+      );
+      setPurchase({ ok: true, message: t("bought", { plan: plan.name }) });
+      await reload();
+    } catch {
+      setPurchase({ ok: false, message: t("buyFailed") });
+    } finally {
+      setBuying(null);
+    }
+  };
 
   if (!business) return null;
   const date = new Intl.DateTimeFormat(locale, {
@@ -92,7 +119,7 @@ export default function Bookings() {
             </View>
           ))}
         </Card>
-      ) : data ? (
+      ) : data && !business.online_sales ? (
         <Card palette={palette}>
           <Text style={[styles.muted, { color: palette.foreground }]}>{t("noPlan")}</Text>
           {data.plans.map((plan) => (
@@ -103,6 +130,48 @@ export default function Bookings() {
           ))}
         </Card>
       ) : null}
+
+      {data && business.online_sales && data.plans.length > 0 && (
+        <>
+          <Heading palette={palette} level={2}>
+            {t("buyTitle")}
+          </Heading>
+          <Card palette={palette}>
+            {data.current.length === 0 && (
+              <Text style={[styles.muted, { color: palette.foreground }]}>{t("noPlanBuy")}</Text>
+            )}
+            {data.plans.map((plan) => (
+              <View key={plan.id} style={local.row}>
+                <View style={local.info}>
+                  <Text style={[local.name, { color: palette.foreground }]}>{plan.name}</Text>
+                  <Text style={[local.meta, { color: palette.muted }]}>
+                    {money(plan.price_amount, plan.price_currency)}
+                  </Text>
+                </View>
+                <View style={local.buy}>
+                  <Button
+                    label={t("buy")}
+                    accessibilityLabel={`${t("buy")} – ${plan.name}`}
+                    palette={palette}
+                    busy={buying === plan.id}
+                    disabled={buying !== null}
+                    onPress={() => void buy(plan)}
+                  />
+                </View>
+              </View>
+            ))}
+            {purchase && (
+              <Text
+                accessibilityRole={purchase.ok ? undefined : "alert"}
+                accessibilityLiveRegion="polite"
+                style={[local.meta, { color: purchase.ok ? palette.primary : palette.danger }]}
+              >
+                {purchase.message}
+              </Text>
+            )}
+          </Card>
+        </>
+      )}
 
       <Heading palette={palette} level={2}>
         {t("upcoming")}
@@ -130,4 +199,5 @@ const local = StyleSheet.create({
   name: { fontSize: 16, fontWeight: "600", textAlign: "left" },
   meta: { fontSize: 14, textAlign: "left" },
   status: { fontSize: 14, fontWeight: "600" },
+  buy: { minWidth: 96 },
 });

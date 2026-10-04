@@ -234,3 +234,129 @@ def _buckets(start: date, end: date, grain: Grain) -> list[date]:
         else:
             day = (day.replace(day=28) + timedelta(days=4)).replace(day=1)
     return buckets
+
+
+# Breakdowns of the attendance metrics over sessions that took place, by one dimension. The
+# definitions match OCCUPANCY and NO_SHOW_RATE above.
+Dimension = Literal["service", "instructor", "time_slot"]
+
+_DIMENSION_SQL: dict[str, tuple[str, str]] = {
+    # (group key, label) expressions over s (sessions), sv (services), u (instructor user)
+    "service": ("sv.id::text", "sv.name"),
+    "instructor": ("coalesce(u.id::text, '')", "coalesce(u.full_name, u.email)"),
+    # ISO weekday (1 = Monday) and local start hour, e.g. "1-18"; the client formats it.
+    "time_slot": (
+        "extract(isodow FROM s.starts_at AT TIME ZONE period.time_zone)::int || '-' || "
+        "extract(hour FROM s.starts_at AT TIME ZONE period.time_zone)::int",
+        "NULL",
+    ),
+}
+
+
+@dataclass(frozen=True)
+class BreakdownRow:
+    key: str
+    label: str | None
+    sessions: int
+    capacity: int
+    taken: int  # booked, attended or no-show
+    attended: int
+    no_shows: int
+
+    @property
+    def occupancy(self) -> float | None:
+        return 100.0 * self.taken / self.capacity if self.capacity else None
+
+    @property
+    def no_show_rate(self) -> float | None:
+        expected = self.attended + self.no_shows
+        return 100.0 * self.no_shows / expected if expected else None
+
+
+def breakdown(db: Session, dimension: Dimension, start: date, end: date) -> list[BreakdownRow]:
+    key_sql, label_sql = _DIMENSION_SQL[dimension]
+    rows = db.execute(
+        text(f"""{PERIOD}
+            SELECT {key_sql} AS key, {label_sql} AS label, count(*) AS sessions,
+                   sum(s.capacity) AS capacity, sum(bk.taken) AS taken,
+                   sum(bk.attended) AS attended, sum(bk.no_shows) AS no_shows
+            FROM app.sessions s
+            JOIN app.services sv ON sv.id = s.service_id
+            LEFT JOIN app.users u ON u.id = s.instructor_user_id
+            CROSS JOIN period
+            CROSS JOIN LATERAL (
+                SELECT count(*) FILTER (WHERE b.status IN ('booked', 'checked_in', 'no_show'))
+                           AS taken,
+                       count(*) FILTER (WHERE b.status = 'checked_in') AS attended,
+                       count(*) FILTER (WHERE b.status = 'no_show') AS no_shows
+                FROM app.bookings b WHERE b.session_id = s.id
+            ) bk
+            WHERE s.status = 'scheduled' AND s.starts_at >= period.from_at
+              AND s.starts_at < least(period.to_at, now())
+            GROUP BY 1, 2
+            ORDER BY sum(bk.attended) DESC, 2
+        """),
+        {"start": start, "end": end},
+    ).all()
+    return [
+        BreakdownRow(
+            key=row.key,
+            label=row.label,
+            sessions=row.sessions,
+            capacity=int(row.capacity or 0),
+            taken=int(row.taken or 0),
+            attended=int(row.attended or 0),
+            no_shows=int(row.no_shows or 0),
+        )
+        for row in rows
+    ]
+
+
+@dataclass(frozen=True)
+class MemberAtRisk:
+    client_id: str
+    name: str
+    reason: Literal["inactive", "plan_ending"]
+    last_visit: date | None  # local date
+    plan_ends_on: date | None
+
+
+def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRisk]:
+    """Retention list: members with a valid plan and no check-in in `days` (inactive), and
+    members whose last valid plan ends within `days` with nothing bought after it."""
+    rows = db.execute(
+        text("""
+            WITH t AS (
+                SELECT time_zone, (now() AT TIME ZONE time_zone)::date AS today
+                FROM app.tenants WHERE id = app.current_tenant_id()
+            ),
+            members AS (
+                SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
+                       (SELECT max(e.ends_on) FROM app.entitlements e
+                        WHERE e.client_id = c.id AND e.status = 'active'
+                          AND e.ends_on >= t.today) AS plan_ends_on,
+                       (SELECT max(s.starts_at) FROM app.bookings b
+                        JOIN app.sessions s ON s.id = b.session_id
+                        WHERE b.client_id = c.id AND b.status = 'checked_in') AS last_visit
+                FROM app.clients c CROSS JOIN t
+                WHERE c.erased_at IS NULL AND EXISTS (
+                    SELECT 1 FROM app.entitlements e
+                    WHERE e.client_id = c.id AND e.status = 'active'
+                      AND t.today BETWEEN e.starts_on AND e.ends_on
+                )
+            )
+            SELECT m.id::text AS client_id, m.name,
+                   CASE WHEN m.last_visit IS NULL
+                             OR m.last_visit < now() - make_interval(days => :days)
+                        THEN 'inactive' ELSE 'plan_ending' END AS reason,
+                   (m.last_visit AT TIME ZONE t.time_zone)::date AS last_visit,
+                   m.plan_ends_on
+            FROM members m CROSS JOIN t
+            WHERE m.last_visit IS NULL OR m.last_visit < now() - make_interval(days => :days)
+               OR m.plan_ends_on < t.today + :days
+            ORDER BY reason, m.last_visit NULLS FIRST, m.plan_ends_on
+            LIMIT :limit
+        """),
+        {"days": days, "limit": limit},
+    ).mappings()
+    return [MemberAtRisk(**row) for row in rows]

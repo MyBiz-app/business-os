@@ -1,6 +1,7 @@
 """Background jobs, run on a schedule (see .github/workflows/jobs-staging.yml).
 
     uv run python -m app.jobs extend-series [--database-url URL]
+    uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
@@ -12,6 +13,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import Connection, create_engine, text
 
 from app.core.config import get_settings
+from app.email import send_emails, sender_from_settings
 from app.scheduling import weekly_occurrences
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
@@ -81,7 +83,14 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
     return added
 
 
-JOBS = {"extend-series": extend_series}
+def send_notification_emails(conn: Connection) -> dict[str, int] | str:
+    sender = sender_from_settings()
+    if sender is None:
+        return "email provider not configured; nothing sent"
+    return send_emails(conn, sender)
+
+
+JOBS = {"extend-series": extend_series, "send-emails": send_notification_emails}
 
 
 def main() -> None:

@@ -6,6 +6,8 @@ import { addDays, dayOf, formatDay, formatTime, isDay, todayIn, weekStart } from
 import { canWriteSchedule } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
+import { CopyWeek } from "./copy-week";
+
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
   const t = await getTranslations("schedule");
   const locale = await getLocale();
@@ -38,6 +40,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("nextWeek")}
             </Link>
           </nav>
+          {canWriteSchedule(tenant) && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {canWriteSchedule(tenant) && (
             <Link
               href={`/schedule/new?date=${start > today ? start : today}`}

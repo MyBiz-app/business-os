@@ -2257,6 +2257,134 @@
         }
       }
     },
+    "/series/{series_id}": {
+      "patch": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Update Series",
+        "description": "Changes time, length, capacity, place, instructor and notes of this and all later\nsessions of a series; new occurrences the daily job adds follow the new settings.\nBookings stay; booked clients are told when the time changes.",
+        "operationId": "update_series",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Series Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesUpdated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sessions/copy-week": {
+      "post": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Copy Week",
+        "description": "Copies the one-off sessions of a week (7 days from from_date) to another week, at the\nsame local weekday and time. Weekly series are left out: they repeat on their own.",
+        "operationId": "copy_week",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WeekCopy"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeekCopied"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/bookings": {
       "get": {
         "tags": [
@@ -3221,6 +3349,158 @@
                     "$ref": "#/components/schemas/Point"
                   },
                   "title": "Response Get Series"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics/breakdown/{dimension}": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Breakdown",
+        "description": "Attendance metrics of sessions that took place, per service, instructor or time slot.",
+        "operationId": "get_breakdown",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "dimension",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "service",
+                "instructor",
+                "time_slot"
+              ],
+              "type": "string",
+              "title": "Dimension"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BreakdownItem"
+                  },
+                  "title": "Response Get Breakdown"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics/members-at-risk": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "summary": "Get Members At Risk",
+        "description": "Members with a valid plan who haven't come in `days`, or whose plan ends within `days`\nwith no renewal.",
+        "operationId": "get_members_at_risk",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 180,
+              "minimum": 7,
+              "default": 14,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberAtRisk"
+                  },
+                  "title": "Response Get Members At Risk"
                 }
               }
             }
@@ -4468,6 +4748,288 @@
         }
       }
     },
+    "/client/checkouts": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Start Checkout",
+        "description": "Starts buying a plan at its current price.",
+        "operationId": "start_checkout",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checkout"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/checkouts/{checkout_id}": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Get Checkout",
+        "operationId": "get_checkout",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "checkout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Checkout Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checkout"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/checkouts/{checkout_id}/simulate-payment": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Simulate Payment",
+        "description": "Completes a simulated checkout: records a test payment and creates the plan. Calling it\nagain returns the same plan.",
+        "operationId": "simulate_payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "checkout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Checkout Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPaid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/notifications": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Notifications",
+        "operationId": "my_notifications",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inbox"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/notifications/read": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Mark Read",
+        "operationId": "mark_read",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkRead"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inbox"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/clients/{client_id}/health-declarations": {
       "get": {
         "tags": [
@@ -5145,6 +5707,68 @@
         ],
         "title": "BookingUpdate"
       },
+      "BreakdownItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "Service id, instructor user id ('' = none) or 'isodow-hour'"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "attended": {
+            "type": "integer",
+            "title": "Attended"
+          },
+          "occupancy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupancy",
+            "description": "Percent of capacity taken"
+          },
+          "no_show_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "No Show Rate",
+            "description": "Percent of expected clients who didn't come"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "sessions",
+          "attended",
+          "occupancy",
+          "no_show_rate"
+        ],
+        "title": "BreakdownItem"
+      },
       "BusinessProfile": {
         "properties": {
           "id": {
@@ -5339,6 +5963,108 @@
           "requires_all"
         ],
         "title": "CatalogModule"
+      },
+      "Checkout": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Plan Id"
+          },
+          "plan_name": {
+            "type": "string",
+            "title": "Plan Name"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount",
+            "description": "Minor units"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "cancelled",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated",
+            "description": "Test payment: no money is charged"
+          },
+          "pay_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pay Url",
+            "description": "Where to pay (real providers only)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "plan_id",
+          "plan_name",
+          "amount",
+          "currency",
+          "status",
+          "simulated",
+          "pay_url",
+          "created_at"
+        ],
+        "title": "Checkout"
+      },
+      "CheckoutCreate": {
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Plan Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan_id"
+        ],
+        "title": "CheckoutCreate"
+      },
+      "CheckoutPaid": {
+        "properties": {
+          "checkout": {
+            "$ref": "#/components/schemas/Checkout"
+          },
+          "entitlement": {
+            "$ref": "#/components/schemas/Entitlement"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checkout",
+          "entitlement"
+        ],
+        "title": "CheckoutPaid"
       },
       "Client": {
         "properties": {
@@ -5594,6 +6320,11 @@
             "type": "integer",
             "title": "Cancellation Window Minutes"
           },
+          "online_sales": {
+            "type": "boolean",
+            "title": "Online Sales",
+            "description": "The client can buy plans in the app"
+          },
           "client_id": {
             "type": "string",
             "format": "uuid",
@@ -5625,6 +6356,7 @@
           "time_zone",
           "currency",
           "cancellation_window_minutes",
+          "online_sales",
           "client_id",
           "first_name",
           "last_name"
@@ -6809,6 +7541,28 @@
         ],
         "title": "ImportedClient"
       },
+      "Inbox": {
+        "properties": {
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "The latest 50, newest first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unread",
+          "items"
+        ],
+        "title": "Inbox"
+      },
       "InstructorOption": {
         "properties": {
           "user_id": {
@@ -7096,6 +7850,28 @@
         "type": "object",
         "title": "LocationUpdate"
       },
+      "MarkRead": {
+        "properties": {
+          "ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ids",
+            "description": "Omit to mark all as read"
+          }
+        },
+        "type": "object",
+        "title": "MarkRead"
+      },
       "Me": {
         "properties": {
           "id": {
@@ -7228,6 +8004,59 @@
           "joined_at"
         ],
         "title": "Member"
+      },
+      "MemberAtRisk": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "inactive",
+              "plan_ending"
+            ],
+            "title": "Reason"
+          },
+          "last_visit": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Visit"
+          },
+          "plan_ends_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan Ends On"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "name",
+          "reason",
+          "last_visit",
+          "plan_ends_on"
+        ],
+        "title": "MemberAtRisk"
       },
       "MemberUpdate": {
         "properties": {
@@ -7445,6 +8274,60 @@
           "current"
         ],
         "title": "MyHealth"
+      },
+      "Notification": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "waitlist_promoted",
+              "booked_by_studio",
+              "booking_cancelled_by_studio",
+              "session_cancelled",
+              "session_moved",
+              "health_approved",
+              "health_rejected"
+            ],
+            "title": "Kind"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload",
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "payload",
+          "created_at",
+          "read_at"
+        ],
+        "title": "Notification"
       },
       "OptionItem": {
         "properties": {
@@ -8634,6 +9517,103 @@
         ],
         "title": "SeriesEnded"
       },
+      "SeriesUpdate": {
+        "properties": {
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "room_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Room Id"
+          },
+          "instructor_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructor User Id"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "from_date": {
+            "type": "string",
+            "format": "date",
+            "title": "From Date",
+            "description": "Local date of the first session to change"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Start Time"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "maximum": 1440.0,
+            "minimum": 5.0,
+            "title": "Duration Minutes"
+          },
+          "capacity": {
+            "type": "integer",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Capacity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_date",
+          "start_time",
+          "duration_minutes",
+          "capacity"
+        ],
+        "title": "SeriesUpdate"
+      },
+      "SeriesUpdated": {
+        "properties": {
+          "updated": {
+            "type": "integer",
+            "title": "Updated",
+            "description": "Sessions changed (scheduled, on or after from_date)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "updated"
+        ],
+        "title": "SeriesUpdated"
+      },
       "Service": {
         "properties": {
           "id": {
@@ -9294,6 +10274,11 @@
             "title": "Requires Health Declaration",
             "description": "Clients need a valid health declaration to book in the app"
           },
+          "online_sales": {
+            "type": "boolean",
+            "title": "Online Sales",
+            "description": "Clients can buy plans in the app"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -9350,6 +10335,7 @@
           "cancellation_window_minutes",
           "booking_requires_plan",
           "requires_health_declaration",
+          "online_sales",
           "join_code",
           "modules",
           "permissions",
@@ -9550,6 +10536,17 @@
               }
             ],
             "title": "Requires Health Declaration"
+          },
+          "online_sales": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Online Sales"
           }
         },
         "type": "object",
@@ -9648,6 +10645,47 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WeekCopied": {
+        "properties": {
+          "created": {
+            "type": "integer",
+            "title": "Created"
+          },
+          "skipped": {
+            "type": "integer",
+            "title": "Skipped",
+            "description": "Already in the target week (same class and time)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "created",
+          "skipped"
+        ],
+        "title": "WeekCopied"
+      },
+      "WeekCopy": {
+        "properties": {
+          "from_date": {
+            "type": "string",
+            "format": "date",
+            "title": "From Date",
+            "description": "First local date of the week to copy"
+          },
+          "to_date": {
+            "type": "string",
+            "format": "date",
+            "title": "To Date",
+            "description": "First local date of the target week"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_date",
+          "to_date"
+        ],
+        "title": "WeekCopy"
       }
     },
     "securitySchemes": {

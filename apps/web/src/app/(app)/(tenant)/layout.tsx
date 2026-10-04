@@ -16,6 +16,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const allowed = (permission: string) => tenant.permissions.includes(permission);
   const candidates: (NavItem & { permission?: string })[] = [
     { href: "/dashboard", label: t("nav.dashboard") },
+    { href: "/reports", label: t("nav.reports"), permission: "reports.read" },
     { href: "/assistant", label: t("nav.assistant"), permission: "ai.use" },
     { href: "/schedule", label: t("nav.schedule"), permission: "schedule.read" },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), permission: "clients.read" },

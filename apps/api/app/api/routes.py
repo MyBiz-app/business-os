@@ -33,7 +33,7 @@ def load_current_tenant(session: Session) -> Tenant:
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
-                       t.requires_health_declaration,
+                       t.requires_health_declaration, t.online_sales,
                        t.join_code, m.role, r.name AS custom_role_name,
                        r.permissions AS custom_permissions,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)

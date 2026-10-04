@@ -32,7 +32,9 @@ production hardening (backups, monitoring, security review, legal docs).
 - [x] Health declaration with typed signature, yearly validity, staff review of any "yes" (T39)
 - [x] Client import from CSV / Excel with column mapping and preview (T40)
 - [x] Privacy requests: export a client's data, erase their personal details (T41)
-- [ ] Payment provider (O1), invoicing provider (O2), real email provider
+- [x] Client notifications in the app (waitlist promotion, studio bookings and cancellations, class changes, health review) (T43)
+- [x] Reports: by class, instructor and hour; members to reach out to (T44)
+- [ ] Payment provider (O1), invoicing provider (O2), real email provider (the notification email job is ready, T46; push notifications later)
 - [x] Security baseline guarded by tests (RLS on every table, pinned search_path, no public grants) and security headers (T42)
 - [ ] Production hardening: backups, monitoring, full security review, privacy policy and terms
 
@@ -73,6 +75,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Client app: email-code sign in, join a business by code / QR, branded home, schedule, book / waitlist / cancel, my bookings, profile (language, theme, switch business)
 - [x] Staff web: join code + printable QR; public join page
 - [x] Background job keeps open-ended weekly series 12 weeks ahead (daily on staging); "stop repeating after this session"
+- [x] Change a series from a session onward; copy a week's one-off sessions to the next week (T45)
 
 ## Sprint 4 progress
 
@@ -81,7 +84,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Bookings use entitlements (credits, validity, freezes); client app requires a valid plan
 - [x] Client app: "My plans" with remaining entries and validity
 - [x] Demo data generator (`python -m app.seed`) + "Create demo studio on staging" workflow
-- [ ] Client self-purchase in the app (needs a payment provider, O1)
+- [x] Client self-purchase in the app, with simulated payments until a provider is chosen (T47; real payments need O1)
 
 ## Sprint 5 progress
 

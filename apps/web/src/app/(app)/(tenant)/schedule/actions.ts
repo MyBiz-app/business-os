@@ -66,11 +66,31 @@ export async function createSessions(_state: SessionFormState, formData: FormDat
 
 export async function updateSession(
   sessionId: string,
+  series: { id: string; date: string } | null,
   _state: SessionFormState,
   formData: FormData,
 ): Promise<SessionFormState> {
   const { api, scope } = await getTenant();
   try {
+    if (series && formData.get("apply_to_series") === "on") {
+      // This and all following sessions of the series (the date field is not used).
+      unwrap(
+        await api.PATCH("/series/{series_id}", {
+          params: { ...scope, path: { series_id: series.id } },
+          body: {
+            from_date: series.date,
+            start_time: text(formData, "start_time"),
+            duration_minutes: Number(text(formData, "duration_minutes")),
+            capacity: Number(text(formData, "capacity")),
+            instructor_user_id: optional(formData, "instructor_user_id"),
+            notes: optional(formData, "notes"),
+            ...readPlace(formData),
+          },
+        }),
+      );
+      revalidatePath("/schedule", "layout");
+      return { saved: true };
+    }
     unwrap(
       await api.PATCH("/sessions/{session_id}", {
         params: { ...scope, path: { session_id: sessionId } },
@@ -163,4 +183,25 @@ export async function endSeries(seriesId: string, sessionId: string, lastDate: s
   );
   revalidatePath("/schedule");
   redirect(`/schedule/${sessionId}?ended=${result.cancelled}-${result.kept}`);
+}
+
+export type CopyWeekState = { error?: "generic"; copied?: { created: number; skipped: number } };
+
+/** Copies the week's one-off sessions to the next week. */
+export async function copyWeek(weekStart: string, _state: CopyWeekState, _formData: FormData): Promise<CopyWeekState> {
+  const { api, scope } = await getTenant();
+  const next = new Date(`${weekStart}T12:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 7);
+  try {
+    const copied = unwrap(
+      await api.POST("/sessions/copy-week", {
+        params: scope,
+        body: { from_date: weekStart, to_date: next.toISOString().slice(0, 10) },
+      }),
+    );
+    revalidatePath("/schedule");
+    return { copied };
+  } catch {
+    return { error: "generic" };
+  }
 }

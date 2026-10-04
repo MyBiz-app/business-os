@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.bookings import lock_session, promote_waitlist
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
+from app.notifications import live_clients, notify, session_snapshot
 from app.permissions import Permission
 from app.scheduling import local_to_utc, weekly_occurrences
 
@@ -376,7 +377,25 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
     except IntegrityError as error:
         raise _invalid_reference() from error
     promote_waitlist(db, session_id)  # more capacity (or a restored session) frees spots
-    return _load(db, session_id)
+    updated = _load(db, session_id)
+    if updated.starts_at > datetime.now(dt.UTC):
+        if current.status == "scheduled" and updated.status == "cancelled":
+            notify(
+                db,
+                context.tenant_id,
+                live_clients(db, session_id),
+                "session_cancelled",
+                session_snapshot(db, session_id),
+            )
+        elif updated.status == "scheduled" and updated.starts_at != current.starts_at:
+            notify(
+                db,
+                context.tenant_id,
+                live_clients(db, session_id),
+                "session_moved",
+                {**session_snapshot(db, session_id), "previous_starts_at": current.starts_at},
+            )
+    return updated
 
 
 class SeriesEnd(BaseModel):
@@ -432,3 +451,161 @@ def end_series(series_id: UUID, body: SeriesEnd, context: WriteDep) -> SeriesEnd
         {"id": series_id, "after": after},
     ).one()
     return SeriesEnded(cancelled=counts.cancelled, kept=counts.kept)
+
+
+class SeriesUpdate(Placement):
+    from_date: dt.date = Field(description="Local date of the first session to change")
+    start_time: time
+    duration_minutes: int = Field(ge=5, le=1440)
+    capacity: int = Field(ge=1, le=1000)
+
+
+class SeriesUpdated(BaseModel):
+    updated: int = Field(description="Sessions changed (scheduled, on or after from_date)")
+
+
+@router.patch("/series/{series_id}")
+def update_series(series_id: UUID, body: SeriesUpdate, context: WriteDep) -> SeriesUpdated:
+    """Changes time, length, capacity, place, instructor and notes of this and all later
+    sessions of a series; new occurrences the daily job adds follow the new settings.
+    Bookings stay; booked clients are told when the time changes."""
+    db = context.session
+    exists = db.execute(
+        text("SELECT 1 FROM app.session_series WHERE id = :id FOR UPDATE"), {"id": series_id}
+    ).scalar()
+    if exists is None:
+        raise not_found()
+    time_zone = _time_zone(db)
+    params = {
+        "id": series_id,
+        "after": local_to_utc(body.from_date, time.min, time_zone),
+        "start_time": body.start_time,
+        "duration": body.duration_minutes,
+        "capacity": body.capacity,
+        "location_id": body.location_id,
+        "room_id": body.room_id,
+        "instructor_user_id": body.instructor_user_id,
+        "notes": body.notes,
+        "time_zone": time_zone,
+    }
+    try:
+        db.execute(
+            text("""
+                UPDATE app.session_series
+                SET start_time = :start_time, duration_minutes = :duration,
+                    capacity = :capacity, location_id = :location_id, room_id = :room_id,
+                    instructor_user_id = :instructor_user_id
+                WHERE id = :id
+            """),
+            params,
+        )
+        changed = (
+            db.execute(
+                text("""
+                    WITH targets AS (
+                        SELECT s.id, s.starts_at AS previous_starts_at,
+                               (((s.starts_at AT TIME ZONE :time_zone)::date + :start_time)
+                                AT TIME ZONE :time_zone) AS new_start
+                        FROM app.sessions s
+                        WHERE s.series_id = :id AND s.status = 'scheduled'
+                          AND s.starts_at >= :after
+                        FOR UPDATE
+                    )
+                    UPDATE app.sessions s
+                    SET starts_at = t.new_start,
+                        ends_at = t.new_start + make_interval(mins => :duration),
+                        capacity = :capacity, location_id = :location_id, room_id = :room_id,
+                        instructor_user_id = :instructor_user_id, notes = :notes,
+                        updated_at = now()
+                    FROM targets t
+                    WHERE s.id = t.id
+                    RETURNING s.id, t.previous_starts_at, s.starts_at
+                """),
+                params,
+            )
+            .mappings()
+            .all()
+        )
+    except IntegrityError as error:
+        raise _invalid_reference() from error
+
+    now = datetime.now(dt.UTC)
+    for row in changed:
+        promote_waitlist(db, row["id"])  # capacity may have grown
+        if row["starts_at"] != row["previous_starts_at"] and row["starts_at"] > now:
+            notify(
+                db,
+                context.tenant_id,
+                live_clients(db, row["id"]),
+                "session_moved",
+                {
+                    **session_snapshot(db, row["id"]),
+                    "previous_starts_at": row["previous_starts_at"],
+                },
+            )
+    return SeriesUpdated(updated=len(changed))
+
+
+class WeekCopy(BaseModel):
+    from_date: dt.date = Field(description="First local date of the week to copy")
+    to_date: dt.date = Field(description="First local date of the target week")
+
+
+class WeekCopied(BaseModel):
+    created: int
+    skipped: int = Field(description="Already in the target week (same class and time)")
+
+
+@router.post("/sessions/copy-week")
+def copy_week(body: WeekCopy, context: WriteDep) -> WeekCopied:
+    """Copies the one-off sessions of a week (7 days from from_date) to another week, at the
+    same local weekday and time. Weekly series are left out: they repeat on their own."""
+    shift = (body.to_date - body.from_date).days
+    if shift == 0 or shift % 7 != 0:
+        raise HTTPException(status_code=422, detail="not_a_week_apart")
+    db = context.session
+    time_zone = _time_zone(db)
+    result = (
+        db.execute(
+            text("""
+                WITH source AS (
+                    SELECT s.*,
+                           ((s.starts_at AT TIME ZONE :tz) + make_interval(days => :shift))
+                               AT TIME ZONE :tz AS new_start
+                    FROM app.sessions s
+                    WHERE s.series_id IS NULL AND s.status = 'scheduled'
+                      AND s.starts_at >= :from_at AND s.starts_at < :to_at
+                ),
+                fresh AS (
+                    SELECT src.* FROM source src
+                    WHERE NOT EXISTS (
+                        SELECT 1 FROM app.sessions s
+                        WHERE s.service_id = src.service_id AND s.starts_at = src.new_start
+                          AND s.status = 'scheduled'
+                          AND s.room_id IS NOT DISTINCT FROM src.room_id
+                    )
+                ),
+                created AS (
+                    INSERT INTO app.sessions
+                        (tenant_id, service_id, location_id, room_id, instructor_user_id,
+                         capacity, notes, starts_at, ends_at)
+                    SELECT tenant_id, service_id, location_id, room_id, instructor_user_id,
+                           capacity, notes, new_start, new_start + (ends_at - starts_at)
+                    FROM fresh
+                    RETURNING 1
+                )
+                SELECT (SELECT count(*) FROM created) AS created,
+                       (SELECT count(*) FROM source) - (SELECT count(*) FROM created)
+                           AS skipped
+            """),
+            {
+                "tz": time_zone,
+                "shift": shift,
+                "from_at": local_to_utc(body.from_date, time.min, time_zone),
+                "to_at": local_to_utc(body.from_date + timedelta(days=7), time.min, time_zone),
+            },
+        )
+        .mappings()
+        .one()
+    )
+    return WeekCopied(created=result["created"], skipped=result["skipped"])

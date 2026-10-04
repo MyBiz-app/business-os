@@ -33,9 +33,20 @@ type Props = {
   allowRepeat?: boolean;
   lockService?: boolean;
   readOnly?: boolean;
+  /** The session belongs to a weekly series: offer applying the change to it from here on. */
+  inSeries?: boolean;
 };
 
-export function SessionForm({ action, options, defaults, submitLabel, allowRepeat, lockService, readOnly }: Props) {
+export function SessionForm({
+  action,
+  options,
+  defaults,
+  submitLabel,
+  allowRepeat,
+  lockService,
+  readOnly,
+  inSeries,
+}: Props) {
   const t = useTranslations();
   const [state, formAction] = useActionState(action, {});
   const [repeat, setRepeat] = useState(false);
@@ -159,6 +170,16 @@ export function SessionForm({ action, options, defaults, submitLabel, allowRepea
             </>
           )}
         </fieldset>
+      )}
+
+      {inSeries && !readOnly && (
+        <label className="flex items-start gap-2 rounded-xl border border-border p-4 text-sm">
+          <input type="checkbox" name="apply_to_series" className="mt-0.5 size-4 accent-primary" />
+          <span className="flex flex-col gap-0.5">
+            <span className="font-medium">{t("schedule.applyToSeries")}</span>
+            <span className="text-muted">{t("schedule.applyToSeriesHint")}</span>
+          </span>
+        </label>
       )}
 
       {!readOnly && (

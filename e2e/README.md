@@ -23,10 +23,16 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `roles.py` checks custom roles through the UI (create a role, assign it, access changes, in-use role is protected). Run it the same way, without arguments, against the normal API.
 
-`series.py` creates an open-ended weekly series and stops it from one of its sessions.
+`series.py` creates an open-ended weekly series, changes its time from one session on, stops it, and copies a week's one-off class to the next week.
 
 `health.py` walks the health declaration: booking blocked without one, a "yes" waits for the studio, the studio approves on the client profile, then the member books. Run it like `roles.py`.
 
 `client_import.py` imports a Hebrew Windows-1255 CSV: recognized columns, a column mapped by hand, preview with a duplicate and an invalid row, then the import.
 
 `privacy.py` downloads a client's data export, then erases their personal details.
+
+`notifications.py`: the studio books a member and cancels the class; the member sees both under Updates, with an unread badge that clears once read.
+
+`reports.py` seeds a demo studio for a new owner and checks the reports page (breakdowns, members to reach out to, period switch).
+
+`purchase.py`: the owner turns on online sales, a member buys a plan in the app with a test payment, and the owner sees it on the member's profile.

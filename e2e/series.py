@@ -1,5 +1,6 @@
 """Weekly series: create one without an end date, then stop it from a session."""
 
+import datetime as dt
 import re
 import time
 
@@ -8,6 +9,8 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 
 email = f"owner{time.time_ns()}@example.com"
+tomorrow = (dt.date.today() + dt.timedelta(days=1)).isoformat()
+next_week = (dt.date.today() + dt.timedelta(days=7)).isoformat()
 
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
@@ -46,10 +49,32 @@ with sync_playwright() as p:
     expect(page.get_by_text("הסדרה ממשיכה")).to_be_visible()
     print("open-ended series: ok")
 
+    # Change the time of this and all later sessions in the series.
+    session_url = page.url
+    page.get_by_label("שעת התחלה").fill("20:15")
+    page.get_by_label("להחיל על השיעור הזה ועל כל השיעורים הבאים בסדרה").check()
+    page.get_by_role("button", name="שמירה").click()
+    expect(page.locator("main p").filter(has_text="20:15").first).to_be_visible()
+    page.goto(f"{h.BASE}/schedule?week={next_week}"); h.ready(page)
+    expect(page.locator("main ol").get_by_text("20:15").first).to_be_visible()
+    print("series time changed from this session on: ok")
+    page.goto(session_url); h.ready(page)
+
     page.get_by_role("button", name="הפסקת החזרה אחרי השיעור הזה").click()
     page.wait_for_url("**?ended=*")
     expect(page.get_by_role("status")).to_contain_text("החזרה הופסקה")
     expect(page.get_by_role("button", name="הפסקת החזרה אחרי השיעור הזה")).to_have_count(0)
     page.screenshot(path=f"{h.OUT}/s1-ended.png", full_page=True)
     print("stop repeating: ok")
+
+    # Copy a week's one-off class to the following week.
+    page.goto(f"{h.BASE}/schedule/new?date={tomorrow}"); h.ready(page)
+    page.get_by_label("שעת התחלה").fill("07:45")
+    page.get_by_role("button", name="יצירה").click()
+    page.wait_for_url("**/schedule?week=*"); h.ready(page)
+    page.get_by_role("button", name="העתקת השבוע לשבוע הבא").click()
+    expect(page.get_by_role("status").filter(has_text="הועתק שיעור אחד")).to_be_visible()
+    page.get_by_role("status").get_by_role("link", name="השבוע הבא").click(); h.ready(page)
+    expect(page.locator("main ol").get_by_text("07:45")).to_be_visible()
+    print("copy week: ok")
     b.close()

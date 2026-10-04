@@ -44,7 +44,9 @@
     "modulesLink": "Modules and plan",
     "modulesHint": "Turn features on or off and see the monthly price.",
     "requireHealth": "Clients need a health declaration to book in the app",
-    "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book."
+    "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book.",
+    "onlineSales": "Clients can buy plans in the app",
+    "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged."
   },
   "locales": {
     "he": "עברית",
@@ -164,7 +166,8 @@
     "settings": "Settings",
     "schedule": "Schedule",
     "plans": "Plans",
-    "assistant": "AI assistant"
+    "assistant": "AI assistant",
+    "reports": "Reports"
   },
   "terms": {
     "fitness": {
@@ -374,7 +377,13 @@
     "waitlisted": "{count} on waitlist",
     "seriesOpen": "It keeps repeating; new weeks are added automatically.",
     "endSeries": "Stop repeating after this session",
-    "seriesEnded": "Repeating stopped. {cancelled, plural, one {# later session was} other {# later sessions were}} cancelled{kept, plural, =0 {.} one { and # was kept because clients are booked: handle it yourself.} other { and # were kept because clients are booked: handle them yourself.}}"
+    "seriesEnded": "Repeating stopped. {cancelled, plural, one {# later session was} other {# later sessions were}} cancelled{kept, plural, =0 {.} one { and # was kept because clients are booked: handle it yourself.} other { and # were kept because clients are booked: handle them yourself.}}",
+    "applyToSeries": "Apply to this and all following classes in the series",
+    "applyToSeriesHint": "Time, length, capacity, place, instructor and notes change from this date on. Booked clients are told about a new time.",
+    "copyWeek": "Copy week to next week",
+    "copyWeekHint": "Copies this week's one-off classes. Weekly series repeat on their own.",
+    "copyWeekDone": "{created, plural, =0 {Nothing new to copy} one {# class copied} other {# classes copied}}{skipped, plural, =0 {} other { (# already there)}}.",
+    "copyWeekError": "Couldn't copy the week. Try again."
   },
   "bookings": {
     "title": "Bookings",
@@ -423,7 +432,9 @@
       "home": "Home",
       "schedule": "Schedule",
       "bookings": "My bookings",
-      "profile": "Profile"
+      "profile": "Profile",
+      "updates": "Updates",
+      "updatesUnread": "{count, plural, one {Updates, # new} other {Updates, # new}}"
     },
     "signIn": {
       "title": "Sign in",
@@ -472,7 +483,16 @@
       "myPlans": "My plans",
       "validUntil": "Valid until {date}",
       "entriesLeft": "{count, plural, one {# entry left} other {# entries left}}",
-      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:"
+      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:",
+      "buyTitle": "Buy a plan",
+      "noPlanBuy": "You don't have a valid plan yet. Choose one to start booking.",
+      "buy": "Buy",
+      "buyConfirmTitle": "Buy {plan}?",
+      "buyConfirmSimulated": "Test payment of {price}: no money is charged while the studio sets up payments.",
+      "buyConfirm": "Buy",
+      "buyCancel": "Not now",
+      "bought": "Done! {plan} is now in your plans.",
+      "buyFailed": "The purchase didn't go through. Try again."
     },
     "profile": {
       "title": "Profile",
@@ -527,6 +547,22 @@
       "banner": "Before your first class, please fill in a short health declaration.",
       "expiringBanner": "Your health declaration ends on {date}. Please sign a new one so you can keep booking.",
       "expiringSoon": "Valid until {date}. It ends soon, so please sign a new one."
+    },
+    "updates": {
+      "title": "Updates",
+      "empty": "Nothing new yet. When the studio changes something about your classes, you'll see it here.",
+      "new": "New",
+      "note": "Studio note: {note}",
+      "kinds": {
+        "waitlist_promoted": "A spot opened up: you're booked into {service} on {when}.",
+        "booked_by_studio": "The studio booked you into {service} on {when}.",
+        "waitlisted_by_studio": "The studio put you on the waitlist for {service} on {when}.",
+        "booking_cancelled_by_studio": "The studio cancelled your booking for {service} on {when}.",
+        "session_cancelled": "{service} on {when} was cancelled.",
+        "session_moved": "{service} moved from {previous} to {when}.",
+        "health_approved": "The studio approved your health declaration. You can book classes.",
+        "health_rejected": "The studio couldn't approve your health declaration. Please contact them."
+      }
     }
   },
   "join": {
@@ -825,6 +861,60 @@
     "errors": {
       "confirm": "Tick the box to confirm.",
       "generic": "Something went wrong. Try again."
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "intro": "Which classes, instructors and hours work best, and which members need attention.",
+    "period": "Period",
+    "lastDays": "Last {count} days",
+    "noSessions": "No classes took place in this period.",
+    "sessions": "Classes",
+    "attended": "Check-ins",
+    "occupancy": "Occupancy",
+    "noShowRate": "No-shows",
+    "byService": "By class",
+    "service": "Class",
+    "byInstructor": "By instructor",
+    "instructor": "Instructor",
+    "noInstructor": "No instructor set",
+    "bySlot": "Busiest times",
+    "slot": "Day and hour",
+    "atRisk": "{count, plural, =0 {Members to reach out to} one {# member to reach out to} other {# members to reach out to}}",
+    "atRiskHint": "Members with a valid plan who haven't come in {days} days, or whose plan ends within {days} days with no renewal.",
+    "atRiskNone": "Nobody right now. Nice!",
+    "reasons": {
+      "inactive": "Hasn't come lately",
+      "plan_ending": "Plan ending"
+    },
+    "lastVisit": "Last visit {date}",
+    "neverVisited": "Hasn't visited yet",
+    "planEnds": "plan ends {date}",
+    "showAll": "Show all {count}"
+  },
+  "email": {
+    "greeting": "Hi {name},",
+    "note": "Studio note: {note}",
+    "footer": "This message was sent by {business}. You can see all updates in the app.",
+    "subject": {
+      "waitlist_promoted": "You're in: {service} on {when}",
+      "booked_by_studio": "You're booked: {service} on {when}",
+      "waitlisted_by_studio": "On the waitlist: {service} on {when}",
+      "booking_cancelled_by_studio": "Booking cancelled: {service} on {when}",
+      "session_cancelled": "Class cancelled: {service} on {when}",
+      "session_moved": "New time: {service} on {when}",
+      "health_approved": "Your health declaration was approved",
+      "health_rejected": "About your health declaration"
+    },
+    "body": {
+      "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
+      "booked_by_studio": "{business} booked you into {service} on {when}.",
+      "waitlisted_by_studio": "{business} put you on the waitlist for {service} on {when}. We'll let you know if a spot opens up.",
+      "booking_cancelled_by_studio": "{business} cancelled your booking for {service} on {when}.",
+      "session_cancelled": "{service} on {when} was cancelled. Sorry for the change.",
+      "session_moved": "{service} moved from {previous} to {when}. Your booking moved with it.",
+      "health_approved": "{business} approved your health declaration. You can book classes in the app.",
+      "health_rejected": "{business} couldn't approve your health declaration. Please contact the studio."
     }
   }
 }

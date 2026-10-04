@@ -26,7 +26,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}`} className="grid gap-4 sm:grid-cols-2">
+      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}`} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
         </div>
@@ -88,6 +88,10 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
             defaultChecked={tenant.requires_health_declaration}
           />
           <p className="mt-1.5 text-xs text-muted">{t("settings.requireHealthHint")}</p>
+        </div>
+        <div className="sm:col-span-2">
+          <CheckboxField label={t("settings.onlineSales")} name="online_sales" defaultChecked={tenant.online_sales} />
+          <p className="mt-1.5 text-xs text-muted">{t("settings.onlineSalesHint")}</p>
         </div>
       </div>
       <div>

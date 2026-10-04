@@ -1,4 +1,5 @@
 from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
@@ -110,3 +111,118 @@ def test_ending_needs_schedule_write(client: TestClient, studio: dict, auth) -> 
         headers=coach,
     )
     assert response.status_code == 403
+
+
+def test_changing_a_series_from_a_date_moves_later_sessions(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    series = create_series(client, studio)
+    ids = series["session_ids"]
+    booked = ids[3]
+    client_id = new_client(client, studio["headers"], "Dana")
+    book(client, studio["headers"], booked, client_id)
+    third = client.get(f"/sessions/{ids[2]}", headers=studio["headers"]).json()
+    from_date = third["starts_at"][:10]  # 18:00 Israel time is still the same UTC date
+
+    changed = client.patch(
+        f"/series/{series['series_id']}",
+        json={
+            "from_date": from_date,
+            "start_time": "19:30",
+            "duration_minutes": 45,
+            "capacity": 6,
+            "notes": "New time",
+        },
+        headers=studio["headers"],
+    )
+
+    assert changed.status_code == 200, changed.text
+    assert changed.json()["updated"] == len(ids) - 2
+    first = client.get(f"/sessions/{ids[0]}", headers=studio["headers"]).json()
+    later = client.get(f"/sessions/{booked}", headers=studio["headers"]).json()
+    assert "T15:00" in first["starts_at"] or "T16:00" in first["starts_at"]  # unchanged 18:00
+    assert later["capacity"] == 6 and later["notes"] == "New time"
+    start = datetime.fromisoformat(later["starts_at"])
+    end = datetime.fromisoformat(later["ends_at"])
+    assert (end - start) == timedelta(minutes=45)
+    assert start.astimezone(ZoneInfo("Asia/Jerusalem")).strftime("%H:%M") == "19:30"
+    roster = client.get(f"/sessions/{booked}/bookings", headers=studio["headers"]).json()
+    assert roster[0]["status"] == "booked"  # bookings follow the session
+    # New occurrences from the daily job use the new time too.
+    with engine.begin() as connection:
+        extend_series(connection, datetime.now(UTC) + timedelta(days=28))
+    sessions = client.get(
+        "/sessions",
+        params={"start": (local_today() + timedelta(days=84)).isoformat(), "days": 28},
+        headers=studio["headers"],
+    ).json()
+    assert sessions
+    assert all(
+        datetime.fromisoformat(s["starts_at"]).astimezone(ZoneInfo("Asia/Jerusalem")).hour == 19
+        for s in sessions
+    )
+
+
+def test_copy_week_copies_one_off_sessions_once(client: TestClient, studio: dict) -> None:
+    monday = local_today() + timedelta(days=7 - local_today().weekday())
+    for offset, hour in ((0, "07:00"), (2, "18:00")):
+        client.post(
+            "/sessions",
+            json={
+                "service_id": studio["service"]["id"],
+                "date": (monday + timedelta(days=offset)).isoformat(),
+                "start_time": hour,
+            },
+            headers=studio["headers"],
+        )
+    create_series(client, studio)  # series are not copied
+    body = {"from_date": monday.isoformat(), "to_date": (monday + timedelta(days=7)).isoformat()}
+
+    first = client.post("/sessions/copy-week", json=body, headers=studio["headers"]).json()
+    again = client.post("/sessions/copy-week", json=body, headers=studio["headers"]).json()
+    odd = client.post(
+        "/sessions/copy-week",
+        json={"from_date": monday.isoformat(), "to_date": (monday + timedelta(days=3)).isoformat()},
+        headers=studio["headers"],
+    )
+
+    assert first == {"created": 2, "skipped": 0}
+    assert again == {"created": 0, "skipped": 2}
+    assert odd.status_code == 422
+    week = client.get(
+        "/sessions",
+        params={"start": (monday + timedelta(days=7)).isoformat(), "days": 7},
+        headers=studio["headers"],
+    ).json()
+    one_offs = [s for s in week if s["series_id"] is None]
+    times = sorted(
+        datetime.fromisoformat(s["starts_at"])
+        .astimezone(ZoneInfo("Asia/Jerusalem"))
+        .strftime("%a %H:%M")
+        for s in one_offs
+    )
+    assert times == ["Mon 07:00", "Wed 18:00"]
+
+
+def test_series_change_and_copy_need_schedule_write(client: TestClient, studio: dict, auth) -> None:
+    series = create_series(client, studio)
+    coach = auth(studio["coach"], studio["tenant_id"])
+    change = client.patch(
+        f"/series/{series['series_id']}",
+        json={
+            "from_date": local_today().isoformat(),
+            "start_time": "19:00",
+            "duration_minutes": 60,
+            "capacity": 5,
+        },
+        headers=coach,
+    )
+    copy = client.post(
+        "/sessions/copy-week",
+        json={
+            "from_date": local_today().isoformat(),
+            "to_date": (local_today() + timedelta(days=7)).isoformat(),
+        },
+        headers=coach,
+    )
+    assert change.status_code == 403 and copy.status_code == 403

@@ -2,8 +2,8 @@
 
 Erasure keeps the client row (as "Deleted client") so bookings, plans and payments keep their
 history; payments must be kept for accounting. It clears the personal fields, removes health
-declarations, frees upcoming bookings and unlinks the client app account. Both actions are
-for owners (permission `clients.privacy`) and are written to the audit log."""
+declarations and notifications, frees upcoming bookings and unlinks the client app account.
+Both actions are for owners (permission `clients.privacy`) and are written to the audit log."""
 
 import json
 from datetime import datetime
@@ -113,6 +113,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "notifications": _rows(
+            db,
+            """
+            SELECT kind, payload, created_at, read_at
+            FROM app.notifications WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
         "health_declarations": _rows(
             db,
             """
@@ -163,6 +171,7 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
     removed = db.execute(
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
+    db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
     db.execute(
         text("""
             UPDATE app.entitlement_freezes SET reason = NULL

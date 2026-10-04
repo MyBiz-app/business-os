@@ -44,7 +44,9 @@
     "modulesLink": "מודולים וחבילה",
     "modulesHint": "הפעלה וכיבוי של יכולות, והמחיר החודשי.",
     "requireHealth": "מתאמנים צריכים הצהרת בריאות כדי להירשם באפליקציה",
-    "requireHealthHint": "המתאמנים חותמים באפליקציה פעם בשנה. מי שעונה \"כן\" על שאלה כלשהי צריך אישור שלך בפרופיל שלו לפני שיוכל להירשם."
+    "requireHealthHint": "המתאמנים חותמים באפליקציה פעם בשנה. מי שעונה \"כן\" על שאלה כלשהי צריך אישור שלך בפרופיל שלו לפני שיוכל להירשם.",
+    "onlineSales": "מתאמנים יכולים לרכוש מנויים באפליקציה",
+    "onlineSalesHint": "עד שיחובר ספק סליקה, הרכישות הן תשלומי ניסיון ולא נגבה כסף."
   },
   "locales": {
     "he": "עברית",
@@ -164,7 +166,8 @@
     "settings": "הגדרות",
     "schedule": "לוח שיעורים",
     "plans": "מנויים וכרטיסיות",
-    "assistant": "עוזר AI"
+    "assistant": "עוזר AI",
+    "reports": "דוחות"
   },
   "terms": {
     "fitness": {
@@ -374,7 +377,13 @@
     "waitlisted": "{count} ברשימת המתנה",
     "seriesOpen": "הסדרה ממשיכה; שבועות חדשים מתווספים אוטומטית.",
     "endSeries": "הפסקת החזרה אחרי השיעור הזה",
-    "seriesEnded": "החזרה הופסקה. {cancelled, plural, one {שיעור אחד מאוחר יותר בוטל} other {# שיעורים מאוחרים יותר בוטלו}}{kept, plural, =0 {.} one {, ושיעור אחד נשאר כי יש בו רשומים: יש לטפל בו ידנית.} other {, ו-# נשארו כי יש בהם רשומים: יש לטפל בהם ידנית.}}"
+    "seriesEnded": "החזרה הופסקה. {cancelled, plural, one {שיעור אחד מאוחר יותר בוטל} other {# שיעורים מאוחרים יותר בוטלו}}{kept, plural, =0 {.} one {, ושיעור אחד נשאר כי יש בו רשומים: יש לטפל בו ידנית.} other {, ו-# נשארו כי יש בהם רשומים: יש לטפל בהם ידנית.}}",
+    "applyToSeries": "להחיל על השיעור הזה ועל כל השיעורים הבאים בסדרה",
+    "applyToSeriesHint": "השעה, האורך, מספר המקומות, המיקום, המדריך וההערות ישתנו מהתאריך הזה והלאה. מי שרשום יקבל עדכון על שעה חדשה.",
+    "copyWeek": "העתקת השבוע לשבוע הבא",
+    "copyWeekHint": "מעתיק את השיעורים החד-פעמיים של השבוע. סדרות שבועיות חוזרות מעצמן.",
+    "copyWeekDone": "{created, plural, =0 {אין שיעורים חדשים להעתקה} one {הועתק שיעור אחד} other {הועתקו # שיעורים}}{skipped, plural, =0 {} one { (אחד כבר קיים)} other { (# כבר קיימים)}}.",
+    "copyWeekError": "לא הצלחנו להעתיק את השבוע. נסו שוב."
   },
   "bookings": {
     "title": "הרשמות",
@@ -423,7 +432,9 @@
       "home": "בית",
       "schedule": "מערכת שעות",
       "bookings": "ההרשמות שלי",
-      "profile": "פרופיל"
+      "profile": "פרופיל",
+      "updates": "עדכונים",
+      "updatesUnread": "{count, plural, one {עדכונים, עדכון חדש אחד} other {עדכונים, # חדשים}}"
     },
     "signIn": {
       "title": "כניסה",
@@ -472,7 +483,16 @@
       "myPlans": "המנויים שלי",
       "validUntil": "בתוקף עד {date}",
       "entriesLeft": "{count, plural, one {נשארה כניסה אחת} other {נשארו # כניסות}}",
-      "noPlan": "עדיין אין לך מנוי או כרטיסייה פעילים. אפשר לבקש מהסטודיו אחד מאלה:"
+      "noPlan": "עדיין אין לך מנוי או כרטיסייה פעילים. אפשר לבקש מהסטודיו אחד מאלה:",
+      "buyTitle": "רכישת מנוי",
+      "noPlanBuy": "עדיין אין לך מנוי בתוקף. אפשר לבחור אחד ולהתחיל להירשם.",
+      "buy": "רכישה",
+      "buyConfirmTitle": "לרכוש את {plan}?",
+      "buyConfirmSimulated": "תשלום ניסיון של {price}: לא ייגבה כסף עד שהסטודיו יחבר סליקה.",
+      "buyConfirm": "רכישה",
+      "buyCancel": "לא עכשיו",
+      "bought": "בוצע! {plan} נוסף למנויים שלך.",
+      "buyFailed": "הרכישה לא הושלמה. נסו שוב."
     },
     "profile": {
       "title": "פרופיל",
@@ -527,6 +547,22 @@
       "banner": "לפני השיעור הראשון, יש למלא הצהרת בריאות קצרה.",
       "expiringBanner": "הצהרת הבריאות שלך בתוקף עד {date}. כדאי לחתום על הצהרה חדשה כדי להמשיך להירשם.",
       "expiringSoon": "בתוקף עד {date}. התוקף מסתיים בקרוב, כדאי לחתום על הצהרה חדשה."
+    },
+    "updates": {
+      "title": "עדכונים",
+      "empty": "אין עדכונים עדיין. כשהסטודיו ישנה משהו בשיעורים שלך, זה יופיע כאן.",
+      "new": "חדש",
+      "note": "הערת הסטודיו: {note}",
+      "kinds": {
+        "waitlist_promoted": "התפנה מקום: נרשמת ל{service} ב{when}.",
+        "booked_by_studio": "הסטודיו רשם אותך ל{service} ב{when}.",
+        "waitlisted_by_studio": "הסטודיו הוסיף אותך לרשימת ההמתנה ל{service} ב{when}.",
+        "booking_cancelled_by_studio": "הסטודיו ביטל את ההרשמה שלך ל{service} ב{when}.",
+        "session_cancelled": "השיעור {service} ב{when} בוטל.",
+        "session_moved": "השיעור {service} הועבר מ{previous} ל{when}.",
+        "health_approved": "הסטודיו אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים.",
+        "health_rejected": "הסטודיו לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור איתם קשר."
+      }
     }
   },
   "join": {
@@ -825,6 +861,60 @@
     "errors": {
       "confirm": "יש לסמן את התיבה כדי לאשר.",
       "generic": "משהו השתבש. נסו שוב."
+    }
+  },
+  "reports": {
+    "title": "דוחות",
+    "intro": "אילו שיעורים, מדריכים ושעות עובדים הכי טוב, ואילו מתאמנים צריכים תשומת לב.",
+    "period": "תקופה",
+    "lastDays": "{count} הימים האחרונים",
+    "noSessions": "לא התקיימו שיעורים בתקופה הזו.",
+    "sessions": "שיעורים",
+    "attended": "הגעות",
+    "occupancy": "תפוסה",
+    "noShowRate": "לא הגיעו",
+    "byService": "לפי שיעור",
+    "service": "שיעור",
+    "byInstructor": "לפי מדריך",
+    "instructor": "מדריך/ה",
+    "noInstructor": "ללא מדריך",
+    "bySlot": "השעות העמוסות",
+    "slot": "יום ושעה",
+    "atRisk": "{count, plural, =0 {מתאמנים שכדאי לפנות אליהם} one {מתאמן/ת אחד/ת שכדאי לפנות אליו/ה} other {# מתאמנים שכדאי לפנות אליהם}}",
+    "atRiskHint": "מתאמנים עם מנוי בתוקף שלא הגיעו {days} ימים, או שהמנוי שלהם מסתיים בתוך {days} ימים בלי חידוש.",
+    "atRiskNone": "אין כרגע אף אחד. יפה!",
+    "reasons": {
+      "inactive": "לא הגיע/ה לאחרונה",
+      "plan_ending": "המנוי מסתיים"
+    },
+    "lastVisit": "ביקור אחרון {date}",
+    "neverVisited": "עוד לא הגיע/ה",
+    "planEnds": "המנוי מסתיים {date}",
+    "showAll": "הצגת כל ה-{count}"
+  },
+  "email": {
+    "greeting": "שלום {name},",
+    "note": "הערת הסטודיו: {note}",
+    "footer": "ההודעה נשלחה מ{business}. את כל העדכונים אפשר לראות באפליקציה.",
+    "subject": {
+      "waitlist_promoted": "נכנסת! {service} ב-{when}",
+      "booked_by_studio": "נרשמת ל{service} ב-{when}",
+      "waitlisted_by_studio": "ברשימת ההמתנה: {service} ב-{when}",
+      "booking_cancelled_by_studio": "ההרשמה בוטלה: {service} ב-{when}",
+      "session_cancelled": "השיעור בוטל: {service} ב-{when}",
+      "session_moved": "שעה חדשה: {service} ב-{when}",
+      "health_approved": "הצהרת הבריאות שלך אושרה",
+      "health_rejected": "לגבי הצהרת הבריאות שלך"
+    },
+    "body": {
+      "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
+      "booked_by_studio": "{business} רשם אותך ל{service} ב-{when}.",
+      "waitlisted_by_studio": "{business} הוסיף אותך לרשימת ההמתנה ל{service} ב-{when}. נעדכן אם יתפנה מקום.",
+      "booking_cancelled_by_studio": "{business} ביטל את ההרשמה שלך ל{service} ב-{when}.",
+      "session_cancelled": "השיעור {service} ב-{when} בוטל. מצטערים על השינוי.",
+      "session_moved": "השיעור {service} הועבר מ-{previous} ל-{when}. ההרשמה שלך עברה איתו.",
+      "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים באפליקציה.",
+      "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם הסטודיו."
     }
   }
 }

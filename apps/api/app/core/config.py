@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     )
     ai_model: str = "claude-opus-5-5"
 
+    # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
+    email_provider: str = "none"  # none | log | resend
+    email_api_key: SecretStr | None = None
+    email_from: str = "MyBiz <no-reply@example.com>"
+
     @field_validator("database_url")
     @classmethod
     def use_psycopg_driver(cls, value: str) -> str:

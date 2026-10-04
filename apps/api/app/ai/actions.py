@@ -14,6 +14,7 @@ from sqlalchemy import text
 from app.ai.tools import TOOLS, payload_hash
 from app.api.bookings import cancel_booking, lock_session, place_booking
 from app.api.deps import TenantContext, has_module
+from app.notifications import notify_booking
 
 
 def _conflict(detail: str) -> HTTPException:
@@ -30,6 +31,7 @@ def _execute(tenant: TenantContext, tool_name: str, payload: dict[str, Any]) -> 
             UUID(payload["client_id"]),
             requires_plan=False,
         )
+        notify_booking(db, booking_id, "booked_by_studio")
         booking_status = db.execute(
             text("SELECT status FROM app.bookings WHERE id = :id"), {"id": booking_id}
         ).scalar_one()
@@ -43,6 +45,7 @@ def _execute(tenant: TenantContext, tool_name: str, payload: dict[str, Any]) -> 
             raise _conflict("already_cancelled")
         lock_session(db, row.session_id)
         cancel_booking(db, booking_id, row.session_id)
+        notify_booking(db, booking_id, "booking_cancelled_by_studio")
         return {"booking_id": str(booking_id), "status": "cancelled"}
     raise _conflict("unknown_action")
 

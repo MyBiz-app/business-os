@@ -33,6 +33,9 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
   const locale = useLocale();
   const compact = new Intl.NumberFormat(locale, {
     notation: "compact",
+    // Both bounds explicit: Node and browsers ship different ICU defaults for compact
+    // currency, and a mismatch breaks hydration ("0 ₪" vs "0.0 ₪").
+    minimumFractionDigits: 0,
     maximumFractionDigits: 1,
     ...(unit.kind === "money" ? { style: "currency", currency: unit.currency } : {}),
   });

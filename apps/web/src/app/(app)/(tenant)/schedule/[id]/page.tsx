@@ -75,7 +75,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
         </h2>
         <SessionForm
           key={`${session.starts_at}-${session.ends_at}-${session.capacity}-${session.room_id}-${session.instructor_user_id}-${session.notes}`}
-          action={updateSession.bind(null, session.id)}
+          action={updateSession.bind(null, session.id, session.series_id ? { id: session.series_id, date: day } : null)}
           options={options}
           defaults={{
             service_id: session.service.id,
@@ -90,6 +90,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           submitLabel={tCommon("save")}
           lockService
           readOnly={!writable}
+          inSeries={!!session.series_id}
         />
       </section>
 
