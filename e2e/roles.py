@@ -92,9 +92,10 @@ with sync_playwright() as p:
     coach.goto(f"{h.BASE}/dashboard")
     h.ready(coach)
     nav = coach.get_by_role("navigation", name="ניווט ראשי")
-    coach.screenshot(path=f"{h.OUT}/r2-coach.png")
     expect(nav.get_by_role("link", name="מנויים וכרטיסיות")).to_be_visible()
     expect(nav.get_by_role("link", name="לוח שיעורים")).to_have_count(0)  # only what the role gives
+    coach.goto(f"{h.BASE}/schedule")  # a direct link to a page the role can't open
+    coach.wait_for_url("**/dashboard")
     print("custom role changes access: ok")
 
     # A role in use cannot be deleted.

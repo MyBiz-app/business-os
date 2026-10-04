@@ -5,11 +5,12 @@ import { notFound } from "next/navigation";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
@@ -26,7 +27,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const t = await getTranslations("clients");
   const tBookings = await getTranslations("bookings");
   const locale = await getLocale();
-  const context = await getTenant();
+  const context = await getTenantFor("clients.read");
   const { tenant, api, scope } = context;
 
   const { data: client } = await api.GET("/clients/{client_id}", {
@@ -92,6 +93,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           readOnly={!writable}
         />
       </section>
+
+      <HealthSection clientId={client.id} context={context} />
 
       <PlansSection clientId={client.id} context={context} />
 

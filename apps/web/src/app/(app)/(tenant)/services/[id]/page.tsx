@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { updateService } from "../actions";
 import { ServiceForm } from "../service-form";
@@ -11,7 +11,7 @@ import { ServiceForm } from "../service-form";
 export default async function ServicePage({ params }: PageProps<"/services/[id]">) {
   const { id } = await params;
   const t = await getTranslations();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("catalog.read");
   const { data: service } = await api.GET("/services/{service_id}", {
     params: { ...scope, path: { service_id: id } },
   });

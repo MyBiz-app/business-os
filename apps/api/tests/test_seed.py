@@ -41,12 +41,15 @@ def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
                 SELECT (SELECT count(*) FROM app.clients WHERE tenant_id = :t),
                        (SELECT count(*) FROM app.bookings WHERE tenant_id = :t
                             AND status = 'checked_in'),
-                       (SELECT count(*) FROM app.payments WHERE tenant_id = :t)
+                       (SELECT count(*) FROM app.payments WHERE tenant_id = :t),
+                       (SELECT count(*) FROM app.health_declarations WHERE tenant_id = :t
+                            AND valid_until >= current_date)
             """),
             {"t": tenant_id},
         ).one()
 
     assert over_capacity == 0
     assert overspent == 0
-    clients, attended, payments = counts
+    clients, attended, payments, declarations = counts
     assert clients == 170 and attended > 500 and payments > 100
+    assert declarations == 155  # every client but the leads

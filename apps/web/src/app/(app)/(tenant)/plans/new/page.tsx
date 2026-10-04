@@ -2,14 +2,14 @@ import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { canWriteCatalog } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { createPlan } from "../actions";
 import { PlanForm } from "../plan-form";
 
 export default async function NewPlanPage() {
   const t = await getTranslations();
-  const { tenant } = await getTenant();
+  const { tenant } = await getTenantFor("catalog.read");
   if (!canWriteCatalog(tenant)) redirect("/plans");
 
   return (

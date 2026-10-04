@@ -3,13 +3,13 @@ import Link from "next/link";
 import QRCode from "qrcode";
 
 import { siteOrigin } from "@/lib/origin";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 /** The business's join code and QR code, to print for the front desk or share. */
 export default async function JoinCodePage() {
   const t = await getTranslations("join");
   const term = await getTranslations("clients");
-  const { tenant } = await getTenant();
+  const { tenant } = await getTenantFor("clients.read");
   const link = `${await siteOrigin()}/join/${tenant.join_code}`;
   const qr = await QRCode.toString(link, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
 

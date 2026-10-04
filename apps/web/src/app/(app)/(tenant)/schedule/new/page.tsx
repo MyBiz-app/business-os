@@ -5,14 +5,14 @@ import { redirect } from "next/navigation";
 import { unwrap } from "@/lib/api";
 import { isDay, todayIn } from "@/lib/dates";
 import { canWriteSchedule } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { createSessions } from "../actions";
 import { SessionForm } from "../session-form";
 
 export default async function NewSessionPage({ searchParams }: PageProps<"/schedule/new">) {
   const t = await getTranslations("schedule");
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("schedule.read");
   if (!canWriteSchedule(tenant)) redirect("/schedule");
   const { date } = await searchParams;
   const options = unwrap(await api.GET("/sessions/options", { params: scope }));

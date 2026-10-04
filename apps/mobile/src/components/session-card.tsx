@@ -1,5 +1,6 @@
 import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
+import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
@@ -11,7 +12,15 @@ import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];
 
-const KNOWN_ERRORS = ["session_started", "already_booked", "session_cancelled", "not_found", "no_valid_plan"] as const;
+const KNOWN_ERRORS = [
+  "session_started",
+  "already_booked",
+  "session_cancelled",
+  "not_found",
+  "no_valid_plan",
+  "health_declaration_required",
+  "health_declaration_review",
+] as const;
 
 type Props = { session: ClientSession; onChange: (session: ClientSession) => void };
 
@@ -22,6 +31,7 @@ export function SessionCard({ session, onChange }: Props) {
   const { api, scope, business, palette } = useBusiness();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsHealth, setNeedsHealth] = useState(false);
   if (!business) return null;
 
   const time = `${formatTime(session.starts_at, locale, business.time_zone)}–${formatTime(session.ends_at, locale, business.time_zone)}`;
@@ -32,10 +42,12 @@ export function SessionCard({ session, onChange }: Props) {
   const run = async (action: () => Promise<{ data?: ClientSession; error?: unknown; response: Response }>) => {
     setBusy(true);
     setError(null);
+    setNeedsHealth(false);
     const result = await action().catch(() => null);
     setBusy(false);
     if (result?.data) return onChange(result.data);
     const detail = (result?.error as { detail?: string } | undefined)?.detail;
+    setNeedsHealth(detail === "health_declaration_required");
     setError(
       KNOWN_ERRORS.includes(detail as (typeof KNOWN_ERRORS)[number])
         ? t(`errors.${detail as (typeof KNOWN_ERRORS)[number]}`)
@@ -122,6 +134,9 @@ export function SessionCard({ session, onChange }: Props) {
         <Text accessibilityRole="alert" style={[styles.meta, { color: palette.danger }]}>
           {error}
         </Text>
+      )}
+      {needsHealth && (
+        <Button label={t("health.fill")} variant="secondary" palette={palette} onPress={() => router.push("/health")} />
       )}
     </View>
   );

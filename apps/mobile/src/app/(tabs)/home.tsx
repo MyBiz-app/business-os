@@ -5,14 +5,17 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
-import { Button, Heading, Screen, styles } from "@/components/ui";
+import { Button, Card, Heading, Screen, styles } from "@/components/ui";
 import { assetUrl, unwrap } from "@/lib/api";
+import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Branded home: the business, the client's next booking and what's on today. */
 export default function Home() {
   const t = useTranslations("client.home");
+  const tHealth = useTranslations("client.health");
+  const health = useHealth();
   const { api, scope, business, palette } = useBusiness();
 
   const load = useCallback(async () => {
@@ -42,6 +45,19 @@ export default function Home() {
           {t("greeting", { name: business.first_name })}
         </Text>
       </View>
+
+      {health?.required && health.state !== "ok" && (
+        <Card palette={palette}>
+          <Text style={[styles.muted, { color: palette.foreground }]}>
+            {health.state === "needs_review" || health.state === "rejected"
+              ? tHealth("reviewPending")
+              : tHealth("banner")}
+          </Text>
+          {health.state !== "needs_review" && health.state !== "rejected" && (
+            <Button label={tHealth("fill")} palette={palette} onPress={() => router.push("/health")} />
+          )}
+        </Card>
+      )}
 
       <Heading palette={palette} level={2}>
         {t("nextBooking")}

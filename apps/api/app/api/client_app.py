@@ -23,6 +23,7 @@ from app.api.bookings import (
 )
 from app.api.common import not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
+from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
 from app.api.schedule import ServiceSummary
@@ -227,6 +228,7 @@ def _ensure_upcoming(context: ClientContext, session_id: UUID) -> None:
 def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
     """Books the signed-in client, or puts them on the waitlist when the session is full."""
     _ensure_upcoming(context, session_id)
+    ensure_may_book(context.session, context.tenant_id, context.client_id)
     requires_plan = context.session.execute(
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),
         {"id": context.tenant_id},

@@ -7,6 +7,7 @@ import { SegmentedControl } from "@/components/segmented-control";
 import { Button, Card, Heading, Screen, styles } from "@/components/ui";
 import type { ThemePreference } from "@/lib/preferences";
 import { supabase } from "@/lib/supabase";
+import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { useLocaleSetting } from "@/providers/i18n-provider";
 import { useSession } from "@/providers/session-provider";
@@ -18,6 +19,7 @@ export default function Profile() {
   const { businesses, business, select, palette } = useBusiness();
   const { preference, setPreference } = useTheme();
   const { locale, setLocale } = useLocaleSetting();
+  const health = useHealth();
 
   const themeOptions: { value: ThemePreference; label: string }[] = [
     { value: "light", label: t("settings.themeLight") },
@@ -36,6 +38,19 @@ export default function Profile() {
           {t("client.profile.signedInAs", { email: session?.user.email ?? "" })}
         </Text>
       </Card>
+
+      {health?.form && (
+        <Card palette={palette}>
+          <Text style={[styles.h2, { color: palette.foreground }]}>{t("client.health.title")}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t(`health.states.${health.state}`)}</Text>
+          <Button
+            label={health.state === "ok" ? t("client.health.view") : t("client.health.fill")}
+            variant={health.state === "ok" ? "secondary" : "primary"}
+            palette={palette}
+            onPress={() => router.push("/health")}
+          />
+        </Card>
+      )}
 
       {businesses && businesses.length > 1 && (
         <SegmentedControl

@@ -51,3 +51,16 @@ def login(page, email: str) -> None:
     page.locator("input[type=password]").fill(PASSWORD)
     page.locator("form button[type=submit]").click()
     page.wait_for_url("**/dashboard**")
+
+
+def sign_health(member, yes: tuple[int, ...] = ()) -> None:
+    """Fills the health declaration in the client app (Hebrew): "no" except the given questions."""
+    member.goto(f"{APP}/health")
+    groups = member.get_by_role("radiogroup")
+    groups.first.wait_for(timeout=30000)
+    for index in range(groups.count()):
+        answer = "כן" if index in yes else "לא"
+        groups.nth(index).get_by_role("radio", name=answer, exact=True).click()
+    member.get_by_role("checkbox").click()
+    member.get_by_label("שם מלא (החתימה שלך)").fill("נועה כהן")
+    member.get_by_role("button", name="חתימה על ההצהרה").click()

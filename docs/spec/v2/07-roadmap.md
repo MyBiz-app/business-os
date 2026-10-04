@@ -65,7 +65,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Bookings (staff web): book a client, capacity, FIFO waitlist with auto-promotion, late-cancellation window, check-in / no-show, client booking history
 - [x] Client app: email-code sign in, join a business by code / QR, branded home, schedule, book / waitlist / cancel, my bookings, profile (language, theme, switch business)
 - [x] Staff web: join code + printable QR; public join page
-- [ ] Background job to extend weekly series beyond their first 12–26 weeks
+- [x] Background job keeps open-ended weekly series 12 weeks ahead (daily on staging); "stop repeating after this session"
 
 ## Sprint 4 progress
 

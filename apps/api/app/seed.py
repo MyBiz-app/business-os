@@ -12,6 +12,7 @@ Everything is generated from --seed, so the same arguments produce the same stud
 """
 
 import argparse
+import json
 import random
 import sys
 from dataclasses import dataclass, field
@@ -24,6 +25,7 @@ from sqlalchemy import Connection, create_engine, text
 from app.api.modules import set_modules
 from app.api.routes import apply_vertical_pack
 from app.core.config import get_settings
+from app.health import FITNESS_FORM
 from app.modules import PRESETS
 from app.scheduling import local_to_utc
 
@@ -247,8 +249,8 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
             text("""
                 INSERT INTO app.session_series
                     (tenant_id, service_id, location_id, room_id, instructor_user_id, capacity,
-                     weekdays, start_time, duration_minutes, starts_on, ends_on)
-                VALUES (:t, :s, :l, :r, :i, :c, :w, :at, :m, :from, :to) RETURNING id
+                     weekdays, start_time, duration_minutes, starts_on, ends_on, open_ended)
+                VALUES (:t, :s, :l, :r, :i, :c, :w, :at, :m, :from, :to, true) RETURNING id
             """),
             {
                 "t": tenant_id,
@@ -342,6 +344,43 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         VALUES (:id, :tenant_id, :first_name, :last_name, :email, :phone, :status, :source,
                 :created_at, :created_at)
     """, client_rows)  # fmt: skip
+
+    # Health declarations: members signed when they joined (renewed yearly); a few answered
+    # "yes" somewhere, and most of those were approved by the studio.
+    declaration_rows: list[dict] = []
+    for index, (client, row) in enumerate(zip(clients, client_rows, strict=True)):
+        if index >= CLIENTS - LEADS:
+            continue
+        signed_on = max(client.joined, today - timedelta(days=rng.randrange(30, 330)))
+        yes = rng.choice(list(FITNESS_FORM.questions)) if rng.random() < 0.08 else None
+        status = "valid" if yes is None else ("approved" if rng.random() < 0.7 else "needs_review")
+        declaration_rows.append(
+            {
+                "tenant_id": tenant_id,
+                "client_id": client.id,
+                "form_key": FITNESS_FORM.key,
+                "answers": json.dumps(
+                    [
+                        {"id": key, "question": texts["he"], "answer": key == yes}
+                        for key, texts in FITNESS_FORM.questions.items()
+                    ],
+                    ensure_ascii=False,
+                ),
+                "statement": FITNESS_FORM.statement["he"],
+                "all_clear": yes is None,
+                "signed_name": f"{row['first_name']} {row['last_name']}",
+                "signed_at": local_to_utc(signed_on, time(12), TIME_ZONE),
+                "valid_until": signed_on + timedelta(days=FITNESS_FORM.validity_days),
+                "status": status,
+            }
+        )
+    _insert(conn, """
+        INSERT INTO app.health_declarations
+            (tenant_id, client_id, form_key, locale, answers, statement, all_clear, signed_name,
+             signed_at, valid_until, status)
+        VALUES (:tenant_id, :client_id, :form_key, 'he', :answers, :statement, :all_clear,
+                :signed_name, :signed_at, :valid_until, :status)
+    """, declaration_rows)  # fmt: skip
 
     # Plans: each client buys a membership or a card when they join and renews while active.
     entitlement_rows: list[dict] = []

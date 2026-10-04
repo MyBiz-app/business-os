@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
 import { StatusBadge } from "./status-badge";
 
@@ -13,7 +13,7 @@ type Status = (typeof STATUSES)[number];
 
 export default async function ClientsPage({ searchParams }: PageProps<"/clients">) {
   const t = await getTranslations();
-  const { tenant, api, scope } = await getTenant();
+  const { tenant, api, scope } = await getTenantFor("clients.read");
   const params = await searchParams;
 
   const search = typeof params.q === "string" ? params.q : "";

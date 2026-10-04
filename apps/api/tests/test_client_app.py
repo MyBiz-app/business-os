@@ -31,10 +31,25 @@ def give_plan(client: TestClient, studio: dict, client_id: str, name: str = "Mon
     return sold.json()
 
 
+def sign_health(
+    client: TestClient, headers: dict, yes: tuple[str, ...] = (), locale: str = "he"
+) -> dict:
+    form = client.get("/client/health-declaration", params={"locale": locale}, headers=headers)
+    answers = {q["id"]: q["id"] in yes for q in form.json()["form"]["questions"]}
+    signed = client.post(
+        "/client/health-declaration",
+        json={"locale": locale, "answers": answers, "signed_name": "Dana Levi", "accept": True},
+        headers=headers,
+    )
+    assert signed.status_code == 201, signed.text
+    return signed.json()
+
+
 def member(client: TestClient, auth: AuthHeaders, studio: dict, user: UUID) -> dict:
-    """A client who joined through the app and holds a membership."""
+    """A client who joined through the app, holds a membership and signed the health form."""
     joined = join(client, auth, user, join_code(client, studio))
     give_plan(client, studio, joined["client_id"])
+    sign_health(client, auth(user, studio["tenant_id"]))
     return joined
 
 
@@ -229,6 +244,7 @@ def test_client_needs_a_valid_plan(client: TestClient, studio: dict, auth: AuthH
     user = uuid4()
     joined = join(client, auth, user, join_code(client, studio))
     headers = auth(user, studio["tenant_id"])
+    sign_health(client, headers)
 
     refused = client.post(f"/client/sessions/{session_id}/bookings", headers=headers)
     assert refused.status_code == 409

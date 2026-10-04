@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
+from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.plans import usable_entitlement
 from app.permissions import Permission
 
@@ -56,6 +57,7 @@ class Booking(BaseModel):
     checked_in_at: datetime | None
     cancelled_at: datetime | None
     created_at: datetime
+    health_state: HealthState = Field(description="The client's health declaration state")
 
 
 class ClientBooking(BaseModel):
@@ -69,14 +71,16 @@ class ClientBooking(BaseModel):
     late_cancel: bool
 
 
-BOOKING_SELECT = """
+BOOKING_SELECT = f"""
     SELECT b.id, b.session_id, b.client_id,
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
            e.name AS plan_name,
            b.status, b.late_cancel, b.checked_in_at, b.cancelled_at, b.created_at,
-           app.waitlist_position(b.id) AS waitlist_position
+           app.waitlist_position(b.id) AS waitlist_position,
+           {HEALTH_STATE_SQL} AS health_state
     FROM app.bookings b
     JOIN app.clients c ON c.id = b.client_id
+    JOIN app.tenants t ON t.id = b.tenant_id
     LEFT JOIN app.entitlements e ON e.id = b.entitlement_id
 """
 

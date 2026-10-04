@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 import { unwrap } from "@/lib/api";
 import { dayOf, formatDay, formatTime } from "@/lib/dates";
 import { canManageBookings, canWriteSchedule } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getTenantFor } from "@/lib/tenant";
 
-import { setSessionStatus, updateSession } from "../actions";
+import { endSeries, setSessionStatus, updateSession } from "../actions";
 import { SessionForm } from "../session-form";
 import { Roster } from "./roster";
 
@@ -18,7 +18,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const t = await getTranslations("schedule");
   const tCommon = await getTranslations("common");
   const locale = await getLocale();
-  const context = await getTenant();
+  const context = await getTenantFor("schedule.read");
   const { tenant, api, scope } = context;
   const { data: session } = await api.GET("/sessions/{session_id}", {
     params: { ...scope, path: { session_id: id } },
@@ -32,6 +32,8 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const day = dayOf(session.starts_at, tenant.time_zone);
   const minutes = Math.round((Date.parse(session.ends_at) - Date.parse(session.starts_at)) / 60000);
   const cancelled = session.status === "cancelled";
+  const endedParam = first(query.ended)?.split("-").map(Number);
+  const ended = endedParam?.length === 2 && endedParam.every(Number.isFinite) ? endedParam : null;
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
@@ -47,7 +49,16 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           </span>
           {cancelled && ` · ${t("cancelled")}`}
         </p>
-        {session.series_id && <p className="text-sm text-muted">{t("series")}</p>}
+        {session.series_id && (
+          <p className="text-sm text-muted">
+            {t("series")} {session.series_open_ended && t("seriesOpen")}
+          </p>
+        )}
+        {ended && (
+          <p role="status" className="rounded-lg bg-surface px-3 py-2 text-sm">
+            {t("seriesEnded", { cancelled: ended[0], kept: ended[1] })}
+          </p>
+        )}
       </div>
 
       <Roster
@@ -81,6 +92,14 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           readOnly={!writable}
         />
       </section>
+
+      {writable && session.series_id && session.series_open_ended && (
+        <form action={endSeries.bind(null, session.series_id, session.id, day)}>
+          <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+            {t("endSeries")}
+          </button>
+        </form>
+      )}
 
       {writable && (
         <form action={setSessionStatus.bind(null, session.id, cancelled ? "scheduled" : "cancelled")}>

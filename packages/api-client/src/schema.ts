@@ -413,6 +413,28 @@ export interface paths {
         patch: operations["update_session"];
         trace?: never;
     };
+    "/series/{series_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Series
+         * @description Stops a weekly series after a date: no more occurrences are generated, and later
+         *     sessions without bookings are cancelled. Sessions with bookings stay, to be handled
+         *     one by one (the business must tell those clients).
+         */
+        post: operations["end_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/{session_id}/bookings": {
         parameters: {
             query?: never;
@@ -975,6 +997,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/{client_id}/health-declarations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Client Health Declarations */
+        get: operations["client_health_declarations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health-declarations/{declaration_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review Health Declaration
+         * @description Approves or rejects a declaration that answered "yes" to a question.
+         */
+        post: operations["review_health_declaration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/health-declaration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Health Declaration */
+        get: operations["my_health_declaration"];
+        put?: never;
+        /**
+         * Sign Health Declaration
+         * @description Signs a new declaration; it replaces the previous one.
+         */
+        post: operations["sign_health_declaration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tenants/current/logo": {
         parameters: {
             query?: never;
@@ -1032,6 +1112,15 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** Answer */
+        Answer: {
+            /** Id */
+            id: string;
+            /** Question */
+            question: string;
+            /** Answer */
+            answer: boolean;
+        };
         /** Body_upload_logo */
         Body_upload_logo: {
             /** File */
@@ -1079,6 +1168,12 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Health State
+             * @description The client's health declaration state
+             * @enum {string}
+             */
+            health_state: "missing" | "expired" | "needs_review" | "rejected" | "ok";
         };
         /** BookingCreate */
         BookingCreate: {
@@ -1288,6 +1383,19 @@ export interface components {
              */
             status: "active" | "inactive" | "lead";
         };
+        /** ClientHealth */
+        ClientHealth: {
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "missing" | "expired" | "needs_review" | "rejected" | "ok";
+            /**
+             * Declarations
+             * @description Newest first
+             */
+            declarations: components["schemas"]["Declaration"][];
+        };
         /** ClientPage */
         ClientPage: {
             /** Items */
@@ -1439,6 +1547,75 @@ export interface components {
             /** Members */
             members: number;
         };
+        /** Declaration */
+        Declaration: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Form Key */
+            form_key: string;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /**
+             * Answers
+             * @description The questions exactly as signed, with answers
+             */
+            answers: components["schemas"]["Answer"][];
+            /** Statement */
+            statement: string;
+            /**
+             * All Clear
+             * @description Every answer was "no"
+             */
+            all_clear: boolean;
+            /** Signed Name */
+            signed_name: string;
+            /**
+             * Signed At
+             * Format: date-time
+             */
+            signed_at: string;
+            /**
+             * Valid Until
+             * Format: date
+             * @description Last local date the declaration is valid
+             */
+            valid_until: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "valid" | "needs_review" | "approved" | "rejected";
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Review Note */
+            review_note: string | null;
+        };
+        /** DeclarationCreate */
+        DeclarationCreate: {
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Answers */
+            answers: {
+                [key: string]: boolean;
+            };
+            /** Signed Name */
+            signed_name: string;
+            /**
+             * Accept
+             * @description The client accepts the statement
+             * @constant
+             */
+            accept: true;
+        };
         /** Entitlement */
         Entitlement: {
             /**
@@ -1495,6 +1672,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** Form */
+        Form: {
+            /** Key */
+            key: string;
+            /** Questions */
+            questions: components["schemas"]["FormQuestion"][];
+            /** Statement */
+            statement: string;
+        };
+        /** FormQuestion */
+        FormQuestion: {
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
         };
         /** Freeze */
         Freeze: {
@@ -1765,6 +1958,22 @@ export interface components {
             /** Waitlist Position */
             waitlist_position: number | null;
         };
+        /** MyHealth */
+        MyHealth: {
+            /**
+             * Required
+             * @description The business requires a declaration to book in the app
+             */
+            required: boolean;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "missing" | "expired" | "needs_review" | "rejected" | "ok";
+            /** @description The form to sign; null if the business has none */
+            form: components["schemas"]["Form"] | null;
+            current: components["schemas"]["Declaration"] | null;
+        };
         /** OptionItem */
         OptionItem: {
             /**
@@ -1992,6 +2201,13 @@ export interface components {
             /** Ends On */
             ends_on?: string | null;
         };
+        /** Review */
+        Review: {
+            /** Approve */
+            approve: boolean;
+            /** Note */
+            note?: string | null;
+        };
         /** RoleFields */
         RoleFields: {
             /** Name */
@@ -2136,6 +2352,11 @@ export interface components {
             /** Waitlisted */
             waitlisted: number;
             /**
+             * Series Open Ended
+             * @description For a session in a weekly series: whether the series keeps going
+             */
+            series_open_ended: boolean | null;
+            /**
              * Status
              * @enum {string}
              */
@@ -2149,6 +2370,28 @@ export interface components {
             modules: {
                 [key: string]: number;
             };
+        };
+        /** SeriesEnd */
+        SeriesEnd: {
+            /**
+             * Last Date
+             * Format: date
+             * @description Last local date with sessions; later ones end
+             */
+            last_date: string;
+        };
+        /** SeriesEnded */
+        SeriesEnded: {
+            /**
+             * Cancelled
+             * @description Later sessions cancelled (they had no bookings)
+             */
+            cancelled: number;
+            /**
+             * Kept
+             * @description Later sessions kept because clients are booked
+             */
+            kept: number;
         };
         /** Service */
         Service: {
@@ -2365,6 +2608,11 @@ export interface components {
              */
             booking_requires_plan: boolean;
             /**
+             * Requires Health Declaration
+             * @description Clients need a valid health declaration to book in the app
+             */
+            requires_health_declaration: boolean;
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -2436,6 +2684,8 @@ export interface components {
             cancellation_window_minutes?: number | null;
             /** Booking Requires Plan */
             booking_requires_plan?: boolean | null;
+            /** Requires Health Declaration */
+            requires_health_declaration?: boolean | null;
         };
         /** Turn */
         Turn: {
@@ -3635,6 +3885,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ScheduledSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesEnd"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesEnded"];
                 };
             };
             /** @description Validation Error */
@@ -4852,6 +5139,144 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Entitlement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_health_declarations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientHealth"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_health_declaration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                declaration_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Review"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Declaration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_health_declaration: {
+        parameters: {
+            query?: {
+                locale?: "he" | "en";
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyHealth"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sign_health_declaration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeclarationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyHealth"];
                 };
             };
             /** @description Validation Error */

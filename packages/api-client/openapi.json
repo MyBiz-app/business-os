@@ -2001,6 +2001,75 @@
         }
       }
     },
+    "/series/{series_id}/end": {
+      "post": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "End Series",
+        "description": "Stops a weekly series after a date: no more occurrences are generated, and later\nsessions without bookings are cancelled. Sessions with bookings stay, to be handled\none by one (the business must tell those clients).",
+        "operationId": "end_series",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "series_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Series Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeriesEnd"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeriesEnded"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/{session_id}/bookings": {
       "get": {
         "tags": [
@@ -4212,6 +4281,252 @@
         }
       }
     },
+    "/clients/{client_id}/health-declarations": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Client Health Declarations",
+        "operationId": "client_health_declarations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientHealth"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health-declarations/{declaration_id}/review": {
+      "post": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Review Health Declaration",
+        "description": "Approves or rejects a declaration that answered \"yes\" to a question.",
+        "operationId": "review_health_declaration",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "declaration_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Declaration Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Review"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Declaration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/health-declaration": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Health Declaration",
+        "operationId": "my_health_declaration",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "he",
+                "en"
+              ],
+              "type": "string",
+              "default": "he",
+              "title": "Locale"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyHealth"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Sign Health Declaration",
+        "description": "Signs a new declaration; it replaces the previous one.",
+        "operationId": "sign_health_declaration",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclarationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyHealth"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tenants/current/logo": {
       "put": {
         "tags": [
@@ -4400,6 +4715,29 @@
         ],
         "title": "Accepted"
       },
+      "Answer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "answer": {
+            "type": "boolean",
+            "title": "Answer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "question",
+          "answer"
+        ],
+        "title": "Answer"
+      },
       "Body_upload_logo": {
         "properties": {
           "file": {
@@ -4501,6 +4839,18 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "health_state": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "expired",
+              "needs_review",
+              "rejected",
+              "ok"
+            ],
+            "title": "Health State",
+            "description": "The client's health declaration state"
           }
         },
         "type": "object",
@@ -4515,7 +4865,8 @@
           "late_cancel",
           "checked_in_at",
           "cancelled_at",
-          "created_at"
+          "created_at",
+          "health_state"
         ],
         "title": "Booking"
       },
@@ -5131,6 +5482,35 @@
         ],
         "title": "ClientCreate"
       },
+      "ClientHealth": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "expired",
+              "needs_review",
+              "rejected",
+              "ok"
+            ],
+            "title": "State"
+          },
+          "declarations": {
+            "items": {
+              "$ref": "#/components/schemas/Declaration"
+            },
+            "type": "array",
+            "title": "Declarations",
+            "description": "Newest first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "declarations"
+        ],
+        "title": "ClientHealth"
+      },
       "ClientPage": {
         "properties": {
           "items": {
@@ -5554,6 +5934,147 @@
         ],
         "title": "CustomRole"
       },
+      "Declaration": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "form_key": {
+            "type": "string",
+            "title": "Form Key"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "he",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/Answer"
+            },
+            "type": "array",
+            "title": "Answers",
+            "description": "The questions exactly as signed, with answers"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          },
+          "all_clear": {
+            "type": "boolean",
+            "title": "All Clear",
+            "description": "Every answer was \"no\""
+          },
+          "signed_name": {
+            "type": "string",
+            "title": "Signed Name"
+          },
+          "signed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Signed At"
+          },
+          "valid_until": {
+            "type": "string",
+            "format": "date",
+            "title": "Valid Until",
+            "description": "Last local date the declaration is valid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "valid",
+              "needs_review",
+              "approved",
+              "rejected"
+            ],
+            "title": "Status"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "form_key",
+          "locale",
+          "answers",
+          "statement",
+          "all_clear",
+          "signed_name",
+          "signed_at",
+          "valid_until",
+          "status",
+          "reviewed_at",
+          "review_note"
+        ],
+        "title": "Declaration"
+      },
+      "DeclarationCreate": {
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "he",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "answers": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object",
+            "title": "Answers"
+          },
+          "signed_name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Signed Name"
+          },
+          "accept": {
+            "type": "boolean",
+            "const": true,
+            "title": "Accept",
+            "description": "The client accepts the statement"
+          }
+        },
+        "type": "object",
+        "required": [
+          "locale",
+          "answers",
+          "signed_name",
+          "accept"
+        ],
+        "title": "DeclarationCreate"
+      },
       "Entitlement": {
         "properties": {
           "id": {
@@ -5671,6 +6192,50 @@
           "created_at"
         ],
         "title": "Entitlement"
+      },
+      "Form": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/FormQuestion"
+            },
+            "type": "array",
+            "title": "Questions"
+          },
+          "statement": {
+            "type": "string",
+            "title": "Statement"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "questions",
+          "statement"
+        ],
+        "title": "Form"
+      },
+      "FormQuestion": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "title": "FormQuestion"
       },
       "Freeze": {
         "properties": {
@@ -6360,6 +6925,55 @@
         ],
         "title": "MyBooking"
       },
+      "MyHealth": {
+        "properties": {
+          "required": {
+            "type": "boolean",
+            "title": "Required",
+            "description": "The business requires a declaration to book in the app"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "expired",
+              "needs_review",
+              "rejected",
+              "ok"
+            ],
+            "title": "State"
+          },
+          "form": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Form"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The form to sign; null if the business has none"
+          },
+          "current": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Declaration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "required",
+          "state",
+          "form",
+          "current"
+        ],
+        "title": "MyHealth"
+      },
       "OptionItem": {
         "properties": {
           "id": {
@@ -6957,6 +7571,31 @@
         ],
         "title": "Repeat"
       },
+      "Review": {
+        "properties": {
+          "approve": {
+            "type": "boolean",
+            "title": "Approve"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "type": "object",
+        "required": [
+          "approve"
+        ],
+        "title": "Review"
+      },
       "RoleFields": {
         "properties": {
           "name": {
@@ -7403,6 +8042,18 @@
             "type": "integer",
             "title": "Waitlisted"
           },
+          "series_open_ended": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series Open Ended",
+            "description": "For a session in a weekly series: whether the series keeps going"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -7439,6 +8090,7 @@
           "capacity",
           "booked",
           "waitlisted",
+          "series_open_ended",
           "status",
           "notes"
         ],
@@ -7472,6 +8124,41 @@
           "modules"
         ],
         "title": "Selection"
+      },
+      "SeriesEnd": {
+        "properties": {
+          "last_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Last Date",
+            "description": "Last local date with sessions; later ones end"
+          }
+        },
+        "type": "object",
+        "required": [
+          "last_date"
+        ],
+        "title": "SeriesEnd"
+      },
+      "SeriesEnded": {
+        "properties": {
+          "cancelled": {
+            "type": "integer",
+            "title": "Cancelled",
+            "description": "Later sessions cancelled (they had no bookings)"
+          },
+          "kept": {
+            "type": "integer",
+            "title": "Kept",
+            "description": "Later sessions kept because clients are booked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cancelled",
+          "kept"
+        ],
+        "title": "SeriesEnded"
       },
       "Service": {
         "properties": {
@@ -8128,6 +8815,11 @@
             "title": "Booking Requires Plan",
             "description": "Clients need a valid plan to book in the app"
           },
+          "requires_health_declaration": {
+            "type": "boolean",
+            "title": "Requires Health Declaration",
+            "description": "Clients need a valid health declaration to book in the app"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -8183,6 +8875,7 @@
           "logo_url",
           "cancellation_window_minutes",
           "booking_requires_plan",
+          "requires_health_declaration",
           "join_code",
           "modules",
           "permissions",
@@ -8372,6 +9065,17 @@
               }
             ],
             "title": "Booking Requires Plan"
+          },
+          "requires_health_declaration": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requires Health Declaration"
           }
         },
         "type": "object",

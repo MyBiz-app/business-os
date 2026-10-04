@@ -115,6 +115,9 @@ with sync_playwright() as p:
     hero = member.get_by_role("heading", name="סטודיו DoD").locator("..")
     expect(hero).to_have_css("background-color", "rgb(15, 118, 110)")
     expect(member.get_by_text("היי נועה")).to_be_visible()  # claimed the client record by email
+    member.get_by_role("button", name="מילוי הצהרת בריאות").click(); member.wait_for_url("**/health")
+    h.sign_health(member)
+    expect(member.get_by_text("הצהרת בריאות בתוקף")).to_be_visible()
     member.goto(f"{APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
     member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
