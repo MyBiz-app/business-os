@@ -42,6 +42,7 @@ export default function Updates() {
     typeof instant === "string"
       ? `${day.format(new Date(instant))} ${formatTime(instant, locale, business.time_zone)}`
       : "";
+  const planDay = new Intl.DateTimeFormat(locale, { day: "numeric", month: "long", timeZone: "UTC" });
   const received = new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short", timeZone: business.time_zone });
 
   const message = (n: Notification) => {
@@ -51,6 +52,8 @@ export default function Updates() {
       when: when(p.starts_at),
       previous: when(p.previous_starts_at),
       note: String(p.note ?? ""),
+      plan: String(p.plan_name ?? ""),
+      date: typeof p.ends_on === "string" ? planDay.format(new Date(`${p.ends_on}T12:00:00Z`)) : "",
     };
     if (n.kind === "booked_by_studio" && p.status === "waitlisted") return t("kinds.waitlisted_by_studio", values);
     if ((n.kind === "health_approved" || n.kind === "health_rejected") && p.note) {

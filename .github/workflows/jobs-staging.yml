@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   extend-series:
-    name: Extend open-ended weekly series
+    name: Extend weekly series, remind today's classes
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: staging
@@ -30,3 +30,15 @@ jobs:
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
         run: uv run python -m app.jobs extend-series
+
+      - name: Remind today's booked clients
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs remind-sessions
+
+      - name: Remind clients whose plan ends soon
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs remind-plans

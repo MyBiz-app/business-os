@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Request, status
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -39,10 +39,35 @@ class TenantContext:
     permissions: frozenset[str] = frozenset()
 
 
+def _support_context(session: Session, tenant_id: UUID, request: Request) -> TenantContext:
+    """A platform admin inside a business that granted support access: every request is
+    audited for the owner, and the transaction is READ ONLY at the database level."""
+    session.execute(
+        text("""
+            INSERT INTO app.audit_log (tenant_id, actor_type, actor_id, action, details)
+            SELECT :tenant_id, 'platform', u.id, 'support.view',
+                   jsonb_build_object('method', CAST(:method AS text), 'path', CAST(:path AS text),
+                                      'email', u.email)
+            FROM app.users u WHERE u.id = app.current_user_id()
+        """),
+        {"tenant_id": tenant_id, "method": request.method, "path": request.url.path},
+    )
+    session.execute(text("SET TRANSACTION READ ONLY"))
+    return TenantContext(
+        session=session,
+        tenant_id=tenant_id,
+        role="support",
+        permissions=effective_permissions("support", None),
+    )
+
+
 def get_tenant_context(
-    session: SessionDep, tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")]
+    session: SessionDep,
+    tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")],
+    request: Request,
 ) -> TenantContext:
-    """Scopes the session to one tenant. Fails unless the user is a member of that tenant."""
+    """Scopes the session to one tenant. Fails unless the user is a member of that tenant
+    (or platform support the business let in)."""
     set_tenant(session, tenant_id)
     member = session.execute(
         text("""
@@ -53,6 +78,8 @@ def get_tenant_context(
         """)
     ).first()
     if member is None:
+        if session.execute(text("SELECT app.support_tenant_id()")).scalar() is not None:
+            return _support_context(session, tenant_id, request)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
     return TenantContext(
         session=session,

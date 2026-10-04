@@ -7,8 +7,10 @@ import { getApi, unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getActiveMembership } from "@/lib/tenant";
 
-/** Platform console (P-2): one business's modules and usage. Read-only: support access to the
- * business's own data is a separate, audited feature (not built yet). */
+import { openAsSupport } from "../actions";
+
+/** Platform console (P-2): one business's modules and usage. Its own data opens only through
+ * support access, which the owner grants for a limited time (read-only and audited). */
 export default async function PlatformBusinessPage({ params }: PageProps<"/platform/[id]">) {
   const { id } = await params;
   const t = await getTranslations();
@@ -24,6 +26,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   if (!business) notFound();
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const credits = usage.filter((u) => u.meter === "ai_credits");
+  const grant = me.support_access.find((g) => g.tenant_id === business.id);
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
@@ -38,6 +41,26 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           <span dir="ltr">{business.owner_email}</span> · {business.time_zone} · {business.currency}
         </p>
       </div>
+      <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-surface p-4">
+        {grant ? (
+          <>
+            <p className="text-sm">
+              {t("support.grantedUntil", {
+                date: new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(
+                  new Date(grant.expires_at),
+                ),
+              })}
+            </p>
+            <form action={openAsSupport.bind(null, business.id)}>
+              <button type="submit" className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary">
+                {t("support.open")}
+              </button>
+            </form>
+          </>
+        ) : (
+          <p className="text-sm text-muted">{t("support.notGranted")}</p>
+        )}
+      </section>
       <dl className="grid gap-3 sm:grid-cols-4">
         {(
           [

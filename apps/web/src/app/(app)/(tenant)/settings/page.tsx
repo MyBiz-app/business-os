@@ -9,10 +9,12 @@ import { getTenant } from "@/lib/tenant";
 
 import { removeLogo } from "./actions";
 import { BrandColorForm, DetailsForm, LogoForm } from "./settings-forms";
+import { SupportSection } from "./support-section";
 
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
-  const { tenant } = await getTenant();
+  const context = await getTenant();
+  const { tenant } = context;
   if (!canManageSettings(tenant)) redirect("/dashboard");
   const logo = apiAssetUrl(tenant.logo_url);
 
@@ -69,6 +71,7 @@ export default async function SettingsPage() {
           <LogoForm key={tenant.logo_url ?? "none"} />
         </div>
       </section>
+      {tenant.role === "owner" && <SupportSection context={context} />}
     </main>
   );
 }

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.modules import check_selection, set_modules
-from app.api.schemas import Me, Membership, Tenant, TenantCreate
+from app.api.schemas import Me, Membership, SupportAccess, Tenant, TenantCreate
 from app.core.db import set_tenant
 from app.modules import PRESETS
 from app.permissions import effective_permissions
@@ -34,7 +34,8 @@ def load_current_tenant(session: Session) -> Tenant:
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales,
-                       t.join_code, m.role, r.name AS custom_role_name,
+                       t.join_code, coalesce(m.role, 'support') AS role,
+                       r.name AS custom_role_name,
                        r.permissions AS custom_permissions,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)
                                  FROM app.tenant_modules tm WHERE tm.tenant_id = t.id), '{}')
@@ -43,7 +44,7 @@ def load_current_tenant(session: Session) -> Tenant:
                             ELSE '/public/tenants/' || t.id || '/logo?v='
                                  || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url
                 FROM app.tenants t
-                JOIN app.tenant_members m
+                LEFT JOIN app.tenant_members m
                     ON m.tenant_id = t.id AND m.user_id = app.current_user_id()
                 LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
                 WHERE t.id = app.current_tenant_id()
@@ -120,7 +121,14 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
             ORDER BY t.created_at
         """)
     ).mappings()
-    return Me(**profile, memberships=[Membership.model_validate(dict(m)) for m in memberships])
+    support = session.execute(
+        text("SELECT tenant_id, tenant_name, expires_at FROM app.my_support_grants()")
+    ).mappings()
+    return Me(
+        **profile,
+        memberships=[Membership.model_validate(dict(m)) for m in memberships],
+        support_access=[SupportAccess.model_validate(dict(g)) for g in support],
+    )
 
 
 @router.post("/tenants", status_code=status.HTTP_201_CREATED, tags=["tenants"])

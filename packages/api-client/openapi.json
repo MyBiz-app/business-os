@@ -4279,6 +4279,157 @@
         }
       }
     },
+    "/support-access": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Support Status",
+        "operationId": "support_status",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Grant Support",
+        "description": "Lets platform support see the business (read-only) for the given hours.",
+        "operationId": "grant_support",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Revoke Support",
+        "operationId": "revoke_support",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/businesses/{code}": {
       "get": {
         "tags": [
@@ -4394,6 +4545,65 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/client/profile": {
+      "patch": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Update Profile",
+        "description": "The client's own name and phone in this business (nothing else).",
+        "operationId": "update_profile",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/client/sessions": {
@@ -6344,6 +6554,17 @@
               }
             ],
             "title": "Last Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
           }
         },
         "type": "object",
@@ -6359,7 +6580,8 @@
           "online_sales",
           "client_id",
           "first_name",
-          "last_name"
+          "last_name",
+          "phone"
         ],
         "title": "ClientBusiness"
       },
@@ -7327,6 +7549,48 @@
         ],
         "title": "FreezeCreate"
       },
+      "Grant": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "Grant"
+      },
+      "GrantCreate": {
+        "properties": {
+          "hours": {
+            "type": "integer",
+            "maximum": 72.0,
+            "minimum": 1.0,
+            "title": "Hours",
+            "description": "How long support may look in"
+          }
+        },
+        "type": "object",
+        "required": [
+          "hours"
+        ],
+        "title": "GrantCreate"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -7919,6 +8183,14 @@
             },
             "type": "array",
             "title": "Memberships"
+          },
+          "support_access": {
+            "items": {
+              "$ref": "#/components/schemas/SupportAccess"
+            },
+            "type": "array",
+            "title": "Support Access",
+            "description": "Businesses that let platform support in (platform admins only)"
           }
         },
         "type": "object",
@@ -7928,7 +8200,8 @@
           "full_name",
           "locale",
           "platform_admin",
-          "memberships"
+          "memberships",
+          "support_access"
         ],
         "title": "Me"
       },
@@ -8291,7 +8564,9 @@
               "session_cancelled",
               "session_moved",
               "health_approved",
-              "health_rejected"
+              "health_rejected",
+              "session_reminder",
+              "plan_ending"
             ],
             "title": "Kind"
           },
@@ -8299,7 +8574,7 @@
             "additionalProperties": true,
             "type": "object",
             "title": "Payload",
-            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind)"
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on"
           },
           "created_at": {
             "type": "string",
@@ -8746,6 +9021,45 @@
           "value"
         ],
         "title": "Point"
+      },
+      "ProfileUpdate": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name"
+        ],
+        "title": "ProfileUpdate"
       },
       "Question": {
         "properties": {
@@ -10155,6 +10469,97 @@
         "type": "object",
         "title": "SessionUpdate"
       },
+      "SupportAccess": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "tenant_name": {
+            "type": "string",
+            "title": "Tenant Name"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "tenant_name",
+          "expires_at"
+        ],
+        "title": "SupportAccess"
+      },
+      "SupportStatus": {
+        "properties": {
+          "active": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Grant"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/SupportVisit"
+            },
+            "type": "array",
+            "title": "Visits",
+            "description": "The latest 50 support requests"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active",
+          "visits"
+        ],
+        "title": "SupportStatus"
+      },
+      "SupportVisit": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Email"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "actor_email",
+          "path"
+        ],
+        "title": "SupportVisit"
+      },
       "SystemRole": {
         "properties": {
           "key": {
@@ -10312,14 +10717,23 @@
             "title": "Custom Role Name"
           },
           "role": {
-            "type": "string",
-            "enum": [
-              "owner",
-              "manager",
-              "staff",
-              "front_desk"
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "owner",
+                  "manager",
+                  "staff",
+                  "front_desk"
+                ]
+              },
+              {
+                "type": "string",
+                "const": "support"
+              }
             ],
-            "title": "Role"
+            "title": "Role",
+            "description": "'support': platform support with read-only access the owner granted"
           }
         },
         "type": "object",

@@ -66,8 +66,22 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
 }
 
 
+# Platform support inside a business that granted access: read-only, never settings or AI.
+SUPPORT_PERMISSIONS: frozenset[Permission] = frozenset(
+    {
+        Permission.CLIENTS_READ,
+        Permission.CATALOG_READ,
+        Permission.SCHEDULE_READ,
+        Permission.REPORTS_READ,
+        Permission.STAFF_READ,
+    }
+)
+
+
 def effective_permissions(role: str, custom: list[str] | None) -> frozenset[str]:
     """The permissions a member actually has. Owners always have everything."""
+    if role == "support":
+        return frozenset(p.value for p in SUPPORT_PERMISSIONS)
     if custom is not None and role != "owner":
         known = {p.value for p in Permission}
         return frozenset(p for p in custom if p in known)

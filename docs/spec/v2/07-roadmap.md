@@ -92,7 +92,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Onboarding questionnaire → recommended plan → configurator with live price
 - [x] Modules & plan page in settings; features gated by module (client app, AI, AI actions)
 - [x] Platform console: businesses, modules, usage (AI credits), per-business page
-- [ ] Platform billing (subscriptions, proration, price versions) and audited support access
+- [x] Audited support access: owner-granted, time-limited, read-only, every request logged (T50)
+- [ ] Platform billing (subscriptions, proration, price versions)
 
 ## Sprint 6 progress
 

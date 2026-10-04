@@ -7,6 +7,8 @@ import { brandStyle } from "@/lib/brand";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
+import { leaveSupport } from "../platform/actions";
+
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const { tenant } = await getTenant();
   const t = await getTranslations();
@@ -47,7 +49,19 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
         </div>
         <SideNav items={items} />
       </aside>
-      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        {tenant.role === "support" && (
+          <div role="status" className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-surface px-6 py-2 text-sm">
+            <span>{t("support.banner")}</span>
+            <form action={leaveSupport}>
+              <button type="submit" className="font-medium text-primary underline-offset-4 hover:underline">
+                {t("support.leave")}
+              </button>
+            </form>
+          </div>
+        )}
+        {children}
+      </div>
     </div>
   );
 }

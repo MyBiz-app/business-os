@@ -256,3 +256,27 @@ def test_client_needs_a_valid_plan(client: TestClient, studio: dict, auth: AuthH
     assert booked.status_code == 201
     [mine] = client.get("/client/entitlements", headers=headers).json()
     assert mine["state"] == "active" and mine["credits_used"] == 1
+
+
+def test_client_edits_own_name_and_phone_only(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    user = uuid4()
+    joined = join(client, auth, user, join_code(client, studio))
+    headers = auth(user, studio["tenant_id"])
+    client.patch(
+        f"/clients/{joined['client_id']}", json={"notes": "VIP"}, headers=studio["headers"]
+    )
+
+    updated = client.patch(
+        "/client/profile",
+        json={"first_name": " Dana ", "last_name": "Levi", "phone": "050-1234567"},
+        headers=headers,
+    )
+    blank = client.patch("/client/profile", json={"first_name": "  "}, headers=headers)
+
+    assert updated.status_code == 200, updated.text
+    assert (updated.json()["first_name"], updated.json()["phone"]) == ("Dana", "050-1234567")
+    profile = client.get(f"/clients/{joined['client_id']}", headers=studio["headers"]).json()
+    assert profile["last_name"] == "Levi" and profile["notes"] == "VIP"  # notes untouched
+    assert blank.status_code == 422
