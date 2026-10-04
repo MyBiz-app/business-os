@@ -82,3 +82,27 @@ def test_every_notification_kind_has_email_text() -> None:
         messages = load_messages(locale)
         assert set(messages["subject"]) == set(kinds)
         assert set(messages["body"]) == set(kinds)
+
+
+def test_gmail_sender_signs_in_with_the_from_address(monkeypatch) -> None:
+    from app.core.config import get_settings
+    from app.email import Email, SmtpSender, sender_from_settings
+
+    monkeypatch.setenv("API_EMAIL_PROVIDER", "gmail")
+    monkeypatch.setenv("API_EMAIL_API_KEY", "app-password")
+    monkeypatch.setenv("API_EMAIL_FROM", "MyBiz <studio.mybiz@gmail.com>")
+    get_settings.cache_clear()
+    try:
+        sender = sender_from_settings()
+    finally:
+        get_settings.cache_clear()
+
+    assert isinstance(sender, SmtpSender)
+    assert (sender.host, sender.port, sender.username) == (
+        "smtp.gmail.com",
+        465,
+        "studio.mybiz@gmail.com",
+    )
+    message = sender.message(Email(to="dana@example.com", subject="שלום", text="שורה 1\nשורה 2"))
+    assert message["From"] == "MyBiz <studio.mybiz@gmail.com>"
+    assert "שורה 1<br>שורה 2" in message.get_body(("html",)).get_content()

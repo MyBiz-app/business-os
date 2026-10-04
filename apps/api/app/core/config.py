@@ -24,9 +24,12 @@ class Settings(BaseSettings):
     ai_model: str = "claude-opus-5-5"
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
-    email_provider: str = "none"  # none | log | resend
-    email_api_key: SecretStr | None = None
+    email_provider: str = "none"  # none | log | resend | gmail | smtp
+    email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password
     email_from: str = "MyBiz <no-reply@example.com>"
+    email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
+    email_smtp_port: int = 465
+    email_smtp_user: str | None = None  # defaults to the address in email_from
 
     @field_validator("database_url")
     @classmethod

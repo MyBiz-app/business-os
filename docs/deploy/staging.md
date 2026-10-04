@@ -51,8 +51,10 @@ only) and not the transaction pooler (port 6543).
 ## Notes
 
 - Supabase's built-in email sender only delivers to members of the Supabase organization and
-  is heavily rate-limited. Fine for staging; production needs a real email provider (Resend /
-  Postmark) configured as custom SMTP.
+  is heavily rate-limited, so other people cannot sign up or get sign-in codes. Configure
+  custom SMTP (Authentication → Emails → SMTP Settings). For the prototype, Gmail works with
+  no domain: host `smtp.gmail.com`, port `465`, username and sender = the Gmail address,
+  password = its app password. Production should use a provider with its own domain.
 - The default Supabase email templates work (links come back to `/auth/confirm?code=…`, in the
   same browser). Our own templates in `supabase/templates/` can be pasted into Authentication →
   Email Templates to allow confirming from any device.
@@ -63,14 +65,18 @@ only) and not the transaction pooler (port 6543).
 
 Client notifications (the app's Updates tab) can also go out by email. The hourly workflow
 **Send notification emails on staging** does nothing until a provider is set.
-**Resend** is used here (free tier: 3,000 emails a month).
+Two providers are supported:
 
-1. Create a Resend account, add and verify your sending domain (DNS records), and create an
-   API key.
-2. GitHub → repository → *Settings → Secrets and variables → Actions*:
-   - **Secrets** → `EMAIL_API_KEY` = the Resend API key
-   - **Variables** → `EMAIL_PROVIDER` = `resend`, `EMAIL_FROM` = e.g. `MyBiz <updates@your-domain>`
-3. Run the workflow once by hand (*Actions → Send notification emails on staging → Run
+- **Gmail** (free, no domain; good for the prototype): a dedicated Gmail account with 2-Step
+  Verification and an *app password* (https://myaccount.google.com/apppasswords). Gmail
+  allows a few hundred messages a day and sends from that Gmail address.
+- **Resend** (free tier: 3,000 emails a month): needs a verified sending domain (DNS records).
+
+1. GitHub → repository → *Settings → Secrets and variables → Actions*:
+   - **Secrets** → `EMAIL_API_KEY` = the Gmail app password (or the Resend API key)
+   - **Variables** → `EMAIL_PROVIDER` = `gmail` (or `resend`), `EMAIL_FROM` = e.g.
+     `MyBiz <mybiz.studio@gmail.com>` (or `MyBiz <updates@your-domain>`)
+2. Run the workflow once by hand (*Actions → Send notification emails on staging → Run
    workflow*) and check its log.
 
 Emails use the business's language and are sent once, within a day of the event; clients
