@@ -12,13 +12,15 @@ import { convertLead, deleteLead, updateLead } from "../actions";
 import { getCrm } from "../crm";
 import { LeadForm } from "../lead-form";
 import { ActivityForm, StageControl } from "./lead-controls";
+import { MessagesSection } from "../../messages/messages-section";
 import { Timeline } from "./timeline";
 
 export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
   const { id } = await params;
   const t = await getTranslations("leads");
   const locale = await getLocale();
-  const { tenant, api, scope } = await getCrm();
+  const context = await getCrm();
+  const { tenant, api, scope } = context;
   const { data: lead, response } = await api.GET("/leads/{lead_id}", { params: { ...scope, path: { lead_id: id } } });
   if (response.status === 404 || !lead) notFound();
   const owners = unwrap(await api.GET("/leads/owners", { params: scope }));
@@ -87,6 +89,10 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
           <Timeline activities={lead.activities} locale={locale} timeZone={tenant.time_zone} />
         </section>
 
+        <MessagesSection target={{ lead_id: lead.id }} phone={lead.phone} path={`/leads/${lead.id}`} context={context} />
+      </div>
+
+      <div className="grid gap-6">
         <section aria-labelledby="details-heading" className="card flex flex-col gap-4 p-5">
           <h2 id="details-heading" className="text-lg font-semibold">{t("details")}</h2>
           <LeadForm

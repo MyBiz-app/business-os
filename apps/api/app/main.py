@@ -15,6 +15,7 @@ from app.api import (
     leads,
     locations,
     marketing,
+    messaging,
     modules,
     notifications,
     plans,
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
     app.include_router(client_notes.router)
     app.include_router(privacy.router)
     app.include_router(leads.router)
+    app.include_router(messaging.router)
     app.include_router(leads.public_router)
     app.include_router(services.router)
     app.include_router(locations.router)

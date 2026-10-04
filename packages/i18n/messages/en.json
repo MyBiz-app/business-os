@@ -205,7 +205,8 @@
     "plans": "Plans",
     "assistant": "AI assistant",
     "reports": "Reports",
-    "leads": "Leads"
+    "leads": "Leads",
+    "messages": "Messages"
   },
   "terms": {
     "fitness": {
@@ -912,7 +913,8 @@
       "ai_basic": "Ask about your business in plain words: schedule, members, numbers.",
       "ai_pro": "Everything in AI Basic, and it prepares bookings and cancellations for you to confirm.",
       "extra_location": "{price} per location beyond the first.",
-      "crm": "A lead pipeline: online inquiry form, call log, follow-up reminders and conversion to clients."
+      "crm": "A lead pipeline: online inquiry form, call log, follow-up reminders and conversion to clients.",
+      "whatsapp": "Messages to clients and leads: broadcasts to a segment, templates and a send log."
     }
   },
   "platform": {
@@ -1767,5 +1769,79 @@
     "add": "Add note",
     "none": "No notes yet.",
     "delete": "Delete note"
+  },
+  "messaging": {
+    "title": "Messages",
+    "subtitle": "WhatsApp and SMS to clients and leads",
+    "simulated": "Prototype: sending is simulated and logged; no message leaves the system. A WhatsApp / SMS provider will be connected later.",
+    "compose": "New message",
+    "audience": "To",
+    "audiences": {
+      "active": "All active clients",
+      "inactive": "Members who haven't come in 14 days",
+      "plan_ending": "Plan ending soon",
+      "no_plan": "Active without a valid plan",
+      "open_leads": "Open leads"
+    },
+    "channel": "Channel",
+    "channels": {
+      "whatsapp": "WhatsApp",
+      "sms": "SMS"
+    },
+    "startFrom": "Start from a template",
+    "chooseTemplate": "Choose a template…",
+    "myTemplates": "My templates",
+    "suggested": "Suggestions",
+    "text": "Message",
+    "insert": "Insert:",
+    "variables": {
+      "first_name": "First name",
+      "business": "Business name"
+    },
+    "sendTo": "{count, plural, =0 {No recipients} one {Send to 1 recipient} other {Send to # recipients}}",
+    "sentTo": "{count, plural, =0 {Sent to nobody} one {Sent to 1 recipient} other {Sent to # recipients}}",
+    "simulatedHint": "Only people with a phone number.",
+    "preview": "Preview",
+    "previewEmpty": "Your message appears here",
+    "previewCaption": "How {name} will see it",
+    "sampleName": "Dana",
+    "history": "Sent broadcasts",
+    "noCampaigns": "No broadcasts yet.",
+    "noTemplates": "No saved templates yet.",
+    "templateName": "Template name",
+    "saveTemplate": "Save template",
+    "deleteTemplate": "Delete template {name}",
+    "sectionTitle": "Messages",
+    "openWhatsApp": "Open in WhatsApp",
+    "sendViaMyBiz": "Send through MyBiz",
+    "sentOne": "Message sent (simulated).",
+    "noMessages": "No messages yet.",
+    "simulatedSent": "Sent (simulated)",
+    "statuses": {
+      "queued": "Queued",
+      "sent": "Sent",
+      "failed": "Failed"
+    },
+    "errors": {
+      "generic": "Sending failed. Please try again."
+    },
+    "suggestions": {
+      "reminder": {
+        "name": "Reminder",
+        "body": "Hi {first_name}, just a reminder that we're waiting for you at {business} 🙂"
+      },
+      "comeback": {
+        "name": "We miss you",
+        "body": "Hi {first_name}, we haven't seen you at {business} in a while! We'd love to see you this week."
+      },
+      "offer": {
+        "name": "Offer",
+        "body": "Hi {first_name}, this week at {business}: a special offer for our clients. Want the details?"
+      },
+      "holiday": {
+        "name": "Holiday greeting",
+        "body": "Happy holidays, {first_name}! Warm wishes from the {business} team."
+      }
+    }
   }
 }
