@@ -45,6 +45,15 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
         >
           {t("openApp")}
         </a>
+        {/* The client app also runs in the browser (see apps/mobile/README.md). */}
+        {process.env.NEXT_PUBLIC_CLIENT_APP_URL && (
+          <a
+            href={`${process.env.NEXT_PUBLIC_CLIENT_APP_URL}/join?code=${encodeURIComponent(joinCode)}`}
+            className="btn-secondary w-full px-4 py-3"
+          >
+            {t("openInBrowser")}
+          </a>
+        )}
       </main>
     </div>
   );

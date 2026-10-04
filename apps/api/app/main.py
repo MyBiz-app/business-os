@@ -15,6 +15,7 @@ from app.api import (
     plans,
     platform,
     privacy,
+    receipts,
     reports,
     schedule,
     services,
@@ -81,6 +82,8 @@ def create_app() -> FastAPI:
     app.include_router(client_app.public_router)
     app.include_router(client_app.router)
     app.include_router(checkouts.router)
+    app.include_router(receipts.router)
+    app.include_router(receipts.client_router)
     app.include_router(notifications.router)
     app.include_router(health_declarations.router)
     app.include_router(health_declarations.client_router)

@@ -41,7 +41,6 @@ with sync_playwright() as p:
             JOIN app.users u ON u.id = m.user_id WHERE u.email = %s
         """, (owner_email,)).fetchone()[0]
     member = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, has_touch=True).new_page()
-    member.on("dialog", lambda dialog: dialog.accept())  # the purchase confirmation
     member.goto(h.APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
@@ -60,9 +59,21 @@ with sync_playwright() as p:
     expect(buy).to_be_visible()
     serious = [v["id"] for v in Axe().run(member).response["violations"] if v["impact"] in ("serious", "critical")]
     buy.click()
-    expect(member.get_by_text(re.compile("^בוצע!"))).to_be_visible(timeout=15000)
+    # The (simulated) payment page: a test card, the total, and the pay button.
+    member.wait_for_url("**/pay/**")
+    expect(member.get_by_text(re.compile("^מצב בדיקה"))).to_be_visible(timeout=15000)
+    pay_serious = [v["id"] for v in Axe().run(member).response["violations"] if v["impact"] in ("serious", "critical")]
+    member.screenshot(path=f"{h.OUT}/payment.png", full_page=True)
+    member.get_by_role("button", name=re.compile("^תשלום ")).click()
+    expect(member.get_by_text("התשלום התקבל!")).to_be_visible(timeout=15000)
+    expect(member.get_by_text(re.compile(r"^קבלה מס׳ \d+"))).to_be_visible()
     member.screenshot(path=f"{h.OUT}/purchase.png", full_page=True)
-    print("2. member bought a plan (test payment): ok | a11y:", serious or "ok")
+    member.get_by_role("button", name="צפייה בקבלה").click()
+    member.wait_for_url("**/receipt/**")
+    expect(member.get_by_text(re.compile("^מסמך לדוגמה"))).to_be_visible(timeout=15000)
+    member.screenshot(path=f"{h.OUT}/receipt-app.png", full_page=True)
+    print("2. member paid on the test payment page and sees the receipt: ok | a11y:", (serious + pay_serious) or "ok")
+    member.goto(f"{h.APP}/bookings")
 
     member.get_by_role("tab", name="פרופיל").click()
     member.get_by_label("שם פרטי").fill("נועה")
@@ -76,6 +87,11 @@ with sync_playwright() as p:
     owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$")); h.ready(owner)
     plans = owner.get_by_role("region", name="מנויים וכרטיסיות")
     expect(plans.locator("li").filter(has_text="כרטיסייה 10 כניסות").first).to_be_visible()
+    plans.get_by_role("link", name=re.compile(r"^קבלה \d+")).first.click()
+    owner.wait_for_url("**/receipts/**"); h.ready(owner)
+    expect(owner.get_by_role("heading", level=1)).to_contain_text("קבלה מס׳")
+    owner.screenshot(path=f"{h.OUT}/receipt-web.png", full_page=True)
+    owner.go_back(); h.ready(owner)
     expect(owner.get_by_label("טלפון")).to_have_value("050-7654321")
     print("3. owner sees the plan and the new phone on the member's profile: ok")
     b.close()

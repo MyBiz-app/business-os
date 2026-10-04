@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { router, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
@@ -8,6 +8,7 @@ import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@/compo
 import { ApiError, apiClient, assetUrl, unwrap } from "@/lib/api";
 import { brandPalette } from "@/lib/brand";
 import { useBusiness } from "@/providers/business-provider";
+import { useSession } from "@/providers/session-provider";
 import { useTheme } from "@/providers/theme-provider";
 
 type Profile = components["schemas"]["BusinessProfile"];
@@ -19,6 +20,7 @@ export default function Join() {
   const t = useTranslations("client.join");
   const { palette: basePalette } = useTheme();
   const { join, businesses } = useBusiness();
+  const { session, loading } = useSession();
   const params = useLocalSearchParams<{ code?: string }>();
   const [code, setCode] = useState(normalize(params.code ?? ""));
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -59,6 +61,10 @@ export default function Join() {
   };
 
   const logo = assetUrl(profile?.logo_url);
+  // A join link opened before signing in: sign in first, then come back with the code.
+  if (!loading && !session) {
+    return <Redirect href={params.code ? { pathname: "/sign-in", params: { code: normalize(params.code) } } : "/sign-in"} />;
+  }
 
   return (
     <Screen palette={palette}>

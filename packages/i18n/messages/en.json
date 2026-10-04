@@ -553,7 +553,9 @@
       "buyConfirm": "Buy",
       "buyCancel": "Not now",
       "bought": "Done! {plan} is now in your plans.",
-      "buyFailed": "The purchase didn't go through. Try again."
+      "buyFailed": "The purchase didn't go through. Try again.",
+      "receipts": "Receipts",
+      "noReceipts": "No receipts yet."
     },
     "profile": {
       "title": "Profile",
@@ -634,6 +636,28 @@
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
         "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
       }
+    },
+    "pay": {
+      "title": "Payment",
+      "testMode": "Test mode: no money is charged. No card needed – this is a test card.",
+      "testCard": "Test card",
+      "cardHolder": "Card holder",
+      "plan": "Plan",
+      "total": "Total",
+      "payNow": "Pay {amount}",
+      "processing": "Processing your payment…",
+      "success": "Payment received!",
+      "successBody": "{plan} was added to your plans.",
+      "receiptNumber": "Receipt no. {number}",
+      "viewReceipt": "View receipt",
+      "toMyPlans": "My plans",
+      "failed": "The payment didn't go through. Please try again.",
+      "cancel": "Cancel",
+      "secure": "Secure payment"
+    },
+    "receipt": {
+      "title": "Receipt",
+      "back": "Back"
     }
   },
   "join": {
@@ -646,7 +670,8 @@
     "step3": "Enter the join code above.",
     "title": "Join {name}",
     "body": "Book classes, join waitlists and manage your bookings in the app.",
-    "openApp": "Open in the app"
+    "openApp": "Open in the app",
+    "openInBrowser": "Open in the browser, no install"
   },
   "plans": {
     "title": "Plans",
@@ -703,7 +728,8 @@
       "outside_validity": "The freeze must start while the plan is valid.",
       "overlapping_freeze": "That overlaps an existing freeze."
     },
-    "validityRange": "Valid {from} – {to}"
+    "validityRange": "Valid {from} – {to}",
+    "paymentMethod": "Payment method"
   },
   "metrics": {
     "revenue": "Revenue",
@@ -755,7 +781,8 @@
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything."
   },
   "modules": {
     "title": "Modules and plan",
@@ -1004,5 +1031,25 @@
     "grantedUntil": "The owner allowed support access until {date}.",
     "open": "Open as support (read-only)",
     "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access."
+  },
+  "receipts": {
+    "title": "Receipt no. {number}",
+    "short": "Receipt {number}",
+    "sample": "Sample document – test payment, not a tax document",
+    "issuedAt": "Date",
+    "to": "To",
+    "item": "Item",
+    "amount": "Amount",
+    "total": "Total",
+    "method": "Payment method",
+    "methods": {
+      "card": "Credit card",
+      "cash": "Cash",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    },
+    "print": "Print",
+    "back": "Back to the client",
+    "thanks": "Thank you!"
   }
 }

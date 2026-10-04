@@ -1,12 +1,12 @@
 import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button, Card, Heading, Screen, styles } from "@/components/ui";
 import { unwrap } from "@/lib/api";
-import { confirm } from "@/lib/confirm";
 import { useLoad } from "@/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -21,6 +21,7 @@ export default function Bookings() {
   const t = useTranslations("client.bookings");
   const tStatus = useTranslations("bookings");
   const tPlans = useTranslations("plans");
+  const tReceipts = useTranslations("receipts");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
 
@@ -43,22 +44,21 @@ export default function Bookings() {
   const [buying, setBuying] = useState<string | null>(null);
   const [purchase, setPurchase] = useState<{ ok: boolean; message: string } | null>(null);
 
+  // Coming back from the payment page shows the new plan.
+  useFocusEffect(
+    useCallback(() => {
+      void reload();
+    }, [reload]),
+  );
+
+  /** Starts a checkout at the plan's current price and opens the payment page. */
   const buy = async (plan: Plan) => {
     if (!business) return;
-    const price = money(plan.price_amount, plan.price_currency);
-    const ok = await confirm(t("buyConfirmTitle", { plan: plan.name }), t("buyConfirmSimulated", { price }), t("buyConfirm"), t("buyCancel"));
-    if (!ok) return;
     setBuying(plan.id);
     setPurchase(null);
     try {
       const checkout = unwrap(await api.POST("/client/checkouts", { params: scope, body: { plan_id: plan.id } }));
-      unwrap(
-        await api.POST("/client/checkouts/{checkout_id}/simulate-payment", {
-          params: { ...scope, path: { checkout_id: checkout.id } },
-        }),
-      );
-      setPurchase({ ok: true, message: t("bought", { plan: plan.name }) });
-      await reload();
+      router.push(`/pay/${checkout.id}`);
     } catch {
       setPurchase({ ok: false, message: t("buyFailed") });
     } finally {
@@ -109,6 +109,15 @@ export default function Bookings() {
                   {t("validUntil", { date: day.format(new Date(`${entitlement.ends_on}T12:00:00Z`)) })}
                 </Text>
               </View>
+              {entitlement.receipt_id && (
+                <Text
+                  accessibilityRole="link"
+                  onPress={() => router.push(`/receipt/${entitlement.receipt_id}`)}
+                  style={[local.meta, { color: palette.primary, textDecorationLine: "underline" }]}
+                >
+                  {tReceipts("short", { number: entitlement.receipt_number ?? "" })}
+                </Text>
+              )}
               <Text style={[local.status, { color: palette.primary }]}>
                 {entitlement.state !== "active"
                   ? tPlans(`states.${entitlement.state}`)

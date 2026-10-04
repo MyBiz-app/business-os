@@ -36,7 +36,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   return (
     // The business's brand color replaces the product color inside its own area.
     <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
-      <aside className="border-b border-border bg-surface/60 backdrop-blur md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-e">
+      <aside className="border-b border-border bg-surface/60 print:hidden backdrop-blur md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-e">
         <div className="mx-3 my-3 flex items-center gap-3 rounded-2xl px-3 py-3">
           {logo ? (
             <Image src={logo} alt="" width={36} height={36} unoptimized className="size-10 rounded-xl object-contain shadow-sm" />

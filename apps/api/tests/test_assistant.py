@@ -85,7 +85,7 @@ def test_not_configured_without_a_key(client: TestClient, studio: dict, use_prov
     use_provider(None)
     headers = studio["headers"]
 
-    assert client.get("/ai/status", headers=headers).json() == {"enabled": False}
+    assert client.get("/ai/status", headers=headers).json() == {"enabled": False, "demo": False}
     response = ask(client, headers, conversation(client, headers), "hi")
     assert response.status_code == 503
     assert response.json()["detail"] == "ai_not_configured"
@@ -276,3 +276,25 @@ def test_marketing_and_retention_tools(
     assert {s["source"] for s in sources["sources"]} >= {"instagram", "referral"}
     inactive = json.loads(provider.calls[2]["messages"][-1]["content"][0]["content"])
     assert inactive["members"], "the demo studio has paying members who stopped coming"
+
+
+def test_demo_mode_answers_from_real_data_without_a_key(
+    client: TestClient, studio: dict, use_provider
+) -> None:
+    from app.ai.demo import DemoProvider
+
+    use_provider(DemoProvider())
+    headers = studio["headers"]
+    assert client.get("/ai/status", headers=headers).json() == {"enabled": True, "demo": True}
+    conversation_id = conversation(client, headers)
+
+    metrics = ask(client, headers, conversation_id, "איך העסק עובד החודש?")
+    plans = ask(client, headers, conversation_id, "What do the plans cost?")
+    help_ = ask(client, headers, conversation_id, "ספר בדיחה")
+
+    assert metrics.status_code == 200, metrics.text
+    texts = [turn["text"] for turn in plans.json()["turns"] if turn["role"] == "assistant"]
+    assert texts[0].startswith("🧪 מצב הדגמה") and "הכנסות" in texts[0]
+    assert texts[1].startswith("🧪 Demo mode") and "₪" in texts[1]
+    last = [turn["text"] for turn in help_.json()["turns"] if turn["role"] == "assistant"][-1]
+    assert "אפשר לשאול" in last

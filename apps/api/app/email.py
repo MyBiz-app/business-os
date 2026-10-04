@@ -8,9 +8,13 @@ and ones for clients without an email address, are skipped."""
 import html
 import json
 import re
+import smtplib
+import ssl
 import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from email.message import EmailMessage
+from email.utils import parseaddr
 from pathlib import Path
 from typing import Any, Protocol
 from zoneinfo import ZoneInfo
@@ -73,6 +77,36 @@ class ResendSender:
         )
         with urllib.request.urlopen(request, timeout=15) as response:
             response.read()
+
+
+class SmtpSender:
+    """Plain SMTP over TLS. With Gmail (an app password, no domain needed) this is the free
+    option for a prototype: it sends from the Gmail address, up to a few hundred a day."""
+
+    def __init__(self, host: str, port: int, username: str, password: str, sender: str) -> None:
+        self.host, self.port = host, port
+        self.username, self.password = username, password
+        self.sender = sender
+
+    def message(self, email: Email) -> EmailMessage:
+        message = EmailMessage()
+        message["From"] = self.sender
+        message["To"] = email.to
+        message["Subject"] = email.subject
+        message.set_content(email.text)
+        message.add_alternative(
+            '<div dir="auto">'
+            + "<br>".join(html.escape(line) for line in email.text.split("\n"))
+            + "</div>",
+            subtype="html",
+        )
+        return message
+
+    def send(self, email: Email) -> None:
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL(self.host, self.port, context=context, timeout=20) as server:
+            server.login(self.username, self.password)
+            server.send_message(self.message(email))
 
 
 def load_messages(locale: str, directory: Path = MESSAGES_DIR) -> dict[str, Any]:
@@ -198,4 +232,17 @@ def sender_from_settings() -> Sender | None:
         if settings.email_api_key is None:
             raise SystemExit("API_EMAIL_API_KEY is required for the resend provider")
         return ResendSender(settings.email_api_key.get_secret_value(), settings.email_from)
+    if settings.email_provider in ("gmail", "smtp"):
+        if settings.email_api_key is None:
+            raise SystemExit("API_EMAIL_API_KEY (the SMTP password) is required")
+        # Gmail signs in with the sending address itself.
+        username = settings.email_smtp_user or parseaddr(settings.email_from)[1]
+        host = "smtp.gmail.com" if settings.email_provider == "gmail" else settings.email_smtp_host
+        return SmtpSender(
+            host,
+            settings.email_smtp_port,
+            username,
+            settings.email_api_key.get_secret_value(),
+            settings.email_from,
+        )
     return None

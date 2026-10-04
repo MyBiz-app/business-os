@@ -18,15 +18,20 @@ class Settings(BaseSettings):
     jwt_audience: str = "authenticated"
 
     # AI assistant. Without a key the assistant is shown as "not set up yet".
+    # Without an API key, answer common questions in demo mode instead of being unavailable.
+    ai_demo: bool = True
     anthropic_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
     )
     ai_model: str = "claude-opus-5-5"
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
-    email_provider: str = "none"  # none | log | resend
-    email_api_key: SecretStr | None = None
+    email_provider: str = "none"  # none | log | resend | gmail | smtp
+    email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password
     email_from: str = "MyBiz <no-reply@example.com>"
+    email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
+    email_smtp_port: int = 465
+    email_smtp_user: str | None = None  # defaults to the address in email_from
 
     @field_validator("database_url")
     @classmethod

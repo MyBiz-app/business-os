@@ -34,6 +34,7 @@ export async function sellPlan(clientId: string, _state: PlanFormState, formData
         body: {
           plan_id: value(formData, "plan_id"),
           starts_on: value(formData, "starts_on") || null,
+          method: (value(formData, "method") || "card") as "card" | "cash" | "transfer" | "other",
           idempotency_key: value(formData, "idempotency_key"),
         },
       }),

@@ -4,9 +4,11 @@
   "scripts": {
     "dev": "turbo run dev",
     "dev:mobile": "pnpm --filter mobile start",
+    "dev:app": "pnpm --filter mobile exec expo start --web --port 8081",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:migrate": "pnpm --filter api db:migrate",
+    "db:seed": "pnpm --filter api db:seed",
     "api:generate": "pnpm --filter @business-os/api-client generate",
     "build": "turbo run build",
     "lint": "turbo run lint",
