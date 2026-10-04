@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Appearance, useColorScheme } from "react-native";
+import { Appearance, Platform, useColorScheme } from "react-native";
 
 import { colors, type Palette } from "@/lib/theme";
 import { loadTheme, saveTheme, type ThemePreference } from "@/lib/preferences";
@@ -16,11 +16,13 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [preference, setPreferenceState] = useState<ThemePreference>("system");
   const systemScheme = useColorScheme();
-  const scheme: "light" | "dark" = systemScheme === "dark" ? "dark" : "light";
+  const scheme: "light" | "dark" =
+    preference === "system" ? (systemScheme === "dark" ? "dark" : "light") : preference;
 
   const apply = useCallback((value: ThemePreference) => {
     setPreferenceState(value);
-    Appearance.setColorScheme(value === "system" ? "unspecified" : value);
+    // Native controls (keyboards, alerts) follow too; not available on the web.
+    if (Platform.OS !== "web") Appearance.setColorScheme(value === "system" ? "unspecified" : value);
   }, []);
 
   useEffect(() => {

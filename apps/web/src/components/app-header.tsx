@@ -1,3 +1,4 @@
+import { Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -7,11 +8,17 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 export async function AppHeader({ children }: { children?: React.ReactNode }) {
   const t = await getTranslations("app");
   return (
-    <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-6 py-4">
-      <Link href="/" className="text-lg font-bold">
+    <header className="sticky top-0 z-30 flex print:hidden flex-wrap items-center justify-between gap-4 border-b border-border/70 bg-background/75 px-6 py-3 backdrop-blur-xl md:h-16 md:py-0">
+      <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
+        <span
+          aria-hidden="true"
+          className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white shadow-md transition-transform duration-300 group-hover:rotate-12"
+        >
+          <Sparkles className="size-4" />
+        </span>
         {t("name")}
       </Link>
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         {children}
         <LocaleSwitcher />
         <ThemeSwitcher />

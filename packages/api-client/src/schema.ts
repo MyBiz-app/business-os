@@ -69,6 +69,24 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
+        /** Update Tenant */
+        patch: operations["update_tenant"];
+        trace?: never;
+    };
+    "/clients/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Clients */
+        post: operations["import_clients"];
+        delete?: never;
+        options?: never;
+        head?: never;
         patch?: never;
         trace?: never;
     };
@@ -108,10 +126,1642 @@ export interface paths {
         patch: operations["update_client"];
         trace?: never;
     };
+    "/clients/{client_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Client
+         * @description Everything the business holds about the client, as one JSON document.
+         */
+        get: operations["export_client"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/erase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Erase Client */
+        post: operations["erase_client"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Services */
+        get: operations["list_services"];
+        put?: never;
+        /** Create Service */
+        post: operations["create_service"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{service_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Service */
+        get: operations["get_service"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Service */
+        patch: operations["update_service"];
+        trace?: never;
+    };
+    "/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Locations */
+        get: operations["list_locations"];
+        put?: never;
+        /** Create Location */
+        post: operations["create_location"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Location */
+        get: operations["get_location"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Location */
+        patch: operations["update_location"];
+        trace?: never;
+    };
+    "/locations/{location_id}/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Room */
+        post: operations["create_room"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/rooms/{room_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Room */
+        patch: operations["update_room"];
+        trace?: never;
+    };
+    "/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Team */
+        get: operations["get_team"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Invitation */
+        post: operations["create_invitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/invitations/{invitation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke Invitation */
+        delete: operations["revoke_invitation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Member */
+        delete: operations["remove_member"];
+        options?: never;
+        head?: never;
+        /** Update Member */
+        patch: operations["update_member"];
+        trace?: never;
+    };
+    "/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Roles */
+        get: operations["list_roles"];
+        put?: never;
+        /** Create Role */
+        post: operations["create_role"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/roles/{role_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Role */
+        delete: operations["delete_role"];
+        options?: never;
+        head?: never;
+        /** Update Role */
+        patch: operations["update_role"];
+        trace?: never;
+    };
+    "/invitations/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview Invitation */
+        get: operations["preview_invitation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invitations/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept Invitation */
+        post: operations["accept_invitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Schedule Options
+         * @description Everything the "new session" form can pick from (active items only).
+         */
+        get: operations["schedule_options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Sessions */
+        get: operations["list_sessions"];
+        put?: never;
+        /** Create Sessions */
+        post: operations["create_sessions"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Session */
+        get: operations["get_session"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Session
+         * @description Changes one occurrence; the rest of its series is not affected.
+         */
+        patch: operations["update_session"];
+        trace?: never;
+    };
+    "/series/{series_id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Series
+         * @description Stops a weekly series after a date: no more occurrences are generated, and later
+         *     sessions without bookings are cancelled. Sessions with bookings stay, to be handled
+         *     one by one (the business must tell those clients).
+         */
+        post: operations["end_series"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/series/{series_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Series
+         * @description Changes time, length, capacity, place, instructor and notes of this and all later
+         *     sessions of a series; new occurrences the daily job adds follow the new settings.
+         *     Bookings stay; booked clients are told when the time changes.
+         */
+        patch: operations["update_series"];
+        trace?: never;
+    };
+    "/sessions/copy-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Week
+         * @description Copies the one-off sessions of a week (7 days from from_date) to another week, at the
+         *     same local weekday and time. Weekly series are left out: they repeat on their own.
+         */
+        post: operations["copy_week"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/closed-days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Closed Days
+         * @description Closed days from `start` (default: today, local) on.
+         */
+        get: operations["list_closed_days"];
+        put?: never;
+        /**
+         * Close Day
+         * @description Marks a day closed and cancels its scheduled sessions; booked clients are told.
+         */
+        post: operations["close_day"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/closed-days/{closed_day_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Reopen Day
+         * @description Opens the day again for new sessions; sessions cancelled when it closed stay cancelled.
+         */
+        delete: operations["reopen_day"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/{session_id}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Bookings
+         * @description The session's roster: live bookings first, then the waitlist in order, then history.
+         */
+        get: operations["list_bookings"];
+        put?: never;
+        /**
+         * Create Booking
+         * @description Books the client if a spot is free, otherwise adds them to the waitlist.
+         */
+        post: operations["create_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{booking_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Booking */
+        patch: operations["update_booking"];
+        trace?: never;
+    };
+    "/clients/{client_id}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Client Bookings
+         * @description A client's bookings, newest session first.
+         */
+        get: operations["list_client_bookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Plans */
+        get: operations["list_plans"];
+        put?: never;
+        /** Create Plan */
+        post: operations["create_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plans/{plan_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Plan */
+        get: operations["get_plan"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Plan
+         * @description Changes apply to future sales only; sold entitlements keep their own terms.
+         */
+        patch: operations["update_plan"];
+        trace?: never;
+    };
+    "/clients/{client_id}/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Client Entitlements */
+        get: operations["client_entitlements"];
+        put?: never;
+        /**
+         * Sell Plan
+         * @description Sells a plan to a client. Payment is simulated until a payment provider is connected.
+         */
+        post: operations["sell_plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/entitlements/{entitlement_id}/freezes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Freeze Entitlement
+         * @description Pauses the entitlement for the given days and extends its end date by as many days.
+         */
+        post: operations["freeze_entitlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/entitlements/{entitlement_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel Entitlement
+         * @description Stops the entitlement from being used for new bookings (no refund is simulated).
+         */
+        post: operations["cancel_entitlement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Metrics
+         * @description Each metric for the period and for the period of the same length just before it.
+         */
+        get: operations["get_metrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/{key}/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Series */
+        get: operations["get_series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/breakdown/{dimension}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Breakdown
+         * @description Attendance metrics of sessions that took place, per service, instructor or time slot.
+         */
+        get: operations["get_breakdown"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/members-at-risk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Members At Risk
+         * @description Members with a valid plan who haven't come in `days`, or whose plan ends within `days`
+         *     with no renewal.
+         */
+        get: operations["get_members_at_risk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Status */
+        get: operations["ai_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Conversations */
+        get: operations["list_conversations"];
+        put?: never;
+        /** Create Conversation */
+        post: operations["create_conversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Conversation */
+        get: operations["get_conversation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/conversations/{conversation_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send Message */
+        post: operations["send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/pending-actions/{action_id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm Action */
+        post: operations["confirm_action"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/pending-actions/{action_id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject Action */
+        post: operations["reject_action"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/modules/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Catalog */
+        get: operations["catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/modules/recommend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recommend Modules */
+        post: operations["recommend_modules"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/modules/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Quote Modules */
+        post: operations["quote_modules"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/current/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tenant Modules */
+        get: operations["get_tenant_modules"];
+        /**
+         * Put Tenant Modules
+         * @description Replaces the business's modules (billing is simulated in the prototype).
+         */
+        put: operations["put_tenant_modules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Businesses */
+        get: operations["businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Usage
+         * @description Usage per day and meter, for one business or the whole platform.
+         */
+        get: operations["usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support-access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Support Status */
+        get: operations["support_status"];
+        put?: never;
+        /**
+         * Grant Support
+         * @description Lets platform support see the business (read-only) for the given hours.
+         */
+        post: operations["grant_support"];
+        /** Revoke Support */
+        delete: operations["revoke_support"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/businesses/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Business By Code */
+        get: operations["business_by_code"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Businesses
+         * @description Every business the signed-in user has joined as a client.
+         */
+        get: operations["my_businesses"];
+        put?: never;
+        /** Join Business */
+        post: operations["join_business"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Profile
+         * @description The client's own name and phone in this business (nothing else).
+         */
+        patch: operations["update_profile"];
+        trace?: never;
+    };
+    "/client/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Sessions
+         * @description Upcoming sessions in the window (past ones are left out).
+         */
+        get: operations["client_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/closed-days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Closed Days
+         * @description Days the business is closed in the window (no classes; usually a holiday).
+         */
+        get: operations["client_closed_days"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/sessions/{session_id}/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Book Session
+         * @description Books the signed-in client, or puts them on the waitlist when the session is full.
+         */
+        post: operations["book_session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/bookings/{booking_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel My Booking */
+        post: operations["cancel_my_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/bookings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Bookings
+         * @description The client's bookings in this business, newest session first.
+         */
+        get: operations["my_bookings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Plans
+         * @description What the business sells (active plans), to show clients their options.
+         */
+        get: operations["business_plans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/entitlements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Entitlements */
+        get: operations["my_entitlements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Checkout
+         * @description Starts buying a plan at its current price.
+         */
+        post: operations["start_checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts/{checkout_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Checkout */
+        get: operations["get_checkout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts/{checkout_id}/simulate-payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate Payment
+         * @description Completes a simulated checkout: records a test payment and creates the plan. Calling it
+         *     again returns the same plan.
+         */
+        post: operations["simulate_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Receipts
+         * @description Newest first; for one client when `client_id` is given.
+         */
+        get: operations["list_receipts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/receipts/{receipt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Receipt */
+        get: operations["get_receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Receipts */
+        get: operations["my_receipts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/receipts/{receipt_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Receipt */
+        get: operations["my_receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Notifications */
+        get: operations["my_notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Read */
+        post: operations["mark_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/health-declarations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Client Health Declarations */
+        get: operations["client_health_declarations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/health-declarations/{declaration_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review Health Declaration
+         * @description Approves or rejects a declaration that answered "yes" to a question.
+         */
+        post: operations["review_health_declaration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/health-declaration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Health Declaration */
+        get: operations["my_health_declaration"];
+        put?: never;
+        /**
+         * Sign Health Declaration
+         * @description Signs a new declaration; it replaces the previous one.
+         */
+        post: operations["sign_health_declaration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/current/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload Logo */
+        put: operations["upload_logo"];
+        post?: never;
+        /** Delete Logo */
+        delete: operations["delete_logo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/tenants/{tenant_id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Logo */
+        get: operations["get_logo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AIStatus */
+        AIStatus: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Demo
+             * @description Demo mode: scripted answers, no AI key
+             * @default false
+             */
+            demo: boolean;
+        };
+        /** AcceptInvitation */
+        AcceptInvitation: {
+            /** Token */
+            token: string;
+        };
+        /** Accepted */
+        Accepted: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+        };
+        /** Answer */
+        Answer: {
+            /** Id */
+            id: string;
+            /** Question */
+            question: string;
+            /** Answer */
+            answer: boolean;
+        };
+        /** Body_import_clients */
+        Body_import_clients: {
+            /** File */
+            file: string;
+            /**
+             * Mapping
+             * @description JSON list: a field (or null) per column
+             */
+            mapping?: string | null;
+            /**
+             * Commit
+             * @description false: preview only
+             * @default false
+             */
+            commit: boolean;
+            /** Source */
+            source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+        };
+        /** Body_upload_logo */
+        Body_upload_logo: {
+            /** File */
+            file: string;
+        };
+        /** Booking */
+        Booking: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Plan Name
+             * @description The client's plan this booking uses, if any
+             */
+            plan_name: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+            /** Waitlist Position */
+            waitlist_position: number | null;
+            /** Late Cancel */
+            late_cancel: boolean;
+            /** Checked In At */
+            checked_in_at: string | null;
+            /** Cancelled At */
+            cancelled_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Health State
+             * @description The client's health declaration state
+             * @enum {string}
+             */
+            health_state: "missing" | "expired" | "needs_review" | "rejected" | "expiring" | "ok";
+        };
+        /** BookingCreate */
+        BookingCreate: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** BookingUpdate */
+        BookingUpdate: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
+        /** BreakdownItem */
+        BreakdownItem: {
+            /**
+             * Key
+             * @description Service id, instructor user id ('' = none) or 'isodow-hour'
+             */
+            key: string;
+            /** Label */
+            label: string | null;
+            /** Sessions */
+            sessions: number;
+            /** Attended */
+            attended: number;
+            /**
+             * Occupancy
+             * @description Percent of capacity taken
+             */
+            occupancy: number | null;
+            /**
+             * No Show Rate
+             * @description Percent of expected clients who didn't come
+             */
+            no_show_rate: number | null;
+        };
+        /**
+         * BusinessProfile
+         * @description What anyone holding a join code may see before signing in.
+         */
+        BusinessProfile: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Primary Color */
+            primary_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
+            /**
+             * Client App
+             * @description Whether the business offers the client app
+             */
+            client_app: boolean;
+        };
+        /** Catalog */
+        Catalog: {
+            /** Currency */
+            currency: string;
+            /** Core */
+            core: components["schemas"]["CoreTier"][];
+            /** Modules */
+            modules: components["schemas"]["CatalogModule"][];
+            /** Presets */
+            presets: {
+                [key: string]: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
+            };
+        };
+        /** CatalogModule */
+        CatalogModule: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location";
+            /**
+             * Price
+             * @description Monthly, minor units (per unit when per_unit)
+             */
+            price: number;
+            /** Available */
+            available: boolean;
+            /** Per Unit */
+            per_unit: boolean;
+            /** Requires Any */
+            requires_any: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
+            /** Requires All */
+            requires_all: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
+        };
+        /** Checkout */
+        Checkout: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Plan Name */
+            plan_name: string;
+            /**
+             * Amount
+             * @description Minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "paid" | "cancelled" | "failed";
+            /**
+             * Simulated
+             * @description Test payment: no money is charged
+             */
+            simulated: boolean;
+            /**
+             * Pay Url
+             * @description Where to pay (real providers only)
+             */
+            pay_url: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CheckoutCreate */
+        CheckoutCreate: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+        };
+        /** CheckoutPaid */
+        CheckoutPaid: {
+            checkout: components["schemas"]["Checkout"];
+            entitlement: components["schemas"]["Entitlement"];
+        };
         /** Client */
         Client: {
             /**
@@ -136,6 +1786,8 @@ export interface components {
              * @enum {string}
              */
             status: "active" | "inactive" | "lead";
+            /** Source */
+            source: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
             /**
              * Created At
              * Format: date-time
@@ -146,6 +1798,89 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /**
+             * Erased At
+             * @description Personal data erased on request (privacy)
+             */
+            erased_at: string | null;
+        };
+        /** ClientBooking */
+        ClientBooking: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Session Status
+             * @enum {string}
+             */
+            session_status: "scheduled" | "cancelled";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+            /** Late Cancel */
+            late_cancel: boolean;
+        };
+        /** ClientBusiness */
+        ClientBusiness: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Primary Color */
+            primary_color: string | null;
+            /** Logo Url */
+            logo_url: string | null;
+            /** Time Zone */
+            time_zone: string;
+            /** Currency */
+            currency: string;
+            /** Cancellation Window Minutes */
+            cancellation_window_minutes: number;
+            /**
+             * Online Sales
+             * @description The client can buy plans in the app
+             */
+            online_sales: boolean;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Phone */
+            phone: string | null;
         };
         /** ClientCreate */
         ClientCreate: {
@@ -159,6 +1894,8 @@ export interface components {
             date_of_birth?: string | null;
             /** Notes */
             notes?: string | null;
+            /** Source */
+            source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
             /** First Name */
             first_name: string;
             /**
@@ -168,12 +1905,60 @@ export interface components {
              */
             status: "active" | "inactive" | "lead";
         };
+        /** ClientHealth */
+        ClientHealth: {
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "missing" | "expired" | "needs_review" | "rejected" | "expiring" | "ok";
+            /**
+             * Declarations
+             * @description Newest first
+             */
+            declarations: components["schemas"]["Declaration"][];
+        };
         /** ClientPage */
         ClientPage: {
             /** Items */
             items: components["schemas"]["Client"][];
             /** Total */
             total: number;
+        };
+        /** ClientSession */
+        ClientSession: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            service: components["schemas"]["ServiceSummary"];
+            /** Location Name */
+            location_name: string | null;
+            /** Room Name */
+            room_name: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "scheduled" | "cancelled";
+            /** Capacity */
+            capacity: number;
+            /** Spots Left */
+            spots_left: number;
+            /** Waitlisted */
+            waitlisted: number;
+            my_booking: components["schemas"]["MyBooking"] | null;
         };
         /** ClientUpdate */
         ClientUpdate: {
@@ -187,10 +1972,358 @@ export interface components {
             date_of_birth?: string | null;
             /** Notes */
             notes?: string | null;
+            /** Source */
+            source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
             /** First Name */
             first_name?: string | null;
             /** Status */
             status?: ("active" | "inactive" | "lead") | null;
+        };
+        /** ClosedDay */
+        ClosedDay: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Reason */
+            reason: string | null;
+        };
+        /** ClosedDayCreate */
+        ClosedDayCreate: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** ClosedDayCreated */
+        ClosedDayCreated: {
+            closed_day: components["schemas"]["ClosedDay"];
+            /** Cancelled Sessions */
+            cancelled_sessions: number;
+        };
+        /** Conversation */
+        Conversation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Turns */
+            turns: components["schemas"]["Turn"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ConversationSummary */
+        ConversationSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CoreTier */
+        CoreTier: {
+            /** Up To Clients */
+            up_to_clients: number | null;
+            /** Price */
+            price: number;
+        };
+        /** CreatedInvitation */
+        CreatedInvitation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "expired" | "accepted";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Token */
+            token: string;
+        };
+        /** CreatedSessions */
+        CreatedSessions: {
+            /** Series Id */
+            series_id: string | null;
+            /** Session Ids */
+            session_ids: string[];
+        };
+        /** CustomRole */
+        CustomRole: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Permissions */
+            permissions: string[];
+            /** Members */
+            members: number;
+        };
+        /** Declaration */
+        Declaration: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Form Key */
+            form_key: string;
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /**
+             * Answers
+             * @description The questions exactly as signed, with answers
+             */
+            answers: components["schemas"]["Answer"][];
+            /** Statement */
+            statement: string;
+            /**
+             * All Clear
+             * @description Every answer was "no"
+             */
+            all_clear: boolean;
+            /** Signed Name */
+            signed_name: string;
+            /**
+             * Signed At
+             * Format: date-time
+             */
+            signed_at: string;
+            /**
+             * Valid Until
+             * Format: date
+             * @description Last local date the declaration is valid
+             */
+            valid_until: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "valid" | "needs_review" | "approved" | "rejected";
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Review Note */
+            review_note: string | null;
+        };
+        /** DeclarationCreate */
+        DeclarationCreate: {
+            /**
+             * Locale
+             * @enum {string}
+             */
+            locale: "he" | "en";
+            /** Answers */
+            answers: {
+                [key: string]: boolean;
+            };
+            /** Signed Name */
+            signed_name: string;
+            /**
+             * Accept
+             * @description The client accepts the statement
+             * @constant
+             */
+            accept: true;
+        };
+        /** Entitlement */
+        Entitlement: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "membership" | "punch_card";
+            /** Credits */
+            credits: number | null;
+            /** Credits Used */
+            credits_used: number;
+            /** Credits Remaining */
+            credits_remaining: number | null;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "active" | "upcoming" | "frozen" | "used_up" | "expired" | "cancelled";
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /** Freezes */
+            freezes: components["schemas"]["Freeze"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Receipt Id
+             * @description The receipt of the payment for this plan
+             */
+            receipt_id: string | null;
+            /** Receipt Number */
+            receipt_number: number | null;
+        };
+        /** EraseRequest */
+        EraseRequest: {
+            /**
+             * Confirm
+             * @description Must be true: erasing cannot be undone
+             */
+            confirm: boolean;
+        };
+        /** EraseResult */
+        EraseResult: {
+            /** Cancelled Bookings */
+            cancelled_bookings: number;
+            /** Removed Health Declarations */
+            removed_health_declarations: number;
+        };
+        /** Form */
+        Form: {
+            /** Key */
+            key: string;
+            /** Questions */
+            questions: components["schemas"]["FormQuestion"][];
+            /** Statement */
+            statement: string;
+        };
+        /** FormQuestion */
+        FormQuestion: {
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
+        };
+        /** Freeze */
+        Freeze: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** Reason */
+            reason: string | null;
+        };
+        /** FreezeCreate */
+        FreezeCreate: {
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** Grant */
+        Grant: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
+        /** GrantCreate */
+        GrantCreate: {
+            /**
+             * Hours
+             * @description How long support may look in
+             */
+            hours: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -203,6 +2336,210 @@ export interface components {
             status: string;
             /** Environment */
             environment: string;
+        };
+        /** ImportIssue */
+        ImportIssue: {
+            /**
+             * Line
+             * @description Row number in the file (the header is row 1)
+             */
+            line: number;
+            /** Field */
+            field: string | null;
+            /**
+             * Code
+             * @enum {string}
+             */
+            code: "missing_name" | "invalid_email" | "invalid_date" | "invalid_status" | "duplicate";
+        };
+        /** ImportResult */
+        ImportResult: {
+            /**
+             * Columns
+             * @description Header of each column in the file
+             */
+            columns: string[];
+            /**
+             * Mapping
+             * @description Field for each column, if any
+             */
+            mapping: (("first_name" | "last_name" | "full_name" | "email" | "phone" | "date_of_birth" | "notes" | "status") | null)[];
+            /**
+             * Examples
+             * @description First non-empty value of each column
+             */
+            examples: string[];
+            /** Rows */
+            rows: number;
+            /**
+             * Ready
+             * @description New clients the import adds (or added)
+             */
+            ready: number;
+            /** Duplicates */
+            duplicates: number;
+            /** Invalid */
+            invalid: number;
+            /** Imported */
+            imported: boolean;
+            /**
+             * Issues
+             * @description The first 50 problems
+             */
+            issues: components["schemas"]["ImportIssue"][];
+            /**
+             * Sample
+             * @description The first new clients
+             */
+            sample: components["schemas"]["ImportedClient"][];
+        };
+        /** ImportedClient */
+        ImportedClient: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
+        };
+        /** Inbox */
+        Inbox: {
+            /** Unread */
+            unread: number;
+            /**
+             * Items
+             * @description The latest 50, newest first
+             */
+            items: components["schemas"]["Notification"][];
+        };
+        /** InstructorOption */
+        InstructorOption: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Email */
+            email: string;
+            /** Full Name */
+            full_name: string | null;
+        };
+        /** Invitation */
+        Invitation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "expired" | "accepted";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** InvitationCreate */
+        InvitationCreate: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+        };
+        /** InvitationPreview */
+        InvitationPreview: {
+            /** Tenant Name */
+            tenant_name: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+            /** Email */
+            email: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "expired" | "accepted";
+        };
+        /** JoinRequest */
+        JoinRequest: {
+            /** Code */
+            code: string;
+        };
+        /** Location */
+        Location: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Address */
+            address: string | null;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Rooms */
+            rooms: components["schemas"]["Room"][];
+        };
+        /** LocationCreate */
+        LocationCreate: {
+            /** Name */
+            name: string;
+            /** Address */
+            address?: string | null;
+        };
+        /** LocationUpdate */
+        LocationUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Address */
+            address?: string | null;
+            /** Active */
+            active?: boolean | null;
+        };
+        /** MarkRead */
+        MarkRead: {
+            /**
+             * Ids
+             * @description Omit to mark all as read
+             */
+            ids?: string[] | null;
         };
         /** Me */
         Me: {
@@ -217,8 +2554,67 @@ export interface components {
             full_name: string | null;
             /** Locale */
             locale: ("he" | "en") | null;
+            /** Platform Admin */
+            platform_admin: boolean;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
+            /**
+             * Support Access
+             * @description Businesses that let platform support in (platform admins only)
+             */
+            support_access: components["schemas"]["SupportAccess"][];
+        };
+        /** Member */
+        Member: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Email */
+            email: string;
+            /** Full Name */
+            full_name: string | null;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+            /** Custom Role Id */
+            custom_role_id: string | null;
+            /** Custom Role Name */
+            custom_role_name: string | null;
+            /**
+             * Joined At
+             * Format: date-time
+             */
+            joined_at: string;
+        };
+        /** MemberAtRisk */
+        MemberAtRisk: {
+            /** Client Id */
+            client_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "inactive" | "plan_ending";
+            /** Last Visit */
+            last_visit: string | null;
+            /** Plan Ends On */
+            plan_ends_on: string | null;
+        };
+        /**
+         * MemberUpdate
+         * @description Either a system role, or a custom role (the member's system role becomes `staff`).
+         */
+        MemberUpdate: {
+            /** Role */
+            role?: ("owner" | "manager" | "staff" | "front_desk") | null;
+            /** Custom Role Id */
+            custom_role_id?: string | null;
         };
         /** Membership */
         Membership: {
@@ -234,6 +2630,812 @@ export interface components {
              * @enum {string}
              */
             role: "owner" | "manager" | "staff" | "front_desk";
+        };
+        /** MetricValue */
+        MetricValue: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held";
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "money" | "count" | "percent";
+            /** Value */
+            value: number | null;
+            /** Previous */
+            previous: number | null;
+            /** Higher Is Better */
+            higher_is_better: boolean;
+        };
+        /** MyBooking */
+        MyBooking: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+            /** Waitlist Position */
+            waitlist_position: number | null;
+        };
+        /** MyHealth */
+        MyHealth: {
+            /**
+             * Required
+             * @description The business requires a declaration to book in the app
+             */
+            required: boolean;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "missing" | "expired" | "needs_review" | "rejected" | "expiring" | "ok";
+            /** @description The form to sign; null if the business has none */
+            form: components["schemas"]["Form"] | null;
+            current: components["schemas"]["Declaration"] | null;
+        };
+        /** Notification */
+        Notification: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending";
+            /**
+             * Payload
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on
+             */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Read At */
+            read_at: string | null;
+        };
+        /** OptionItem */
+        OptionItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+        };
+        /** PendingAction */
+        PendingAction: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Tool Name */
+            tool_name: string;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            };
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "rejected" | "expired" | "executed" | "failed";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** Plan */
+        Plan: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "membership" | "punch_card";
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /** Validity Days */
+            validity_days: number;
+            /** Credits */
+            credits: number | null;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** PlanCreate */
+        PlanCreate: {
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "membership" | "punch_card";
+            /**
+             * Price Amount
+             * @description Price in minor units (agorot, cents)
+             */
+            price_amount: number;
+            /**
+             * Price Currency
+             * @description Defaults to the business currency
+             */
+            price_currency?: string | null;
+            /** Validity Days */
+            validity_days: number;
+            /**
+             * Credits
+             * @description Punch cards only
+             */
+            credits?: number | null;
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+        };
+        /**
+         * PlanUpdate
+         * @description The kind and credits are fixed once a plan exists; create a new plan instead.
+         */
+        PlanUpdate: {
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Price Amount */
+            price_amount?: number | null;
+            /** Validity Days */
+            validity_days?: number | null;
+            /** Active */
+            active?: boolean | null;
+        };
+        /** PlatformBusiness */
+        PlatformBusiness: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Vertical */
+            vertical: string;
+            /** Locale */
+            locale: string;
+            /** Currency */
+            currency: string;
+            /** Time Zone */
+            time_zone: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Members */
+            members: number;
+            /** Clients */
+            clients: number;
+            /** Active Clients */
+            active_clients: number;
+            /** Modules */
+            modules: string[];
+            /** Ai Credits 30D */
+            ai_credits_30d: number;
+            /** Bookings 30D */
+            bookings_30d: number;
+            /** Owner Email */
+            owner_email: string | null;
+        };
+        /** Point */
+        Point: {
+            /**
+             * Bucket
+             * Format: date
+             */
+            bucket: string;
+            /** Value */
+            value: number;
+        };
+        /** ProfileUpdate */
+        ProfileUpdate: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** Question */
+        Question: {
+            /** Text */
+            text: string;
+        };
+        /** QuestionnaireIn */
+        QuestionnaireIn: {
+            /** Active Clients */
+            active_clients: number;
+            /** Staff */
+            staff: number;
+            /** Locations */
+            locations: number;
+            /** Wants Client App */
+            wants_client_app: boolean;
+            /** Wants Ai Actions */
+            wants_ai_actions: boolean;
+        };
+        /** QuoteOut */
+        QuoteOut: {
+            /** Currency */
+            currency: string;
+            /** Core */
+            core: number;
+            /** Core Tier */
+            core_tier: number | null;
+            /** Lines */
+            lines: {
+                [key: string]: number;
+            };
+            /** Total */
+            total: number;
+        };
+        /** Receipt */
+        Receipt: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /** Client Email */
+            client_email: string | null;
+            /** Description */
+            description: string;
+            /**
+             * Amount
+             * @description Minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
+            /**
+             * Simulated
+             * @description A sample from a test payment, not a tax document
+             */
+            simulated: boolean;
+        };
+        /** Recommendation */
+        Recommendation: {
+            /**
+             * Preset
+             * @enum {string}
+             */
+            preset: "starter" | "growing" | "ai_powered";
+            /** Modules */
+            modules: {
+                [key: string]: number;
+            };
+        };
+        /** Repeat */
+        Repeat: {
+            /**
+             * Weekdays
+             * @description 0 = Monday … 6 = Sunday
+             */
+            weekdays: number[];
+            /** Ends On */
+            ends_on?: string | null;
+        };
+        /** Review */
+        Review: {
+            /** Approve */
+            approve: boolean;
+            /** Note */
+            note?: string | null;
+        };
+        /** RoleFields */
+        RoleFields: {
+            /** Name */
+            name: string;
+            /** Permissions */
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
+        };
+        /** RoleUpdate */
+        RoleUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Permissions */
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+        };
+        /** Roles */
+        Roles: {
+            /**
+             * Permissions
+             * @description Every permission key, in display order
+             */
+            permissions: string[];
+            /** System */
+            system: components["schemas"]["SystemRole"][];
+            /** Custom */
+            custom: components["schemas"]["CustomRole"][];
+        };
+        /** Room */
+        Room: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Name */
+            name: string;
+            /** Capacity */
+            capacity: number | null;
+            /** Active */
+            active: boolean;
+        };
+        /** RoomCreate */
+        RoomCreate: {
+            /** Name */
+            name: string;
+            /** Capacity */
+            capacity?: number | null;
+        };
+        /** RoomOption */
+        RoomOption: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+        };
+        /** RoomUpdate */
+        RoomUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Capacity */
+            capacity?: number | null;
+            /** Active */
+            active?: boolean | null;
+        };
+        /** Sale */
+        Sale: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /**
+             * Method
+             * @default card
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
+            /**
+             * Starts On
+             * @description Defaults to today (local)
+             */
+            starts_on?: string | null;
+            /**
+             * Idempotency Key
+             * @description Same key, same sale: retries never double-sell
+             */
+            idempotency_key: string;
+        };
+        /** ScheduleOptions */
+        ScheduleOptions: {
+            /** Services */
+            services: components["schemas"]["ServiceOption"][];
+            /** Locations */
+            locations: components["schemas"]["OptionItem"][];
+            /** Rooms */
+            rooms: components["schemas"]["RoomOption"][];
+            /** Instructors */
+            instructors: components["schemas"]["InstructorOption"][];
+        };
+        /** ScheduledSession */
+        ScheduledSession: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Series Id */
+            series_id: string | null;
+            service: components["schemas"]["ServiceSummary"];
+            /** Location Id */
+            location_id: string | null;
+            /** Location Name */
+            location_name: string | null;
+            /** Room Id */
+            room_id: string | null;
+            /** Room Name */
+            room_name: string | null;
+            /** Instructor User Id */
+            instructor_user_id: string | null;
+            /** Instructor Email */
+            instructor_email: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Capacity */
+            capacity: number;
+            /** Booked */
+            booked: number;
+            /** Waitlisted */
+            waitlisted: number;
+            /**
+             * Series Open Ended
+             * @description For a session in a weekly series: whether the series keeps going
+             */
+            series_open_ended: boolean | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "scheduled" | "cancelled";
+            /** Notes */
+            notes: string | null;
+        };
+        /** Selection */
+        Selection: {
+            /** Modules */
+            modules: {
+                [key: string]: number;
+            };
+        };
+        /** SeriesEnd */
+        SeriesEnd: {
+            /**
+             * Last Date
+             * Format: date
+             * @description Last local date with sessions; later ones end
+             */
+            last_date: string;
+        };
+        /** SeriesEnded */
+        SeriesEnded: {
+            /**
+             * Cancelled
+             * @description Later sessions cancelled (they had no bookings)
+             */
+            cancelled: number;
+            /**
+             * Kept
+             * @description Later sessions kept because clients are booked
+             */
+            kept: number;
+        };
+        /** SeriesUpdate */
+        SeriesUpdate: {
+            /** Location Id */
+            location_id?: string | null;
+            /** Room Id */
+            room_id?: string | null;
+            /** Instructor User Id */
+            instructor_user_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * From Date
+             * Format: date
+             * @description Local date of the first session to change
+             */
+            from_date: string;
+            /**
+             * Start Time
+             * Format: time
+             */
+            start_time: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Capacity */
+            capacity: number;
+        };
+        /** SeriesUpdated */
+        SeriesUpdated: {
+            /**
+             * Updated
+             * @description Sessions changed (scheduled, on or after from_date)
+             */
+            updated: number;
+        };
+        /** Service */
+        Service: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Capacity */
+            capacity: number;
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /** Color */
+            color: string | null;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ServiceCreate */
+        ServiceCreate: {
+            /** Description */
+            description?: string | null;
+            /** Color */
+            color?: string | null;
+            /** Name */
+            name: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /**
+             * Capacity
+             * @default 1
+             */
+            capacity: number;
+            /**
+             * Price Amount
+             * @description Price in minor units (agorot, cents)
+             * @default 0
+             */
+            price_amount: number;
+            /**
+             * Price Currency
+             * @description Defaults to the business currency
+             */
+            price_currency?: string | null;
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+        };
+        /** ServiceOption */
+        ServiceOption: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Duration Minutes */
+            duration_minutes: number;
+            /** Capacity */
+            capacity: number;
+        };
+        /** ServiceSummary */
+        ServiceSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Color */
+            color: string | null;
+        };
+        /** ServiceUpdate */
+        ServiceUpdate: {
+            /** Description */
+            description?: string | null;
+            /** Color */
+            color?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /** Capacity */
+            capacity?: number | null;
+            /** Price Amount */
+            price_amount?: number | null;
+            /** Active */
+            active?: boolean | null;
+        };
+        /** SessionCreate */
+        SessionCreate: {
+            /** Location Id */
+            location_id?: string | null;
+            /** Room Id */
+            room_id?: string | null;
+            /** Instructor User Id */
+            instructor_user_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Date
+             * Format: date
+             * @description Local date in the business's time zone
+             */
+            date: string;
+            /**
+             * Start Time
+             * Format: time
+             * @description Local wall-clock time
+             */
+            start_time: string;
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /** Capacity */
+            capacity?: number | null;
+            repeat?: components["schemas"]["Repeat"] | null;
+        };
+        /** SessionUpdate */
+        SessionUpdate: {
+            /** Location Id */
+            location_id?: string | null;
+            /** Room Id */
+            room_id?: string | null;
+            /** Instructor User Id */
+            instructor_user_id?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Date */
+            date?: string | null;
+            /** Start Time */
+            start_time?: string | null;
+            /** Duration Minutes */
+            duration_minutes?: number | null;
+            /** Capacity */
+            capacity?: number | null;
+            /** Status */
+            status?: ("scheduled" | "cancelled") | null;
+        };
+        /** SupportAccess */
+        SupportAccess: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Tenant Name */
+            tenant_name: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+        };
+        /** SupportStatus */
+        SupportStatus: {
+            active: components["schemas"]["Grant"] | null;
+            /**
+             * Visits
+             * @description The latest 50 support requests
+             */
+            visits: components["schemas"]["SupportVisit"][];
+        };
+        /** SupportVisit */
+        SupportVisit: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Actor Email */
+            actor_email: string | null;
+            /** Path */
+            path: string | null;
+        };
+        /** SystemRole */
+        SystemRole: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "owner" | "manager" | "staff" | "front_desk";
+            /** Permissions */
+            permissions: string[];
+        };
+        /** Team */
+        Team: {
+            /** Members */
+            members: components["schemas"]["Member"][];
+            /** Invitations */
+            invitations: components["schemas"]["Invitation"][];
         };
         /** Tenant */
         Tenant: {
@@ -255,11 +3457,52 @@ export interface components {
             time_zone: string;
             /** Currency */
             currency: string;
+            /** Primary Color */
+            primary_color: string | null;
+            /**
+             * Logo Url
+             * @description Public path of the logo on this API, if any
+             */
+            logo_url: string | null;
+            /** Cancellation Window Minutes */
+            cancellation_window_minutes: number;
+            /**
+             * Booking Requires Plan
+             * @description Clients need a valid plan to book in the app
+             */
+            booking_requires_plan: boolean;
+            /**
+             * Requires Health Declaration
+             * @description Clients need a valid health declaration to book in the app
+             */
+            requires_health_declaration: boolean;
+            /**
+             * Online Sales
+             * @description Clients can buy plans in the app
+             */
+            online_sales: boolean;
+            /**
+             * Join Code
+             * @description Code clients enter or scan to join this business
+             */
+            join_code: string;
+            /**
+             * Modules
+             * @description Enabled modules (features depend on them)
+             */
+            modules: string[];
+            /**
+             * Permissions
+             * @description The current user's effective permissions
+             */
+            permissions: string[];
+            /** Custom Role Name */
+            custom_role_name: string | null;
             /**
              * Role
-             * @enum {string}
+             * @description 'support': platform support with read-only access the owner granted
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: ("owner" | "manager" | "staff" | "front_desk") | "support";
         };
         /** TenantCreate */
         TenantCreate: {
@@ -276,6 +3519,71 @@ export interface components {
             time_zone: string;
             /** Currency */
             currency: string;
+            /**
+             * Modules
+             * @description Modules to enable; defaults to the vertical pack's preset
+             */
+            modules?: {
+                [key: string]: number;
+            } | null;
+        };
+        /** TenantModules */
+        TenantModules: {
+            /** Modules */
+            modules: {
+                [key: string]: number;
+            };
+            /** Active Clients */
+            active_clients: number;
+            quote: components["schemas"]["QuoteOut"];
+        };
+        /** TenantUpdate */
+        TenantUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Locale */
+            locale?: ("he" | "en") | null;
+            /** Time Zone */
+            time_zone?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Primary Color */
+            primary_color?: string | null;
+            /** Cancellation Window Minutes */
+            cancellation_window_minutes?: number | null;
+            /** Booking Requires Plan */
+            booking_requires_plan?: boolean | null;
+            /** Requires Health Declaration */
+            requires_health_declaration?: boolean | null;
+            /** Online Sales */
+            online_sales?: boolean | null;
+        };
+        /** Turn */
+        Turn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /** Text */
+            text: string;
+            /**
+             * Pending Actions
+             * @default []
+             */
+            pending_actions: components["schemas"]["PendingAction"][];
+        };
+        /** UsagePoint */
+        UsagePoint: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Meter */
+            meter: string;
+            /** Quantity */
+            quantity: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -289,6 +3597,31 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WeekCopied */
+        WeekCopied: {
+            /** Created */
+            created: number;
+            /**
+             * Skipped
+             * @description Already in the target week (same class and time)
+             */
+            skipped: number;
+        };
+        /** WeekCopy */
+        WeekCopy: {
+            /**
+             * From Date
+             * Format: date
+             * @description First local date of the week to copy
+             */
+            from_date: string;
+            /**
+             * To Date
+             * Format: date
+             * @description First local date of the target week
+             */
+            to_date: string;
         };
     };
     responses: never;
@@ -403,11 +3736,85 @@ export interface operations {
             };
         };
     };
+    update_tenant: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TenantUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_clients: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_clients"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_clients: {
         parameters: {
             query?: {
                 search?: string | null;
                 status?: ("active" | "inactive" | "lead") | null;
+                /** @description valid: holds a plan valid today; none: doesn't */
+                plan?: ("valid" | "none") | null;
+                /** @description No check-in in this many days */
+                absent_days?: number | null;
                 limit?: number;
                 offset?: number;
             };
@@ -531,6 +3938,3158 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    erase_client: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EraseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EraseResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_services: {
+        parameters: {
+            query?: {
+                active?: boolean | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Service"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_service: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Service"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_service: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Service"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_service: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ServiceUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Service"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_locations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_location: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_location: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_location: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LocationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_room: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoomCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Room"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_room: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                room_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoomUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Room"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_team: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Team"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_invitation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InvitationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedInvitation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_invitation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                invitation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_member: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_member: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Member"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_roles: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Roles"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_role: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRole"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_role: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                role_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_role: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                role_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RoleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CustomRole"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_invitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationPreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_invitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptInvitation"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Accepted"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schedule_options: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleOptions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_sessions: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+                /** @description Only sessions the user teaches */
+                mine?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduledSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_sessions: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedSessions"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_session: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduledSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_session: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SessionUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduledSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    end_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesEnd"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesEnded"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                series_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesUpdated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_week: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WeekCopy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WeekCopied"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_closed_days: {
+        parameters: {
+            query?: {
+                start?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDay"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_day: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClosedDayCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDayCreated"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_day: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                closed_day_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_bookings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BookingUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_client_bookings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBooking"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_plans: {
+        parameters: {
+            query?: {
+                active?: boolean | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlanUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_entitlements: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sell_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Sale"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    freeze_entitlement: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                entitlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FreezeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_entitlement: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                entitlement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_metrics: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                /** @description Last local date (inclusive) */
+                end: string;
+                keys?: ("revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held")[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetricValue"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_series: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+                grain?: "day" | "week" | "month";
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                key: "revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Point"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_breakdown: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                dimension: "service" | "instructor" | "time_slot";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BreakdownItem"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_members_at_risk: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAtRisk"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_status: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_conversations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_conversation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_conversation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_message: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Question"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    confirm_action: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                action_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingAction"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reject_action: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                action_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingAction"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    catalog: {
+        parameters: {
+            query?: {
+                currency?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Catalog"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommend_modules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuestionnaireIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Recommendation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    quote_modules: {
+        parameters: {
+            query?: {
+                currency?: string;
+                active_clients?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Selection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tenant_modules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantModules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_tenant_modules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Selection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantModules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBusiness"][];
+                };
+            };
+        };
+    };
+    usage: {
+        parameters: {
+            query?: {
+                tenant_id?: string | null;
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsagePoint"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    support_status: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    grant_support: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GrantCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_support: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_by_code: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"][];
+                };
+            };
+        };
+    };
+    join_business: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JoinRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_profile: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_sessions: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_closed_days: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDay"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    book_session: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_my_booking: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_bookings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBooking"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_plans: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Plan"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_entitlements: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entitlement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_payment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutPaid"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_receipts: {
+        parameters: {
+            query?: {
+                client_id?: string | null;
+                limit?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_receipt: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_receipts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_receipt: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                receipt_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_notifications: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_read: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkRead"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_health_declarations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientHealth"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_health_declaration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                declaration_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Review"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Declaration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_health_declaration: {
+        parameters: {
+            query?: {
+                locale?: "he" | "en";
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyHealth"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sign_health_declaration: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeclarationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyHealth"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_logo"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_logo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
                 };
             };
             /** @description Validation Error */

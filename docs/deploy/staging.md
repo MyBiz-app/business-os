@@ -6,6 +6,7 @@
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|
 | Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main` (previews for every PR) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json) |
+| Client app on the web (`apps/mobile`) | Vercel, static site | `main` | [`apps/mobile/vercel.json`](../../apps/mobile/vercel.json), [`apps/mobile/README.md`](../../apps/mobile/README.md) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | — | Supabase dashboard |
 | Migrations | GitHub Actions | `main` (when migrations change) or by hand | [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
@@ -29,6 +30,9 @@ up to about a minute.
 | Vercel | `NEXT_PUBLIC_SUPABASE_KEY` | Supabase **publishable** key |
 | Vercel | `NEXT_PUBLIC_API_URL` | Render service URL, e.g. `https://business-os-api-staging.onrender.com` |
 | Vercel | `ENABLE_EXPERIMENTAL_COREPACK` | `1` (use the pnpm version pinned in `package.json`) |
+| Vercel (web) | `NEXT_PUBLIC_CLIENT_APP_URL` | Optional: the client app's web address; the QR join page then offers "open in the browser" |
+| Vercel (client app project) | `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` | Same values as the web's API URL, Supabase URL and publishable key |
+| Render → service → Environment | `API_CORS_ORIGINS` | `["https://<client app address>"]`: the browser app calls the API directly |
 
 Use the session pooler (IPv4, supports `SET LOCAL ROLE`), not the direct connection (IPv6
 only) and not the transaction pooler (port 6543).
@@ -51,10 +55,34 @@ only) and not the transaction pooler (port 6543).
 ## Notes
 
 - Supabase's built-in email sender only delivers to members of the Supabase organization and
-  is heavily rate-limited. Fine for staging; production needs a real email provider (Resend /
-  Postmark) configured as custom SMTP.
+  is heavily rate-limited, so other people cannot sign up or get sign-in codes. Configure
+  custom SMTP (Authentication → Emails → SMTP Settings). For the prototype, Gmail works with
+  no domain: host `smtp.gmail.com`, port `465`, username and sender = the Gmail address,
+  password = its app password. Production should use a provider with its own domain.
 - The default Supabase email templates work (links come back to `/auth/confirm?code=…`, in the
   same browser). Our own templates in `supabase/templates/` can be pasted into Authentication →
   Email Templates to allow confirming from any device.
 - On a push to `main` the migration workflow and the Render deploy run in parallel. Keep
   migrations backward compatible (add first, remove later) so either order works.
+
+## Notification emails (optional)
+
+Client notifications (the app's Updates tab) can also go out by email. The hourly workflow
+**Send notification emails on staging** does nothing until a provider is set.
+Two providers are supported:
+
+- **Gmail** (free, no domain; good for the prototype): a dedicated Gmail account with 2-Step
+  Verification and an *app password* (https://myaccount.google.com/apppasswords). Gmail
+  allows a few hundred messages a day and sends from that Gmail address.
+- **Resend** (free tier: 3,000 emails a month): needs a verified sending domain (DNS records).
+
+1. GitHub → repository → *Settings → Secrets and variables → Actions*:
+   - **Secrets** → `EMAIL_API_KEY` = the Gmail app password (or the Resend API key)
+   - **Variables** → `EMAIL_PROVIDER` = `gmail` (or `resend`), `EMAIL_FROM` = e.g.
+     `MyBiz <mybiz.studio@gmail.com>` (or `MyBiz <updates@your-domain>`)
+2. Run the workflow once by hand (*Actions → Send notification emails on staging → Run
+   workflow*) and check its log.
+
+Emails use the business's language and are sent once, within a day of the event; clients
+without an email address are skipped. For local testing: `API_EMAIL_PROVIDER=log uv run
+python -m app.jobs send-emails` prints instead of sending.

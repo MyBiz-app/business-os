@@ -1,13 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+import { safeNext } from "@/lib/navigation";
+
 import { supabaseConfig } from "./env";
 
 const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/check-email", "/forgot-password"]);
 const AUTH_PAGES = new Set(["/", "/login", "/signup"]);
 
 function isPublic(pathname: string) {
-  return PUBLIC_PAGES.has(pathname) || pathname.startsWith("/auth/");
+  return PUBLIC_PAGES.has(pathname) || pathname.startsWith("/auth/") || pathname.startsWith("/invite/") ||
+    pathname.startsWith("/join/");
 }
 
 /** Refreshes the session cookie and redirects based on whether the user is signed in. */
@@ -34,16 +37,16 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const redirectTo = (path: string) => {
-    const target = request.nextUrl.clone();
-    target.pathname = path;
-    target.search = "";
+    const target = new URL(path, request.url);
     const redirect = NextResponse.redirect(target);
     for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
     return redirect;
   };
 
   if (!signedIn && !isPublic(pathname)) return redirectTo("/login");
-  if (signedIn && AUTH_PAGES.has(pathname)) return redirectTo("/dashboard");
+  if (signedIn && AUTH_PAGES.has(pathname)) {
+    return redirectTo(safeNext(request.nextUrl.searchParams.get("next")) ?? "/dashboard");
+  }
 
   return response;
 }

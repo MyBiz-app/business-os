@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 const CONTROL =
-  "rounded-lg border border-border bg-background px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary";
+  "control w-full min-w-0 px-3 py-2";
 
 type FieldProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label: string;
@@ -59,6 +59,20 @@ export function SelectField({ label, options, ...selectProps }: SelectFieldProps
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+type CheckboxFieldProps = React.InputHTMLAttributes<HTMLInputElement> & { label: string };
+
+export function CheckboxField({ label, ...inputProps }: CheckboxFieldProps) {
+  const id = useId();
+  return (
+    <div className="flex items-center gap-2">
+      <input id={id} type="checkbox" className="size-4 accent-primary" {...inputProps} />
+      <label htmlFor={id} className="text-sm font-medium">
+        {label}
+      </label>
     </div>
   );
 }

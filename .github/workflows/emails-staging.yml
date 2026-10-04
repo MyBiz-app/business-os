@@ -1,0 +1,39 @@
+name: Send notification emails on staging
+
+# Emails pending client notifications (apps/api/app/email.py). Does nothing until the
+# repository variable EMAIL_PROVIDER is set (Settings → Secrets and variables → Actions →
+# Variables): `gmail` (free, no domain: EMAIL_FROM is the Gmail address, the secret
+# EMAIL_API_KEY its app password) or `resend` (EMAIL_API_KEY is the Resend key).
+on:
+  schedule:
+    - cron: "7 * * * *"  # hourly; free minutes allow this, a worker comes with production
+  workflow_dispatch:
+
+concurrency:
+  group: emails-staging
+  cancel-in-progress: false
+
+jobs:
+  send:
+    name: Send pending emails
+    if: ${{ vars.EMAIL_PROVIDER != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Run
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+          API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+        run: uv run python -m app.jobs send-emails

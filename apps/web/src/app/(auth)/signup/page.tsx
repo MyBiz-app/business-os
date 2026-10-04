@@ -1,10 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { safeNext } from "@/lib/navigation";
+
 import { SignupForm } from "./signup-form";
 
-export default async function SignupPage() {
+export default async function SignupPage({ searchParams }: PageProps<"/signup">) {
   const t = await getTranslations("auth");
+  const nextPath = safeNext((await searchParams).next) ?? undefined;
 
   return (
     <>
@@ -12,10 +15,10 @@ export default async function SignupPage() {
         <h1 className="text-2xl font-bold">{t("signup.title")}</h1>
         <p className="text-sm text-muted">{t("signup.subtitle")}</p>
       </div>
-      <SignupForm />
+      <SignupForm next={nextPath} />
       <p className="text-sm text-muted">
         {t("signup.haveAccount")}{" "}
-        <Link href="/login" className="text-primary underline-offset-4 hover:underline">
+        <Link href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"} className="text-primary underline-offset-4 hover:underline">
           {t("signup.loginLink")}
         </Link>
       </p>

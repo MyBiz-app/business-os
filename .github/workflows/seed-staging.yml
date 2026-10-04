@@ -1,0 +1,44 @@
+name: Create demo studio on staging
+
+# Creates a demo fitness studio with months of history on staging, owned by the given user
+# (who must have signed in to the staging site once). Started by hand from the Actions tab.
+on:
+  workflow_dispatch:
+    inputs:
+      owner_email:
+        description: Email of the staging user who will own the demo studio
+        required: true
+        type: string
+      months:
+        description: Months of history
+        required: false
+        default: "3"
+        type: choice
+        options: ["1", "2", "3", "6"]
+
+concurrency:
+  group: migrate-staging
+  cancel-in-progress: false
+
+jobs:
+  seed:
+    name: app.seed
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Create the demo studio
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          OWNER_EMAIL: ${{ inputs.owner_email }}
+          MONTHS: ${{ inputs.months }}
+        run: uv run python -m app.seed --owner-email "$OWNER_EMAIL" --months "$MONTHS" --seed "$GITHUB_RUN_NUMBER"

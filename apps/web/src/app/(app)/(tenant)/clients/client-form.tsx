@@ -13,6 +13,8 @@ import type { ClientFormState } from "./actions";
 
 type Client = components["schemas"]["Client"];
 
+const SOURCES = ["walk_in", "referral", "instagram", "facebook", "google", "website", "app", "other"] as const;
+
 type Props = {
   action: (state: ClientFormState, formData: FormData) => Promise<ClientFormState>;
   client?: Client;
@@ -65,6 +67,15 @@ function ClientFields({ client, readOnly }: { client?: Client; readOnly: boolean
           name="status"
           defaultValue={client?.status ?? "active"}
           options={STATUSES.map((value) => ({ value, label: t(`statuses.${value}`) }))}
+        />
+        <SelectField
+          label={t("source")}
+          name="source"
+          defaultValue={client?.source ?? ""}
+          options={[
+            { value: "", label: t("sourceUnknown") },
+            ...SOURCES.map((value) => ({ value, label: t(`sources.${value}`) })),
+          ]}
         />
         <div className="sm:col-span-2">
           <TextAreaField label={t("notes")} name="notes" maxLength={5000} defaultValue={client?.notes ?? ""} />

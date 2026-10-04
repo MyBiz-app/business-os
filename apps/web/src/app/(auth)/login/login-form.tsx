@@ -10,12 +10,13 @@ import { SubmitButton } from "@/components/form/submit-button";
 
 import { type FormState, login } from "../actions";
 
-export function LoginForm({ initialError }: { initialError?: string }) {
+export function LoginForm({ initialError, next }: { initialError?: string; next?: string }) {
   const t = useTranslations("auth");
   const [state, action] = useActionState<FormState, FormData>(login, { error: initialError });
 
   return (
     <form action={action} className="flex flex-col gap-4">
+      {next && <input type="hidden" name="next" value={next} />}
       <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
       <Field label={t("email")} name="email" type="email" autoComplete="email" required defaultValue={state.email} />
       <Field label={t("password")} name="password" type="password" autoComplete="current-password" required />

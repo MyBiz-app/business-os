@@ -1,7 +1,9 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
+import { BusinessProvider } from "@/providers/business-provider";
 import { I18nProvider } from "@/providers/i18n-provider";
+import { SessionProvider } from "@/providers/session-provider";
 import { ThemeProvider, useTheme } from "@/providers/theme-provider";
 
 function ThemedStack() {
@@ -20,7 +22,11 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <I18nProvider>
-        <ThemedStack />
+        <SessionProvider>
+          <BusinessProvider>
+            <ThemedStack />
+          </BusinessProvider>
+        </SessionProvider>
       </I18nProvider>
     </ThemeProvider>
   );

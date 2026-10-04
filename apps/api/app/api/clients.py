@@ -7,26 +7,24 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
+from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
 ClientStatus = Literal["active", "inactive", "lead"]
+ClientSource = Literal[
+    "walk_in", "referral", "instagram", "facebook", "google", "website", "app", "other"
+]
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
-    "id, first_name, last_name, email, phone, date_of_birth, notes, status, created_at, updated_at"
+    "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, created_at, "
+    "updated_at, erased_at"
 )
-
-
-def _blank_to_none(value: object) -> object:
-    if isinstance(value, str):
-        value = value.strip()
-        return value or None
-    return value
 
 
 class ClientFields(BaseModel):
@@ -35,11 +33,14 @@ class ClientFields(BaseModel):
     phone: str | None = Field(default=None, max_length=30)
     date_of_birth: date | None = None
     notes: str | None = Field(default=None, max_length=5000)
+    source: ClientSource | None = None
 
-    @field_validator("last_name", "email", "phone", "notes", "date_of_birth", mode="before")
+    @field_validator(
+        "last_name", "email", "phone", "notes", "date_of_birth", "source", mode="before"
+    )
     @classmethod
     def blank_is_missing(cls, value: object) -> object:
-        return _blank_to_none(value)
+        return blank_to_none(value)
 
 
 class ClientCreate(ClientFields):
@@ -69,8 +70,10 @@ class Client(BaseModel):
     date_of_birth: date | None
     notes: str | None
     status: ClientStatus
+    source: ClientSource | None
     created_at: datetime
     updated_at: datetime
+    erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
 
 
 class ClientPage(BaseModel):
@@ -94,6 +97,13 @@ def list_clients(
     context: ReadDep,
     search: Annotated[str | None, Query(max_length=100)] = None,
     client_status: Annotated[ClientStatus | None, Query(alias="status")] = None,
+    plan: Annotated[
+        Literal["valid", "none"] | None,
+        Query(description="valid: holds a plan valid today; none: doesn't"),
+    ] = None,
+    absent_days: Annotated[
+        int | None, Query(ge=1, le=365, description="No check-in in this many days")
+    ] = None,
     limit: Annotated[int, Query(ge=1, le=100)] = 25,
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> ClientPage:
@@ -106,6 +116,21 @@ def list_clients(
     if client_status:
         where += " AND status = :status"
         params["status"] = client_status
+    if plan:
+        # "Today" in the business's time zone, like everywhere plans are checked.
+        valid = """EXISTS (
+            SELECT 1 FROM app.entitlements e JOIN app.tenants t ON t.id = e.tenant_id
+            WHERE e.client_id = app.clients.id AND e.status = 'active'
+              AND (now() AT TIME ZONE t.time_zone)::date BETWEEN e.starts_on AND e.ends_on
+        )"""
+        where += f" AND {'' if plan == 'valid' else 'NOT '}{valid}"
+    if absent_days:
+        where += """ AND NOT EXISTS (
+            SELECT 1 FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+            WHERE b.client_id = app.clients.id AND b.status = 'checked_in'
+              AND s.starts_at > now() - make_interval(days => :absent_days)
+        )"""
+        params["absent_days"] = absent_days
 
     session = context.session
     total = session.execute(text(f"SELECT count(*) FROM app.clients {where}"), params).scalar_one()
@@ -128,10 +153,10 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
                 text(f"""
                     INSERT INTO app.clients
                         (tenant_id, first_name, last_name, email, phone, date_of_birth, notes,
-                         status)
+                         status, source)
                     VALUES
                         (:tenant_id, :first_name, :last_name, :email, :phone, :date_of_birth,
-                         :notes, :status)
+                         :notes, :status, :source)
                     RETURNING {COLUMNS}
                 """),
                 {**body.model_dump(), "tenant_id": context.tenant_id},
@@ -154,24 +179,23 @@ def get_client(client_id: UUID, context: ReadDep) -> Client:
         .first()
     )
     if row is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+        raise not_found()
     return Client.model_validate(dict(row))
 
 
 @router.patch("/{client_id}")
 def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Client:
+    ensure_not_erased(context.session, client_id)
     changes = body.model_dump(exclude_unset=True)
     if "first_name" in changes and not changes["first_name"]:
         raise HTTPException(status_code=422, detail="first_name must not be blank")
     if "status" in changes and changes["status"] is None:
         del changes["status"]
-    # Column names come from the model's fields, never from user input.
-    assignments = ", ".join(f"{column} = :{column}" for column in changes)
-    set_clause = f"{assignments}, updated_at = now()" if assignments else "updated_at = now()"
+    sql = f"UPDATE app.clients SET {set_clause(changes)} WHERE id = :id RETURNING {COLUMNS}"
     try:
         row = (
             context.session.execute(
-                text(f"UPDATE app.clients SET {set_clause} WHERE id = :id RETURNING {COLUMNS}"),
+                text(sql),
                 {**changes, "id": client_id},
             )
             .mappings()
@@ -180,5 +204,5 @@ def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Cli
     except IntegrityError as error:
         raise _email_taken(error) or error from error
     if row is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+        raise not_found()
     return Client.model_validate(dict(row))

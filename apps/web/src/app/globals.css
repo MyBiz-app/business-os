@@ -3,27 +3,55 @@
 /* Dark mode follows the `dark` class set by next-themes. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Design tokens. Use logical utilities (ms-*, ps-*, start-*, text-start) — never left/right. */
+/* Design tokens. Use logical utilities (ms-*, ps-*, start-*, text-start) — never left/right.
+ * Surfaces: `background` is the page canvas, `surface` the raised cards on it. Accents are
+ * mixed from `primary`, so a business's brand color carries through the whole UI. */
 :root {
-  --background: #ffffff;
+  --background: #f6f6f9;
   --foreground: #18181b;
-  --surface: #f4f4f5;
-  --border: #e4e4e7;
+  --surface: #ffffff;
+  --border: #e4e4ea;
   --muted: #52525b;
   --primary: #4f46e5;
-  --success: #16a34a;
-  --danger: #dc2626;
+  --on-primary: #ffffff;
+  --success: #15803d;
+  --danger: #b91c1c;
+  --warning: #b45309;
+  --shadow-color: 240 10% 20%;
+  --elevation:
+    0 1px 2px hsl(var(--shadow-color) / 0.06),
+    0 2px 6px hsl(var(--shadow-color) / 0.04);
+  --elevation-hover:
+    0 2px 4px hsl(var(--shadow-color) / 0.06),
+    0 10px 24px -6px hsl(var(--shadow-color) / 0.14);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
-  --background: #09090b;
+  --background: #0a0a0f;
   --foreground: #fafafa;
-  --surface: #18181b;
-  --border: #27272a;
+  --surface: #15151c;
+  --border: #2a2a33;
   --muted: #a1a1aa;
   --primary: #818cf8;
+  --on-primary: #09090b;
   --success: #22c55e;
   --danger: #f87171;
+  --warning: #fbbf24;
+  --shadow-color: 240 30% 2%;
+  --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
+  --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);
+}
+
+/* A business's brand color (lib/brand.ts brandStyle), in its light or dark variant. */
+.brand {
+  --primary: var(--brand, #4f46e5);
+  --on-primary: var(--on-brand, #ffffff);
+}
+
+.dark .brand {
+  --primary: var(--brand-dark, #818cf8);
+  --on-primary: var(--on-brand-dark, #09090b);
 }
 
 @theme inline {
@@ -33,13 +61,228 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
   --color-success: var(--success);
   --color-danger: var(--danger);
+  --color-warning: var(--warning);
   --font-sans: var(--font-heebo), system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1200px 500px at 85% -10%, color-mix(in oklab, var(--primary) 9%, transparent), transparent 70%),
+    radial-gradient(900px 400px at 0% 0%, color-mix(in oklab, var(--primary) 5%, transparent), transparent 70%),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ---- Surfaces ---------------------------------------------------------------------------- */
+
+/* A raised card. */
+@utility card {
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--elevation);
+}
+
+/* A card that reacts to the pointer (links, clickable rows). */
+@utility card-hover {
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    border-color 200ms var(--ease-out);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--elevation-hover);
+    border-color: color-mix(in oklab, var(--primary) 35%, var(--border));
+  }
+}
+
+/* An accent surface tinted with the brand color. */
+@utility card-accent {
+  border-radius: 1.25rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 35%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in oklab, var(--primary) 10%, transparent), transparent 60%),
+    var(--surface);
+  box-shadow: var(--elevation);
+}
+
+/* An icon in a soft brand-tinted tile. */
+@utility icon-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+/* ---- Controls ---------------------------------------------------------------------------- */
+
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  color: var(--on-primary);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, white 14%, transparent), transparent),
+    var(--primary);
+  box-shadow:
+    0 1px 2px hsl(var(--shadow-color) / 0.2),
+    0 4px 12px -2px color-mix(in oklab, var(--primary) 45%, transparent);
+  transition:
+    transform 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out),
+    filter 150ms var(--ease-out);
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    box-shadow:
+      0 2px 4px hsl(var(--shadow-color) / 0.2),
+      0 8px 20px -4px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+  &:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+}
+
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-weight: 600;
+  transition:
+    transform 150ms var(--ease-out),
+    border-color 150ms var(--ease-out),
+    background-color 150ms var(--ease-out);
+  &:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+    background: color-mix(in oklab, var(--primary) 5%, var(--surface));
+  }
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
+/* Text inputs, selects and text areas. */
+@utility control {
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition:
+    border-color 150ms var(--ease-out),
+    box-shadow 150ms var(--ease-out);
+  &:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--foreground) 25%, var(--border));
+  }
+  &:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
+  }
+}
+
+/* ---- Motion ------------------------------------------------------------------------------ */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Page content enters in a short cascade: each direct child a little after the previous. */
+@utility enter {
+  & > * {
+    animation: rise 480ms var(--ease-out) both;
+  }
+  & > *:nth-child(2) { animation-delay: 50ms; }
+  & > *:nth-child(3) { animation-delay: 100ms; }
+  & > *:nth-child(4) { animation-delay: 150ms; }
+  & > *:nth-child(5) { animation-delay: 200ms; }
+  & > *:nth-child(n + 6) { animation-delay: 250ms; }
+}
+
+/* The same cascade for items of a grid or list. */
+@utility enter-items {
+  & > * {
+    animation: pop 420ms var(--ease-out) both;
+  }
+  & > *:nth-child(2) { animation-delay: 40ms; }
+  & > *:nth-child(3) { animation-delay: 80ms; }
+  & > *:nth-child(4) { animation-delay: 120ms; }
+  & > *:nth-child(5) { animation-delay: 160ms; }
+  & > *:nth-child(6) { animation-delay: 200ms; }
+  & > *:nth-child(n + 7) { animation-delay: 240ms; }
+}
+
+/* A loading placeholder. */
+@utility skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--foreground) 6%, transparent) 25%,
+    color-mix(in oklab, var(--foreground) 11%, transparent) 50%,
+    color-mix(in oklab, var(--foreground) 6%, transparent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
 }

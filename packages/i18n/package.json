@@ -5,11 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./messages/*.json": "./messages/*.json"
+    "./messages/*.json": "./messages/*.json",
+    "./dates": "./src/dates.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/messages.test.mjs"
+    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts"
   },
   "devDependencies": {
     "typescript": "^5"

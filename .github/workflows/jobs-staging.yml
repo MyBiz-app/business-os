@@ -1,0 +1,44 @@
+name: Background jobs on staging
+
+# Daily system jobs (see apps/api/app/jobs.py). Scheduled runs use the default branch.
+on:
+  schedule:
+    - cron: "17 2 * * *"  # 02:17 UTC, early morning in Israel
+  workflow_dispatch:
+
+concurrency:
+  group: migrate-staging
+  cancel-in-progress: false
+
+jobs:
+  extend-series:
+    name: Extend weekly series, remind today's classes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Run
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs extend-series
+
+      - name: Remind today's booked clients
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs remind-sessions
+
+      - name: Remind clients whose plan ends soon
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs remind-plans

@@ -8,7 +8,7 @@
 param(
     [string]$DevRoot = "C:\dev",
     [string]$RepoUrl = "https://github.com/adiredri/business-os.git",
-    [string]$Branch = "claude/kind-maxwell-e86wk9",
+    [string]$Branch = "main",
     [string]$PythonVersion = "3.13"
 )
 
