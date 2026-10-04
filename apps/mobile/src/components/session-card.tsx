@@ -5,7 +5,8 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Button } from "@/components/ui";
+import { Button, elevation } from "@/components/ui";
+import { tint } from "@/lib/brand";
 import { ApiError } from "@/lib/api";
 import { confirm } from "@/lib/confirm";
 import { useBusiness } from "@/providers/business-provider";
@@ -82,23 +83,33 @@ export function SessionCard({ session, onChange }: Props) {
   else status = t("spotsLeft", { count: session.spots_left });
 
   const place = [session.location_name, session.room_name].filter(Boolean).join(" · ");
+  const color = session.service.color ?? palette.primary;
+  const fill = session.capacity ? Math.min((session.capacity - session.spots_left) / session.capacity, 1) : 0;
   const label = `${session.service.name}, ${time}`;
 
   return (
     <View
       style={[
         styles.card,
-        { backgroundColor: palette.surface, borderColor: palette.border },
-        { borderStartColor: session.service.color ?? palette.primary },
+        elevation.card,
+        { backgroundColor: palette.surface, borderColor: mine && !cancelled ? palette.primary : palette.border },
       ]}
     >
       <View style={styles.row}>
+        <View aria-hidden style={[styles.accent, { backgroundColor: color }]} />
         <View style={styles.info}>
-          <Text style={[styles.time, { color: palette.foreground }]}>{time}</Text>
+          <View style={[styles.timeChip, { backgroundColor: tint(color, 0.14) }]}>
+            <Text style={[styles.time, { color: palette.foreground }]}>{time}</Text>
+          </View>
           <Text style={[styles.name, { color: palette.foreground }, cancelled && styles.strike]}>
             {session.service.name}
           </Text>
           {place ? <Text style={[styles.meta, { color: palette.muted }]}>{place}</Text> : null}
+          {!cancelled && (
+            <View aria-hidden style={[styles.bar, { backgroundColor: tint(palette.muted, 0.18) }]}>
+              <View style={[styles.barFill, { width: `${fill * 100}%`, backgroundColor: color }]} />
+            </View>
+          )}
           <Text
             accessibilityLiveRegion="polite"
             style={[styles.meta, { color: mine ? palette.primary : palette.muted }, mine && styles.bold]}
@@ -143,9 +154,13 @@ export function SessionCard({ session, onChange }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderStartWidth: 5, borderRadius: 14, padding: 14, gap: 8 },
+  card: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 8 },
+  accent: { alignSelf: "stretch", width: 4, borderRadius: 2 },
+  timeChip: { alignSelf: "flex-start", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2, marginBottom: 4 },
+  bar: { height: 4, borderRadius: 2, overflow: "hidden", marginTop: 6, marginBottom: 2, maxWidth: 180 },
+  barFill: { height: "100%", borderRadius: 2 },
   row: { flexDirection: "row", alignItems: "center", gap: 12 },
-  info: { flex: 1, gap: 2 },
+  info: { flex: 1, gap: 2, alignItems: "stretch" },
   action: { minWidth: 110 },
   time: { fontSize: 15, fontWeight: "600", fontVariant: ["tabular-nums"], textAlign: "left", writingDirection: "ltr" },
   name: { fontSize: 17, fontWeight: "700", textAlign: "left" },

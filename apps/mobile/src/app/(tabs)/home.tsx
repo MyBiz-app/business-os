@@ -5,8 +5,9 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
-import { Button, Card, Heading, Screen, styles } from "@/components/ui";
+import { Button, Card, elevation, Heading, Screen, styles } from "@/components/ui";
 import { assetUrl, unwrap } from "@/lib/api";
+import { tint } from "@/lib/brand";
 import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -39,7 +40,10 @@ export default function Home() {
 
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
-      <View style={[local.hero, { backgroundColor: palette.primary }]}>
+      <View style={[local.hero, elevation.raised, { backgroundColor: palette.primary }]}>
+        {/* Soft light circles give the brand color depth. */}
+        <View aria-hidden style={[local.orb, local.orbLarge, { backgroundColor: tint(palette.onPrimary === "#ffffff" ? "#ffffff" : "#000000", 0.12) }]} />
+        <View aria-hidden style={[local.orb, local.orbSmall, { backgroundColor: tint(palette.onPrimary === "#ffffff" ? "#ffffff" : "#000000", 0.08) }]} />
         {logo && <Image source={{ uri: logo }} style={local.logo} accessibilityIgnoresInvertColors />}
         <Text accessibilityRole="header" style={[local.business, { color: palette.onPrimary }]}>
           {business.name}
@@ -94,7 +98,10 @@ export default function Home() {
 }
 
 const local = StyleSheet.create({
-  hero: { borderRadius: 20, padding: 20, gap: 6 },
+  hero: { borderRadius: 24, padding: 22, paddingVertical: 28, gap: 6, overflow: "hidden" },
+  orb: { position: "absolute", borderRadius: 999 },
+  orbLarge: { width: 220, height: 220, top: -90, end: -60 },
+  orbSmall: { width: 120, height: 120, bottom: -50, end: 70 },
   logo: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#ffffff" },
   business: { fontSize: 26, fontWeight: "700", textAlign: "left" },
   greeting: { fontSize: 16, textAlign: "left" },

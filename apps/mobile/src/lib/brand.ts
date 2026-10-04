@@ -42,3 +42,10 @@ export function brandPalette(palette: Palette, color: string | null | undefined)
   const primary = readableOn(color, palette.surface);
   return { ...palette, primary, onPrimary: textOn(primary) };
 }
+
+/** The color at the given opacity, for soft tints (`#rrggbb` only; anything else is returned as is). */
+export function tint(hex: string, alpha: number): string {
+  if (!/^#[0-9a-f]{6}$/i.test(hex)) return hex;
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
