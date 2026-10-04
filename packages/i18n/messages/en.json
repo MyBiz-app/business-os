@@ -499,7 +499,15 @@
       "signedInAs": "Signed in as {email}",
       "business": "Business",
       "joinAnother": "Join another business",
-      "signOut": "Sign out"
+      "signOut": "Sign out",
+      "details": "My details",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone",
+      "save": "Save details",
+      "saved": "Saved.",
+      "saveFailed": "Couldn't save. Try again.",
+      "firstNameRequired": "Please enter your first name."
     },
     "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
     "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",

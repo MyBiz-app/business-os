@@ -1021,6 +1021,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Profile
+         * @description The client's own name and phone in this business (nothing else).
+         */
+        patch: operations["update_profile"];
+        trace?: never;
+    };
     "/client/sessions": {
         parameters: {
             query?: never;
@@ -1696,6 +1716,8 @@ export interface components {
             first_name: string;
             /** Last Name */
             last_name: string | null;
+            /** Phone */
+            phone: string | null;
         };
         /** ClientCreate */
         ClientCreate: {
@@ -2625,6 +2647,15 @@ export interface components {
             bucket: string;
             /** Value */
             value: number;
+        };
+        /** ProfileUpdate */
+        ProfileUpdate: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name?: string | null;
+            /** Phone */
+            phone?: string | null;
         };
         /** Question */
         Question: {
@@ -5734,6 +5765,41 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_profile: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
+import { ProfileForm } from "@/components/profile-form";
 import { SegmentedControl } from "@/components/segmented-control";
 import { Button, Card, Heading, Screen, styles } from "@/components/ui";
 import type { ThemePreference } from "@/lib/preferences";
@@ -38,6 +39,8 @@ export default function Profile() {
           {t("client.profile.signedInAs", { email: session?.user.email ?? "" })}
         </Text>
       </Card>
+
+      <ProfileForm key={business?.client_id} />
 
       {health?.form && (
         <Card palette={palette}>

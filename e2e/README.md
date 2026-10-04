@@ -35,4 +35,4 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `reports.py` seeds a demo studio for a new owner and checks the reports page (breakdowns, members to reach out to, period switch).
 
-`purchase.py`: the owner turns on online sales, a member buys a plan in the app with a test payment, and the owner sees it on the member's profile.
+`purchase.py`: the owner turns on online sales, a member buys a plan in the app with a test payment and edits their details, and the owner sees both on the member's profile.

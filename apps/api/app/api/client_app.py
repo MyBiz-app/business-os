@@ -10,7 +10,7 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,7 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
-from app.api.common import not_found
+from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
 from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
@@ -63,6 +63,18 @@ class ClientBusiness(BaseModel):
     client_id: UUID
     first_name: str
     last_name: str | None
+    phone: str | None
+
+
+class ProfileUpdate(BaseModel):
+    first_name: str = Field(min_length=1, max_length=100)
+    last_name: str | None = Field(default=None, max_length=100)
+    phone: str | None = Field(default=None, max_length=30)
+
+    @field_validator("first_name", "last_name", "phone", mode="before")
+    @classmethod
+    def trim(cls, value: object) -> object:
+        return blank_to_none(value)
 
 
 class JoinRequest(BaseModel):
@@ -111,7 +123,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.online_sales, {LOGO_URL.format(t="t")} AS logo_url,
-           c.id AS client_id, c.first_name, c.last_name
+           c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
     WHERE c.user_id = app.current_user_id()
 """
@@ -196,6 +208,22 @@ def _time_zone(db: Session) -> str:
     return db.execute(
         text("SELECT time_zone FROM app.tenants WHERE id = app.client_tenant_id()")
     ).scalar_one()
+
+
+@router.patch("/profile")
+def update_profile(body: ProfileUpdate, context: ClientDep) -> ClientBusiness:
+    """The client's own name and phone in this business (nothing else)."""
+    db = context.session
+    db.execute(
+        text("SELECT app.update_my_profile(:first_name, :last_name, :phone)"),
+        body.model_dump(),
+    )
+    row = (
+        db.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": context.client_id})
+        .mappings()
+        .one()
+    )
+    return ClientBusiness.model_validate(dict(row))
 
 
 @router.get("/sessions")

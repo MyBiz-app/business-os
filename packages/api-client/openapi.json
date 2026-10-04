@@ -4396,6 +4396,65 @@
         ]
       }
     },
+    "/client/profile": {
+      "patch": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Update Profile",
+        "description": "The client's own name and phone in this business (nothing else).",
+        "operationId": "update_profile",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/sessions": {
       "get": {
         "tags": [
@@ -6344,6 +6403,17 @@
               }
             ],
             "title": "Last Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
           }
         },
         "type": "object",
@@ -6359,7 +6429,8 @@
           "online_sales",
           "client_id",
           "first_name",
-          "last_name"
+          "last_name",
+          "phone"
         ],
         "title": "ClientBusiness"
       },
@@ -8748,6 +8819,45 @@
           "value"
         ],
         "title": "Point"
+      },
+      "ProfileUpdate": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name"
+        ],
+        "title": "ProfileUpdate"
       },
       "Question": {
         "properties": {
