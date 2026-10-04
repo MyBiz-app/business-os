@@ -58,3 +58,21 @@ only) and not the transaction pooler (port 6543).
   Email Templates to allow confirming from any device.
 - On a push to `main` the migration workflow and the Render deploy run in parallel. Keep
   migrations backward compatible (add first, remove later) so either order works.
+
+## Notification emails (optional)
+
+Client notifications (the app's Updates tab) can also go out by email. The hourly workflow
+**Send notification emails on staging** does nothing until a provider is set.
+**Resend** is used here (free tier: 3,000 emails a month).
+
+1. Create a Resend account, add and verify your sending domain (DNS records), and create an
+   API key.
+2. GitHub → repository → *Settings → Secrets and variables → Actions*:
+   - **Secrets** → `EMAIL_API_KEY` = the Resend API key
+   - **Variables** → `EMAIL_PROVIDER` = `resend`, `EMAIL_FROM` = e.g. `MyBiz <updates@your-domain>`
+3. Run the workflow once by hand (*Actions → Send notification emails on staging → Run
+   workflow*) and check its log.
+
+Emails use the business's language and are sent once, within a day of the event; clients
+without an email address are skipped. For local testing: `API_EMAIL_PROVIDER=log uv run
+python -m app.jobs send-emails` prints instead of sending.

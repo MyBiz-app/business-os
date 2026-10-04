@@ -880,5 +880,30 @@
     "neverVisited": "עוד לא הגיע/ה",
     "planEnds": "המנוי מסתיים {date}",
     "showAll": "הצגת כל ה-{count}"
+  },
+  "email": {
+    "greeting": "שלום {name},",
+    "note": "הערת הסטודיו: {note}",
+    "footer": "ההודעה נשלחה מ{business}. את כל העדכונים אפשר לראות באפליקציה.",
+    "subject": {
+      "waitlist_promoted": "נכנסת! {service} ב-{when}",
+      "booked_by_studio": "נרשמת ל{service} ב-{when}",
+      "waitlisted_by_studio": "ברשימת ההמתנה: {service} ב-{when}",
+      "booking_cancelled_by_studio": "ההרשמה בוטלה: {service} ב-{when}",
+      "session_cancelled": "השיעור בוטל: {service} ב-{when}",
+      "session_moved": "שעה חדשה: {service} ב-{when}",
+      "health_approved": "הצהרת הבריאות שלך אושרה",
+      "health_rejected": "לגבי הצהרת הבריאות שלך"
+    },
+    "body": {
+      "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
+      "booked_by_studio": "{business} רשם אותך ל{service} ב-{when}.",
+      "waitlisted_by_studio": "{business} הוסיף אותך לרשימת ההמתנה ל{service} ב-{when}. נעדכן אם יתפנה מקום.",
+      "booking_cancelled_by_studio": "{business} ביטל את ההרשמה שלך ל{service} ב-{when}.",
+      "session_cancelled": "השיעור {service} ב-{when} בוטל. מצטערים על השינוי.",
+      "session_moved": "השיעור {service} הועבר מ-{previous} ל-{when}. ההרשמה שלך עברה איתו.",
+      "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים באפליקציה.",
+      "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם הסטודיו."
+    }
   }
 }

@@ -880,5 +880,30 @@
     "neverVisited": "Hasn't visited yet",
     "planEnds": "plan ends {date}",
     "showAll": "Show all {count}"
+  },
+  "email": {
+    "greeting": "Hi {name},",
+    "note": "Studio note: {note}",
+    "footer": "This message was sent by {business}. You can see all updates in the app.",
+    "subject": {
+      "waitlist_promoted": "You're in: {service} on {when}",
+      "booked_by_studio": "You're booked: {service} on {when}",
+      "waitlisted_by_studio": "On the waitlist: {service} on {when}",
+      "booking_cancelled_by_studio": "Booking cancelled: {service} on {when}",
+      "session_cancelled": "Class cancelled: {service} on {when}",
+      "session_moved": "New time: {service} on {when}",
+      "health_approved": "Your health declaration was approved",
+      "health_rejected": "About your health declaration"
+    },
+    "body": {
+      "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
+      "booked_by_studio": "{business} booked you into {service} on {when}.",
+      "waitlisted_by_studio": "{business} put you on the waitlist for {service} on {when}. We'll let you know if a spot opens up.",
+      "booking_cancelled_by_studio": "{business} cancelled your booking for {service} on {when}.",
+      "session_cancelled": "{service} on {when} was cancelled. Sorry for the change.",
+      "session_moved": "{service} moved from {previous} to {when}. Your booking moved with it.",
+      "health_approved": "{business} approved your health declaration. You can book classes in the app.",
+      "health_rejected": "{business} couldn't approve your health declaration. Please contact the studio."
+    }
   }
 }
