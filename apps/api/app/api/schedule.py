@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.bookings import lock_session, promote_waitlist
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
+from app.notifications import live_clients, notify, session_snapshot
 from app.permissions import Permission
 from app.scheduling import local_to_utc, weekly_occurrences
 
@@ -376,7 +377,25 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
     except IntegrityError as error:
         raise _invalid_reference() from error
     promote_waitlist(db, session_id)  # more capacity (or a restored session) frees spots
-    return _load(db, session_id)
+    updated = _load(db, session_id)
+    if updated.starts_at > datetime.now(dt.UTC):
+        if current.status == "scheduled" and updated.status == "cancelled":
+            notify(
+                db,
+                context.tenant_id,
+                live_clients(db, session_id),
+                "session_cancelled",
+                session_snapshot(db, session_id),
+            )
+        elif updated.status == "scheduled" and updated.starts_at != current.starts_at:
+            notify(
+                db,
+                context.tenant_id,
+                live_clients(db, session_id),
+                "session_moved",
+                {**session_snapshot(db, session_id), "previous_starts_at": current.starts_at},
+            )
+    return updated
 
 
 class SeriesEnd(BaseModel):

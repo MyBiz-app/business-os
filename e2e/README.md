@@ -30,3 +30,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `client_import.py` imports a Hebrew Windows-1255 CSV: recognized columns, a column mapped by hand, preview with a duplicate and an invalid row, then the import.
 
 `privacy.py` downloads a client's data export, then erases their personal details.
+
+`notifications.py`: the studio books a member and cancels the class; the member sees both under Updates, with an unread badge that clears once read.

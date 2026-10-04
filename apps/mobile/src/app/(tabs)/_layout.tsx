@@ -4,6 +4,7 @@ import { ActivityIndicator, type ColorValue, View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { useBusiness } from "@/providers/business-provider";
+import { InboxProvider, useInbox } from "@/providers/inbox-provider";
 import { useSession } from "@/providers/session-provider";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -14,7 +15,6 @@ const icon =
 
 /** The client app's bottom tabs, in the selected business's brand color. */
 export default function TabsLayout() {
-  const t = useTranslations("client.tabs");
   const { session, loading } = useSession();
   const { businesses, business, palette } = useBusiness();
 
@@ -29,6 +29,19 @@ export default function TabsLayout() {
   }
 
   return (
+    <InboxProvider>
+      <BusinessTabs />
+    </InboxProvider>
+  );
+}
+
+function BusinessTabs() {
+  const t = useTranslations("client.tabs");
+  const { palette } = useBusiness();
+  const { inbox } = useInbox();
+  const unread = inbox?.unread ?? 0;
+
+  return (
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -41,6 +54,16 @@ export default function TabsLayout() {
       <Tabs.Screen name="home" options={{ title: t("home"), tabBarIcon: icon("home-outline") }} />
       <Tabs.Screen name="schedule" options={{ title: t("schedule"), tabBarIcon: icon("calendar-outline") }} />
       <Tabs.Screen name="bookings" options={{ title: t("bookings"), tabBarIcon: icon("checkmark-done-outline") }} />
+      <Tabs.Screen
+        name="updates"
+        options={{
+          title: t("updates"),
+          tabBarIcon: icon("notifications-outline"),
+          tabBarBadge: unread > 0 ? (unread > 9 ? "9+" : unread) : undefined,
+          tabBarAccessibilityLabel: unread > 0 ? t("updatesUnread", { count: unread }) : t("updates"),
+          tabBarBadgeStyle: { backgroundColor: palette.primary, color: palette.onPrimary },
+        }}
+      />
       <Tabs.Screen name="profile" options={{ title: t("profile"), tabBarIcon: icon("person-outline") }} />
     </Tabs>
   );

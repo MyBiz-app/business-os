@@ -1051,6 +1051,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Notifications */
+        get: operations["my_notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Read */
+        post: operations["mark_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/health-declarations": {
         parameters: {
             query?: never;
@@ -1895,6 +1929,16 @@ export interface components {
             /** Phone */
             phone: string | null;
         };
+        /** Inbox */
+        Inbox: {
+            /** Unread */
+            unread: number;
+            /**
+             * Items
+             * @description The latest 50, newest first
+             */
+            items: components["schemas"]["Notification"][];
+        };
         /** InstructorOption */
         InstructorOption: {
             /**
@@ -2014,6 +2058,14 @@ export interface components {
             /** Active */
             active?: boolean | null;
         };
+        /** MarkRead */
+        MarkRead: {
+            /**
+             * Ids
+             * @description Omit to mark all as read
+             */
+            ids?: string[] | null;
+        };
         /** Me */
         Me: {
             /**
@@ -2132,6 +2184,33 @@ export interface components {
             /** @description The form to sign; null if the business has none */
             form: components["schemas"]["Form"] | null;
             current: components["schemas"]["Declaration"] | null;
+        };
+        /** Notification */
+        Notification: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected";
+            /**
+             * Payload
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind)
+             */
+            payload: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Read At */
+            read_at: string | null;
         };
         /** OptionItem */
         OptionItem: {
@@ -5405,6 +5484,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Entitlement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_notifications: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mark_read: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkRead"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Inbox"];
                 };
             };
             /** @description Validation Error */

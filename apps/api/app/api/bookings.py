@@ -17,6 +17,7 @@ from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.plans import usable_entitlement
+from app.notifications import notify_booking
 from app.permissions import Permission
 
 router = APIRouter(tags=["bookings"])
@@ -215,6 +216,7 @@ def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) ->
     booking_id = place_booking(
         context.session, context.tenant_id, session_id, body.client_id, requires_plan=False
     )
+    notify_booking(context.session, booking_id, "booked_by_studio")
     return _load(context.session, booking_id)
 
 
@@ -231,6 +233,7 @@ def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) ->
 
     if body.status == "cancelled":
         cancel_booking(db, booking_id, current.session_id)
+        notify_booking(db, booking_id, "booking_cancelled_by_studio")
     else:
         db.execute(
             text("""

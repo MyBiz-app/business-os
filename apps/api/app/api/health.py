@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
 from app.health import FORMS, HealthForm
+from app.notifications import notify
 from app.permissions import Permission
 
 router = APIRouter(tags=["health"])
@@ -297,5 +298,16 @@ def review_health_declaration(declaration_id: UUID, body: Review, context: Write
         )
         .mappings()
         .one()
+    )
+    client_id = db.execute(
+        text("SELECT client_id FROM app.health_declarations WHERE id = :id"),
+        {"id": declaration_id},
+    ).scalar_one()
+    notify(
+        db,
+        context.tenant_id,
+        [client_id],
+        "health_approved" if body.approve else "health_rejected",
+        {"note": row["review_note"]},
     )
     return Declaration.model_validate(dict(row))

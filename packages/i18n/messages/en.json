@@ -423,7 +423,9 @@
       "home": "Home",
       "schedule": "Schedule",
       "bookings": "My bookings",
-      "profile": "Profile"
+      "profile": "Profile",
+      "updates": "Updates",
+      "updatesUnread": "{count, plural, one {Updates, # new} other {Updates, # new}}"
     },
     "signIn": {
       "title": "Sign in",
@@ -527,6 +529,22 @@
       "banner": "Before your first class, please fill in a short health declaration.",
       "expiringBanner": "Your health declaration ends on {date}. Please sign a new one so you can keep booking.",
       "expiringSoon": "Valid until {date}. It ends soon, so please sign a new one."
+    },
+    "updates": {
+      "title": "Updates",
+      "empty": "Nothing new yet. When the studio changes something about your classes, you'll see it here.",
+      "new": "New",
+      "note": "Studio note: {note}",
+      "kinds": {
+        "waitlist_promoted": "A spot opened up: you're booked into {service} on {when}.",
+        "booked_by_studio": "The studio booked you into {service} on {when}.",
+        "waitlisted_by_studio": "The studio put you on the waitlist for {service} on {when}.",
+        "booking_cancelled_by_studio": "The studio cancelled your booking for {service} on {when}.",
+        "session_cancelled": "{service} on {when} was cancelled.",
+        "session_moved": "{service} moved from {previous} to {when}.",
+        "health_approved": "The studio approved your health declaration. You can book classes.",
+        "health_rejected": "The studio couldn't approve your health declaration. Please contact them."
+      }
     }
   },
   "join": {

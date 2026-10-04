@@ -423,7 +423,9 @@
       "home": "בית",
       "schedule": "מערכת שעות",
       "bookings": "ההרשמות שלי",
-      "profile": "פרופיל"
+      "profile": "פרופיל",
+      "updates": "עדכונים",
+      "updatesUnread": "{count, plural, one {עדכונים, עדכון חדש אחד} other {עדכונים, # חדשים}}"
     },
     "signIn": {
       "title": "כניסה",
@@ -527,6 +529,22 @@
       "banner": "לפני השיעור הראשון, יש למלא הצהרת בריאות קצרה.",
       "expiringBanner": "הצהרת הבריאות שלך בתוקף עד {date}. כדאי לחתום על הצהרה חדשה כדי להמשיך להירשם.",
       "expiringSoon": "בתוקף עד {date}. התוקף מסתיים בקרוב, כדאי לחתום על הצהרה חדשה."
+    },
+    "updates": {
+      "title": "עדכונים",
+      "empty": "אין עדכונים עדיין. כשהסטודיו ישנה משהו בשיעורים שלך, זה יופיע כאן.",
+      "new": "חדש",
+      "note": "הערת הסטודיו: {note}",
+      "kinds": {
+        "waitlist_promoted": "התפנה מקום: נרשמת ל{service} ב{when}.",
+        "booked_by_studio": "הסטודיו רשם אותך ל{service} ב{when}.",
+        "waitlisted_by_studio": "הסטודיו הוסיף אותך לרשימת ההמתנה ל{service} ב{when}.",
+        "booking_cancelled_by_studio": "הסטודיו ביטל את ההרשמה שלך ל{service} ב{when}.",
+        "session_cancelled": "השיעור {service} ב{when} בוטל.",
+        "session_moved": "השיעור {service} הועבר מ{previous} ל{when}.",
+        "health_approved": "הסטודיו אישר את הצהרת הבריאות שלך. אפשר להירשם לשיעורים.",
+        "health_rejected": "הסטודיו לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור איתם קשר."
+      }
     }
   },
   "join": {

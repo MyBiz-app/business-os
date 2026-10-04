@@ -4468,6 +4468,112 @@
         }
       }
     },
+    "/client/notifications": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Notifications",
+        "operationId": "my_notifications",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inbox"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/notifications/read": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Mark Read",
+        "operationId": "mark_read",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkRead"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inbox"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/clients/{client_id}/health-declarations": {
       "get": {
         "tags": [
@@ -6809,6 +6915,28 @@
         ],
         "title": "ImportedClient"
       },
+      "Inbox": {
+        "properties": {
+          "unread": {
+            "type": "integer",
+            "title": "Unread"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            },
+            "type": "array",
+            "title": "Items",
+            "description": "The latest 50, newest first"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unread",
+          "items"
+        ],
+        "title": "Inbox"
+      },
       "InstructorOption": {
         "properties": {
           "user_id": {
@@ -7095,6 +7223,28 @@
         },
         "type": "object",
         "title": "LocationUpdate"
+      },
+      "MarkRead": {
+        "properties": {
+          "ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ids",
+            "description": "Omit to mark all as read"
+          }
+        },
+        "type": "object",
+        "title": "MarkRead"
       },
       "Me": {
         "properties": {
@@ -7445,6 +7595,60 @@
           "current"
         ],
         "title": "MyHealth"
+      },
+      "Notification": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "waitlist_promoted",
+              "booked_by_studio",
+              "booking_cancelled_by_studio",
+              "session_cancelled",
+              "session_moved",
+              "health_approved",
+              "health_rejected"
+            ],
+            "title": "Kind"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Payload",
+            "description": "session_id, service_name, starts_at (and previous_starts_at, status or note, by kind)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "payload",
+          "created_at",
+          "read_at"
+        ],
+        "title": "Notification"
       },
       "OptionItem": {
         "properties": {
