@@ -365,3 +365,42 @@ def test_closing_days_needs_schedule_write(client: TestClient, studio: dict, aut
     coach = auth(studio["coach"], studio["tenant_id"])
     response = client.post("/closed-days", json={"day": local_today().isoformat()}, headers=coach)
     assert response.status_code == 403
+
+
+def test_reminders_also_go_out_on_whatsapp_with_the_module(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import message_reminders, remind_sessions
+    from app.scheduling import local_to_utc
+
+    headers = studio["headers"]
+    today = local_today()
+    session = client.post(
+        "/sessions",
+        json={
+            "service_id": studio["service"]["id"],
+            "date": today.isoformat(),
+            "start_time": "23:30",
+        },
+        headers=headers,
+    ).json()["session_ids"][0]
+    dana = client.post(
+        "/clients", json={"first_name": "Dana", "phone": "050-1111111"}, headers=headers
+    ).json()["id"]
+    silent = new_client(client, headers, "NoPhone")
+    book(client, headers, session, dana)
+    book(client, headers, session, silent)
+    morning = local_to_utc(today, datetime.min.time().replace(hour=5), "Asia/Jerusalem")
+
+    with engine.begin() as connection:
+        remind_sessions(connection, morning)
+        assert message_reminders(connection) == 0  # no messaging module yet
+    client.put("/tenants/current/modules", json={"modules": {"whatsapp": 1}}, headers=headers)
+    with engine.begin() as connection:
+        sent = message_reminders(connection)
+        again = message_reminders(connection)
+
+    assert sent == 1 and again == 0
+    [message] = client.get("/messages", params={"client_id": dana}, headers=headers).json()
+    assert message["channel"] == "whatsapp" and "Pilates" in message["body"]
+    assert "Dana" in message["body"]

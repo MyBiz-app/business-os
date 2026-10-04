@@ -113,7 +113,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Industry client details (e.g. the car at a garage) and visit notes (T58)
 - [x] Messaging, simulated: broadcasts to segments, templates, direct messages, free wa.me links (T59)
 - [ ] Real providers: payments (O1), invoicing (O2), email, WhatsApp / SMS, AI key
-- [ ] Automated messages (reminders and follow-ups over WhatsApp / SMS)
+- [x] Reminders also over WhatsApp, simulated (T60)
+- [ ] Lead follow-ups and custom automations over WhatsApp / SMS
 
 ## Owner setup checklist (Windows + iPhone)
 

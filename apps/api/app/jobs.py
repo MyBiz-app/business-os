@@ -4,20 +4,23 @@
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
+    uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; see app/billing.py)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
 
 import argparse
+import json
 from datetime import UTC, date, datetime, timedelta
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, create_engine, text
 
 from app.billing import bill_businesses
 from app.core.config import get_settings
-from app.email import send_emails, sender_from_settings
+from app.email import MESSAGES_DIR, load_messages, render, send_emails, sender_from_settings
 from app.scheduling import weekly_occurrences
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
@@ -160,6 +163,68 @@ def remind_plans(conn: Connection, now: datetime | None = None) -> int:
     ).rowcount
 
 
+AUTOMATED_KINDS = ("session_reminder", "plan_ending")
+AUTOMATED_DETAILS = json.dumps({"channel": "whatsapp", "automated": True, "simulated": True})
+
+
+def message_reminders(
+    conn: Connection, now: datetime | None = None, messages_dir: Path = MESSAGES_DIR
+) -> int:
+    """Sends today's reminders over WhatsApp (simulated) for businesses with the messaging
+    module and clients with a phone; once per notification. Run after the reminder jobs."""
+    now = now or datetime.now(UTC)
+    rows = (
+        conn.execute(
+            text("""
+                SELECT n.id, n.tenant_id, n.client_id, n.kind, n.payload, c.first_name, c.phone,
+                       t.name AS business, t.locale, t.time_zone
+                FROM app.notifications n
+                JOIN app.clients c ON c.id = n.client_id
+                JOIN app.tenants t ON t.id = n.tenant_id
+                WHERE n.kind = ANY(:kinds) AND n.created_at > :since
+                  AND c.erased_at IS NULL AND nullif(trim(c.phone), '') IS NOT NULL
+                  AND EXISTS (SELECT 1 FROM app.tenant_modules m
+                              WHERE m.tenant_id = n.tenant_id AND m.module_key = 'whatsapp')
+                  AND NOT EXISTS (SELECT 1 FROM app.messages x WHERE x.notification_id = n.id)
+                ORDER BY n.created_at
+            """),
+            {"kinds": list(AUTOMATED_KINDS), "since": now - timedelta(days=1)},
+        )
+        .mappings()
+        .all()
+    )
+    texts: dict[str, dict] = {}
+    per_tenant: dict[object, int] = {}
+    for row in rows:
+        locale = row["locale"] if row["locale"] in ("he", "en") else "en"
+        texts.setdefault(locale, load_messages(locale, messages_dir))
+        _subject, body = render(texts[locale], row["kind"], row["payload"], row)
+        conn.execute(
+            text("""
+                INSERT INTO app.messages
+                    (tenant_id, client_id, channel, to_phone, body, status, notification_id)
+                VALUES (:t, :c, 'whatsapp', :phone, :body, 'sent', :n)
+            """),
+            {
+                "t": row["tenant_id"],
+                "c": row["client_id"],
+                "phone": row["phone"].strip(),
+                "body": body[:1100],
+                "n": row["id"],
+            },
+        )
+        per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
+    for tenant_id, count in per_tenant.items():
+        conn.execute(
+            text("""
+                INSERT INTO app.usage_events (tenant_id, meter, quantity, details, source_ref)
+                VALUES (:t, 'messages', :n, CAST(:details AS jsonb), 'reminders')
+            """),
+            {"t": tenant_id, "n": count, "details": AUTOMATED_DETAILS},
+        )
+    return len(rows)
+
+
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
     if sender is None:
@@ -172,6 +237,7 @@ JOBS = {
     "remind-sessions": remind_sessions,
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
+    "message-reminders": message_reminders,
     "bill-businesses": bill_businesses,
 }
 
