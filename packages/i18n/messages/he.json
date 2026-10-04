@@ -225,7 +225,8 @@
       "appEmpty": "אין שיעורים ביום הזה.",
       "place": "הסטודיו",
       "profile": "פרטי אימון",
-      "visitNotes": "הערות מאמן"
+      "visitNotes": "הערות מאמן",
+      "nextBooking": "השיעור הבא שלך"
     },
     "beauty": {
       "client": "לקוח/ה",
@@ -243,7 +244,8 @@
       "appEmpty": "אין אירועים קבוצתיים ביום הזה.",
       "place": "העסק",
       "profile": "כרטיס טיפוח",
-      "visitNotes": "יומן טיפולים"
+      "visitNotes": "יומן טיפולים",
+      "nextBooking": "התור הבא שלך"
     },
     "clinic": {
       "client": "מטופל/ת",
@@ -261,7 +263,8 @@
       "appEmpty": "אין מפגשים קבוצתיים ביום הזה.",
       "place": "הקליניקה",
       "profile": "פרטי מטופל",
-      "visitNotes": "רשומות טיפול"
+      "visitNotes": "רשומות טיפול",
+      "nextBooking": "הטיפול הבא שלך"
     },
     "garage": {
       "client": "לקוח/ה",
@@ -279,7 +282,8 @@
       "appEmpty": "אין אירועים ביום הזה.",
       "place": "המוסך",
       "profile": "פרטי הרכב",
-      "visitNotes": "היסטוריית שירות"
+      "visitNotes": "היסטוריית שירות",
+      "nextBooking": "התור הבא שלך"
     }
   },
   "clients": {

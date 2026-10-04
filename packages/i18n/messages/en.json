@@ -225,7 +225,8 @@
       "appEmpty": "No classes on this day.",
       "place": "The studio",
       "profile": "Training profile",
-      "visitNotes": "Coach notes"
+      "visitNotes": "Coach notes",
+      "nextBooking": "Your next class"
     },
     "beauty": {
       "client": "Client",
@@ -243,7 +244,8 @@
       "appEmpty": "No group events on this day.",
       "place": "The salon",
       "profile": "Client card",
-      "visitNotes": "Treatment log"
+      "visitNotes": "Treatment log",
+      "nextBooking": "Your next appointment"
     },
     "clinic": {
       "client": "Patient",
@@ -261,7 +263,8 @@
       "appEmpty": "No group sessions on this day.",
       "place": "The clinic",
       "profile": "Patient details",
-      "visitNotes": "Treatment notes"
+      "visitNotes": "Treatment notes",
+      "nextBooking": "Your next visit"
     },
     "garage": {
       "client": "Customer",
@@ -279,7 +282,8 @@
       "appEmpty": "No events on this day.",
       "place": "The garage",
       "profile": "Vehicle",
-      "visitNotes": "Service history"
+      "visitNotes": "Service history",
+      "nextBooking": "Your next appointment"
     }
   },
   "clients": {

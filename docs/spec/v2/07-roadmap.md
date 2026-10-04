@@ -94,7 +94,8 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Modules & plan page in settings; features gated by module (client app, AI, AI actions)
 - [x] Platform console: businesses, modules, usage (AI credits), per-business page
 - [x] Audited support access: owner-granted, time-limited, read-only, every request logged (T50)
-- [ ] Platform billing (subscriptions, proration, price versions)
+- [x] Platform billing, simulated: 14-day trial, monthly invoices in arrears, test card, printable invoices (T57)
+- [ ] Platform billing with a real provider: proration, price versions, dunning
 
 ## Sprint 6 progress
 
@@ -102,6 +103,17 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] KPI dashboard (tiles, revenue and check-ins per week, today's sessions)
 - [x] AI assistant: Q&A through read tools + metrics; booking / cancelling as confirmable pending actions; audit log; AI usage metering
 - [ ] AI eval set (Hebrew + English business questions) run when prompts or models change
+
+## Prototype expansion (multi-vertical, T51–T59)
+
+- [x] Closed days / holidays (T51), visual language (T52), full prototype without paid services (T53)
+- [x] Marketing site for MyBiz in Hebrew and English with live pricing and a contact form (T54)
+- [x] Appointments (1:1 with staff, working hours, free times) and packs for beauty, clinics and garages (T55)
+- [x] CRM: leads pipeline, activity log, conversion, public inquiry form (T56)
+- [x] Industry client details (e.g. the car at a garage) and visit notes (T58)
+- [x] Messaging, simulated: broadcasts to segments, templates, direct messages, free wa.me links (T59)
+- [ ] Real providers: payments (O1), invoicing (O2), email, WhatsApp / SMS, AI key
+- [ ] Automated messages (reminders and follow-ups over WhatsApp / SMS)
 
 ## Owner setup checklist (Windows + iPhone)
 

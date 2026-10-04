@@ -92,6 +92,10 @@ with sync_playwright() as p:
     member.get_by_role("button", name=re.compile("^קביעת תור ל-")).click()
     expect(member.get_by_text("התור נקבע!")).to_be_visible(timeout=15000)
     print("4. client booked in the app | a11y:", app_serious or "ok")
+    member.goto(f"{h.APP}/home")
+    expect(member.get_by_role("heading", name="התור הבא שלך")).to_be_visible(timeout=30000)
+    expect(member.get_by_role("button", name="קביעת תור")).to_be_visible()
+    h.ready(member); member.screenshot(path=f"{h.OUT}/appointment-app-home.png", full_page=True)
 
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
     expect(owner.locator("main ol").get_by_text("יוסי")).to_be_visible()
