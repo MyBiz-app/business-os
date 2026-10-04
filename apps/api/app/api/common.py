@@ -20,10 +20,15 @@ def not_found() -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
 
 
-def set_clause(changes: dict[str, Any]) -> str:
+def set_clause(changes: dict[str, Any], casts: dict[str, str] | None = None) -> str:
     """SET clause for an UPDATE. Keys must come from a Pydantic model's fields, never from
-    user input, because they become column names."""
-    assignments = [f"{column} = :{column}" for column in changes]
+    user input, because they become column names. `casts` gives a column's SQL type (jsonb)."""
+    casts = casts or {}
+    assignments = [
+        f"{column} = CAST(:{column} AS {casts[column]})" if column in casts
+        else f"{column} = :{column}"
+        for column in changes
+    ]  # fmt: skip
     return ", ".join([*assignments, "updated_at = now()"])
 
 

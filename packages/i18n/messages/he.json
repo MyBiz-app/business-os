@@ -222,7 +222,9 @@
       "sessionsToday": "{count, plural, =0 {אין שיעורים היום} one {שיעור אחד היום} other {# שיעורים היום}}",
       "appTab": "מערכת שעות",
       "appEmpty": "אין שיעורים ביום הזה.",
-      "place": "הסטודיו"
+      "place": "הסטודיו",
+      "profile": "פרטי אימון",
+      "visitNotes": "הערות מאמן"
     },
     "beauty": {
       "client": "לקוח/ה",
@@ -238,7 +240,9 @@
       "sessionsToday": "{count, plural, =0 {אין תורים היום} one {תור אחד היום} other {# תורים היום}}",
       "appTab": "תורים",
       "appEmpty": "אין אירועים קבוצתיים ביום הזה.",
-      "place": "העסק"
+      "place": "העסק",
+      "profile": "כרטיס טיפוח",
+      "visitNotes": "יומן טיפולים"
     },
     "clinic": {
       "client": "מטופל/ת",
@@ -254,7 +258,9 @@
       "sessionsToday": "{count, plural, =0 {אין טיפולים היום} one {טיפול אחד היום} other {# טיפולים היום}}",
       "appTab": "תורים",
       "appEmpty": "אין מפגשים קבוצתיים ביום הזה.",
-      "place": "הקליניקה"
+      "place": "הקליניקה",
+      "profile": "פרטי מטופל",
+      "visitNotes": "רשומות טיפול"
     },
     "garage": {
       "client": "לקוח/ה",
@@ -270,7 +276,9 @@
       "sessionsToday": "{count, plural, =0 {אין עבודות היום} one {עבודה אחת היום} other {# עבודות היום}}",
       "appTab": "תורים",
       "appEmpty": "אין אירועים ביום הזה.",
-      "place": "המוסך"
+      "place": "המוסך",
+      "profile": "פרטי הרכב",
+      "visitNotes": "היסטוריית שירות"
     }
   },
   "clients": {
@@ -1705,5 +1713,59 @@
     "paidWith": "שולם בכרטיס שמסתיים ב-{last4} ב-{date}",
     "dashboardTrial": "{days, plural, one {נשאר יום אחד} other {נשארו # ימים}} לתקופת הניסיון. הוסיפו אמצעי תשלום כדי להמשיך בלי הפסקה.",
     "dashboardDue": "יש חשבונית פתוחה של MyBiz בסך {amount}."
+  },
+  "fields": {
+    "notSet": "לא צוין",
+    "fitness": {
+      "goal": "מטרה",
+      "injuries": "פציעות ומגבלות",
+      "goal_options": {
+        "weight_loss": "ירידה במשקל",
+        "strength": "כוח",
+        "flexibility": "גמישות",
+        "rehab": "שיקום",
+        "general": "כושר כללי"
+      }
+    },
+    "beauty": {
+      "hair_type": "סוג שיער",
+      "color_formula": "נוסחת צבע",
+      "allergies": "רגישויות ואלרגיות",
+      "hair_type_options": {
+        "straight": "חלק",
+        "wavy": "גלי",
+        "curly": "מתולתל",
+        "coily": "מסולסל מאוד"
+      }
+    },
+    "clinic": {
+      "id_number": "תעודת זהות",
+      "health_fund": "קופת חולים",
+      "referred_by": "הופנה על ידי",
+      "allergies": "אלרגיות",
+      "health_fund_options": {
+        "clalit": "כללית",
+        "maccabi": "מכבי",
+        "meuhedet": "מאוחדת",
+        "leumit": "לאומית",
+        "private": "פרטי"
+      }
+    },
+    "garage": {
+      "plate": "מספר רישוי",
+      "make": "יצרן",
+      "model": "דגם",
+      "year": "שנת ייצור",
+      "mileage": "קילומטראז׳",
+      "next_inspection": "טסט הבא"
+    }
+  },
+  "visitNotes": {
+    "body": "מה נעשה / מה חשוב לזכור?",
+    "about": "בהקשר של",
+    "general": "כללי (לא קשור לביקור)",
+    "add": "הוספת רשומה",
+    "none": "עוד אין רשומות.",
+    "delete": "מחיקת הרשומה"
   }
 }

@@ -1,3 +1,4 @@
+import json
 from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
@@ -6,10 +7,12 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
+from app.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -22,8 +25,8 @@ ReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
-    "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, created_at, "
-    "updated_at, erased_at"
+    "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
+    "custom_fields, created_at, updated_at, erased_at"
 )
 
 
@@ -34,6 +37,10 @@ class ClientFields(BaseModel):
     date_of_birth: date | None = None
     notes: str | None = Field(default=None, max_length=5000)
     source: ClientSource | None = None
+    custom_fields: dict[str, str | int | None] | None = Field(
+        default=None,
+        description="The vertical pack's extra fields (GET /clients/fields); replaces all",
+    )
 
     @field_validator(
         "last_name", "email", "phone", "notes", "date_of_birth", "source", mode="before"
@@ -71,6 +78,7 @@ class Client(BaseModel):
     notes: str | None
     status: ClientStatus
     source: ClientSource | None
+    custom_fields: dict[str, str | int]
     created_at: datetime
     updated_at: datetime
     erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
@@ -85,6 +93,44 @@ def _email_taken(error: IntegrityError) -> HTTPException | None:
     if "clients_tenant_email_key" in str(error.orig):
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail="email_taken")
     return None
+
+
+def _pack(db: Session) -> VerticalPack:
+    vertical = db.execute(
+        text("SELECT vertical FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    return VERTICAL_PACKS[vertical]
+
+
+def _custom_fields(db: Session, values: dict[str, str | int | None] | None) -> str:
+    """The values validated against the business's vertical pack, as JSON for the column."""
+    try:
+        return json.dumps(clean_client_fields(_pack(db), values or {}))
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error)
+        ) from error
+
+
+class ClientFieldDefinition(BaseModel):
+    key: str
+    kind: Literal["text", "long_text", "number", "date", "select"]
+    options: list[str]
+    max_length: int
+
+
+@router.get("/fields")
+def client_fields(context: ReadDep) -> list[ClientFieldDefinition]:
+    """The extra client fields of the business's vertical (labels come from translations)."""
+    return [
+        ClientFieldDefinition(
+            key=f.key,
+            kind=f.kind,
+            options=list(f.options),
+            max_length=f.max_length,  # type: ignore[arg-type]
+        )
+        for f in _pack(context.session).client_fields
+    ]
 
 
 def _like_pattern(search: str) -> str:
@@ -153,13 +199,17 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
                 text(f"""
                     INSERT INTO app.clients
                         (tenant_id, first_name, last_name, email, phone, date_of_birth, notes,
-                         status, source)
+                         status, source, custom_fields)
                     VALUES
                         (:tenant_id, :first_name, :last_name, :email, :phone, :date_of_birth,
-                         :notes, :status, :source)
+                         :notes, :status, :source, CAST(:custom_fields AS jsonb))
                     RETURNING {COLUMNS}
                 """),
-                {**body.model_dump(), "tenant_id": context.tenant_id},
+                {
+                    **body.model_dump(),
+                    "custom_fields": _custom_fields(context.session, body.custom_fields),
+                    "tenant_id": context.tenant_id,
+                },
             )
             .mappings()
             .one()
@@ -191,7 +241,10 @@ def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Cli
         raise HTTPException(status_code=422, detail="first_name must not be blank")
     if "status" in changes and changes["status"] is None:
         del changes["status"]
-    sql = f"UPDATE app.clients SET {set_clause(changes)} WHERE id = :id RETURNING {COLUMNS}"
+    if "custom_fields" in changes:
+        changes["custom_fields"] = _custom_fields(context.session, changes["custom_fields"])
+    assignments = set_clause(changes, casts={"custom_fields": "jsonb"})
+    sql = f"UPDATE app.clients SET {assignments} WHERE id = :id RETURNING {COLUMNS}"
     try:
         row = (
             context.session.execute(

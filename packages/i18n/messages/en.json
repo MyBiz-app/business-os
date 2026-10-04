@@ -222,7 +222,9 @@
       "sessionsToday": "{count, plural, =0 {No classes today} one {One class today} other {# classes today}}",
       "appTab": "Schedule",
       "appEmpty": "No classes on this day.",
-      "place": "The studio"
+      "place": "The studio",
+      "profile": "Training profile",
+      "visitNotes": "Coach notes"
     },
     "beauty": {
       "client": "Client",
@@ -238,7 +240,9 @@
       "sessionsToday": "{count, plural, =0 {No appointments today} one {One appointment today} other {# appointments today}}",
       "appTab": "Book",
       "appEmpty": "No group events on this day.",
-      "place": "The salon"
+      "place": "The salon",
+      "profile": "Client card",
+      "visitNotes": "Treatment log"
     },
     "clinic": {
       "client": "Patient",
@@ -254,7 +258,9 @@
       "sessionsToday": "{count, plural, =0 {No treatments today} one {One treatment today} other {# treatments today}}",
       "appTab": "Book",
       "appEmpty": "No group sessions on this day.",
-      "place": "The clinic"
+      "place": "The clinic",
+      "profile": "Patient details",
+      "visitNotes": "Treatment notes"
     },
     "garage": {
       "client": "Customer",
@@ -270,7 +276,9 @@
       "sessionsToday": "{count, plural, =0 {No jobs today} one {One job today} other {# jobs today}}",
       "appTab": "Book",
       "appEmpty": "No events on this day.",
-      "place": "The garage"
+      "place": "The garage",
+      "profile": "Vehicle",
+      "visitNotes": "Service history"
     }
   },
   "clients": {
@@ -1705,5 +1713,59 @@
     "paidWith": "Paid with the card ending {last4} on {date}",
     "dashboardTrial": "{days, plural, one {1 day} other {# days}} left in your trial. Add a payment method to keep going without a break.",
     "dashboardDue": "You have an open MyBiz invoice of {amount}."
+  },
+  "fields": {
+    "notSet": "Not set",
+    "fitness": {
+      "goal": "Goal",
+      "injuries": "Injuries and limitations",
+      "goal_options": {
+        "weight_loss": "Weight loss",
+        "strength": "Strength",
+        "flexibility": "Flexibility",
+        "rehab": "Rehabilitation",
+        "general": "General fitness"
+      }
+    },
+    "beauty": {
+      "hair_type": "Hair type",
+      "color_formula": "Color formula",
+      "allergies": "Sensitivities and allergies",
+      "hair_type_options": {
+        "straight": "Straight",
+        "wavy": "Wavy",
+        "curly": "Curly",
+        "coily": "Coily"
+      }
+    },
+    "clinic": {
+      "id_number": "ID number",
+      "health_fund": "Health fund",
+      "referred_by": "Referred by",
+      "allergies": "Allergies",
+      "health_fund_options": {
+        "clalit": "Clalit",
+        "maccabi": "Maccabi",
+        "meuhedet": "Meuhedet",
+        "leumit": "Leumit",
+        "private": "Private"
+      }
+    },
+    "garage": {
+      "plate": "License plate",
+      "make": "Make",
+      "model": "Model",
+      "year": "Year",
+      "mileage": "Mileage",
+      "next_inspection": "Next inspection"
+    }
+  },
+  "visitNotes": {
+    "body": "What was done / worth remembering?",
+    "about": "About",
+    "general": "General (not about a visit)",
+    "add": "Add note",
+    "none": "No notes yet.",
+    "delete": "Delete note"
   }
 }

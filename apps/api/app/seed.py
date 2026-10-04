@@ -555,6 +555,34 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
                 :created_at)
     """, booking_rows)  # fmt: skip
 
+    # The fitness pack's profile fields and a few coach notes from recent classes.
+    goals = ("weight_loss", "strength", "flexibility", "rehab", "general")
+    profile_rows = [
+        {"id": c.id, "fields": json.dumps({"goal": rng.choice(goals)})}
+        for c in clients
+        if rng.random() < 0.4
+    ]
+    _insert(conn, "UPDATE app.clients SET custom_fields = CAST(:fields AS jsonb) WHERE id = :id",
+            profile_rows)  # fmt: skip
+    by_id = {s["id"]: s for s in sessions}
+    attended = [b for b in booking_rows if b.get("status") == "checked_in"]
+    note_rows = [
+        {
+            "tenant_id": tenant_id,
+            "client_id": b["client_id"],
+            "booking_id": b["id"],
+            "author": by_id[b["session_id"]]["instructor"],
+            "body": rng.choice(COACH_NOTES),
+            "at": by_id[b["session_id"]]["ends_at"] + timedelta(minutes=10),
+        }
+        for b in rng.sample(attended, k=min(60, len(attended)))
+    ]
+    _insert(conn, """
+        INSERT INTO app.client_notes
+            (tenant_id, client_id, booking_id, author_user_id, body, created_at)
+        VALUES (:tenant_id, :client_id, :booking_id, :author, :body, :at)
+    """, note_rows)  # fmt: skip
+
     # MyBiz's own (simulated) billing: a test card on file, monthly invoices since the trial.
     conn.execute(
         text("""
@@ -576,6 +604,13 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
     return tenant_id
 
 
+COACH_NOTES = (
+    "עבדנו על יציבה בגב התחתון, להמשיך בשבוע הבא",
+    "התקדמות יפה בכוח הליבה",
+    "להקל בתרגילי ברכיים",
+    "ביקש/ה תרגילים לבית, שלחתי",
+    "עלה/תה רמה במשקולות",
+)
 LEAD_INTERESTS = (
     "פילאטיס מכשירים למתחילים",
     "שיעורי בוקר לפני העבודה",

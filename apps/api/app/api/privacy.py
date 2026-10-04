@@ -54,8 +54,8 @@ def _client(db: Session, client_id: UUID, lock: bool = False) -> dict[str, Any]:
         db.execute(
             text(f"""
                 SELECT id, first_name, last_name, email, phone, date_of_birth, notes, status,
-                       source, user_id IS NOT NULL AS uses_client_app, created_at, updated_at,
-                       erased_at
+                       source, custom_fields, user_id IS NOT NULL AS uses_client_app, created_at,
+                       updated_at, erased_at
                 FROM app.clients WHERE id = :id {"FOR UPDATE" if lock else ""}
             """),
             {"id": client_id},
@@ -129,6 +129,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "visit_notes": _rows(
+            db,
+            """
+            SELECT body, created_at FROM app.client_notes
+            WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
         "leads": _rows(
             db,
             """
@@ -193,6 +201,7 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
+    db.execute(text("DELETE FROM app.client_notes WHERE client_id = :id"), {"id": client_id})
     # The CRM history that led to the client (their inquiry, calls, notes) goes with them.
     db.execute(text("DELETE FROM app.leads WHERE client_id = :id"), {"id": client_id})
     db.execute(
@@ -209,7 +218,8 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         text("""
             UPDATE app.clients
             SET first_name = :name, last_name = NULL, email = NULL, phone = NULL,
-                date_of_birth = NULL, notes = NULL, status = 'inactive', user_id = NULL,
+                date_of_birth = NULL, notes = NULL, custom_fields = '{}', status = 'inactive',
+                user_id = NULL,
                 erased_at = now(), updated_at = now()
             WHERE id = :id
         """),

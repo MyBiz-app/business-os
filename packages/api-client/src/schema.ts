@@ -90,6 +90,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/fields": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Fields
+         * @description The extra client fields of the business's vertical (labels come from translations).
+         */
+        get: operations["client_fields"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients": {
         parameters: {
             query?: never;
@@ -124,6 +144,41 @@ export interface paths {
         head?: never;
         /** Update Client */
         patch: operations["update_client"];
+        trace?: never;
+    };
+    "/clients/{client_id}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Notes */
+        get: operations["list_notes"];
+        put?: never;
+        /** Add Note */
+        post: operations["add_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/notes/{note_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Note */
+        delete: operations["delete_note"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/clients/{client_id}/export": {
@@ -2396,6 +2451,10 @@ export interface components {
             status: "active" | "inactive" | "lead";
             /** Source */
             source: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+            /** Custom Fields */
+            custom_fields: {
+                [key: string]: string | number;
+            };
             /**
              * Created At
              * Format: date-time
@@ -2527,6 +2586,13 @@ export interface components {
             notes?: string | null;
             /** Source */
             source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+            /**
+             * Custom Fields
+             * @description The vertical pack's extra fields (GET /clients/fields); replaces all
+             */
+            custom_fields?: {
+                [key: string]: string | number | null;
+            } | null;
             /** First Name */
             first_name: string;
             /**
@@ -2535,6 +2601,20 @@ export interface components {
              * @enum {string}
              */
             status: "active" | "inactive" | "lead";
+        };
+        /** ClientFieldDefinition */
+        ClientFieldDefinition: {
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "text" | "long_text" | "number" | "date" | "select";
+            /** Options */
+            options: string[];
+            /** Max Length */
+            max_length: number;
         };
         /** ClientHealth */
         ClientHealth: {
@@ -2548,6 +2628,34 @@ export interface components {
              * @description Newest first
              */
             declarations: components["schemas"]["Declaration"][];
+        };
+        /** ClientNote */
+        ClientNote: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Body */
+            body: string;
+            /** Booking Id */
+            booking_id: string | null;
+            /**
+             * Service Name
+             * @description The booked service, when about a booking
+             */
+            service_name: string | null;
+            /** Session Starts At */
+            session_starts_at: string | null;
+            /** Author User Id */
+            author_user_id: string | null;
+            /** Author Name */
+            author_name: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** ClientPage */
         ClientPage: {
@@ -2605,6 +2713,13 @@ export interface components {
             notes?: string | null;
             /** Source */
             source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+            /**
+             * Custom Fields
+             * @description The vertical pack's extra fields (GET /clients/fields); replaces all
+             */
+            custom_fields?: {
+                [key: string]: string | number | null;
+            } | null;
             /** First Name */
             first_name?: string | null;
             /** Status */
@@ -3681,6 +3796,13 @@ export interface components {
             /** @description The form to sign; null if the business has none */
             form: components["schemas"]["Form"] | null;
             current: components["schemas"]["Declaration"] | null;
+        };
+        /** NoteCreate */
+        NoteCreate: {
+            /** Body */
+            body: string;
+            /** Booking Id */
+            booking_id?: string | null;
         };
         /** Notification */
         Notification: {
@@ -4909,6 +5031,37 @@ export interface operations {
             };
         };
     };
+    client_fields: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientFieldDefinition"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_clients: {
         parameters: {
             query?: {
@@ -5042,6 +5195,108 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Client"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_notes: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientNote"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_note: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientNote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_note: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+                note_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

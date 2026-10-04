@@ -14,6 +14,7 @@ import { StatusBadge } from "../status-badge";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
+import { NotesSection, ProfileSection } from "./profile-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
 function splitByNow<T extends { starts_at: string }>(bookings: T[]) {
@@ -110,7 +111,9 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         />
       </section>
 
-      {!erased && <HealthSection clientId={client.id} context={context} />}
+      <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
+
+      {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
 
       <PlansSection clientId={client.id} context={context} locked={erased} />
 
@@ -132,6 +135,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           </div>
         )}
       </section>
+
+      <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 
       {!erased && tenant.permissions.includes("clients.privacy") && (
         <PrivacySection
