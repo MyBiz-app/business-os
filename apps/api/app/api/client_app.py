@@ -59,6 +59,7 @@ class ClientBusiness(BaseModel):
     time_zone: str
     currency: str
     cancellation_window_minutes: int
+    online_sales: bool = Field(description="The client can buy plans in the app")
     client_id: UUID
     first_name: str
     last_name: str | None
@@ -109,7 +110,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.locale, t.primary_color, t.time_zone, t.currency,
-           t.cancellation_window_minutes, {LOGO_URL.format(t="t")} AS logo_url,
+           t.cancellation_window_minutes, t.online_sales, {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
     WHERE c.user_id = app.current_user_id()

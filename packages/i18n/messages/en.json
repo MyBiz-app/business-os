@@ -44,7 +44,9 @@
     "modulesLink": "Modules and plan",
     "modulesHint": "Turn features on or off and see the monthly price.",
     "requireHealth": "Clients need a health declaration to book in the app",
-    "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book."
+    "requireHealthHint": "Clients sign it in the app once a year. If they answer \"yes\" to a question, you approve it on their profile before they can book.",
+    "onlineSales": "Clients can buy plans in the app",
+    "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged."
   },
   "locales": {
     "he": "עברית",
@@ -481,7 +483,16 @@
       "myPlans": "My plans",
       "validUntil": "Valid until {date}",
       "entriesLeft": "{count, plural, one {# entry left} other {# entries left}}",
-      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:"
+      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:",
+      "buyTitle": "Buy a plan",
+      "noPlanBuy": "You don't have a valid plan yet. Choose one to start booking.",
+      "buy": "Buy",
+      "buyConfirmTitle": "Buy {plan}?",
+      "buyConfirmSimulated": "Test payment of {price}: no money is charged while the studio sets up payments.",
+      "buyConfirm": "Buy",
+      "buyCancel": "Not now",
+      "bought": "Done! {plan} is now in your plans.",
+      "buyFailed": "The purchase didn't go through. Try again."
     },
     "profile": {
       "title": "Profile",

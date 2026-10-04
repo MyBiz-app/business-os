@@ -84,7 +84,7 @@ specialized agents, then additional vertical packs and markets (US, EU).
 - [x] Bookings use entitlements (credits, validity, freezes); client app requires a valid plan
 - [x] Client app: "My plans" with remaining entries and validity
 - [x] Demo data generator (`python -m app.seed`) + "Create demo studio on staging" workflow
-- [ ] Client self-purchase in the app (needs a payment provider, O1)
+- [x] Client self-purchase in the app, with simulated payments until a provider is chosen (T47; real payments need O1)
 
 ## Sprint 5 progress
 

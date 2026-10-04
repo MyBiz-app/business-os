@@ -1135,6 +1135,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/checkouts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Checkout
+         * @description Starts buying a plan at its current price.
+         */
+        post: operations["start_checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts/{checkout_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Checkout */
+        get: operations["get_checkout"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/checkouts/{checkout_id}/simulate-payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate Payment
+         * @description Completes a simulated checkout: records a test payment and creates the plan. Calling it
+         *     again returns the same plan.
+         */
+        post: operations["simulate_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/notifications": {
         parameters: {
             query?: never;
@@ -1466,6 +1524,61 @@ export interface components {
             /** Requires All */
             requires_all: ("client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location")[];
         };
+        /** Checkout */
+        Checkout: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Plan Name */
+            plan_name: string;
+            /**
+             * Amount
+             * @description Minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "paid" | "cancelled" | "failed";
+            /**
+             * Simulated
+             * @description Test payment: no money is charged
+             */
+            simulated: boolean;
+            /**
+             * Pay Url
+             * @description Where to pay (real providers only)
+             */
+            pay_url: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CheckoutCreate */
+        CheckoutCreate: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+        };
+        /** CheckoutPaid */
+        CheckoutPaid: {
+            checkout: components["schemas"]["Checkout"];
+            entitlement: components["schemas"]["Entitlement"];
+        };
         /** Client */
         Client: {
             /**
@@ -1569,6 +1682,11 @@ export interface components {
             currency: string;
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
+            /**
+             * Online Sales
+             * @description The client can buy plans in the app
+             */
+            online_sales: boolean;
             /**
              * Client Id
              * Format: uuid
@@ -3009,6 +3127,11 @@ export interface components {
              */
             requires_health_declaration: boolean;
             /**
+             * Online Sales
+             * @description Clients can buy plans in the app
+             */
+            online_sales: boolean;
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -3082,6 +3205,8 @@ export interface components {
             booking_requires_plan?: boolean | null;
             /** Requires Health Declaration */
             requires_health_declaration?: boolean | null;
+            /** Online Sales */
+            online_sales?: boolean | null;
         };
         /** Turn */
         Turn: {
@@ -5808,6 +5933,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Entitlement"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    start_checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_checkout: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_payment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckoutPaid"];
                 };
             };
             /** @description Validation Error */

@@ -4748,6 +4748,182 @@
         }
       }
     },
+    "/client/checkouts": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Start Checkout",
+        "description": "Starts buying a plan at its current price.",
+        "operationId": "start_checkout",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checkout"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/checkouts/{checkout_id}": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Get Checkout",
+        "operationId": "get_checkout",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "checkout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Checkout Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checkout"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/checkouts/{checkout_id}/simulate-payment": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Simulate Payment",
+        "description": "Completes a simulated checkout: records a test payment and creates the plan. Calling it\nagain returns the same plan.",
+        "operationId": "simulate_payment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "checkout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Checkout Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckoutPaid"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/notifications": {
       "get": {
         "tags": [
@@ -5788,6 +5964,108 @@
         ],
         "title": "CatalogModule"
       },
+      "Checkout": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Plan Id"
+          },
+          "plan_name": {
+            "type": "string",
+            "title": "Plan Name"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount",
+            "description": "Minor units"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "paid",
+              "cancelled",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated",
+            "description": "Test payment: no money is charged"
+          },
+          "pay_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pay Url",
+            "description": "Where to pay (real providers only)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "plan_id",
+          "plan_name",
+          "amount",
+          "currency",
+          "status",
+          "simulated",
+          "pay_url",
+          "created_at"
+        ],
+        "title": "Checkout"
+      },
+      "CheckoutCreate": {
+        "properties": {
+          "plan_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Plan Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan_id"
+        ],
+        "title": "CheckoutCreate"
+      },
+      "CheckoutPaid": {
+        "properties": {
+          "checkout": {
+            "$ref": "#/components/schemas/Checkout"
+          },
+          "entitlement": {
+            "$ref": "#/components/schemas/Entitlement"
+          }
+        },
+        "type": "object",
+        "required": [
+          "checkout",
+          "entitlement"
+        ],
+        "title": "CheckoutPaid"
+      },
       "Client": {
         "properties": {
           "id": {
@@ -6042,6 +6320,11 @@
             "type": "integer",
             "title": "Cancellation Window Minutes"
           },
+          "online_sales": {
+            "type": "boolean",
+            "title": "Online Sales",
+            "description": "The client can buy plans in the app"
+          },
           "client_id": {
             "type": "string",
             "format": "uuid",
@@ -6073,6 +6356,7 @@
           "time_zone",
           "currency",
           "cancellation_window_minutes",
+          "online_sales",
           "client_id",
           "first_name",
           "last_name"
@@ -9990,6 +10274,11 @@
             "title": "Requires Health Declaration",
             "description": "Clients need a valid health declaration to book in the app"
           },
+          "online_sales": {
+            "type": "boolean",
+            "title": "Online Sales",
+            "description": "Clients can buy plans in the app"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -10046,6 +10335,7 @@
           "cancellation_window_minutes",
           "booking_requires_plan",
           "requires_health_declaration",
+          "online_sales",
           "join_code",
           "modules",
           "permissions",
@@ -10246,6 +10536,17 @@
               }
             ],
             "title": "Requires Health Declaration"
+          },
+          "online_sales": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Online Sales"
           }
         },
         "type": "object",

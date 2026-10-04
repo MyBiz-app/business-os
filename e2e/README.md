@@ -34,3 +34,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `notifications.py`: the studio books a member and cancels the class; the member sees both under Updates, with an unread badge that clears once read.
 
 `reports.py` seeds a demo studio for a new owner and checks the reports page (breakdowns, members to reach out to, period switch).
+
+`purchase.py`: the owner turns on online sales, a member buys a plan in the app with a test payment, and the owner sees it on the member's profile.

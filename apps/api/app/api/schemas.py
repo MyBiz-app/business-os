@@ -67,6 +67,7 @@ class TenantUpdate(BaseModel):
     cancellation_window_minutes: int | None = Field(default=None, ge=0, le=10080)
     booking_requires_plan: bool | None = None
     requires_health_declaration: bool | None = None
+    online_sales: bool | None = None
 
     @field_validator("name")
     @classmethod
@@ -97,6 +98,7 @@ class Tenant(BaseModel):
     requires_health_declaration: bool = Field(
         description="Clients need a valid health declaration to book in the app"
     )
+    online_sales: bool = Field(description="Clients can buy plans in the app")
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
     permissions: list[str] = Field(description="The current user's effective permissions")
