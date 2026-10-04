@@ -10,8 +10,11 @@ import { CopyWeek } from "./copy-week";
 
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
   const t = await getTranslations("schedule");
+  const tAppointments = await getTranslations("appointments");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("schedule.read");
+  const tAll = await getTranslations();
+  const term = (key: "schedule" | "newSession" | "noSessions") => tAll(`terms.${tenant.vertical}.${key}` as "terms.fitness.schedule");
   const { week } = await searchParams;
 
   const today = todayIn(tenant.time_zone);
@@ -29,11 +32,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     <main className="enter flex w-full flex-1 flex-col gap-6 px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
+          <h1 className="text-3xl font-bold">{term("schedule")}</h1>
           <p className="text-sm text-muted">{range}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <nav aria-label={t("title")} className="flex items-center gap-1 text-sm">
+          <nav aria-label={term("schedule")} className="flex items-center gap-1 text-sm">
             <Link href={`/schedule?week=${addDays(start, -7)}`} className="btn-secondary px-3 py-2 font-medium">
               {t("previousWeek")}
             </Link>
@@ -50,12 +53,20 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             </Link>
           )}
           {canWriteSchedule(tenant) && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
+          {tenant.permissions.includes("bookings.manage") && (
+            <Link
+              href={`/schedule/appointment?date=${start > today ? start : today}`}
+              className="btn-secondary px-4 py-2.5"
+            >
+              {tAppointments("new")}
+            </Link>
+          )}
           {canWriteSchedule(tenant) && (
             <Link
               href={`/schedule/new?date=${start > today ? start : today}`}
               className="btn-primary px-4 py-2.5"
             >
-              {t("newSession")}
+              {term("newSession")}
             </Link>
           )}
         </div>
@@ -85,7 +96,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                 </p>
               )}
               {daySessions.length === 0 ? (
-                <p className="px-1 text-xs text-muted">{t("noSessions")}</p>
+                <p className="px-1 text-xs text-muted">{term("noSessions")}</p>
               ) : (
                 <ul className="flex flex-col gap-2">
                   {daySessions.map((session) => {
@@ -107,10 +118,16 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                           </span>
                           <span className={`font-semibold ${cancelled ? "line-through" : ""}`}>{session.service.name}</span>
                           {session.room_name && <span className="text-xs text-muted">{session.room_name}</span>}
-                          <span className="text-xs text-muted" aria-label={t("spotsLabel", { booked: session.booked, capacity: session.capacity })}>
-                            {cancelled ? t("cancelled") : t("spots", { booked: session.booked, capacity: session.capacity })}
-                          </span>
-                          {!cancelled && (
+                          {session.booking_mode === "appointment" ? (
+                            <span className="truncate text-xs font-medium" dir="auto">
+                              {cancelled ? t("cancelled") : session.appointment_client}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted" aria-label={t("spotsLabel", { booked: session.booked, capacity: session.capacity })}>
+                              {cancelled ? t("cancelled") : t("spots", { booked: session.booked, capacity: session.capacity })}
+                            </span>
+                          )}
+                          {!cancelled && session.booking_mode === "class" && (
                             <span aria-hidden="true" className="mt-1 h-1 overflow-hidden rounded-full bg-foreground/8">
                               <span className="block h-full rounded-full" style={{ width: `${fill * 100}%`, backgroundColor: color }} />
                             </span>

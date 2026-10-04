@@ -2879,6 +2879,588 @@
         }
       }
     },
+    "/staff/{user_id}/hours": {
+      "get": {
+        "tags": [
+          "appointments"
+        ],
+        "summary": "Get Staff Hours",
+        "operationId": "get_staff_hours",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffHours"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "appointments"
+        ],
+        "summary": "Set Staff Hours",
+        "description": "Replaces the staff member's weekly working hours (blocks may not overlap).",
+        "operationId": "set_staff_hours",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/HoursBlock"
+                },
+                "title": "Blocks"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffHours"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments/staff": {
+      "get": {
+        "tags": [
+          "appointments"
+        ],
+        "summary": "Staff For Appointments",
+        "operationId": "staff_for_appointments",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentStaff"
+                  },
+                  "title": "Response Staff For Appointments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments/slots": {
+      "get": {
+        "tags": [
+          "appointments"
+        ],
+        "summary": "Slots",
+        "operationId": "slots",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date"
+            }
+          },
+          {
+            "name": "staff_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Staff User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Slot"
+                  },
+                  "title": "Response Slots"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/appointments": {
+      "post": {
+        "tags": [
+          "appointments"
+        ],
+        "summary": "Book Appointment",
+        "description": "Books a client into a free time with a staff member (staff may book without a plan).",
+        "operationId": "book_appointment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppointmentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Booking"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/appointments/staff": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Staff For Appointments",
+        "operationId": "my_staff_for_appointments",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentStaff"
+                  },
+                  "title": "Response My Staff For Appointments"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/appointments/slots": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Slots",
+        "operationId": "my_slots",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date"
+            }
+          },
+          {
+            "name": "staff_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Staff User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Slot"
+                  },
+                  "title": "Response My Slots"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/appointments": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Book My Appointment",
+        "description": "The signed-in client books a free time (the business's booking rules apply).",
+        "operationId": "book_my_appointment",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientAppointmentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientSession"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/appointments/services": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Appointment Services",
+        "description": "What the client can book as a personal appointment.",
+        "operationId": "my_appointment_services",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentService"
+                  },
+                  "title": "Response My Appointment Services"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/plans": {
       "get": {
         "tags": [
@@ -6378,6 +6960,115 @@
         ],
         "title": "Answer"
       },
+      "AppointmentCreate": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "staff_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Staff User Id"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "staff_user_id",
+          "starts_at",
+          "client_id"
+        ],
+        "title": "AppointmentCreate"
+      },
+      "AppointmentService": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "duration_minutes": {
+            "type": "integer",
+            "title": "Duration Minutes"
+          },
+          "price_amount": {
+            "type": "integer",
+            "title": "Price Amount"
+          },
+          "price_currency": {
+            "type": "string",
+            "title": "Price Currency"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "duration_minutes",
+          "price_amount",
+          "price_currency",
+          "color"
+        ],
+        "title": "AppointmentService"
+      },
+      "AppointmentStaff": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "name"
+        ],
+        "title": "AppointmentStaff"
+      },
       "Body_import_clients": {
         "properties": {
           "file": {
@@ -7095,6 +7786,32 @@
         ],
         "title": "Client"
       },
+      "ClientAppointmentCreate": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "staff_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Staff User Id"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "staff_user_id",
+          "starts_at"
+        ],
+        "title": "ClientAppointmentCreate"
+      },
       "ClientBooking": {
         "properties": {
           "id": {
@@ -7168,6 +7885,11 @@
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "vertical": {
+            "type": "string",
+            "title": "Vertical",
+            "description": "The business's industry (terms in the app follow it)"
           },
           "locale": {
             "type": "string",
@@ -7252,6 +7974,7 @@
         "required": [
           "id",
           "name",
+          "vertical",
           "locale",
           "primary_color",
           "logo_url",
@@ -8582,6 +9305,34 @@
           "environment"
         ],
         "title": "HealthResponse"
+      },
+      "HoursBlock": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Weekday",
+            "description": "0 = Monday … 6 = Sunday"
+          },
+          "starts": {
+            "type": "string",
+            "format": "time",
+            "title": "Starts"
+          },
+          "ends": {
+            "type": "string",
+            "format": "time",
+            "title": "Ends"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "starts",
+          "ends"
+        ],
+        "title": "HoursBlock"
       },
       "ImportIssue": {
         "properties": {
@@ -10801,6 +11552,27 @@
               }
             ],
             "title": "Notes"
+          },
+          "booking_mode": {
+            "type": "string",
+            "enum": [
+              "class",
+              "appointment"
+            ],
+            "title": "Booking Mode",
+            "description": "appointment: a one-to-one booking with the instructor"
+          },
+          "appointment_client": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Appointment Client",
+            "description": "For an appointment: who it is with"
           }
         },
         "type": "object",
@@ -10821,7 +11593,9 @@
           "waitlisted",
           "series_open_ended",
           "status",
-          "notes"
+          "notes",
+          "booking_mode",
+          "appointment_client"
         ],
         "title": "ScheduledSession"
       },
@@ -11016,6 +11790,14 @@
             "type": "integer",
             "title": "Capacity"
           },
+          "booking_mode": {
+            "type": "string",
+            "enum": [
+              "class",
+              "appointment"
+            ],
+            "title": "Booking Mode"
+          },
           "price_amount": {
             "type": "integer",
             "title": "Price Amount"
@@ -11057,6 +11839,7 @@
           "description",
           "duration_minutes",
           "capacity",
+          "booking_mode",
           "price_amount",
           "price_currency",
           "color",
@@ -11110,6 +11893,15 @@
             "minimum": 1.0,
             "title": "Capacity",
             "default": 1
+          },
+          "booking_mode": {
+            "type": "string",
+            "enum": [
+              "class",
+              "appointment"
+            ],
+            "title": "Booking Mode",
+            "default": "class"
           },
           "price_amount": {
             "type": "integer",
@@ -11268,6 +12060,21 @@
               }
             ],
             "title": "Capacity"
+          },
+          "booking_mode": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "class",
+                  "appointment"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Mode"
           },
           "price_amount": {
             "anyOf": [
@@ -11526,6 +12333,59 @@
         },
         "type": "object",
         "title": "SessionUpdate"
+      },
+      "Slot": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "staff_user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Staff User Id"
+          },
+          "staff_name": {
+            "type": "string",
+            "title": "Staff Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "staff_user_id",
+          "staff_name"
+        ],
+        "title": "Slot"
+      },
+      "StaffHours": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/HoursBlock"
+            },
+            "type": "array",
+            "title": "Blocks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "blocks"
+        ],
+        "title": "StaffHours"
       },
       "SupportAccess": {
         "properties": {

@@ -21,6 +21,7 @@ axe = Axe()
 a11y: list[str] = []
 
 def check_a11y(page, label):
+    h.ready(page)  # client-side navigations can still be fading in
     results = axe.run(page)
     serious = [v for v in results.response["violations"] if v["impact"] in ("serious", "critical")]
     for v in serious:

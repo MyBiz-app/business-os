@@ -128,7 +128,10 @@
     "currency": "מטבע",
     "submit": "יצירת העסק",
     "verticals": {
-      "fitness": "סטודיו כושר"
+      "fitness": "סטודיו כושר",
+      "beauty": "מספרה / סלון יופי",
+      "clinic": "קליניקה / מטפל/ת",
+      "garage": "מוסך / שירותי רכב"
     },
     "currencies": {
       "ILS": "שקל חדש (₪)",
@@ -209,7 +212,62 @@
       "newClient": "מתאמן/ת חדש/ה",
       "searchClients": "חיפוש מתאמנים",
       "noClients": "עדיין אין מתאמנים",
-      "noResults": "לא נמצאו מתאמנים שמתאימים לחיפוש"
+      "noResults": "לא נמצאו מתאמנים שמתאימים לחיפוש",
+      "schedule": "לוח שיעורים",
+      "newSession": "שיעור חדש",
+      "noSessions": "אין שיעורים",
+      "sessionsToday": "{count, plural, =0 {אין שיעורים היום} one {שיעור אחד היום} other {# שיעורים היום}}",
+      "appTab": "מערכת שעות",
+      "appEmpty": "אין שיעורים ביום הזה.",
+      "place": "הסטודיו"
+    },
+    "beauty": {
+      "client": "לקוח/ה",
+      "clients": "לקוחות",
+      "addClient": "הוספת לקוח/ה",
+      "newClient": "לקוח/ה חדש/ה",
+      "searchClients": "חיפוש לקוחות",
+      "noClients": "עדיין אין לקוחות",
+      "noResults": "לא נמצאו לקוחות שמתאימים לחיפוש",
+      "schedule": "יומן",
+      "newSession": "אירוע קבוצתי",
+      "noSessions": "אין תורים",
+      "sessionsToday": "{count, plural, =0 {אין תורים היום} one {תור אחד היום} other {# תורים היום}}",
+      "appTab": "תורים",
+      "appEmpty": "אין אירועים קבוצתיים ביום הזה.",
+      "place": "העסק"
+    },
+    "clinic": {
+      "client": "מטופל/ת",
+      "clients": "מטופלים",
+      "addClient": "הוספת מטופל/ת",
+      "newClient": "מטופל/ת חדש/ה",
+      "searchClients": "חיפוש מטופלים",
+      "noClients": "עדיין אין מטופלים",
+      "noResults": "לא נמצאו מטופלים שמתאימים לחיפוש",
+      "schedule": "יומן",
+      "newSession": "מפגש קבוצתי",
+      "noSessions": "אין טיפולים",
+      "sessionsToday": "{count, plural, =0 {אין טיפולים היום} one {טיפול אחד היום} other {# טיפולים היום}}",
+      "appTab": "תורים",
+      "appEmpty": "אין מפגשים קבוצתיים ביום הזה.",
+      "place": "הקליניקה"
+    },
+    "garage": {
+      "client": "לקוח/ה",
+      "clients": "לקוחות",
+      "addClient": "הוספת לקוח/ה",
+      "newClient": "לקוח/ה חדש/ה",
+      "searchClients": "חיפוש לקוחות",
+      "noClients": "עדיין אין לקוחות",
+      "noResults": "לא נמצאו לקוחות שמתאימים לחיפוש",
+      "schedule": "יומן עבודה",
+      "newSession": "אירוע",
+      "noSessions": "אין עבודות",
+      "sessionsToday": "{count, plural, =0 {אין עבודות היום} one {עבודה אחת היום} other {# עבודות היום}}",
+      "appTab": "תורים",
+      "appEmpty": "אין אירועים ביום הזה.",
+      "place": "המוסך"
     }
   },
   "clients": {
@@ -296,7 +354,13 @@
     "active": "זמין להזמנה",
     "minutes": "{count} דק׳",
     "participants": "{count, plural, one {אישי (1:1)} other {עד # משתתפים}}",
-    "free": "ללא תשלום"
+    "free": "ללא תשלום",
+    "bookingMode": "איך מזמינים",
+    "modes": {
+      "class": "שיעור קבוצתי – בזמנים קבועים בלוח",
+      "appointment": "תור אישי – הלקוח בוחר זמן פנוי"
+    },
+    "appointmentLabel": "תור אישי"
   },
   "locations": {
     "title": "מיקומים",
@@ -532,8 +596,8 @@
       "title": "מערכת שעות",
       "today": "היום",
       "empty": "אין שיעורים ביום הזה.",
-      "closed": "הסטודיו סגור ביום הזה.",
-      "closedReason": "הסטודיו סגור ביום הזה ({reason}).",
+      "closed": "סגורים ביום הזה.",
+      "closedReason": "סגורים ביום הזה ({reason}).",
       "closedShort": "סגור"
     },
     "bookings": {
@@ -658,6 +722,31 @@
     "receipt": {
       "title": "קבלה",
       "back": "חזרה"
+    },
+    "appointment": {
+      "cta": "קביעת תור",
+      "ctaText": "בחרו שירות וזמן שנוח לכם.",
+      "title": "קביעת תור",
+      "service": "מה תרצו?",
+      "staff": "עם מי?",
+      "any": "כל מי שפנוי",
+      "day": "מתי?",
+      "time": "באיזו שעה?",
+      "noSlots": "אין זמנים פנויים ביום הזה. נסו יום אחר.",
+      "confirm": "קביעת תור ל-{time}",
+      "booked": "התור נקבע!",
+      "bookedBody": "{service} ב-{date} בשעה {time}, עם {staff}.",
+      "toBookings": "להרשמות שלי",
+      "another": "קביעת תור נוסף",
+      "minutes": "{count} דק׳",
+      "errors": {
+        "slot_taken": "הזמן הזה נתפס הרגע. בחרו זמן אחר.",
+        "outside_hours": "הזמן כבר לא זמין. בחרו זמן אחר.",
+        "no_valid_plan": "צריך מנוי או כרטיסייה בתוקף כדי לקבוע תור.",
+        "health_declaration_required": "צריך למלא הצהרת בריאות לפני הקביעה.",
+        "health_declaration_review": "הצהרת הבריאות שלך ממתינה לאישור.",
+        "generic": "משהו השתבש. נסו שוב."
+      }
     }
   },
   "join": {
@@ -1395,6 +1484,59 @@
       "about": "אודות",
       "contact": "צור קשר",
       "industries": "תחומים"
+    }
+  },
+  "appointments": {
+    "new": "תור חדש",
+    "title": "קביעת תור",
+    "service": "שירות",
+    "staff": "איש/ת צוות",
+    "anyStaff": "כל מי שפנוי",
+    "date": "תאריך",
+    "slots": "זמנים פנויים",
+    "noSlots": "אין זמנים פנויים ביום הזה.",
+    "noServices": "עדיין אין שירותים של תורים אישיים. אפשר להגדיר אותם בעמוד השירותים.",
+    "noStaff": "אף אחד בצוות עוד לא הגדיר שעות עבודה. מגדירים בעמוד הצוות.",
+    "client": "למי",
+    "searchClient": "חיפוש לקוח לפי שם, טלפון או מייל",
+    "search": "חיפוש",
+    "book": "קביעת התור",
+    "booked": "התור נקבע.",
+    "withStaff": "עם {name}",
+    "show": "הצגת זמנים",
+    "chooseSlot": "בחרו זמן",
+    "errors": {
+      "slot_taken": "הזמן הזה נתפס הרגע. בחרו זמן אחר.",
+      "outside_hours": "הזמן מחוץ לשעות העבודה.",
+      "generic": "משהו השתבש. נסו שוב.",
+      "invalid": "בחרו לקוח וזמן."
+    }
+  },
+  "hours": {
+    "title": "שעות עבודה",
+    "subtitle": "בשעות האלה אפשר לקבוע תורים אישיים עם {name}.",
+    "link": "שעות עבודה",
+    "day": "יום",
+    "from": "מ-",
+    "to": "עד",
+    "addBlock": "הוספת טווח",
+    "remove": "הסרה",
+    "save": "שמירה",
+    "saved": "השעות נשמרו.",
+    "none": "לא עובד/ת",
+    "weekdays": [
+      "שני",
+      "שלישי",
+      "רביעי",
+      "חמישי",
+      "שישי",
+      "שבת",
+      "ראשון"
+    ],
+    "errors": {
+      "overlapping_hours": "יש טווחים חופפים באותו יום.",
+      "invalid": "בדקו את השעות: ההתחלה צריכה להיות לפני הסוף.",
+      "generic": "משהו השתבש. נסו שוב."
     }
   }
 }

@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
@@ -16,10 +16,12 @@ ReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 
 COLUMNS = (
-    "id, name, description, duration_minutes, capacity, price_amount, price_currency, color, "
-    "active, created_at, updated_at"
+    "id, name, description, duration_minutes, capacity, booking_mode, price_amount, "
+    "price_currency, color, active, created_at, updated_at"
 )
 COLOR_PATTERN = r"^#[0-9a-fA-F]{6}$"
+# class: scheduled sessions people join; appointment: one-to-one at a free time with a staff member.
+BookingMode = Literal["class", "appointment"]
 
 
 class ServiceFields(BaseModel):
@@ -36,6 +38,7 @@ class ServiceCreate(ServiceFields):
     name: str = Field(min_length=1, max_length=120)
     duration_minutes: int = Field(ge=5, le=1440)
     capacity: int = Field(default=1, ge=1, le=1000)
+    booking_mode: BookingMode = "class"
     price_amount: int = Field(default=0, ge=0, description="Price in minor units (agorot, cents)")
     price_currency: str | None = Field(
         default=None, pattern=r"^[A-Z]{3}$", description="Defaults to the business currency"
@@ -54,6 +57,7 @@ class ServiceUpdate(ServiceFields):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     duration_minutes: int | None = Field(default=None, ge=5, le=1440)
     capacity: int | None = Field(default=None, ge=1, le=1000)
+    booking_mode: BookingMode | None = None
     price_amount: int | None = Field(default=None, ge=0)
     active: bool | None = None
 
@@ -64,6 +68,7 @@ class Service(BaseModel):
     description: str | None
     duration_minutes: int
     capacity: int
+    booking_mode: BookingMode
     price_amount: int
     price_currency: str
     color: str | None
@@ -91,10 +96,12 @@ def create_service(body: ServiceCreate, context: WriteDep) -> Service:
         context.session.execute(
             text(f"""
                 INSERT INTO app.services
-                    (tenant_id, name, description, duration_minutes, capacity, price_amount,
-                     price_currency, color, active)
-                SELECT :tenant_id, :name, :description, :duration_minutes, :capacity,
-                       :price_amount, coalesce(:price_currency, t.currency), :color, :active
+                    (tenant_id, name, description, duration_minutes, capacity, booking_mode,
+                     price_amount, price_currency, color, active)
+                SELECT :tenant_id, :name, :description, :duration_minutes,
+                       CASE WHEN :booking_mode = 'appointment' THEN 1 ELSE :capacity END,
+                       :booking_mode, :price_amount, coalesce(:price_currency, t.currency),
+                       :color, :active
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {COLUMNS}
             """),
@@ -123,7 +130,7 @@ def get_service(service_id: UUID, context: ReadDep) -> Service:
 @router.patch("/{service_id}")
 def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> Service:
     # Required columns cannot be cleared; an explicit null for them means "no change".
-    required = {"name", "duration_minutes", "capacity", "price_amount", "active"}
+    required = {"name", "duration_minutes", "capacity", "booking_mode", "price_amount", "active"}
     changes = {
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()

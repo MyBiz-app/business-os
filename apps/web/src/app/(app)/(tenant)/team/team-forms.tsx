@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { useActionState, useState } from "react";
 
 import { Field, SelectField } from "@/components/form/field";
@@ -94,6 +95,9 @@ export function MemberRow({ userId, email, role, customRoleId, isSelf, allowOwne
         <span className="flex-1 truncate" dir="ltr">
           {email} {isSelf && <span className="text-muted">{t("team.you")}</span>}
         </span>
+        <Link href={`/team/${userId}/hours`} className="text-sm text-primary underline-offset-4 hover:underline">
+          {t("hours.link")}
+        </Link>
         <form action={roleAction}>
           <select
             name="role"

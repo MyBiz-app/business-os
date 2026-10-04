@@ -53,6 +53,7 @@ class BusinessProfile(BaseModel):
 class ClientBusiness(BaseModel):
     id: UUID
     name: str
+    vertical: str = Field(description="The business's industry (terms in the app follow it)")
     locale: Literal["he", "en"]
     primary_color: str | None
     logo_url: str | None
@@ -121,7 +122,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 
 BUSINESS_SELECT = f"""
-    SELECT t.id, t.name, t.locale, t.primary_color, t.time_zone, t.currency,
+    SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
            t.cancellation_window_minutes, t.online_sales, {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
@@ -240,7 +241,9 @@ def client_sessions(
     rows = db.execute(
         text(f"""
             {CLIENT_SESSION_SELECT}
-            WHERE s.starts_at >= :from AND s.starts_at < :to ORDER BY s.starts_at
+            WHERE s.starts_at >= :from AND s.starts_at < :to
+              AND (sv.booking_mode = 'class' OR mine.id IS NOT NULL)
+            ORDER BY s.starts_at
         """),
         {"from": window_start, "to": window_end},
     ).mappings()
@@ -274,6 +277,15 @@ def _ensure_upcoming(context: ClientContext, session_id: UUID) -> None:
 def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
     """Books the signed-in client, or puts them on the waitlist when the session is full."""
     _ensure_upcoming(context, session_id)
+    mode = context.session.execute(
+        text("""
+            SELECT sv.booking_mode FROM app.sessions s JOIN app.services sv ON sv.id = s.service_id
+            WHERE s.id = :id
+        """),
+        {"id": session_id},
+    ).scalar()
+    if mode == "appointment":  # appointments are booked at a free time (POST /appointments)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_bookable")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
     requires_plan = context.session.execute(
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),

@@ -45,7 +45,8 @@ export default async function ServicesPage() {
                     </span>
                   </span>
                   <span className="text-sm text-muted">
-                    {t("services.minutes", { count: service.duration_minutes })} · {t("services.participants", { count: service.capacity })}
+                    {t("services.minutes", { count: service.duration_minutes })} ·{" "}
+                    {service.booking_mode === "appointment" ? t("services.appointmentLabel") : t("services.participants", { count: service.capacity })}
                     {!service.active && ` · ${t("common.inactive")}`}
                   </span>
                 </span>

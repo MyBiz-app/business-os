@@ -17,6 +17,7 @@ function readForm(formData: FormData) {
     description: value("description"),
     duration_minutes: Number(value("duration_minutes")),
     capacity: Number(value("capacity")),
+    booking_mode: (value("booking_mode") === "appointment" ? "appointment" : "class") as "class" | "appointment",
     price_amount: price,
     color: value("color"),
     active: formData.get("active") === "on",

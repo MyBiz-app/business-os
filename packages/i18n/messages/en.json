@@ -128,7 +128,10 @@
     "currency": "Currency",
     "submit": "Create business",
     "verticals": {
-      "fitness": "Fitness studio"
+      "fitness": "Fitness studio",
+      "beauty": "Barber / beauty salon",
+      "clinic": "Clinic / therapist",
+      "garage": "Garage / car services"
     },
     "currencies": {
       "ILS": "Israeli shekel (₪)",
@@ -209,7 +212,62 @@
       "newClient": "New member",
       "searchClients": "Search members",
       "noClients": "No members yet",
-      "noResults": "No members match your search"
+      "noResults": "No members match your search",
+      "schedule": "Class schedule",
+      "newSession": "New class",
+      "noSessions": "No classes",
+      "sessionsToday": "{count, plural, =0 {No classes today} one {One class today} other {# classes today}}",
+      "appTab": "Schedule",
+      "appEmpty": "No classes on this day.",
+      "place": "The studio"
+    },
+    "beauty": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Calendar",
+      "newSession": "Group event",
+      "noSessions": "No appointments",
+      "sessionsToday": "{count, plural, =0 {No appointments today} one {One appointment today} other {# appointments today}}",
+      "appTab": "Book",
+      "appEmpty": "No group events on this day.",
+      "place": "The salon"
+    },
+    "clinic": {
+      "client": "Patient",
+      "clients": "Patients",
+      "addClient": "Add patient",
+      "newClient": "New patient",
+      "searchClients": "Search patients",
+      "noClients": "No patients yet",
+      "noResults": "No patients match your search",
+      "schedule": "Calendar",
+      "newSession": "Group session",
+      "noSessions": "No treatments",
+      "sessionsToday": "{count, plural, =0 {No treatments today} one {One treatment today} other {# treatments today}}",
+      "appTab": "Book",
+      "appEmpty": "No group sessions on this day.",
+      "place": "The clinic"
+    },
+    "garage": {
+      "client": "Customer",
+      "clients": "Customers",
+      "addClient": "Add customer",
+      "newClient": "New customer",
+      "searchClients": "Search customers",
+      "noClients": "No customers yet",
+      "noResults": "No customers match your search",
+      "schedule": "Work calendar",
+      "newSession": "Event",
+      "noSessions": "No jobs",
+      "sessionsToday": "{count, plural, =0 {No jobs today} one {One job today} other {# jobs today}}",
+      "appTab": "Book",
+      "appEmpty": "No events on this day.",
+      "place": "The garage"
     }
   },
   "clients": {
@@ -296,7 +354,13 @@
     "active": "Available for booking",
     "minutes": "{count} min",
     "participants": "{count, plural, one {Personal (1:1)} other {Up to # participants}}",
-    "free": "Free"
+    "free": "Free",
+    "bookingMode": "How it is booked",
+    "modes": {
+      "class": "Group class – at set times on the schedule",
+      "appointment": "Personal appointment – the client picks a free time"
+    },
+    "appointmentLabel": "Appointment"
   },
   "locations": {
     "title": "Locations",
@@ -532,8 +596,8 @@
       "title": "Schedule",
       "today": "Today",
       "empty": "No classes on this day.",
-      "closed": "The studio is closed on this day.",
-      "closedReason": "The studio is closed on this day ({reason}).",
+      "closed": "Closed on this day.",
+      "closedReason": "Closed on this day ({reason}).",
       "closedShort": "Closed"
     },
     "bookings": {
@@ -658,6 +722,31 @@
     "receipt": {
       "title": "Receipt",
       "back": "Back"
+    },
+    "appointment": {
+      "cta": "Book an appointment",
+      "ctaText": "Pick a service and a time that suits you.",
+      "title": "Book an appointment",
+      "service": "What would you like?",
+      "staff": "With whom?",
+      "any": "Anyone available",
+      "day": "When?",
+      "time": "What time?",
+      "noSlots": "No free times on this day. Try another day.",
+      "confirm": "Book for {time}",
+      "booked": "You're booked!",
+      "bookedBody": "{service} on {date} at {time}, with {staff}.",
+      "toBookings": "My bookings",
+      "another": "Book another",
+      "minutes": "{count} min",
+      "errors": {
+        "slot_taken": "That time was just taken. Choose another.",
+        "outside_hours": "That time is no longer available. Choose another.",
+        "no_valid_plan": "You need a valid plan to book.",
+        "health_declaration_required": "Please fill in the health declaration before booking.",
+        "health_declaration_review": "Your health declaration is waiting for review.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "join": {
@@ -1395,6 +1484,59 @@
       "about": "About",
       "contact": "Contact",
       "industries": "Industries"
+    }
+  },
+  "appointments": {
+    "new": "New appointment",
+    "title": "Book an appointment",
+    "service": "Service",
+    "staff": "Staff member",
+    "anyStaff": "Anyone available",
+    "date": "Date",
+    "slots": "Free times",
+    "noSlots": "No free times on this day.",
+    "noServices": "No personal-appointment services yet. Set them up on the Services page.",
+    "noStaff": "Nobody on the team has set working hours yet. Set them on the Team page.",
+    "client": "For",
+    "searchClient": "Search a client by name, phone or email",
+    "search": "Search",
+    "book": "Book appointment",
+    "booked": "The appointment is booked.",
+    "withStaff": "with {name}",
+    "show": "Show times",
+    "chooseSlot": "Choose a time",
+    "errors": {
+      "slot_taken": "That time was just taken. Choose another.",
+      "outside_hours": "That time is outside working hours.",
+      "generic": "Something went wrong. Please try again.",
+      "invalid": "Choose a client and a time."
+    }
+  },
+  "hours": {
+    "title": "Working hours",
+    "subtitle": "Personal appointments with {name} can be booked in these hours.",
+    "link": "Working hours",
+    "day": "Day",
+    "from": "From",
+    "to": "To",
+    "addBlock": "Add hours",
+    "remove": "Remove",
+    "save": "Save",
+    "saved": "Hours saved.",
+    "none": "Not working",
+    "weekdays": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "errors": {
+      "overlapping_hours": "Some hours overlap on the same day.",
+      "invalid": "Check the hours: the start must be before the end.",
+      "generic": "Something went wrong. Please try again."
     }
   }
 }
