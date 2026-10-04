@@ -77,4 +77,16 @@ with sync_playwright() as p:
     page.get_by_role("status").get_by_role("link", name="השבוע הבא").click(); h.ready(page)
     expect(page.locator("main ol").get_by_text("07:45")).to_be_visible()
     print("copy week: ok")
+
+    # An instructor sees their own classes for today first on the dashboard.
+    today = dt.date.today().isoformat()
+    page.goto(f"{h.BASE}/schedule/new?date={today}"); h.ready(page)
+    page.get_by_label("שעת התחלה").fill("23:30")
+    page.get_by_label("מדריך/ה").select_option(label=email)
+    page.get_by_role("button", name="יצירה").click()
+    page.wait_for_url("**/schedule?week=*")
+    page.goto(f"{h.BASE}/dashboard"); h.ready(page)
+    mine = page.get_by_role("region", name="השיעור שלך היום")
+    expect(mine.get_by_text("23:30")).to_be_visible()
+    print("instructor's classes today on the dashboard: ok")
     b.close()

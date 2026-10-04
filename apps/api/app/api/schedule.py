@@ -227,11 +227,13 @@ def list_sessions(
     context: ReadDep,
     start: Annotated[dt.date, Query(description="First local date (business time zone)")],
     days: Annotated[int, Query(ge=1, le=42)] = 7,
+    mine: Annotated[bool, Query(description="Only sessions the user teaches")] = False,
 ) -> list[ScheduledSession]:
     time_zone = _time_zone(context.session)
     window_start = local_to_utc(start, time.min, time_zone)
     window_end = local_to_utc(start + timedelta(days=days), time.min, time_zone)
-    in_window = "WHERE s.starts_at >= :from AND s.starts_at < :to ORDER BY s.starts_at"
+    teaching = "AND s.instructor_user_id = app.current_user_id()" if mine else ""
+    in_window = f"WHERE s.starts_at >= :from AND s.starts_at < :to {teaching} ORDER BY s.starts_at"
     rows = context.session.execute(
         text(f"{SESSION_SELECT} {in_window}"),
         {"from": window_start, "to": window_end},

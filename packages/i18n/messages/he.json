@@ -149,7 +149,8 @@
     "weeklyRevenue": "הכנסות לפי שבוע",
     "weeklyAttendance": "הגעות לפי שבוע",
     "showTable": "הצגה כטבלה",
-    "weekOf": "שבוע של"
+    "weekOf": "שבוע של",
+    "myClassesToday": "{count, plural, one {השיעור שלך היום} other {# השיעורים שלך היום}}"
   },
   "roles": {
     "owner": "בעלים",

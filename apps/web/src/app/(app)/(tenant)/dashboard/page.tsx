@@ -48,6 +48,34 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     if (metric.unit === "percent") return `${number.format(Math.round(value))}%`;
     return number.format(value);
   };
+  const mine = todays.filter((session) => session.instructor_user_id === me.id);
+  const sessionList = (sessions: typeof todays) => (
+    <ul className="flex flex-col divide-y divide-border">
+      {sessions.map((session) => (
+        <li key={session.id}>
+          <Link
+            href={`/schedule/${session.id}`}
+            className="flex items-center justify-between gap-3 py-2.5 hover:text-primary"
+          >
+            <span className="flex items-center gap-3">
+              <span aria-hidden="true" className="size-2.5 rounded-full" style={{ backgroundColor: session.service.color ?? "var(--primary)" }} />
+              <span className="tabular-nums" dir="ltr">
+                {formatTime(session.starts_at, locale, tenant.time_zone)}
+              </span>
+              <span className={`font-medium ${session.status === "cancelled" ? "line-through" : ""}`}>
+                {session.service.name}
+              </span>
+            </span>
+            <span className="text-sm text-muted">
+              {session.status === "cancelled"
+                ? t("schedule.cancelled")
+                : t("schedule.spotsLabel", { booked: session.booked, capacity: session.capacity })}
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
   const weekLabel = (bucket: string) => formatDay(bucket, locale, { day: "numeric", month: "numeric" });
 
   return (
@@ -61,6 +89,15 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </div>
         <BusinessSwitcher current={tenant.id} memberships={me.memberships} />
       </div>
+
+      {mine.length > 0 && (
+        <section aria-labelledby="mine-heading" className="flex flex-col gap-3 rounded-2xl border border-primary bg-surface p-6">
+          <h2 id="mine-heading" className="text-lg font-semibold">
+            {t("dashboard.myClassesToday", { count: mine.length })}
+          </h2>
+          {sessionList(mine)}
+        </section>
+      )}
 
       {reports && (
         <section aria-labelledby="kpi-heading" className="flex flex-col gap-4">
@@ -151,31 +188,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         {todays.length === 0 ? (
           <p className="text-muted">{t("dashboard.emptyToday")}</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-border">
-            {todays.map((session) => (
-              <li key={session.id}>
-                <Link
-                  href={`/schedule/${session.id}`}
-                  className="flex items-center justify-between gap-3 py-2.5 hover:text-primary"
-                >
-                  <span className="flex items-center gap-3">
-                    <span aria-hidden="true" className="size-2.5 rounded-full" style={{ backgroundColor: session.service.color ?? "var(--primary)" }} />
-                    <span className="tabular-nums" dir="ltr">
-                      {formatTime(session.starts_at, locale, tenant.time_zone)}
-                    </span>
-                    <span className={`font-medium ${session.status === "cancelled" ? "line-through" : ""}`}>
-                      {session.service.name}
-                    </span>
-                  </span>
-                  <span className="text-sm text-muted">
-                    {session.status === "cancelled"
-                      ? t("schedule.cancelled")
-                      : t("schedule.spotsLabel", { booked: session.booked, capacity: session.capacity })}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          sessionList(todays)
         )}
       </section>}
     </main>

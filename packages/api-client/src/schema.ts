@@ -4541,6 +4541,8 @@ export interface operations {
                 /** @description First local date (business time zone) */
                 start: string;
                 days?: number;
+                /** @description Only sessions the user teaches */
+                mine?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;

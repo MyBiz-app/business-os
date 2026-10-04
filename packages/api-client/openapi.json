@@ -2011,6 +2011,18 @@
             }
           },
           {
+            "name": "mine",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Only sessions the user teaches",
+              "default": false,
+              "title": "Mine"
+            },
+            "description": "Only sessions the user teaches"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,

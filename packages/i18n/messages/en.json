@@ -149,7 +149,8 @@
     "weeklyRevenue": "Revenue per week",
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
-    "weekOf": "Week of"
+    "weekOf": "Week of",
+    "myClassesToday": "{count, plural, one {Your class today} other {Your # classes today}}"
   },
   "roles": {
     "owner": "Owner",
