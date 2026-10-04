@@ -14,6 +14,7 @@ import { StatusBadge } from "../status-badge";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
+import { MessagesSection } from "../../messages/messages-section";
 import { NotesSection, ProfileSection } from "./profile-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
@@ -137,6 +138,14 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
       </section>
 
       <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
+
+      <MessagesSection
+        target={{ client_id: client.id }}
+        phone={client.phone}
+        path={`/clients/${client.id}`}
+        context={context}
+        locked={erased}
+      />
 
       {!erased && tenant.permissions.includes("clients.privacy") && (
         <PrivacySection

@@ -52,7 +52,7 @@ MODULES: dict[str, Module] = {
             requires_all=("crm",),
             available=False,
         ),
-        Module("whatsapp", {"ILS": 2900, "USD": 900, "EUR": 800}, available=False),
+        Module("whatsapp", {"ILS": 2900, "USD": 900, "EUR": 800}),
         Module("extra_location", {"ILS": 2900, "USD": 900, "EUR": 800}, per_unit=True),
     )
 }

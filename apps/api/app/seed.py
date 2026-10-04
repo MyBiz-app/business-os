@@ -179,8 +179,9 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         {"t": tenant_id, "u": owner},
     )
     apply_vertical_pack(conn, tenant_id, "fitness", "he", "ILS")
-    # Show everything: the richest preset plus the CRM.
-    set_modules(conn, tenant_id, {**dict.fromkeys(PRESETS["ai_powered"], 1), "crm": 1})
+    # Show everything: the richest preset plus the CRM and messaging.
+    modules = {**dict.fromkeys(PRESETS["ai_powered"], 1), "crm": 1, "whatsapp": 1}
+    set_modules(conn, tenant_id, modules)
     plans = (
         conn.execute(
             text("""
@@ -582,6 +583,15 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
             (tenant_id, client_id, booking_id, author_user_id, body, created_at)
         VALUES (:tenant_id, :client_id, :booking_id, :author, :body, :at)
     """, note_rows)  # fmt: skip
+
+    conn.execute(
+        text("""
+            INSERT INTO app.message_templates (tenant_id, name, body) VALUES
+                (:t, 'תזכורת לשיעור', 'היי {first_name}, מחכים לך היום בסטודיו 🙂'),
+                (:t, 'מתגעגעים', 'היי {first_name}, מזמן לא ראינו אותך! נשמח לראות אותך השבוע.')
+        """),
+        {"t": tenant_id},
+    )
 
     # MyBiz's own (simulated) billing: a test card on file, monthly invoices since the trial.
     conn.execute(
