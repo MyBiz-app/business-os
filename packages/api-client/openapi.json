@@ -4916,6 +4916,83 @@
         }
       }
     },
+    "/client/closed-days": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Client Closed Days",
+        "description": "Days the business is closed in the window (no classes; usually a holiday).",
+        "operationId": "client_closed_days",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date (business time zone)",
+              "title": "Start"
+            },
+            "description": "First local date (business time zone)"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 14,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClosedDay"
+                  },
+                  "title": "Response Client Closed Days"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/sessions/{session_id}/bookings": {
       "post": {
         "tags": [

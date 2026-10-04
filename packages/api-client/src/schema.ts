@@ -1127,6 +1127,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/closed-days": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Closed Days
+         * @description Days the business is closed in the window (no classes; usually a holiday).
+         */
+        get: operations["client_closed_days"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/sessions/{session_id}/bookings": {
         parameters: {
             query?: never;
@@ -6206,6 +6226,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_closed_days: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClosedDay"][];
                 };
             };
             /** @description Validation Error */

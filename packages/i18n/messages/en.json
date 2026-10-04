@@ -500,7 +500,10 @@
     "schedule": {
       "title": "Schedule",
       "today": "Today",
-      "empty": "No classes on this day."
+      "empty": "No classes on this day.",
+      "closed": "The studio is closed on this day.",
+      "closedReason": "The studio is closed on this day ({reason}).",
+      "closedShort": "Closed"
     },
     "bookings": {
       "title": "My bookings",
