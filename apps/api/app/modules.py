@@ -37,7 +37,7 @@ MODULES: dict[str, Module] = {
         Module("client_app", {"ILS": 4900, "USD": 1500, "EUR": 1400}),
         Module("ai_basic", {"ILS": 4900, "USD": 1500, "EUR": 1400}),
         Module("ai_pro", {"ILS": 11900, "USD": 3500, "EUR": 3200}),
-        Module("crm", {"ILS": 3900, "USD": 1200, "EUR": 1100}, available=False),
+        Module("crm", {"ILS": 3900, "USD": 1200, "EUR": 1100}),
         Module("analytics_pro", {"ILS": 3900, "USD": 1200, "EUR": 1100}, available=False),
         Module(
             "agent_finance",

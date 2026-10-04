@@ -53,3 +53,19 @@ def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
     clients, attended, payments, declarations = counts
     assert clients == 170 and attended > 500 and payments > 100
     assert declarations == 155  # every client but the leads
+    with engine.connect() as connection:
+        stages = dict(
+            connection.execute(
+                text("SELECT stage, count(*) FROM app.leads WHERE tenant_id = :t GROUP BY 1"),
+                {"t": tenant_id},
+            ).all()
+        )
+        won_without_client = connection.execute(
+            text("""
+                SELECT count(*) FROM app.leads
+                WHERE tenant_id = :t AND stage = 'won' AND client_id IS NULL
+            """),
+            {"t": tenant_id},
+        ).scalar_one()
+    assert set(stages) == {"new", "contacted", "trial", "offer", "won", "lost"}
+    assert won_without_client == 0  # won leads are clients

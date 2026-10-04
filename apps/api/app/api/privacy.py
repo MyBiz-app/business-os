@@ -129,6 +129,19 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "leads": _rows(
+            db,
+            """
+            SELECT l.first_name, l.last_name, l.email, l.phone, l.interest, l.source, l.stage,
+                   l.created_at,
+                   (SELECT coalesce(json_agg(json_build_object(
+                        'kind', a.kind, 'note', a.note, 'occurred_at', a.occurred_at)
+                        ORDER BY a.occurred_at), '[]')
+                    FROM app.lead_activities a WHERE a.lead_id = l.id) AS activities
+            FROM app.leads l WHERE l.client_id = :id ORDER BY l.created_at
+            """,
+            client_id,
+        ),
         "health_declarations": _rows(
             db,
             """
@@ -180,6 +193,8 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
+    # The CRM history that led to the client (their inquiry, calls, notes) goes with them.
+    db.execute(text("DELETE FROM app.leads WHERE client_id = :id"), {"id": client_id})
     db.execute(
         text("""
             UPDATE app.entitlement_freezes SET reason = NULL

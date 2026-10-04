@@ -202,7 +202,8 @@
     "schedule": "Schedule",
     "plans": "Plans",
     "assistant": "AI assistant",
-    "reports": "Reports"
+    "reports": "Reports",
+    "leads": "Leads"
   },
   "terms": {
     "fitness": {
@@ -900,7 +901,8 @@
       "client_app": "Your clients join with a code or QR, book, cancel and join waitlists in your branded app.",
       "ai_basic": "Ask about your business in plain words: schedule, members, numbers.",
       "ai_pro": "Everything in AI Basic, and it prepares bookings and cancellations for you to confirm.",
-      "extra_location": "{price} per location beyond the first."
+      "extra_location": "{price} per location beyond the first.",
+      "crm": "A lead pipeline: online inquiry form, call log, follow-up reminders and conversion to clients."
     }
   },
   "platform": {
@@ -1536,6 +1538,105 @@
     "errors": {
       "overlapping_hours": "Some hours overlap on the same day.",
       "invalid": "Check the hours: the start must be before the end.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "leads": {
+    "title": "Leads",
+    "subtitle": "People on their way to becoming clients",
+    "new": "New lead",
+    "create": "Save lead",
+    "save": "Save",
+    "back": "Back to leads",
+    "cancel": "Cancel",
+    "search": "Search",
+    "filter": "Filter",
+    "allSources": "All sources",
+    "emptyStage": "No leads here",
+    "due": "Follow up today",
+    "inquiryLink": "Inquiry form link",
+    "copy": "Copy",
+    "copied": "Copied",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "source": "Source",
+    "campaign": "Campaign",
+    "owner": "Owner",
+    "noOwner": "Nobody",
+    "followUp": "Follow up on",
+    "interest": "Interested in",
+    "details": "Details",
+    "stageTitle": "Stage",
+    "convert": "Convert to client",
+    "convertHint": "Creates a client (or links an existing client with the same email) and marks the lead as won.",
+    "isClient": "This lead became a client.",
+    "openClient": "Open client",
+    "markLost": "Mark as lost",
+    "lostReason": "Reason (optional)",
+    "activityTitle": "Activity",
+    "activityKind": "Type",
+    "activityNote": "What happened?",
+    "logActivity": "Add",
+    "movedTo": "Moved to {stage}",
+    "delete": "Delete lead",
+    "deleteConfirm": "Delete this lead and all its activity?",
+    "deleteYes": "Yes, delete",
+    "stats": {
+      "new30": "New leads (30 days)",
+      "won30": "Became clients (30 days)",
+      "conversion": "Conversion (90 days)",
+      "followUps": "Follow up today"
+    },
+    "stages": {
+      "new": "New",
+      "contacted": "Contacted",
+      "trial": "Trial",
+      "offer": "Offer",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "sources": {
+      "manual": "Entered by hand",
+      "form": "Inquiry form",
+      "walk_in": "Walk-in",
+      "referral": "Referral",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "google": "Google",
+      "website": "Website",
+      "other": "Other"
+    },
+    "activities": {
+      "note": "Note",
+      "call": "Call",
+      "message": "Message",
+      "meeting": "Meeting",
+      "stage": "Stage change",
+      "created": "Lead created",
+      "converted": "Became a client"
+    },
+    "pipeline": "Lead pipeline"
+  },
+  "inquiry": {
+    "title": "Get in touch · {name}",
+    "subtitle": "Leave your details and we'll get back to you soon.",
+    "closed": "This form isn't open right now.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "contactHint": "Phone or email — at least one of them.",
+    "interest": "What are you interested in?",
+    "website": "Website",
+    "send": "Send",
+    "sent": "Thank you! We got your details and will be in touch soon.",
+    "privacy": "Your details are kept by the business only to contact you.",
+    "errors": {
+      "invalid": "Some details aren't valid.",
+      "contact": "We need a phone number or email to get back to you.",
+      "too_many_requests": "We've already received a few messages from you. Please try again later.",
       "generic": "Something went wrong. Please try again."
     }
   }

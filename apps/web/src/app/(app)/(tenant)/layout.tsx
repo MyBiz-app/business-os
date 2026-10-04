@@ -22,6 +22,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use" },
     { href: "/schedule", label: t(`terms.${tenant.vertical}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
+    { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read" },
     { href: "/services", label: t("nav.services"), icon: "services", permission: "catalog.read" },
     { href: "/plans", label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
     { href: "/locations", label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
@@ -29,6 +30,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const items: NavItem[] = candidates
     .filter((item) => !item.permission || allowed(item.permission))
     .filter((item) => item.href !== "/assistant" || tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro"))
+    .filter((item) => item.href !== "/leads" || tenant.modules.includes("crm"))
     .map(({ href, label, icon }) => ({ href, label, icon }));
   if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team" });
   if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings" });

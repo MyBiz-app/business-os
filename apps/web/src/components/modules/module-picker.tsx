@@ -50,7 +50,10 @@ export function ModulePicker({ catalog, initial, activeClients, name }: Props) {
       return next;
     });
 
-  const others = catalog.modules.filter((m) => !["ai_basic", "ai_pro", "client_app", "extra_location"].includes(m.key));
+  // On/off modules; the AI tiers and per-unit locations have their own controls.
+  const special = (key: string) => ["ai_basic", "ai_pro", "extra_location"].includes(key);
+  const toggles = catalog.modules.filter((m) => m.available && !special(m.key));
+  const others = catalog.modules.filter((m) => !m.available && !special(m.key));
 
   return (
     <div className="flex flex-col gap-5">
@@ -66,21 +69,23 @@ export function ModulePicker({ catalog, initial, activeClients, name }: Props) {
         <span className="font-semibold">{money(core.price)}</span>
       </div>
 
-      <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
-        <span className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            className="mt-1 size-4 accent-[var(--primary)]"
-            checked={!!selection.client_app}
-            onChange={(event) => set("client_app", event.target.checked ? 1 : 0)}
-          />
-          <span className="flex flex-col">
-            <span className="font-semibold">{t("names.client_app")}</span>
-            <span className="text-sm text-muted">{t("descriptions.client_app")}</span>
+      {toggles.map((module) => (
+        <label key={module.key} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
+          <span className="flex items-start gap-3">
+            <input
+              type="checkbox"
+              className="mt-1 size-4 accent-[var(--primary)]"
+              checked={!!selection[module.key]}
+              onChange={(event) => set(module.key, event.target.checked ? 1 : 0)}
+            />
+            <span className="flex flex-col">
+              <span className="font-semibold">{t(`names.${module.key}`)}</span>
+              <span className="text-sm text-muted">{t(`descriptions.${module.key as "client_app"}`)}</span>
+            </span>
           </span>
-        </span>
-        <span className="shrink-0 text-sm">{money(byKey.client_app.price)}</span>
-      </label>
+          <span className="shrink-0 text-sm">{money(module.price)}</span>
+        </label>
+      ))}
 
       <fieldset className="flex flex-col gap-2 rounded-xl border border-border bg-background p-4">
         <legend className="px-1 font-semibold">{t("aiTier")}</legend>

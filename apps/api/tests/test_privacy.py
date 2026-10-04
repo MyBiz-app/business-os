@@ -135,3 +135,24 @@ def test_privacy_requests_are_for_owners_only(
         f"/clients/{created['id']}/erase", json={"confirm": False}, headers=studio["headers"]
     )
     assert unconfirmed.status_code == 422
+
+
+def test_privacy_covers_the_clients_lead(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"crm": 1}}, headers=headers)
+    lead = client.post(
+        "/leads", json={"first_name": "Gal", "phone": "050-3333333"}, headers=headers
+    ).json()
+    client.post(
+        f"/leads/{lead['id']}/activities", json={"kind": "call", "note": "Wants evenings"},
+        headers=headers,
+    )  # fmt: skip
+    client_id = client.post(f"/leads/{lead['id']}/convert", headers=headers).json()["client_id"]
+
+    document = client.get(f"/clients/{client_id}/export", headers=headers).json()
+    [exported] = document["leads"]
+    assert exported["phone"] == "050-3333333"
+    assert "Wants evenings" in [a["note"] for a in exported["activities"]]
+
+    client.post(f"/clients/{client_id}/erase", json={"confirm": True}, headers=headers)
+    assert client.get(f"/leads/{lead['id']}", headers=headers).status_code == 404

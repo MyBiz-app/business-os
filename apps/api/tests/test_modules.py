@@ -20,7 +20,9 @@ def test_business_created_with_chosen_modules(client: TestClient, auth: AuthHead
     owner = uuid4()
     created = client.post("/tenants", json={**STUDIO, "modules": {}}, headers=auth(owner)).json()
     assert created["modules"] == []
-    bad = client.post("/tenants", json={**STUDIO, "modules": {"crm": 1}}, headers=auth(uuid4()))
+    bad = client.post(
+        "/tenants", json={**STUDIO, "modules": {"whatsapp": 1}}, headers=auth(uuid4())
+    )
     assert bad.status_code == 422
     assert bad.json()["detail"] == "module_not_available"
 
@@ -53,7 +55,10 @@ def test_recommend_and_quote(client: TestClient, auth: AuthHeaders) -> None:
     )
     assert both.json()["detail"] == "choose_one_ai_tier"
     catalog = client.get("/modules/catalog", params={"currency": "USD"}, headers=headers).json()
-    assert {m["key"] for m in catalog["modules"] if not m["available"]} >= {"crm", "whatsapp"}
+    assert {m["key"] for m in catalog["modules"] if not m["available"]} >= {
+        "analytics_pro",
+        "whatsapp",
+    }
 
 
 def test_changing_modules_needs_settings_permission(
