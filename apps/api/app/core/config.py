@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from
+    # Public addresses used in emails (links to the web app and the client app).
+    web_url: str = "http://localhost:3000"
+    client_app_url: str = "http://localhost:8081"
 
     @field_validator("database_url")
     @classmethod

@@ -10,7 +10,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts"
+    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts",
+    "export:api": "node scripts/export-api.mjs"
   },
   "devDependencies": {
     "typescript": "^5"

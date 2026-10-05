@@ -36,6 +36,10 @@ select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
 # Hebrew letters are legitimate content (vertical packs, demo data), not look-alike characters.
 ignore = ["RUF001"]
 
+[tool.ruff.lint.per-file-ignores]
+# Inline-styled email HTML reads better unwrapped.
+"app/welcome.py" = ["E501"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

@@ -1,0 +1,71 @@
+{
+  "email": {
+    "greeting": "שלום {name},",
+    "note": "הערת העסק: {note}",
+    "footer": "ההודעה נשלחה מ{business}. את כל העדכונים אפשר לראות באפליקציה.",
+    "subject": {
+      "waitlist_promoted": "נכנסת! {service} ב-{when}",
+      "booked_by_studio": "נרשמת ל{service} ב-{when}",
+      "waitlisted_by_studio": "ברשימת ההמתנה: {service} ב-{when}",
+      "booking_cancelled_by_studio": "ההרשמה בוטלה: {service} ב-{when}",
+      "session_cancelled": "בוטל: {service} ב-{when}",
+      "session_moved": "שעה חדשה: {service} ב-{when}",
+      "health_approved": "הצהרת הבריאות שלך אושרה",
+      "health_rejected": "לגבי הצהרת הבריאות שלך",
+      "session_reminder": "היום: {service} ב-{when}",
+      "plan_ending": "המנוי שלך מסתיים ב-{date}"
+    },
+    "body": {
+      "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
+      "booked_by_studio": "{business} רשם אותך ל{service} ב-{when}.",
+      "waitlisted_by_studio": "{business} הוסיף אותך לרשימת ההמתנה ל{service} ב-{when}. נעדכן אם יתפנה מקום.",
+      "booking_cancelled_by_studio": "{business} ביטל את ההרשמה שלך ל{service} ב-{when}.",
+      "session_cancelled": "{service} ב-{when} בוטל. מצטערים על השינוי.",
+      "session_moved": "{service} הועבר מ-{previous} ל-{when}. ההרשמה שלך עברה איתו.",
+      "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם באפליקציה.",
+      "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם העסק.",
+      "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום.",
+      "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם."
+    },
+    "welcome": {
+      "subject": "ברוכים הבאים ל-MyBiz, {business}! 🎉",
+      "preheader": "העסק שלך מוכן. הנה כל מה שצריך כדי להתחיל.",
+      "hello": "שלום,",
+      "intro": "איזה כיף שהצטרפת! {business} כבר מוגדר ב-MyBiz ומחכה לך. כאן מרוכז כל מה שצריך לדעת כדי להתחיל.",
+      "planTitle": "המסלול שלך",
+      "core": "בסיס (עד {count} לקוחות פעילים)",
+      "coreCustom": "בסיס (מעל 1,000 לקוחות פעילים)",
+      "total": "סה״כ לחודש אחרי תקופת הניסיון",
+      "trial": "תקופת הניסיון חינם עד {date}. לא תחויב/י לפני כן, ואפשר לשנות את המסלול בכל רגע.",
+      "simulated": "אב-טיפוס: החיובים מדומים ולא יורד כסף.",
+      "joinTitle": "קוד ההצטרפות של העסק",
+      "joinText": "הלקוחות שלך מצטרפים לאפליקציה עם הקוד הזה (או עם קוד ה-QR שבמערכת).",
+      "stepsTitle": "4 צעדים ראשונים",
+      "steps": [
+        "להוסיף לוגו וצבעים (הגדרות)",
+        "להגדיר שירותים ושעות פעילות",
+        "להזמין את הצוות",
+        "לשתף את קוד ההצטרפות עם הלקוחות"
+      ],
+      "openApp": "כניסה למערכת",
+      "guide": "מדריך צעדים ראשונים",
+      "clientApp": "אפליקציית הלקוחות",
+      "help": "יש שאלה? פשוט עונים למייל הזה או כותבים לנו בעמוד צור קשר: {contact}",
+      "signature": "בהצלחה,\nצוות MyBiz"
+    }
+  },
+  "modules": {
+    "names": {
+      "none": "בלי AI",
+      "client_app": "אפליקציית לקוחות",
+      "ai_basic": "AI בסיסי",
+      "ai_pro": "AI מתקדם",
+      "crm": "CRM ולידים",
+      "analytics_pro": "אנליטיקה מתקדמת",
+      "agent_finance": "סוכן כספים",
+      "agent_marketing": "סוכן שיווק",
+      "whatsapp": "וואטסאפ",
+      "extra_location": "סניפים נוספים"
+    }
+  }
+}

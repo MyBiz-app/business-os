@@ -26,3 +26,13 @@ test("no message is empty", () => {
     }
   }
 });
+
+test("the API's copy of its messages is up to date (pnpm --filter @business-os/i18n export:api)", async () => {
+  const { API_MESSAGES, LOCALES, apiMessages, serialize } = await import("../scripts/export-api.mjs");
+  const { readFileSync } = await import("node:fs");
+  const { join } = await import("node:path");
+  for (const locale of LOCALES) {
+    const copy = readFileSync(join(API_MESSAGES, `${locale}.json`), "utf8");
+    assert.equal(copy, serialize(apiMessages(locale)), `${locale}: run export:api`);
+  }
+});

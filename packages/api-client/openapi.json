@@ -7317,6 +7317,111 @@
         }
       }
     },
+    "/tenants/current/welcome-email": {
+      "post": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Send Welcome",
+        "description": "Sends the welcome email once; later calls return it without sending again.",
+        "operationId": "send_welcome",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WelcomeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WelcomeEmail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Preview Welcome",
+        "operationId": "preview_welcome",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WelcomeEmail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/pricing": {
       "get": {
         "tags": [
@@ -17990,6 +18095,56 @@
           "to_date"
         ],
         "title": "WeekCopy"
+      },
+      "WelcomeEmail": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "sent",
+              "logged",
+              "not_configured",
+              "already_sent",
+              "preview"
+            ],
+            "title": "Status"
+          },
+          "to": {
+            "type": "string",
+            "title": "To"
+          },
+          "subject": {
+            "type": "string",
+            "title": "Subject"
+          },
+          "html": {
+            "type": "string",
+            "title": "Html",
+            "description": "The email as sent, to show it in the app"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "to",
+          "subject",
+          "html"
+        ],
+        "title": "WelcomeEmail"
+      },
+      "WelcomeRequest": {
+        "properties": {
+          "expected_active_clients": {
+            "type": "integer",
+            "maximum": 100000.0,
+            "minimum": 0.0,
+            "title": "Expected Active Clients",
+            "description": "From the sign-up journey, for the core tier",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "WelcomeRequest"
       }
     },
     "securitySchemes": {

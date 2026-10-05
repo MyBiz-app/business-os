@@ -1169,6 +1169,32 @@
       "health_rejected": "{business} couldn't approve your health declaration. Please contact the business.",
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
       "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking."
+    },
+    "welcome": {
+      "subject": "Welcome to MyBiz, {business}! 🎉",
+      "preheader": "Your business is ready. Here's everything you need to get started.",
+      "hello": "Hi,",
+      "intro": "We're so glad you're here! {business} is set up on MyBiz and waiting for you. Everything you need to get started is below.",
+      "planTitle": "Your plan",
+      "core": "Core (up to {count} active clients)",
+      "coreCustom": "Core (over 1,000 active clients)",
+      "total": "Monthly total after the trial",
+      "trial": "Your free trial runs until {date}. You won't be charged before then, and you can change your plan any time.",
+      "simulated": "Prototype: charges are simulated; no money moves.",
+      "joinTitle": "Your business's join code",
+      "joinText": "Your clients join the app with this code (or with the QR code in the app).",
+      "stepsTitle": "4 first steps",
+      "steps": [
+        "Add your logo and colors (Settings)",
+        "Set up services and opening hours",
+        "Invite your team",
+        "Share the join code with your clients"
+      ],
+      "openApp": "Open MyBiz",
+      "guide": "Getting-started guide",
+      "clientApp": "The client app",
+      "help": "Questions? Just reply to this email or write to us on the contact page: {contact}",
+      "signature": "Good luck,\nThe MyBiz team"
     }
   },
   "support": {

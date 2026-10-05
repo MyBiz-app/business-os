@@ -1,0 +1,71 @@
+{
+  "email": {
+    "greeting": "Hi {name},",
+    "note": "Note from the business: {note}",
+    "footer": "This message was sent by {business}. You can see all updates in the app.",
+    "subject": {
+      "waitlist_promoted": "You're in: {service} on {when}",
+      "booked_by_studio": "You're booked: {service} on {when}",
+      "waitlisted_by_studio": "On the waitlist: {service} on {when}",
+      "booking_cancelled_by_studio": "Booking cancelled: {service} on {when}",
+      "session_cancelled": "Cancelled: {service} on {when}",
+      "session_moved": "New time: {service} on {when}",
+      "health_approved": "Your health declaration was approved",
+      "health_rejected": "About your health declaration",
+      "session_reminder": "Today: {service} at {when}",
+      "plan_ending": "Your plan ends on {date}"
+    },
+    "body": {
+      "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
+      "booked_by_studio": "{business} booked you into {service} on {when}.",
+      "waitlisted_by_studio": "{business} put you on the waitlist for {service} on {when}. We'll let you know if a spot opens up.",
+      "booking_cancelled_by_studio": "{business} cancelled your booking for {service} on {when}.",
+      "session_cancelled": "{service} on {when} was cancelled. Sorry for the change.",
+      "session_moved": "{service} moved from {previous} to {when}. Your booking moved with it.",
+      "health_approved": "{business} approved your health declaration. You can book in the app.",
+      "health_rejected": "{business} couldn't approve your health declaration. Please contact the business.",
+      "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
+      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking."
+    },
+    "welcome": {
+      "subject": "Welcome to MyBiz, {business}! 🎉",
+      "preheader": "Your business is ready. Here's everything you need to get started.",
+      "hello": "Hi,",
+      "intro": "We're so glad you're here! {business} is set up on MyBiz and waiting for you. Everything you need to get started is below.",
+      "planTitle": "Your plan",
+      "core": "Core (up to {count} active clients)",
+      "coreCustom": "Core (over 1,000 active clients)",
+      "total": "Monthly total after the trial",
+      "trial": "Your free trial runs until {date}. You won't be charged before then, and you can change your plan any time.",
+      "simulated": "Prototype: charges are simulated; no money moves.",
+      "joinTitle": "Your business's join code",
+      "joinText": "Your clients join the app with this code (or with the QR code in the app).",
+      "stepsTitle": "4 first steps",
+      "steps": [
+        "Add your logo and colors (Settings)",
+        "Set up services and opening hours",
+        "Invite your team",
+        "Share the join code with your clients"
+      ],
+      "openApp": "Open MyBiz",
+      "guide": "Getting-started guide",
+      "clientApp": "The client app",
+      "help": "Questions? Just reply to this email or write to us on the contact page: {contact}",
+      "signature": "Good luck,\nThe MyBiz team"
+    }
+  },
+  "modules": {
+    "names": {
+      "none": "No AI",
+      "client_app": "Client app",
+      "ai_basic": "AI Basic",
+      "ai_pro": "AI Pro",
+      "crm": "CRM & leads",
+      "analytics_pro": "Advanced analytics",
+      "agent_finance": "Finance agent",
+      "agent_marketing": "Marketing agent",
+      "whatsapp": "WhatsApp",
+      "extra_location": "Extra locations"
+    }
+  }
+}

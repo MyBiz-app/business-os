@@ -1668,6 +1668,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/welcome-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview Welcome */
+        get: operations["preview_welcome"];
+        put?: never;
+        /**
+         * Send Welcome
+         * @description Sends the welcome email once; later calls return it without sending again.
+         */
+        post: operations["send_welcome"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/pricing": {
         parameters: {
             query?: never;
@@ -5494,6 +5515,32 @@ export interface components {
              * @description First local date of the target week
              */
             to_date: string;
+        };
+        /** WelcomeEmail */
+        WelcomeEmail: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "sent" | "logged" | "not_configured" | "already_sent" | "preview";
+            /** To */
+            to: string;
+            /** Subject */
+            subject: string;
+            /**
+             * Html
+             * @description The email as sent, to show it in the app
+             */
+            html: string;
+        };
+        /** WelcomeRequest */
+        WelcomeRequest: {
+            /**
+             * Expected Active Clients
+             * @description From the sign-up journey, for the core tier
+             * @default 0
+             */
+            expected_active_clients: number;
         };
     };
     responses: never;
@@ -9511,6 +9558,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Invoice"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_welcome: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WelcomeEmail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_welcome: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WelcomeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WelcomeEmail"];
                 };
             };
             /** @description Validation Error */
