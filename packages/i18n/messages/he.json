@@ -2569,5 +2569,48 @@
       "name": "השם שלך",
       "save": "שמירה"
     }
+  },
+  "staffApp": {
+    "tabs": {
+      "home": "MyBiz",
+      "businesses": "עסקים",
+      "inbox": "פניות",
+      "me": "אני"
+    },
+    "notStaff": {
+      "title": "האפליקציה הזו לצוות MyBiz",
+      "text": "האימייל שאיתו נכנסת לא שייך לצוות MyBiz. אם הוא אמור להיות, אפשר לבקש מבעלים להוסיף אותו.",
+      "signOut": "כניסה עם אימייל אחר"
+    },
+    "home": {
+      "title": "MyBiz",
+      "open": "פניות פתוחות",
+      "newBusinesses": "עסקים חדשים השבוע",
+      "nothing": "אין מה לטפל. אפשר לנשום.",
+      "youAre": "את/ה מחובר/ת כ{level}"
+    },
+    "businesses": {
+      "search": "חיפוש עסק",
+      "none": "לא נמצא עסק מתאים.",
+      "owner": "בעלים",
+      "clients": "{count} לקוחות",
+      "trialEnds": "הניסיון מסתיים {date}",
+      "modules": "מודולים"
+    },
+    "inbox": {
+      "title": "פניות",
+      "open": "פתוחות",
+      "done": "טופלו",
+      "empty": "אין כאן כלום.",
+      "take": "אני מטפל/ת",
+      "markDone": "סימון כטופלה",
+      "fromBusiness": "מעסק",
+      "noPermission": "אין לך הרשאת תיבת פניות."
+    },
+    "me": {
+      "title": "אני",
+      "level": "הרמה שלך: {level}",
+      "permissions": "מה מותר לך"
+    }
   }
 }

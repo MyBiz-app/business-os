@@ -14,6 +14,7 @@ class Settings(BaseSettings):
         "http://localhost:3000",  # the business web app and the marketing site
         "http://localhost:8081",  # the client app (Expo web)
         "http://localhost:8082",  # the business app (Expo web)
+        "http://localhost:8083",  # the MyBiz team app (Expo web)
     ]
 
     # Local defaults match `supabase start`. Other environments set these explicitly.
@@ -40,6 +41,7 @@ class Settings(BaseSettings):
     web_url: str = "http://localhost:3000"
     client_app_url: str = "http://localhost:8081"
     business_app_url: str = "http://localhost:8082"
+    staff_app_url: str = "http://localhost:8083"
 
     @field_validator("database_url")
     @classmethod

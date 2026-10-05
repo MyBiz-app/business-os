@@ -2569,5 +2569,48 @@
       "name": "Your name",
       "save": "Save"
     }
+  },
+  "staffApp": {
+    "tabs": {
+      "home": "MyBiz",
+      "businesses": "Businesses",
+      "inbox": "Inbox",
+      "me": "Me"
+    },
+    "notStaff": {
+      "title": "This app is for the MyBiz team",
+      "text": "The email you signed in with isn't on the MyBiz team. If it should be, ask an owner to add it.",
+      "signOut": "Sign in with another email"
+    },
+    "home": {
+      "title": "MyBiz",
+      "open": "Open requests",
+      "newBusinesses": "New businesses this week",
+      "nothing": "Nothing waiting. Enjoy the quiet.",
+      "youAre": "You're signed in as {level}"
+    },
+    "businesses": {
+      "search": "Search a business",
+      "none": "No business matches.",
+      "owner": "Owner",
+      "clients": "{count} clients",
+      "trialEnds": "Trial ends {date}",
+      "modules": "Modules"
+    },
+    "inbox": {
+      "title": "Inbox",
+      "open": "Open",
+      "done": "Done",
+      "empty": "Nothing here.",
+      "take": "I'll handle it",
+      "markDone": "Mark as done",
+      "fromBusiness": "From a business",
+      "noPermission": "You don't have the inbox permission."
+    },
+    "me": {
+      "title": "Me",
+      "level": "Your level: {level}",
+      "permissions": "What you may do"
+    }
   }
 }
