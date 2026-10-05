@@ -63,10 +63,11 @@ def _status(context: TenantContext) -> SupportStatus:
     )
     visits = db.execute(
         text("""
-            SELECT a.occurred_at, a.details->>'email' AS actor_email, a.details->>'path' AS path,
-                   a.action = 'platform.change' AS changed
+            SELECT a.occurred_at, a.details->>'email' AS actor_email,
+                   coalesce(a.details->>'path', a.action) AS path,
+                   a.action <> 'support.view' AND a.action <> 'platform.view' AS changed
             FROM app.audit_log a
-            WHERE a.action IN ('support.view', 'platform.view', 'platform.change')
+            WHERE a.actor_type = 'platform'
             ORDER BY a.occurred_at DESC LIMIT 50
         """)
     ).mappings()

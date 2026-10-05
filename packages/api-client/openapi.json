@@ -8120,6 +8120,240 @@
         }
       }
     },
+    "/platform/businesses/{tenant_id}/invoices": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business Invoices",
+        "description": "One business's invoices, newest first.",
+        "operationId": "business_invoices",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessInvoice"
+                  },
+                  "title": "Response Business Invoices"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/trial": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Extend Trial",
+        "description": "Gives a business more trial days (a goodwill gesture, a late start).",
+        "operationId": "extend_trial",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrialExtension"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trial"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/modules": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Set Business Modules",
+        "description": "Changes a business's modules for it (a sale, a mistake to undo).",
+        "operationId": "set_business_modules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModulesChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/invoices/{invoice_id}/void": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Void Invoice",
+        "description": "Credits an invoice: it stops counting as due or paid, with the reason in both logs.",
+        "operationId": "void_invoice",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Invoice Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoidInvoice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BillingMonth"
+                  },
+                  "title": "Response Void Invoice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-access": {
       "get": {
         "tags": [
@@ -10786,6 +11020,64 @@
           "no_show_rate"
         ],
         "title": "BreakdownItem"
+      },
+      "BusinessInvoice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Minor units"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "paid",
+              "void"
+            ],
+            "title": "Status"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "period_start",
+          "period_end",
+          "currency",
+          "total",
+          "status",
+          "issued_at"
+        ],
+        "title": "BusinessInvoice"
       },
       "BusinessProfile": {
         "properties": {
@@ -15298,6 +15590,23 @@
         ],
         "title": "MetricValue"
       },
+      "ModulesChange": {
+        "properties": {
+          "modules": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Modules",
+            "description": "The business's new modules, like its own page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "modules"
+        ],
+        "title": "ModulesChange"
+      },
       "MyBooking": {
         "properties": {
           "id": {
@@ -18979,6 +19288,35 @@
         ],
         "title": "TimeOffCreate"
       },
+      "Trial": {
+        "properties": {
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trial_ends_at"
+        ],
+        "title": "Trial"
+      },
+      "TrialExtension": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "maximum": 180.0,
+            "minimum": 1.0,
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days"
+        ],
+        "title": "TrialExtension"
+      },
       "Turn": {
         "properties": {
           "role": {
@@ -19072,6 +19410,21 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VoidInvoice": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "VoidInvoice"
       },
       "WeekCopied": {
         "properties": {

@@ -3,6 +3,7 @@ and MyBiz's own team (migration 0037). Each part needs a console permission; own
 them all. The database functions enforce the same rules."""
 
 import datetime as dt
+import json
 from collections.abc import Callable
 from enum import StrEnum
 from typing import Annotated, Any, Literal
@@ -15,6 +16,7 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep
+from app.api.modules import check_selection
 
 router = APIRouter(prefix="/platform", tags=["platform"])
 
@@ -56,11 +58,11 @@ BillingDep = Annotated[Session, Depends(require_platform(PlatformPermission.BILL
 TeamDep = Annotated[Session, Depends(require_platform(PlatformPermission.STAFF_MANAGE))]
 
 
-def run_rule(db: Session, sql: str, params: dict[str, Any]) -> None:
+def run_rule(db: Session, sql: str, params: dict[str, Any]) -> Any:
     """Calls a console function whose rules raise errors; maps them to HTTP errors."""
     try:
         with db.begin_nested():
-            db.execute(text(sql), params)
+            return db.execute(text(sql), params).scalar()
     except DBAPIError as error:
         code = getattr(error.orig, "sqlstate", None)
         detail = str(getattr(getattr(error.orig, "diag", None), "message_primary", "")) or "error"
@@ -264,3 +266,74 @@ def audit(db: StaffDep, limit: Annotated[int, Query(ge=1, le=500)] = 200) -> lis
     except DBAPIError as error:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="owners_only") from error
     return [AuditEntry.model_validate(dict(row)) for row in rows]
+
+
+# --- Actions on a business ------------------------------------------------------------------
+
+
+class TrialExtension(BaseModel):
+    days: int = Field(ge=1, le=180)
+
+
+class Trial(BaseModel):
+    trial_ends_at: dt.datetime
+
+
+class ModulesChange(BaseModel):
+    modules: dict[str, int] = Field(description="The business's new modules, like its own page")
+
+
+class VoidInvoice(BaseModel):
+    reason: str = Field(min_length=3, max_length=500)
+
+
+class BusinessInvoice(BaseModel):
+    id: UUID
+    number: int
+    period_start: dt.date
+    period_end: dt.date
+    currency: str
+    total: int = Field(description="Minor units")
+    status: Literal["open", "paid", "void"]
+    issued_at: dt.datetime
+
+
+@router.get("/businesses/{tenant_id}/invoices")
+def business_invoices(tenant_id: UUID, db: BillingDep) -> list[BusinessInvoice]:
+    """One business's invoices, newest first."""
+    rows = db.execute(
+        text("SELECT * FROM app.platform_business_invoices(:t)"), {"t": tenant_id}
+    ).mappings()
+    return [BusinessInvoice.model_validate(dict(row)) for row in rows]
+
+
+@router.post("/businesses/{tenant_id}/trial")
+def extend_trial(tenant_id: UUID, body: TrialExtension, db: BillingDep) -> Trial:
+    """Gives a business more trial days (a goodwill gesture, a late start)."""
+    until = run_rule(
+        db, "SELECT app.platform_extend_trial(:t, :days)", {"t": tenant_id, "days": body.days}
+    )
+    return Trial(trial_ends_at=until)
+
+
+@router.put("/businesses/{tenant_id}/modules")
+def set_business_modules(tenant_id: UUID, body: ModulesChange, db: BillingDep) -> PlatformBusiness:
+    """Changes a business's modules for it (a sale, a mistake to undo)."""
+    check_selection(body.modules)
+    run_rule(
+        db,
+        "SELECT app.platform_set_modules(:t, CAST(:modules AS jsonb))",
+        {"t": tenant_id, "modules": json.dumps(body.modules)},
+    )
+    return next(b for b in businesses(db) if b.id == tenant_id)
+
+
+@router.post("/invoices/{invoice_id}/void")
+def void_invoice(invoice_id: UUID, body: VoidInvoice, db: BillingDep) -> list[BillingMonth]:
+    """Credits an invoice: it stops counting as due or paid, with the reason in both logs."""
+    run_rule(
+        db,
+        "SELECT app.platform_void_invoice(:id, :reason)",
+        {"id": invoice_id, "reason": body.reason},
+    )
+    return billing_summary(db)

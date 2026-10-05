@@ -1089,7 +1089,11 @@
         "staff_added": "Added a team member",
         "staff_changed": "Changed a team member",
         "staff_removed": "Removed a team member",
-        "platform_change": "Changed something in a business"
+        "platform_change": "Changed something in a business",
+        "business_trial_extended": "Extended a trial",
+        "business_modules_changed": "Changed a plan",
+        "business_invoice_voided": "Credited an invoice",
+        "inbox_updated": "Updated a request"
       }
     },
     "inbox": {
@@ -1114,6 +1118,29 @@
       "openBusiness": "Open the business",
       "empty": "Nothing here.",
       "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}"
+    },
+    "actions": {
+      "title": "Actions for the owner",
+      "intro": "Everything here is written to the business's own log, which its owner reads, and to the MyBiz audit log.",
+      "trial": "Extend the trial",
+      "trialDays": "Days",
+      "trialDone": "The trial now ends on {date}.",
+      "modules": "Change the plan",
+      "modulesHint": "The business's modules, as on its own modules page. The next invoice follows.",
+      "modulesDone": "The plan was changed.",
+      "voidTitle": "Credit an invoice",
+      "voidHint": "The invoice stops counting as due or paid.",
+      "voidReason": "Why",
+      "void": "Credit the invoice",
+      "voidDone": "Invoice credited.",
+      "invoice": "Invoice {number} · {amount}",
+      "noInvoices": "No invoices yet.",
+      "errors": {
+        "already_void": "This invoice is already credited.",
+        "forbidden": "You don't have permission for this.",
+        "not_found": "Not found.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "permissions": {

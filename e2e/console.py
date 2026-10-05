@@ -152,10 +152,26 @@ with sync_playwright() as p:
     h.ready(owner)
     print(f"6. owner entered {business_name} and added a client (audited): ok")
 
+    # Actions for the owner: extend the trial and change the plan, both audited.
+    owner.goto(f"{h.BASE}/platform/businesses"); h.ready(owner)
+    owner.locator("tbody tr").filter(has_text=inbox_business).first.get_by_role("link").first.click()
+    owner.wait_for_url("**/platform/businesses/**"); h.ready(owner)
+    actions = owner.get_by_role("region", name="פעולות עבור הבעלים")
+    actions.get_by_label("ימים").fill("30")
+    actions.get_by_role("button", name="הארכת תקופת הניסיון").click(); h.ready(owner)
+    expect(actions.get_by_role("status").first).to_contain_text("מסתיימת עכשיו")
+    actions.get_by_role("checkbox", name=re.compile("CRM ולידים")).check()
+    actions.get_by_role("button", name="שינוי החבילה").click(); h.ready(owner)
+    expect(owner.get_by_text("החבילה שונתה.")).to_be_visible()
+    check(owner, "business-actions")
+    owner.screenshot(path=f"{h.OUT}/console-business-actions.png", full_page=True)
+    print("7. extended the trial and changed the plan from the console: ok")
+
     # The audit log (owners only) has every change.
     owner.goto(f"{h.BASE}/platform/audit"); h.ready(owner)
     rows = owner.get_by_role("region", name="יומן פעולות").locator("tbody tr")
-    assert rows.count() >= 3
+    assert rows.count() >= 5
+    expect(rows.filter(has_text="האריך/ה תקופת ניסיון").first).to_be_visible()
     expect(rows.filter(has_text="ביצע/ה שינוי בעסק").first).to_be_visible()
     expect(rows.filter(has_text="הוסיף/ה איש צוות").first).to_be_visible()
     check(owner, "audit")
@@ -169,7 +185,7 @@ with sync_playwright() as p:
             ).fetchall()
         )
     assert levels == {manager_email: "manager", employee_email: "employee", PRIMARY: "primary_owner"}, levels
-    print("7. audit log and levels: ok")
+    print("8. audit log and levels: ok")
 
     print("a11y:", a11y or "ok")
     assert not a11y

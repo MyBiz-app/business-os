@@ -1089,7 +1089,11 @@
         "staff_added": "הוסיף/ה איש צוות",
         "staff_changed": "שינה/תה איש צוות",
         "staff_removed": "הסיר/ה איש צוות",
-        "platform_change": "ביצע/ה שינוי בעסק"
+        "platform_change": "ביצע/ה שינוי בעסק",
+        "business_trial_extended": "האריך/ה תקופת ניסיון",
+        "business_modules_changed": "שינה/תה חבילה",
+        "business_invoice_voided": "זיכה/תה חשבונית",
+        "inbox_updated": "עדכן/ה פנייה"
       }
     },
     "inbox": {
@@ -1114,6 +1118,29 @@
       "openBusiness": "פתיחת העסק",
       "empty": "אין כאן כלום.",
       "count": "{count, plural, =0 {אין פניות} one {פנייה אחת} other {# פניות}}"
+    },
+    "actions": {
+      "title": "פעולות עבור הבעלים",
+      "intro": "כל מה שכאן נרשם ביומן של העסק, שהבעלים קוראים, וגם ביומן הפעולות של MyBiz.",
+      "trial": "הארכת תקופת הניסיון",
+      "trialDays": "ימים",
+      "trialDone": "תקופת הניסיון מסתיימת עכשיו ב-{date}.",
+      "modules": "שינוי החבילה",
+      "modulesHint": "המודולים של העסק, כמו בדף המודולים שלו. החשבונית הבאה תתעדכן.",
+      "modulesDone": "החבילה שונתה.",
+      "voidTitle": "זיכוי חשבונית",
+      "voidHint": "החשבונית מפסיקה להיחשב כחוב או כתשלום.",
+      "voidReason": "סיבה",
+      "void": "לזכות את החשבונית",
+      "voidDone": "החשבונית זוכתה.",
+      "invoice": "חשבונית {number} · {amount}",
+      "noInvoices": "אין עדיין חשבוניות.",
+      "errors": {
+        "already_void": "החשבונית כבר מזוכה.",
+        "forbidden": "אין לך הרשאה לפעולה הזו.",
+        "not_found": "לא נמצא.",
+        "generic": "משהו השתבש. כדאי לנסות שוב."
+      }
     }
   },
   "permissions": {

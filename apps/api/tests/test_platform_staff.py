@@ -201,3 +201,67 @@ def test_the_inbox_moves_requests_along(
 
     other, _ = staff_member(engine, "employee", ("usage.read",))
     assert client.get("/platform/contact-requests", headers=auth(other)).status_code == 403
+
+
+def test_staff_act_on_a_business_from_the_console(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    from tests.test_billing import end_trial, run_billing
+
+    staff, staff_email = staff_member(engine, "employee", ("billing.manage", "businesses.read"))
+    headers = auth(staff)
+    tenant_id = str(studio["tenant_id"])
+
+    before = client.get("/billing", headers=studio["headers"]).json()["trial_ends_at"]
+    extended = client.post(
+        f"/platform/businesses/{tenant_id}/trial", json={"days": 14}, headers=headers
+    ).json()
+    assert extended["trial_ends_at"] > before
+
+    changed = client.put(
+        f"/platform/businesses/{tenant_id}/modules",
+        json={"modules": {"crm": 1, "whatsapp": 1}},
+        headers=headers,
+    ).json()
+    assert changed["modules"] == ["crm", "whatsapp"]
+    assert client.get("/tenants/current", headers=studio["headers"]).json()["modules"] == [
+        "crm",
+        "whatsapp",
+    ]
+
+    end_trial(engine, studio["tenant_id"], days_ago=40)
+    run_billing(engine)
+    invoice = client.get("/billing", headers=studio["headers"]).json()["invoices"][0]
+    voided = client.post(
+        f"/platform/invoices/{invoice['id']}/void",
+        json={"reason": "Goodwill after a problem"},
+        headers=headers,
+    )
+    assert voided.status_code == 200
+    billing = client.get("/billing", headers=studio["headers"]).json()
+    assert billing["balance_due"] == 0
+    assert (
+        client.post(
+            f"/platform/invoices/{invoice['id']}/void", json={"reason": "Again"}, headers=headers
+        ).json()["detail"]
+        == "already_void"
+    )
+
+    # Both logs: MyBiz's console audit and the business's own (its owner reads it).
+    owner, _ = staff_member(engine, "owner")
+    actions = [a["action"] for a in client.get("/platform/audit", headers=auth(owner)).json()]
+    assert {
+        "business.trial_extended",
+        "business.modules_changed",
+        "business.invoice_voided",
+    } <= set(actions)
+    visits = client.get("/support-access", headers=studio["headers"]).json()["visits"]
+    assert any(v["actor_email"] == staff_email for v in visits)
+
+    nobody, _ = staff_member(engine, "employee", ("businesses.read",))
+    assert (
+        client.post(
+            f"/platform/businesses/{tenant_id}/trial", json={"days": 1}, headers=auth(nobody)
+        ).status_code
+        == 403
+    )

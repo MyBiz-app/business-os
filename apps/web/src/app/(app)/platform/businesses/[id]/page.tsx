@@ -10,6 +10,8 @@ import { getPlatformFor } from "@/lib/platform";
 
 import { openAsSupport } from "../../actions";
 
+import { BusinessActions } from "./business-actions";
+
 /** Platform console (P-2): one business's modules and usage. Its own data opens only through
  * support access, which the owner grants for a limited time (read-only and audited). */
 export default async function PlatformBusinessPage({ params }: PageProps<"/platform/businesses/[id]">) {
@@ -18,12 +20,17 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const locale = await getLocale();
   const { me } = await getActiveMembership();
   const { api, can } = await getPlatformFor("businesses.read");
-  const [businesses, usage] = await Promise.all([
+  const [businesses, usage, invoices] = await Promise.all([
     api.GET("/platform/businesses").then(unwrap),
-    api.GET("/platform/usage", { params: { query: { tenant_id: id, days: 90 } } }).then(unwrap),
+    can("usage.read") ? api.GET("/platform/usage", { params: { query: { tenant_id: id, days: 90 } } }).then(unwrap) : [],
+    can("billing.manage") ? api.GET("/platform/businesses/{tenant_id}/invoices", { params: { path: { tenant_id: id } } }).then(unwrap) : [],
   ]);
   const business = businesses.find((b) => b.id === id);
   if (!business) notFound();
+  // Prices in the business's own currency.
+  const catalog = can("billing.manage")
+    ? unwrap(await api.GET("/modules/catalog", { params: { query: { currency: business.currency } } }))
+    : null;
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const credits = usage.filter((u) => u.meter === "ai_credits");
   const grant = me.support_access.find((g) => g.tenant_id === business.id);
@@ -75,6 +82,15 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           <p className="text-sm text-muted">{t("support.notGranted")}</p>
         )}
       </section>
+      {catalog && (
+        <BusinessActions
+          tenantId={business.id}
+          catalog={catalog}
+          modules={Object.fromEntries(business.modules.map((key) => [key, 1])) as Parameters<typeof BusinessActions>[0]["modules"]}
+          activeClients={business.active_clients}
+          invoices={invoices}
+        />
+      )}
       <dl className="grid gap-3 sm:grid-cols-4">
         {(
           [
