@@ -42,7 +42,7 @@ with sync_playwright() as p:
     owner.wait_for_url("**/dashboard")
 
     owner.goto(f"{h.BASE}/settings"); h.ready(owner)
-    expect(owner.get_by_label("מתאמנים צריכים הצהרת בריאות כדי להירשם באפליקציה")).to_be_checked()
+    expect(owner.get_by_label("לקוחות צריכים הצהרת בריאות כדי להירשם באפליקציה")).to_be_checked()
 
     owner.goto(f"{h.BASE}/services/new"); h.ready(owner)
     owner.get_by_label("שם").fill("פילאטיס")
@@ -81,7 +81,7 @@ with sync_playwright() as p:
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_role("button", name="הצטרפות לסטודיו בריאות").click(); member.wait_for_url("**/home")
-    expect(member.get_by_text("לפני השיעור הראשון, יש למלא הצהרת בריאות קצרה.")).to_be_visible()
+    expect(member.get_by_text("לפני הביקור הראשון, יש למלא הצהרת בריאות קצרה.")).to_be_visible()
 
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
@@ -100,7 +100,7 @@ with sync_playwright() as p:
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
     member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
-    expect(member.get_by_text("הסטודיו צריך לאשר את הצהרת הבריאות שלך")).to_be_visible()
+    expect(member.get_by_text("העסק צריך לאשר את הצהרת הבריאות שלך")).to_be_visible()
     print("3. a \"yes\" waits for approval: ok")
 
     owner.goto(client_url); h.ready(owner)
@@ -111,7 +111,7 @@ with sync_playwright() as p:
     section.get_by_label("הערה (לא חובה)").fill("אישור רופא התקבל")
     section.get_by_role("button", name="אישור").click()
     expect(section.get_by_text("הצהרת בריאות בתוקף")).to_be_visible()
-    expect(section.get_by_text("הערת הסטודיו: אישור רופא התקבל")).to_be_visible()
+    expect(section.get_by_text("הערת העסק: אישור רופא התקבל")).to_be_visible()
     owner.screenshot(path=f"{h.OUT}/health-approved.png", full_page=True)
     print("4. studio approves: ok")
 

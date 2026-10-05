@@ -29,6 +29,20 @@ def ready(page) -> None:
     )
 
 
+def app_ready(page) -> None:
+    """The client app's entrance fades run in JavaScript (React Native Animated), not as CSS
+    animations; wait until nothing is part-way faded before checking contrast."""
+    ready(page)
+    try:
+        page.wait_for_function(
+            """![...document.querySelectorAll('[style*="opacity"]')].some(e => {
+                const o = parseFloat(e.style.opacity); return o > 0 && o < 1; })""",
+            timeout=3000,
+        )
+    except Exception:  # something stays translucent on purpose; carry on
+        pass
+
+
 def _message(email: str) -> dict:
     for _ in range(40):
         messages = json.load(urllib.request.urlopen(f"{MAILBOX}/messages"))["messages"]

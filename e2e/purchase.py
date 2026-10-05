@@ -29,7 +29,7 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard")
     owner.goto(f"{h.BASE}/settings"); h.ready(owner)
-    owner.get_by_label("מתאמנים יכולים לרכוש מנויים באפליקציה").check()
+    owner.get_by_label("לקוחות יכולים לרכוש מנויים באפליקציה").check()
     with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
         owner.get_by_role("button", name="שמירה").first.click()
     print("1. online sales on: ok")
@@ -57,11 +57,13 @@ with sync_playwright() as p:
         raise
     buy = member.get_by_role("button", name=re.compile("^רכישה – כרטיסייה"))
     expect(buy).to_be_visible()
+    h.app_ready(member)
     serious = [v["id"] for v in Axe().run(member).response["violations"] if v["impact"] in ("serious", "critical")]
     buy.click()
     # The (simulated) payment page: a test card, the total, and the pay button.
     member.wait_for_url("**/pay/**")
     expect(member.get_by_text(re.compile("^מצב בדיקה"))).to_be_visible(timeout=15000)
+    h.app_ready(member)
     pay_serious = [v["id"] for v in Axe().run(member).response["violations"] if v["impact"] in ("serious", "critical")]
     member.screenshot(path=f"{h.OUT}/payment.png", full_page=True)
     member.get_by_role("button", name=re.compile("^תשלום ")).click()
