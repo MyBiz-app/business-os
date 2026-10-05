@@ -43,6 +43,7 @@ export default async function TeamPage() {
               key={`${member.user_id}-${member.role}-${member.custom_role_id}`}
               userId={member.user_id}
               email={member.email}
+              name={member.full_name}
               role={member.role}
               customRoleId={member.custom_role_id}
               customRoles={roles.custom.map(({ id, name }) => ({ id, name }))}

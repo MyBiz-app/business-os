@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, status
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
@@ -172,3 +173,23 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
 @router.get("/tenants/current", tags=["tenants"])
 def get_current_tenant(context: TenantDep) -> Tenant:
     return load_current_tenant(context.session)
+
+
+class ProfileUpdate(BaseModel):
+    full_name: str | None = Field(default=None, max_length=120)
+
+    @field_validator("full_name", mode="before")
+    @classmethod
+    def blank(cls, value: object) -> object:
+        return value.strip() or None if isinstance(value, str) else value
+
+
+@router.patch("/me", tags=["account"])
+def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
+    """The signed-in person's own profile: the name the team, clients and reports see."""
+    ensure_profile(session, user.id, user.email)
+    session.execute(
+        text("UPDATE app.users SET full_name = :name WHERE id = :id"),
+        {"name": body.full_name, "id": user.id},
+    )
+    return get_me(user, session)

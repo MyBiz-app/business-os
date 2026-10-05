@@ -59,3 +59,13 @@ def test_requires_a_valid_token(client: TestClient, make_token: TokenFactory) ->
     foreign_key = ec.generate_private_key(ec.SECP256R1())
     forged = make_token(uuid4(), key=foreign_key)
     assert client.get("/me", headers={"Authorization": f"Bearer {forged}"}).status_code == 401
+
+
+def test_people_set_their_own_name(client: TestClient, auth, new_user_id) -> None:
+    headers = auth(new_user_id())
+    assert client.get("/me", headers=headers).json()["full_name"] is None
+    me = client.patch("/me", json={"full_name": "  Dana Cohen "}, headers=headers).json()
+    assert me["full_name"] == "Dana Cohen"
+    cleared = client.patch("/me", json={"full_name": " "}, headers=headers).json()
+    assert cleared["full_name"] is None
+    assert client.patch("/me", json={"full_name": "x" * 121}, headers=headers).status_code == 422

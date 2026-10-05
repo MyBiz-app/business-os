@@ -2293,5 +2293,17 @@
     "chooseTier": "Choose a level",
     "manage": "All modules and prices",
     "unknown": "This module isn't available."
+  },
+  "account": {
+    "link": "My profile",
+    "title": "My profile",
+    "subtitle": "How you appear to your team, your clients and in reports.",
+    "name": "Full name",
+    "nameHint": "Shown on the schedule, in the client app and in reports.",
+    "email": "Email",
+    "emailHint": "You sign in with this email.",
+    "password": "Password",
+    "changePassword": "Change password",
+    "businesses": "Your businesses"
   }
 }

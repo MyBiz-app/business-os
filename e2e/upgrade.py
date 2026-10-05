@@ -62,6 +62,16 @@ with sync_playwright() as p:
     assert modules == ["ai_basic", "client_app", "crm"], modules
     print("locked CRM: preview, invoice change, add to plan: ok")
 
+    # Everyone sets their own name; the team list and the header show it.
+    owner.goto(f"{h.BASE}/account"); h.ready(owner)
+    owner.get_by_label("שם מלא").fill("שירה לוי")
+    owner.get_by_role("button", name="שמירה").click()
+    expect(owner.get_by_role("link", name="שירה לוי")).to_be_visible()
+    check(owner, "account")
+    owner.goto(f"{h.BASE}/team"); h.ready(owner)
+    expect(owner.get_by_role("main").get_by_text("שירה לוי")).to_be_visible()
+    print("profile name in the header and the team list: ok")
+
     # Phone, English, dark: the WhatsApp preview.
     phone = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 390, "height": 844}, is_mobile=True)
     phone.add_cookies(owner.context.cookies())

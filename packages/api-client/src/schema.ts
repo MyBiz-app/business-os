@@ -35,7 +35,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update Me
+         * @description The signed-in person's own profile: the name the team, clients and reports see.
+         */
+        patch: operations["update_me"];
         trace?: never;
     };
     "/tenants": {
@@ -4535,15 +4539,6 @@ export interface components {
             /** Value */
             value: number;
         };
-        /** ProfileUpdate */
-        ProfileUpdate: {
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name?: string | null;
-            /** Phone */
-            phone?: string | null;
-        };
         /** PromoCode */
         PromoCode: {
             /**
@@ -5602,6 +5597,20 @@ export interface components {
              */
             expected_active_clients: number;
         };
+        /** ProfileUpdate */
+        app__api__client_app__ProfileUpdate: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** ProfileUpdate */
+        app__api__routes__ProfileUpdate: {
+            /** Full Name */
+            full_name?: string | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -5647,6 +5656,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Me"];
+                };
+            };
+        };
+    };
+    update_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__routes__ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -10109,7 +10151,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProfileUpdate"];
+                "application/json": components["schemas"]["app__api__client_app__ProfileUpdate"];
             };
         };
         responses: {

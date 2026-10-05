@@ -44,7 +44,7 @@ pages = [
     "/dashboard", "/reports", "/assistant", "/schedule", "/schedule/new", "/schedule/appointment",
     "/schedule/closed", "/clients", "/clients/new", "/clients/import", "/clients/join", "/leads",
     "/leads/new", "/messages", "/services", "/services/new", "/plans", "/plans/new", "/locations",
-    "/locations/new", "/team", "/team/roles", "/settings", "/settings/modules", "/settings/billing",
+    "/locations/new", "/team", "/team/roles", "/account", "/settings", "/settings/modules", "/settings/billing",
 ]  # fmt: skip
 detail = {
     "client": "/clients/{}", "lead": "/leads/{}", "location": "/locations/{}", "plan": "/plans/{}",

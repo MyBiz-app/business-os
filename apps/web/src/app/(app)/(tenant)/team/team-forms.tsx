@@ -70,6 +70,7 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
 type MemberRowProps = {
   userId: string;
   email: string;
+  name: string | null;
   role: (typeof ROLES)[number];
   customRoleId: string | null;
   isSelf: boolean;
@@ -77,7 +78,7 @@ type MemberRowProps = {
   customRoles: CustomRoleOption[];
 };
 
-export function MemberRow({ userId, email, role, customRoleId, isSelf, allowOwner, customRoles }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -92,8 +93,15 @@ export function MemberRow({ userId, email, role, customRoleId, isSelf, allowOwne
     <li className="flex flex-col gap-2 border-t border-border px-4 py-3 first:border-t-0">
       <TeamError state={roleState.error ? roleState : removeState} />
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex-1 truncate" dir="ltr">
-          {email} {isSelf && <span className="text-muted">{t("team.you")}</span>}
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate font-medium" dir="auto">
+            {name ?? email} {isSelf && <span className="font-normal text-muted">{t("team.you")}</span>}
+          </span>
+          {name && (
+            <span className="truncate text-sm text-muted" dir="ltr">
+              {email}
+            </span>
+          )}
         </span>
         <Link href={`/team/${userId}/hours`} className="text-sm text-primary underline-offset-4 hover:underline">
           {t("hours.link")}

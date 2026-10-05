@@ -35,7 +35,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("hours.title")}</h1>
         <p className="text-muted">
-          {t("hours.subtitle", { name: isolate(member.email) })}
+          {t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })}
         </p>
       </div>
       <section className="card p-6">
