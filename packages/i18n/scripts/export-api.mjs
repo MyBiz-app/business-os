@@ -1,4 +1,4 @@
-// Copies the translations the API itself renders (emails, module names) into the API package,
+// Copies the translations the API itself renders (emails, module names, default branch names) into the API package,
 // because the API's container image is built from apps/api alone. The copy is checked in;
 // test/messages.test.mjs fails when it is out of date.
 //
@@ -14,7 +14,11 @@ export const LOCALES = ["he", "en"];
 /** The part of a locale's messages the API needs. */
 export function apiMessages(locale) {
   const all = JSON.parse(readFileSync(join(root, "messages", `${locale}.json`), "utf8"));
-  return { email: all.email, modules: { names: all.modules.names } };
+  return {
+    email: all.email,
+    modules: { names: all.modules.names },
+    locations: { mainBranch: all.locations.mainBranch, branchNumber: all.locations.branchNumber },
+  };
 }
 
 export const serialize = (value) => `${JSON.stringify(value, null, 2)}\n`;

@@ -29,7 +29,7 @@ PERIOD = """
 PAST_SESSIONS = """
     SELECT s.id, s.capacity FROM app.sessions s, period
     WHERE s.status = 'scheduled' AND s.starts_at >= period.from_at
-      AND s.starts_at < least(period.to_at, now())
+      AND s.starts_at < least(period.to_at, now()) AND app.in_branch(s.location_id)
 """
 
 
@@ -56,12 +56,12 @@ REVENUE = Metric(
     sql=f"""{PERIOD}
         SELECT coalesce(sum(p.amount), 0) FROM app.payments p, period
         WHERE p.status = 'succeeded' AND p.created_at >= period.from_at
-          AND p.created_at < period.to_at
+          AND p.created_at < period.to_at AND app.in_branch(p.location_id)
     """,
     bucket_sql=f"""{PERIOD}
         SELECT {{bucket}} AS bucket, sum(p.amount) AS value FROM app.payments p, period
         WHERE p.status = 'succeeded' AND p.created_at >= period.from_at
-          AND p.created_at < period.to_at
+          AND p.created_at < period.to_at AND app.in_branch(p.location_id)
         GROUP BY 1 ORDER BY 1
     """,
 )
@@ -73,6 +73,7 @@ PLANS_SOLD = Metric(
     sql=f"""{PERIOD}
         SELECT count(*) FROM app.entitlements e, period
         WHERE e.created_at >= period.from_at AND e.created_at < period.to_at
+          AND app.in_branch(e.location_id)
     """,
 )
 
@@ -83,6 +84,7 @@ ACTIVE_CLIENTS = Metric(
     sql="""
         SELECT count(DISTINCT e.client_id) FROM app.entitlements e
         WHERE e.status = 'active' AND CAST(:end AS date) BETWEEN e.starts_on AND e.ends_on
+          AND app.in_branch(e.location_id)
     """,
 )
 
@@ -93,6 +95,7 @@ NEW_CLIENTS = Metric(
     sql=f"""{PERIOD}
         SELECT count(*) FROM app.clients c, period
         WHERE c.created_at >= period.from_at AND c.created_at < period.to_at
+          AND app.in_branch(c.home_location_id)
     """,
 )
 
@@ -103,13 +106,13 @@ ATTENDANCE = Metric(
     sql=f"""{PERIOD}
         SELECT count(*) FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id, period
         WHERE b.status = 'checked_in' AND s.starts_at >= period.from_at
-          AND s.starts_at < period.to_at
+          AND s.starts_at < period.to_at AND app.in_branch(s.location_id)
     """,
     bucket_sql=f"""{PERIOD}
         SELECT {{bucket}} AS bucket, count(*) AS value
         FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id, period
         WHERE b.status = 'checked_in' AND s.starts_at >= period.from_at
-          AND s.starts_at < period.to_at
+          AND s.starts_at < period.to_at AND app.in_branch(s.location_id)
         GROUP BY 1 ORDER BY 1
     """,
 )
@@ -150,7 +153,7 @@ LATE_CANCEL_RATE = Metric(
             100.0 * count(*) FILTER (WHERE b.late_cancel) / count(*) END
         FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id, period
         WHERE b.status <> 'waitlisted' AND s.starts_at >= period.from_at
-          AND s.starts_at < period.to_at
+          AND s.starts_at < period.to_at AND app.in_branch(s.location_id)
     """,
     higher_is_better=False,
 )
@@ -238,11 +241,13 @@ def _buckets(start: date, end: date, grain: Grain) -> list[date]:
 
 # Breakdowns of the attendance metrics over sessions that took place, by one dimension. The
 # definitions match OCCUPANCY and NO_SHOW_RATE above.
-Dimension = Literal["service", "instructor", "time_slot"]
+Dimension = Literal["service", "instructor", "time_slot", "branch"]
 
 _DIMENSION_SQL: dict[str, tuple[str, str]] = {
-    # (group key, label) expressions over s (sessions), sv (services), u (instructor user)
+    # (group key, label) expressions over s (sessions), sv (services), u (instructor user),
+    # l (branch)
     "service": ("sv.id::text", "sv.name"),
+    "branch": ("coalesce(l.id::text, '')", "coalesce(l.name, '')"),
     "instructor": ("coalesce(u.id::text, '')", "coalesce(u.full_name, u.email)"),
     # ISO weekday (1 = Monday) and local start hour, e.g. "1-18"; the client formats it.
     "time_slot": (
@@ -283,6 +288,7 @@ def breakdown(db: Session, dimension: Dimension, start: date, end: date) -> list
             FROM app.sessions s
             JOIN app.services sv ON sv.id = s.service_id
             LEFT JOIN app.users u ON u.id = s.instructor_user_id
+            LEFT JOIN app.locations l ON l.id = s.location_id
             CROSS JOIN period
             CROSS JOIN LATERAL (
                 SELECT count(*) FILTER (WHERE b.status IN ('booked', 'checked_in', 'no_show'))
@@ -292,7 +298,7 @@ def breakdown(db: Session, dimension: Dimension, start: date, end: date) -> list
                 FROM app.bookings b WHERE b.session_id = s.id
             ) bk
             WHERE s.status = 'scheduled' AND s.starts_at >= period.from_at
-              AND s.starts_at < least(period.to_at, now())
+              AND s.starts_at < least(period.to_at, now()) AND app.in_branch(s.location_id)
             GROUP BY 1, 2
             ORDER BY sum(bk.attended) DESC, 2
         """),
@@ -339,7 +345,10 @@ def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRi
                         JOIN app.sessions s ON s.id = b.session_id
                         WHERE b.client_id = c.id AND b.status = 'checked_in') AS last_visit
                 FROM app.clients c CROSS JOIN t
-                WHERE c.erased_at IS NULL AND EXISTS (
+                WHERE c.erased_at IS NULL
+                  -- clients without a home branch belong to every branch
+                  AND (c.home_location_id IS NULL OR app.in_branch(c.home_location_id))
+                  AND EXISTS (
                     SELECT 1 FROM app.entitlements e
                     WHERE e.client_id = c.id AND e.status = 'active'
                       AND t.today BETWEEN e.starts_on AND e.ends_on

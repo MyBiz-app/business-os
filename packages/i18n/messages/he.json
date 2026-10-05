@@ -155,8 +155,6 @@
     "today": "היום",
     "emptyToday": "כאן יופיעו לוח הזמנים, הלקוחות והמכירות.",
     "business": "עסק",
-    "switchBusiness": "החלפת עסק",
-    "newBusiness": "יצירת עסק נוסף",
     "kpis": "מספרים מרכזיים",
     "period": "תקופה",
     "lastDays": "{count} ימים אחרונים",
@@ -413,7 +411,9 @@
     "roomName": "שם החדר",
     "roomCapacity": "קיבולת",
     "addRoom": "הוספת חדר",
-    "noRooms": "עדיין אין חדרים."
+    "noRooms": "עדיין אין חדרים.",
+    "mainBranch": "סניף ראשי",
+    "branchNumber": "סניף {number}"
   },
   "team": {
     "title": "צוות",
@@ -2866,5 +2866,13 @@
     "school_grade": "כיתה",
     "subjects": "מקצועות",
     "tire_size": "מידת צמיגים"
+  },
+  "businessMenu": {
+    "switch": "מעבר בין עסקים",
+    "myBusinesses": "העסקים שלי",
+    "allBusinesses": "כל העסקים שלי",
+    "newBusiness": "הוספת עסק",
+    "branch": "סניף",
+    "allBranches": "כל הסניפים"
   }
 }

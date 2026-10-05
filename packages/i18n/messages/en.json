@@ -155,8 +155,6 @@
     "today": "Today",
     "emptyToday": "Your schedule, clients and sales will appear here.",
     "business": "Business",
-    "switchBusiness": "Switch business",
-    "newBusiness": "Create another business",
     "kpis": "Key numbers",
     "period": "Period",
     "lastDays": "Last {count} days",
@@ -413,7 +411,9 @@
     "roomName": "Room name",
     "roomCapacity": "Capacity",
     "addRoom": "Add room",
-    "noRooms": "No rooms yet."
+    "noRooms": "No rooms yet.",
+    "mainBranch": "Main branch",
+    "branchNumber": "Branch {number}"
   },
   "team": {
     "title": "Team",
@@ -2866,5 +2866,13 @@
     "school_grade": "School grade",
     "subjects": "Subjects",
     "tire_size": "Tire size"
+  },
+  "businessMenu": {
+    "switch": "Switch business",
+    "myBusinesses": "My businesses",
+    "allBusinesses": "All my businesses",
+    "newBusiness": "Add a business",
+    "branch": "Branch",
+    "allBranches": "All branches"
   }
 }

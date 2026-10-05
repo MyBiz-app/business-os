@@ -9,6 +9,7 @@ from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.modules import check_selection, set_modules
 from app.api.schemas import Me, Membership, SupportAccess, Tenant, TenantCreate
 from app.core.db import set_tenant
+from app.email import load_all_messages
 from app.modules import PRESETS
 from app.permissions import effective_permissions
 from app.verticals import VERTICAL_PACKS
@@ -170,7 +171,30 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
     set_tenant(session, tenant_id)
     apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
     set_modules(session, tenant_id, modules)
+    create_first_branches(session, tenant_id, body.locale, 1 + modules.get("extra_location", 0))
     return load_current_tenant(session)
+
+
+def create_first_branches(
+    session: Session | Connection, tenant_id: UUID, locale: str, count: int
+) -> None:
+    """A business starts with its main branch, plus the extra branches chosen at sign-up
+    (renamed later). The extra-branch charge then follows the active branches."""
+    names = load_all_messages(locale)["locations"]
+    for number in range(1, count + 1):
+        name = (
+            names["mainBranch"]
+            if number == 1
+            else names["branchNumber"].replace("{number}", str(number))
+        )
+        session.execute(
+            # clock_timestamp keeps them in order (the main branch first) within one transaction
+            text("""
+                INSERT INTO app.locations (tenant_id, name, created_at)
+                VALUES (:t, :name, clock_timestamp())
+            """),
+            {"t": tenant_id, "name": name},
+        )
 
 
 @router.get("/tenants/current", tags=["tenants"])

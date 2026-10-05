@@ -67,5 +67,9 @@
       "whatsapp": "וואטסאפ",
       "extra_location": "סניפים נוספים"
     }
+  },
+  "locations": {
+    "mainBranch": "סניף ראשי",
+    "branchNumber": "סניף {number}"
   }
 }

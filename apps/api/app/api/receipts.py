@@ -97,6 +97,7 @@ def sales(context: SalesDep, start: date, end: date) -> Sales:
                       (SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()))
         AND issued_at < ((CAST(:end AS date) + 1)::timestamp AT TIME ZONE
                       (SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()))
+        AND app.in_branch((SELECT p.location_id FROM app.payments p WHERE p.id = payment_id))
     """
     params = {"start": start, "end": end}
     rows = db.execute(

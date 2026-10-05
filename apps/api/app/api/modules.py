@@ -162,8 +162,12 @@ def enabled_modules(db: Session) -> dict[str, int]:
 
 
 def set_modules(db: Session | Connection, tenant_id: object, selection: dict[str, int]) -> None:
+    """Replaces the business's modules. Extra branches are not chosen here: they follow the
+    business's active branches (app.sync_extra_locations_for)."""
     db.execute(text("DELETE FROM app.tenant_modules WHERE tenant_id = :t"), {"t": tenant_id})
     for key, quantity in selection.items():
+        if key == "extra_location":
+            continue
         db.execute(
             text("""
                 INSERT INTO app.tenant_modules (tenant_id, module_key, quantity)
@@ -171,6 +175,7 @@ def set_modules(db: Session | Connection, tenant_id: object, selection: dict[str
             """),
             {"t": tenant_id, "key": key, "quantity": quantity},
         )
+    db.execute(text("SELECT app.sync_extra_locations_for(:t)"), {"t": tenant_id})
 
 
 def _tenant_modules(db: Session) -> TenantModules:

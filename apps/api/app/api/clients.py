@@ -26,7 +26,7 @@ WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
-    "custom_fields, created_at, updated_at, erased_at"
+    "custom_fields, home_location_id, created_at, updated_at, erased_at"
 )
 
 
@@ -40,6 +40,10 @@ class ClientFields(BaseModel):
     custom_fields: dict[str, str | int | None] | None = Field(
         default=None,
         description="The vertical pack's extra fields (GET /clients/fields); replaces all",
+    )
+    home_location_id: UUID | None = Field(
+        default=None,
+        description="The client's home branch; new clients default to the current branch",
     )
 
     @field_validator(
@@ -79,6 +83,7 @@ class Client(BaseModel):
     status: ClientStatus
     source: ClientSource | None
     custom_fields: dict[str, str | int]
+    home_location_id: UUID | None
     created_at: datetime
     updated_at: datetime
     erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
@@ -92,6 +97,10 @@ class ClientPage(BaseModel):
 def _email_taken(error: IntegrityError) -> HTTPException | None:
     if "clients_tenant_email_key" in str(error.orig):
         return HTTPException(status_code=status.HTTP_409_CONFLICT, detail="email_taken")
+    if "home_location_id" in str(error.orig):
+        return HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_branch"
+        )
     return None
 
 
@@ -154,7 +163,8 @@ def list_clients(
     offset: Annotated[int, Query(ge=0)] = 0,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
-    where = "WHERE TRUE"
+    # The current branch's clients, and those without a home branch (they belong to all).
+    where = "WHERE (home_location_id IS NULL OR app.in_branch(home_location_id))"
     params: dict[str, object] = {"limit": limit, "offset": offset}
     if search and search.strip():
         where += """ AND concat_ws(' ', first_name, last_name, email, phone) ILIKE :pattern"""
@@ -199,10 +209,11 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
                 text(f"""
                     INSERT INTO app.clients
                         (tenant_id, first_name, last_name, email, phone, date_of_birth, notes,
-                         status, source, custom_fields)
+                         status, source, custom_fields, home_location_id)
                     VALUES
                         (:tenant_id, :first_name, :last_name, :email, :phone, :date_of_birth,
-                         :notes, :status, :source, CAST(:custom_fields AS jsonb))
+                         :notes, :status, :source, CAST(:custom_fields AS jsonb),
+                         :home_location_id)
                     RETURNING {COLUMNS}
                 """),
                 {
