@@ -957,6 +957,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{user_id}/time-off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Time Off
+         * @description The staff member's time off that hasn't ended yet, soonest first.
+         */
+        get: operations["list_time_off"];
+        put?: never;
+        /**
+         * Add Time Off
+         * @description Blocks whole days; appointments already booked in them stay (the business handles
+         *     them), but no new ones are offered.
+         */
+        post: operations["add_time_off"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/time-off/{time_off_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Time Off */
+        delete: operations["remove_time_off"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/appointments/staff": {
         parameters: {
             query?: never;
@@ -1257,6 +1299,63 @@ export interface paths {
         get: operations["get_members_at_risk"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Review Summary
+         * @description Ratings in the last `days` days (or all of one client's).
+         */
+        get: operations["review_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/reviews/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pending Reviews
+         * @description Recent attended visits the client hasn't rated yet, newest first.
+         */
+        get: operations["pending_reviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/bookings/{booking_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Review Visit */
+        post: operations["review_visit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2708,6 +2807,11 @@ export interface components {
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
             /** Late Cancel */
             late_cancel: boolean;
+            /**
+             * Rating
+             * @description The client's review of the visit
+             */
+            rating?: number | null;
         };
         /** ClientBusiness */
         ClientBusiness: {
@@ -4032,6 +4136,28 @@ export interface components {
             form: components["schemas"]["Form"] | null;
             current: components["schemas"]["Declaration"] | null;
         };
+        /** MyReview */
+        MyReview: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /** Rating */
+            rating: number;
+            /** Comment */
+            comment: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** NoteCreate */
         NoteCreate: {
             /** Body */
@@ -4120,6 +4246,21 @@ export interface components {
             result: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** PendingReview */
+        PendingReview: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
         };
         /** Plan */
         Plan: {
@@ -4297,6 +4438,20 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** RatingGroup */
+        RatingGroup: {
+            /**
+             * Key
+             * Format: uuid
+             */
+            key: string;
+            /** Name */
+            name: string;
+            /** Average */
+            average: number;
+            /** Count */
+            count: number;
+        };
         /** Receipt */
         Receipt: {
             /**
@@ -4370,6 +4525,59 @@ export interface components {
             approve: boolean;
             /** Note */
             note?: string | null;
+        };
+        /** ReviewCreate */
+        ReviewCreate: {
+            /** Rating */
+            rating: number;
+            /** Comment */
+            comment?: string | null;
+        };
+        /** ReviewItem */
+        ReviewItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Rating */
+            rating: number;
+            /** Comment */
+            comment: string | null;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /** Service Name */
+            service_name: string;
+            /** Staff Name */
+            staff_name: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ReviewSummary */
+        ReviewSummary: {
+            /** Average */
+            average: number | null;
+            /** Count */
+            count: number;
+            /**
+             * Distribution
+             * @description How many 1, 2, 3, 4 and 5-star reviews
+             */
+            distribution: number[];
+            /** By Staff */
+            by_staff: components["schemas"]["RatingGroup"][];
+            /** By Service */
+            by_service: components["schemas"]["RatingGroup"][];
+            /** Latest */
+            latest: components["schemas"]["ReviewItem"][];
         };
         /** RoleFields */
         RoleFields: {
@@ -5041,6 +5249,41 @@ export interface components {
              * @enum {string}
              */
             brand: "visa" | "mastercard" | "amex";
+        };
+        /** TimeOff */
+        TimeOff: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** Reason */
+            reason: string | null;
+        };
+        /** TimeOffCreate */
+        TimeOffCreate: {
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** Reason */
+            reason?: string | null;
         };
         /** Turn */
         Turn: {
@@ -7553,6 +7796,108 @@ export interface operations {
             };
         };
     };
+    list_time_off: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeOff"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_time_off: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TimeOffCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeOff"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_time_off: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+                time_off_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     staff_for_appointments: {
         parameters: {
             query?: never;
@@ -8194,6 +8539,108 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberAtRisk"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_summary: {
+        parameters: {
+            query?: {
+                days?: number;
+                client_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pending_reviews: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingReview"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_visit: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyReview"];
                 };
             };
             /** @description Validation Error */

@@ -49,7 +49,7 @@
     "removeLogo": "Remove logo",
     "noLogo": "No logo yet",
     "preview": "Preview",
-    "previewButton": "Book a class",
+    "previewButton": "Book",
     "errors": {
       "logo_too_large": "The image is larger than 512 KB.",
       "unsupported_image": "Use a PNG, JPG or WebP image."
@@ -174,14 +174,14 @@
     "weeklyAttendance": "Check-ins per week",
     "showTable": "Show as a table",
     "weekOf": "Week of",
-    "myClassesToday": "{count, plural, one {Your class today} other {Your # classes today}}",
+    "myClassesToday": "{count, plural, one {Your session today} other {Your # sessions today}}",
     "greeting": {
       "morning": "Good morning",
       "afternoon": "Good afternoon",
       "evening": "Good evening",
       "night": "Good night"
     },
-    "classesToday": "{count, plural, =0 {No classes today} one {One class today} other {# classes today}}",
+    "classesToday": "{count, plural, =0 {Nothing scheduled today} one {One session today} other {# sessions today}}",
     "bookedToday": "{count, plural, one {one booking} other {# bookings}}",
     "openSchedule": "Open schedule",
     "now": "Now",
@@ -357,15 +357,15 @@
   },
   "services": {
     "title": "Services",
-    "subtitle": "Classes and appointments you offer.",
+    "subtitle": "The services you offer: personal appointments and group sessions.",
     "add": "Add service",
     "new": "New service",
-    "empty": "No services yet. Add your first class or appointment type.",
+    "empty": "No services yet. Add your first one.",
     "name": "Name",
     "description": "Description",
     "duration": "Duration (minutes)",
     "capacity": "Participants per session",
-    "capacityHint": "1 for a personal appointment, more for a group class.",
+    "capacityHint": "1 for a personal appointment, more for a group session.",
     "price": "Price",
     "color": "Calendar color",
     "active": "Available for booking",
@@ -374,7 +374,7 @@
     "free": "Free",
     "bookingMode": "How it is booked",
     "modes": {
-      "class": "Group class – at set times on the schedule",
+      "class": "Group session – at set times on the schedule",
       "appointment": "Personal appointment – the client picks a free time"
     },
     "appointmentLabel": "Appointment"
@@ -513,7 +513,7 @@
     "closedDate": "Date",
     "closedReason": "Reason (optional)",
     "closedReasonHint": "For example: Rosh Hashanah",
-    "closedHint": "Classes that day are cancelled and booked clients are told. Weekly series won't add classes on this day.",
+    "closedHint": "Everything scheduled that day is cancelled and booked clients are told. Weekly series won't add sessions on this day.",
     "closedDone": "{count, plural, =0 {Day closed. There were no classes that day.} one {Day closed. # class was cancelled.} other {Day closed. # classes were cancelled.}}",
     "upcomingClosed": "Upcoming closed days",
     "noClosedDays": "No closed days ahead.",
@@ -590,11 +590,11 @@
       "generic": "Something went wrong. Try again."
     },
     "join": {
-      "title": "Join your studio",
-      "subtitle": "Enter the code your studio gave you (it's on their sign or QR code).",
+      "title": "Join a business",
+      "subtitle": "Enter the code the business gave you (it's on their sign or QR code).",
       "code": "Join code",
       "continue": "Continue",
-      "preview": "You're joining this business. They'll see your name and email, and you'll be able to book their classes.",
+      "preview": "You're joining this business. They'll see your name and email, and you'll be able to book with them.",
       "joinButton": "Join {name}",
       "otherCode": "Use a different code",
       "back": "Back",
@@ -612,7 +612,7 @@
     "schedule": {
       "title": "Schedule",
       "today": "Today",
-      "empty": "No classes on this day.",
+      "empty": "Nothing on this day.",
       "closed": "Closed on this day.",
       "closedReason": "Closed on this day ({reason}).",
       "closedShort": "Closed"
@@ -625,12 +625,12 @@
       "myPlans": "My plans",
       "validUntil": "Valid until {date}",
       "entriesLeft": "{count, plural, one {# entry left} other {# entries left}}",
-      "noPlan": "You don't have an active plan yet. Ask the studio to set you up with one of these:",
+      "noPlan": "You don't have an active plan yet. Ask the business to set you up with one of these:",
       "buyTitle": "Buy a plan",
       "noPlanBuy": "You don't have a valid plan yet. Choose one to start booking.",
       "buy": "Buy",
       "buyConfirmTitle": "Buy {plan}?",
-      "buyConfirmSimulated": "Test payment of {price}: no money is charged while the studio sets up payments.",
+      "buyConfirmSimulated": "Test payment of {price}: no money is charged while the business sets up payments.",
       "buyConfirm": "Buy",
       "buyCancel": "Not now",
       "bought": "Done! {plan} is now in your plans.",
@@ -657,29 +657,29 @@
     "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",
     "youreBooked": "You're booked",
     "waitlistPosition": "On the waitlist · #{position}",
-    "sessionCancelled": "Cancelled by the studio",
+    "sessionCancelled": "Cancelled by the business",
     "book": "Book",
     "joinWaitlist": "Waitlist",
     "cancelBooking": "Cancel",
     "leaveWaitlist": "Leave",
     "cancelTitle": "Cancel this booking?",
     "cancelMessage": "Your spot will go to the next person on the waitlist.",
-    "cancelLateMessage": "This is a late cancellation: it's inside the studio's cancellation window and will be recorded as late.",
+    "cancelLateMessage": "This is a late cancellation: it's inside the business's cancellation window and will be recorded as late.",
     "cancelConfirm": "Yes, cancel",
     "keep": "Keep it",
     "errors": {
-      "session_started": "This class has already started.",
-      "already_booked": "You're already booked into this class.",
-      "session_cancelled": "This class was cancelled.",
+      "session_started": "This has already started.",
+      "already_booked": "You're already booked.",
+      "session_cancelled": "This was cancelled.",
       "not_found": "This booking no longer exists. Pull down to refresh.",
       "generic": "Something went wrong. Try again.",
-      "no_valid_plan": "You need a valid membership or punch card to book. Ask the studio.",
+      "no_valid_plan": "You need a valid membership or punch card to book. Ask the business.",
       "health_declaration_required": "Please fill in the health declaration before booking.",
-      "health_declaration_review": "The studio needs to approve your health declaration before you can book."
+      "health_declaration_review": "The business needs to approve your health declaration before you can book."
     },
     "health": {
       "title": "Health declaration",
-      "intro": "Please answer each question. If you answer \"yes\" to any of them, the studio will review your declaration before you can book.",
+      "intro": "Please answer each question. If you answer \"yes\" to any of them, the business will review your declaration before you can book.",
       "accept": "I have read and accept the statement",
       "signedName": "Full name (your signature)",
       "signedNameHint": "Typing your name is your signature.",
@@ -689,31 +689,31 @@
       "acceptRequired": "Please accept the statement.",
       "generic": "Something went wrong. Try again.",
       "noForm": "This business doesn't use a health declaration.",
-      "reviewPending": "The studio is reviewing your health declaration. You can book once it's approved.",
-      "rejected": "The studio couldn't approve your declaration. Please contact them.",
+      "reviewPending": "The business is reviewing your health declaration. You can book once it's approved.",
+      "rejected": "The business couldn't approve your declaration. Please contact them.",
       "validUntil": "Valid until {date}.",
       "update": "Sign a new declaration",
       "back": "Back",
       "fill": "Fill in health declaration",
       "view": "View declaration",
-      "banner": "Before your first class, please fill in a short health declaration.",
+      "banner": "Before your first visit, please fill in a short health declaration.",
       "expiringBanner": "Your health declaration ends on {date}. Please sign a new one so you can keep booking.",
       "expiringSoon": "Valid until {date}. It ends soon, so please sign a new one."
     },
     "updates": {
       "title": "Updates",
-      "empty": "Nothing new yet. When the studio changes something about your classes, you'll see it here.",
+      "empty": "Nothing new yet. When the business changes something about your bookings, you'll see it here.",
       "new": "New",
-      "note": "Studio note: {note}",
+      "note": "Note from the business: {note}",
       "kinds": {
         "waitlist_promoted": "A spot opened up: you're booked into {service} on {when}.",
-        "booked_by_studio": "The studio booked you into {service} on {when}.",
-        "waitlisted_by_studio": "The studio put you on the waitlist for {service} on {when}.",
-        "booking_cancelled_by_studio": "The studio cancelled your booking for {service} on {when}.",
+        "booked_by_studio": "The business booked you into {service} on {when}.",
+        "waitlisted_by_studio": "The business put you on the waitlist for {service} on {when}.",
+        "booking_cancelled_by_studio": "The business cancelled your booking for {service} on {when}.",
         "session_cancelled": "{service} on {when} was cancelled.",
         "session_moved": "{service} moved from {previous} to {when}.",
-        "health_approved": "The studio approved your health declaration. You can book classes.",
-        "health_rejected": "The studio couldn't approve your health declaration. Please contact them.",
+        "health_approved": "The business approved your health declaration. You can book now.",
+        "health_rejected": "The business couldn't approve your health declaration. Please contact them.",
         "session_reminder": "Reminder: you're booked into {service} today, {when}.",
         "plan_ending": "Your {plan} ends on {date}. Renew it to keep booking."
       }
@@ -764,6 +764,24 @@
         "health_declaration_review": "Your health declaration is waiting for review.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "review": {
+      "cardTitle": "How was {service}?",
+      "cardText": "Rate your visit — it helps us get better.",
+      "rate": "Rate",
+      "title": "Rate your visit",
+      "question": "How was it?",
+      "star": "{count, plural, one {1 star} other {# stars}}",
+      "comment": "Anything to add? (optional)",
+      "send": "Send rating",
+      "thanks": "Thanks for rating!",
+      "back": "Back",
+      "rated": "You rated: {count, plural, one {1 star} other {# stars}}",
+      "errors": {
+        "already_reviewed": "You already rated this visit.",
+        "not_reviewable": "This visit can't be rated.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "join": {
@@ -775,7 +793,7 @@
     "step2": "Sign in with your email (you'll get a 6-digit code).",
     "step3": "Enter the join code above.",
     "title": "Join {name}",
-    "body": "Book classes, join waitlists and manage your bookings in the app.",
+    "body": "Book appointments and sessions, join waitlists and manage your bookings in the app.",
     "openApp": "Open in the app",
     "openInBrowser": "Open in the browser, no install"
   },
@@ -839,7 +857,7 @@
   },
   "metrics": {
     "revenue": "Revenue",
-    "active_clients": "Active members",
+    "active_clients": "Active clients",
     "new_clients": "New clients",
     "plans_sold": "Plans sold",
     "attendance": "Check-ins",
@@ -856,7 +874,7 @@
     "conversation": "Conversation",
     "empty": "No conversations yet.",
     "start": "Start a conversation",
-    "intro": "Hi! Ask me about your schedule, members, plans or numbers.",
+    "intro": "Hi! Ask me about your schedule, clients, plans or numbers.",
     "you": "You:",
     "assistantLabel": "Assistant:",
     "noAnswer": "I couldn't answer that one. Try asking differently.",
@@ -872,7 +890,7 @@
     "needsConfirmation": "Needs your confirmation",
     "bookPreview": "Book {client} into {service}",
     "cancelPreview": "Cancel {client}'s booking for {service}",
-    "fullWaitlist": "The class is full, so this will add them to the waitlist.",
+    "fullWaitlist": "It's full, so this will add them to the waitlist.",
     "confirm": "Confirm",
     "reject": "Don't do it",
     "statuses": {
@@ -915,7 +933,7 @@
     "descriptions": {
       "none": "You can add it any time.",
       "client_app": "Your clients join with a code or QR, book, cancel and join waitlists in your branded app.",
-      "ai_basic": "Ask about your business in plain words: schedule, members, numbers.",
+      "ai_basic": "Ask about your business in plain words: schedule, clients, numbers.",
       "ai_pro": "Everything in AI Basic, and it prepares bookings and cancellations for you to confirm.",
       "extra_location": "{price} per location beyond the first.",
       "crm": "A lead pipeline: online inquiry form, call log, follow-up reminders and conversion to clients.",
@@ -1012,7 +1030,7 @@
     "showAll": "All answers",
     "yes": "Yes",
     "no": "No",
-    "reviewNote": "Studio note: {note}",
+    "reviewNote": "Note from the business: {note}",
     "reviewHint": "The client can book in the app only after you approve. Approve once you're satisfied they can train safely (for example, with a doctor's letter).",
     "note": "Note (optional)",
     "approve": "Approve",
@@ -1088,23 +1106,23 @@
   },
   "reports": {
     "title": "Reports",
-    "intro": "Which classes, instructors and hours work best, and which members need attention.",
+    "intro": "Which services, staff and hours work best, and which clients need attention.",
     "period": "Period",
     "lastDays": "Last {count} days",
-    "noSessions": "No classes took place in this period.",
-    "sessions": "Classes",
+    "noSessions": "Nothing took place in this period.",
+    "sessions": "Sessions",
     "attended": "Check-ins",
     "occupancy": "Occupancy",
     "noShowRate": "No-shows",
-    "byService": "By class",
-    "service": "Class",
-    "byInstructor": "By instructor",
-    "instructor": "Instructor",
-    "noInstructor": "No instructor set",
+    "byService": "By service",
+    "service": "Service",
+    "byInstructor": "By staff member",
+    "instructor": "Staff member",
+    "noInstructor": "No staff member set",
     "bySlot": "Busiest times",
     "slot": "Day and hour",
-    "atRisk": "{count, plural, =0 {Members to reach out to} one {# member to reach out to} other {# members to reach out to}}",
-    "atRiskHint": "Members with a valid plan who haven't come in {days} days, or whose plan ends within {days} days with no renewal.",
+    "atRisk": "{count, plural, =0 {Clients to reach out to} one {# client to reach out to} other {# clients to reach out to}}",
+    "atRiskHint": "Clients with a valid plan who haven't come in {days} days, or whose plan ends within {days} days with no renewal.",
     "atRiskNone": "Nobody right now. Nice!",
     "reasons": {
       "inactive": "Hasn't come lately",
@@ -1117,14 +1135,14 @@
   },
   "email": {
     "greeting": "Hi {name},",
-    "note": "Studio note: {note}",
+    "note": "Note from the business: {note}",
     "footer": "This message was sent by {business}. You can see all updates in the app.",
     "subject": {
       "waitlist_promoted": "You're in: {service} on {when}",
       "booked_by_studio": "You're booked: {service} on {when}",
       "waitlisted_by_studio": "On the waitlist: {service} on {when}",
       "booking_cancelled_by_studio": "Booking cancelled: {service} on {when}",
-      "session_cancelled": "Class cancelled: {service} on {when}",
+      "session_cancelled": "Cancelled: {service} on {when}",
       "session_moved": "New time: {service} on {when}",
       "health_approved": "Your health declaration was approved",
       "health_rejected": "About your health declaration",
@@ -1138,10 +1156,10 @@
       "booking_cancelled_by_studio": "{business} cancelled your booking for {service} on {when}.",
       "session_cancelled": "{service} on {when} was cancelled. Sorry for the change.",
       "session_moved": "{service} moved from {previous} to {when}. Your booking moved with it.",
-      "health_approved": "{business} approved your health declaration. You can book classes in the app.",
-      "health_rejected": "{business} couldn't approve your health declaration. Please contact the studio.",
+      "health_approved": "{business} approved your health declaration. You can book in the app.",
+      "health_rejected": "{business} couldn't approve your health declaration. Please contact the business.",
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
-      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking classes."
+      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking."
     }
   },
   "support": {
@@ -1799,7 +1817,7 @@
     "audience": "To",
     "audiences": {
       "active": "All active clients",
-      "inactive": "Members who haven't come in 14 days",
+      "inactive": "Plan holders who haven't come in 14 days",
       "plan_ending": "Plan ending soon",
       "no_plan": "Active without a valid plan",
       "open_leads": "Open leads"
@@ -1864,5 +1882,27 @@
         "body": "Happy holidays, {first_name}! Warm wishes from the {business} team."
       }
     }
+  },
+  "reviews": {
+    "title": "Satisfaction ({count} days)",
+    "clientTitle": "This client's ratings",
+    "none": "No ratings in this period yet.",
+    "count": "{count, plural, one {1 rating} other {# ratings}}",
+    "distribution": "Ratings breakdown",
+    "starsShort": "{count, plural, one {1 star} other {# stars}}",
+    "starsLabel": "{rating} out of 5 stars",
+    "byStaff": "By staff member",
+    "byService": "By service",
+    "comments": "Latest comments"
+  },
+  "timeOff": {
+    "title": "Time off",
+    "hint": "No appointments are offered with this staff member on these days. Appointments already booked stay — handle them separately.",
+    "from": "From",
+    "to": "To",
+    "toHint": "Empty = one day",
+    "reason": "Reason (optional)",
+    "add": "Add time off",
+    "remove": "Remove"
   }
 }

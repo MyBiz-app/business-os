@@ -50,6 +50,18 @@ with sync_playwright() as p:
     expect(owner.get_by_role("status")).to_contain_text("השעות נשמרו")
     print("2. working hours saved | a11y:", hours_serious or "ok")
 
+    # Time off on a later day shows in the list and can be removed.
+    later = owner.evaluate("() => { const d = new Date(); d.setDate(d.getDate() + 5); return d.toISOString().slice(0, 10); }")
+    time_off = owner.get_by_role("region", name="חופשות והיעדרויות")
+    time_off.get_by_label("מתאריך").fill(later)
+    time_off.get_by_label("סיבה (לא חובה)").fill("חופשה")
+    time_off.get_by_role("button", name="הוספת היעדרות").click()
+    expect(time_off.get_by_text("· חופשה")).to_be_visible()
+    off_serious = serious(owner)
+    time_off.get_by_role("button", name="הסרה").click()
+    expect(time_off.get_by_text("· חופשה")).to_have_count(0)
+    print("2b. time off added and removed | a11y:", off_serious or "ok")
+
     # A walk-in from the web: a new client, then the first free time tomorrow.
     owner.goto(f"{h.BASE}/clients/new"); h.ready(owner)
     owner.get_by_label("שם פרטי").fill("יוסי")

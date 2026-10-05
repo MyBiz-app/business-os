@@ -23,6 +23,7 @@ from app.api import (
     privacy,
     receipts,
     reports,
+    reviews,
     schedule,
     services,
     staff,
@@ -87,6 +88,8 @@ def create_app() -> FastAPI:
     app.include_router(appointments.client_router)
     app.include_router(plans.router)
     app.include_router(reports.router)
+    app.include_router(reviews.router)
+    app.include_router(reviews.client_router)
     app.include_router(assistant.router)
     app.include_router(modules.router)
     app.include_router(billing.router)
