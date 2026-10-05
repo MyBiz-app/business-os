@@ -26,7 +26,10 @@ class Checkout(BaseModel):
     id: UUID
     plan_id: UUID
     plan_name: str
-    amount: int = Field(description="Minor units")
+    amount: int = Field(description="What the client pays, minor units")
+    list_amount: int = Field(description="The plan's price before a promo code")
+    discount: int
+    promo_code: str | None
     currency: str
     status: Literal["pending", "paid", "cancelled", "failed"]
     simulated: bool = Field(description="Test payment: no money is charged")
@@ -40,8 +43,10 @@ class CheckoutPaid(BaseModel):
 
 
 SELECT = """
-    SELECT k.id, k.plan_id, p.name AS plan_name, k.amount, k.currency, k.status,
-           k.provider = 'simulated' AS simulated, NULL AS pay_url, k.created_at
+    SELECT k.id, k.plan_id, p.name AS plan_name, k.amount, k.list_amount, k.discount,
+           (SELECT c.code FROM app.promo_codes c WHERE c.id = k.promo_code_id) AS promo_code,
+           k.currency, k.status, k.provider = 'simulated' AS simulated, NULL AS pay_url,
+           k.created_at
     FROM app.checkouts k JOIN app.plans p ON p.id = k.plan_id
 """
 
@@ -88,6 +93,36 @@ def start_checkout(body: CheckoutCreate, context: ClientDep) -> Checkout:
 
 @router.get("/checkouts/{checkout_id}")
 def get_checkout(checkout_id: UUID, context: ClientDep) -> Checkout:
+    return _load(context, checkout_id)
+
+
+class PromoCodeApply(BaseModel):
+    code: str | None = Field(default=None, max_length=20, description="Empty removes the code")
+
+
+@router.post("/checkouts/{checkout_id}/promo")
+def apply_promo(checkout_id: UUID, body: PromoCodeApply, context: ClientDep) -> Checkout:
+    """Applies (or removes) a promo code on the client's pending checkout."""
+    db = context.session
+    try:
+        with db.begin_nested():
+            db.execute(
+                text("SELECT app.apply_promo_code(:id, :code)"),
+                {"id": checkout_id, "code": body.code},
+            )
+    except DBAPIError as error:
+        code = getattr(error.orig, "sqlstate", None)
+        if code == "P0002":
+            raise not_found() from error
+        if code == "22023":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="invalid_code"
+            ) from error
+        if code == "P0001":
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="not_pending"
+            ) from error
+        raise
     return _load(context, checkout_id)
 
 

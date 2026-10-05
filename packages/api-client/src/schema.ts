@@ -1227,6 +1227,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/promo-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Promo Codes */
+        get: operations["list_promo_codes"];
+        put?: never;
+        /** Create Promo Code */
+        post: operations["create_promo_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/promo-codes/{code_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Promo Code
+         * @description Deletes a code nobody used; a used code is paused instead (its history stays).
+         */
+        delete: operations["delete_promo_code"];
+        options?: never;
+        head?: never;
+        /** Update Promo Code */
+        patch: operations["update_promo_code"];
+        trace?: never;
+    };
     "/metrics": {
         parameters: {
             query?: never;
@@ -1994,6 +2033,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/checkouts/{checkout_id}/promo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply Promo
+         * @description Applies (or removes) a promo code on the client's pending checkout.
+         */
+        post: operations["apply_promo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/checkouts/{checkout_id}/simulate-payment": {
         parameters: {
             query?: never;
@@ -2668,9 +2727,18 @@ export interface components {
             plan_name: string;
             /**
              * Amount
-             * @description Minor units
+             * @description What the client pays, minor units
              */
             amount: number;
+            /**
+             * List Amount
+             * @description The plan's price before a promo code
+             */
+            list_amount: number;
+            /** Discount */
+            discount: number;
+            /** Promo Code */
+            promo_code: string | null;
             /** Currency */
             currency: string;
             /**
@@ -4404,6 +4472,83 @@ export interface components {
             last_name?: string | null;
             /** Phone */
             phone?: string | null;
+        };
+        /** PromoCode */
+        PromoCode: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Percent Off */
+            percent_off: number | null;
+            /** Amount Off */
+            amount_off: number | null;
+            /** Plan Id */
+            plan_id: string | null;
+            /** Plan Name */
+            plan_name: string | null;
+            /** Starts On */
+            starts_on: string | null;
+            /** Ends On */
+            ends_on: string | null;
+            /** Max Uses */
+            max_uses: number | null;
+            /**
+             * Uses
+             * @description Paid checkouts with this code
+             */
+            uses: number;
+            /**
+             * Discount Given
+             * @description Total discount on those checkouts, minor units
+             */
+            discount_given: number;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** PromoCodeApply */
+        PromoCodeApply: {
+            /**
+             * Code
+             * @description Empty removes the code
+             */
+            code?: string | null;
+        };
+        /** PromoCodeCreate */
+        PromoCodeCreate: {
+            /** Code */
+            code: string;
+            /** Percent Off */
+            percent_off?: number | null;
+            /**
+             * Amount Off
+             * @description Minor units
+             */
+            amount_off?: number | null;
+            /**
+             * Plan Id
+             * @description Only this plan; empty = every plan
+             */
+            plan_id?: string | null;
+            /** Starts On */
+            starts_on?: string | null;
+            /** Ends On */
+            ends_on?: string | null;
+            /** Max Uses */
+            max_uses?: number | null;
+        };
+        /** PromoCodeUpdate */
+        PromoCodeUpdate: {
+            /** Active */
+            active: boolean;
         };
         /** Question */
         Question: {
@@ -8409,6 +8554,140 @@ export interface operations {
             };
         };
     };
+    list_promo_codes: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromoCode"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_promo_code: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoCodeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromoCode"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_promo_code: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                code_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_promo_code: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                code_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoCodeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromoCode"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_metrics: {
         parameters: {
             query: {
@@ -9893,6 +10172,43 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    apply_promo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoCodeApply"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

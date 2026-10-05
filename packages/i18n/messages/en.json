@@ -782,6 +782,15 @@
         "not_reviewable": "This visit can't be rated.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "promo": {
+      "label": "Promo code",
+      "apply": "Apply",
+      "remove": "Remove code",
+      "applied": "Code {code} applied",
+      "listPrice": "Price",
+      "discount": "Discount",
+      "invalid": "This code isn't valid for this purchase."
     }
   },
   "join": {
@@ -1904,5 +1913,39 @@
     "reason": "Reason (optional)",
     "add": "Add time off",
     "remove": "Remove"
+  },
+  "promo": {
+    "title": "Promo codes",
+    "subtitle": "Codes clients enter when they buy a plan in the app.",
+    "code": "Code",
+    "codeHint": "Letters and digits, 3–20 characters",
+    "kind": "Discount type",
+    "percent": "Percent",
+    "amount": "Fixed amount",
+    "percentValue": "Percent off",
+    "amountValue": "Amount off ({currency})",
+    "plan": "Applies to",
+    "allPlans": "Every plan",
+    "startsOn": "Valid from",
+    "endsOn": "Valid until",
+    "maxUses": "Number of uses",
+    "maxUsesHint": "Empty = unlimited",
+    "create": "Create code",
+    "created": "Code created.",
+    "percentOff": "{value}% off",
+    "amountOff": "{value} off",
+    "paused": "paused",
+    "until": "until {date}",
+    "uses": "{uses, plural, =0 {not used yet} one {used once} other {used # times}}",
+    "usesOf": "used {uses} of {max}",
+    "given": "{amount} given in total",
+    "pause": "Pause",
+    "resume": "Resume",
+    "delete": "Delete",
+    "errors": {
+      "invalid": "Some details aren't valid.",
+      "code_taken": "That code already exists.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }
