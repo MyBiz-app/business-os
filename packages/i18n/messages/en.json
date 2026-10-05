@@ -155,8 +155,6 @@
     "today": "Today",
     "emptyToday": "Your schedule, clients and sales will appear here.",
     "business": "Business",
-    "switchBusiness": "Switch business",
-    "newBusiness": "Create another business",
     "kpis": "Key numbers",
     "period": "Period",
     "lastDays": "Last {count} days",
@@ -356,7 +354,9 @@
     },
     "absentFilter": "Last visit",
     "absentAny": "Any time",
-    "absentDays": "Not in {days} days"
+    "absentDays": "Not in {days} days",
+    "homeBranch": "Home branch",
+    "allBranches": "All branches"
   },
   "common": {
     "save": "Save",
@@ -413,7 +413,9 @@
     "roomName": "Room name",
     "roomCapacity": "Capacity",
     "addRoom": "Add room",
-    "noRooms": "No rooms yet."
+    "noRooms": "No rooms yet.",
+    "mainBranch": "Main branch",
+    "branchNumber": "Branch {number}"
   },
   "team": {
     "title": "Team",
@@ -456,7 +458,12 @@
     "roleCreated": "Role created.",
     "roleMembers": "{count, plural, =0 {Nobody has this role.} one {1 person has this role.} other {# people have this role.}}",
     "deleteRole": "Delete role",
-    "deleteRoleConfirm": "Delete the role \"{name}\"?"
+    "deleteRoleConfirm": "Delete the role \"{name}\"?",
+    "branchesOf": "Branches of {email}",
+    "allBranches": "All branches",
+    "someBranches": "{count} branches",
+    "branchesHint": "Where they work. None checked means all branches.",
+    "saveBranches": "Save"
   },
   "invite": {
     "title": "You're invited",
@@ -967,7 +974,8 @@
       "extra_location": "{price} per location beyond the first.",
       "crm": "A lead pipeline: online inquiry form, call log, follow-up reminders and conversion to clients.",
       "whatsapp": "Messages to clients and leads: broadcasts to a segment, templates and a send log."
-    }
+    },
+    "followsBranches": "Follows your active branches"
   },
   "platform": {
     "title": "MyBiz console",
@@ -1305,7 +1313,10 @@
     "lastVisit": "Last visit {date}",
     "neverVisited": "Hasn't visited yet",
     "planEnds": "plan ends {date}",
-    "showAll": "Show all {count}"
+    "showAll": "Show all {count}",
+    "byBranch": "By branch",
+    "branch": "Branch",
+    "noBranch": "No branch"
   },
   "email": {
     "greeting": "Hi {name},",
@@ -2866,5 +2877,26 @@
     "school_grade": "School grade",
     "subjects": "Subjects",
     "tire_size": "Tire size"
+  },
+  "businessMenu": {
+    "switch": "Switch business",
+    "myBusinesses": "My businesses",
+    "allBusinesses": "All my businesses",
+    "newBusiness": "Add a business",
+    "branch": "Branch",
+    "allBranches": "All branches"
+  },
+  "businesses": {
+    "title": "My businesses",
+    "summary": "{businesses, plural, one {One business} other {# businesses}} · {branches, plural, one {one branch} other {# branches}}",
+    "add": "Add a business",
+    "addHint": "Another business of yours, with its own industry, team, clients and plan.",
+    "open": "Open now",
+    "branches": "{count, plural, one {One branch} other {# branches}}",
+    "more": "+{count} more",
+    "today": "Sessions today",
+    "activeClients": "Active clients",
+    "revenue": "Revenue this month",
+    "enter": "Open {name}"
   }
 }

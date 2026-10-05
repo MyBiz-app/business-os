@@ -23,6 +23,8 @@ function readForm(formData: FormData) {
     notes: value("notes"),
     status: (value("status") || "active") as ClientStatus,
     source: (value("source") || null) as ClientSource | null,
+    // Only sent when the form shows it (businesses with several branches).
+    ...(formData.has("home_location_id") ? { home_location_id: value("home_location_id") || null } : {}),
   };
 }
 

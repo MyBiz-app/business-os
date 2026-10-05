@@ -8,7 +8,7 @@ import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
-import { changeRole, inviteMember, removeMember, type TeamState } from "./actions";
+import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
 
 const ROLES = ["owner", "manager", "front_desk", "staff"] as const;
 
@@ -76,9 +76,12 @@ type MemberRowProps = {
   isSelf: boolean;
   allowOwner: boolean;
   customRoles: CustomRoleOption[];
+  /** The business's active branches (a picker appears when there are several). */
+  branches: { id: string; name: string }[];
+  memberBranches: string[];
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -103,6 +106,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
             </span>
           )}
         </span>
+        {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} />}
         <Link href={`/team/${userId}/hours`} className="text-sm text-primary underline-offset-4 hover:underline">
           {t("hours.link")}
         </Link>
@@ -137,5 +141,37 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
         )}
       </div>
     </li>
+  );
+}
+
+type MemberBranchesProps = { userId: string; email: string; branches: { id: string; name: string }[]; selected: string[] };
+
+/** Where a member works: some branches, or (none checked) all of them. */
+function MemberBranches({ userId, email, branches, selected }: MemberBranchesProps) {
+  const t = useTranslations("team");
+  const [state, action] = useActionState<TeamState, FormData>(setBranches.bind(null, userId), {});
+  const names = branches.filter((b) => selected.includes(b.id)).map((b) => b.name);
+  return (
+    <details className="group relative">
+      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
+        <span className="sr-only">{t("branchesOf", { email })}: </span>
+        {names.length === 0 ? t("allBranches") : names.length === 1 ? names[0] : t("someBranches", { count: names.length })}
+      </summary>
+      <form action={action} className="absolute end-0 top-full z-20 mt-1 flex w-56 flex-col gap-2 rounded-2xl bg-surface p-3 shadow-xl ring-1 ring-border">
+        <TeamError state={state} />
+        <fieldset className="flex flex-col gap-1.5">
+          <legend className="mb-1 text-xs text-muted">{t("branchesHint")}</legend>
+          {branches.map((branch) => (
+            <label key={branch.id} className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="location_ids" value={branch.id} defaultChecked={selected.includes(branch.id)} className="size-4 accent-primary" />
+              <span dir="auto">{branch.name}</span>
+            </label>
+          ))}
+        </fieldset>
+        <button type="submit" className="btn-primary px-3 py-1.5 text-sm">
+          {t("saveBranches")}
+        </button>
+      </form>
+    </details>
   );
 }

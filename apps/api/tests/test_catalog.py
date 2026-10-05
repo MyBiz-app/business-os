@@ -97,7 +97,8 @@ def test_locations_with_rooms(
     assert renamed.json()["name"] == "Big room"
     assert [r["name"] for r in fetched["rooms"]] == ["Big room"]
     assert closed.json()["active"] is False
-    assert client.get("/locations", headers=headers).json()[0]["rooms"][0]["capacity"] == 14
+    listed = {loc["id"]: loc for loc in client.get("/locations", headers=headers).json()}
+    assert listed[location["id"]]["rooms"][0]["capacity"] == 14
 
 
 def test_catalog_permissions(
@@ -130,7 +131,10 @@ def test_catalog_is_isolated_between_businesses(
 
     assert client.get("/services", headers=theirs).json() == []
     assert client.get(f"/services/{service['id']}", headers=theirs).status_code == 404
-    assert client.get("/locations", headers=theirs).json() == []
+    # They see only their own main branch.
+    assert location["id"] not in {
+        loc["id"] for loc in client.get("/locations", headers=theirs).json()
+    }
     # They cannot add a room to my location, through the API or directly in the database.
     room = client.post(f"/locations/{location['id']}/rooms", json={"name": "X"}, headers=theirs)
     assert room.status_code == 404

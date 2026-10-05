@@ -7,7 +7,7 @@ import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
-import { getTenantFor } from "@/lib/tenant";
+import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
@@ -112,6 +112,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           client={client}
           submitLabel={t("save")}
           readOnly={!writable}
+          branches={await getBranches()}
         />
       </section>
 

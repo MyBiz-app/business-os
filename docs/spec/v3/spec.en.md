@@ -50,6 +50,17 @@ Rules: every level can only give permissions it holds itself; only owners create
 
 A client signs in to the client app with an email code, joins businesses with a join code or QR, and only ever sees their own data.
 
+### 3.4 Owners, businesses and branches
+
+A MyBiz customer is a person, and a person can own several businesses. For example, Adir owns a chain of pizzerias with four branches and, separately, a barbershop in Tel Aviv with one branch: two businesses, five branches.
+
+- **Business**: has its own industry, name, brand, team, clients, plan and monthly invoice. Data never mixes between businesses; even the same person's two businesses are separate.
+- **Branch**: a place where the business works, with its own address and rooms. A business starts with one branch; each additional branch is the "extra branch" item on the invoice, which follows the number of active branches.
+- **My businesses**: one page shows every business the person belongs to, with its industry, branches and the key numbers of today and this month; from there they open a business or add a new one. A switcher in the side menu moves between businesses from any page.
+- **Current branch**: inside a business with several branches, a selector in the header chooses "all branches" or one branch. The schedule, the dashboard's numbers, reports, sales and the client list follow it, and new sessions, sales and clients are filed under it.
+- **What belongs to a branch**: sessions and appointments (where they happen), sales (where they were sold), clients (their home branch, optional) and team members (the branches they work at; none means all). Services, plans and prices belong to the whole business.
+- **Roles**: a person's role is per business (owner of one, manager in another). Within a business, a team member assigned to branches sees those branches first; limiting permissions per branch comes later.
+
 ## 4. Industries: categories and sub-categories
 
 The fitness studio was the prototype. Every industry now stands on equal footing: no industry is "the main one", and the core never asks which industry a business belongs to. Industries are organized in two levels:
@@ -215,7 +226,8 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
 | 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
 | 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | Done |
-| 6 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories | Planned |
+| 6 — Businesses and branches | One owner with several businesses, each with several branches: my businesses, a current branch, data and numbers per branch, a full demo | In progress |
+| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories | Planned |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 The live status of the work — done, in progress and next — is kept in `docs/STATUS.md` and in the repository's GitHub issues, updated with every merged change.

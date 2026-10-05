@@ -20,11 +20,15 @@ type Props = {
   client?: Client;
   submitLabel: string;
   readOnly?: boolean;
+  /** Shown as "home branch" when the business has several. */
+  branches?: { id: string; name: string }[];
+  /** A new client's home branch: the current branch. */
+  defaultBranch?: string | null;
 };
 
 const STATUSES = ["active", "lead", "inactive"] as const;
 
-export function ClientForm({ action, client, submitLabel, readOnly = false }: Props) {
+export function ClientForm({ action, client, submitLabel, readOnly = false, branches = [], defaultBranch = null }: Props) {
   const t = useTranslations("clients");
   const tAuth = useTranslations("auth");
   const [state, formAction] = useActionState(action, {});
@@ -40,7 +44,13 @@ export function ClientForm({ action, client, submitLabel, readOnly = false }: Pr
       <FormNotice message={state.saved ? t("saved") : undefined} />
       {/* Keyed by the saved version: after a save the fields remount with the stored values
           instead of React's form reset restoring the values the page first loaded with. */}
-      <ClientFields key={client?.updated_at ?? "new"} client={client} readOnly={readOnly} />
+      <ClientFields
+        key={client?.updated_at ?? "new"}
+        client={client}
+        readOnly={readOnly}
+        branches={branches}
+        homeBranch={client ? client.home_location_id : defaultBranch}
+      />
       {!readOnly && (
         <div className="flex items-center gap-4">
           <SubmitButton>{submitLabel}</SubmitButton>
@@ -53,7 +63,14 @@ export function ClientForm({ action, client, submitLabel, readOnly = false }: Pr
   );
 }
 
-function ClientFields({ client, readOnly }: { client?: Client; readOnly: boolean }) {
+type FieldsProps = {
+  client?: Client;
+  readOnly: boolean;
+  branches: { id: string; name: string }[];
+  homeBranch: string | null;
+};
+
+function ClientFields({ client, readOnly, branches, homeBranch }: FieldsProps) {
   const t = useTranslations("clients");
   return (
     <fieldset disabled={readOnly} className="grid gap-4 sm:grid-cols-2">
@@ -68,6 +85,14 @@ function ClientFields({ client, readOnly }: { client?: Client; readOnly: boolean
           defaultValue={client?.status ?? "active"}
           options={STATUSES.map((value) => ({ value, label: t(`statuses.${value}`) }))}
         />
+        {branches.length > 1 && (
+          <SelectField
+            label={t("homeBranch")}
+            name="home_location_id"
+            defaultValue={homeBranch ?? ""}
+            options={[{ value: "", label: t("allBranches") }, ...branches.map((b) => ({ value: b.id, label: b.name }))]}
+          />
+        )}
         <SelectField
           label={t("source")}
           name="source"

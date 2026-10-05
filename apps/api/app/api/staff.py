@@ -47,6 +47,7 @@ class Member(BaseModel):
     role: Role
     custom_role_id: UUID | None
     custom_role_name: str | None
+    location_ids: list[UUID] = Field(description="Branches they work at; empty means all")
     joined_at: datetime
 
 
@@ -176,7 +177,8 @@ def get_team(context: ReadDep) -> Team:
     members = context.session.execute(
         text("""
             SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
-                   r.name AS custom_role_name, m.created_at AS joined_at
+                   r.name AS custom_role_name, m.location_ids,
+                   m.created_at AS joined_at
             FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
             LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
             WHERE m.tenant_id = app.current_tenant_id()
@@ -252,7 +254,8 @@ def _load_member(session: Session, user_id: UUID) -> Member:
         session.execute(
             text("""
                 SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
-                       r.name AS custom_role_name, m.created_at AS joined_at
+                       r.name AS custom_role_name, m.location_ids,
+                   m.created_at AS joined_at
                 FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
                 LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
                 WHERE m.tenant_id = app.current_tenant_id() AND m.user_id = :user_id
@@ -298,6 +301,32 @@ def update_member(user_id: UUID, body: MemberUpdate, user: UserDep, context: Man
             WHERE tenant_id = app.current_tenant_id() AND user_id = :user_id
         """),
         {"role": new_role, "custom_role_id": body.custom_role_id, "user_id": user_id},
+    )
+    return _load_member(context.session, user_id)
+
+
+class MemberBranches(BaseModel):
+    location_ids: list[UUID] = Field(max_length=200, description="Empty means all branches")
+
+
+@router.put("/staff/{user_id}/branches")
+def set_member_branches(user_id: UUID, body: MemberBranches, context: ManageDep) -> Member:
+    """The branches a team member works at (they see these first); none means all."""
+    if _member_role(context.session, user_id) is None:
+        raise not_found()
+    ids = sorted(set(body.location_ids))
+    known = context.session.execute(
+        text("SELECT count(*) FROM app.locations WHERE id = ANY(CAST(:ids AS uuid[]))"),
+        {"ids": [str(i) for i in ids]},
+    ).scalar_one()
+    if known != len(ids):
+        raise HTTPException(status_code=422, detail="unknown_branch")
+    context.session.execute(
+        text("""
+            UPDATE app.tenant_members SET location_ids = CAST(:ids AS uuid[])
+            WHERE tenant_id = app.current_tenant_id() AND user_id = :user_id
+        """),
+        {"ids": [str(i) for i in ids], "user_id": user_id},
     )
     return _load_member(context.session, user_id)
 

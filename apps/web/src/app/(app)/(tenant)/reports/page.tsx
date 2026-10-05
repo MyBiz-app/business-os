@@ -28,10 +28,11 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const start = addDays(end, -(PERIODS[period] - 1));
   const range = { start, end };
 
-  const [byService, byInstructor, bySlot, atRisk, reviews] = await Promise.all([
+  const [byService, byInstructor, bySlot, byBranch, atRisk, reviews] = await Promise.all([
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "service" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "instructor" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "time_slot" }, query: range } }).then(unwrap),
+    api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "branch" }, query: range } }).then(unwrap),
     api.GET("/metrics/members-at-risk", { params: { ...scope, query: { days: AT_RISK_DAYS } } }).then(unwrap),
     api.GET("/reviews", { params: { ...scope, query: { days: PERIODS[period] } } }).then(unwrap),
   ]);
@@ -126,6 +127,8 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         timeZone={tenant.time_zone}
         title={tReviews("title", { count: PERIODS[period] })}
       />
+      {/* Comparing branches matters once there is more than one (and none is selected). */}
+      {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"))}
       {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
       {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
       {table("by-slot", t("bySlot"), t("slot"), slots, (row) => slotLabel(row.key))}

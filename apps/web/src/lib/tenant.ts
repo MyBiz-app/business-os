@@ -7,6 +7,10 @@ import { cache } from "react";
 import { getApi, unwrap } from "@/lib/api";
 
 export const TENANT_COOKIE = "TENANT_ID";
+/** The current branch, remembered per business (none: all branches). */
+export const branchCookie = (tenantId: string) => `BRANCH_${tenantId}`;
+
+type Scope = { header: { "X-Tenant-Id": string; "X-Location-Id"?: string } };
 
 /** The signed-in user and the business they are working in (null if they have none yet). */
 export const getActiveMembership = cache(async () => {
@@ -27,16 +31,37 @@ export const getActiveMembership = cache(async () => {
   return { me, membership };
 });
 
-/** The active business, its API client and the header that scopes requests to it. */
+/** The active business, its API client and the headers that scope requests to it and to the
+ * current branch (lists, numbers and new records follow it; the API checks it). */
 export const getTenant = cache(async () => {
   const { me, membership } = await getActiveMembership();
   if (!membership) redirect("/onboarding");
 
   const api = await getApi();
-  const scope = { header: { "X-Tenant-Id": membership.tenant_id } };
-  const tenant = unwrap(await api.GET("/tenants/current", { params: scope }));
-  return { me, tenant, api, scope };
+  const branch = (await cookies()).get(branchCookie(membership.tenant_id))?.value;
+  let scope: Scope = { header: { "X-Tenant-Id": membership.tenant_id, ...(branch ? { "X-Location-Id": branch } : {}) } };
+  let response = await api.GET("/tenants/current", { params: scope });
+  if (response.error && branch) {
+    // A branch that no longer belongs to the business: fall back to all branches.
+    scope = { header: { "X-Tenant-Id": membership.tenant_id } };
+    response = await api.GET("/tenants/current", { params: scope });
+  }
+  const tenant = unwrap(response);
+  return { me, tenant, api, scope, branch: scope.header["X-Location-Id"] ?? null };
 });
+
+/** The business's active branches (empty when the person may not read them). */
+export const getBranches = cache(async () => {
+  const { tenant, api, scope } = await getTenant();
+  if (!tenant.permissions.includes("catalog.read")) return [];
+  return ((await api.GET("/locations", { params: scope })).data ?? []).filter((b) => b.active).map(({ id, name }) => ({ id, name }));
+});
+
+export async function setActiveBranch(tenantId: string, branchId: string | null) {
+  const store = await cookies();
+  if (!branchId) store.delete(branchCookie(tenantId));
+  else store.set(branchCookie(tenantId), branchId, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax", httpOnly: true });
+}
 
 export async function setActiveTenant(tenantId: string) {
   (await cookies()).set(TENANT_COOKIE, tenantId, {

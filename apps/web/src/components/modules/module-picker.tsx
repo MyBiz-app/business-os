@@ -19,11 +19,13 @@ type Props = {
   activeClients: number;
   /** Name of the hidden input that carries the selection (JSON) in the form. */
   name: string;
+  /** For an existing business, extra branches follow its active branches: shown, not chosen. */
+  branchesFollowLocations?: boolean;
 };
 
 /** Toggles for the business's modules with a live monthly price. The server validates and
  * prices the selection again when it is saved; this is the preview. */
-export function ModulePicker({ catalog, initial, activeClients, name }: Props) {
+export function ModulePicker({ catalog, initial, activeClients, name, branchesFollowLocations = false }: Props) {
   const t = useTranslations("modules");
   const locale = useLocale();
   const [selection, setSelection] = useState<Selection>(initial);
@@ -114,15 +116,22 @@ export function ModulePicker({ catalog, initial, activeClients, name }: Props) {
           <span className="font-semibold">{t("names.extra_location")}</span>
           <span className="text-sm text-muted">{t("descriptions.extra_location", { price: money(byKey.extra_location.price) })}</span>
         </span>
-        <input
-          type="number"
-          min={0}
-          max={50}
-          value={selection.extra_location ?? 0}
-          onChange={(event) => set("extra_location", Math.max(0, Math.min(50, Number(event.target.value) || 0)))}
-          aria-label={t("names.extra_location")}
-          className="control w-20 px-2 py-1.5 text-center"
-        />
+        {branchesFollowLocations ? (
+          <span className="flex flex-col items-end gap-0.5 text-end">
+            <span className="text-lg font-bold tabular-nums">{selection.extra_location ?? 0}</span>
+            <span className="text-xs text-muted">{t("followsBranches")}</span>
+          </span>
+        ) : (
+          <input
+            type="number"
+            min={0}
+            max={50}
+            value={selection.extra_location ?? 0}
+            onChange={(event) => set("extra_location", Math.max(0, Math.min(50, Number(event.target.value) || 0)))}
+            aria-label={t("names.extra_location")}
+            className="control w-20 px-2 py-1.5 text-center"
+          />
+        )}
       </label>
 
       <ul className="grid gap-2 sm:grid-cols-2">

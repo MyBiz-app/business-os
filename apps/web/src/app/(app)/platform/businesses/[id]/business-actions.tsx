@@ -74,7 +74,7 @@ export function BusinessActions({
         <p className="text-sm text-muted">{t("modulesHint")}</p>
         <FormError message={error(plan)} />
         <FormNotice message={plan.done ? t("modulesDone") : undefined} />
-        <ModulePicker catalog={catalog} initial={modules} activeClients={activeClients} name="modules" />
+        <ModulePicker catalog={catalog} initial={modules} activeClients={activeClients} name="modules" branchesFollowLocations />
         <div>
           <SubmitButton>{t("modules")}</SubmitButton>
         </div>

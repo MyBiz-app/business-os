@@ -165,7 +165,11 @@ def studio(client: TestClient, auth: AuthHeaders, engine: Engine) -> dict:
         json={"name": "Pilates", "duration_minutes": 55, "capacity": 12},
         headers=headers,
     ).json()
-    location = client.post("/locations", json={"name": "Main"}, headers=headers).json()
+    # Every business starts with its main branch.
+    main = client.get("/locations", headers=headers).json()[0]
+    location = client.patch(
+        f"/locations/{main['id']}", json={"name": "Main"}, headers=headers
+    ).json()
     room = client.post(
         f"/locations/{location['id']}/rooms", json={"name": "Studio A"}, headers=headers
     ).json()

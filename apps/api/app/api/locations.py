@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -89,7 +89,10 @@ class Location(BaseModel):
 def _load_locations(session: Session, location_id: UUID | None = None) -> list[Location]:
     where, params = ("WHERE id = :id", {"id": location_id}) if location_id else ("", {})
     locations = session.execute(
-        text(f"SELECT {LOCATION_COLUMNS} FROM app.locations {where} ORDER BY active DESC, name"),
+        text(
+            f"SELECT {LOCATION_COLUMNS} FROM app.locations {where}"
+            " ORDER BY active DESC, created_at, name"
+        ),
         params,
     ).mappings()
     rooms_by_location: dict[UUID, list[Room]] = {}
@@ -141,6 +144,14 @@ def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) 
         for key, value in body.model_dump(exclude_unset=True).items()
         if not (key in {"name", "active"} and value is None)
     }
+    if changes.get("active") is False:
+        # A business always keeps at least one active branch.
+        others = context.session.execute(
+            text("SELECT count(*) FROM app.locations WHERE active AND id <> :id"),
+            {"id": location_id},
+        ).scalar_one()
+        if others == 0:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_branch")
     updated = context.session.execute(
         text(f"UPDATE app.locations SET {set_clause(changes)} WHERE id = :id RETURNING id"),
         {**changes, "id": location_id},

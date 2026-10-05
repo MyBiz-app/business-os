@@ -247,6 +247,8 @@ def list_sessions(
     # An appointment whose booking was cancelled frees the time; it is not shown.
     in_window = (
         f"WHERE s.starts_at >= :from AND s.starts_at < :to {teaching}"
+        # sessions without a branch show in every branch
+        " AND (s.location_id IS NULL OR app.in_branch(s.location_id))"
         " AND (sv.booking_mode = 'class' OR bk.booked + bk.waitlisted > 0)"
         " ORDER BY s.starts_at"
     )

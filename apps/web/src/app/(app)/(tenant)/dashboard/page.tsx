@@ -13,7 +13,6 @@ import { formatMoney } from "@/lib/money";
 import { canManageSettings, canReadReports } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
-import { BusinessSwitcher } from "./business-switcher";
 import { isolate } from "@/lib/bidi";
 
 type MetricValue = components["schemas"]["MetricValue"];
@@ -174,9 +173,6 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               </Link>
             </p>
           )}
-        </div>
-        <div className="relative">
-          <BusinessSwitcher current={tenant.id} memberships={me.memberships} />
         </div>
       </div>
 

@@ -77,6 +77,23 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/me/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List My Businesses */
+        get: operations["list_my_businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/import": {
         parameters: {
             query?: never;
@@ -639,6 +656,26 @@ export interface paths {
         head?: never;
         /** Update Member */
         patch: operations["update_member"];
+        trace?: never;
+    };
+    "/staff/{user_id}/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Member Branches
+         * @description The branches a team member works at (they see these first); none means all.
+         */
+        put: operations["set_member_branches"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/roles": {
@@ -2959,6 +2996,46 @@ export interface components {
              */
             inquiries: boolean;
         };
+        /** BusinessSummary */
+        BusinessSummary: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Vertical */
+            vertical: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+            /** Logo Url */
+            logo_url: string | null;
+            /** Primary Color */
+            primary_color: string | null;
+            /** Currency */
+            currency: string;
+            /**
+             * Branches
+             * @description Names of the active branches
+             */
+            branches: string[];
+            /** Sessions Today */
+            sessions_today: number;
+            /**
+             * Active Clients
+             * @description Null when the role may not read reports
+             */
+            active_clients: number | null;
+            /**
+             * Revenue Month
+             * @description Minor units; null without reports.read
+             */
+            revenue_month: number | null;
+        };
         /** Campaign */
         Campaign: {
             /**
@@ -3150,6 +3227,8 @@ export interface components {
             custom_fields: {
                 [key: string]: string | number;
             };
+            /** Home Location Id */
+            home_location_id: string | null;
             /**
              * Created At
              * Format: date-time
@@ -3293,6 +3372,11 @@ export interface components {
             custom_fields?: {
                 [key: string]: string | number | null;
             } | null;
+            /**
+             * Home Location Id
+             * @description The client's home branch; new clients default to the current branch
+             */
+            home_location_id?: string | null;
             /** First Name */
             first_name: string;
             /**
@@ -3420,6 +3504,11 @@ export interface components {
             custom_fields?: {
                 [key: string]: string | number | null;
             } | null;
+            /**
+             * Home Location Id
+             * @description The client's home branch; new clients default to the current branch
+             */
+            home_location_id?: string | null;
             /** First Name */
             first_name?: string | null;
             /** Status */
@@ -4472,6 +4561,11 @@ export interface components {
             /** Custom Role Name */
             custom_role_name: string | null;
             /**
+             * Location Ids
+             * @description Branches they work at; empty means all
+             */
+            location_ids: string[];
+            /**
              * Joined At
              * Format: date-time
              */
@@ -4492,6 +4586,14 @@ export interface components {
             last_visit: string | null;
             /** Plan Ends On */
             plan_ends_on: string | null;
+        };
+        /** MemberBranches */
+        MemberBranches: {
+            /**
+             * Location Ids
+             * @description Empty means all branches
+             */
+            location_ids: string[];
         };
         /**
          * MemberUpdate
@@ -6197,6 +6299,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6228,6 +6332,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6258,11 +6364,33 @@ export interface operations {
             };
         };
     };
+    list_my_businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessSummary"][];
+                };
+            };
+        };
+    };
     import_clients: {
         parameters: {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6298,6 +6426,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6338,6 +6468,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6369,6 +6501,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6404,6 +6538,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6437,6 +6573,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6474,6 +6612,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6507,6 +6647,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6544,6 +6686,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6576,6 +6720,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6611,6 +6757,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -6654,6 +6802,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6685,6 +6835,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6720,6 +6872,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6751,6 +6905,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 lead_id: string;
@@ -6784,6 +6940,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 lead_id: string;
@@ -6815,6 +6973,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 lead_id: string;
@@ -6852,6 +7012,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 lead_id: string;
@@ -6889,6 +7051,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 lead_id: string;
@@ -6926,6 +7090,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 lead_id: string;
@@ -6959,6 +7125,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -6990,6 +7158,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7021,6 +7191,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7056,6 +7228,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7096,6 +7270,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7127,6 +7303,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7158,6 +7336,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7193,6 +7373,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 template_id: string;
@@ -7261,6 +7443,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7292,6 +7476,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7327,6 +7513,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 service_id: string;
@@ -7360,6 +7548,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 service_id: string;
@@ -7397,6 +7587,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7428,6 +7620,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7463,6 +7657,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 location_id: string;
@@ -7496,6 +7692,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 location_id: string;
@@ -7533,6 +7731,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 location_id: string;
@@ -7570,6 +7770,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 room_id: string;
@@ -7607,6 +7809,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7638,6 +7842,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7673,6 +7879,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 invitation_id: string;
@@ -7704,6 +7912,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -7735,6 +7945,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -7767,11 +7979,52 @@ export interface operations {
             };
         };
     };
+    set_member_branches: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberBranches"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Member"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_roles: {
         parameters: {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7803,6 +8056,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -7838,6 +8093,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 role_id: string;
@@ -7869,6 +8126,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 role_id: string;
@@ -7970,6 +8229,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8007,6 +8268,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8038,6 +8301,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8073,6 +8338,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 session_id: string;
@@ -8106,6 +8373,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 session_id: string;
@@ -8143,6 +8412,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 series_id: string;
@@ -8180,6 +8451,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 series_id: string;
@@ -8217,6 +8490,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8254,6 +8529,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8285,6 +8562,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8320,6 +8599,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 closed_day_id: string;
@@ -8351,6 +8632,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 session_id: string;
@@ -8384,6 +8667,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 session_id: string;
@@ -8421,6 +8706,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 booking_id: string;
@@ -8458,6 +8745,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -8491,6 +8780,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -8524,6 +8815,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -8561,6 +8854,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -8594,6 +8889,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -8631,6 +8928,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 user_id: string;
@@ -8663,6 +8962,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8698,6 +8999,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8729,6 +9032,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8898,6 +9203,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8929,6 +9236,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -8964,6 +9273,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 plan_id: string;
@@ -8997,6 +9308,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 plan_id: string;
@@ -9034,6 +9347,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -9067,6 +9382,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -9104,6 +9421,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 entitlement_id: string;
@@ -9141,6 +9460,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 entitlement_id: string;
@@ -9174,6 +9495,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9205,6 +9528,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9240,6 +9565,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 code_id: string;
@@ -9271,6 +9598,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 code_id: string;
@@ -9314,6 +9643,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9349,6 +9680,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 key: "revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held";
@@ -9385,9 +9718,11 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
-                dimension: "service" | "instructor" | "time_slot";
+                dimension: "service" | "instructor" | "time_slot" | "branch";
             };
             cookie?: never;
         };
@@ -9420,6 +9755,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9454,6 +9791,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9553,6 +9892,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9584,6 +9925,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9615,6 +9958,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9646,6 +9991,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 conversation_id: string;
@@ -9679,6 +10026,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 conversation_id: string;
@@ -9716,6 +10065,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 action_id: string;
@@ -9749,6 +10100,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 action_id: string;
@@ -9882,6 +10235,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9913,6 +10268,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -9948,6 +10305,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 key: "client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location";
@@ -9981,6 +10340,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10012,6 +10373,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10047,6 +10410,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10082,6 +10447,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10111,6 +10478,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 invoice_id: string;
@@ -10144,6 +10513,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 invoice_id: string;
@@ -10177,6 +10548,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10208,6 +10581,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10243,6 +10618,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10738,6 +11115,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10769,6 +11148,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10804,6 +11185,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -10835,6 +11218,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -11359,6 +11744,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -11393,6 +11780,8 @@ export interface operations {
             };
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -11424,6 +11813,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 receipt_id: string;
@@ -11587,6 +11978,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 client_id: string;
@@ -11620,6 +12013,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path: {
                 declaration_id: string;
@@ -11725,6 +12120,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;
@@ -11760,6 +12157,8 @@ export interface operations {
             query?: never;
             header: {
                 "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
             };
             path?: never;
             cookie?: never;

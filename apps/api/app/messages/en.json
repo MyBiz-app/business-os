@@ -67,5 +67,9 @@
       "whatsapp": "WhatsApp",
       "extra_location": "Extra locations"
     }
+  },
+  "locations": {
+    "mainBranch": "Main branch",
+    "branchNumber": "Branch {number}"
   }
 }

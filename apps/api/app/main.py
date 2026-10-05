@@ -7,6 +7,7 @@ from app.api import (
     assistant,
     billing,
     bookings,
+    businesses,
     checkouts,
     client_app,
     client_import,
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
         return HealthResponse(status="ok", environment=settings.environment)
 
     app.include_router(router)
+    app.include_router(businesses.router)
     app.include_router(client_import.router)
     app.include_router(clients.router)
     app.include_router(client_notes.router)

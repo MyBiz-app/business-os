@@ -165,6 +165,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -211,6 +230,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -247,6 +285,36 @@
         }
       }
     },
+    "/me/businesses": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "List My Businesses",
+        "operationId": "list_my_businesses",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List My Businesses"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/clients/import": {
       "post": {
         "tags": [
@@ -269,6 +337,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -328,6 +415,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -483,6 +589,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -529,6 +654,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -597,6 +741,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -653,6 +816,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -721,6 +903,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -781,6 +982,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -859,6 +1079,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -911,6 +1150,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -971,6 +1229,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1105,6 +1382,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1151,6 +1447,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1210,6 +1525,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1272,6 +1606,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1328,6 +1681,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1394,6 +1766,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1446,6 +1837,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1514,6 +1924,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1583,6 +2012,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1631,6 +2079,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1684,6 +2151,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1740,6 +2226,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1792,6 +2297,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -1913,6 +2437,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -1965,6 +2508,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2015,6 +2577,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2083,6 +2664,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2191,6 +2791,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2241,6 +2860,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2309,6 +2947,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2365,6 +3022,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2423,6 +3099,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2473,6 +3168,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2541,6 +3255,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2597,6 +3330,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2665,6 +3417,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2733,6 +3504,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2791,6 +3581,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2839,6 +3648,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -2907,6 +3735,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -2958,6 +3805,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3024,11 +3890,118 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/{user_id}/branches": {
+      "put": {
+        "tags": [
+          "staff"
+        ],
+        "summary": "Set Member Branches",
+        "description": "The branches a team member works at (they see these first); none means all.",
+        "operationId": "set_member_branches",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberBranches"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -3065,6 +4038,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -3111,6 +4103,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3179,6 +4190,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3245,6 +4275,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -3380,6 +4429,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -3464,6 +4532,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -3514,6 +4601,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3582,6 +4688,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -3639,6 +4764,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3708,6 +4852,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3777,6 +4940,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3836,6 +5018,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -3912,6 +5113,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -3963,6 +5183,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -4032,6 +5271,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4084,6 +5342,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4145,6 +5422,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -4213,6 +5509,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -4282,6 +5597,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4344,6 +5678,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4401,6 +5754,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -4474,6 +5846,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4535,6 +5926,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -4613,6 +6023,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4654,6 +6083,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4743,6 +6191,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -4796,6 +6263,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5123,6 +6609,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -5173,6 +6678,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5241,6 +6765,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -5298,6 +6841,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5366,6 +6928,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -5427,6 +7008,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5496,6 +7096,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5565,6 +7184,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -5613,6 +7251,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -5663,6 +7320,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5731,6 +7407,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -5798,6 +7493,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -5894,6 +7608,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6001,6 +7734,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6053,7 +7805,8 @@
               "enum": [
                 "service",
                 "instructor",
-                "time_slot"
+                "time_slot",
+                "branch"
               ],
               "type": "string",
               "title": "Dimension"
@@ -6088,6 +7841,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6153,6 +7925,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6235,6 +8026,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6404,6 +8214,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6452,6 +8281,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6502,6 +8350,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6560,6 +8427,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6618,6 +8504,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -6686,6 +8591,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6744,6 +8668,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -6958,6 +8901,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7005,6 +8967,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -7084,6 +9065,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7132,6 +9132,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7180,6 +9199,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -7239,6 +9277,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -7295,6 +9352,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7346,6 +9422,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7405,6 +9500,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7454,6 +9568,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -7510,6 +9643,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -7559,6 +9711,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -8376,6 +10547,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -8423,6 +10613,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -8479,6 +10688,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -8528,6 +10756,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -9466,6 +11713,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -9539,6 +11805,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -9597,6 +11882,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -9871,6 +12175,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -9930,6 +12253,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -10107,6 +12449,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "requestBody": {
@@ -10163,6 +12524,25 @@
               "format": "uuid",
               "title": "X-Tenant-Id"
             }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
           }
         ],
         "responses": {
@@ -11144,6 +13524,110 @@
         "title": "BusinessProfile",
         "description": "What anyone holding a join code may see before signing in."
       },
+      "BusinessSummary": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "vertical": {
+            "type": "string",
+            "title": "Vertical"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "manager",
+              "staff",
+              "front_desk"
+            ],
+            "title": "Role"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "branches": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Branches",
+            "description": "Names of the active branches"
+          },
+          "sessions_today": {
+            "type": "integer",
+            "title": "Sessions Today"
+          },
+          "active_clients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Clients",
+            "description": "Null when the role may not read reports"
+          },
+          "revenue_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Month",
+            "description": "Minor units; null without reports.read"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "vertical",
+          "role",
+          "logo_url",
+          "primary_color",
+          "currency",
+          "branches",
+          "sessions_today",
+          "active_clients",
+          "revenue_month"
+        ],
+        "title": "BusinessSummary"
+      },
       "Campaign": {
         "properties": {
           "id": {
@@ -11660,6 +14144,18 @@
             "type": "object",
             "title": "Custom Fields"
           },
+          "home_location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Location Id"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -11696,6 +14192,7 @@
           "status",
           "source",
           "custom_fields",
+          "home_location_id",
           "created_at",
           "updated_at",
           "erased_at"
@@ -12024,6 +14521,19 @@
             ],
             "title": "Custom Fields",
             "description": "The vertical pack's extra fields (GET /clients/fields); replaces all"
+          },
+          "home_location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Location Id",
+            "description": "The client's home branch; new clients default to the current branch"
           },
           "first_name": {
             "type": "string",
@@ -12422,6 +14932,19 @@
             ],
             "title": "Custom Fields",
             "description": "The vertical pack's extra fields (GET /clients/fields); replaces all"
+          },
+          "home_location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Location Id",
+            "description": "The client's home branch; new clients default to the current branch"
           },
           "first_name": {
             "anyOf": [
@@ -15252,6 +17775,15 @@
             ],
             "title": "Custom Role Name"
           },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "description": "Branches they work at; empty means all"
+          },
           "joined_at": {
             "type": "string",
             "format": "date-time",
@@ -15266,6 +17798,7 @@
           "role",
           "custom_role_id",
           "custom_role_name",
+          "location_ids",
           "joined_at"
         ],
         "title": "Member"
@@ -15322,6 +17855,25 @@
           "plan_ends_on"
         ],
         "title": "MemberAtRisk"
+      },
+      "MemberBranches": {
+        "properties": {
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Location Ids",
+            "description": "Empty means all branches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_ids"
+        ],
+        "title": "MemberBranches"
       },
       "MemberUpdate": {
         "properties": {

@@ -95,13 +95,34 @@ def _platform_context(session: Session, tenant_id: UUID, request: Request) -> Te
     )
 
 
+def set_branch(session: Session, location_id: UUID | None) -> None:
+    """The branch this request works in: lists and numbers follow it (app.in_branch) and new
+    sessions, sales and clients are filed under it. It must be one of the business's branches."""
+    if location_id is None:
+        return
+    known = session.execute(
+        text("SELECT EXISTS (SELECT 1 FROM app.locations WHERE id = :id)"), {"id": location_id}
+    ).scalar_one()
+    if not known:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_branch"
+        )
+    session.execute(
+        text("SELECT set_config('app.location_id', :id, true)"), {"id": str(location_id)}
+    )
+
+
 def get_tenant_context(
     session: SessionDep,
     tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")],
     request: Request,
+    branch_id: Annotated[
+        UUID | None,
+        Header(alias="X-Location-Id", description="The current branch (none: all branches)"),
+    ] = None,
 ) -> TenantContext:
-    """Scopes the session to one tenant. Fails unless the user is a member of that tenant
-    (or platform support the business let in)."""
+    """Scopes the session to one tenant (and optionally one of its branches). Fails unless the
+    user is a member of that tenant (or platform support the business let in)."""
     set_tenant(session, tenant_id)
     member = session.execute(
         text("""
@@ -113,10 +134,15 @@ def get_tenant_context(
     ).first()
     if member is None:
         if session.execute(text("SELECT app.support_tenant_id()")).scalar() is not None:
-            return _support_context(session, tenant_id, request)
+            context = _support_context(session, tenant_id, request)
+            set_branch(session, branch_id)
+            return context
         if session.execute(text("SELECT app.platform_act_tenant_id()")).scalar() is not None:
-            return _platform_context(session, tenant_id, request)
+            context = _platform_context(session, tenant_id, request)
+            set_branch(session, branch_id)
+            return context
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
+    set_branch(session, branch_id)
     return TenantContext(
         session=session,
         tenant_id=tenant_id,

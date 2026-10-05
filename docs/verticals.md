@@ -68,4 +68,4 @@ every open entry.
 
 A category that needs something the core cannot do yet (courts and rooms, jobs at the client's
 address, pets under an owner, quotes and deposits) stays `planned` until that capability is
-built: see spec section 4.3 and the phase 6 issues.
+built: see spec section 4.3 and the phase 7 issues.
