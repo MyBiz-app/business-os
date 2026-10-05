@@ -20,6 +20,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
   [`docs/spec/MyBiz-Spec-he.docx`](docs/spec/MyBiz-Spec-he.docx)
   (regenerate with `node scripts/spec-to-docx.cjs he|en`, needs the `docx` npm package).
 - **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) — every product and technical decision.
+- **Status:** [`docs/STATUS.md`](docs/STATUS.md) — what is done, in progress and next; open work in GitHub issues.
 - **Detailed v2 chapters:** [`docs/spec/v2/`](docs/spec/v2/README.md) (architecture, data model, AI).
 - **Where we are:** the foundation is built (see the spec's roadmap). Now, one phase at a time:
   1 marketing website and sign-up journey → 2 business web app → 3 MyBiz console → 4 apps →
