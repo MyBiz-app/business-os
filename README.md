@@ -114,6 +114,18 @@ reinstalling Windows) and run the Supabase CLI from WSL instead; Docker Desktop 
 
 Everything else (`pnpm db:migrate`, `pnpm dev`, `pnpm dev:app`) runs in PowerShell as usual.
 
+**Windows: the API fails with "An Application Control policy has blocked this file".** The same
+Smart App Control blocks Python's unsigned binaries (`uvicorn.exe`, compiled modules). Run the
+API from WSL (Ubuntu, set up as above) and everything else from PowerShell:
+
+```bash
+bash /mnt/c/dev/business-os/scripts/api-wsl.sh                      # migrations + API on :8000
+bash /mnt/c/dev/business-os/scripts/api-wsl.sh seed you@example.com # demo data
+```
+
+Then in PowerShell start only the web app: `pnpm --filter web dev` (not `pnpm dev`, which
+also starts the API).
+
 ## Checks
 
 ```bash
