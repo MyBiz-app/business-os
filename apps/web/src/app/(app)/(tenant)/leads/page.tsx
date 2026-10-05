@@ -106,7 +106,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
 
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
       <div role="region" aria-label={t("pipeline")} tabIndex={0} className="-mx-6 overflow-x-auto px-6 pb-2">
-        <div className="grid min-w-[58rem] grid-cols-6 gap-3">
+        <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:min-w-[58rem] lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-6">
           {STAGES.map((stage) => {
             const leads = board.items.filter((lead) => lead.stage === stage);
             const headingId = `stage-${stage}`;
