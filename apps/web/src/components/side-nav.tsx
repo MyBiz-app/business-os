@@ -8,10 +8,12 @@ import {
   CreditCard,
   Dumbbell,
   LayoutDashboard,
+  Lock,
   MapPin,
   Menu,
   MessageCircle,
   Settings,
+  Smartphone,
   Target,
   Users,
   UsersRound,
@@ -27,6 +29,7 @@ const ICONS = {
   assistant: Bot,
   schedule: CalendarDays,
   clients: Users,
+  clientApp: Smartphone,
   leads: Target,
   messages: MessageCircle,
   services: Dumbbell,
@@ -37,14 +40,18 @@ const ICONS = {
 } as const;
 
 export type NavIcon = keyof typeof ICONS;
-export type NavItem = { href: string; label: string; icon: NavIcon };
+/** `locked`: a module the business doesn't have; the link opens its preview. */
+export type NavItem = { href: string; label: string; icon: NavIcon; locked?: boolean };
 
 export function SideNav({ items }: { items: NavItem[] }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   // On small screens the list is a menu that opens below a button showing the current page.
   const [open, setOpen] = useState(false);
-  const current = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+  // The most specific match wins (/clients/join over /clients).
+  const current = items
+    .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
+    .sort((a, b) => b.href.length - a.href.length)[0];
   const CurrentIcon = current ? ICONS[current.icon] : Menu;
 
   return (
@@ -66,7 +73,7 @@ export function SideNav({ items }: { items: NavItem[] }) {
         className={`${open ? "grid" : "hidden"} grid-cols-2 gap-1 px-3 pb-3 md:flex md:flex-col`}
       >
         {items.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active = item.href === current?.href;
           const Icon = ICONS[item.icon];
           return (
             <li key={item.href}>
@@ -74,10 +81,13 @@ export function SideNav({ items }: { items: NavItem[] }) {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 aria-current={active ? "page" : undefined}
+                aria-label={item.locked ? t("lockedItem", { name: item.label }) : undefined}
                 className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                   active
                     ? "bg-primary/10 text-primary"
-                    : "text-muted hover:bg-foreground/5 hover:text-foreground"
+                    : item.locked
+                      ? "text-muted/80 hover:bg-foreground/5 hover:text-foreground"
+                      : "text-muted hover:bg-foreground/5 hover:text-foreground"
                 }`}
               >
                 {/* Active marker on the inline-start edge (desktop column). */}
@@ -91,7 +101,10 @@ export function SideNav({ items }: { items: NavItem[] }) {
                   aria-hidden="true"
                   className={`size-[18px] shrink-0 transition-transform duration-200 ${active ? "" : "group-hover:scale-110"}`}
                 />
-                {item.label}
+                <span className="truncate">{item.label}</span>
+                {item.locked && (
+                  <Lock aria-hidden="true" className="ms-auto size-3.5 shrink-0 opacity-70" />
+                )}
               </Link>
             </li>
           );

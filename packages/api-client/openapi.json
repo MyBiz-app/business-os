@@ -6996,6 +6996,75 @@
         }
       }
     },
+    "/tenants/current/modules/{key}": {
+      "post": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Add Tenant Module",
+        "description": "Adds one module to the plan (the \"add to plan\" button on a locked module). Choosing an AI\ntier replaces the other one; adding a module the plan already has changes nothing.",
+        "operationId": "add_tenant_module",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantModules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/billing": {
       "get": {
         "tags": [

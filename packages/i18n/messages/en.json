@@ -207,7 +207,10 @@
     "reports": "Reports",
     "leads": "Leads",
     "messages": "Messages",
-    "menu": "Menu"
+    "menu": "Menu",
+    "clientApp": "Client app",
+    "locked": "Not in your plan",
+    "lockedItem": "{name} — not in your plan"
   },
   "terms": {
     "fitness": {
@@ -2272,5 +2275,21 @@
       "helpCta": "Contact us",
       "startCta": "Haven't joined yet? Build your plan"
     }
+  },
+  "upgrade": {
+    "notInPlan": "Not in your plan yet",
+    "peek": "A peek at what you get",
+    "invoiceTitle": "What changes on your invoice",
+    "now": "Your plan today",
+    "with": "With {name}",
+    "difference": "Difference",
+    "perMonth": "/ month",
+    "inTrial": "You're in your free trial: nothing is charged until {date}.",
+    "afterTrial": "Added to your next monthly invoice. You can remove it any time in Settings → Modules.",
+    "add": "Add to my plan · +{price} / month",
+    "noPermission": "Only the owner or a manager can add modules. Ask them — it takes one click.",
+    "chooseTier": "Choose a level",
+    "manage": "All modules and prices",
+    "unknown": "This module isn't available."
   }
 }

@@ -203,3 +203,18 @@ def put_tenant_modules(body: Selection, context: SettingsDep) -> TenantModules:
     check_selection(body.modules)
     set_modules(context.session, context.tenant_id, body.modules)
     return _tenant_modules(context.session)
+
+
+@router.post("/tenants/current/modules/{key}")
+def add_tenant_module(key: ModuleKey, context: SettingsDep) -> TenantModules:
+    """Adds one module to the plan (the "add to plan" button on a locked module). Choosing an AI
+    tier replaces the other one; adding a module the plan already has changes nothing."""
+    db = context.session
+    selection = enabled_modules(db)
+    if key not in selection:
+        if key in ("ai_basic", "ai_pro"):
+            selection.pop("ai_pro" if key == "ai_basic" else "ai_basic", None)
+        selection[key] = 1
+        check_selection(selection)
+        set_modules(db, context.tenant_id, selection)
+    return _tenant_modules(db)

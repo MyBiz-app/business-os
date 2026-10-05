@@ -16,7 +16,7 @@ export default async function MessagesPage() {
   const t = await getTranslations("messaging");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("clients.read");
-  if (!tenant.modules.includes("whatsapp")) redirect("/settings/modules");
+  if (!tenant.modules.includes("whatsapp")) redirect("/upgrade/whatsapp");
   const writable = canWriteClients(tenant);
   const [audiences, templates, campaigns] = await Promise.all([
     api.GET("/messages/audiences", { params: scope }).then(unwrap),

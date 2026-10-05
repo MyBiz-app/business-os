@@ -1576,6 +1576,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/modules/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Tenant Module
+         * @description Adds one module to the plan (the "add to plan" button on a locked module). Choosing an AI
+         *     tier replaces the other one; adding a module the plan already has changes nothing.
+         */
+        post: operations["add_tenant_module"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/billing": {
         parameters: {
             query?: never;
@@ -9393,6 +9414,39 @@ export interface operations {
                 "application/json": components["schemas"]["Selection"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantModules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_tenant_module: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                key: "client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
