@@ -99,11 +99,32 @@ with sync_playwright() as p:
     assert employee.goto(f"{h.BASE}/platform/team").status == 404
     print("3. employee sees only the inbox: ok")
 
+    # An owner can enter a business and fix something; the business's owner sees it.
+    owner.goto(f"{h.BASE}/platform/businesses"); h.ready(owner)
+    # A business this person doesn't own, so they get in as MyBiz staff.
+    row = owner.locator("tbody tr").filter(has_not_text=OWNER).first
+    row.get_by_role("link").first.click()
+    owner.wait_for_url("**/platform/businesses/**"); h.ready(owner)
+    business_name = owner.get_by_role("heading", level=1).inner_text()
+    check(owner, "business")
+    owner.screenshot(path=f"{h.OUT}/console-business.png", full_page=True)
+    owner.get_by_role("button", name="כניסה לעסק").click()
+    owner.wait_for_url("**/dashboard"); h.ready(owner)
+    expect(owner.get_by_role("status").filter(has_text="כצוות MyBiz")).to_be_visible()
+    owner.goto(f"{h.BASE}/clients/new"); h.ready(owner)
+    owner.get_by_label("שם פרטי").fill("לקוח מתמיכה")
+    owner.get_by_role("button", name="יצירה").click()
+    owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$"))
+    owner.get_by_role("button", name="יציאה מהעסק").click(); owner.wait_for_url("**/platform")
+    h.ready(owner)
+    print(f"5. owner entered {business_name} and added a client (audited): ok")
+
     # The audit log (owners only) has every change.
     owner.goto(f"{h.BASE}/platform/audit"); h.ready(owner)
     rows = owner.get_by_role("region", name="יומן פעולות").locator("tbody tr")
-    expect(rows.first).to_contain_text("הוסיף/ה איש צוות")
-    assert rows.count() >= 2
+    assert rows.count() >= 3
+    expect(rows.filter(has_text="ביצע/ה שינוי בעסק").first).to_be_visible()
+    expect(rows.filter(has_text="הוסיף/ה איש צוות").first).to_be_visible()
     check(owner, "audit")
     owner.screenshot(path=f"{h.OUT}/console-audit.png", full_page=True)
 
@@ -115,7 +136,7 @@ with sync_playwright() as p:
             ).fetchall()
         )
     assert levels == {manager_email: "manager", employee_email: "employee", PRIMARY: "primary_owner"}, levels
-    print("4. audit log and levels: ok")
+    print("6. audit log and levels: ok")
 
     print("a11y:", a11y or "ok")
     assert not a11y

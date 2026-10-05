@@ -35,7 +35,10 @@ def load_current_tenant(session: Session) -> Tenant:
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales,
-                       t.join_code, coalesce(m.role, 'support') AS role,
+                       t.join_code,
+                       coalesce(m.role,
+                                CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'
+                                     ELSE 'platform' END) AS role,
                        r.name AS custom_role_name,
                        r.permissions AS custom_permissions,
                        coalesce((SELECT array_agg(tm.module_key ORDER BY tm.module_key)

@@ -113,6 +113,9 @@ class Tenant(BaseModel):
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
     permissions: list[str] = Field(description="The current user's effective permissions")
     custom_role_name: str | None
-    role: Role | Literal["support"] = Field(
-        description="'support': platform support with read-only access the owner granted"
+    role: Role | Literal["support", "platform"] = Field(
+        description=(
+            "'support': MyBiz support, read-only, while the owner's grant lasts. "
+            "'platform': MyBiz staff working in the business for its owner (audited)."
+        )
     )

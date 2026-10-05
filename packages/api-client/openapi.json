@@ -18128,7 +18128,7 @@
             },
             "type": "array",
             "title": "Visits",
-            "description": "The latest 50 support requests"
+            "description": "The latest 50 requests MyBiz staff made inside this business"
           }
         },
         "type": "object",
@@ -18166,6 +18166,12 @@
               }
             ],
             "title": "Path"
+          },
+          "changed": {
+            "type": "boolean",
+            "title": "Changed",
+            "description": "MyBiz staff changed something here",
+            "default": false
           }
         },
         "type": "object",
@@ -18397,11 +18403,14 @@
               },
               {
                 "type": "string",
-                "const": "support"
+                "enum": [
+                  "support",
+                  "platform"
+                ]
               }
             ],
             "title": "Role",
-            "description": "'support': platform support with read-only access the owner granted"
+            "description": "'support': MyBiz support, read-only, while the owner's grant lasts. 'platform': MyBiz staff working in the business for its owner (audited)."
           }
         },
         "type": "object",

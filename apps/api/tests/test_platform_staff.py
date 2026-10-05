@@ -128,3 +128,37 @@ def test_employees_see_only_what_they_were_given(
         headers=auth(owner),
     )
     assert client.get("/platform/me", headers=headers).status_code == 403
+
+
+def test_staff_can_work_inside_a_business_and_the_owner_sees_it(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    helper, helper_email = staff_member(engine, "employee", ("businesses.act",))
+    inside = auth(helper, studio["tenant_id"])
+
+    tenant = client.get("/tenants/current", headers=inside).json()
+    assert tenant["role"] == "platform"
+    assert "clients.write" in tenant["permissions"]  # can actually fix things
+    assert "clients.privacy" not in tenant["permissions"]  # never privacy requests
+
+    fixed = client.post("/clients", json={"first_name": "Dana"}, headers=inside)
+    assert fixed.status_code == 201
+    assert [c["first_name"] for c in client.get("/clients", headers=inside).json()["items"]] == [
+        "Dana"
+    ]
+
+    # The business's owner sees the visit, and MyBiz's own audit log has the change.
+    visits = client.get("/support-access", headers=studio["headers"]).json()["visits"]
+    assert visits and visits[0]["actor_email"] == helper_email
+    owner, _ = staff_member(engine, "owner")
+    entries = client.get("/platform/audit", headers=auth(owner)).json()
+    changes = [e for e in entries if e["action"] == "platform.change"]
+    assert changes and changes[0]["tenant_id"] == str(studio["tenant_id"])
+    assert changes[0]["details"]["path"] == "/clients"
+
+
+def test_staff_without_that_permission_stay_outside(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    watcher, _ = staff_member(engine, "employee", ("businesses.read",))
+    assert client.get("/clients", headers=auth(watcher, studio["tenant_id"])).status_code == 403

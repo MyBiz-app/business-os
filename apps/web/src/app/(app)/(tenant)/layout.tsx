@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
+import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
@@ -57,12 +58,17 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
         <SideNav items={items} />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        {tenant.role === "support" && (
-          <div role="status" className="flex flex-wrap items-center justify-between gap-2 border-b border-border bg-surface px-6 py-2 text-sm">
-            <span>{t("support.banner")}</span>
+        {(tenant.role === "support" || tenant.role === "platform") && (
+          <div
+            role="status"
+            className={`flex flex-wrap items-center justify-between gap-2 border-b px-6 py-2 text-sm ${
+              tenant.role === "platform" ? "border-warning/50 bg-warning/10 font-medium" : "border-border bg-surface"
+            }`}
+          >
+            <span>{tenant.role === "platform" ? t("support.actBanner", { name: isolate(tenant.name) }) : t("support.banner")}</span>
             <form action={leaveSupport}>
               <button type="submit" className="font-medium text-primary underline-offset-4 hover:underline">
-                {t("support.leave")}
+                {tenant.role === "platform" ? t("support.actLeave") : t("support.leave")}
               </button>
             </form>
           </div>

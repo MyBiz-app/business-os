@@ -192,7 +192,8 @@
     "manager": "Manager",
     "staff": "Staff",
     "front_desk": "Front desk",
-    "support": "Platform support (read-only)"
+    "support": "Platform support (read-only)",
+    "platform": "MyBiz staff"
   },
   "nav": {
     "label": "Main navigation",
@@ -1087,7 +1088,8 @@
       "actions": {
         "staff_added": "Added a team member",
         "staff_changed": "Changed a team member",
-        "staff_removed": "Removed a team member"
+        "staff_removed": "Removed a team member",
+        "platform_change": "Changed something in a business"
       }
     }
   },
@@ -1308,7 +1310,14 @@
     "leave": "Leave support mode",
     "grantedUntil": "The owner allowed support access until {date}.",
     "open": "Open as support (read-only)",
-    "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access."
+    "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access.",
+    "actTitle": "Work inside this business",
+    "actIntro": "You may enter this business to fix things for its owner. Everything you open or change is written to the business's own log, which the owner reads, and to the MyBiz audit log.",
+    "actOpen": "Enter the business",
+    "actBanner": "You are inside {name} as MyBiz staff. Everything you open or change is logged for the owner.",
+    "actLeave": "Leave the business",
+    "visitsTitle": "What MyBiz opened here",
+    "changed": "Changed something"
   },
   "receipts": {
     "title": "Receipt no. {number}",

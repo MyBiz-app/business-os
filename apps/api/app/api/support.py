@@ -1,5 +1,5 @@
-"""The owner's side of audited support access: let platform support in for a limited time,
-end it early, and see what support looked at (see migration 0023)."""
+"""The owner's side: let MyBiz support in for a limited time (read-only), end it early, and
+see everything MyBiz staff opened or changed in the business (migrations 0023 and 0038)."""
 
 from datetime import datetime
 from typing import Annotated
@@ -33,11 +33,14 @@ class SupportVisit(BaseModel):
     occurred_at: datetime
     actor_email: str | None
     path: str | None
+    changed: bool = Field(default=False, description="MyBiz staff changed something here")
 
 
 class SupportStatus(BaseModel):
     active: Grant | None
-    visits: list[SupportVisit] = Field(description="The latest 50 support requests")
+    visits: list[SupportVisit] = Field(
+        description="The latest 50 requests MyBiz staff made inside this business"
+    )
 
 
 class GrantCreate(BaseModel):
@@ -59,9 +62,10 @@ def _status(context: TenantContext) -> SupportStatus:
     )
     visits = db.execute(
         text("""
-            SELECT a.occurred_at, a.details->>'email' AS actor_email, a.details->>'path' AS path
+            SELECT a.occurred_at, a.details->>'email' AS actor_email, a.details->>'path' AS path,
+                   a.action = 'platform.change' AS changed
             FROM app.audit_log a
-            WHERE a.action = 'support.view'
+            WHERE a.action IN ('support.view', 'platform.view', 'platform.change')
             ORDER BY a.occurred_at DESC LIMIT 50
         """)
     ).mappings()

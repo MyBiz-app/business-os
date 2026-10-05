@@ -17,7 +17,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const t = await getTranslations();
   const locale = await getLocale();
   const { me } = await getActiveMembership();
-  const { api } = await getPlatformFor("businesses.read");
+  const { api, can } = await getPlatformFor("businesses.read");
   const [businesses, usage] = await Promise.all([
     api.GET("/platform/businesses").then(unwrap),
     api.GET("/platform/usage", { params: { query: { tenant_id: id, days: 90 } } }).then(unwrap),
@@ -27,6 +27,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const credits = usage.filter((u) => u.meter === "ai_credits");
   const grant = me.support_access.find((g) => g.tenant_id === business.id);
+  const mayAct = can("businesses.act");
 
   return (
     <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
@@ -41,6 +42,19 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           <span dir="ltr">{business.owner_email}</span> · {business.time_zone} · {business.currency}
         </p>
       </div>
+      {mayAct && (
+        <section aria-labelledby="act-heading" className="card-accent flex flex-col gap-3 p-5">
+          <h2 id="act-heading" className="font-semibold">
+            {t("support.actTitle")}
+          </h2>
+          <p className="text-sm text-muted">{t("support.actIntro")}</p>
+          <form action={openAsSupport.bind(null, business.id)}>
+            <button type="submit" className="btn-primary px-5 py-2.5">
+              {t("support.actOpen")}
+            </button>
+          </form>
+        </section>
+      )}
       <section className="flex flex-wrap items-center justify-between gap-3 card p-4">
         {grant ? (
           <>

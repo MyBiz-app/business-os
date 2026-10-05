@@ -5510,7 +5510,7 @@ export interface components {
             active: components["schemas"]["Grant"] | null;
             /**
              * Visits
-             * @description The latest 50 support requests
+             * @description The latest 50 requests MyBiz staff made inside this business
              */
             visits: components["schemas"]["SupportVisit"][];
         };
@@ -5525,6 +5525,12 @@ export interface components {
             actor_email: string | null;
             /** Path */
             path: string | null;
+            /**
+             * Changed
+             * @description MyBiz staff changed something here
+             * @default false
+             */
+            changed: boolean;
         };
         /** SystemRole */
         SystemRole: {
@@ -5630,9 +5636,9 @@ export interface components {
             custom_role_name: string | null;
             /**
              * Role
-             * @description 'support': platform support with read-only access the owner granted
+             * @description 'support': MyBiz support, read-only, while the owner's grant lasts. 'platform': MyBiz staff working in the business for its owner (audited).
              */
-            role: ("owner" | "manager" | "staff" | "front_desk") | "support";
+            role: ("owner" | "manager" | "staff" | "front_desk") | ("support" | "platform");
         };
         /** TenantCreate */
         TenantCreate: {

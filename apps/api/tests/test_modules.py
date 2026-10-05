@@ -127,8 +127,8 @@ def test_platform_console_is_for_platform_admins(
         "/platform/usage", params={"tenant_id": studio["tenant_id"]}, headers=admin_headers
     ).json()
     assert usage[0]["meter"] == "ai_credits" and usage[0]["quantity"] == 12.5
-    # Being a platform admin does not make you a member of the business.
-    assert client.get("/clients", headers=auth(admin, studio["tenant_id"])).status_code == 403
+    # Owners of MyBiz may also work inside a business (audited); see test_platform_staff.
+    assert client.get("/clients", headers=auth(admin, studio["tenant_id"])).status_code == 200
 
 
 def test_adding_one_module_to_the_plan(client: TestClient, studio: dict, auth) -> None:
