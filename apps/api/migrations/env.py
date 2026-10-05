@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import create_engine, pool
+from sqlalchemy import create_engine, pool, text
 
 from app.core.config import get_settings
 
@@ -24,12 +24,23 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+# Migrations can start from two places at once (the API's container on start and the staging
+# workflow); a session-level advisory lock makes the second wait and then find nothing to do.
+MIGRATION_LOCK = 72_000_042
+
+
 def run_migrations_online() -> None:
     engine = create_engine(database_url(), poolclass=pool.NullPool)
     with engine.connect() as connection:
-        context.configure(connection=connection, version_table_schema="public")
-        with context.begin_transaction():
-            context.run_migrations()
+        connection.execute(text("SELECT pg_advisory_lock(:key)"), {"key": MIGRATION_LOCK})
+        connection.commit()
+        try:
+            context.configure(connection=connection, version_table_schema="public")
+            with context.begin_transaction():
+                context.run_migrations()
+        finally:
+            connection.execute(text("SELECT pg_advisory_unlock(:key)"), {"key": MIGRATION_LOCK})
+            connection.commit()
 
 
 if context.is_offline_mode():

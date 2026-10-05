@@ -9,7 +9,8 @@
 | Client app on the web (`apps/mobile`) | Vercel, static site | `main` | [`apps/mobile/vercel.json`](../../apps/mobile/vercel.json), [`apps/mobile/README.md`](../../apps/mobile/README.md) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | — | Supabase dashboard |
-| Migrations | GitHub Actions | `main` (when migrations change) or by hand | [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
+| Migrations | The API container on start (`alembic upgrade head` before uvicorn), and GitHub Actions | Every deploy; `main` (when migrations change) or by hand | [`Dockerfile`](../../apps/api/Dockerfile), [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
+| Demo data | GitHub Actions, by hand | — | [`seed-staging.yml`](../../.github/workflows/seed-staging.yml) |
 
 All server-side parts run in Frankfurt: every page load makes several web → API → database
 round trips, so keeping them in one region matters more than the user's distance to it.
@@ -62,8 +63,12 @@ only) and not the transaction pooler (port 6543).
 - The default Supabase email templates work (links come back to `/auth/confirm?code=…`, in the
   same browser). Our own templates in `supabase/templates/` can be pasted into Authentication →
   Email Templates to allow confirming from any device.
-- On a push to `main` the migration workflow and the Render deploy run in parallel. Keep
-  migrations backward compatible (add first, remove later) so either order works.
+- The API container migrates the database before it starts serving, so new code never runs
+  against an old schema even when the GitHub runner for the migration workflow is slow (this
+  happened once: the site errored until the queued workflow ran). Both paths take the same
+  advisory lock, so they never migrate at the same time. Render keeps the previous version
+  serving until the new one is healthy, so keep migrations backward compatible (add first,
+  remove later).
 
 ## Notification emails (optional)
 
