@@ -60,7 +60,7 @@ export default function Join() {
       const joined = await join(code);
       await apiClient().PATCH("/client/profile", {
         params: { header: { "X-Tenant-Id": joined.id } },
-        body: { first_name: firstName.trim(), last_name: lastName.trim() || null, phone: joined.phone ?? known?.phone ?? null },
+        body: { first_name: firstName.trim(), last_name: lastName.trim() || joined.last_name || null, phone: joined.phone ?? known?.phone ?? null },
       }).then(unwrap);
       await refresh();
       router.replace("/home");

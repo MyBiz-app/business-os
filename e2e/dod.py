@@ -16,7 +16,7 @@ ADMIN = sys.argv[1]  # a platform admin's email (see README)
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
 owner_email, coach_email, member_email = (f"{n}{stamp}@example.com" for n in ("owner", "coach", "member"))
-tomorrow = (dt.date.today() + dt.timedelta(days=1)).isoformat()
+tomorrow = (h.local_today() + dt.timedelta(days=1)).isoformat()
 axe = Axe()
 a11y: list[str] = []
 
@@ -38,6 +38,7 @@ with sync_playwright() as p:
     owner.wait_for_url("**/check-email**")
     owner.goto(h.confirm_link(owner_email)); owner.wait_for_url("**/onboarding"); h.ready(owner)
     owner.get_by_label("שם העסק").fill("סטודיו DoD")
+    owner.get_by_label("סוג העסק").select_option("pilates")  # a class studio
     owner.get_by_label("אני רוצה עוזר AI שיכול גם לבצע פעולות (רישומים)").check()
     owner.get_by_role("button", name="המשך").click()
     owner.get_by_role("button", name="יצירת העסק").click()

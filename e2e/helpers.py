@@ -83,3 +83,11 @@ def sign_health(member, yes: tuple[int, ...] = ()) -> None:
     member.get_by_role("checkbox").click()
     member.get_by_label("שם מלא (החתימה שלך)").fill("נועה כהן")
     member.get_by_role("button", name="חתימה על ההצהרה").click()
+
+
+def local_today():
+    """Today in the demo businesses' time zone (Israel), not UTC: near midnight they differ."""
+    import datetime as _dt
+    from zoneinfo import ZoneInfo
+
+    return _dt.datetime.now(ZoneInfo("Asia/Jerusalem")).date()

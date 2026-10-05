@@ -3,6 +3,7 @@
     cd apps/api && PYTHONPATH=../../e2e:. uv run uvicorn fake_ai_api:app --port 8000
 """
 import datetime as dt, json
+from zoneinfo import ZoneInfo
 from app.ai.gateway import LLMResponse, Usage, get_provider
 from app.main import create_app
 
@@ -15,7 +16,7 @@ class Fake:
         question = next(b["text"] for b in reversed(messages) if b["role"] == "user" and isinstance(b["content"], list) and b["content"][-1].get("type") == "text" for b in [b["content"][-1]] if not b["text"].startswith("<context>"))
         last = messages[-1]["content"][-1]
         result = json.loads(last["content"]) if last.get("type") == "tool_result" else None
-        today = dt.date.today()
+        today = dt.datetime.now(ZoneInfo("Asia/Jerusalem")).date()  # the demo businesses' day, not UTC's
         if "רשום" in question or "book" in question.lower():
             if result is None:
                 return tool("list_sessions", {"start_date": (today + dt.timedelta(days=1)).isoformat(), "days": 1})

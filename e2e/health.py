@@ -15,7 +15,7 @@ import helpers as h
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
 owner_email, member_email = (f"{n}{stamp}@example.com" for n in ("owner", "member"))
-tomorrow = (dt.date.today() + dt.timedelta(days=1)).isoformat()
+tomorrow = (h.local_today() + dt.timedelta(days=1)).isoformat()
 axe = Axe()
 problems: list[str] = []
 
@@ -37,6 +37,7 @@ with sync_playwright() as p:
     owner.wait_for_url("**/check-email**")
     owner.goto(h.confirm_link(owner_email)); owner.wait_for_url("**/onboarding"); h.ready(owner)
     owner.get_by_label("שם העסק").fill("סטודיו בריאות")
+    owner.get_by_label("סוג העסק").select_option("pilates")  # classes, with a health declaration
     owner.get_by_role("button", name="המשך").click()
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard")

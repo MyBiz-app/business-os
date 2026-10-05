@@ -356,7 +356,20 @@
     "absentAny": "Any time",
     "absentDays": "Not in {days} days",
     "homeBranch": "Home branch",
-    "allBranches": "All branches"
+    "allBranches": "All branches",
+    "profile": {
+      "contact": "Contact",
+      "call": "Call",
+      "email": "Email",
+      "never": "Not yet",
+      "stats": {
+        "visits": "Visits",
+        "lastVisit": "Last visit",
+        "upcoming": "Upcoming bookings",
+        "noShows": "No-shows",
+        "rating": "Average rating"
+      }
+    }
   },
   "common": {
     "save": "Save",

@@ -1,3 +1,4 @@
+import { CalendarCheck, CalendarClock, History, Mail, MapPin, MessageCircle, Phone, Star, UserX } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +9,7 @@ import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
+import { whatsappLink } from "@/lib/whatsapp";
 
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
@@ -80,19 +82,92 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
     </ul>
   );
 
+  const name = [client.first_name, client.last_name].filter(Boolean).join(" ");
+  const branches = await getBranches();
+  const home = branches.find((branch) => branch.id === client.home_location_id);
+  const attended = past.filter((b) => b.status === "checked_in");
+  const noShows = past.filter((b) => b.status === "no_show").length;
+  const lastVisit = attended[0];
+  const number = new Intl.NumberFormat(locale);
+  type Stat = { key: "visits" | "lastVisit" | "upcoming" | "noShows" | "rating"; Icon: typeof Star; value: string };
+  const stats: Stat[] = [
+    { key: "visits", Icon: CalendarCheck, value: number.format(attended.length) },
+    {
+      key: "lastVisit",
+      Icon: History,
+      value: lastVisit
+        ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: tenant.time_zone }).format(new Date(lastVisit.starts_at))
+        : t("profile.never"),
+    },
+    { key: "upcoming", Icon: CalendarClock, value: number.format(upcoming.filter((b) => b.status === "booked").length) },
+    { key: "noShows", Icon: UserX, value: number.format(noShows) },
+    ...(reviews.count > 0 && reviews.average !== null
+      ? [{ key: "rating" as const, Icon: Star, value: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reviews.average) }]
+      : []),
+  ];
+  const whatsapp = client.phone ? whatsappLink(client.phone, tenant.time_zone) : null;
+
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
       <Link href="/clients" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-4">
-          <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} size="lg" />
-          <h1 className="text-3xl font-bold">{[client.first_name, client.last_name].filter(Boolean).join(" ")}</h1>
+
+      <header className="card-accent flex flex-col gap-5 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-4">
+            <Avatar id={client.id} name={name} size="lg" />
+            <div className="flex min-w-0 flex-col gap-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="truncate text-3xl font-bold">{name}</h1>
+                <StatusBadge status={client.status} />
+              </div>
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
+                <span>{t("joined", { date: joined })}</span>
+                {home && (
+                  <span className="flex items-center gap-1">
+                    <MapPin aria-hidden="true" className="size-3.5" />
+                    {home.name}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          {!erased && (client.phone || client.email) && (
+            <nav aria-label={t("profile.contact")} className="flex flex-wrap gap-2">
+              {client.phone && (
+                <a href={`tel:${client.phone}`} className="btn-secondary px-3 py-2 text-sm">
+                  <Phone aria-hidden="true" className="size-4" /> {t("profile.call")}
+                </a>
+              )}
+              {whatsapp && (
+                <a href={whatsapp} target="_blank" rel="noreferrer" className="btn-secondary px-3 py-2 text-sm">
+                  <MessageCircle aria-hidden="true" className="size-4" /> WhatsApp
+                </a>
+              )}
+              {client.email && (
+                <a href={`mailto:${client.email}`} className="btn-secondary px-3 py-2 text-sm">
+                  <Mail aria-hidden="true" className="size-4" /> {t("profile.email")}
+                </a>
+              )}
+            </nav>
+          )}
         </div>
-        <StatusBadge status={client.status} />
-      </div>
-      <p className="text-sm text-muted">{t("joined", { date: joined })}</p>
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {stats.map(({ key, Icon, value }) => (
+            <li key={key} className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3">
+              <span aria-hidden="true" className="icon-tile size-9">
+                <Icon className="size-4" />
+              </span>
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-xs text-muted">{t(`profile.stats.${key}`)}</span>
+                <span className="truncate text-lg font-bold">{value}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </header>
+
       {client.erased_at && (
         <p role="status" className="rounded-lg border border-border bg-surface px-4 py-3 text-sm">
           {tPrivacy("erasedOn", {
@@ -103,71 +178,72 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
         </p>
       )}
 
-      <section aria-labelledby="details-heading" className="card p-6">
-        <h2 id="details-heading" className="mb-4 text-lg font-semibold">
-          {t("details")}
-        </h2>
-        <ClientForm
-          action={updateClient.bind(null, client.id)}
-          client={client}
-          submitLabel={t("save")}
-          readOnly={!writable}
-          branches={await getBranches()}
-        />
-      </section>
+      <div className="grid items-start gap-6 lg:grid-cols-5">
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-3">
+          <PlansSection clientId={client.id} context={context} locked={erased} />
 
-      <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
+          <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 card p-6">
+            <h2 id="bookings-heading" className="text-lg font-semibold">
+              {tBookings("title")}
+            </h2>
+            {bookings.length === 0 && <p className="text-sm text-muted">{tBookings("noneYet")}</p>}
+            {upcoming.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <h3 className="font-semibold">{tBookings("upcoming")}</h3>
+                {bookingList(upcoming)}
+              </div>
+            )}
+            {past.length > 0 && (
+              <div className="flex flex-col gap-1">
+                <h3 className="font-semibold">{tBookings("history")}</h3>
+                {bookingList(past)}
+              </div>
+            )}
+          </section>
 
-      {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
+          <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 
-      <PlansSection clientId={client.id} context={context} locked={erased} />
+          <MessagesSection
+            target={{ client_id: client.id }}
+            phone={client.phone}
+            path={`/clients/${client.id}`}
+            context={context}
+            locked={erased}
+          />
+        </div>
 
-      <section aria-labelledby="bookings-heading" className="flex flex-col gap-4 card p-6">
-        <h2 id="bookings-heading" className="text-lg font-semibold">
-          {tBookings("title")}
-        </h2>
-        {bookings.length === 0 && <p className="text-sm text-muted">{tBookings("noneYet")}</p>}
-        {upcoming.length > 0 && (
-          <div className="flex flex-col gap-1">
-            <h3 className="font-semibold">{tBookings("upcoming")}</h3>
-            {bookingList(upcoming)}
-          </div>
-        )}
-        {past.length > 0 && (
-          <div className="flex flex-col gap-1">
-            <h3 className="font-semibold">{tBookings("history")}</h3>
-            {bookingList(past)}
-          </div>
-        )}
-      </section>
+        <div className="flex min-w-0 flex-col gap-6 lg:col-span-2">
+          <section aria-labelledby="details-heading" className="card p-6">
+            <h2 id="details-heading" className="mb-4 text-lg font-semibold">
+              {t("details")}
+            </h2>
+            <ClientForm
+              action={updateClient.bind(null, client.id)}
+              client={client}
+              submitLabel={t("save")}
+              readOnly={!writable}
+              branches={branches}
+            />
+          </section>
 
-      {reviews.count > 0 && (
-        <ReviewsSummary
-          summary={reviews}
-          locale={locale}
-          timeZone={tenant.time_zone}
-          title={tReviews("clientTitle")}
-          withClients={false}
-          withGroups={false}
-        />
-      )}
+          <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
 
-      <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
+          {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
 
-      <MessagesSection
-        target={{ client_id: client.id }}
-        phone={client.phone}
-        path={`/clients/${client.id}`}
-        context={context}
-        locked={erased}
-      />
+          {reviews.count > 0 && (
+            <ReviewsSummary
+              summary={reviews}
+              locale={locale}
+              timeZone={tenant.time_zone}
+              title={tReviews("clientTitle")}
+              withClients={false}
+              withGroups={false}
+            />
+          )}
 
-      {!erased && tenant.permissions.includes("clients.privacy") && (
-        <PrivacySection
-          clientId={client.id}
-          name={[client.first_name, client.last_name].filter(Boolean).join(" ")}
-        />
-      )}
+          {!erased && tenant.permissions.includes("clients.privacy") && <PrivacySection clientId={client.id} name={name} />}
+        </div>
+      </div>
     </main>
   );
 }
