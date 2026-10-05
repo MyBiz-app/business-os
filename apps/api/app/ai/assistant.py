@@ -9,11 +9,12 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 
-from app.ai.gateway import LLMProvider, LLMResponse, credits
+from app.ai.gateway import LLMProvider, LLMResponse, ProviderBusy, ProviderUnavailable, credits
 from app.ai.tools import ToolContext, run_tool, tools_for
 from app.api.deps import TenantContext, has_module
 
 MAX_STEPS = 8  # model calls per user message
+STEP_LIMIT_NOTE = "<context>Step limit reached. Answer with what you have.</context>"
 
 # Stable across requests (and businesses) so it stays in the prompt cache. Anything that
 # changes - today's date, the business, the user's role - goes in the user turn instead.
@@ -82,7 +83,8 @@ def ask(
     question: str,
 ) -> None:
     """Adds the user's question and the assistant's answer (with any tool calls) to the
-    conversation. Errors from the provider propagate; nothing partial is stored then."""
+    conversation. Errors from the provider propagate; nothing partial is stored then, except
+    the usage of the model calls already made (they are billable either way)."""
     db = tenant.session
     row = (
         db.execute(
@@ -111,42 +113,56 @@ def ask(
     definitions = [tool.definition() for tool in tools]
     ctx = ToolContext(tenant, user_id, conversation_id, row["time_zone"], modules)
 
-    for _ in range(MAX_STEPS):
-        response = provider.create(SYSTEM_PROMPT, messages, definitions)
-        _record_usage(tenant, conversation_id, response)
-        messages.append({"role": "assistant", "content": response.content})
-        if response.stop_reason != "tool_use":
-            break
-        results = []
-        for block in response.content:
-            if block.get("type") != "tool_use":
-                continue
-            result, is_error = run_tool(ctx, block["name"], block.get("input") or {})
-            results.append(
+    spent: list[LLMResponse] = []
+    work = db.begin_nested()
+    try:
+        for _ in range(MAX_STEPS):
+            response = provider.create(SYSTEM_PROMPT, messages, definitions)
+            spent.append(response)
+            messages.append({"role": "assistant", "content": response.content})
+            if response.stop_reason != "tool_use":
+                break
+            results = []
+            for block in response.content:
+                if block.get("type") != "tool_use":
+                    continue
+                result, is_error = run_tool(ctx, block["name"], block.get("input") or {})
+                results.append(
+                    {
+                        "type": "tool_result",
+                        "tool_use_id": block["id"],
+                        "content": json.dumps(result, ensure_ascii=False, default=str),
+                        **({"is_error": True} if is_error else {}),
+                    }
+                )
+            messages.append({"role": "user", "content": results})
+        else:
+            # Out of steps while still calling tools: close the turn so the history stays valid.
+            messages.append(
                 {
-                    "type": "tool_result",
-                    "tool_use_id": block["id"],
-                    "content": json.dumps(result, ensure_ascii=False, default=str),
-                    **({"is_error": True} if is_error else {}),
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": STEP_LIMIT_NOTE,
+                        }
+                    ],
                 }
             )
-        messages.append({"role": "user", "content": results})
-    else:
-        # Out of steps while still calling tools: close the turn so the history stays valid.
-        messages.append(
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": "<context>Step limit reached. Answer with what you have.</context>",
-                    }
-                ],
-            }
-        )
-        response = provider.create(SYSTEM_PROMPT, messages, definitions)
-        _record_usage(tenant, conversation_id, response)
-        messages.append({"role": "assistant", "content": response.content})
+            response = provider.create(SYSTEM_PROMPT, messages, definitions)
+            spent.append(response)
+            messages.append({"role": "assistant", "content": response.content})
+
+    except (ProviderBusy, ProviderUnavailable):
+        # Undo the partial turn but keep (and commit) the usage already incurred.
+        work.rollback()
+        for done in spent:
+            _record_usage(tenant, conversation_id, done)
+        db.commit()
+        raise
+    work.commit()
+    for done in spent:
+        _record_usage(tenant, conversation_id, done)
 
     db.execute(
         text("""

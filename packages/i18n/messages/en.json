@@ -1423,7 +1423,8 @@
     },
     "print": "Print",
     "back": "Back to the client",
-    "thanks": "Thank you!"
+    "thanks": "Thank you!",
+    "email": "Email"
   },
   "marketing": {
     "nav": {

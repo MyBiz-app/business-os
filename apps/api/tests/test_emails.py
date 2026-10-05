@@ -44,6 +44,14 @@ def test_pending_notifications_are_emailed_once_in_the_business_language(
     assert email.subject.startswith("נרשמת לPilates ב-")  # the studio is Hebrew
     assert email.text.startswith("שלום Dana,")
     assert "Studio Flow" in email.text
+    with engine.connect() as connection:
+        usage = connection.execute(
+            text("""
+                SELECT quantity, details->>'channel' FROM app.usage_events
+                WHERE meter = 'messages'
+            """)
+        ).all()
+    assert [(int(q), channel) for q, channel in usage] == [(1, "email")]
 
 
 def test_old_notifications_and_clients_without_email_are_skipped(

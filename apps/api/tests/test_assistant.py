@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.ai.gateway import LLMResponse, Usage, get_provider
+from app.ai.gateway import LLMResponse, ProviderBusy, Usage, get_provider
 from tests.conftest import AuthHeaders, add_member
 from tests.test_bookings import new_client, new_session
 
@@ -319,3 +319,39 @@ def test_demo_mode_answers_about_leads(client: TestClient, studio: dict, use_pro
 
     texts = [turn["text"] for turn in answer.json()["turns"] if turn["role"] == "assistant"]
     assert "חדש: 1" in texts[-1] and "Yael (050-9999999)" in texts[-1]
+
+
+def test_usage_is_kept_when_the_provider_fails_midway(
+    client: TestClient, studio: dict, use_provider, engine: Engine
+) -> None:
+    def busy(_messages: Any) -> LLMResponse:
+        raise ProviderBusy
+
+    use_provider(FakeProvider([calls("get_metrics", {"metrics": ["revenue"]}), busy]))
+    headers = studio["headers"]
+    conversation_id = conversation(client, headers)
+
+    response = ask(client, headers, conversation_id, "How are we doing?")
+
+    assert response.status_code == 429
+    # The partial turn is not stored, but the model call already made is billed.
+    turns = client.get(f"/ai/conversations/{conversation_id}", headers=headers).json()["turns"]
+    assert turns == []
+    with engine.connect() as connection:
+        meters = connection.execute(text("SELECT meter FROM app.usage_events")).scalars().all()
+    assert meters == ["ai_credits"]
+
+
+def test_a_missing_tool_input_goes_back_to_the_model(
+    client: TestClient, studio: dict, use_provider
+) -> None:
+    provider = FakeProvider([calls("get_metrics", {"metrics": ["revenue"]}), says("Which dates?")])
+    use_provider(provider)
+    headers = studio["headers"]
+
+    response = ask(client, headers, conversation(client, headers), "Revenue?")
+
+    assert response.status_code == 200, response.text
+    result = provider.calls[1]["messages"][-1]["content"][0]
+    assert result["is_error"] is True
+    assert "start_date" in result["content"]
