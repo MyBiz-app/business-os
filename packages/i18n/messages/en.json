@@ -1526,7 +1526,9 @@
           "title": "Professional records",
           "text": "The car at a garage, treatment notes at a clinic, coach notes at a gym — by business type."
         }
-      }
+      },
+      "gridTitle": "All in one place",
+      "gridSubtitle": "Twelve capabilities that work together, no systems to connect."
     },
     "steps": {
       "title": "Get started in three steps",
@@ -1734,6 +1736,56 @@
       "about": "About",
       "contact": "Contact",
       "industries": "Industries"
+    },
+    "branches": {
+      "eyebrow": "Chains and branches",
+      "title": "Several businesses, several branches. One picture.",
+      "text": "Run a chain of branches or several different businesses from one account. Each business stays separate, and each branch keeps its own numbers.",
+      "points": [
+        "Switch between your businesses in one click",
+        "Pick a branch, or see all branches together",
+        "Revenue, occupancy and clients per branch",
+        "Team members assigned to the branches they work at"
+      ],
+      "mock": {
+        "business": "Pilates Plus",
+        "delta": "+14% this month",
+        "all": "All branches",
+        "branches": [
+          "Downtown",
+          "Riverside",
+          "Uptown"
+        ],
+        "second": "Blade Barbers · 3 branches"
+      }
+    },
+    "addOns": {
+      "title": "Add only what you need",
+      "subtitle": "The base includes the schedule, clients, plans, team, reports and payments. Everything else is an add-on you turn on or off whenever you like.",
+      "cta": "All add-ons and prices"
+    },
+    "safety": {
+      "eyebrow": "Security and privacy",
+      "title": "Your business, your data",
+      "subtitle": "MyBiz is built so your data is protected and sensitive actions always wait for your approval.",
+      "items": {
+        "separate": {
+          "title": "Every business is separate",
+          "text": "Each business's data is separated in the database itself, even between businesses of the same owner."
+        },
+        "approve": {
+          "title": "The AI asks first",
+          "text": "The assistant prepares actions like booking or cancelling, and nothing happens until you approve."
+        },
+        "roles": {
+          "title": "Permissions by role",
+          "text": "Each team member sees only what their role needs: coach, front desk, manager or owner."
+        },
+        "yours": {
+          "title": "Your data is yours",
+          "text": "Export sales and a client's data any time, and cancel with no commitment."
+        }
+      }
     }
   },
   "appointments": {

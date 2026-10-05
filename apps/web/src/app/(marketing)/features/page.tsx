@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
-import { CtaBand, FeatureGrid, SectionHeading } from "@/components/marketing/sections";
+import { BranchesSection, CtaBand, FeatureGrid, SafetySection, SectionHeading } from "@/components/marketing/sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
@@ -20,7 +20,7 @@ export default async function FeaturesPage() {
         </div>
         <DashboardMock />
       </section>
-      <FeatureGrid />
+      <FeatureGrid inFeaturesPage />
       <section className="bg-surface/60 py-20">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
           <div className="flex flex-col gap-4">
@@ -35,6 +35,8 @@ export default async function FeaturesPage() {
           <SectionHeading eyebrow={t("app.eyebrow")} title={t("app.title")} subtitle={t("app.text")} />
         </div>
       </section>
+      <BranchesSection />
+      <SafetySection />
       <CtaBand />
     </main>
   );
