@@ -593,6 +593,30 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
         {"t": tenant_id},
     )
 
+    # Ratings clients left after their classes, mostly happy.
+    review_rows = []
+    for b in rng.sample(attended, k=min(220, len(attended))):
+        rating = rng.choices((5, 4, 3, 2, 1), weights=(52, 30, 11, 5, 2))[0]
+        session = by_id[b["session_id"]]
+        review_rows.append(
+            {
+                "tenant_id": tenant_id,
+                "client_id": b["client_id"],
+                "booking_id": b["id"],
+                "service_id": session["service_id"],
+                "staff": session["instructor"],
+                "rating": rating,
+                "comment": rng.choice(REVIEW_COMMENTS[rating]) if rng.random() < 0.35 else None,
+                "at": session["ends_at"] + timedelta(hours=rng.randint(1, 30)),
+            }
+        )
+    _insert(conn, """
+        INSERT INTO app.reviews
+            (tenant_id, client_id, booking_id, service_id, staff_user_id, rating, comment,
+             created_at)
+        VALUES (:tenant_id, :client_id, :booking_id, :service_id, :staff, :rating, :comment, :at)
+    """, review_rows)  # fmt: skip
+
     # MyBiz's own (simulated) billing: a test card on file, monthly invoices since the trial.
     conn.execute(
         text("""
@@ -614,6 +638,13 @@ def seed(conn: Connection, owner_email: str, months: int, rng: random.Random) ->
     return tenant_id
 
 
+REVIEW_COMMENTS = {
+    5: ("שיעור מעולה, יצאתי עם אנרגיות!", "המדריכה הכי טובה שיש", "בדיוק מה שהייתי צריכה"),
+    4: ("שיעור טוב, קצת צפוף", "נהניתי מאוד", "אחלה אווירה"),
+    3: ("היה בסדר", "המוזיקה הייתה חזקה מדי"),
+    2: ("החדר היה חם מדי", "התחיל באיחור"),
+    1: ("השיעור בוטל ברגע האחרון",),
+}
 COACH_NOTES = (
     "עבדנו על יציבה בגב התחתון, להמשיך בשבוע הבא",
     "התקדמות יפה בכוח הליבה",

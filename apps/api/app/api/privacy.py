@@ -129,6 +129,15 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "reviews": _rows(
+            db,
+            """
+            SELECT r.rating, r.comment, sv.name AS service, r.created_at
+            FROM app.reviews r JOIN app.services sv ON sv.id = r.service_id
+            WHERE r.client_id = :id ORDER BY r.created_at
+            """,
+            client_id,
+        ),
         "messages": _rows(
             db,
             """
@@ -211,6 +220,10 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
     db.execute(text("DELETE FROM app.client_notes WHERE client_id = :id"), {"id": client_id})
     db.execute(text("DELETE FROM app.messages WHERE client_id = :id"), {"id": client_id})
+    # Ratings stay in the business's averages; the comments (free text) go.
+    db.execute(
+        text("UPDATE app.reviews SET comment = NULL WHERE client_id = :id"), {"id": client_id}
+    )
     # The CRM history that led to the client (their inquiry, calls, notes) goes with them.
     db.execute(text("DELETE FROM app.leads WHERE client_id = :id"), {"id": client_id})
     db.execute(

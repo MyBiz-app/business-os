@@ -1,5 +1,5 @@
 import { dayOf, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
@@ -19,6 +19,7 @@ export default function Home() {
   const tHealth = useTranslations("client.health");
   const tTerms = useTranslations("terms");
   const tAppointment = useTranslations("client.appointment");
+  const tReview = useTranslations("client.review");
   const health = useHealth();
   const locale = useLocale();
   const formatDay = (day: string) =>
@@ -26,16 +27,27 @@ export default function Home() {
   const { api, scope, business, palette } = useBusiness();
 
   const load = useCallback(async () => {
-    if (!business) return { sessions: [], appointments: 0 };
+    if (!business) return { sessions: [], appointments: 0, toReview: [] };
     const start = todayIn(business.time_zone);
-    const [sessions, services] = await Promise.all([
+    const [sessions, services, pending] = await Promise.all([
       api.GET("/client/sessions", { params: { ...scope, query: { start, days: 14 } } }),
       api.GET("/client/appointments/services", { params: scope }),
+      api.GET("/client/reviews/pending", { params: scope }),
     ]);
-    return { sessions: unwrap(sessions), appointments: services.data?.length ?? 0 };
+    return {
+      sessions: unwrap(sessions),
+      appointments: services.data?.length ?? 0,
+      toReview: pending.data ?? [],
+    };
   }, [api, scope, business]);
   const { data, loading, reload } = useLoad(load);
   const sessions = data?.sessions;
+  // Coming back (e.g. after rating a visit) shows fresh data.
+  useFocusEffect(
+    useCallback(() => {
+      void reload();
+    }, [reload]),
+  );
 
   if (!business) return null;
   const today = todayIn(business.time_zone);
@@ -77,6 +89,26 @@ export default function Home() {
               onPress={() => router.push("/health")}
             />
           )}
+        </Card>
+      )}
+
+      {data?.toReview[0] && (
+        <Card palette={palette}>
+          <Text style={[local.reviewTitle, { color: palette.foreground }]}>
+            {tReview("cardTitle", { service: data.toReview[0].service_name })}
+          </Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{tReview("cardText")}</Text>
+          <Button
+            label={tReview("rate")}
+            palette={palette}
+            variant="secondary"
+            onPress={() =>
+              router.push({
+                pathname: "/review/[id]",
+                params: { id: data.toReview[0].booking_id, service: data.toReview[0].service_name },
+              })
+            }
+          />
         </Card>
       )}
 
@@ -125,4 +157,5 @@ const local = StyleSheet.create({
   logo: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#ffffff" },
   business: { fontSize: 26, fontWeight: "700", textAlign: "left" },
   greeting: { fontSize: 16, textAlign: "left" },
+  reviewTitle: { fontSize: 17, fontWeight: "700", textAlign: "left" },
 });

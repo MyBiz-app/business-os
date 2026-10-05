@@ -764,6 +764,24 @@
         "health_declaration_review": "Your health declaration is waiting for review.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "review": {
+      "cardTitle": "How was {service}?",
+      "cardText": "Rate your visit — it helps us get better.",
+      "rate": "Rate",
+      "title": "Rate your visit",
+      "question": "How was it?",
+      "star": "{count, plural, one {1 star} other {# stars}}",
+      "comment": "Anything to add? (optional)",
+      "send": "Send rating",
+      "thanks": "Thanks for rating!",
+      "back": "Back",
+      "rated": "You rated: {count, plural, one {1 star} other {# stars}}",
+      "errors": {
+        "already_reviewed": "You already rated this visit.",
+        "not_reviewable": "This visit can't be rated.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "join": {
@@ -1088,23 +1106,23 @@
   },
   "reports": {
     "title": "Reports",
-    "intro": "Which classes, instructors and hours work best, and which members need attention.",
+    "intro": "Which services, staff and hours work best, and which clients need attention.",
     "period": "Period",
     "lastDays": "Last {count} days",
-    "noSessions": "No classes took place in this period.",
-    "sessions": "Classes",
+    "noSessions": "Nothing took place in this period.",
+    "sessions": "Sessions",
     "attended": "Check-ins",
     "occupancy": "Occupancy",
     "noShowRate": "No-shows",
-    "byService": "By class",
-    "service": "Class",
-    "byInstructor": "By instructor",
-    "instructor": "Instructor",
-    "noInstructor": "No instructor set",
+    "byService": "By service",
+    "service": "Service",
+    "byInstructor": "By staff member",
+    "instructor": "Staff member",
+    "noInstructor": "No staff member set",
     "bySlot": "Busiest times",
     "slot": "Day and hour",
-    "atRisk": "{count, plural, =0 {Members to reach out to} one {# member to reach out to} other {# members to reach out to}}",
-    "atRiskHint": "Members with a valid plan who haven't come in {days} days, or whose plan ends within {days} days with no renewal.",
+    "atRisk": "{count, plural, =0 {Clients to reach out to} one {# client to reach out to} other {# clients to reach out to}}",
+    "atRiskHint": "Clients with a valid plan who haven't come in {days} days, or whose plan ends within {days} days with no renewal.",
     "atRiskNone": "Nobody right now. Nice!",
     "reasons": {
       "inactive": "Hasn't come lately",
@@ -1864,5 +1882,17 @@
         "body": "Happy holidays, {first_name}! Warm wishes from the {business} team."
       }
     }
+  },
+  "reviews": {
+    "title": "Satisfaction ({count} days)",
+    "clientTitle": "This client's ratings",
+    "none": "No ratings in this period yet.",
+    "count": "{count, plural, one {1 rating} other {# ratings}}",
+    "distribution": "Ratings breakdown",
+    "starsShort": "{count, plural, one {1 star} other {# stars}}",
+    "starsLabel": "{rating} out of 5 stars",
+    "byStaff": "By staff member",
+    "byService": "By service",
+    "comments": "Latest comments"
   }
 }

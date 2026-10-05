@@ -22,6 +22,7 @@ export default function Bookings() {
   const tStatus = useTranslations("bookings");
   const tPlans = useTranslations("plans");
   const tReceipts = useTranslations("receipts");
+  const tReview = useTranslations("client.review");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
 
@@ -84,6 +85,9 @@ export default function Bookings() {
         <Text style={[local.meta, { color: palette.muted }]}>
           {date.format(new Date(booking.starts_at))} · {formatTime(booking.starts_at, locale, business.time_zone)}
         </Text>
+        {booking.rating ? (
+          <Text style={[local.meta, { color: palette.muted }]}>{tReview("rated", { count: booking.rating })}</Text>
+        ) : null}
       </View>
       <Text style={[local.status, { color: booking.status === "booked" ? palette.primary : palette.muted }]}>
         {booking.session_status === "cancelled" ? tStatus("sessionCancelled") : tStatus(`statuses.${booking.status}`)}

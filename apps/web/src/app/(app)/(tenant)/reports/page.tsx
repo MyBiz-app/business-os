@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Pill } from "@/components/pill";
+import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
@@ -26,12 +27,14 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const start = addDays(end, -(PERIODS[period] - 1));
   const range = { start, end };
 
-  const [byService, byInstructor, bySlot, atRisk] = await Promise.all([
+  const [byService, byInstructor, bySlot, atRisk, reviews] = await Promise.all([
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "service" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "instructor" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "time_slot" }, query: range } }).then(unwrap),
     api.GET("/metrics/members-at-risk", { params: { ...scope, query: { days: AT_RISK_DAYS } } }).then(unwrap),
+    api.GET("/reviews", { params: { ...scope, query: { days: PERIODS[period] } } }).then(unwrap),
   ]);
+  const tReviews = await getTranslations("reviews");
 
   const number = new Intl.NumberFormat(locale);
   const percent = (value: number | null) => (value === null ? "—" : `${number.format(Math.round(value))}%`);
@@ -116,6 +119,12 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         </nav>
       </div>
 
+      <ReviewsSummary
+        summary={reviews}
+        locale={locale}
+        timeZone={tenant.time_zone}
+        title={tReviews("title", { count: PERIODS[period] })}
+      />
       {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
       {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
       {table("by-slot", t("bySlot"), t("slot"), slots, (row) => slotLabel(row.key))}

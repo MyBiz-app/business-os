@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Avatar } from "@/components/avatar";
+import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
@@ -49,6 +50,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
     await api.GET("/clients/{client_id}/bookings", { params: { ...scope, path: { client_id: id } } }),
   );
   const { upcoming, past } = splitByNow(bookings);
+  const reviews = unwrap(await api.GET("/reviews", { params: { ...scope, query: { client_id: id } } }));
+  const tReviews = await getTranslations("reviews");
   const dateFormat = new Intl.DateTimeFormat(locale, {
     weekday: "short",
     day: "numeric",
@@ -136,6 +139,17 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           </div>
         )}
       </section>
+
+      {reviews.count > 0 && (
+        <ReviewsSummary
+          summary={reviews}
+          locale={locale}
+          timeZone={tenant.time_zone}
+          title={tReviews("clientTitle")}
+          withClients={false}
+          withGroups={false}
+        />
+      )}
 
       <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 

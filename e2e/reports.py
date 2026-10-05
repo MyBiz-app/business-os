@@ -30,7 +30,7 @@ with sync_playwright() as p:
     page.get_by_role("link", name="דוחות").click(); page.wait_for_url("**/reports"); h.ready(page)
 
     expect(page.get_by_role("heading", level=1)).to_have_text("דוחות")
-    by_class = page.get_by_role("region", name="לפי שיעור")
+    by_class = page.get_by_role("region", name="לפי שירות")
     expect(by_class.get_by_role("row")).to_have_count(6)  # header + 5 classes
     expect(page.get_by_role("region", name="השעות העמוסות").get_by_role("rowheader").first).to_contain_text(":00")
     at_risk = page.get_by_role("region", name=__import__("re").compile("שכדאי לפנות"))

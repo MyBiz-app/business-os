@@ -70,6 +70,7 @@ class ClientBooking(BaseModel):
     session_status: Literal["scheduled", "cancelled"]
     status: BookingStatus
     late_cancel: bool
+    rating: int | None = Field(default=None, description="The client's review of the visit")
 
 
 BOOKING_SELECT = f"""
@@ -253,7 +254,8 @@ def list_client_bookings(client_id: UUID, context: ClientsReadDep) -> list[Clien
     rows = context.session.execute(
         text("""
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
-                   s.status AS session_status, b.status, b.late_cancel
+                   s.status AS session_status, b.status, b.late_cancel,
+                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
