@@ -976,7 +976,10 @@
       "ai_pro": "Everything in AI Basic, and it prepares bookings and cancellations for you to confirm.",
       "extra_location": "{price} per location beyond the first.",
       "crm": "A lead pipeline: online inquiry form, call log, follow-up reminders and conversion to clients.",
-      "whatsapp": "Messages to clients and leads: broadcasts to a segment, templates and a send log."
+      "whatsapp": "Messages to clients and leads: broadcasts to a segment, templates and a send log.",
+      "analytics_pro": "Deeper reports: cohorts, retention, revenue per client and per branch, with exports.",
+      "agent_finance": "An AI agent that follows payments, debts and renewals, and prepares reminders for your approval.",
+      "agent_marketing": "An AI agent that finds clients to win back and drafts campaigns for your approval."
     },
     "followsBranches": "Follows your active branches"
   },
@@ -1584,12 +1587,12 @@
       "subtitle": "A base price by business size, plus modules you add when you want. No surprises.",
       "from": "From ",
       "perMonth": "/month",
-      "core": "Base",
+      "core": "The base: everything to run the business",
       "coreText": "Calendar, clients, memberships, team, reports and payments.",
       "upTo": "Up to {count} active clients",
       "custom": "Over 1,000 active clients",
       "customPrice": "Custom price",
-      "modulesTitle": "Modules",
+      "modulesTitle": "Add-ons",
       "presetsTitle": "Recommended plans",
       "presets": {
         "starter": "Starter",
@@ -1605,7 +1608,8 @@
       "cta": "Start free",
       "seeAll": "See all prices",
       "note": "Launch prices, subject to change.",
-      "currency": "Currency"
+      "currency": "Currency",
+      "modulesText": "Add only what your business needs. Turn any add-on on or off whenever you like."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -2229,7 +2233,8 @@
       "hide": "Hide your plan",
       "items": "{count, plural, one {# item} other {# items}}",
       "addedNotice": "{name} added. Monthly total: {total}",
-      "removedNotice": "{name} removed. Monthly total: {total}"
+      "removedNotice": "{name} removed. Monthly total: {total}",
+      "emptyHint": "Add-ons you choose show up here. You can change them any time."
     },
     "summary": {
       "title": "Your plan is ready",

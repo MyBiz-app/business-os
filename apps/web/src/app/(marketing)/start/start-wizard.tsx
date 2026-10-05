@@ -5,17 +5,13 @@ import { categories, childrenOf, vertical as findVertical } from "@business-os/v
 import {
   ArrowLeft,
   ArrowRight,
-  Bot,
   Check,
   ChevronUp,
-  MessageCircle,
   Minus,
   Plus,
   ShieldCheck,
   ShoppingBag,
-  Smartphone,
   Sparkles,
-  Target,
   X,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -23,6 +19,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
+import { ModuleIcon } from "@/components/modules/module-icon";
 import { OfferPicture } from "@/components/modules/offer-picture";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { formatMoney } from "@/lib/money";
@@ -54,7 +51,8 @@ const GROUPS = [
   { key: "summary", steps: ["summary"] },
 ] as const;
 
-const OFFER_ICONS: Record<Offer, typeof Bot> = { client_app: Smartphone, ai: Bot, crm: Target, whatsapp: MessageCircle };
+/** The module shown for each add-on screen (the AI screen offers two tiers). */
+const OFFER_MODULE: Record<Offer, ModuleKey> = { client_app: "client_app", ai: "ai_basic", crm: "crm", whatsapp: "whatsapp" };
 
 
 type Draft = Omit<SignupPlan, "vertical"> & { vertical: string | null };
@@ -126,6 +124,10 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
     const merged = { ...draft, ...changes };
     setDraft({ ...merged, modules: withLocations(merged.modules, merged.locations) });
   };
+
+  const offerAdded = (offer: Offer) => (offer === "ai" ? !!(draft.modules.ai_basic || draft.modules.ai_pro) : !!draft.modules[offer]);
+  const removeOffer = (offer: Offer) => setModule(offer === "ai" ? (draft.modules.ai_pro ? "ai_pro" : "ai_basic") : offer, false);
+  const isOffer = (OFFERS as readonly string[]).includes(step);
 
   const recommends = findVertical(draft.vertical)?.recommendedModules ?? [];
   const recommended: Record<Offer, boolean> = {
@@ -342,6 +344,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
               return (
                 <div key={key} className={`relative flex flex-col gap-3 p-5 ${chosen ? "card-accent ring-2 ring-primary" : "card"}`}>
                   {key === recommendedAi && <Badge>{t("offer.popular")}</Badge>}
+                  <ModuleIcon module={key} />
                   <h2 className="text-lg font-bold">{t(`offers.ai.tiers.${key}.title`)}</h2>
                   <p className="flex-1 text-sm text-muted">{t(`offers.ai.tiers.${key}.text`)}</p>
                   <p className="flex items-baseline gap-1">
@@ -373,30 +376,18 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
           </div>
           <div className="hidden lg:block">{illustrations.ai}</div>
         </div>
-        <OfferFooter
-          added={!!(draft.modules.ai_basic || draft.modules.ai_pro)}
-          onRemove={() => setModule(draft.modules.ai_pro ? "ai_pro" : "ai_basic", false)}
-          onSkip={() => {
-            if (draft.modules.ai_basic || draft.modules.ai_pro) setModule(draft.modules.ai_pro ? "ai_pro" : "ai_basic", false);
-            next();
-          }}
-          t={t}
-        />
       </>
     );
   } else if (step === "client_app" || step === "crm" || step === "whatsapp") {
     const key: ModuleKey = step;
     const added = !!draft.modules[key];
-    const Icon = OFFER_ICONS[step];
     content = (
       <>
         <OfferHeading offer={step} t={t} headingProps={headingProps} />
         <div className="grid items-center gap-8 lg:grid-cols-2">
           <div className={`relative flex flex-col gap-4 p-6 ${added ? "card-accent ring-2 ring-primary" : "card"}`}>
             {recommended[step] && <Badge>{t("offer.popular")}</Badge>}
-            <span aria-hidden="true" className="icon-tile size-12">
-              <Icon className="size-6" />
-            </span>
+            <ModuleIcon module={key} size="lg" />
             <ul className="flex flex-col gap-2">
               {(t.raw(`offers.${step}.points`) as string[]).map((point) => (
                 <li key={point} className="flex items-start gap-2 font-medium">
@@ -429,9 +420,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
               </button>
             )}
           </div>
-          <div aria-hidden="true">{illustrations[step] ?? <OfferPicture offer={step} />}</div>
+          <div aria-hidden="true" className="hidden sm:block">{illustrations[step] ?? <OfferPicture offer={step} />}</div>
         </div>
-        <OfferFooter added={added} onRemove={() => setModule(key, false)} onSkip={next} t={t} />
       </>
     );
   } else {
@@ -558,6 +548,16 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
           <p className="text-xs text-muted">{t("progress.step", { step: stepIndex + 1, total: STEPS.length })}</p>
         </nav>
 
+        {isOffer && (
+          <AddOnRail
+            current={step as Offer}
+            added={offerAdded}
+            onPick={(offer) => go(STEPS.indexOf(offer))}
+            label={(offer) => label(OFFER_MODULE[offer])}
+            t={t}
+          />
+        )}
+
         <section key={step} aria-labelledby={undefined} className="enter flex flex-col gap-6">
           {content}
         </section>
@@ -569,6 +569,24 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
             </button>
           ) : (
             <span />
+          )}
+          {isOffer && (
+            <div className="flex flex-wrap items-center gap-4">
+              {offerAdded(step as Offer) ? (
+                <>
+                  <button type="button" onClick={() => removeOffer(step as Offer)} className="text-sm font-semibold text-muted underline-offset-4 hover:underline">
+                    {t("offer.remove")}
+                  </button>
+                  <button type="button" onClick={next} className="btn-primary px-6 py-3">
+                    {t("next")} <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+                  </button>
+                </>
+              ) : (
+                <button type="button" onClick={next} className="btn-secondary px-6 py-3">
+                  {t("offer.skip")}
+                </button>
+              )}
+            </div>
           )}
           {showContinue && (
             <button
@@ -611,6 +629,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
         money={money}
         open={cartOpen}
         onToggle={() => setCartOpen((value) => !value)}
+        onRemove={(key) => setModule(key, false)}
         t={t}
       />
       <p aria-live="polite" className="sr-only">
@@ -644,24 +663,51 @@ function OfferHeading({ offer, t, headingProps }: { offer: Offer; t: T; headingP
   );
 }
 
-function OfferFooter({ added, onRemove, onSkip, t }: { added: boolean; onRemove: () => void; onSkip: () => void; t: T }) {
+
+/** The add-ons at a glance: where the person is, what they added, and a way to jump back. */
+function AddOnRail({
+  current,
+  added,
+  onPick,
+  label,
+  t,
+}: {
+  current: Offer;
+  added: (offer: Offer) => boolean;
+  onPick: (offer: Offer) => void;
+  label: (offer: Offer) => string;
+  t: T;
+}) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {added ? (
-        <>
-          <button type="button" onClick={onSkip} className="btn-primary px-6 py-3">
-            {t("next")} <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-          </button>
-          <button type="button" onClick={onRemove} className="text-sm font-semibold text-muted underline-offset-4 hover:underline">
-            {t("offer.remove")}
-          </button>
-        </>
-      ) : (
-        <button type="button" onClick={onSkip} className="btn-secondary px-6 py-3">
-          {t("offer.skip")}
-        </button>
-      )}
-    </div>
+    <nav aria-label={t("progress.extras")} className="-mx-1 overflow-x-auto px-1 pb-1">
+      <ol className="flex min-w-max gap-2">
+        {OFFERS.map((offer) => {
+          const isCurrent = offer === current;
+          const isAdded = added(offer);
+          return (
+            <li key={offer}>
+              <button
+                type="button"
+                onClick={() => onPick(offer)}
+                aria-current={isCurrent ? "step" : undefined}
+                className={`flex items-center gap-2 rounded-full border py-1.5 ps-1.5 pe-3 text-sm font-semibold transition-colors ${
+                  isCurrent ? "border-primary bg-primary/10 text-primary" : "border-border bg-surface hover:border-primary/50"
+                }`}
+              >
+                <ModuleIcon module={OFFER_MODULE[offer]} size="sm" />
+                {label(offer)}
+                {isAdded && (
+                  <span className="flex size-5 items-center justify-center rounded-full bg-success text-white">
+                    <Check aria-hidden="true" className="size-3" />
+                    <span className="sr-only">{t("offer.added")}</span>
+                  </span>
+                )}
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
 }
 
@@ -818,9 +864,11 @@ function Cart({
   money,
   open,
   onToggle,
+  onRemove,
   t,
 }: {
   lines: CartLine[];
+  onRemove?: (key: ModuleKey) => void;
   total: number;
   money: (amount: number) => string;
   open: boolean;
@@ -830,13 +878,31 @@ function Cart({
   const list = (
     <ul className="flex flex-col gap-2">
       {lines.map((line) => (
-        <li key={line.key} className="flex animate-[pop_360ms_var(--ease-out)_both] items-center justify-between gap-3 text-sm">
-          <span className="flex items-center gap-1.5">
-            <Check aria-hidden="true" className="size-4 shrink-0 text-success" />
-            {line.label}
+        <li key={line.key} className="group flex animate-[pop_360ms_var(--ease-out)_both] items-center justify-between gap-3 text-sm">
+          <span className="flex min-w-0 items-center gap-2">
+            {line.key === "core" ? (
+              <span aria-hidden="true" className="icon-tile size-8">
+                <Check className="size-4" />
+              </span>
+            ) : (
+              <ModuleIcon module={line.key} size="sm" />
+            )}
+            <span className="truncate">{line.label}</span>
             {line.quantity > 1 && <span className="text-muted" dir="ltr">× {line.quantity}</span>}
           </span>
-          <bdi className="font-semibold">{money(line.amount)}</bdi>
+          <span className="flex items-center gap-1">
+            <bdi className="font-semibold">{money(line.amount)}</bdi>
+            {onRemove && line.key !== "core" && line.key !== "extra_location" && (
+              <button
+                type="button"
+                onClick={() => onRemove(line.key as ModuleKey)}
+                aria-label={`${t("offer.remove")}: ${line.label}`}
+                className="flex size-7 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
+              >
+                <X aria-hidden="true" className="size-3.5" />
+              </button>
+            )}
+          </span>
         </li>
       ))}
     </ul>
@@ -865,6 +931,7 @@ function Cart({
             {t("cart.title")}
           </h2>
           {list}
+          {lines.length === 1 && <p className="text-sm text-muted">{t("cart.emptyHint")}</p>}
           {totals}
           <p className="rounded-xl bg-primary/10 px-3 py-2 text-center text-sm font-semibold text-primary">{t("cart.trial")}</p>
         </div>

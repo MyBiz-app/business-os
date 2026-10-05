@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { CtaBand, Faq } from "@/components/marketing/sections";
+import { ModuleIcon } from "@/components/modules/module-icon";
 import { API_URL } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 
@@ -106,20 +107,22 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
             })}
           </section>
 
-          <section aria-labelledby="tiers-heading" className="mx-auto grid w-full max-w-6xl gap-6 px-6 pb-12 lg:grid-cols-2">
-            <div className="card flex flex-col gap-4 p-6">
-              <h2 id="tiers-heading" className="text-lg font-semibold">
-                {t("core")}
-              </h2>
-              <p className="text-sm text-muted">{t("coreText")}</p>
-              <ul className="flex flex-col divide-y divide-border">
+          <section aria-labelledby="tiers-heading" className="mx-auto w-full max-w-6xl px-6 pb-12">
+            <div className="card-accent flex flex-col gap-5 p-6 sm:p-8">
+              <div className="flex flex-col gap-1">
+                <h2 id="tiers-heading" className="text-2xl font-extrabold tracking-tight">
+                  {t("core")}
+                </h2>
+                <p className="text-muted">{t("coreText")}</p>
+              </div>
+              <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                 {catalog.core.map((tier) => (
-                  <li key={tier.up_to_clients ?? "custom"} className="flex items-center justify-between gap-3 py-3">
-                    <span>{tier.up_to_clients ? t("upTo", { count: tier.up_to_clients }) : t("custom")}</span>
-                    <span className="font-semibold">
+                  <li key={tier.up_to_clients ?? "custom"} className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4">
+                    <span className="text-sm text-muted">{tier.up_to_clients ? t("upTo", { count: tier.up_to_clients }) : t("custom")}</span>
+                    <span className="text-xl font-extrabold">
                       {tier.up_to_clients ? (
                         <>
-                          <bdi>{money(tier.price)}</bdi> {t("perMonth")}
+                          <bdi>{money(tier.price)}</bdi> <span className="text-sm font-medium text-muted">{t("perMonth")}</span>
                         </>
                       ) : (
                         t("customPrice")
@@ -129,25 +132,45 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                 ))}
               </ul>
             </div>
-            <div className="card flex flex-col gap-4 p-6">
-              <h2 className="text-lg font-semibold">{t("modulesTitle")}</h2>
-              <ul className="flex flex-col divide-y divide-border">
-                {catalog.modules.map((module) => (
-                  <li key={module.key} className="flex items-center justify-between gap-3 py-3">
-                    <span className="flex items-center gap-2">
-                      {tModules(`names.${module.key}` as "names.client_app")}
-                      {!module.available && (
-                        <span className="rounded-full bg-foreground/8 px-2 py-0.5 text-xs font-medium text-muted">{tModules("comingSoon")}</span>
-                      )}
-                    </span>
-                    <span className="font-semibold">
-                      <bdi>{money(module.price)}</bdi> {t("perMonth")}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </section>
+          <section aria-labelledby="modules-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12">
+            <div className="flex flex-col gap-2 text-center">
+              <h2 id="modules-heading" className="text-3xl font-extrabold tracking-tight">
+                {t("modulesTitle")}
+              </h2>
+              <p className="text-muted">{t("modulesText")}</p>
+            </div>
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[...catalog.modules].sort((x, y) => Number(y.available) - Number(x.available)).map((module) => (
+                <li
+                  key={module.key}
+                  className={`card group flex flex-col gap-3 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+                    module.available ? "" : "opacity-80"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <ModuleIcon module={module.key} />
+                    {!module.available && (
+                      <span className="rounded-full bg-foreground/8 px-2.5 py-1 text-xs font-semibold text-muted">{tModules("comingSoon")}</span>
+                    )}
+                  </div>
+                  <h3 className="text-lg font-bold">{tModules(`names.${module.key}` as "names.client_app")}</h3>
+                  <p className="flex-1 text-sm text-muted">
+                    {module.key === "extra_location"
+                      ? tModules("descriptions.extra_location", { price: money(module.price) })
+                      : tModules(`descriptions.${module.key}` as "descriptions.client_app")}
+                  </p>
+                  <p className="flex items-baseline gap-1 border-t border-border pt-3">
+                    <span className="text-2xl font-extrabold">
+                      + <bdi>{money(module.price)}</bdi>
+                    </span>
+                    <span className="text-sm text-muted">{t("perMonth")}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+
           <p className="px-6 text-center text-sm text-muted">{t("note")}</p>
         </>
       )}
