@@ -41,7 +41,7 @@ export async function BusinessMenu({ name, logo, current, memberships, branchNam
         <ChevronsUpDown aria-hidden="true" className="size-4 shrink-0 text-muted" />
         <span className="sr-only">{t("switch")}</span>
       </summary>
-      <div className="enter absolute inset-x-0 top-full z-30 mt-1 flex flex-col gap-1 rounded-2xl bg-surface p-2 shadow-xl ring-1 ring-border">
+      <div className="absolute inset-x-0 top-full z-30 mt-1 flex flex-col gap-1 rounded-2xl bg-surface p-2 shadow-xl ring-1 ring-border">
         <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-muted">{t("myBusinesses")}</p>
         <ul className="flex flex-col">
           {memberships.map((m) => (
@@ -63,7 +63,7 @@ export async function BusinessMenu({ name, logo, current, memberships, branchNam
           ))}
         </ul>
         <div className="my-1 border-t border-border" />
-        <Link href="/businesses" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-background">
+        <Link href="/businesses" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground hover:bg-background">
           <LayoutGrid aria-hidden="true" className="size-4 text-muted" />
           {t("allBusinesses")}
         </Link>

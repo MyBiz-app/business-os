@@ -354,7 +354,9 @@
     },
     "absentFilter": "ביקור אחרון",
     "absentAny": "בכל זמן",
-    "absentDays": "לא הגיעו {days} ימים"
+    "absentDays": "לא הגיעו {days} ימים",
+    "homeBranch": "סניף הבית",
+    "allBranches": "כל הסניפים"
   },
   "common": {
     "save": "שמירה",
@@ -456,7 +458,12 @@
     "roleCreated": "התפקיד נוצר.",
     "roleMembers": "{count, plural, =0 {אף אחד לא בתפקיד הזה.} one {אדם אחד בתפקיד הזה.} other {# אנשים בתפקיד הזה.}}",
     "deleteRole": "מחיקת התפקיד",
-    "deleteRoleConfirm": "למחוק את התפקיד \"{name}\"?"
+    "deleteRoleConfirm": "למחוק את התפקיד \"{name}\"?",
+    "branchesOf": "הסניפים של {email}",
+    "allBranches": "כל הסניפים",
+    "someBranches": "{count} סניפים",
+    "branchesHint": "איפה הם עובדים. בלי סימון: כל הסניפים.",
+    "saveBranches": "שמירה"
   },
   "invite": {
     "title": "הוזמנת להצטרף",
@@ -967,7 +974,8 @@
       "extra_location": "{price} לכל סניף מעבר לראשון.",
       "crm": "צינור לידים: פניות מטופס אונליין, מעקב שיחות, תזכורות חזרה והמרה ללקוחות.",
       "whatsapp": "הודעות ללקוחות ולידים: תפוצה לקהל מסוים, תבניות והיסטוריית שליחה."
-    }
+    },
+    "followsBranches": "לפי הסניפים הפעילים שלך"
   },
   "platform": {
     "title": "קונסולת MyBiz",
@@ -1305,7 +1313,10 @@
     "lastVisit": "ביקור אחרון {date}",
     "neverVisited": "עוד לא הגיע/ה",
     "planEnds": "המנוי מסתיים {date}",
-    "showAll": "הצגת כל ה-{count}"
+    "showAll": "הצגת כל ה-{count}",
+    "byBranch": "לפי סניף",
+    "branch": "סניף",
+    "noBranch": "ללא סניף"
   },
   "email": {
     "greeting": "שלום {name},",
@@ -2874,5 +2885,18 @@
     "newBusiness": "הוספת עסק",
     "branch": "סניף",
     "allBranches": "כל הסניפים"
+  },
+  "businesses": {
+    "title": "העסקים שלי",
+    "summary": "{businesses, plural, one {עסק אחד} other {# עסקים}} · {branches, plural, one {סניף אחד} other {# סניפים}}",
+    "add": "הוספת עסק",
+    "addHint": "עסק נוסף שלך, עם תחום, צוות, לקוחות וחבילה משלו.",
+    "open": "פתוח עכשיו",
+    "branches": "{count, plural, one {סניף אחד} other {# סניפים}}",
+    "more": "+{count} נוספים",
+    "today": "שיעורים ותורים היום",
+    "activeClients": "לקוחות פעילים",
+    "revenue": "הכנסות החודש",
+    "enter": "כניסה ל{name}"
   }
 }

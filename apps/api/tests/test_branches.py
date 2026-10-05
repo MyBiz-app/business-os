@@ -186,3 +186,30 @@ def test_migration_files_existing_rows_of_single_branch_businesses(engine: Engin
             {"t": tenant},
         ).scalar_one()
     assert home == branch
+
+
+def test_my_businesses_shows_each_business_with_its_branches(
+    client: TestClient, engine: Engine, auth: AuthHeaders
+) -> None:
+    owner = uuid4()
+    pizza = client.post(
+        "/tenants",
+        json={**STUDIO, "name": "Pizza", "modules": {"extra_location": 3}},
+        headers=auth(owner),
+    ).json()
+    barber = client.post(
+        "/tenants", json={**STUDIO, "name": "Barber", "vertical": "barbershop"}, headers=auth(owner)
+    ).json()
+    # In a third business they are only staff: no money figures there.
+    other_owner = uuid4()
+    gym = client.post("/tenants", json={**STUDIO, "name": "Gym"}, headers=auth(other_owner)).json()
+    add_member(engine, gym["id"], owner, "staff")
+
+    found = client.get("/me/businesses", headers=auth(owner)).json()
+    by_name = {b["name"]: b for b in found}
+    assert list(by_name) == ["Pizza", "Barber", "Gym"]
+    assert len(by_name["Pizza"]["branches"]) == 4 and len(by_name["Barber"]["branches"]) == 1
+    assert by_name["Barber"]["vertical"] == "barbershop" and by_name["Pizza"]["role"] == "owner"
+    assert by_name["Pizza"]["revenue_month"] == 0 and by_name["Pizza"]["active_clients"] == 0
+    assert by_name["Gym"]["role"] == "staff" and by_name["Gym"]["revenue_month"] is None
+    assert {b["tenant_id"] for b in found} == {pizza["id"], barber["id"], gym["id"]}

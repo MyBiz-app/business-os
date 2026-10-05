@@ -7,20 +7,18 @@ import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
-import { getTenant } from "@/lib/tenant";
+import { getBranches, getTenant } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
 import { BranchPicker } from "./_menu/branch-picker";
 import { BusinessMenu } from "./_menu/business-menu";
 
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
-  const { tenant, me, api, scope, branch } = await getTenant();
+  const { tenant, me, branch } = await getTenant();
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
   // The branch picker appears once the business has more than one active branch.
-  const branches = tenant.permissions.includes("catalog.read")
-    ? ((await api.GET("/locations", { params: scope })).data ?? []).filter((b) => b.active)
-    : [];
+  const branches = await getBranches();
   const currentBranch = branches.find((b) => b.id === branch) ?? null;
 
   // Only what the user's permissions let them open.

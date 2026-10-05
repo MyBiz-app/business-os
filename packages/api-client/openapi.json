@@ -285,6 +285,36 @@
         }
       }
     },
+    "/me/businesses": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "List My Businesses",
+        "operationId": "list_my_businesses",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessSummary"
+                  },
+                  "type": "array",
+                  "title": "Response List My Businesses"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/clients/import": {
       "post": {
         "tags": [
@@ -13493,6 +13523,110 @@
         ],
         "title": "BusinessProfile",
         "description": "What anyone holding a join code may see before signing in."
+      },
+      "BusinessSummary": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "vertical": {
+            "type": "string",
+            "title": "Vertical"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "manager",
+              "staff",
+              "front_desk"
+            ],
+            "title": "Role"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "branches": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Branches",
+            "description": "Names of the active branches"
+          },
+          "sessions_today": {
+            "type": "integer",
+            "title": "Sessions Today"
+          },
+          "active_clients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active Clients",
+            "description": "Null when the role may not read reports"
+          },
+          "revenue_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revenue Month",
+            "description": "Minor units; null without reports.read"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "vertical",
+          "role",
+          "logo_url",
+          "primary_color",
+          "currency",
+          "branches",
+          "sessions_today",
+          "active_clients",
+          "revenue_month"
+        ],
+        "title": "BusinessSummary"
       },
       "Campaign": {
         "properties": {

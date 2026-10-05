@@ -18,19 +18,17 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 | 3 — MyBiz console | Team levels and permissions, working inside a business, actions, support inbox, audit | ✅ Done | #29 |
 | 4 — Apps | Business app and MyBiz team app built, shared app kit | 🟡 Mostly done | #35 |
 | 5 — Industries | Category → sub-category template in one catalog ([how to add one](verticals.md)); five main categories with 25 sub-categories; five more coming soon | ✅ Done | #30 |
-| 6 — Businesses and branches | One owner with several businesses, each with several branches; my businesses, current branch, numbers per branch; full demo | 🔵 In progress | #55 |
+| 6 — Businesses and branches | One owner with several businesses, each with several branches. Done: my businesses, business menu, current branch, data and numbers per branch, branches per team member, extra-branch charge follows branches. Left: full demo on staging | 🔵 In progress | #55 |
 | 7 — More categories | Core capabilities that open the future categories | ⚪ Planned | #33 |
 | Go-live | Real payments, invoicing, email, WhatsApp, AI key, hardening, store builds | ⚪ When the owner decides | #34 |
 
 ## In progress
 
-- [#56](https://github.com/adiredri/business-os/issues/56) Branches everywhere: a current branch, filters and data per branch
+- [#58](https://github.com/adiredri/business-os/issues/58) Full demo: an owner with two businesses (5 and 3 branches) on staging
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next
 
-- [#57](https://github.com/adiredri/business-os/issues/57) My businesses page and switcher in the menu
-- [#58](https://github.com/adiredri/business-os/issues/58) Full demo: an owner with two businesses (5 and 3 branches) on staging
 - [#39](https://github.com/adiredri/business-os/issues/39) Client app: final polish
 - [#40](https://github.com/adiredri/business-os/issues/40) Architecture review after phase 4
 
@@ -55,5 +53,5 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 ## Health
 
 - CI (lint, typecheck, tests, build) runs on every pull request; `main` is green.
-- About 270 API tests and 26 end-to-end browser flows, including accessibility (WCAG AA) and dark mode.
+- About 280 API tests and 27 end-to-end browser flows, including accessibility (WCAG AA) and dark mode.
 - Paid services run in simulated mode until go-live (spec section 10).

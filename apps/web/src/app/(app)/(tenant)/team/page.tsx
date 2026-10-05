@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
 import { canManageTeam } from "@/lib/permissions";
-import { getTenant } from "@/lib/tenant";
+import { getBranches, getTenant } from "@/lib/tenant";
 
 import { revokeInvitation } from "./actions";
 import { InviteForm, MemberRow } from "./team-forms";
@@ -13,6 +13,7 @@ export default async function TeamPage() {
   const t = await getTranslations();
   const locale = await getLocale();
   const { me, tenant, api, scope } = await getTenant();
+  const branches = await getBranches();
   if (!canManageTeam(tenant)) redirect("/dashboard");
 
   const [team, roles] = await Promise.all([
@@ -49,6 +50,8 @@ export default async function TeamPage() {
               customRoles={roles.custom.map(({ id, name }) => ({ id, name }))}
               isSelf={member.user_id === me.id}
               allowOwner={isOwner}
+              branches={branches}
+              memberBranches={member.location_ids}
             />
           ))}
         </ul>

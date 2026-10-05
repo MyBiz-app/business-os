@@ -18,7 +18,7 @@ export function ModulesForm({ catalog, selection, activeClients }: Props) {
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <ModulePicker catalog={catalog} initial={selection} activeClients={activeClients} name="modules" />
+      <ModulePicker catalog={catalog} initial={selection} activeClients={activeClients} name="modules" branchesFollowLocations />
       <div>
         <SubmitButton>{t("common.save")}</SubmitButton>
       </div>

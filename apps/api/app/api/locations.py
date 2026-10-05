@@ -90,7 +90,8 @@ def _load_locations(session: Session, location_id: UUID | None = None) -> list[L
     where, params = ("WHERE id = :id", {"id": location_id}) if location_id else ("", {})
     locations = session.execute(
         text(
-            f"SELECT {LOCATION_COLUMNS} FROM app.locations {where} ORDER BY active DESC, created_at, name"
+            f"SELECT {LOCATION_COLUMNS} FROM app.locations {where}"
+            " ORDER BY active DESC, created_at, name"
         ),
         params,
     ).mappings()

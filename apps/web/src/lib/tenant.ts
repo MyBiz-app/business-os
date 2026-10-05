@@ -50,6 +50,13 @@ export const getTenant = cache(async () => {
   return { me, tenant, api, scope, branch: scope.header["X-Location-Id"] ?? null };
 });
 
+/** The business's active branches (empty when the person may not read them). */
+export const getBranches = cache(async () => {
+  const { tenant, api, scope } = await getTenant();
+  if (!tenant.permissions.includes("catalog.read")) return [];
+  return ((await api.GET("/locations", { params: scope })).data ?? []).filter((b) => b.active).map(({ id, name }) => ({ id, name }));
+});
+
 export async function setActiveBranch(tenantId: string, branchId: string | null) {
   const store = await cookies();
   if (!branchId) store.delete(branchCookie(tenantId));

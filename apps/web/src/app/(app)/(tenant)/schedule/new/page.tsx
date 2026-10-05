@@ -14,7 +14,7 @@ import { SessionForm } from "../session-form";
 export default async function NewSessionPage({ searchParams }: PageProps<"/schedule/new">) {
   const t = await getTranslations("schedule");
   const tAll = await getTranslations();
-  const { tenant, api, scope } = await getTenantFor("schedule.read");
+  const { tenant, api, scope, branch } = await getTenantFor("schedule.read");
   if (!canWriteSchedule(tenant)) redirect("/schedule");
   const { date } = await searchParams;
   const options = unwrap(await api.GET("/sessions/options", { params: scope }));
@@ -33,7 +33,8 @@ export default async function NewSessionPage({ searchParams }: PageProps<"/sched
         <SessionForm
           action={createSessions}
           options={options}
-          defaults={{ date: isDay(date) ? date : todayIn(tenant.time_zone) }}
+          // New sessions start in the current branch.
+          defaults={{ date: isDay(date) ? date : todayIn(tenant.time_zone), place: branch ? `${branch}:` : "" }}
           submitLabel={t("create")}
           allowRepeat
         />

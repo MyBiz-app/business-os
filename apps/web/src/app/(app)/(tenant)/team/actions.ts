@@ -64,6 +64,23 @@ export async function changeRole(userId: string, _state: TeamState, formData: Fo
   return {};
 }
 
+/** The branches a member works at (none checked: all branches). */
+export async function setBranches(userId: string, _state: TeamState, formData: FormData): Promise<TeamState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(
+      await api.PUT("/staff/{user_id}/branches", {
+        params: { ...scope, path: { user_id: userId } },
+        body: { location_ids: formData.getAll("location_ids").map(String) },
+      }),
+    );
+  } catch (error) {
+    return { error: toError(error) };
+  }
+  revalidatePath("/team");
+  return {};
+}
+
 function assignment(value: string): { role: Role } | { custom_role_id: string } {
   return value.startsWith("custom:") ? { custom_role_id: value.slice("custom:".length) } : { role: value as Role };
 }

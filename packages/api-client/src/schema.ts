@@ -77,6 +77,23 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/me/businesses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List My Businesses */
+        get: operations["list_my_businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/import": {
         parameters: {
             query?: never;
@@ -2978,6 +2995,46 @@ export interface components {
              * @default false
              */
             inquiries: boolean;
+        };
+        /** BusinessSummary */
+        BusinessSummary: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Vertical */
+            vertical: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "owner" | "manager" | "staff" | "front_desk";
+            /** Logo Url */
+            logo_url: string | null;
+            /** Primary Color */
+            primary_color: string | null;
+            /** Currency */
+            currency: string;
+            /**
+             * Branches
+             * @description Names of the active branches
+             */
+            branches: string[];
+            /** Sessions Today */
+            sessions_today: number;
+            /**
+             * Active Clients
+             * @description Null when the role may not read reports
+             */
+            active_clients: number | null;
+            /**
+             * Revenue Month
+             * @description Minor units; null without reports.read
+             */
+            revenue_month: number | null;
         };
         /** Campaign */
         Campaign: {
@@ -6303,6 +6360,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_my_businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessSummary"][];
                 };
             };
         };
