@@ -13,7 +13,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 - Before a significant product/architecture decision, propose it and wait for the owner's answer.
   Record every decision in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 - Keep the project status current: with every merged pull request update [`docs/STATUS.md`](docs/STATUS.md)
-  and the GitHub issues (labels `status: in progress` / `status: planned` / `status: needs decision`;
+  and its Hebrew twin [`docs/STATUS.he.md`](docs/STATUS.he.md) (for the owner), and the GitHub issues (labels `status: in progress` / `status: planned` / `status: needs decision`;
   pull requests close their issues).
 - Build small, vertical slices end-to-end (DB → API → Web → Mobile). Every slice must keep tenant
   isolation, i18n/RTL, dark mode and accessibility intact.
@@ -26,7 +26,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 | `docs/spec/v1/` | Original owner spec (Hebrew + English .docx) |
 | `docs/spec/v2/` | Current working spec (source of truth) |
 | `docs/DECISIONS.md` | Decision log |
-| `docs/STATUS.md` | Project status board (done, in progress, next) |
+| `docs/STATUS.md`, `docs/STATUS.he.md` | Project status board (done, in progress, next), English and Hebrew |
 | `docs/verticals.md` | Industries: the category catalog and how to add a category |
 
 ## Non-negotiable principles
