@@ -627,7 +627,10 @@
       "back": "Back",
       "unknownCode": "We couldn't find a business with that code.",
       "generic": "Something went wrong. Try again.",
-      "noApp": "This business doesn't offer the app yet. Ask them about it."
+      "noApp": "This business doesn't offer the app yet. Ask them about it.",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "nameRequired": "Please enter your first name, so the business knows who you are."
     },
     "home": {
       "greeting": "Hi {name}",
@@ -2499,7 +2502,9 @@
       },
       "signOut": "Sign out",
       "name": "Your name",
-      "save": "Save"
+      "save": "Save",
+      "branch": "Branch",
+      "allBranches": "All branches"
     }
   },
   "staffApp": {

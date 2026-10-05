@@ -51,6 +51,7 @@ with sync_playwright() as p:
     member.get_by_role("button", name="שליחת קוד").click()
     member.get_by_label("קוד בן 6 ספרות").fill(h.otp(member_email))
     member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join**")
+    member.get_by_label("שם פרטי").fill("נועה")
     member.get_by_role("button", name="הצטרפות לסלון רוני").click(); member.wait_for_url("**/home")
 
     # Yesterday's visit, attended (set up directly in the database).

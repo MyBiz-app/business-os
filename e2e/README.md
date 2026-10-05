@@ -53,6 +53,8 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
 
+`client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.
+
 `business_app.py <owner email with data>` (needs `pnpm --filter business-app exec expo start --web --port 8082`): the business app — today, a session's roster and check-in, a client, the numbers.
 
 `staff_app.py <team email>` (needs `pnpm --filter staff-app exec expo start --web --port 8083`): the MyBiz team app — what needs attention, businesses, and handling a request.

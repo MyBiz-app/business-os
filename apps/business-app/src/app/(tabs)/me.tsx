@@ -19,7 +19,7 @@ const THEMES = ["system", "light", "dark"] as const;
 export default function Me() {
   const t = useTranslations("business.me");
   const tRoles = useTranslations("roles");
-  const { palette, memberships, tenant, select, api, refresh } = useBusiness();
+  const { palette, memberships, tenant, select, api, refresh, branches, branch, selectBranch } = useBusiness();
   const { session } = useSession();
   const { locale, setLocale } = useLocaleSetting();
   const { preference, setPreference } = useTheme();
@@ -74,6 +74,22 @@ export default function Me() {
                 variant={membership.tenant_id === tenant?.id ? "primary" : "secondary"}
                 palette={palette}
                 onPress={() => void select(membership.tenant_id)}
+              />
+            </View>
+          ))}
+        </Card>
+      )}
+
+      {branches.length > 1 && (
+        <Card palette={palette}>
+          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("branch")}</Text>
+          {[{ id: null, name: t("allBranches") }, ...branches].map((option) => (
+            <View key={option.id ?? "all"}>
+              <Button
+                label={option.name}
+                variant={(branch?.id ?? null) === option.id ? "primary" : "secondary"}
+                palette={palette}
+                onPress={() => void selectBranch(option.id)}
               />
             </View>
           ))}
