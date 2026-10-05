@@ -1,10 +1,14 @@
+import { categories } from "@business-os/verticals";
 import { Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { industryTexts } from "@/lib/verticals";
+
 export async function MarketingFooter() {
   const t = await getTranslations("marketing");
   const tApp = await getTranslations("app");
+  const { text } = industryTexts(await getTranslations());
   const columns = [
     {
       title: t("footer.product"),
@@ -18,10 +22,12 @@ export async function MarketingFooter() {
     },
     {
       title: t("nav.industries"),
-      links: (["fitness", "beauty", "clinic", "garage"] as const).map((key) => ({
-        href: `/industries/${key}`,
-        label: t(`industries.items.${key}.name`),
-      })),
+      links: [
+        ...categories()
+          .filter((c) => c.status !== "planned")
+          .map(({ key }) => ({ href: `/industries/${key}`, label: text(key, "name") })),
+        { href: "/industries", label: t("industries.all") },
+      ],
     },
     {
       title: t("footer.company"),

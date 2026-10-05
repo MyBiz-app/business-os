@@ -4,7 +4,7 @@ Version 3 · October 2026 · Working document. The decision log (docs/DECISIONS.
 
 ## 1. What MyBiz is
 
-MyBiz is an operating system for small and medium service businesses: studios and gyms, hair and beauty salons, clinics, garages and more. One platform runs the business day to day — schedule and appointments, clients, plans and payments, leads, messages, reports and an AI assistant — and gives every business its own branded app for its clients.
+MyBiz is an operating system for small and medium service businesses: fitness and training, beauty and spa, clinics and health, classes and lessons, automotive services and more, each on equal footing. One platform runs the business day to day — schedule and appointments, clients, plans and payments, leads, messages, reports and an AI assistant — and gives every business its own branded app for its clients.
 
 - Market: Israel first (Hebrew, right-to-left, shekels), then the US and Europe (English).
 - Model: software as a service. A business pays a monthly subscription built from modules; a 14-day free trial first.
@@ -50,16 +50,59 @@ Rules: every level can only give permissions it holds itself; only owners create
 
 A client signs in to the client app with an email code, joins businesses with a join code or QR, and only ever sees their own data.
 
-## 4. Industries (vertical packs)
+## 4. Industries: categories and sub-categories
 
-| Pack | Clients are | Booking | Starter content | Extra client details |
+The fitness studio was the prototype. Every industry now stands on equal footing: no industry is "the main one", and the core never asks which industry a business belongs to. Industries are organized in two levels:
+
+- **Category**: a family of businesses that work the same way, for example "Beauty & Spa". It defines the shared defaults: what clients are called, how they book (group classes, one-to-one appointments or both), cancellation policy, whether a plan is needed to book, a health declaration, the client details the business keeps, and the starter services and plans.
+- **Sub-category**: a specific kind of business inside the family, for example "Barbershop" or "Nail studio". It inherits everything from its category and overrides only what differs, usually its name, its starter services and sometimes an extra client detail. A sub-category can have sub-categories of its own when needed.
+
+A business picks its sub-category (or only the category) when it signs up. The choice sets its starting point, and everything stays editable afterwards.
+
+### 4.1 The five main categories
+
+Chosen because the current core already serves them fully (schedule, appointments, plans, client app) and together they cover most service businesses in Israel.
+
+| Category | Sub-categories | Clients are | Booking | Typical client details |
 |---|---|---|---|---|
-| Fitness | members | group classes (+ personal sessions) | memberships, punch cards | goal, injuries; health declaration |
-| Beauty | clients | appointments | haircuts, color, beard | hair type, color formula, allergies |
-| Clinic | patients | appointments | first visit, treatment, follow-up | ID number, health fund, referred by, allergies |
-| Garage | customers | appointments | periodic service, oil change, diagnostics | plate, make, model, year, mileage, next inspection |
+| Fitness & Training | gym, pilates studio, yoga studio, CrossFit box, functional training, personal trainer | members | group classes, personal sessions; memberships and punch cards | goal, injuries; health declaration |
+| Beauty & Spa | hair salon, barbershop, cosmetics and facials, nails, laser hair removal, spa and massage | clients | appointments | hair type, color formula, skin type, allergies |
+| Clinics & Health | physiotherapy and rehabilitation, dental clinic, nutrition, aesthetic clinic, therapy and coaching | patients | appointments, treatment series | ID number, health fund, referred by, allergies |
+| Classes & Lessons | dance, martial arts, music lessons, private tutoring, kids' activities | students | weekly classes and private lessons; term and monthly plans | level, parent's contact (for children) |
+| Automotive | garage, detailing and car wash, tires | customers | appointments | plate, make, model, year, mileage, next inspection |
 
-Adding an industry means adding a pack: words, default services and plans, client fields, policies.
+Several industries in the original list live inside these as sub-categories: wellness and spa (Beauty & Spa); rehabilitation, nutrition, therapy and coaching (Clinics & Health); education, dance, music and kids' activities (Classes & Lessons).
+
+### 4.2 The category template
+
+Every category and sub-category is one entry in a shared catalog that the API, the website and the apps all read, so adding one never means changing code across the system. An entry holds:
+
+| Part | What it sets |
+|---|---|
+| Identity | key, parent (for a sub-category), icon and color, status (live, beta, planned) |
+| Words | what clients are called and every industry word in the interface, in Hebrew and English |
+| Booking | booking modes, cancellation window, plan required to book, health declaration |
+| Starter content | services (name, duration, price per currency, color) and plans (membership or punch card) |
+| Client details | extra fields the business keeps (text, number, date, choice) |
+| Modules | the recommended starting set of modules |
+| Marketing | name, short line, three benefits and the industry page text, in both languages |
+
+To open a new category or sub-category: run the generator (`pnpm vertical:new <key> --parent <category>`), fill in the entry and its texts, and the checks confirm it is complete (both languages, valid prices, a known parent and module set). It then appears on the marketing site, in the sign-up journey, in onboarding, in the contact form and in the apps by itself. A category marked "planned" shows on the site as "coming soon" with a "tell me when" option, before it is open for sign-up.
+
+### 4.3 Future categories (catalog)
+
+These need one new capability in the core first. Each capability is built once for the core and then serves every category that needs it.
+
+| Category | Examples | New capability it needs |
+|---|---|---|
+| Sports & facility booking | football, tennis and padel academies; courts, rehearsal and studio rooms, meeting rooms by the hour | Resources: booking a court, room or space by the hour, alongside or without a staff member |
+| Home & field services | cleaning, air conditioning, electricians, plumbers, pest control | On-site jobs: the client's address, travel time, assigning a technician, quotes |
+| Pet services | dog grooming, training, boarding, dog day care | Dependents: several profiles under one client (pets; also children for Kids & Youth) |
+| Kids & Youth (full) | enrichment centers, camps, toddler gyms | Dependents and parent accounts |
+| Creative & events | photographers and studios, DJs, event suppliers, small venues | Quotes, deposits and event projects |
+| Professional services | consultants, accountants, lawyers, agencies | Documents and retainers, time-based billing |
+
+Until a category opens, interested businesses can leave their details through the contact form, which records the industry.
 
 ## 5. Modules and pricing
 
@@ -171,6 +214,10 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
 | 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
+| 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | Done |
+| 6 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories | Planned |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
+
+The live status of the work — done, in progress and next — is kept in `docs/STATUS.md` and in the repository's GitHub issues, updated with every merged change.
 
 Each phase ends with a review: every page and button checked, accessibility and dark mode, tests, and a tidy codebase.

@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { termsOf } from "@business-os/verticals";
 
 import { Avatar } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
@@ -42,7 +43,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       },
     }),
   );
-  const term = (key: string) => t(`terms.${tenant.vertical}.${key}` as "terms.fitness.clients");
+  const term = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
   const pages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
   const pageHref = (target: number) => {
     const query = new URLSearchParams();

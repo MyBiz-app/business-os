@@ -10,7 +10,7 @@ import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { verticalOf } from "@business-os/app-kit/lib/vertical";
+import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 const DAYS = 14;
@@ -115,7 +115,7 @@ export default function Schedule() {
       )}
 
       {closed && sessions.length === 0 ? null : sessions.length === 0 ? (
-        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : tTerms(`${verticalOf(business)}.appEmpty`)}</Text>
+        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : tTerms(`${termsFor(business)}.appEmpty`)}</Text>
       ) : (
         <View style={local.list}>
           {sessions.map((session) => (

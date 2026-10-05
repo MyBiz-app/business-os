@@ -1,0 +1,386 @@
+{
+  "key": "clinic",
+  "order": 3,
+  "status": "live",
+  "icon": "stethoscope",
+  "color": "from-teal-500 to-emerald-500",
+  "terms": "clinic",
+  "client_term": "patient",
+  "booking_modes": [
+    "appointment"
+  ],
+  "cancellation_window_minutes": 1440,
+  "booking_requires_plan": false,
+  "default_preset": "growing",
+  "recommended_modules": [
+    "whatsapp"
+  ],
+  "client_fields": [
+    {
+      "key": "id_number",
+      "kind": "text",
+      "max_length": 20
+    },
+    {
+      "key": "health_fund",
+      "kind": "select",
+      "options": [
+        "clalit",
+        "maccabi",
+        "meuhedet",
+        "leumit",
+        "private"
+      ]
+    },
+    {
+      "key": "referred_by",
+      "kind": "text"
+    },
+    {
+      "key": "allergies",
+      "kind": "text"
+    }
+  ],
+  "default_services": [
+    {
+      "names": {
+        "he": "פגישת היכרות",
+        "en": "First visit"
+      },
+      "duration_minutes": 60,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 35000
+      },
+      "color": "#14b8a6"
+    },
+    {
+      "names": {
+        "he": "טיפול",
+        "en": "Treatment"
+      },
+      "duration_minutes": 45,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 30000
+      },
+      "color": "#6366f1"
+    },
+    {
+      "names": {
+        "he": "פגישת מעקב",
+        "en": "Follow-up"
+      },
+      "duration_minutes": 30,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 20000
+      },
+      "color": "#8b5cf6"
+    }
+  ],
+  "children": [
+    {
+      "key": "physiotherapy",
+      "status": "live",
+      "extra_client_fields": [
+        {
+          "key": "injury",
+          "kind": "long_text",
+          "max_length": 1000
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "אבחון ראשוני",
+            "en": "Initial assessment"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 35000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "טיפול פיזיותרפיה",
+            "en": "Physiotherapy session"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 28000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "שיקום ספורט",
+            "en": "Sports rehabilitation"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 32000
+          },
+          "color": "#f59e0b"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "סדרת 10 טיפולים",
+            "en": "Series of 10 sessions"
+          },
+          "kind": "punch_card",
+          "validity_days": 180,
+          "credits": 10,
+          "prices": {
+            "ILS": 250000
+          }
+        }
+      ]
+    },
+    {
+      "key": "dental",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "בדיקה תקופתית",
+            "en": "Check-up"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "ניקוי אבנית (שיננית)",
+            "en": "Hygienist cleaning"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 30000
+          },
+          "color": "#0ea5e9"
+        },
+        {
+          "names": {
+            "he": "סתימה",
+            "en": "Filling"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 50000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "הלבנת שיניים",
+            "en": "Teeth whitening"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 120000
+          },
+          "color": "#f59e0b"
+        }
+      ]
+    },
+    {
+      "key": "nutrition",
+      "status": "live",
+      "extra_client_fields": [
+        {
+          "key": "dietary_restrictions",
+          "kind": "text"
+        },
+        {
+          "key": "goal",
+          "kind": "select",
+          "options": [
+            "weight_loss",
+            "strength",
+            "flexibility",
+            "rehab",
+            "general"
+          ]
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת ייעוץ ראשונה",
+            "en": "First consultation"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 40000
+          },
+          "color": "#22c55e"
+        },
+        {
+          "names": {
+            "he": "פגישת מעקב",
+            "en": "Follow-up"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "מדידת הרכב גוף",
+            "en": "Body composition scan"
+          },
+          "duration_minutes": 20,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#f59e0b"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "ליווי — 4 פגישות מעקב",
+            "en": "Coaching — 4 follow-ups"
+          },
+          "kind": "punch_card",
+          "validity_days": 90,
+          "credits": 4,
+          "prices": {
+            "ILS": 70000
+          }
+        }
+      ]
+    },
+    {
+      "key": "aesthetics",
+      "status": "live",
+      "extra_client_fields": [
+        {
+          "key": "medications",
+          "kind": "text"
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת ייעוץ",
+            "en": "Consultation"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "בוטוקס",
+            "en": "Botox"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 120000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "חומרי מילוי",
+            "en": "Fillers"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 180000
+          },
+          "color": "#ec4899"
+        },
+        {
+          "names": {
+            "he": "טיפול עור",
+            "en": "Skin treatment"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 60000
+          },
+          "color": "#f59e0b"
+        }
+      ]
+    },
+    {
+      "key": "therapy",
+      "status": "live",
+      "client_fields": [
+        {
+          "key": "referred_by",
+          "kind": "text"
+        },
+        {
+          "key": "emergency_contact",
+          "kind": "text"
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת היכרות",
+            "en": "Intake session"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 45000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "פגישה",
+            "en": "Session"
+          },
+          "duration_minutes": 50,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 40000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "פגישה זוגית",
+            "en": "Couples session"
+          },
+          "duration_minutes": 75,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 55000
+          },
+          "color": "#8b5cf6"
+        }
+      ]
+    }
+  ]
+}

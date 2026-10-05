@@ -8,11 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --test --experimental-strip-types src/lib/*.test.ts"
+    "test": "node --import @business-os/verticals/node-resolve --test --experimental-strip-types src/lib/*.test.ts"
   },
   "dependencies": {
     "@business-os/api-client": "workspace:*",
     "@business-os/i18n": "workspace:*",
+    "@business-os/verticals": "workspace:*",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.2",
     "lucide-react": "1.51.0",

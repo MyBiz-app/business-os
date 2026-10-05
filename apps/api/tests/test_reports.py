@@ -130,7 +130,10 @@ def test_members_at_risk(client: TestClient, engine: Engine, auth: AuthHeaders) 
     cutoff = local_today() - timedelta(days=14)
     for member in members:
         if member["reason"] == "inactive":
-            assert member["last_visit"] is None or date.fromisoformat(member["last_visit"]) < cutoff
+            # inactive means no visit for `days` exact days; a visit on the cutoff date
+            # earlier in the day than now already counts
+            last = member["last_visit"]
+            assert last is None or date.fromisoformat(last) <= cutoff
         else:
             ends = date.fromisoformat(member["plan_ends_on"])
             assert ends < local_today() + timedelta(days=14)

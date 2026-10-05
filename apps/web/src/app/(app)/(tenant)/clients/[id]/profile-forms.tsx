@@ -14,18 +14,18 @@ type Definition = components["schemas"]["ClientFieldDefinition"];
 
 type ProfileProps = {
   clientId: string;
-  vertical: string;
   fields: Definition[];
   values: Record<string, string | number>;
   readOnly: boolean;
 };
 
 /** The vertical pack's extra client fields, as a form. */
-export function ProfileForm({ clientId, vertical, fields, values, readOnly }: ProfileProps) {
-  const t = useTranslations("fields");
+export function ProfileForm({ clientId, fields, values, readOnly }: ProfileProps) {
+  const t = useTranslations("clientFields");
   const tCommon = useTranslations("clients");
   const [state, action] = useActionState(saveProfile.bind(null, clientId), {});
-  const label = (key: string) => t(`${vertical}.${key}` as "fitness.goal");
+  // Labels are shared by every industry that keeps the field (clientFields.<key>).
+  const label = (key: string) => t(key as "goal");
 
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -45,7 +45,7 @@ export function ProfileForm({ clientId, vertical, fields, values, readOnly }: Pr
                   { value: "", label: t("notSet") },
                   ...field.options.map((option) => ({
                     value: option,
-                    label: t(`${vertical}.${field.key}_options.${option}` as "fitness.goal_options.strength"),
+                    label: t(`${field.key}_options.${option}` as "goal_options.strength"),
                   })),
                 ]}
               />

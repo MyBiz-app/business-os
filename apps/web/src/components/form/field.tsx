@@ -40,10 +40,23 @@ export function TextAreaField({ label, ...textAreaProps }: TextAreaFieldProps) {
   );
 }
 
+export type SelectOption = { value: string; label: string; /** Options with the same group are listed together under it. */ group?: string };
+
 type SelectFieldProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
-  options: { value: string; label: string }[];
+  options: SelectOption[];
 };
+
+/** Consecutive options of one group, in order. */
+function grouped(options: SelectOption[]): { group?: string; options: SelectOption[] }[] {
+  const runs: { group?: string; options: SelectOption[] }[] = [];
+  for (const option of options) {
+    const last = runs.at(-1);
+    if (last && last.group === option.group) last.options.push(option);
+    else runs.push({ group: option.group, options: [option] });
+  }
+  return runs;
+}
 
 export function SelectField({ label, options, ...selectProps }: SelectFieldProps) {
   const id = useId();
@@ -53,11 +66,20 @@ export function SelectField({ label, options, ...selectProps }: SelectFieldProps
         {label}
       </label>
       <select id={id} className={CONTROL} {...selectProps}>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {grouped(options).map(({ group, options: run }) => {
+          const items = run.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ));
+          return group ? (
+            <optgroup key={`${group}:${run[0]!.value}`} label={group}>
+              {items}
+            </optgroup>
+          ) : (
+            items
+          );
+        })}
       </select>
     </div>
   );

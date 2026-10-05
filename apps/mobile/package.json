@@ -6,6 +6,7 @@
     "@business-os/api-client": "workspace:*",
     "@business-os/app-kit": "workspace:*",
     "@business-os/i18n": "workspace:*",
+    "@business-os/verticals": "workspace:*",
     "@expo/metro-runtime": "~57.0.16",
     "@expo/vector-icons": "^15.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",

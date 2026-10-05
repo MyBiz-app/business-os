@@ -1,0 +1,19 @@
+{
+  "name": "@business-os/verticals",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node-resolve": "./scripts/node-resolve.mjs"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import ./scripts/node-resolve.mjs --test --experimental-strip-types test/catalog.test.ts",
+    "export": "node scripts/export.mjs",
+    "new": "node scripts/new-vertical.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

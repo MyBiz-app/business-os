@@ -1,7 +1,7 @@
 # CLAUDE.md — Business OS (codename)
 
 Modular, multi-tenant Business OS + AI Workforce for small and medium businesses.
-Israel first (Hebrew), then US/EU (American English). First vertical: boutique fitness studio.
+Israel first (Hebrew), then US/EU (American English). Industries are categories and sub-categories on equal footing (the fitness studio was the prototype).
 
 ## Working agreement
 
@@ -12,6 +12,9 @@ Israel first (Hebrew), then US/EU (American English). First vertical: boutique f
   and in user-entered content.
 - Before a significant product/architecture decision, propose it and wait for the owner's answer.
   Record every decision in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+- Keep the project status current: with every merged pull request update [`docs/STATUS.md`](docs/STATUS.md)
+  and the GitHub issues (labels `status: in progress` / `status: planned` / `status: needs decision`;
+  pull requests close their issues).
 - Build small, vertical slices end-to-end (DB → API → Web → Mobile). Every slice must keep tenant
   isolation, i18n/RTL, dark mode and accessibility intact.
 - Never paste or commit secrets. Secrets live in environment variables / provider secret stores.
@@ -23,6 +26,8 @@ Israel first (Hebrew), then US/EU (American English). First vertical: boutique f
 | `docs/spec/v1/` | Original owner spec (Hebrew + English .docx) |
 | `docs/spec/v2/` | Current working spec (source of truth) |
 | `docs/DECISIONS.md` | Decision log |
+| `docs/STATUS.md` | Project status board (done, in progress, next) |
+| `docs/verticals.md` | Industries: the category catalog and how to add a category |
 
 ## Non-negotiable principles
 

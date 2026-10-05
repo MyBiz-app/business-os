@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { termsOf } from "@business-os/verticals";
 
 import { unwrap } from "@/lib/api";
 import { formatTime, todayIn } from "@/lib/dates";
@@ -37,7 +38,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
     api.GET("/clients", { params: { ...scope, query: { limit: 20, status: "active", ...(search ? { search } : {}) } } }).then(unwrap),
   ]);
 
-  const terms = (key: string) => t(`terms.${tenant.vertical}.${key}` as "terms.fitness.clients");
+  const terms = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
 
   return (
     <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">

@@ -1,0 +1,355 @@
+{
+  "key": "classes",
+  "order": 4,
+  "status": "live",
+  "icon": "graduation-cap",
+  "color": "from-sky-500 to-blue-600",
+  "terms": "classes",
+  "client_term": "student",
+  "booking_modes": [
+    "class",
+    "appointment"
+  ],
+  "cancellation_window_minutes": 720,
+  "booking_requires_plan": true,
+  "default_preset": "growing",
+  "recommended_modules": [
+    "client_app",
+    "whatsapp"
+  ],
+  "client_fields": [
+    {
+      "key": "level",
+      "kind": "select",
+      "options": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    {
+      "key": "birth_date",
+      "kind": "date"
+    },
+    {
+      "key": "parent_name",
+      "kind": "text"
+    },
+    {
+      "key": "parent_phone",
+      "kind": "text",
+      "max_length": 30
+    }
+  ],
+  "default_plans": [
+    {
+      "names": {
+        "he": "מנוי חודשי",
+        "en": "Monthly membership"
+      },
+      "kind": "membership",
+      "validity_days": 30,
+      "prices": {
+        "ILS": 35000
+      }
+    },
+    {
+      "names": {
+        "he": "מנוי לתקופה (3 חודשים)",
+        "en": "Term (3 months)"
+      },
+      "kind": "membership",
+      "validity_days": 90,
+      "prices": {
+        "ILS": 95000
+      }
+    },
+    {
+      "names": {
+        "he": "שיעור ניסיון",
+        "en": "Trial lesson"
+      },
+      "kind": "punch_card",
+      "validity_days": 14,
+      "credits": 1,
+      "prices": {
+        "ILS": 5000
+      }
+    }
+  ],
+  "children": [
+    {
+      "key": "dance",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "בלט ילדים",
+            "en": "Kids' ballet"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "class",
+          "capacity": 15,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#ec4899"
+        },
+        {
+          "names": {
+            "he": "היפ־הופ",
+            "en": "Hip-hop"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 20,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#8b5cf6"
+        },
+        {
+          "names": {
+            "he": "מחול עכשווי",
+            "en": "Contemporary"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 15,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#0ea5e9"
+        }
+      ]
+    },
+    {
+      "key": "martial_arts",
+      "status": "live",
+      "extra_client_fields": [
+        {
+          "key": "belt",
+          "kind": "text",
+          "max_length": 40
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "קראטה ילדים",
+            "en": "Kids' karate"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "class",
+          "capacity": 20,
+          "prices": {
+            "ILS": 5000
+          },
+          "color": "#ef4444"
+        },
+        {
+          "names": {
+            "he": "קרב מגע",
+            "en": "Krav Maga"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 20,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#f59e0b"
+        },
+        {
+          "names": {
+            "he": "ג'יו־ג'יטסו ברזילאי",
+            "en": "Brazilian jiu-jitsu"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 16,
+          "prices": {
+            "ILS": 7000
+          },
+          "color": "#6366f1"
+        }
+      ]
+    },
+    {
+      "key": "music",
+      "status": "live",
+      "extra_client_fields": [
+        {
+          "key": "instrument",
+          "kind": "text",
+          "max_length": 60
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "שיעור גיטרה",
+            "en": "Guitar lesson"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 18000
+          },
+          "color": "#f59e0b"
+        },
+        {
+          "names": {
+            "he": "שיעור פסנתר",
+            "en": "Piano lesson"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 18000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "שיעור פיתוח קול",
+            "en": "Voice lesson"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#ec4899"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "4 שיעורים בחודש",
+            "en": "4 lessons a month"
+          },
+          "kind": "punch_card",
+          "validity_days": 35,
+          "credits": 4,
+          "prices": {
+            "ILS": 65000
+          }
+        },
+        {
+          "names": {
+            "he": "שיעור ניסיון",
+            "en": "Trial lesson"
+          },
+          "kind": "punch_card",
+          "validity_days": 14,
+          "credits": 1,
+          "prices": {
+            "ILS": 10000
+          }
+        }
+      ]
+    },
+    {
+      "key": "tutoring",
+      "status": "live",
+      "extra_client_fields": [
+        {
+          "key": "school_grade",
+          "kind": "text",
+          "max_length": 40
+        },
+        {
+          "key": "subjects",
+          "kind": "text"
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "שיעור פרטי",
+            "en": "Private lesson"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 18000
+          },
+          "color": "#0ea5e9"
+        },
+        {
+          "names": {
+            "he": "קבוצה קטנה",
+            "en": "Small group"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "class",
+          "capacity": 6,
+          "prices": {
+            "ILS": 12000
+          },
+          "color": "#8b5cf6"
+        },
+        {
+          "names": {
+            "he": "הכנה לבגרות",
+            "en": "Exam preparation"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "class",
+          "capacity": 15,
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#f59e0b"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 10 שיעורים",
+            "en": "10 lessons"
+          },
+          "kind": "punch_card",
+          "validity_days": 120,
+          "credits": 10,
+          "prices": {
+            "ILS": 160000
+          }
+        }
+      ]
+    },
+    {
+      "key": "kids_activities",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "חוג העשרה",
+            "en": "Enrichment class"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "class",
+          "capacity": 12,
+          "prices": {
+            "ILS": 5000
+          },
+          "color": "#22c55e"
+        },
+        {
+          "names": {
+            "he": "חוג פעוטות (עם הורה)",
+            "en": "Toddlers with a parent"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "class",
+          "capacity": 10,
+          "prices": {
+            "ILS": 5500
+          },
+          "color": "#f59e0b"
+        }
+      ]
+    }
+  ]
+}

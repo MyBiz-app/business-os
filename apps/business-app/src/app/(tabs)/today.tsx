@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from "use-intl";
 import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { verticalOf } from "@business-os/app-kit/lib/vertical";
+import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -40,7 +40,7 @@ export default function Today() {
 
   const sessions = data ?? [];
   const mine = sessions.filter((s) => s.instructor_user_id === auth?.user.id);
-  const vertical = verticalOf(tenant);
+  const terms = termsFor(tenant);
 
   const list = (items: ScheduledSession[]) =>
     items.map((session) => {
@@ -110,7 +110,7 @@ export default function Today() {
           {list(sessions)}
         </>
       )}
-      <Text style={[styles.muted, { color: palette.muted }]}>{tTerms(`${vertical}.schedule`)}</Text>
+      <Text style={[styles.muted, { color: palette.muted }]}>{tTerms(`${terms}.schedule`)}</Text>
     </Screen>
   );
 }

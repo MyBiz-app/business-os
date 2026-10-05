@@ -8,10 +8,10 @@ import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import { type Catalog, ModulePicker, type Selection } from "@/components/modules/module-picker";
 import { locales } from "@/i18n/config";
+import { industryOptions, industryTexts } from "@/lib/verticals";
 
 import { createBusiness, type OnboardingState, recommendModules } from "./actions";
 
-const VERTICALS = ["fitness", "beauty", "clinic", "garage"] as const;
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 
 type Props = { timeZones: string[]; catalogs: Record<string, Catalog> };
@@ -20,6 +20,7 @@ type Props = { timeZones: string[]; catalogs: Record<string, Catalog> };
  * with a live price. Both steps are one form, submitted once at the end. */
 export function OnboardingForm({ timeZones, catalogs }: Props) {
   const t = useTranslations();
+  const { text } = industryTexts(t);
   const locale = useLocale();
   const [state, action] = useActionState<OnboardingState, FormData>(createBusiness, {});
   const israel = locale === "he";
@@ -66,7 +67,7 @@ export function OnboardingForm({ timeZones, catalogs }: Props) {
         <SelectField
           label={t("onboarding.vertical")}
           name="vertical"
-          options={VERTICALS.map((value) => ({ value, label: t(`onboarding.verticals.${value}`) }))}
+          options={industryOptions(text, (name) => t("start.industry.otherKind", { name }))}
         />
         <SelectField
           label={t("onboarding.locale")}

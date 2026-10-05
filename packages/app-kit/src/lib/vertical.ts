@@ -1,8 +1,7 @@
-// The business's vertical as a key of the `terms` messages; older cached data has none.
-const VERTICALS = ["fitness", "beauty", "clinic", "garage"] as const;
-export type Vertical = (typeof VERTICALS)[number];
+import { termsOf } from "@business-os/verticals";
 
-export function verticalOf(business: { vertical?: string | null } | null | undefined): Vertical {
-  const value = business?.vertical;
-  return VERTICALS.find((v) => v === value) ?? "fitness";
+/** The set of industry words (`terms.<set>` in the translations) for a business, from the
+ * industry catalog; a sub-category uses its category's words, older cached data the default. */
+export function termsFor(business: { vertical?: string | null } | null | undefined): string {
+  return termsOf(business?.vertical);
 }

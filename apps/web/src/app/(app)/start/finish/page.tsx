@@ -7,6 +7,7 @@ import Link from "next/link";
 import { API_URL } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { decodePlan, encodePlan, priceLines, trialEndsOn } from "@/lib/signup-plan";
+import { industryTexts } from "@/lib/verticals";
 
 import { FinishForm } from "./finish-form";
 import { isolate } from "@/lib/bidi";
@@ -31,7 +32,7 @@ async function loadCatalog(currency: string): Promise<Catalog | null> {
 export default async function FinishPage({ searchParams }: PageProps<"/start/finish">) {
   const t = await getTranslations("start");
   const tModules = await getTranslations("modules");
-  const tIndustries = await getTranslations("marketing.industries.items");
+  const { text } = industryTexts(await getTranslations());
   const locale = await getLocale();
   const plan = decodePlan((await searchParams).p);
   const catalog = plan ? await loadCatalog(plan.currency) : null;
@@ -70,7 +71,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
 
       <aside aria-labelledby="finish-plan" className="card flex h-fit flex-col gap-4 p-5 lg:sticky lg:top-24">
         <h2 id="finish-plan" className="font-bold">
-          {t("summary.business", { name: isolate(plan.name), vertical: tIndustries(`${plan.vertical}.name`) })}
+          {t("summary.business", { name: isolate(plan.name), vertical: text(plan.vertical, "name") })}
         </h2>
         <ul className="flex flex-col gap-2">
           {lines.map((line) => (

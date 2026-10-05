@@ -20,6 +20,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
   [`docs/spec/MyBiz-Spec-he.docx`](docs/spec/MyBiz-Spec-he.docx)
   (regenerate with `node scripts/spec-to-docx.cjs he|en`, needs the `docx` npm package).
 - **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) — every product and technical decision.
+- **Status:** [`docs/STATUS.md`](docs/STATUS.md) — what is done, in progress and next; open work in GitHub issues.
 - **Detailed v2 chapters:** [`docs/spec/v2/`](docs/spec/v2/README.md) (architecture, data model, AI).
 - **Where we are:** the foundation is built (see the spec's roadmap). Now, one phase at a time:
   1 marketing website and sign-up journey → 2 business web app → 3 MyBiz console → 4 apps →
@@ -37,6 +38,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 | `apps/staff-app` | MyBiz team app (Expo) |
 | `packages/i18n` | Shared translations (he / en) and locale helpers for the web and the apps |
 | `packages/app-kit` | What the three apps share: API client, design tokens, components, providers |
+| `packages/verticals` | The industry catalog: categories and sub-categories, shared by the API, the web and the apps ([how to add one](docs/verticals.md)) |
 | `docs/` | Spec (v3 overview + Word files, v2 chapters) and decision log |
 | `scripts/` | Developer machine setup, spec → Word |
 

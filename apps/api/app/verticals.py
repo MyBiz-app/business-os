@@ -1,10 +1,14 @@
 """Vertical packs: configuration that adapts the vertical-agnostic core to an industry.
 
-The core never branches on the vertical; it reads the pack. Packs grow with each sprint
-(terminology, default services, roles, metrics)."""
+Industries are categories and sub-categories in one catalog shared with the website and the
+apps (packages/verticals). A sub-category inherits everything from its parent and overrides
+only what it sets. The core never branches on the industry; it reads the resolved pack."""
 
+import json
 from dataclasses import dataclass, field
 from datetime import date
+from pathlib import Path
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -32,8 +36,8 @@ class DefaultService:
 
 @dataclass(frozen=True)
 class ClientField:
-    """An extra detail the vertical keeps about each client (labels: fields.<vertical>.<key>,
-    select options: fields.<vertical>.<key>_options.<option>)."""
+    """An extra detail the vertical keeps about each client (labels: clientFields.<key>,
+    select options: clientFields.<key>_options.<option>)."""
 
     key: str
     kind: str  # "text" | "long_text" | "number" | "date" | "select"
@@ -43,132 +47,134 @@ class ClientField:
 
 @dataclass(frozen=True)
 class VerticalPack:
+    """A catalog entry with everything it inherits from its parents filled in."""
+
     key: str
-    client_term: str  # i18n key suffix for what the business calls its clients
+    status: str  # "live" | "beta" | "planned"
+    parent: str | None
+    category: str  # the top-level category (its own key for a category)
+    terms: str  # the set of industry words in the translations (terms.<set>)
+    client_term: str  # what the business calls its clients
     cancellation_window_minutes: int  # default booking policy for new businesses
     booking_requires_plan: bool  # clients need a valid plan to book in the client app
     default_preset: str  # modules a new business starts with (app/modules.py PRESETS)
-    requires_health_declaration: bool = False  # clients sign app/health.py's form to book
+    health_form: str | None = None  # app/health.py FORMS key clients sign before booking
+    recommended_modules: tuple[str, ...] = ()
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
     default_services: tuple[DefaultService, ...] = field(default_factory=tuple)
     client_fields: tuple[ClientField, ...] = field(default_factory=tuple)
 
+    @property
+    def requires_health_declaration(self) -> bool:
+        return self.health_form is not None
 
-FITNESS = VerticalPack(
-    key="fitness",
-    client_term="member",
-    cancellation_window_minutes=120,
-    booking_requires_plan=True,
-    default_preset="growing",
-    requires_health_declaration=True,
-    client_fields=(
-        ClientField(
-            "goal", "select", ("weight_loss", "strength", "flexibility", "rehab", "general")
-        ),
-        ClientField("injuries", "long_text", max_length=1000),
-    ),
-    default_plans=(
-        DefaultPlan(
-            names={"he": "מנוי חודשי ללא הגבלה", "en": "Monthly unlimited"},
-            kind="membership",
-            validity_days=30,
-            prices={"ILS": 45000, "USD": 12900, "EUR": 11900},
-        ),
-        DefaultPlan(
-            names={"he": "כרטיסייה 10 כניסות", "en": "10-class card"},
-            kind="punch_card",
-            validity_days=120,
-            credits=10,
-            prices={"ILS": 60000, "USD": 18000, "EUR": 16000},
-        ),
-        DefaultPlan(
-            names={"he": "כניסה בודדת", "en": "Single class"},
-            kind="punch_card",
-            validity_days=30,
-            credits=1,
-            prices={"ILS": 7000, "USD": 2000, "EUR": 1800},
-        ),
-    ),
-)
+    @property
+    def is_open(self) -> bool:
+        """A business can sign up with it."""
+        return self.status != "planned"
 
 
-def _service(he: str, en: str, minutes: int, ils: int, color: str) -> DefaultService:
-    """An appointment service, priced in ILS with rough USD/EUR equivalents."""
-    usd = round(ils * 0.27 / 100) * 100
-    return DefaultService(
-        names={"he": he, "en": en},
-        duration_minutes=minutes,
-        booking_mode="appointment",
-        prices={"ILS": ils, "USD": usd, "EUR": round(usd * 0.92 / 100) * 100},
-        color=color,
+# The industry catalog (packages/verticals/catalog/*.json), copied here by
+# `pnpm verticals:export` because the API's image is built from apps/api alone.
+CATALOG_PATH = Path(__file__).with_name("verticals_catalog.json")
+
+
+def _prices(raw: dict[str, int]) -> dict[str, int]:
+    """Prices by currency; USD and EUR default to rough equivalents of the ILS price."""
+    usd = raw.get("USD", round(raw["ILS"] * 0.27 / 100) * 100)
+    return {"ILS": raw["ILS"], "USD": usd, "EUR": raw.get("EUR", round(usd * 0.92 / 100) * 100)}
+
+
+def _field(raw: dict[str, Any]) -> ClientField:
+    return ClientField(
+        raw["key"], raw["kind"], tuple(raw.get("options", ())), raw.get("max_length", 200)
     )
 
 
-BEAUTY = VerticalPack(
-    key="beauty",
-    client_term="client",
-    cancellation_window_minutes=180,
-    booking_requires_plan=False,
-    default_preset="growing",
-    client_fields=(
-        ClientField("hair_type", "select", ("straight", "wavy", "curly", "coily")),
-        ClientField("color_formula", "long_text", max_length=1000),
-        ClientField("allergies", "text"),
-    ),
-    default_services=(
-        _service("תספורת גברים", "Men's haircut", 30, 8000, "#6366f1"),
-        _service("תספורת ועיצוב נשים", "Women's cut & style", 60, 18000, "#ec4899"),
-        _service("צבע שורשים", "Root color", 90, 25000, "#f59e0b"),
-        _service("עיצוב זקן", "Beard trim", 20, 5000, "#10b981"),
-    ),
-)
+def _service(raw: dict[str, Any]) -> DefaultService:
+    return DefaultService(
+        names=raw["names"],
+        duration_minutes=raw["duration_minutes"],
+        booking_mode=raw["booking_mode"],
+        prices=_prices(raw["prices"]),
+        color=raw["color"],
+        capacity=raw.get("capacity", 1),
+    )
 
-CLINIC = VerticalPack(
-    key="clinic",
-    client_term="patient",
-    cancellation_window_minutes=1440,
-    booking_requires_plan=False,
-    default_preset="growing",
-    client_fields=(
-        ClientField("id_number", "text", max_length=20),
-        ClientField(
-            "health_fund", "select", ("clalit", "maccabi", "meuhedet", "leumit", "private")
+
+def _plan(raw: dict[str, Any]) -> DefaultPlan:
+    return DefaultPlan(
+        names=raw["names"],
+        kind=raw["kind"],
+        validity_days=raw["validity_days"],
+        prices=_prices(raw["prices"]),
+        credits=raw.get("credits"),
+    )
+
+
+def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
+    """The entry with what it leaves out taken from its parent."""
+
+    def get(name: str, default: Any = None) -> Any:
+        if name in raw:
+            return raw[name]
+        return getattr(parent, name) if parent is not None else default
+
+    fields = (
+        tuple(_field(f) for f in raw["client_fields"])
+        if "client_fields" in raw
+        else (parent.client_fields if parent else ())
+    )
+    extra = tuple(
+        _field(f)
+        for f in raw.get("extra_client_fields", ())
+        if f["key"] not in {existing.key for existing in fields}
+    )
+    return VerticalPack(
+        key=raw["key"],
+        status=raw["status"],
+        parent=parent.key if parent else None,
+        category=parent.category if parent else raw["key"],
+        terms=get("terms", ""),
+        client_term=get("client_term", "client"),
+        cancellation_window_minutes=get("cancellation_window_minutes", 0),
+        booking_requires_plan=get("booking_requires_plan", False),
+        default_preset=get("default_preset", "starter"),
+        health_form=get("health_form"),
+        recommended_modules=tuple(get("recommended_modules", ())),
+        default_plans=(
+            tuple(_plan(p) for p in raw["default_plans"])
+            if "default_plans" in raw
+            else (parent.default_plans if parent else ())
         ),
-        ClientField("referred_by", "text"),
-        ClientField("allergies", "text"),
-    ),
-    default_services=(
-        _service("פגישת היכרות", "First visit", 60, 35000, "#14b8a6"),
-        _service("טיפול", "Treatment", 45, 30000, "#6366f1"),
-        _service("פגישת מעקב", "Follow-up", 30, 20000, "#8b5cf6"),
-    ),
-)
+        default_services=(
+            tuple(_service(s) for s in raw["default_services"])
+            if "default_services" in raw
+            else (parent.default_services if parent else ())
+        ),
+        client_fields=fields + extra,
+    )
 
-GARAGE = VerticalPack(
-    key="garage",
-    client_term="customer",
-    cancellation_window_minutes=1440,
-    booking_requires_plan=False,
-    default_preset="starter",
-    client_fields=(
-        ClientField("plate", "text", max_length=12),
-        ClientField("make", "text", max_length=40),
-        ClientField("model", "text", max_length=40),
-        ClientField("year", "number"),
-        ClientField("mileage", "number"),
-        ClientField("next_inspection", "date"),
-    ),
-    default_services=(
-        _service("טיפול תקופתי", "Periodic service", 120, 60000, "#f59e0b"),
-        _service("החלפת שמן ומסננים", "Oil & filter change", 45, 25000, "#0ea5e9"),
-        _service("בדיקה לפני טסט", "Pre-inspection check", 60, 20000, "#10b981"),
-        _service("אבחון תקלה", "Diagnostics", 60, 30000, "#ef4444"),
-    ),
-)
 
-VERTICAL_PACKS: dict[str, VerticalPack] = {
-    pack.key: pack for pack in (FITNESS, BEAUTY, CLINIC, GARAGE)
-}
+def load_catalog(path: Path = CATALOG_PATH) -> dict[str, VerticalPack]:
+    """Every catalog entry by key: each category followed by its sub-categories."""
+    packs: dict[str, VerticalPack] = {}
+
+    def visit(raw: dict[str, Any], parent: VerticalPack | None) -> None:
+        pack = _resolve(raw, parent)
+        packs[pack.key] = pack
+        for child in raw.get("children", ()):
+            visit(child, pack)
+
+    for category in json.loads(path.read_text(encoding="utf-8")):
+        visit(category, None)
+    return packs
+
+
+CATALOG: dict[str, VerticalPack] = load_catalog()
+
+# The industries a business can sign up with (live and beta).
+VERTICAL_PACKS: dict[str, VerticalPack] = {k: p for k, p in CATALOG.items() if p.is_open}
 
 
 MAX_NUMBER = 10_000_000

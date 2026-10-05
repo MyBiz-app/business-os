@@ -1,11 +1,12 @@
 import type { components } from "@business-os/api-client";
+import { isOpen } from "@business-os/verticals";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
-import { CURRENCIES, type Currency, trialEndsOn, VERTICALS, type Vertical, withLocations } from "@/lib/signup-plan";
+import { CURRENCIES, type Currency, trialEndsOn, withLocations } from "@/lib/signup-plan";
 
 import { StartWizard } from "./start-wizard";
 
@@ -25,7 +26,7 @@ async function loadCatalog(currency: Currency): Promise<Catalog | null> {
   }
 }
 
-/** "Start free": the sign-up journey. Links can preselect an industry (?vertical=beauty), a
+/** "Start free": the sign-up journey. Links can preselect an industry (?vertical=beauty or a sub-category such as barbershop), a
  * recommended plan (?preset=growing) or a currency (?currency=USD). */
 export default async function StartPage({ searchParams }: PageProps<"/start">) {
   const t = await getTranslations("start");
@@ -51,7 +52,7 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
 
   const asked = <T extends string>(value: unknown, allowed: readonly T[]) =>
     typeof value === "string" && (allowed as readonly string[]).includes(value) ? (value as T) : null;
-  const vertical = asked<Vertical>(query.vertical, VERTICALS);
+  const vertical = typeof query.vertical === "string" && isOpen(query.vertical) ? query.vertical : null;
   const requestedCurrency = asked<Currency>(query.currency, CURRENCIES);
   const currency = requestedCurrency && catalogs[requestedCurrency] ? requestedCurrency : locale === "he" && catalogs.ILS ? "ILS" : (Object.keys(catalogs)[0] as Currency);
   const preset = typeof query.preset === "string" ? query.preset : "";

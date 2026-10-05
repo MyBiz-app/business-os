@@ -3,23 +3,23 @@ import {
   BarChart3,
   Bot,
   CalendarDays,
-  Car,
   Check,
   CalendarClock,
   CreditCard,
-  Dumbbell,
   MessageCircle,
   NotebookPen,
   Receipt,
-  Scissors,
   Smartphone,
-  Stethoscope,
   Target,
   Users,
   UsersRound,
 } from "lucide-react";
+import { categories } from "@business-os/verticals";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+
+import { VerticalIcon } from "@/components/vertical-icon";
+import { industryTexts } from "@/lib/verticals";
 
 export const FEATURES = [
   { key: "schedule", Icon: CalendarDays },
@@ -36,23 +36,16 @@ export const FEATURES = [
   { key: "records", Icon: NotebookPen },
 ] as const;
 
-export const INDUSTRIES = [
-  { key: "fitness", Icon: Dumbbell, color: "from-indigo-500 to-violet-500" },
-  { key: "beauty", Icon: Scissors, color: "from-pink-500 to-rose-500" },
-  { key: "clinic", Icon: Stethoscope, color: "from-teal-500 to-emerald-500" },
-  { key: "garage", Icon: Car, color: "from-amber-500 to-orange-500" },
-] as const;
-
-export type IndustryKey = (typeof INDUSTRIES)[number]["key"];
-
-/** A section heading: optional eyebrow, title and subtitle, centered. */
-export function SectionHeading({ eyebrow, title, subtitle, id }: { eyebrow?: string; title: string; subtitle?: string; id?: string }) {
+/** A section heading: optional eyebrow, title and subtitle, centered. `level` 1 when it is the
+ * page's own heading. */
+export function SectionHeading({ eyebrow, title, subtitle, id, level = 2 }: { eyebrow?: string; title: string; subtitle?: string; id?: string; level?: 1 | 2 }) {
+  const Heading = level === 1 ? "h1" : "h2";
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
       {eyebrow && <p className="text-sm font-semibold text-primary">{eyebrow}</p>}
-      <h2 id={id} className="text-3xl font-bold tracking-tight sm:text-4xl">
+      <Heading id={id} className={level === 1 ? "text-4xl font-extrabold tracking-tight sm:text-5xl" : "text-3xl font-bold tracking-tight sm:text-4xl"}>
         {title}
-      </h2>
+      </Heading>
       {subtitle && <p className="text-lg text-muted">{subtitle}</p>}
     </div>
   );
@@ -80,22 +73,25 @@ export async function FeatureGrid() {
 
 export async function IndustryCards() {
   const t = await getTranslations("marketing.industries");
+  const { text, points } = industryTexts(await getTranslations());
+  const open = categories().filter((c) => c.status !== "planned");
+  const soon = categories().filter((c) => c.status === "planned");
   return (
     <section aria-labelledby="industries-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
       <SectionHeading id="industries-heading" title={t("title")} subtitle={t("subtitle")} />
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {INDUSTRIES.map(({ key, Icon, color }) => (
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {open.map(({ key, icon, color }) => (
           <li key={key}>
             <Link href={`/industries/${key}`} className="card card-hover group flex h-full flex-col gap-4 p-6">
               <span aria-hidden="true" className={`flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg`}>
-                <Icon className="size-6" />
+                <VerticalIcon icon={icon} className="size-6" />
               </span>
               <span className="flex flex-col gap-1">
-                <span className="text-lg font-semibold">{t(`items.${key}.name`)}</span>
-                <span className="text-sm text-muted">{t(`items.${key}.tagline`)}</span>
+                <span className="text-lg font-semibold">{text(key, "name")}</span>
+                <span className="text-sm text-muted">{text(key, "tagline")}</span>
               </span>
               <ul className="flex flex-col gap-1.5 text-sm">
-                {(t.raw(`items.${key}.points`) as string[]).map((point) => (
+                {points(key).map((point) => (
                   <li key={point} className="flex items-start gap-2">
                     <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
                     {point}
@@ -109,6 +105,28 @@ export async function IndustryCards() {
             </Link>
           </li>
         ))}
+        {soon.length > 0 && (
+          <li>
+            <Link href="/industries" className="card card-hover group flex h-full flex-col gap-4 p-6">
+              <span className="flex flex-col gap-1">
+                <span className="text-lg font-semibold">{t("soonTitle")}</span>
+                <span className="text-sm text-muted">{t("soonText")}</span>
+              </span>
+              <ul className="flex flex-wrap gap-2 text-sm">
+                {soon.map(({ key, icon }) => (
+                  <li key={key} className="flex items-center gap-1.5 rounded-full bg-background px-3 py-1 ring-1 ring-border">
+                    <VerticalIcon icon={icon} className="size-3.5 text-muted" />
+                    {text(key, "name")}
+                  </li>
+                ))}
+              </ul>
+              <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                {t("all")}
+                <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
+              </span>
+            </Link>
+          </li>
+        )}
       </ul>
     </section>
   );

@@ -37,11 +37,15 @@ with sync_playwright() as p:
 
     page.goto(h.BASE + "/start")
     check(page, "1-industry")
-    page.get_by_role("button", name=re.compile("מספרות וסלוני יופי")).click()
+    page.get_by_role("button", name=re.compile("יופי וספא")).click()
+    # the category's kinds of business, then the business itself
+    expect(page.get_by_role("heading", level=1)).to_have_text("איזה סוג עסק בתחום יופי וספא?")
+    check(page, "1b-kind")
+    page.get_by_role("button", name=re.compile("^ברברשופ")).click()
 
-    expect(page.get_by_role("heading", level=1)).to_have_text("ספרו לנו על המספרה")
+    expect(page.get_by_role("heading", level=1)).to_have_text("ספרו לנו על הברברשופ")
     page.get_by_role("button", name="המשך").click()  # the name is required
-    expect(page.get_by_role("heading", level=1)).to_have_text("ספרו לנו על המספרה")
+    expect(page.get_by_role("heading", level=1)).to_have_text("ספרו לנו על הברברשופ")
     page.get_by_label("שם העסק").fill("המספרה של שירה")
     page.get_by_text("101–300").click()
     page.get_by_role("button", name="יותר סניפים").click()
@@ -90,7 +94,7 @@ with sync_playwright() as p:
     page.wait_for_url("**/start/finish?p=**")
 
     expect(page.get_by_role("heading", level=1)).to_have_text("שלב אחרון: פרטי תשלום")
-    expect(page.get_by_text(re.compile("המספרה של שירה. · מספרות וסלוני יופי"))).to_be_visible()
+    expect(page.get_by_text(re.compile("המספרה של שירה. · ברברשופ"))).to_be_visible()
     check(page, "8-payment")
     page.get_by_label("שם בעל הכרטיס").fill("שירה לוי")
     page.get_by_role("button", name="להתחיל את תקופת הניסיון").click()
@@ -108,7 +112,7 @@ with sync_playwright() as p:
                FROM app.tenants t JOIN app.billing_accounts b ON b.tenant_id = t.id
                WHERE t.name = 'המספרה של שירה' ORDER BY t.created_at DESC LIMIT 1"""
         ).fetchone()
-    assert tenant == ("beauty", "ILS", True, "4242", ["ai_pro:1", "client_app:1", "extra_location:1"]), tenant
+    assert tenant == ("barbershop", "ILS", True, "4242", ["ai_pro:1", "client_app:1", "extra_location:1"]), tenant
     print("phone journey (he): wizard, cart, account, payment, business created: ok")
 
     page.goto(h.BASE + "/getting-started")
@@ -123,7 +127,8 @@ with sync_playwright() as p:
     wide.locator("a[href*=\"preset=growing\"]").click()
     wide.wait_for_url("**/start?preset=growing&currency=USD")
     check(wide, "en-industry")
-    wide.get_by_role("button", name=re.compile("Studios & gyms")).click()
+    wide.get_by_role("button", name=re.compile("Fitness & Training")).click()
+    wide.get_by_role("button", name=re.compile("^Another Fitness & Training business")).click()
     wide.get_by_label("Business name").fill("Flow Studio")
     wide.get_by_role("button", name="Continue").click()
     cart = wide.get_by_role("complementary", name="Your plan")

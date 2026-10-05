@@ -12601,19 +12601,14 @@
             "anyOf": [
               {
                 "type": "string",
-                "enum": [
-                  "fitness",
-                  "beauty",
-                  "clinic",
-                  "garage",
-                  "other"
-                ]
+                "maxLength": 40
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Vertical"
+            "title": "Vertical",
+            "description": "A catalog industry (also a coming-soon one) or \"other\""
           },
           "message": {
             "anyOf": [

@@ -1,5 +1,6 @@
 import { NotebookPen, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+import { termsOf } from "@business-os/verticals";
 
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
@@ -25,11 +26,10 @@ export async function ProfileSection({ clientId, values, context, locked }: Prop
   return (
     <section aria-labelledby="profile-heading" className="card p-6">
       <h2 id="profile-heading" className="mb-4 text-lg font-semibold">
-        {t(`terms.${tenant.vertical}.profile` as "terms.fitness.profile")}
+        {t(`terms.${termsOf(tenant.vertical)}.profile` as "terms.fitness.profile")}
       </h2>
       <ProfileForm
         clientId={clientId}
-        vertical={tenant.vertical}
         fields={fields}
         values={values}
         readOnly={locked || !canWriteClients(tenant)}
@@ -69,7 +69,7 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
     <section aria-labelledby="notes-heading" className="flex flex-col gap-4 card p-6">
       <h2 id="notes-heading" className="flex items-center gap-2 text-lg font-semibold">
         <NotebookPen aria-hidden="true" className="size-5 text-primary" />
-        {t(`terms.${tenant.vertical}.visitNotes` as "terms.fitness.visitNotes")}
+        {t(`terms.${termsOf(tenant.vertical)}.visitNotes` as "terms.fitness.visitNotes")}
       </h2>
       {canWrite && <NoteForm clientId={clientId} bookings={recentVisits} />}
       {notes.length === 0 ? (

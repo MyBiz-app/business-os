@@ -1,3 +1,4 @@
+import { ALL_VERTICALS } from "@business-os/verticals";
 import type { MetadataRoute } from "next";
 
 import { siteOrigin } from "@/lib/origin";
@@ -8,10 +9,8 @@ const PAGES = [
   "/pricing",
   "/start",
   "/getting-started",
-  "/industries/fitness",
-  "/industries/beauty",
-  "/industries/clinic",
-  "/industries/garage",
+  "/industries",
+  ...ALL_VERTICALS.map(({ key }) => `/industries/${key}`),
   "/about",
   "/contact",
   "/legal/terms",

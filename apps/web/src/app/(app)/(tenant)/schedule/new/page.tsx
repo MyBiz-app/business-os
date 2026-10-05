@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { termsOf } from "@business-os/verticals";
 
 import { unwrap } from "@/lib/api";
 import { isDay, todayIn } from "@/lib/dates";
@@ -20,7 +21,7 @@ export default async function NewSessionPage({ searchParams }: PageProps<"/sched
 
   return (
     <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-      <h1 className="text-3xl font-bold">{tAll(`terms.${tenant.vertical}.newSession` as "terms.fitness.newSession")}</h1>
+      <h1 className="text-3xl font-bold">{tAll(`terms.${termsOf(tenant.vertical)}.newSession` as "terms.fitness.newSession")}</h1>
       {options.services.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-8 text-center text-muted">
           {t("needService")}{" "}

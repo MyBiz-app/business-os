@@ -1,0 +1,7 @@
+{
+  "key": "sports",
+  "order": 6,
+  "status": "planned",
+  "icon": "trophy",
+  "color": "from-lime-500 to-green-600"
+}

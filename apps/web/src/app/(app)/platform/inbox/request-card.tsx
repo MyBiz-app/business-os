@@ -2,12 +2,14 @@
 
 import type { components } from "@business-os/api-client";
 import { Building2, Check, CircleDot, Hand, RotateCcw } from "lucide-react";
+import { isVertical } from "@business-os/verticals";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { industryTexts } from "@/lib/verticals";
 
 import { type InboxState, saveNotes, updateRequest } from "./actions";
 
@@ -23,6 +25,7 @@ const TONE = {
 export function RequestCard({ request, when }: { request: Request; when: string }) {
   const t = useTranslations("platform.inbox");
   const tContact = useTranslations("marketing.contact");
+  const { text } = industryTexts(useTranslations());
   const tCommon = useTranslations("common");
   const [state, action] = useActionState<InboxState, FormData>(saveNotes.bind(null, request.id), {});
   const [rowState, setRowState] = useState<InboxState>({});
@@ -62,7 +65,7 @@ export function RequestCard({ request, when }: { request: Request; when: string 
         </a>
         {request.phone && <span>{request.phone}</span>}
       </p>
-      {request.vertical && <p className="text-sm text-muted">{tContact(`verticals.${request.vertical as "fitness"}`)}</p>}
+      {request.vertical && <p className="text-sm text-muted">{isVertical(request.vertical) ? text(request.vertical, "name") : tContact("otherVertical")}</p>}
       {request.message && (
         <p className="whitespace-pre-wrap text-sm" dir="auto">
           {request.message}

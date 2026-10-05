@@ -10,7 +10,7 @@ import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { verticalOf } from "@business-os/app-kit/lib/vertical";
+import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Branded home: the business, the client's next booking and what's on today. */
@@ -113,7 +113,7 @@ export default function Home() {
       )}
 
       <Heading palette={palette} level={2}>
-        {tTerms(`${verticalOf(business)}.nextBooking`)}
+        {tTerms(`${termsFor(business)}.nextBooking`)}
       </Heading>
       {next ? (
         <SessionCard session={next} onChange={update} showDay />
@@ -136,7 +136,7 @@ export default function Home() {
         <>
           <Button label={tAppointment("cta")} palette={palette} onPress={() => router.push("/appointment")} />
           <Button
-            label={tTerms(`${verticalOf(business)}.appTab`)}
+            label={tTerms(`${termsFor(business)}.appTab`)}
             palette={palette}
             variant="secondary"
             onPress={() => router.navigate("/schedule")}

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* The industry catalog sets each industry's gradient (`from-… to-…`): include its classes. */
+@source "../../../../packages/verticals/src/catalog.generated.ts";
 
 /* Dark mode follows the `dark` class set by next-themes. */
 @custom-variant dark (&:where(.dark, .dark *));
