@@ -154,7 +154,7 @@ with sync_playwright() as p:
     # Platform admin sees the new business and its usage.
     admin = b.new_context(locale="he-IL", viewport={"width": 1280, "height": 900}).new_page()
     login(admin, ADMIN)
-    admin.goto(f"{h.BASE}/platform"); h.ready(admin)
+    admin.goto(f"{h.BASE}/platform/businesses"); h.ready(admin)
     row = admin.get_by_role("row").filter(has_text=owner_email)
     expect(row).to_contain_text(owner_email)
     credits = row.locator("td").nth(6).inner_text()

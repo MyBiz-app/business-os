@@ -1,3 +1,4 @@
+import json
 from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 from typing import Annotated
@@ -39,25 +40,58 @@ class TenantContext:
     permissions: frozenset[str] = frozenset()
 
 
-def _support_context(session: Session, tenant_id: UUID, request: Request) -> TenantContext:
-    """A platform admin inside a business that granted support access: every request is
-    audited for the owner, and the transaction is READ ONLY at the database level."""
+def _audit_platform_visit(session: Session, tenant_id: UUID, action: str, request: Request) -> None:
+    """Writes the visit to the business's own audit log, which its owner reads in settings."""
     session.execute(
         text("""
             INSERT INTO app.audit_log (tenant_id, actor_type, actor_id, action, details)
-            SELECT :tenant_id, 'platform', u.id, 'support.view',
+            SELECT :tenant_id, 'platform', u.id, CAST(:action AS text),
                    jsonb_build_object('method', CAST(:method AS text), 'path', CAST(:path AS text),
                                       'email', u.email)
             FROM app.users u WHERE u.id = app.current_user_id()
         """),
-        {"tenant_id": tenant_id, "method": request.method, "path": request.url.path},
+        {
+            "tenant_id": tenant_id,
+            "action": action,
+            "method": request.method,
+            "path": request.url.path,
+        },
     )
+
+
+def _support_context(session: Session, tenant_id: UUID, request: Request) -> TenantContext:
+    """A MyBiz staff member inside a business that granted support access: every request is
+    audited for the owner, and the transaction is READ ONLY at the database level."""
+    _audit_platform_visit(session, tenant_id, "support.view", request)
     session.execute(text("SET TRANSACTION READ ONLY"))
     return TenantContext(
         session=session,
         tenant_id=tenant_id,
         role="support",
         permissions=effective_permissions("support", None),
+    )
+
+
+def _platform_context(session: Session, tenant_id: UUID, request: Request) -> TenantContext:
+    """A MyBiz staff member with `businesses.act` working in a business for its owner: they can
+    fix things like a manager, and every request (reads and changes alike) is audited for the
+    owner and for MyBiz."""
+    action = "platform.view" if request.method in ("GET", "HEAD", "OPTIONS") else "platform.change"
+    _audit_platform_visit(session, tenant_id, action, request)
+    if action == "platform.change":
+        session.execute(
+            text("SELECT app.platform_audit_add(:action, :tenant, :details)"),
+            {
+                "action": action,
+                "tenant": tenant_id,
+                "details": json.dumps({"method": request.method, "path": request.url.path}),
+            },
+        )
+    return TenantContext(
+        session=session,
+        tenant_id=tenant_id,
+        role="platform",
+        permissions=effective_permissions("platform", None),
     )
 
 
@@ -80,6 +114,8 @@ def get_tenant_context(
     if member is None:
         if session.execute(text("SELECT app.support_tenant_id()")).scalar() is not None:
             return _support_context(session, tenant_id, request)
+        if session.execute(text("SELECT app.platform_act_tenant_id()")).scalar() is not None:
+            return _platform_context(session, tenant_id, request)
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
     return TenantContext(
         session=session,

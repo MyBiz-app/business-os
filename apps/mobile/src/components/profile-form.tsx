@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { Button, Card, ErrorText, Field, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
+import { Button, Card, ErrorText, Field, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
 import { useBusiness } from "@/providers/business-provider";
 
 /** The client's own name and phone in the current business. */

@@ -14,9 +14,14 @@ export const getActiveMembership = cache(async () => {
   const selected = (await cookies()).get(TENANT_COOKIE)?.value;
   // Platform support inside a business that granted access (read-only, audited by the API).
   const support = me.support_access.find((g) => g.tenant_id === selected);
+  // MyBiz staff working inside a business for its owner: not a member, and no grant needed;
+  // the API checks the permission and audits every request.
+  const asPlatform =
+    selected && me.platform_admin ? { tenant_id: selected, tenant_name: "", role: "platform" as const } : null;
   const membership =
     me.memberships.find((m) => m.tenant_id === selected) ??
     (support ? { tenant_id: support.tenant_id, tenant_name: support.tenant_name, role: "support" as const } : null) ??
+    asPlatform ??
     me.memberships[0] ??
     null;
   return { me, membership };

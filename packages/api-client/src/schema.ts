@@ -1817,7 +1817,8 @@ export interface paths {
         };
         /**
          * Contact Requests
-         * @description Businesses that wrote in through the marketing site, newest first.
+         * @description The inbox: requests from the marketing site and complaints from businesses. Open ones
+         *     first, then newest.
          */
         get: operations["contact_requests"];
         put?: never;
@@ -1826,6 +1827,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/platform/contact-requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Contact Request
+         * @description Moves a request along: status, who on the MyBiz side handles it, internal notes.
+         */
+        patch: operations["update_contact_request"];
         trace?: never;
     };
     "/platform/billing": {
@@ -1842,6 +1863,165 @@ export interface paths {
         get: operations["billing_summary"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform Me
+         * @description The signed-in team member's level and permissions (the console shows what they hold).
+         */
+        get: operations["platform_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Staff */
+        get: operations["list_staff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/staff/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Staff
+         * @description Adds a team member or changes one. Nobody changes the primary owner or themselves;
+         *     only owners handle owners and managers; nobody gives more than they hold.
+         */
+        put: operations["save_staff"];
+        post?: never;
+        /** Remove Staff */
+        delete: operations["remove_staff"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Audit
+         * @description What the MyBiz team did, newest first (owners only).
+         */
+        get: operations["audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/invoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Invoices
+         * @description One business's invoices, newest first.
+         */
+        get: operations["business_invoices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/trial": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Extend Trial
+         * @description Gives a business more trial days (a goodwill gesture, a late start).
+         */
+        post: operations["extend_trial"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Business Modules
+         * @description Changes a business's modules for it (a sale, a mistake to undo).
+         */
+        put: operations["set_business_modules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/invoices/{invoice_id}/void": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Void Invoice
+         * @description Credits an invoice: it stops counting as due or paid, with the reason in both logs.
+         */
+        post: operations["void_invoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1865,6 +2045,27 @@ export interface paths {
         post: operations["grant_support"];
         /** Revoke Support */
         delete: operations["revoke_support"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write To Mybiz
+         * @description A question or complaint from the business to the MyBiz team; it lands in the console's
+         *     inbox with the business attached.
+         */
+        post: operations["write_to_mybiz"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2496,6 +2697,26 @@ export interface components {
              */
             recipients: number;
         };
+        /** AuditEntry */
+        AuditEntry: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Actor Email */
+            actor_email: string;
+            /** Action */
+            action: string;
+            /** Tenant Id */
+            tenant_id: string | null;
+            /** Tenant Name */
+            tenant_name: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+        };
         /** Billing */
         Billing: {
             /**
@@ -2667,6 +2888,43 @@ export interface components {
              * @description Percent of expected clients who didn't come
              */
             no_show_rate: number | null;
+        };
+        /** BusinessInvoice */
+        BusinessInvoice: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /**
+             * Period Start
+             * Format: date
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Total
+             * @description Minor units
+             */
+            total: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "open" | "paid" | "void";
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
         };
         /**
          * BusinessProfile
@@ -3198,6 +3456,19 @@ export interface components {
             /** Cancelled Sessions */
             cancelled_sessions: number;
         };
+        /** Complaint */
+        Complaint: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** ComplaintCreate */
+        ComplaintCreate: {
+            /** Message */
+            message: string;
+        };
         /** ContactCreate */
         ContactCreate: {
             /** Name */
@@ -3250,6 +3521,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "new" | "in_progress" | "done";
+            /** Assignee */
+            assignee: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Tenant Id */
+            tenant_id: string | null;
+            /**
+             * From Business
+             * @description A complaint from inside a business, not the site
+             */
+            from_business: boolean;
         };
         /** Conversation */
         Conversation: {
@@ -3697,6 +3984,18 @@ export interface components {
              */
             items: components["schemas"]["Notification"][];
         };
+        /** InboxUpdate */
+        InboxUpdate: {
+            /** Status */
+            status?: ("new" | "in_progress" | "done") | null;
+            /**
+             * Assignee
+             * @description 'me', an email, or '' to clear
+             */
+            assignee?: string | null;
+            /** Notes */
+            notes?: string | null;
+        };
         /** InquiryCreate */
         InquiryCreate: {
             /** First Name */
@@ -4136,13 +4435,16 @@ export interface components {
             full_name: string | null;
             /** Locale */
             locale: ("he" | "en") | null;
-            /** Platform Admin */
+            /**
+             * Platform Admin
+             * @description On the MyBiz team (sees the console)
+             */
             platform_admin: boolean;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
             /**
              * Support Access
-             * @description Businesses that let platform support in (platform admins only)
+             * @description Businesses that let MyBiz support in (the MyBiz team only)
              */
             support_access: components["schemas"]["SupportAccess"][];
         };
@@ -4280,6 +4582,16 @@ export interface components {
             previous: number | null;
             /** Higher Is Better */
             higher_is_better: boolean;
+        };
+        /** ModulesChange */
+        ModulesChange: {
+            /**
+             * Modules
+             * @description The business's new modules, like its own page
+             */
+            modules: {
+                [key: string]: number;
+            };
         };
         /** MyBooking */
         MyBooking: {
@@ -4562,6 +4874,11 @@ export interface components {
             /** Owner Email */
             owner_email: string | null;
         };
+        /**
+         * PlatformPermission
+         * @enum {string}
+         */
+        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage";
         /** Point */
         Point: {
             /**
@@ -5306,6 +5623,64 @@ export interface components {
             /** Blocks */
             blocks: components["schemas"]["HoursBlock"][];
         };
+        /** StaffMe */
+        StaffMe: {
+            /** Email */
+            email: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "primary_owner" | "owner" | "manager" | "employee";
+            /** Permissions */
+            permissions: components["schemas"]["PlatformPermission"][];
+        };
+        /** StaffMember */
+        StaffMember: {
+            /** Email */
+            email: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "primary_owner" | "owner" | "manager" | "employee";
+            /** Permissions */
+            permissions: components["schemas"]["PlatformPermission"][];
+            /** Disabled */
+            disabled: boolean;
+            /** Full Name */
+            full_name: string | null;
+            /**
+             * Signed Up
+             * @description Has signed in to MyBiz at least once
+             */
+            signed_up: boolean;
+            /** Added By */
+            added_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** StaffSave */
+        StaffSave: {
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "owner" | "manager" | "employee";
+            /**
+             * Permissions
+             * @default []
+             */
+            permissions: components["schemas"]["PlatformPermission"][];
+            /**
+             * Disabled
+             * @default false
+             */
+            disabled: boolean;
+        };
         /** StageChange */
         StageChange: {
             /**
@@ -5348,7 +5723,7 @@ export interface components {
             active: components["schemas"]["Grant"] | null;
             /**
              * Visits
-             * @description The latest 50 support requests
+             * @description The latest 50 requests MyBiz staff made inside this business
              */
             visits: components["schemas"]["SupportVisit"][];
         };
@@ -5363,6 +5738,12 @@ export interface components {
             actor_email: string | null;
             /** Path */
             path: string | null;
+            /**
+             * Changed
+             * @description MyBiz staff changed something here
+             * @default false
+             */
+            changed: boolean;
         };
         /** SystemRole */
         SystemRole: {
@@ -5468,9 +5849,9 @@ export interface components {
             custom_role_name: string | null;
             /**
              * Role
-             * @description 'support': platform support with read-only access the owner granted
+             * @description 'support': MyBiz support, read-only, while the owner's grant lasts. 'platform': MyBiz staff working in the business for its owner (audited).
              */
-            role: ("owner" | "manager" | "staff" | "front_desk") | "support";
+            role: ("owner" | "manager" | "staff" | "front_desk") | ("support" | "platform");
         };
         /** TenantCreate */
         TenantCreate: {
@@ -5570,6 +5951,19 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** Trial */
+        Trial: {
+            /**
+             * Trial Ends At
+             * Format: date-time
+             */
+            trial_ends_at: string;
+        };
+        /** TrialExtension */
+        TrialExtension: {
+            /** Days */
+            days: number;
+        };
         /** Turn */
         Turn: {
             /**
@@ -5609,6 +6003,11 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VoidInvoice */
+        VoidInvoice: {
+            /** Reason */
+            reason: string;
         };
         /** WeekCopied */
         WeekCopied: {
@@ -10003,6 +10402,41 @@ export interface operations {
             };
         };
     };
+    update_contact_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InboxUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactRequest"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     billing_summary: {
         parameters: {
             query?: never;
@@ -10019,6 +10453,279 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BillingMonth"][];
+                };
+            };
+        };
+    };
+    platform_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMe"];
+                };
+            };
+        };
+    };
+    list_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMember"][];
+                };
+            };
+        };
+    };
+    save_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffSave"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMember"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMember"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEntry"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_invoices: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessInvoice"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    extend_trial: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrialExtension"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Trial"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_business_modules: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ModulesChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    void_invoice: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                invoice_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VoidInvoice"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingMonth"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -10107,6 +10814,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_to_mybiz: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComplaintCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Complaint"];
                 };
             };
             /** @description Validation Error */

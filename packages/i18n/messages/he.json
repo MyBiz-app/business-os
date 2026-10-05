@@ -192,7 +192,8 @@
     "manager": "מנהל/ת",
     "staff": "צוות",
     "front_desk": "קבלה",
-    "support": "תמיכת המערכת (צפייה בלבד)"
+    "support": "תמיכת המערכת (צפייה בלבד)",
+    "platform": "צוות MyBiz"
   },
   "nav": {
     "label": "ניווט ראשי",
@@ -956,7 +957,7 @@
     }
   },
   "platform": {
-    "title": "קונסולת פלטפורמה",
+    "title": "קונסולת MyBiz",
     "subtitle": "כל העסקים בפלטפורמה, המודולים והשימוש שלהם.",
     "businesses": "עסקים",
     "activeClients": "לקוחות פעילים",
@@ -995,7 +996,152 @@
     "month": "חודש",
     "invoices": "חשבוניות",
     "paid": "שולם",
-    "open": "פתוח"
+    "open": "פתוח",
+    "console": "קונסולת MyBiz",
+    "nav": {
+      "label": "ניווט בקונסולה",
+      "overview": "סקירה",
+      "businesses": "עסקים",
+      "inbox": "תיבת פניות",
+      "billing": "חיוב",
+      "team": "צוות MyBiz",
+      "audit": "יומן פעולות"
+    },
+    "levels": {
+      "primary_owner": "בעלים ראשי",
+      "owner": "בעלים",
+      "manager": "מנהל/ת",
+      "employee": "עובד/ת"
+    },
+    "levelHints": {
+      "primary_owner": "הכול. אף אחד לא יכול להסיר או לשנות.",
+      "owner": "הכול, כולל ניהול הצוות. שותף.",
+      "manager": "מנהל/ת עובדים ונותן/ת להם הרשאות שיש לו/ה בעצמו/ה.",
+      "employee": "רק ההרשאות שניתנו."
+    },
+    "permissions": {
+      "businesses_read": {
+        "name": "צפייה בעסקים",
+        "hint": "כל עסק, הבעלים, הצוות והלקוחות שלו."
+      },
+      "businesses_act": {
+        "name": "עבודה בתוך עסקים",
+        "hint": "כניסה לעסק כדי לתקן; הבעלים רואים זאת."
+      },
+      "billing_manage": {
+        "name": "חיוב",
+        "hint": "תקופות ניסיון, מודולים, חשבוניות והכנסות."
+      },
+      "inbox_manage": {
+        "name": "תיבת פניות",
+        "hint": "פניות מהאתר ותלונות."
+      },
+      "usage_read": {
+        "name": "שימוש",
+        "hint": "שימוש ב-AI בכל הפלטפורמה."
+      },
+      "staff_manage": {
+        "name": "ניהול עובדים",
+        "hint": "הוספת עובדים ומתן הרשאות."
+      }
+    },
+    "you": "את/ה · {level}",
+    "seeAll": "לכל הרשימה",
+    "newestBusinesses": "העסקים החדשים",
+    "latestRequests": "הפניות האחרונות",
+    "team": {
+      "title": "צוות MyBiz",
+      "subtitle": "מי עובד ב-MyBiz ומה כל אחד רשאי לעשות. כל אחד מתחבר עם האימייל שהוספת.",
+      "add": "הוספת איש צוות",
+      "email": "אימייל",
+      "level": "רמה",
+      "permissions": "הרשאות",
+      "allPermissions": "כל ההרשאות",
+      "save": "שמירה",
+      "added": "נשמר.",
+      "remove": "הסרה",
+      "removeConfirm": "להסיר את {email} מצוות MyBiz?",
+      "disable": "השהיית גישה",
+      "enable": "חידוש גישה",
+      "paused": "מושהה",
+      "invited": "עוד לא התחבר/ה",
+      "protected": "מוגן",
+      "rules": "כל רמה נותנת רק הרשאות שיש לה. רק בעלים מוסיפים בעלים ומנהלים. אף אחד לא יכול לשנות את הבעלים הראשי או את עצמו.",
+      "errors": {
+        "primary_owner_protected": "אי אפשר לשנות או להסיר את הבעלים הראשי.",
+        "not_yourself": "אי אפשר לשנות את עצמך.",
+        "cannot_grant_more_than_you_hold": "אפשר לתת רק הרשאות שיש לך.",
+        "employees_do_not_manage_staff": "עובדים לא מנהלים צוות — אפשר להפוך אותם למנהלים.",
+        "forbidden": "הרמה שלך לא מאפשרת את השינוי הזה.",
+        "generic": "משהו השתבש. כדאי לנסות שוב."
+      }
+    },
+    "audit": {
+      "title": "יומן פעולות",
+      "subtitle": "כל מה שצוות MyBiz עשה, מהחדש לישן.",
+      "when": "מתי",
+      "who": "מי",
+      "action": "פעולה",
+      "business": "עסק",
+      "details": "פרטים",
+      "empty": "עוד אין כלום.",
+      "actions": {
+        "staff_added": "הוסיף/ה איש צוות",
+        "staff_changed": "שינה/תה איש צוות",
+        "staff_removed": "הסיר/ה איש צוות",
+        "platform_change": "ביצע/ה שינוי בעסק",
+        "business_trial_extended": "האריך/ה תקופת ניסיון",
+        "business_modules_changed": "שינה/תה חבילה",
+        "business_invoice_voided": "זיכה/תה חשבונית",
+        "inbox_updated": "עדכן/ה פנייה"
+      }
+    },
+    "inbox": {
+      "title": "תיבת פניות",
+      "subtitle": "פניות מהאתר והודעות מעסקים. הפתוחות קודם.",
+      "statuses": {
+        "new": "חדשה",
+        "in_progress": "בטיפול",
+        "done": "טופלה"
+      },
+      "filter": "להציג",
+      "all": "הכול",
+      "fromBusiness": "מעסק",
+      "fromSite": "מהאתר",
+      "take": "אני מטפל/ת",
+      "assigned": "בטיפול {who}",
+      "unassign": "שחרור",
+      "markDone": "סימון כטופלה",
+      "reopen": "פתיחה מחדש",
+      "notes": "הערות פנימיות",
+      "saveNotes": "שמירת הערות",
+      "openBusiness": "פתיחת העסק",
+      "empty": "אין כאן כלום.",
+      "count": "{count, plural, =0 {אין פניות} one {פנייה אחת} other {# פניות}}"
+    },
+    "actions": {
+      "title": "פעולות עבור הבעלים",
+      "intro": "כל מה שכאן נרשם ביומן של העסק, שהבעלים קוראים, וגם ביומן הפעולות של MyBiz.",
+      "trial": "הארכת תקופת הניסיון",
+      "trialDays": "ימים",
+      "trialDone": "תקופת הניסיון מסתיימת עכשיו ב-{date}.",
+      "modules": "שינוי החבילה",
+      "modulesHint": "המודולים של העסק, כמו בדף המודולים שלו. החשבונית הבאה תתעדכן.",
+      "modulesDone": "החבילה שונתה.",
+      "voidTitle": "זיכוי חשבונית",
+      "voidHint": "החשבונית מפסיקה להיחשב כחוב או כתשלום.",
+      "voidReason": "סיבה",
+      "void": "לזכות את החשבונית",
+      "voidDone": "החשבונית זוכתה.",
+      "invoice": "חשבונית {number} · {amount}",
+      "noInvoices": "אין עדיין חשבוניות.",
+      "errors": {
+        "already_void": "החשבונית כבר מזוכה.",
+        "forbidden": "אין לך הרשאה לפעולה הזו.",
+        "not_found": "לא נמצא.",
+        "generic": "משהו השתבש. כדאי לנסות שוב."
+      }
+    }
   },
   "permissions": {
     "clients_read": "צפייה בלקוחות",
@@ -1214,7 +1360,23 @@
     "leave": "יציאה ממצב תמיכה",
     "grantedUntil": "בעל העסק אישר גישת תמיכה עד {date}.",
     "open": "כניסה כתמיכה (צפייה בלבד)",
-    "notGranted": "בעל העסק לא אישר גישת תמיכה. אפשר לעשות זאת בהגדרות ← גישת תמיכה."
+    "notGranted": "בעל העסק לא אישר גישת תמיכה. אפשר לעשות זאת בהגדרות ← גישת תמיכה.",
+    "actTitle": "עבודה בתוך העסק",
+    "actIntro": "אפשר להיכנס לעסק כדי לתקן דברים עבור הבעלים. כל מה שנפתח או משתנה נרשם ביומן של העסק, שהבעלים קוראים, וגם ביומן הפעולות של MyBiz.",
+    "actOpen": "כניסה לעסק",
+    "actBanner": "את/ה בתוך {name} כצוות MyBiz. כל מה שנפתח או משתנה נרשם עבור הבעלים.",
+    "actLeave": "יציאה מהעסק",
+    "visitsTitle": "מה MyBiz פתחו כאן",
+    "changed": "בוצע שינוי",
+    "writeTitle": "כתיבה ל-MyBiz",
+    "writeIntro": "שאלה, תקלה או תלונה — צוות MyBiz יחזור אליך במייל.",
+    "writeLabel": "מה קורה?",
+    "writeSend": "שליחה ל-MyBiz",
+    "writeSent": "נשלח. נחזור אליך במייל.",
+    "writeErrors": {
+      "too_many_requests": "שלחת כמה הודעות לאחרונה. אפשר לנסות שוב בעוד שעה.",
+      "generic": "משהו השתבש. כדאי לנסות שוב."
+    }
   },
   "receipts": {
     "title": "קבלה מס׳ {number}",
@@ -2336,5 +2498,119 @@
       "מטבע",
       "לדוגמה"
     ]
+  },
+  "business": {
+    "tabs": {
+      "today": "היום",
+      "numbers": "מספרים",
+      "me": "אני"
+    },
+    "noBusiness": {
+      "title": "האפליקציה הזו לבעלי עסקים ולצוות",
+      "text": "האימייל שאיתו נכנסת עדיין לא שייך לאף צוות. אפשר לבקש מהבעלים הזמנה, או לפתוח את MyBiz במחשב כדי ליצור עסק.",
+      "signOut": "כניסה עם אימייל אחר"
+    },
+    "today": {
+      "title": "היום",
+      "greeting": "{part, select, morning {בוקר טוב} afternoon {צהריים טובים} evening {ערב טוב} other {שלום}}",
+      "none": "אין היום כלום ביומן.",
+      "mine": "שלך היום",
+      "all": "כל היום",
+      "spots": "{booked} מתוך {capacity}",
+      "waitlist": "{count} בהמתנה",
+      "cancelled": "בוטל",
+      "openSchedule": "השבוע",
+      "checkIn": "סימון הגעה",
+      "checkedIn": "הגיע/ה",
+      "undo": "ביטול הגעה",
+      "noShow": "לא הגיע/ה",
+      "roster": "מי מגיע",
+      "empty": "עוד אין רישומים.",
+      "statuses": {
+        "booked": "רשום/ה",
+        "checked_in": "הגיע/ה",
+        "no_show": "לא הגיע/ה",
+        "cancelled": "בוטל",
+        "waitlisted": "בהמתנה"
+      },
+      "saved": "נשמר."
+    },
+    "clients": {
+      "search": "חיפוש",
+      "none": "לא נמצאו תוצאות.",
+      "visits": "{count, plural, =0 {אין ביקורים} one {ביקור אחד} other {# ביקורים}}",
+      "lastVisit": "ביקור אחרון {date}",
+      "neverVisited": "עוד לא הגיע/ה",
+      "call": "חיוג",
+      "whatsapp": "וואטסאפ",
+      "email": "אימייל",
+      "plan": "מסלול",
+      "noPlan": "אין מסלול פעיל",
+      "notes": "הערות"
+    },
+    "numbers": {
+      "title": "מספרים מרכזיים",
+      "period": "{count} הימים האחרונים",
+      "empty": "אין עדיין מספרים."
+    },
+    "me": {
+      "title": "אני",
+      "business": "עסק",
+      "switch": "החלפת עסק",
+      "role": "התפקיד שלך: {role}",
+      "language": "שפה",
+      "theme": "מראה",
+      "themes": {
+        "system": "לפי המכשיר",
+        "light": "בהיר",
+        "dark": "כהה"
+      },
+      "signOut": "התנתקות",
+      "name": "השם שלך",
+      "save": "שמירה"
+    }
+  },
+  "staffApp": {
+    "tabs": {
+      "home": "MyBiz",
+      "businesses": "עסקים",
+      "inbox": "פניות",
+      "me": "אני"
+    },
+    "notStaff": {
+      "title": "האפליקציה הזו לצוות MyBiz",
+      "text": "האימייל שאיתו נכנסת לא שייך לצוות MyBiz. אם הוא אמור להיות, אפשר לבקש מבעלים להוסיף אותו.",
+      "signOut": "כניסה עם אימייל אחר"
+    },
+    "home": {
+      "title": "MyBiz",
+      "open": "פניות פתוחות",
+      "newBusinesses": "עסקים חדשים השבוע",
+      "nothing": "אין מה לטפל. אפשר לנשום.",
+      "youAre": "את/ה מחובר/ת כ{level}"
+    },
+    "businesses": {
+      "search": "חיפוש עסק",
+      "none": "לא נמצא עסק מתאים.",
+      "owner": "בעלים",
+      "clients": "{count} לקוחות",
+      "trialEnds": "הניסיון מסתיים {date}",
+      "modules": "מודולים"
+    },
+    "inbox": {
+      "title": "פניות",
+      "open": "פתוחות",
+      "done": "טופלו",
+      "empty": "אין כאן כלום.",
+      "take": "אני מטפל/ת",
+      "markDone": "סימון כטופלה",
+      "fromBusiness": "מעסק",
+      "noPermission": "אין לך הרשאת תיבת פניות."
+    },
+    "me": {
+      "title": "אני",
+      "level": "הרמה שלך: {level}",
+      "permissions": "מה מותר לך"
+    }
   }
 }

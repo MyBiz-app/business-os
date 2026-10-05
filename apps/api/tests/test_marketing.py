@@ -1,9 +1,9 @@
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, text
+from sqlalchemy import Engine
 
-from tests.conftest import AuthHeaders
+from tests.conftest import AuthHeaders, make_staff
 
 LEAD = {
     "name": "Dana Levi",
@@ -36,10 +36,7 @@ def test_contact_requests_reach_platform_admins_only(
     user = uuid4()
     client.get("/me", headers=auth(user))
     assert client.get("/platform/contact-requests", headers=auth(user)).status_code == 403
-    with engine.begin() as connection:
-        connection.execute(
-            text("INSERT INTO app.platform_admins (user_id) VALUES (:id)"), {"id": user}
-        )
+    make_staff(engine, user, "employee", ("inbox.manage",))
     requests = client.get("/platform/contact-requests", headers=auth(user)).json()
     assert [(r["name"], r["email"], r["vertical"]) for r in requests] == [
         ("Dana Levi", "dana@example.com", "beauty")

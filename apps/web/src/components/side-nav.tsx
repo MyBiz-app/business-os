@@ -2,6 +2,10 @@
 
 import {
   BarChart3,
+  Building2,
+  Inbox,
+  ScrollText,
+  Wallet,
   Bot,
   CalendarDays,
   ChevronDown,
@@ -22,7 +26,7 @@ import {
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 const ICONS = {
   dashboard: LayoutDashboard,
@@ -39,17 +43,22 @@ const ICONS = {
   locations: MapPin,
   team: UsersRound,
   settings: Settings,
+  businesses: Building2,
+  inbox: Inbox,
+  billing: Wallet,
+  audit: ScrollText,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;
 /** `locked`: a module the business doesn't have; the link opens its preview. */
 export type NavItem = { href: string; label: string; icon: NavIcon; locked?: boolean };
 
-export function SideNav({ items }: { items: NavItem[] }) {
+export function SideNav({ items, label }: { items: NavItem[]; label?: string }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   // On small screens the list is a menu that opens below a button showing the current page.
   const [open, setOpen] = useState(false);
+  const listId = useId();
   // The most specific match wins (/clients/join over /clients).
   const current = items
     .filter((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))
@@ -57,11 +66,11 @@ export function SideNav({ items }: { items: NavItem[] }) {
   const CurrentIcon = current ? ICONS[current.icon] : Menu;
 
   return (
-    <nav aria-label={t("label")}>
+    <nav aria-label={label ?? t("label")}>
       <button
         type="button"
         aria-expanded={open}
-        aria-controls="main-nav-list"
+        aria-controls={listId}
         onClick={() => setOpen((value) => !value)}
         className="mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold md:hidden"
       >
@@ -71,7 +80,7 @@ export function SideNav({ items }: { items: NavItem[] }) {
         <ChevronDown aria-hidden="true" className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <ul
-        id="main-nav-list"
+        id={listId}
         className={`${open ? "grid" : "hidden"} grid-cols-2 gap-1 px-3 pb-3 md:flex md:flex-col`}
       >
         {items.map((item) => {

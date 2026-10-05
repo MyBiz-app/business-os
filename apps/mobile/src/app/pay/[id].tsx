@@ -5,12 +5,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { useReducedMotion } from "@/components/motion";
-import { Button, Card, ErrorText, Field, Heading, Screen, elevation, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { tint } from "@/lib/brand";
-import { formatMoney } from "@/lib/money";
-import { useLoad } from "@/lib/use-load";
+import { useReducedMotion } from "@business-os/app-kit/components/motion";
+import { Button, Card, ErrorText, Field, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { tint } from "@business-os/app-kit/lib/brand";
+import { formatMoney } from "@business-os/app-kit/lib/money";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type Paid = components["schemas"]["CheckoutPaid"];

@@ -102,6 +102,7 @@ def create_app() -> FastAPI:
     app.include_router(marketing.router)
     app.include_router(platform.router)
     app.include_router(support.router)
+    app.include_router(support.complaints_router)
     app.include_router(client_app.public_router)
     app.include_router(client_app.router)
     app.include_router(checkouts.router)

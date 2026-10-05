@@ -192,7 +192,8 @@
     "manager": "Manager",
     "staff": "Staff",
     "front_desk": "Front desk",
-    "support": "Platform support (read-only)"
+    "support": "Platform support (read-only)",
+    "platform": "MyBiz staff"
   },
   "nav": {
     "label": "Main navigation",
@@ -956,8 +957,8 @@
     }
   },
   "platform": {
-    "title": "Platform console",
-    "subtitle": "All businesses on the platform, their modules and usage.",
+    "title": "MyBiz console",
+    "subtitle": "Every business on the platform, its modules and usage.",
     "businesses": "Businesses",
     "activeClients": "Active clients",
     "bookings30d": "Bookings (30 days)",
@@ -995,7 +996,152 @@
     "month": "Month",
     "invoices": "Invoices",
     "paid": "Paid",
-    "open": "Open"
+    "open": "Open",
+    "console": "MyBiz console",
+    "nav": {
+      "label": "Console navigation",
+      "overview": "Overview",
+      "businesses": "Businesses",
+      "inbox": "Inbox",
+      "billing": "Billing",
+      "team": "MyBiz team",
+      "audit": "Audit log"
+    },
+    "levels": {
+      "primary_owner": "Primary owner",
+      "owner": "Owner",
+      "manager": "Manager",
+      "employee": "Employee"
+    },
+    "levelHints": {
+      "primary_owner": "Everything. Can't be removed or changed by anyone.",
+      "owner": "Everything, including the team. A partner.",
+      "manager": "Manages employees and gives them permissions they hold themselves.",
+      "employee": "Only the permissions given."
+    },
+    "permissions": {
+      "businesses_read": {
+        "name": "See businesses",
+        "hint": "Every business, its owners, team and clients."
+      },
+      "businesses_act": {
+        "name": "Work inside businesses",
+        "hint": "Enter a business to fix things; the owner sees it."
+      },
+      "billing_manage": {
+        "name": "Billing",
+        "hint": "Trials, modules, invoices and revenue."
+      },
+      "inbox_manage": {
+        "name": "Inbox",
+        "hint": "Contact requests and complaints."
+      },
+      "usage_read": {
+        "name": "Usage",
+        "hint": "AI usage across the platform."
+      },
+      "staff_manage": {
+        "name": "Manage employees",
+        "hint": "Add employees and give them permissions."
+      }
+    },
+    "you": "You · {level}",
+    "seeAll": "See all",
+    "newestBusinesses": "Newest businesses",
+    "latestRequests": "Latest requests",
+    "team": {
+      "title": "MyBiz team",
+      "subtitle": "Who works on MyBiz, and what each person may do. Everyone signs in with the email you add.",
+      "add": "Add a team member",
+      "email": "Email",
+      "level": "Level",
+      "permissions": "Permissions",
+      "allPermissions": "All permissions",
+      "save": "Save",
+      "added": "Saved.",
+      "remove": "Remove",
+      "removeConfirm": "Remove {email} from the MyBiz team?",
+      "disable": "Pause access",
+      "enable": "Resume access",
+      "paused": "Paused",
+      "invited": "Hasn't signed in yet",
+      "protected": "Protected",
+      "rules": "Every level only gives permissions it holds. Only owners add owners and managers. Nobody can change the primary owner or their own entry.",
+      "errors": {
+        "primary_owner_protected": "The primary owner can't be changed or removed.",
+        "not_yourself": "You can't change your own entry.",
+        "cannot_grant_more_than_you_hold": "You can only give permissions you hold yourself.",
+        "employees_do_not_manage_staff": "Employees can't manage the team — make them a manager.",
+        "forbidden": "Your level can't make this change.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Everything the MyBiz team did, newest first.",
+      "when": "When",
+      "who": "Who",
+      "action": "Action",
+      "business": "Business",
+      "details": "Details",
+      "empty": "Nothing yet.",
+      "actions": {
+        "staff_added": "Added a team member",
+        "staff_changed": "Changed a team member",
+        "staff_removed": "Removed a team member",
+        "platform_change": "Changed something in a business",
+        "business_trial_extended": "Extended a trial",
+        "business_modules_changed": "Changed a plan",
+        "business_invoice_voided": "Credited an invoice",
+        "inbox_updated": "Updated a request"
+      }
+    },
+    "inbox": {
+      "title": "Inbox",
+      "subtitle": "Requests from the website and messages from businesses. Open ones first.",
+      "statuses": {
+        "new": "New",
+        "in_progress": "In progress",
+        "done": "Done"
+      },
+      "filter": "Show",
+      "all": "All",
+      "fromBusiness": "From a business",
+      "fromSite": "From the website",
+      "take": "I'll handle it",
+      "assigned": "Handled by {who}",
+      "unassign": "Release",
+      "markDone": "Mark as done",
+      "reopen": "Reopen",
+      "notes": "Internal notes",
+      "saveNotes": "Save notes",
+      "openBusiness": "Open the business",
+      "empty": "Nothing here.",
+      "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}"
+    },
+    "actions": {
+      "title": "Actions for the owner",
+      "intro": "Everything here is written to the business's own log, which its owner reads, and to the MyBiz audit log.",
+      "trial": "Extend the trial",
+      "trialDays": "Days",
+      "trialDone": "The trial now ends on {date}.",
+      "modules": "Change the plan",
+      "modulesHint": "The business's modules, as on its own modules page. The next invoice follows.",
+      "modulesDone": "The plan was changed.",
+      "voidTitle": "Credit an invoice",
+      "voidHint": "The invoice stops counting as due or paid.",
+      "voidReason": "Why",
+      "void": "Credit the invoice",
+      "voidDone": "Invoice credited.",
+      "invoice": "Invoice {number} · {amount}",
+      "noInvoices": "No invoices yet.",
+      "errors": {
+        "already_void": "This invoice is already credited.",
+        "forbidden": "You don't have permission for this.",
+        "not_found": "Not found.",
+        "generic": "Something went wrong. Please try again."
+      }
+    }
   },
   "permissions": {
     "clients_read": "View clients",
@@ -1214,7 +1360,23 @@
     "leave": "Leave support mode",
     "grantedUntil": "The owner allowed support access until {date}.",
     "open": "Open as support (read-only)",
-    "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access."
+    "notGranted": "The owner hasn't allowed support access. They can do it under Settings → Support access.",
+    "actTitle": "Work inside this business",
+    "actIntro": "You may enter this business to fix things for its owner. Everything you open or change is written to the business's own log, which the owner reads, and to the MyBiz audit log.",
+    "actOpen": "Enter the business",
+    "actBanner": "You are inside {name} as MyBiz staff. Everything you open or change is logged for the owner.",
+    "actLeave": "Leave the business",
+    "visitsTitle": "What MyBiz opened here",
+    "changed": "Changed something",
+    "writeTitle": "Write to MyBiz",
+    "writeIntro": "A question, a problem or a complaint — the MyBiz team will get back to you by email.",
+    "writeLabel": "What's going on?",
+    "writeSend": "Send to MyBiz",
+    "writeSent": "Sent. We'll get back to you by email.",
+    "writeErrors": {
+      "too_many_requests": "You've sent a few messages recently. Please try again in an hour.",
+      "generic": "Something went wrong. Please try again."
+    }
   },
   "receipts": {
     "title": "Receipt no. {number}",
@@ -2336,5 +2498,119 @@
       "Currency",
       "Sample"
     ]
+  },
+  "business": {
+    "tabs": {
+      "today": "Today",
+      "numbers": "Numbers",
+      "me": "Me"
+    },
+    "noBusiness": {
+      "title": "This app is for business owners and staff",
+      "text": "The email you signed in with isn't on any business team yet. Ask the owner to invite you, or open MyBiz on a computer to create your business.",
+      "signOut": "Sign in with another email"
+    },
+    "today": {
+      "title": "Today",
+      "greeting": "{part, select, morning {Good morning} afternoon {Good afternoon} evening {Good evening} other {Hello}}",
+      "none": "Nothing booked today.",
+      "mine": "Yours today",
+      "all": "The whole day",
+      "spots": "{booked} of {capacity}",
+      "waitlist": "{count} waiting",
+      "cancelled": "Cancelled",
+      "openSchedule": "The week",
+      "checkIn": "Check in",
+      "checkedIn": "Checked in",
+      "undo": "Undo check-in",
+      "noShow": "Didn't come",
+      "roster": "Who's coming",
+      "empty": "Nobody booked yet.",
+      "statuses": {
+        "booked": "Booked",
+        "checked_in": "Checked in",
+        "no_show": "Didn't come",
+        "cancelled": "Cancelled",
+        "waitlisted": "Waiting"
+      },
+      "saved": "Saved."
+    },
+    "clients": {
+      "search": "Search",
+      "none": "No one matches.",
+      "visits": "{count, plural, =0 {No visits} one {# visit} other {# visits}}",
+      "lastVisit": "Last visit {date}",
+      "neverVisited": "Hasn't come yet",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "plan": "Plan",
+      "noPlan": "No active plan",
+      "notes": "Notes"
+    },
+    "numbers": {
+      "title": "Key numbers",
+      "period": "Last {count} days",
+      "empty": "No numbers yet."
+    },
+    "me": {
+      "title": "Me",
+      "business": "Business",
+      "switch": "Switch business",
+      "role": "Your role: {role}",
+      "language": "Language",
+      "theme": "Appearance",
+      "themes": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "signOut": "Sign out",
+      "name": "Your name",
+      "save": "Save"
+    }
+  },
+  "staffApp": {
+    "tabs": {
+      "home": "MyBiz",
+      "businesses": "Businesses",
+      "inbox": "Inbox",
+      "me": "Me"
+    },
+    "notStaff": {
+      "title": "This app is for the MyBiz team",
+      "text": "The email you signed in with isn't on the MyBiz team. If it should be, ask an owner to add it.",
+      "signOut": "Sign in with another email"
+    },
+    "home": {
+      "title": "MyBiz",
+      "open": "Open requests",
+      "newBusinesses": "New businesses this week",
+      "nothing": "Nothing waiting. Enjoy the quiet.",
+      "youAre": "You're signed in as {level}"
+    },
+    "businesses": {
+      "search": "Search a business",
+      "none": "No business matches.",
+      "owner": "Owner",
+      "clients": "{count} clients",
+      "trialEnds": "Trial ends {date}",
+      "modules": "Modules"
+    },
+    "inbox": {
+      "title": "Inbox",
+      "open": "Open",
+      "done": "Done",
+      "empty": "Nothing here.",
+      "take": "I'll handle it",
+      "markDone": "Mark as done",
+      "fromBusiness": "From a business",
+      "noPermission": "You don't have the inbox permission."
+    },
+    "me": {
+      "title": "Me",
+      "level": "Your level: {level}",
+      "permissions": "What you may do"
+    }
   }
 }

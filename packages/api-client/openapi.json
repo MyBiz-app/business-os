@@ -7777,7 +7777,7 @@
           "platform"
         ],
         "summary": "Contact Requests",
-        "description": "Businesses that wrote in through the marketing site, newest first.",
+        "description": "The inbox: requests from the marketing site and complaints from businesses. Open ones\nfirst, then newest.",
         "operationId": "contact_requests",
         "responses": {
           "200": {
@@ -7800,6 +7800,69 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/platform/contact-requests/{request_id}": {
+      "patch": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Update Contact Request",
+        "description": "Moves a request along: status, who on the MyBiz side handles it, internal notes.",
+        "operationId": "update_contact_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactRequest"
+                  },
+                  "title": "Response Update Contact Request"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/platform/billing": {
@@ -7831,6 +7894,464 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/platform/me": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Platform Me",
+        "description": "The signed-in team member's level and permissions (the console shows what they hold).",
+        "operationId": "platform_me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffMe"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/staff": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "List Staff",
+        "operationId": "list_staff",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  },
+                  "type": "array",
+                  "title": "Response List Staff"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/staff/{email}": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Save Staff",
+        "description": "Adds a team member or changes one. Nobody changes the primary owner or themselves;\nonly owners handle owners and managers; nobody gives more than they hold.",
+        "operationId": "save_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "title": "Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  },
+                  "title": "Response Save Staff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Remove Staff",
+        "operationId": "remove_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  },
+                  "title": "Response Remove Staff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/audit": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Audit",
+        "description": "What the MyBiz team did, newest first (owners only).",
+        "operationId": "audit",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEntry"
+                  },
+                  "title": "Response Audit"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/invoices": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Business Invoices",
+        "description": "One business's invoices, newest first.",
+        "operationId": "business_invoices",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessInvoice"
+                  },
+                  "title": "Response Business Invoices"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/trial": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Extend Trial",
+        "description": "Gives a business more trial days (a goodwill gesture, a late start).",
+        "operationId": "extend_trial",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrialExtension"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trial"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/businesses/{tenant_id}/modules": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Set Business Modules",
+        "description": "Changes a business's modules for it (a sale, a mistake to undo).",
+        "operationId": "set_business_modules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModulesChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/invoices/{invoice_id}/void": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Void Invoice",
+        "description": "Credits an invoice: it stops counting as due or paid, with the reason in both logs.",
+        "operationId": "void_invoice",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Invoice Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoidInvoice"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BillingMonth"
+                  },
+                  "title": "Response Void Invoice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/support-access": {
@@ -7967,6 +8488,65 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SupportStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-requests": {
+      "post": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Write To Mybiz",
+        "description": "A question or complaint from the business to the MyBiz team; it lands in the console's\ninbox with the business attached.",
+        "operationId": "write_to_mybiz",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComplaintCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Complaint"
                 }
               }
             }
@@ -9961,6 +10541,61 @@
         ],
         "title": "AudienceCount"
       },
+      "AuditEntry": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor_email": {
+            "type": "string",
+            "title": "Actor Email"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "tenant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Id"
+          },
+          "tenant_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Name"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "actor_email",
+          "action",
+          "tenant_id",
+          "tenant_name",
+          "details"
+        ],
+        "title": "AuditEntry"
+      },
       "Billing": {
         "properties": {
           "trial_ends_at": {
@@ -10385,6 +11020,64 @@
           "no_show_rate"
         ],
         "title": "BreakdownItem"
+      },
+      "BusinessInvoice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date",
+            "title": "Period End"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Minor units"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "paid",
+              "void"
+            ],
+            "title": "Status"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "number",
+          "period_start",
+          "period_end",
+          "currency",
+          "total",
+          "status",
+          "issued_at"
+        ],
+        "title": "BusinessInvoice"
       },
       "BusinessProfile": {
         "properties": {
@@ -11838,6 +12531,35 @@
         ],
         "title": "ClosedDayCreated"
       },
+      "Complaint": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "Complaint"
+      },
+      "ComplaintCreate": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 5,
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ComplaintCreate"
+      },
       "ContactCreate": {
         "properties": {
           "name": {
@@ -12001,6 +12723,54 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_progress",
+              "done"
+            ],
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "tenant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Id"
+          },
+          "from_business": {
+            "type": "boolean",
+            "title": "From Business",
+            "description": "A complaint from inside a business, not the site"
           }
         },
         "type": "object",
@@ -12013,7 +12783,12 @@
           "vertical",
           "message",
           "locale",
-          "created_at"
+          "created_at",
+          "status",
+          "assignee",
+          "notes",
+          "tenant_id",
+          "from_business"
         ],
         "title": "ContactRequest"
       },
@@ -13024,6 +13799,52 @@
           "items"
         ],
         "title": "Inbox"
+      },
+      "InboxUpdate": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "new",
+                  "in_progress",
+                  "done"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee",
+            "description": "'me', an email, or '' to clear"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "InboxUpdate"
       },
       "InquiryCreate": {
         "properties": {
@@ -14350,7 +15171,8 @@
           },
           "platform_admin": {
             "type": "boolean",
-            "title": "Platform Admin"
+            "title": "Platform Admin",
+            "description": "On the MyBiz team (sees the console)"
           },
           "memberships": {
             "items": {
@@ -14365,7 +15187,7 @@
             },
             "type": "array",
             "title": "Support Access",
-            "description": "Businesses that let platform support in (platform admins only)"
+            "description": "Businesses that let MyBiz support in (the MyBiz team only)"
           }
         },
         "type": "object",
@@ -14768,6 +15590,23 @@
           "higher_is_better"
         ],
         "title": "MetricValue"
+      },
+      "ModulesChange": {
+        "properties": {
+          "modules": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Modules",
+            "description": "The business's new modules, like its own page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "modules"
+        ],
+        "title": "ModulesChange"
       },
       "MyBooking": {
         "properties": {
@@ -15440,6 +16279,18 @@
           "owner_email"
         ],
         "title": "PlatformBusiness"
+      },
+      "PlatformPermission": {
+        "type": "string",
+        "enum": [
+          "businesses.read",
+          "businesses.act",
+          "billing.manage",
+          "inbox.manage",
+          "usage.read",
+          "staff.manage"
+        ],
+        "title": "PlatformPermission"
       },
       "Point": {
         "properties": {
@@ -17587,6 +18438,142 @@
         ],
         "title": "StaffHours"
       },
+      "StaffMe": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "primary_owner",
+              "owner",
+              "manager",
+              "employee"
+            ],
+            "title": "Level"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "level",
+          "permissions"
+        ],
+        "title": "StaffMe"
+      },
+      "StaffMember": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "primary_owner",
+              "owner",
+              "manager",
+              "employee"
+            ],
+            "title": "Level"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions"
+          },
+          "disabled": {
+            "type": "boolean",
+            "title": "Disabled"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "signed_up": {
+            "type": "boolean",
+            "title": "Signed Up",
+            "description": "Has signed in to MyBiz at least once"
+          },
+          "added_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "level",
+          "permissions",
+          "disabled",
+          "full_name",
+          "signed_up",
+          "added_by",
+          "created_at"
+        ],
+        "title": "StaffMember"
+      },
+      "StaffSave": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "manager",
+              "employee"
+            ],
+            "title": "Level"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions",
+            "default": []
+          },
+          "disabled": {
+            "type": "boolean",
+            "title": "Disabled",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "level"
+        ],
+        "title": "StaffSave"
+      },
       "StageChange": {
         "properties": {
           "stage": {
@@ -17701,7 +18688,7 @@
             },
             "type": "array",
             "title": "Visits",
-            "description": "The latest 50 support requests"
+            "description": "The latest 50 requests MyBiz staff made inside this business"
           }
         },
         "type": "object",
@@ -17739,6 +18726,12 @@
               }
             ],
             "title": "Path"
+          },
+          "changed": {
+            "type": "boolean",
+            "title": "Changed",
+            "description": "MyBiz staff changed something here",
+            "default": false
           }
         },
         "type": "object",
@@ -17970,11 +18963,14 @@
               },
               {
                 "type": "string",
-                "const": "support"
+                "enum": [
+                  "support",
+                  "platform"
+                ]
               }
             ],
             "title": "Role",
-            "description": "'support': platform support with read-only access the owner granted"
+            "description": "'support': MyBiz support, read-only, while the owner's grant lasts. 'platform': MyBiz staff working in the business for its owner (audited)."
           }
         },
         "type": "object",
@@ -18293,6 +19289,35 @@
         ],
         "title": "TimeOffCreate"
       },
+      "Trial": {
+        "properties": {
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "trial_ends_at"
+        ],
+        "title": "Trial"
+      },
+      "TrialExtension": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "maximum": 180.0,
+            "minimum": 1.0,
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days"
+        ],
+        "title": "TrialExtension"
+      },
       "Turn": {
         "properties": {
           "role": {
@@ -18386,6 +19411,21 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VoidInvoice": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "VoidInvoice"
       },
       "WeekCopied": {
         "properties": {

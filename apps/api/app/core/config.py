@@ -10,7 +10,12 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_prefix="API_", extra="ignore")
 
     environment: str = "local"
-    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:8081"]
+    cors_origins: list[str] = [
+        "http://localhost:3000",  # the business web app and the marketing site
+        "http://localhost:8081",  # the client app (Expo web)
+        "http://localhost:8082",  # the business app (Expo web)
+        "http://localhost:8083",  # the MyBiz team app (Expo web)
+    ]
 
     # Local defaults match `supabase start`. Other environments set these explicitly.
     database_url: str = "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"
@@ -35,6 +40,8 @@ class Settings(BaseSettings):
     # Public addresses used in emails (links to the web app and the client app).
     web_url: str = "http://localhost:3000"
     client_app_url: str = "http://localhost:8081"
+    business_app_url: str = "http://localhost:8082"
+    staff_app_url: str = "http://localhost:8083"
 
     @field_validator("database_url")
     @classmethod

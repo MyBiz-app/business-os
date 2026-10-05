@@ -1,5 +1,5 @@
-"""The owner's side of audited support access: let platform support in for a limited time,
-end it early, and see what support looked at (see migration 0023)."""
+"""The owner's side: let MyBiz support in for a limited time (read-only), end it early, and
+see everything MyBiz staff opened or changed in the business (migrations 0023 and 0038)."""
 
 from datetime import datetime
 from typing import Annotated
@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 
 from app.api.deps import TenantContext, get_tenant_context
 
@@ -33,11 +34,14 @@ class SupportVisit(BaseModel):
     occurred_at: datetime
     actor_email: str | None
     path: str | None
+    changed: bool = Field(default=False, description="MyBiz staff changed something here")
 
 
 class SupportStatus(BaseModel):
     active: Grant | None
-    visits: list[SupportVisit] = Field(description="The latest 50 support requests")
+    visits: list[SupportVisit] = Field(
+        description="The latest 50 requests MyBiz staff made inside this business"
+    )
 
 
 class GrantCreate(BaseModel):
@@ -59,9 +63,11 @@ def _status(context: TenantContext) -> SupportStatus:
     )
     visits = db.execute(
         text("""
-            SELECT a.occurred_at, a.details->>'email' AS actor_email, a.details->>'path' AS path
+            SELECT a.occurred_at, a.details->>'email' AS actor_email,
+                   coalesce(a.details->>'path', a.action) AS path,
+                   a.action <> 'support.view' AND a.action <> 'platform.view' AS changed
             FROM app.audit_log a
-            WHERE a.action = 'support.view'
+            WHERE a.actor_type = 'platform'
             ORDER BY a.occurred_at DESC LIMIT 50
         """)
     ).mappings()
@@ -105,3 +111,38 @@ def revoke_support(context: OwnerDep) -> SupportStatus:
         """)
     )
     return _status(context)
+
+
+# --- Writing to MyBiz ------------------------------------------------------------------------
+
+complaints_router = APIRouter(prefix="/support-requests", tags=["settings"])
+
+
+class ComplaintCreate(BaseModel):
+    message: str = Field(min_length=5, max_length=4000)
+
+
+class Complaint(BaseModel):
+    id: UUID
+
+
+@complaints_router.post("", status_code=status.HTTP_201_CREATED)
+def write_to_mybiz(
+    body: ComplaintCreate, context: Annotated[TenantContext, Depends(get_tenant_context)]
+) -> Complaint:
+    """A question or complaint from the business to the MyBiz team; it lands in the console's
+    inbox with the business attached."""
+    locale = context.session.execute(
+        text("SELECT locale FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    try:
+        with context.session.begin_nested():
+            new_id = context.session.execute(
+                text("SELECT app.submit_complaint(:message, :locale)"),
+                {"message": body.message, "locale": locale},
+            ).scalar_one()
+    except DBAPIError as error:
+        if getattr(error.orig, "sqlstate", None) == "P0001":
+            raise HTTPException(status_code=429, detail="too_many_requests") from error
+        raise
+    return Complaint(id=new_id)

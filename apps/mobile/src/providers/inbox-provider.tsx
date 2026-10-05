@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { AppState } from "react-native";
 
-import { unwrap } from "@/lib/api";
+import { unwrap } from "@business-os/app-kit/lib/api";
 import { useBusiness } from "@/providers/business-provider";
 
 export type Inbox = components["schemas"]["Inbox"];

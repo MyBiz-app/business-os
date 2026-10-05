@@ -5,12 +5,12 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
-import { Button, Card, elevation, Heading, Screen, styles } from "@/components/ui";
-import { assetUrl, unwrap } from "@/lib/api";
-import { tint } from "@/lib/brand";
+import { Button, Card, elevation, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
+import { tint } from "@business-os/app-kit/lib/brand";
 import { useHealth } from "@/lib/use-health";
-import { useLoad } from "@/lib/use-load";
-import { verticalOf } from "@/lib/vertical";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { verticalOf } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Branded home: the business, the client's next booking and what's on today. */

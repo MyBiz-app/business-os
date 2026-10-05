@@ -4,7 +4,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 # Tables without tenant_id that are still protected by RLS (their own policies).
-GLOBAL_TABLES = {"tenants", "users", "platform_admins", "contact_requests"}
+GLOBAL_TABLES = {"tenants", "users", "platform_staff", "platform_audit"}
+# Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
+# API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.
+PLATFORM_TABLES = {"contact_requests", "platform_audit"}
 
 
 def _query(engine: Engine, sql: str) -> list:
@@ -29,9 +32,25 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
     )
     assert tables
     assert [name for name, rls, _, _ in tables if not rls] == []
-    tenant_tables = [(name, scoped) for name, _, has_tenant, scoped in tables if has_tenant]
+    tenant_tables = [
+        (name, scoped)
+        for name, _, has_tenant, scoped in tables
+        if has_tenant and name not in PLATFORM_TABLES
+    ]
     assert [name for name, scoped in tenant_tables if not scoped] == []
     assert {name for name, _, has_tenant, _ in tables if not has_tenant} <= GLOBAL_TABLES
+    # MyBiz's own tables stay unreachable from the API role.
+    own = tuple(sorted(PLATFORM_TABLES | {"platform_staff"}))
+    reachable = _query(
+        engine,
+        f"""
+        SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'app' AND c.relname IN {own}
+          AND (EXISTS (SELECT 1 FROM pg_policy p WHERE p.polrelid = c.oid)
+               OR has_table_privilege('app_api', c.oid, 'SELECT'))
+        """,
+    )
+    assert reachable == []
 
 
 def test_security_definer_functions_pin_search_path(engine: Engine) -> None:

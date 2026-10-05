@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 import { removeLogo } from "./actions";
 import { BrandColorForm, DetailsForm, LogoForm } from "./settings-forms";
 import { SupportSection } from "./support-section";
+import { WriteToMyBiz } from "./write-to-mybiz";
 
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
@@ -76,6 +77,7 @@ export default async function SettingsPage() {
         </div>
       </section>
       {tenant.role === "owner" && <SupportSection context={context} />}
+      <WriteToMyBiz />
     </main>
   );
 }

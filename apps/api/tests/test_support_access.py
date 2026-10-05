@@ -1,19 +1,16 @@
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine, text
+from sqlalchemy import Engine
 
-from tests.conftest import AuthHeaders, add_member
+from tests.conftest import AuthHeaders, add_member, make_staff
 
 
 def platform_admin(engine: Engine) -> object:
+    """A MyBiz staff member who may see businesses but not work inside them, so getting in
+    needs the owner's support grant."""
     admin = uuid4()
-    with engine.begin() as connection:
-        connection.execute(
-            text("INSERT INTO app.users (id, email) VALUES (:id, 'support@mybiz.test')"),
-            {"id": admin},
-        )
-        connection.execute(text("INSERT INTO app.platform_admins VALUES (:id)"), {"id": admin})
+    make_staff(engine, admin, "employee", ("businesses.read",))
     return admin
 
 

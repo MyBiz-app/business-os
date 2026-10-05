@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@/components/ui";
+import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { useBusiness } from "@/providers/business-provider";
 
 const ERRORS = ["already_reviewed", "not_reviewable"] as const;

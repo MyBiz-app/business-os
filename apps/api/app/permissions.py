@@ -78,10 +78,18 @@ SUPPORT_PERMISSIONS: frozenset[Permission] = frozenset(
 )
 
 
+# MyBiz staff working inside a business for its owner (a complaint, a mistake): everything a
+# manager can do, so they can actually fix things. Never privacy requests, and every request is
+# written to the business's audit log, which its owner reads.
+PLATFORM_ACT_PERMISSIONS: frozenset[Permission] = ROLE_PERMISSIONS["manager"]
+
+
 def effective_permissions(role: str, custom: list[str] | None) -> frozenset[str]:
     """The permissions a member actually has. Owners always have everything."""
     if role == "support":
         return frozenset(p.value for p in SUPPORT_PERMISSIONS)
+    if role == "platform":
+        return frozenset(p.value for p in PLATFORM_ACT_PERMISSIONS)
     if custom is not None and role != "owner":
         known = {p.value for p in Permission}
         return frozenset(p for p in custom if p in known)

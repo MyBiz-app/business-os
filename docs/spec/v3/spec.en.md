@@ -123,17 +123,22 @@ Phase 2 review: every screen checked on phone and computer, Hebrew/light and Eng
 
 Built: businesses list, business detail, AI usage, contact requests, billing revenue, audited support access granted by owners.
 
-To complete in phase 3:
-- MyBiz team: primary owner, owners, managers, employees, with permission switches.
-- Full visibility: every business, its owners, team and clients.
-- Actions on any business (fix data, change modules, extend a trial, credit an invoice), each written to the audit log.
-- Support inbox (contact requests and complaints) with status.
+Built in phase 3:
+- Its own menu — overview, businesses, inbox, billing, team, audit — where each item appears only for someone who may open it.
+- The MyBiz team: a primary owner nobody can remove, change or disable (even through direct database access), owners (partners), managers (who handle employees with the permissions they hold themselves) and employees. People are added by email before they ever sign in, and access can be paused instead of removed.
+- Permissions: see businesses, work inside businesses, billing, inbox, usage, manage employees. Every level gives only what it holds, and only owners handle owners and managers.
+- Working inside a business: staff who may do it enter any business and work there like a manager, to handle a complaint or fix a mistake — never privacy requests. Every request appears in the business's own log, which its owner reads, with changes marked. Others still need the owner's read-only support grant.
+- Actions for the owner: extend the trial, change the plan, credit an invoice — each written to both logs.
+- Inbox: requests from the website and messages businesses send from Settings, with status (new, in progress, done), someone handling them and internal notes.
+- Audit log (owners only): everything the MyBiz team did.
 
 ## 9. Apps
 
 - Client app (built, Expo; also runs in the browser): join, home, schedule and appointments, bookings and plans, buying with promo codes, receipts, ratings, updates, profile, health declaration.
-- Business app (phase 4): the owner's and staff's day on the go.
-- MyBiz staff app (phase 4): businesses, support, alerts.
+- Business app (built in phase 4): the owner's and staff's day on the go. Today — the day's sessions with check-in of every booked client; Clients — search and a client card with plan, visits and contact; Numbers — the key figures of the last 30 days; Me — profile, language, theme and switching between businesses. Each person sees only what their permissions allow.
+- MyBiz staff app (built in phase 4): Home — what needs attention (open requests, new businesses); Businesses — search and a business card; Inbox — handle requests (take, status, notes); Me. Each staff member sees only what their level and permissions allow.
+- All three apps share one kit (sign-in, theme, language, right-to-left, accessible components), so a fix in one place reaches all of them.
+- Still to do: final polish of the client app and builds for the app stores (at go-live).
 
 ## 10. Simulated services (until go-live)
 
@@ -164,8 +169,8 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | Foundation | Core, verticals, schedule, clients, plans, client app, AI, reports, modules, billing, CRM, messaging, reviews, promo codes | Done |
 | 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
-| 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | In progress |
-| 4 — Apps | Client app polish, business app, MyBiz staff app | After the websites |
+| 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
+| 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 Each phase ends with a review: every page and button checked, accessibility and dark mode, tests, and a tidy codebase.

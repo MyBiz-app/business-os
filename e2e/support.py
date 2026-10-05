@@ -39,7 +39,7 @@ with sync_playwright() as p:
 
     admin = b.new_context(locale="he-IL", viewport={"width": 1280, "height": 900}).new_page()
     h.login(admin, ADMIN)
-    admin.goto(f"{h.BASE}/platform"); h.ready(admin)
+    admin.goto(f"{h.BASE}/platform/businesses"); h.ready(admin)
     admin.get_by_role("link", name="סטודיו תמיכה").first.click(); h.ready(admin)
     admin.get_by_role("button", name="כניסה כתמיכה (צפייה בלבד)").click()
     admin.wait_for_url("**/dashboard"); h.ready(admin)
@@ -53,6 +53,7 @@ with sync_playwright() as p:
     serious = [v["id"] for v in Axe().run(admin).response["violations"] if v["impact"] in ("serious", "critical")]
     admin.screenshot(path=f"{h.OUT}/support-mode.png", full_page=True)
     admin.get_by_role("button", name="יציאה ממצב תמיכה").click(); admin.wait_for_url("**/platform")
+    h.ready(admin)
     print("2. admin opened the business read-only and left: ok | a11y:", serious or "ok")
 
     owner.goto(f"{h.BASE}/settings"); h.ready(owner)

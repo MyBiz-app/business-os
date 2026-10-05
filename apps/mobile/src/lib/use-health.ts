@@ -3,7 +3,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { useLocale } from "use-intl";
 
-import { unwrap } from "@/lib/api";
+import { unwrap } from "@business-os/app-kit/lib/api";
 import { useBusiness } from "@/providers/business-provider";
 
 export type MyHealth = components["schemas"]["MyHealth"];
