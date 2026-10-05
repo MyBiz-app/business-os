@@ -100,6 +100,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 <span className={`truncate font-medium ${session.status === "cancelled" ? "text-muted line-through" : ""}`}>
                   {session.service.name}
                 </span>
+                <span className="text-xs text-muted sm:hidden">
+                  {session.status === "cancelled"
+                  ? t("schedule.cancelled")
+                  : t("schedule.spotsLabel", { booked: session.booked, capacity: session.capacity })}
+                </span>
                 {session.status !== "cancelled" && (
                   <span aria-hidden="true" className="h-1.5 w-full max-w-48 overflow-hidden rounded-full bg-foreground/8">
                     <span
@@ -109,7 +114,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                   </span>
                 )}
               </span>
-              <span className="shrink-0 text-sm text-muted">
+              {/* On wide screens the spots sit at the end; on phones, under the name. */}
+              <span className="hidden shrink-0 text-sm text-muted sm:block">
                 {session.status === "cancelled"
                   ? t("schedule.cancelled")
                   : t("schedule.spotsLabel", { booked: session.booked, capacity: session.capacity })}
@@ -182,13 +188,13 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             <h2 id="kpi-heading" className="text-lg font-semibold">
               {t("dashboard.kpis")}
             </h2>
-            <nav aria-label={t("dashboard.period")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm">
+            <nav aria-label={t("dashboard.period")} className="flex w-full gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm sm:w-auto">
               {(Object.keys(PERIODS) as Period[]).map((value) => (
                 <Link
                   key={value}
                   href={`/dashboard?period=${value}`}
                   aria-current={value === period ? "page" : undefined}
-                  className={`whitespace-nowrap rounded-lg px-3 py-1 transition-colors ${value === period ? "bg-primary text-on-primary shadow-sm" : "hover:bg-foreground/5"}`}
+                  className={`flex-1 whitespace-nowrap rounded-lg px-2 py-1 text-center transition-colors sm:flex-none sm:px-3 ${value === period ? "bg-primary text-on-primary shadow-sm" : "hover:bg-foreground/5"}`}
                 >
                   {t("dashboard.lastDays", { count: PERIODS[value] })}
                 </Link>

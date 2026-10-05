@@ -4,10 +4,12 @@ import {
   BarChart3,
   Bot,
   CalendarDays,
+  ChevronDown,
   CreditCard,
   Dumbbell,
   LayoutDashboard,
   MapPin,
+  Menu,
   MessageCircle,
   Settings,
   Target,
@@ -17,6 +19,7 @@ import {
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const ICONS = {
   dashboard: LayoutDashboard,
@@ -39,10 +42,29 @@ export type NavItem = { href: string; label: string; icon: NavIcon };
 export function SideNav({ items }: { items: NavItem[] }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
+  // On small screens the list is a menu that opens below a button showing the current page.
+  const [open, setOpen] = useState(false);
+  const current = items.find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`));
+  const CurrentIcon = current ? ICONS[current.icon] : Menu;
 
   return (
     <nav aria-label={t("label")}>
-      <ul className="flex gap-1 overflow-x-auto px-3 pb-3 md:flex-col">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="main-nav-list"
+        onClick={() => setOpen((value) => !value)}
+        className="mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold md:hidden"
+      >
+        <CurrentIcon aria-hidden="true" className="size-[18px] text-primary" />
+        <span className="flex-1 text-start">{current?.label ?? t("menu")}</span>
+        <span className="sr-only">{t("menu")}</span>
+        <ChevronDown aria-hidden="true" className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      <ul
+        id="main-nav-list"
+        className={`${open ? "grid" : "hidden"} grid-cols-2 gap-1 px-3 pb-3 md:flex md:flex-col`}
+      >
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = ICONS[item.icon];
@@ -50,6 +72,7 @@ export function SideNav({ items }: { items: NavItem[] }) {
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={() => setOpen(false)}
                 aria-current={active ? "page" : undefined}
                 className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                   active
