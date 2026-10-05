@@ -58,6 +58,7 @@ with sync_playwright() as p:
     member.get_by_role("button", name="שליחת קוד").click()
     member.get_by_label("קוד בן 6 ספרות").fill(h.otp(member_email))
     member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join**")
+    member.get_by_label("שם פרטי").fill("נועה")
     member.get_by_role("button", name="הצטרפות לסטודיו עדכונים").click(); member.wait_for_url("**/home")
     member.goto(f"{h.APP}/updates")
     expect(member.get_by_text("אין עדכונים עדיין")).to_be_visible(timeout=30000)

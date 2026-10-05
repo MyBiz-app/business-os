@@ -92,6 +92,7 @@ with sync_playwright() as p:
     member.get_by_role("button", name="שליחת קוד").click()
     member.get_by_label("קוד בן 6 ספרות").fill(h.otp(member_email))
     member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join**")
+    member.get_by_label("שם פרטי").fill("נועה")
     member.get_by_role("button", name="הצטרפות למספרת דנה").click(); member.wait_for_url("**/home")
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("button", name=re.compile("קביעת תור")).first.click(timeout=30000)

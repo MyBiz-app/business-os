@@ -112,6 +112,7 @@ with sync_playwright() as p:
     member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join")
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
+    member.get_by_label("שם פרטי").fill("נועה")
     member.get_by_role("button", name="הצטרפות לסטודיו DoD").click(); member.wait_for_url("**/home")
     hero = member.get_by_role("heading", name="סטודיו DoD").locator("..")
     expect(hero).to_have_css("background-color", "rgb(15, 118, 110)")

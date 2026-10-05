@@ -19,13 +19,17 @@ const normalize = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "
 export default function Join() {
   const t = useTranslations("client.join");
   const { palette: basePalette } = useTheme();
-  const { join, businesses } = useBusiness();
+  const { join, businesses, refresh } = useBusiness();
   const { session, loading } = useSession();
   const params = useLocalSearchParams<{ code?: string }>();
   const [code, setCode] = useState(normalize(params.code ?? ""));
   const [profile, setProfile] = useState<Profile | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The name the business will see; taken from another business the person already joined.
+  const known = businesses?.[0];
+  const [firstName, setFirstName] = useState(known?.first_name ?? "");
+  const [lastName, setLastName] = useState(known?.last_name ?? "");
   const palette = brandPalette(basePalette, profile?.primary_color);
 
   const lookUp = async (value: string) => {
@@ -49,10 +53,16 @@ export default function Join() {
   }, [params.code]);
 
   const confirmJoin = async () => {
+    if (!firstName.trim()) return setError(t("nameRequired"));
     setBusy(true);
     setError(null);
     try {
-      await join(code);
+      const joined = await join(code);
+      await apiClient().PATCH("/client/profile", {
+        params: { header: { "X-Tenant-Id": joined.id } },
+        body: { first_name: firstName.trim(), last_name: lastName.trim() || null, phone: joined.phone ?? known?.phone ?? null },
+      }).then(unwrap);
+      await refresh();
       router.replace("/home");
     } catch {
       setError(t("generic"));
@@ -82,6 +92,12 @@ export default function Join() {
             </View>
             <Text style={[styles.muted, { color: palette.muted }]}>{t("preview")}</Text>
           </Card>
+          {profile.client_app && (
+            <>
+              <Field label={t("firstName")} palette={palette} value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" />
+              <Field label={t("lastName")} palette={palette} value={lastName} onChangeText={setLastName} autoComplete="family-name" textContentType="familyName" />
+            </>
+          )}
           <ErrorText message={error} palette={palette} />
           {profile.client_app ? (
             <Button label={t("joinButton", { name: profile.name })} palette={palette} busy={busy} onPress={() => void confirmJoin()} />

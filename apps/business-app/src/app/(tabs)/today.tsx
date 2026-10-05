@@ -24,7 +24,7 @@ export default function Today() {
   const t = useTranslations("business.today");
   const tTerms = useTranslations("terms");
   const locale = useLocale();
-  const { api, scope, tenant, palette, can } = useBusiness();
+  const { api, scope, tenant, palette, can, branch } = useBusiness();
   const { session: auth } = useSession();
   const tenantId = tenant?.id;
   const timeZone = tenant?.time_zone ?? "UTC";
@@ -84,6 +84,7 @@ export default function Today() {
           {new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone }).format(new Date())}
         </Text>
         <Heading palette={palette}>{tenant.name}</Heading>
+        {branch && <Text style={[styles.muted, { color: palette.muted }]}>{branch.name}</Text>}
       </View>
 
       {!can("schedule.read") ? (
