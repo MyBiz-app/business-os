@@ -53,7 +53,7 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
             <dd dir="auto">{receipt.client_name}</dd>
             {receipt.client_email && (
               <>
-                <dt className="sr-only">Email</dt>
+                <dt className="sr-only">{t("email")}</dt>
                 <dd className="col-start-2 text-muted" dir="ltr">{receipt.client_email}</dd>
               </>
             )}

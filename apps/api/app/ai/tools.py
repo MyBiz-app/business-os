@@ -525,3 +525,5 @@ def run_tool(ctx: ToolContext, name: str, args: dict[str, Any]) -> tuple[dict[st
         return {"error": str(error)}, True
     except HTTPException as error:
         return {"error": str(error.detail)}, True
+    except KeyError as error:  # the model left out a required input
+        return {"error": f"missing input: {error.args[0]}"}, True

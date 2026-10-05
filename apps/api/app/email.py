@@ -163,6 +163,9 @@ def render(
     return subject, "\n".join(lines)
 
 
+EMAIL_DETAILS = json.dumps({"channel": "email", "automated": True})
+
+
 def send_emails(
     conn: Connection,
     sender: Sender,
@@ -183,7 +186,8 @@ def send_emails(
     rows = (
         conn.execute(
             text("""
-                SELECT n.id, n.kind, n.payload, c.email, c.first_name, t.name AS business,
+                SELECT n.id, n.tenant_id, n.kind, n.payload, c.email, c.first_name,
+                       t.name AS business,
                        t.locale, t.time_zone
                 FROM app.notifications n
                 JOIN app.clients c ON c.id = n.client_id
@@ -199,6 +203,7 @@ def send_emails(
     )
     messages: dict[str, dict[str, Any]] = {}
     sent = failed = 0
+    per_tenant: dict[Any, int] = {}
     for row in rows:
         locale = row["locale"] if row["locale"] in ("he", "en") else "en"
         if locale not in messages:
@@ -228,6 +233,16 @@ def send_emails(
                 WHERE id = :id
             """),
             {"id": row["id"]},
+        )
+        per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
+    # Every email sent is usage of the business (meter "messages", channel email).
+    for tenant_id, count in per_tenant.items():
+        conn.execute(
+            text("""
+                INSERT INTO app.usage_events (tenant_id, meter, quantity, details, source_ref)
+                VALUES (:t, 'messages', :n, CAST(:details AS jsonb), 'notification_emails')
+            """),
+            {"t": tenant_id, "n": count, "details": EMAIL_DETAILS},
         )
     return {"sent": sent, "failed": failed, "skipped": skipped}
 

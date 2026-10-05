@@ -18,6 +18,7 @@ const THEMES = ["system", "light", "dark"] as const;
 /** The staff member's own settings: name, business, language, appearance, sign out. */
 export default function Me() {
   const t = useTranslations("business.me");
+  const tLocales = useTranslations("locales");
   const tRoles = useTranslations("roles");
   const { palette, memberships, tenant, select, api, refresh, branches, branch, selectBranch } = useBusiness();
   const { session } = useSession();
@@ -101,7 +102,7 @@ export default function Me() {
         <SegmentedControl
           label={t("language")}
           value={locale}
-          options={locales.map((value) => ({ value, label: value === "he" ? "עברית" : "English" }))}
+          options={locales.map((value) => ({ value, label: tLocales(value) }))}
           onChange={(value) => void setLocale(value as "he")}
         />
         <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("theme")}</Text>
