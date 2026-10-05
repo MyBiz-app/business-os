@@ -2498,5 +2498,76 @@
       "Currency",
       "Sample"
     ]
+  },
+  "business": {
+    "tabs": {
+      "today": "Today",
+      "numbers": "Numbers",
+      "me": "Me"
+    },
+    "noBusiness": {
+      "title": "This app is for business owners and staff",
+      "text": "The email you signed in with isn't on any business team yet. Ask the owner to invite you, or open MyBiz on a computer to create your business.",
+      "signOut": "Sign in with another email"
+    },
+    "today": {
+      "title": "Today",
+      "greeting": "{part, select, morning {Good morning} afternoon {Good afternoon} evening {Good evening} other {Hello}}",
+      "none": "Nothing booked today.",
+      "mine": "Yours today",
+      "all": "The whole day",
+      "spots": "{booked} of {capacity}",
+      "waitlist": "{count} waiting",
+      "cancelled": "Cancelled",
+      "openSchedule": "The week",
+      "checkIn": "Check in",
+      "checkedIn": "Checked in",
+      "undo": "Undo check-in",
+      "noShow": "Didn't come",
+      "roster": "Who's coming",
+      "empty": "Nobody booked yet.",
+      "statuses": {
+        "booked": "Booked",
+        "checked_in": "Checked in",
+        "no_show": "Didn't come",
+        "cancelled": "Cancelled",
+        "waitlisted": "Waiting"
+      },
+      "saved": "Saved."
+    },
+    "clients": {
+      "search": "Search",
+      "none": "No one matches.",
+      "visits": "{count, plural, =0 {No visits} one {# visit} other {# visits}}",
+      "lastVisit": "Last visit {date}",
+      "neverVisited": "Hasn't come yet",
+      "call": "Call",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "plan": "Plan",
+      "noPlan": "No active plan",
+      "notes": "Notes"
+    },
+    "numbers": {
+      "title": "Key numbers",
+      "period": "Last {count} days",
+      "empty": "No numbers yet."
+    },
+    "me": {
+      "title": "Me",
+      "business": "Business",
+      "switch": "Switch business",
+      "role": "Your role: {role}",
+      "language": "Language",
+      "theme": "Appearance",
+      "themes": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "signOut": "Sign out",
+      "name": "Your name",
+      "save": "Save"
+    }
   }
 }

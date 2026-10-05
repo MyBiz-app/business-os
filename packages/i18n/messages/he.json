@@ -2498,5 +2498,76 @@
       "מטבע",
       "לדוגמה"
     ]
+  },
+  "business": {
+    "tabs": {
+      "today": "היום",
+      "numbers": "מספרים",
+      "me": "אני"
+    },
+    "noBusiness": {
+      "title": "האפליקציה הזו לבעלי עסקים ולצוות",
+      "text": "האימייל שאיתו נכנסת עדיין לא שייך לאף צוות. אפשר לבקש מהבעלים הזמנה, או לפתוח את MyBiz במחשב כדי ליצור עסק.",
+      "signOut": "כניסה עם אימייל אחר"
+    },
+    "today": {
+      "title": "היום",
+      "greeting": "{part, select, morning {בוקר טוב} afternoon {צהריים טובים} evening {ערב טוב} other {שלום}}",
+      "none": "אין היום כלום ביומן.",
+      "mine": "שלך היום",
+      "all": "כל היום",
+      "spots": "{booked} מתוך {capacity}",
+      "waitlist": "{count} בהמתנה",
+      "cancelled": "בוטל",
+      "openSchedule": "השבוע",
+      "checkIn": "סימון הגעה",
+      "checkedIn": "הגיע/ה",
+      "undo": "ביטול הגעה",
+      "noShow": "לא הגיע/ה",
+      "roster": "מי מגיע",
+      "empty": "עוד אין רישומים.",
+      "statuses": {
+        "booked": "רשום/ה",
+        "checked_in": "הגיע/ה",
+        "no_show": "לא הגיע/ה",
+        "cancelled": "בוטל",
+        "waitlisted": "בהמתנה"
+      },
+      "saved": "נשמר."
+    },
+    "clients": {
+      "search": "חיפוש",
+      "none": "לא נמצאו תוצאות.",
+      "visits": "{count, plural, =0 {אין ביקורים} one {ביקור אחד} other {# ביקורים}}",
+      "lastVisit": "ביקור אחרון {date}",
+      "neverVisited": "עוד לא הגיע/ה",
+      "call": "חיוג",
+      "whatsapp": "וואטסאפ",
+      "email": "אימייל",
+      "plan": "מסלול",
+      "noPlan": "אין מסלול פעיל",
+      "notes": "הערות"
+    },
+    "numbers": {
+      "title": "מספרים מרכזיים",
+      "period": "{count} הימים האחרונים",
+      "empty": "אין עדיין מספרים."
+    },
+    "me": {
+      "title": "אני",
+      "business": "עסק",
+      "switch": "החלפת עסק",
+      "role": "התפקיד שלך: {role}",
+      "language": "שפה",
+      "theme": "מראה",
+      "themes": {
+        "system": "לפי המכשיר",
+        "light": "בהיר",
+        "dark": "כהה"
+      },
+      "signOut": "התנתקות",
+      "name": "השם שלך",
+      "save": "שמירה"
+    }
   }
 }
