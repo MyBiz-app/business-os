@@ -37,4 +37,20 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `purchase.py`: the owner turns on online sales, a member buys a plan in the app with a test payment and edits their details, and the owner sees both on the member's profile.
 
-`support.py <admin email>`: the owner allows support access, a platform admin opens the business read-only from the console, and the owner sees the visits and ends access.
+`support.py <team email>`: the owner allows support access, a MyBiz team member opens the business read-only from the console, and the owner sees the visits and ends access.
+
+`appointments.py`, `leads.py`, `messaging.py`, `billing.py`, `marketing.py`, `reviews.py`, `client_profile.py`: one flow each, run like `roles.py`.
+
+`signup_journey.py`: the whole sign-up journey — the plan builder with its live cart, the account, the email confirmation, the simulated payment, and the dashboard with its first-steps checklist — on a phone in Hebrew and on a wide screen in English with dark mode.
+
+`upgrade.py`: a module the business doesn't have stays in the menu, locked; its preview shows what changes on the invoice, and "add to plan" turns it on.
+
+`sales.py <owner email with data>`: the sales page for a month, its totals and the CSV export.
+
+`console.py <team email of an owner>`: the MyBiz console — an owner builds the team (manager, employee), each level sees only its own parts, a business writes in and the inbox handles it, an owner enters a business and fixes something, extends a trial and changes a plan, and the audit log has it all.
+
+`crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
+
+`business_app.py <owner email with data>` (needs `pnpm --filter business-app exec expo start --web --port 8082`): the business app — today, a session's roster and check-in, a client, the numbers.
+
+`staff_app.py <team email>` (needs `pnpm --filter staff-app exec expo start --web --port 8083`): the MyBiz team app — what needs attention, businesses, and handling a request.

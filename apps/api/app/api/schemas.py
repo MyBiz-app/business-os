@@ -28,10 +28,10 @@ class Me(BaseModel):
     email: str
     full_name: str | None
     locale: Locale | None
-    platform_admin: bool
+    platform_admin: bool = Field(description="On the MyBiz team (sees the console)")
     memberships: list[Membership]
     support_access: list[SupportAccess] = Field(
-        description="Businesses that let platform support in (platform admins only)"
+        description="Businesses that let MyBiz support in (the MyBiz team only)"
     )
 
 

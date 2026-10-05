@@ -4435,13 +4435,16 @@ export interface components {
             full_name: string | null;
             /** Locale */
             locale: ("he" | "en") | null;
-            /** Platform Admin */
+            /**
+             * Platform Admin
+             * @description On the MyBiz team (sees the console)
+             */
             platform_admin: boolean;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
             /**
              * Support Access
-             * @description Businesses that let platform support in (platform admins only)
+             * @description Businesses that let MyBiz support in (the MyBiz team only)
              */
             support_access: components["schemas"]["SupportAccess"][];
         };

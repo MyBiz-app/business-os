@@ -957,8 +957,8 @@
     }
   },
   "platform": {
-    "title": "Platform console",
-    "subtitle": "All businesses on the platform, their modules and usage.",
+    "title": "MyBiz console",
+    "subtitle": "Every business on the platform, its modules and usage.",
     "businesses": "Businesses",
     "activeClients": "Active clients",
     "bookings30d": "Bookings (30 days)",
