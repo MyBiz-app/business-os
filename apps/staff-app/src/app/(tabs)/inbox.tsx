@@ -2,12 +2,12 @@ import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { SegmentedControl } from "@/components/segmented-control";
-import { Button, Card, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
+import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
+import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useStaff } from "@/providers/staff-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 /** Requests from the website and messages from businesses, handled on the go. */
 export default function Inbox() {

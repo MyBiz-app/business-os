@@ -5,12 +5,12 @@ import { useCallback } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Card, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
-import { verticalOf } from "@/lib/vertical";
+import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { verticalOf } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 type ScheduledSession = components["schemas"]["ScheduledSession"];
 

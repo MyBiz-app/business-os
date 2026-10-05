@@ -1,4 +1,4 @@
-import type { Palette } from "@/lib/theme";
+import type { Palette } from "./theme";
 
 // Same contrast rule as the web app (apps/web/src/lib/brand.ts).
 function luminance(hex: string): number {

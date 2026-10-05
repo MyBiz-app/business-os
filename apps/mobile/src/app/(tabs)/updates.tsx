@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Card, Heading, Screen, styles } from "@/components/ui";
+import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
 

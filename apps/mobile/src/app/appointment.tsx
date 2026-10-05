@@ -6,13 +6,13 @@ import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Chip } from "@/components/chip";
-import { PressableScale } from "@/components/motion";
-import { Button, Card, ErrorText, Heading, Screen, elevation, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { tint } from "@/lib/brand";
-import { formatMoney } from "@/lib/money";
-import { useLoad } from "@/lib/use-load";
+import { Chip } from "@business-os/app-kit/components/chip";
+import { PressableScale } from "@business-os/app-kit/components/motion";
+import { Button, Card, ErrorText, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { tint } from "@business-os/app-kit/lib/brand";
+import { formatMoney } from "@business-os/app-kit/lib/money";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type Slot = components["schemas"]["Slot"];

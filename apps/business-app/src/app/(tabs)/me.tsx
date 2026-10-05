@@ -4,14 +4,14 @@ import { useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { SegmentedControl } from "@/components/segmented-control";
-import { Button, Card, Field, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { supabase } from "@/lib/supabase";
+import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
+import { Button, Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { supabase } from "@business-os/app-kit/lib/supabase";
 import { useBusiness } from "@/providers/business-provider";
-import { useLocaleSetting } from "@/providers/i18n-provider";
-import { useSession } from "@/providers/session-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useLocaleSetting } from "@business-os/app-kit/providers/i18n-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 const THEMES = ["system", "light", "dark"] as const;
 

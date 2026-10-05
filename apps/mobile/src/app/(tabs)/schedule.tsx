@@ -5,12 +5,12 @@ import { useCallback, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { PressableScale } from "@/components/motion";
+import { PressableScale } from "@business-os/app-kit/components/motion";
 import { type ClientSession, SessionCard } from "@/components/session-card";
-import { Heading, Screen, elevation, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
-import { verticalOf } from "@/lib/vertical";
+import { Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { verticalOf } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 const DAYS = 14;

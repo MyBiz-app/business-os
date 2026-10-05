@@ -3,10 +3,10 @@ import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, type ColorValue, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { verticalOf } from "@/lib/vertical";
+import { verticalOf } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { InboxProvider, useInbox } from "@/providers/inbox-provider";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 

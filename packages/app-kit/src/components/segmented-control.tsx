@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "../providers/theme-provider";
 
 type Option<T extends string> = { value: T; label: string };
 

@@ -5,9 +5,9 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Button, Card, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
+import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type Booking = components["schemas"]["ClientBooking"];

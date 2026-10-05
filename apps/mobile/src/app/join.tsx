@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@/components/ui";
-import { ApiError, apiClient, assetUrl, unwrap } from "@/lib/api";
-import { brandPalette } from "@/lib/brand";
+import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { ApiError, apiClient, assetUrl, unwrap } from "@business-os/app-kit/lib/api";
+import { brandPalette } from "@business-os/app-kit/lib/brand";
 import { useBusiness } from "@/providers/business-provider";
-import { useSession } from "@/providers/session-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 type Profile = components["schemas"]["BusinessProfile"];
 

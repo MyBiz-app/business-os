@@ -2,8 +2,8 @@ import { Redirect } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
 
 import { useBusiness } from "@/providers/business-provider";
-import { useSession } from "@/providers/session-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 /** Sends the staff member where they belong: sign in, the "no business" note, or today. */
 export default function Gate() {

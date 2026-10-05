@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { FadeIn, PressableScale } from "@/components/motion";
-import { tint } from "@/lib/brand";
-import type { Palette } from "@/lib/theme";
+import { FadeIn, PressableScale } from "./motion";
+import { tint } from "../lib/brand";
+import type { Palette } from "../lib/theme";
 
 /** Soft layered shadows for raised surfaces (same feel as the web app's cards). */
 export const elevation = {

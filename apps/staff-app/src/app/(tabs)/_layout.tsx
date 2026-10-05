@@ -3,9 +3,9 @@ import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, type ColorValue, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useStaff } from "@/providers/staff-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 

@@ -5,10 +5,10 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Button, elevation } from "@/components/ui";
-import { tint } from "@/lib/brand";
-import { ApiError } from "@/lib/api";
-import { confirm } from "@/lib/confirm";
+import { Button, elevation } from "@business-os/app-kit/components/ui";
+import { tint } from "@business-os/app-kit/lib/brand";
+import { ApiError } from "@business-os/app-kit/lib/api";
+import { confirm } from "@business-os/app-kit/lib/confirm";
 import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];

@@ -1,8 +1,8 @@
 import type { ApiClient, components } from "@business-os/api-client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { apiClient, unwrap } from "@/lib/api";
-import { useSession } from "@/providers/session-provider";
+import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 export type StaffMe = components["schemas"]["StaffMe"];
 export type PlatformPermission = StaffMe["permissions"][number];

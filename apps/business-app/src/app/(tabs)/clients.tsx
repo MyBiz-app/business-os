@@ -3,10 +3,10 @@ import { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { Card, Field, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
-import { verticalOf } from "@/lib/vertical";
+import { Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { verticalOf } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 /** The business's clients, searchable, with a tap into each one. */

@@ -2,9 +2,9 @@ import { router } from "expo-router";
 import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { Button, Card, Heading, Screen, styles } from "@/components/ui";
-import { supabase } from "@/lib/supabase";
-import { useTheme } from "@/providers/theme-provider";
+import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { supabase } from "@business-os/app-kit/lib/supabase";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 export default function NotStaff() {
   const t = useTranslations("staffApp.notStaff");

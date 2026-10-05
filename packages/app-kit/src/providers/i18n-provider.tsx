@@ -12,7 +12,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { DevSettings, I18nManager, Platform } from "react-native";
 import { IntlProvider } from "use-intl";
 
-import { loadLocale, saveLocale } from "@/lib/preferences";
+import { loadLocale, saveLocale } from "../lib/preferences";
 
 type LocaleContextValue = {
   locale: Locale;

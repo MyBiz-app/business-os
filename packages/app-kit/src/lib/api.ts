@@ -1,7 +1,7 @@
 import { createApiClient, type ApiClient } from "@business-os/api-client";
 
-import { API_URL } from "@/lib/env";
-import { supabase } from "@/lib/supabase";
+import { API_URL } from "./env";
+import { supabase } from "./supabase";
 
 export { API_URL };
 

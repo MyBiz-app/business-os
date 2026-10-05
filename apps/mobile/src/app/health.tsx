@@ -4,10 +4,10 @@ import { useCallback, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { SegmentedControl } from "@/components/segmented-control";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
+import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
+import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type MyHealth = components["schemas"]["MyHealth"];

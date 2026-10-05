@@ -3,13 +3,13 @@ import { router } from "expo-router";
 import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { SegmentedControl } from "@/components/segmented-control";
-import { Button, Card, Heading, Screen, styles } from "@/components/ui";
-import { supabase } from "@/lib/supabase";
-import { useLocaleSetting } from "@/providers/i18n-provider";
-import { useSession } from "@/providers/session-provider";
+import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
+import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { supabase } from "@business-os/app-kit/lib/supabase";
+import { useLocaleSetting } from "@business-os/app-kit/providers/i18n-provider";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
 import { useStaff } from "@/providers/staff-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 const THEMES = ["system", "light", "dark"] as const;
 

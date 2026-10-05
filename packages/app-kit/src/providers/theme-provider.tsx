@@ -1,8 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Appearance, Platform, useColorScheme } from "react-native";
 
-import { colors, type Palette } from "@/lib/theme";
-import { loadTheme, saveTheme, type ThemePreference } from "@/lib/preferences";
+import { colors, type Palette } from "../lib/theme";
+import { loadTheme, saveTheme, type ThemePreference } from "../lib/preferences";
 
 type ThemeContextValue = {
   preference: ThemePreference;

@@ -1,8 +1,8 @@
 import { StyleSheet, Text } from "react-native";
 
-import { PressableScale } from "@/components/motion";
-import { tint } from "@/lib/brand";
-import type { Palette } from "@/lib/theme";
+import { PressableScale } from "./motion";
+import { tint } from "../lib/brand";
+import type { Palette } from "../lib/theme";
 
 type Props = {
   label: string;

@@ -2,11 +2,11 @@ import type { ApiClient, components } from "@business-os/api-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { apiClient, unwrap } from "@/lib/api";
-import { brandPalette } from "@/lib/brand";
-import type { Palette } from "@/lib/theme";
-import { useSession } from "@/providers/session-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { brandPalette } from "@business-os/app-kit/lib/brand";
+import type { Palette } from "@business-os/app-kit/lib/theme";
+import { useSession } from "@business-os/app-kit/providers/session-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 export type ClientBusiness = components["schemas"]["ClientBusiness"];
 

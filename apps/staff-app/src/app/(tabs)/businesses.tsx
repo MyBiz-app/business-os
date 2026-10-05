@@ -2,11 +2,11 @@ import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Card, Field, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { useLoad } from "@/lib/use-load";
+import { Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useStaff } from "@/providers/staff-provider";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 /** Every business on the platform, searchable. */
 export default function Businesses() {

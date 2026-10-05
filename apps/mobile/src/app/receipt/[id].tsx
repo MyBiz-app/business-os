@@ -3,11 +3,11 @@ import { useCallback } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Button, Card, Heading, Screen, styles } from "@/components/ui";
-import { unwrap } from "@/lib/api";
-import { tint } from "@/lib/brand";
-import { formatMoney } from "@/lib/money";
-import { useLoad } from "@/lib/use-load";
+import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { tint } from "@business-os/app-kit/lib/brand";
+import { formatMoney } from "@business-os/app-kit/lib/money";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 /** One of the client's receipts, as a document. */
