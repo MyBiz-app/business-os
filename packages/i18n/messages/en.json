@@ -1557,7 +1557,17 @@
       "all": "All industries",
       "kinds": "Kinds of {name}",
       "notify": "Tell me when it opens",
-      "soonPage": "We're building MyBiz for {name} right now. Leave your details and we'll let you know as soon as it opens."
+      "soonPage": "We're building MyBiz for {name} right now. Leave your details and we'll let you know as soon as it opens.",
+      "ready": {
+        "title": "Ready on day one",
+        "subtitle": "A new business gets services, plans and a client card that fit the industry. Change anything in a click.",
+        "services": "Sample services",
+        "plans": "Plans and class cards",
+        "fields": "Client card: {client}",
+        "capacity": "participants",
+        "minutes": "{count} min",
+        "note": "Sample prices only. You set your own."
+      }
     },
     "ai": {
       "eyebrow": "AI workforce",

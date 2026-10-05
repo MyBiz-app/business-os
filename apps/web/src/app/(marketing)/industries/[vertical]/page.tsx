@@ -1,12 +1,13 @@
-import { ALL_VERTICALS, categories, childrenOf, vertical as findVertical } from "@business-os/verticals";
-import { Check } from "lucide-react";
+import { ALL_VERTICALS, categories, childrenOf, vertical as findVertical, type Vertical } from "@business-os/verticals";
+import { Check, Clock, CreditCard, IdCard, Users } from "lucide-react";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CtaBand, FeatureGrid } from "@/components/marketing/sections";
 import { VerticalIcon } from "@/components/vertical-icon";
+import { formatMoney } from "@/lib/money";
 import { industryTexts } from "@/lib/verticals";
 
 export function generateStaticParams() {
@@ -103,7 +104,10 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
         </section>
       )}
 
-      <nav aria-label={t("nav.industries")} className="mx-auto flex flex-wrap justify-center gap-2 px-6">
+      {!planned && <ReadySection match={match} />}
+
+      <h2 className="pt-6 text-center text-lg font-semibold">{t("industries.all")}</h2>
+      <nav aria-label={t("nav.industries")} className="mx-auto mt-4 flex flex-wrap justify-center gap-2 px-6">
         {categories().map((other) => (
           <Link
             key={other.key}
@@ -121,5 +125,109 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
       <FeatureGrid />
       <CtaBand />
     </main>
+  );
+}
+
+/** What a new business in this industry gets on day one, straight from the catalog: starter
+ * services, plans and the client card's fields. */
+async function ReadySection({ match }: { match: Vertical }) {
+  const t = await getTranslations("marketing.industries.ready");
+  const tFields = await getTranslations("clientFields");
+  const { text } = industryTexts(await getTranslations());
+  const locale = await getLocale();
+  const lang = locale === "he" ? "he" : "en";
+  const currency = locale === "he" ? "ILS" : "USD";
+  // A category without its own services shows its first kind's.
+  const firstKind = childrenOf(match.key).find((kind) => kind.defaultServices.length > 0);
+  const services = (match.defaultServices.length ? match.defaultServices : (firstKind?.defaultServices ?? [])).slice(0, 4);
+  const plans = match.defaultPlans.slice(0, 3);
+  const fields = match.clientFields.slice(0, 5);
+  if (!services.length && !plans.length && !fields.length) return null;
+
+  const columns = [
+    services.length > 0 && (
+      <div key="services" className="card flex flex-col gap-4 p-6">
+        <h3 className="flex items-center gap-2 font-semibold">
+          <span aria-hidden="true" className="icon-tile size-9">
+            <Clock className="size-4" />
+          </span>
+          {t("services")}
+        </h3>
+        <ul className="flex flex-col gap-2.5">
+          {services.map((service) => (
+            <li key={service.names.en} className="flex items-center justify-between gap-3 text-sm">
+              <span className="flex items-center gap-2">
+                <span aria-hidden="true" className="h-4 w-1 rounded-full" style={{ backgroundColor: service.color }} />
+                {service.names[lang] ?? service.names.en}
+              </span>
+              <span className="flex items-center gap-2 text-muted">
+                {service.capacity && service.capacity > 1 && (
+                  <span className="flex items-center gap-1">
+                    <Users aria-hidden="true" className="size-3.5" />
+                    <span className="sr-only">{t("capacity")}</span>
+                    {service.capacity}
+                  </span>
+                )}
+                <span>{t("minutes", { count: service.duration_minutes })}</span>
+                {service.prices[currency] !== undefined && (
+                  <bdi className="font-semibold text-foreground">{formatMoney(service.prices[currency], currency, locale)}</bdi>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ),
+    plans.length > 0 && (
+      <div key="plans" className="card flex flex-col gap-4 p-6">
+        <h3 className="flex items-center gap-2 font-semibold">
+          <span aria-hidden="true" className="icon-tile size-9">
+            <CreditCard className="size-4" />
+          </span>
+          {t("plans")}
+        </h3>
+        <ul className="flex flex-col gap-2.5">
+          {plans.map((plan) => (
+            <li key={plan.names.en} className="flex items-center justify-between gap-3 text-sm">
+              <span>{plan.names[lang] ?? plan.names.en}</span>
+              <bdi className="font-semibold">{formatMoney(plan.prices[currency] ?? 0, currency, locale)}</bdi>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ),
+    fields.length > 0 && (
+      <div key="fields" className="card flex flex-col gap-4 p-6">
+        <h3 className="flex items-center gap-2 font-semibold">
+          <span aria-hidden="true" className="icon-tile size-9">
+            <IdCard className="size-4" />
+          </span>
+          {t("fields", { client: text(match.key, "name") })}
+        </h3>
+        <ul className="flex flex-wrap gap-2">
+          {fields.map((field) => (
+            <li key={field.key} className="rounded-full bg-foreground/5 px-3 py-1 text-sm">
+              {tFields(field.key as "goal")}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ),
+  ].filter(Boolean);
+
+  return (
+    <section aria-labelledby="ready-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h2 id="ready-heading" className="text-3xl font-bold tracking-tight">
+          {t("title")}
+        </h2>
+        <p className="max-w-2xl text-muted">{t("subtitle")}</p>
+      </div>
+      <div className={`grid gap-4 ${columns.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>{columns}</div>
+      <p className="flex items-center justify-center gap-2 text-sm text-muted">
+        <Check aria-hidden="true" className="size-4 text-success" />
+        {t("note")}
+      </p>
+    </section>
   );
 }
