@@ -2,7 +2,7 @@
 
 _Last updated: 2026-10-05_ · Updated with every merged pull request. Open work lives in
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
-whose sub-issues show its progress.
+whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 **Now:** owner review on computer and phone ([#38](https://github.com/adiredri/business-os/issues/38)).
 **Next:** the rest of phase 4 (client app polish, architecture review), then phase 6.
