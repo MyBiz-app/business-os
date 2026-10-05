@@ -7,6 +7,7 @@ import { getApi } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
 import { acceptInvitation } from "./actions";
+import { isolate } from "@/lib/bidi";
 
 const BUTTON = "rounded-lg bg-primary px-4 py-2.5 text-center font-semibold text-on-primary";
 
@@ -55,10 +56,10 @@ export default async function InvitePage({ params }: PageProps<"/invite/[token]"
     } else {
       content = (
         <>
-          <p>{t("invite.body", { business: invite.tenant_name, role: t(`roles.${invite.role}`) })}</p>
+          <p>{t("invite.body", { business: isolate(invite.tenant_name), role: t(`roles.${invite.role}`) })}</p>
           <form action={acceptInvitation.bind(null, token)}>
             <button type="submit" className={`${BUTTON} w-full`}>
-              {t("invite.accept", { business: invite.tenant_name })}
+              {t("invite.accept", { business: isolate(invite.tenant_name) })}
             </button>
           </form>
         </>

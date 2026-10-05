@@ -13,6 +13,7 @@ import { getTenant } from "@/lib/tenant";
 
 import { addTestCard, payInvoice, removeCard } from "./actions";
 import { DetailsForm } from "./details-form";
+import { ScrollRegion } from "@/components/scroll-region";
 
 const TRIAL_DAYS = 14;
 const BRANDS = ["visa", "mastercard", "amex"] as const;
@@ -171,7 +172,7 @@ export default async function BillingPage() {
         {billing.invoices.length === 0 ? (
           <p className="text-sm text-muted">{t("noInvoices")}</p>
         ) : (
-          <div className="overflow-x-auto">
+          <ScrollRegion labelledBy="invoices-heading">
             <table className="w-full text-sm">
               <thead className="text-muted">
                 <tr className="border-b border-border">
@@ -218,7 +219,7 @@ export default async function BillingPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         )}
       </section>
     </main>

@@ -131,3 +131,23 @@ def test_platform_console_is_for_platform_admins(
     assert usage[0]["meter"] == "ai_credits" and usage[0]["quantity"] == 12.5
     # Being a platform admin does not make you a member of the business.
     assert client.get("/clients", headers=auth(admin, studio["tenant_id"])).status_code == 403
+
+
+def test_adding_one_module_to_the_plan(client: TestClient, studio: dict, auth) -> None:
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"ai_basic": 1}}, headers=headers)
+    before = client.get("/tenants/current/modules", headers=headers).json()
+
+    added = client.post("/tenants/current/modules/crm", headers=headers).json()
+    assert added["modules"] == {"ai_basic": 1, "crm": 1}
+    assert added["quote"]["total"] == before["quote"]["total"] + 3900
+    again = client.post("/tenants/current/modules/crm", headers=headers).json()
+    assert again["modules"] == added["modules"]
+
+    upgraded = client.post("/tenants/current/modules/ai_pro", headers=headers).json()
+    assert upgraded["modules"] == {"ai_pro": 1, "crm": 1}
+
+    soon = client.post("/tenants/current/modules/analytics_pro", headers=headers)
+    assert soon.status_code == 422 and soon.json()["detail"] == "module_not_available"
+    staff = auth(studio["coach"], studio["tenant_id"])
+    assert client.post("/tenants/current/modules/whatsapp", headers=staff).status_code == 403

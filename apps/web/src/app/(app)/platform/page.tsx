@@ -7,6 +7,7 @@ import { getApi, unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getActiveMembership } from "@/lib/tenant";
+import { ScrollRegion } from "@/components/scroll-region";
 
 /** Platform console (P-1, P-3): every business on the platform and AI usage. */
 export default async function PlatformPage() {
@@ -80,7 +81,7 @@ export default async function PlatformPage() {
         <h2 id="businesses-heading" className="text-lg font-semibold">
           {t("platform.businessesTitle")}
         </h2>
-        <div className="overflow-x-auto rounded-2xl border border-border">
+        <ScrollRegion labelledBy="businesses-heading" className="rounded-2xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-muted">
               <tr>
@@ -117,7 +118,7 @@ export default async function PlatformPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       </section>
 
       <section aria-labelledby="billing-heading" className="flex flex-col gap-3">
@@ -130,7 +131,7 @@ export default async function PlatformPage() {
         {billing.length === 0 ? (
           <p className="text-muted">{t("platform.noBilling")}</p>
         ) : (
-          <div className="overflow-x-auto card">
+          <ScrollRegion labelledBy="billing-heading" className="card">
             <table className="w-full text-sm">
               <thead className="text-muted">
                 <tr className="border-b border-border">
@@ -151,7 +152,7 @@ export default async function PlatformPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         )}
       </section>
 

@@ -50,6 +50,51 @@
             "HTTPBearer": []
           }
         ]
+      },
+      "patch": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Update Me",
+        "description": "The signed-in person's own profile: the name the team, clients and reports see.",
+        "operationId": "update_me",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__api__routes__ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/tenants": {
@@ -6996,6 +7041,75 @@
         }
       }
     },
+    "/tenants/current/modules/{key}": {
+      "post": {
+        "tags": [
+          "modules"
+        ],
+        "summary": "Add Tenant Module",
+        "description": "Adds one module to the plan (the \"add to plan\" button on a locked module). Choosing an AI\ntier replaces the other one; adding a module the plan already has changes nothing.",
+        "operationId": "add_tenant_module",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "client_app",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "extra_location"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantModules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/billing": {
       "get": {
         "tags": [
@@ -8017,7 +8131,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ProfileUpdate"
+                "$ref": "#/components/schemas/app__api__client_app__ProfileUpdate"
               }
             }
           }
@@ -8785,6 +8899,75 @@
                     "$ref": "#/components/schemas/Receipt"
                   },
                   "title": "Response List Receipts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sales": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Sales",
+        "description": "Receipts issued between two local dates (inclusive, in the business's time zone), with\ntotals: the sales page and its export for the accountant.",
+        "operationId": "sales",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sales"
                 }
               }
             }
@@ -14494,6 +14677,35 @@
         ],
         "title": "Message"
       },
+      "MethodTotal": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "card",
+              "cash",
+              "transfer",
+              "other"
+            ],
+            "title": "Method"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "method",
+          "count",
+          "amount"
+        ],
+        "title": "MethodTotal"
+      },
       "MetricValue": {
         "properties": {
           "key": {
@@ -15247,45 +15459,6 @@
           "value"
         ],
         "title": "Point"
-      },
-      "ProfileUpdate": {
-        "properties": {
-          "first_name": {
-            "type": "string",
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "First Name"
-          },
-          "last_name": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 100
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Last Name"
-          },
-          "phone": {
-            "anyOf": [
-              {
-                "type": "string",
-                "maxLength": 30
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Phone"
-          }
-        },
-        "type": "object",
-        "required": [
-          "first_name"
-        ],
-        "title": "ProfileUpdate"
       },
       "PromoCode": {
         "properties": {
@@ -16311,6 +16484,64 @@
           "idempotency_key"
         ],
         "title": "Sale"
+      },
+      "Sales": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Minor units, in the business's currency"
+          },
+          "by_method": {
+            "items": {
+              "$ref": "#/components/schemas/MethodTotal"
+            },
+            "type": "array",
+            "title": "By Method"
+          },
+          "receipts": {
+            "items": {
+              "$ref": "#/components/schemas/Receipt"
+            },
+            "type": "array",
+            "title": "Receipts"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated",
+            "description": "Some receipts are samples from test payments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "currency",
+          "count",
+          "total",
+          "by_method",
+          "receipts",
+          "simulated"
+        ],
+        "title": "Sales"
       },
       "ScheduleOptions": {
         "properties": {
@@ -18246,6 +18477,63 @@
         },
         "type": "object",
         "title": "WelcomeRequest"
+      },
+      "app__api__client_app__ProfileUpdate": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 30
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name"
+        ],
+        "title": "ProfileUpdate"
+      },
+      "app__api__routes__ProfileUpdate": {
+        "properties": {
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "title": "ProfileUpdate"
       }
     },
     "securitySchemes": {

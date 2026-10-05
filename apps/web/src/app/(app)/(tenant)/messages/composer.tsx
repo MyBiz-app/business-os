@@ -9,6 +9,7 @@ import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type SendState, sendCampaign } from "./actions";
+import { isolate } from "@/lib/bidi";
 
 type AudienceCount = components["schemas"]["AudienceCount"];
 type Template = components["schemas"]["Template"];
@@ -194,7 +195,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
             )}
           </div>
         </div>
-        <figcaption className="mt-2 text-center text-xs text-muted">{t("previewCaption", { name: sampleName })}</figcaption>
+        <figcaption className="mt-2 text-center text-xs text-muted">{t("previewCaption", { name: isolate(sampleName) })}</figcaption>
       </figure>
     </div>
   );

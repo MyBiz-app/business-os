@@ -5,6 +5,7 @@ import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { brandStyle } from "@/lib/brand";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
+import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
 import { getTenant } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
@@ -16,24 +17,26 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
 
   // Only what the user's permissions let them open.
   const allowed = (permission: string) => tenant.permissions.includes(permission);
-  const candidates: (NavItem & { permission?: string })[] = [
+  const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
     { href: "/dashboard", label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", label: t("nav.reports"), icon: "reports", permission: "reports.read" },
-    { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use" },
+    { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
     { href: "/schedule", label: t(`terms.${tenant.vertical}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
     { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
-    { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read" },
-    { href: "/messages", label: t("nav.messages"), icon: "messages", permission: "clients.read" },
+    { href: "/clients/join", label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
+    { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
+    { href: "/messages", label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
     { href: "/services", label: t("nav.services"), icon: "services", permission: "catalog.read" },
     { href: "/plans", label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
+    { href: "/sales", label: t("nav.sales"), icon: "sales", permission: "reports.read" },
     { href: "/locations", label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
   ];
+  // Modules the business doesn't have stay in the menu, locked, and open a preview.
   const items: NavItem[] = candidates
     .filter((item) => !item.permission || allowed(item.permission))
-    .filter((item) => item.href !== "/assistant" || tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro"))
-    .filter((item) => item.href !== "/leads" || tenant.modules.includes("crm"))
-    .filter((item) => item.href !== "/messages" || tenant.modules.includes("whatsapp"))
-    .map(({ href, label, icon }) => ({ href, label, icon }));
+    .map(({ href, label, icon, upgrade }) =>
+      upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, locked: true } : { href, label, icon },
+    );
   if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team" });
   if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings" });
 

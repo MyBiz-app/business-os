@@ -64,3 +64,30 @@ def test_erasing_a_client_removes_their_name_from_receipts(
     assert erased.status_code == 200, erased.text
     receipt = client.get(f"/receipts/{sold['receipt_id']}", headers=studio["headers"]).json()
     assert receipt["client_email"] is None and "Dana" not in receipt["client_name"]
+
+
+def test_sales_for_a_period(client: TestClient, studio: dict, auth: AuthHeaders) -> None:
+    from tests.conftest import local_today
+
+    headers = studio["headers"]
+    dana = new_client(client, headers, "Dana")
+    cash = sell(client, studio, dana, method="cash")
+    card = sell(client, studio, dana)
+    today = local_today().isoformat()
+
+    sales = client.get("/sales", params={"start": today, "end": today}, headers=headers).json()
+    assert sales["count"] == 2 and sales["total"] == cash["price_amount"] + card["price_amount"]
+    assert {m["method"] for m in sales["by_method"]} == {"cash", "card"}
+    assert [r["number"] for r in sales["receipts"]] == [1002, 1001] and sales["simulated"]
+
+    empty = client.get(
+        "/sales", params={"start": "2020-01-01", "end": "2020-01-31"}, headers=headers
+    ).json()
+    assert empty["count"] == 0 and empty["total"] == 0
+    backwards = client.get("/sales", params={"start": today, "end": "2020-01-01"}, headers=headers)
+    assert backwards.status_code == 422
+    staff = auth(studio["coach"], studio["tenant_id"])
+    assert (
+        client.get("/sales", params={"start": today, "end": today}, headers=staff).status_code
+        == 403
+    )

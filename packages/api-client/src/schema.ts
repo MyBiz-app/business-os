@@ -35,7 +35,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update Me
+         * @description The signed-in person's own profile: the name the team, clients and reports see.
+         */
+        patch: operations["update_me"];
         trace?: never;
     };
     "/tenants": {
@@ -1576,6 +1580,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/modules/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Tenant Module
+         * @description Adds one module to the plan (the "add to plan" button on a locked module). Choosing an AI
+         *     tier replaces the other one; adding a module the plan already has changes nothing.
+         */
+        post: operations["add_tenant_module"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/billing": {
         parameters: {
             query?: never;
@@ -2127,6 +2152,27 @@ export interface paths {
          * @description Newest first; for one client when `client_id` is given.
          */
         get: operations["list_receipts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sales
+         * @description Receipts issued between two local dates (inclusive, in the business's time zone), with
+         *     totals: the sales page and its export for the accountant.
+         */
+        get: operations["sales"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4204,6 +4250,18 @@ export interface components {
              */
             created_at: string;
         };
+        /** MethodTotal */
+        MethodTotal: {
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
+            /** Count */
+            count: number;
+            /** Amount */
+            amount: number;
+        };
         /** MetricValue */
         MetricValue: {
             /**
@@ -4513,15 +4571,6 @@ export interface components {
             bucket: string;
             /** Value */
             value: number;
-        };
-        /** ProfileUpdate */
-        ProfileUpdate: {
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name?: string | null;
-            /** Phone */
-            phone?: string | null;
         };
         /** PromoCode */
         PromoCode: {
@@ -4873,6 +4922,37 @@ export interface components {
              * @description Same key, same sale: retries never double-sell
              */
             idempotency_key: string;
+        };
+        /** Sales */
+        Sales: {
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Currency */
+            currency: string;
+            /** Count */
+            count: number;
+            /**
+             * Total
+             * @description Minor units, in the business's currency
+             */
+            total: number;
+            /** By Method */
+            by_method: components["schemas"]["MethodTotal"][];
+            /** Receipts */
+            receipts: components["schemas"]["Receipt"][];
+            /**
+             * Simulated
+             * @description Some receipts are samples from test payments
+             */
+            simulated: boolean;
         };
         /** ScheduleOptions */
         ScheduleOptions: {
@@ -5581,6 +5661,20 @@ export interface components {
              */
             expected_active_clients: number;
         };
+        /** ProfileUpdate */
+        app__api__client_app__ProfileUpdate: {
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name?: string | null;
+            /** Phone */
+            phone?: string | null;
+        };
+        /** ProfileUpdate */
+        app__api__routes__ProfileUpdate: {
+            /** Full Name */
+            full_name?: string | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -5626,6 +5720,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Me"];
+                };
+            };
+        };
+    };
+    update_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__routes__ProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -9414,6 +9541,39 @@ export interface operations {
             };
         };
     };
+    add_tenant_module: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                key: "client_app" | "ai_basic" | "ai_pro" | "crm" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "extra_location";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenantModules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_billing: {
         parameters: {
             query?: never;
@@ -10055,7 +10215,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ProfileUpdate"];
+                "application/json": components["schemas"]["app__api__client_app__ProfileUpdate"];
             };
         };
         responses: {
@@ -10467,6 +10627,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sales: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sales"];
                 };
             };
             /** @description Validation Error */

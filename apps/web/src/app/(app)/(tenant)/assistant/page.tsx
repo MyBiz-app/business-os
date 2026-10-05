@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 
 import { askAssistant, decideAction, newConversation } from "./actions";
 import { AskForm } from "./ask-form";
+import { isolate } from "@/lib/bidi";
 
 type PendingAction = components["schemas"]["PendingAction"];
 
@@ -29,8 +30,8 @@ async function ActionCard({ action }: { action: PendingAction }) {
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("needsConfirmation")}</p>
       <p className="font-medium" dir="auto">
         {preview.kind === "cancel_booking"
-          ? t("cancelPreview", { client: preview.client, service: preview.service })
-          : t("bookPreview", { client: preview.client, service: preview.service })}
+          ? t("cancelPreview", { client: isolate(preview.client), service: isolate(preview.service) })
+          : t("bookPreview", { client: isolate(preview.client), service: isolate(preview.service) })}
         {" · "}
         <span dir="ltr">{preview.starts}</span>
       </p>
@@ -61,9 +62,8 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
   const t = await getTranslations("assistant");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenant();
-  if (!canUseAssistant(tenant) || !tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")) {
-    redirect("/dashboard");
-  }
+  if (!canUseAssistant(tenant)) redirect("/dashboard");
+  if (!tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")) redirect("/upgrade/ai");
   const query = await searchParams;
   const requested = typeof query.c === "string" ? query.c : null;
 

@@ -56,7 +56,7 @@ with sync_playwright() as p:
     expect(page.get_by_role("status").filter(has_text="יובאו 2 לקוחות.")).to_be_visible(timeout=15000)
     page.get_by_role("link", name="לרשימת הלקוחות").click(); page.wait_for_url("**/clients"); h.ready(page)
     page.get_by_role("link", name="דנה לוי").click(); h.ready(page)
-    expect(page.get_by_label("הערות")).to_have_value("ברך כואבת")
+    expect(page.get_by_role("textbox", name="הערות", exact=True)).to_have_value("ברך כואבת")
     expect(page.get_by_label("טלפון")).to_have_value("050-1234567")
     print("3. imported, notes and phone kept: ok")
     b.close()

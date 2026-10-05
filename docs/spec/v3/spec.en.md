@@ -112,7 +112,12 @@ Built (all in Hebrew and English, light and dark, accessible, phone-friendly):
 - Team: invitations, roles, custom roles, working hours, time off.
 - Settings: business details, branding, booking rules, modules, billing (trial, card, invoices), support access.
 
-To complete in phase 2: locked modules in the menu with previews and "add to plan", and a full review of every screen.
+- Sales: a month of receipts, totals by payment method, CSV export for the accountant.
+- My profile: everyone sets the name the team, clients and reports see.
+- Locked modules: modules the business doesn't have stay in the menu with a lock and open a preview — what it does, a picture, what changes on the invoice — with one-click "add to plan".
+- Getting started: a first-steps checklist on the dashboard for a new business.
+
+Phase 2 review: every screen checked on phone and computer, Hebrew/light and English/dark, for accessibility, errors and layout (automated crawl plus a visual pass).
 
 ## 8. The MyBiz console
 
@@ -158,8 +163,8 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 |---|---|---|
 | Foundation | Core, verticals, schedule, clients, plans, client app, AI, reports, modules, billing, CRM, messaging, reviews, promo codes | Done |
 | 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
-| 2 — Business web app | Locked modules with previews and upsell; full review and polish | In progress |
-| 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Next |
+| 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
+| 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | In progress |
 | 4 — Apps | Client app polish, business app, MyBiz staff app | After the websites |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 

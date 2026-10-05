@@ -8,6 +8,7 @@ import { apiAssetUrl, getApi } from "@/lib/api";
 import { brandStyle } from "@/lib/brand";
 
 import { InquiryForm } from "./inquiry-form";
+import { isolate } from "@/lib/bidi";
 
 async function business(code: string) {
   const { data } = await (await getApi()).GET("/public/businesses/{code}", { params: { path: { code } } });
@@ -17,7 +18,7 @@ async function business(code: string) {
 export async function generateMetadata({ params }: PageProps<"/inquiry/[code]">): Promise<Metadata> {
   const found = await business((await params).code);
   const t = await getTranslations("inquiry");
-  return { title: found ? t("title", { name: found.name }) : t("closed") };
+  return { title: found ? t("title", { name: isolate(found.name) }) : t("closed") };
 }
 
 /** A business's public "leave your details" page; inquiries arrive as new leads (CRM). */

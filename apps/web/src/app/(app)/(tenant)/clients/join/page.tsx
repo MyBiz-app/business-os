@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import QRCode from "qrcode";
 
 import { siteOrigin } from "@/lib/origin";
@@ -10,6 +11,7 @@ export default async function JoinCodePage() {
   const t = await getTranslations("join");
   const term = await getTranslations("clients");
   const { tenant } = await getTenantFor("clients.read");
+  if (!tenant.modules.includes("client_app")) redirect("/upgrade/client_app");
   const link = `${await siteOrigin()}/join/${tenant.join_code}`;
   const qr = await QRCode.toString(link, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
 

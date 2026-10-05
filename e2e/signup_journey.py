@@ -90,13 +90,13 @@ with sync_playwright() as p:
     page.wait_for_url("**/start/finish?p=**")
 
     expect(page.get_by_role("heading", level=1)).to_have_text("שלב אחרון: פרטי תשלום")
-    expect(page.get_by_text("המספרה של שירה · מספרות וסלוני יופי")).to_be_visible()
+    expect(page.get_by_text(re.compile("המספרה של שירה. · מספרות וסלוני יופי"))).to_be_visible()
     check(page, "8-payment")
     page.get_by_label("שם בעל הכרטיס").fill("שירה לוי")
     page.get_by_role("button", name="להתחיל את תקופת הניסיון").click()
 
     page.wait_for_url("**/dashboard?welcome=1")
-    expect(page.get_by_role("heading", name="ברוכים הבאים ל-MyBiz, המספרה של שירה! 🎉")).to_be_visible()
+    expect(page.get_by_role("heading", name=re.compile("ברוכים הבאים ל-MyBiz, .המספרה של שירה.! 🎉"))).to_be_visible()
     expect(page.get_by_role("progressbar")).to_be_visible()
     check(page, "9-dashboard")
 

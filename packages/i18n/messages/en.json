@@ -207,7 +207,11 @@
     "reports": "Reports",
     "leads": "Leads",
     "messages": "Messages",
-    "menu": "Menu"
+    "menu": "Menu",
+    "clientApp": "Client app",
+    "locked": "Not in your plan",
+    "lockedItem": "{name} — not in your plan",
+    "sales": "Sales"
   },
   "terms": {
     "fitness": {
@@ -353,7 +357,9 @@
       "invalid": "Please check the details and try again.",
       "generic": "Something went wrong. Please try again."
     },
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "chooseFile": "Choose a file",
+    "noFile": "No file chosen"
   },
   "services": {
     "title": "Services",
@@ -2272,5 +2278,63 @@
       "helpCta": "Contact us",
       "startCta": "Haven't joined yet? Build your plan"
     }
+  },
+  "upgrade": {
+    "notInPlan": "Not in your plan yet",
+    "peek": "A peek at what you get",
+    "invoiceTitle": "What changes on your invoice",
+    "now": "Your plan today",
+    "with": "With {name}",
+    "difference": "Difference",
+    "perMonth": "/ month",
+    "inTrial": "You're in your free trial: nothing is charged until {date}.",
+    "afterTrial": "Added to your next monthly invoice. You can remove it any time in Settings → Modules.",
+    "add": "Add to my plan · +{price} / month",
+    "noPermission": "Only the owner or a manager can add modules. Ask them — it takes one click.",
+    "chooseTier": "Choose a level",
+    "manage": "All modules and prices",
+    "unknown": "This module isn't available."
+  },
+  "account": {
+    "link": "My profile",
+    "title": "My profile",
+    "subtitle": "How you appear to your team, your clients and in reports.",
+    "name": "Full name",
+    "nameHint": "Shown on the schedule, in the client app and in reports.",
+    "email": "Email",
+    "emailHint": "You sign in with this email.",
+    "password": "Password",
+    "changePassword": "Change password",
+    "businesses": "Your businesses"
+  },
+  "sales": {
+    "title": "Sales",
+    "subtitle": "Every payment and its receipt, by month.",
+    "previous": "Previous month",
+    "next": "Next month",
+    "total": "Total sales",
+    "count": "{count, plural, =0 {No receipts} one {# receipt} other {# receipts}}",
+    "byMethod": "By payment method",
+    "receipts": "Receipts",
+    "number": "No.",
+    "date": "Date",
+    "client": "Client",
+    "item": "Item",
+    "method": "Method",
+    "amount": "Amount",
+    "empty": "No sales this month yet.",
+    "export": "Export for the accountant (CSV)",
+    "simulated": "Includes sample receipts from test payments — they aren't tax documents.",
+    "csvHeader": [
+      "Receipt",
+      "Date",
+      "Client",
+      "Email",
+      "Item",
+      "Method",
+      "Amount",
+      "Currency",
+      "Sample"
+    ]
   }
 }
