@@ -3,21 +3,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ColumnChart } from "@/components/charts/column-chart";
-import { getApi, unwrap } from "@/lib/api";
+import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getActiveMembership } from "@/lib/tenant";
+import { getPlatformFor } from "@/lib/platform";
 
-import { openAsSupport } from "../actions";
+import { openAsSupport } from "../../actions";
 
 /** Platform console (P-2): one business's modules and usage. Its own data opens only through
  * support access, which the owner grants for a limited time (read-only and audited). */
-export default async function PlatformBusinessPage({ params }: PageProps<"/platform/[id]">) {
+export default async function PlatformBusinessPage({ params }: PageProps<"/platform/businesses/[id]">) {
   const { id } = await params;
   const t = await getTranslations();
   const locale = await getLocale();
   const { me } = await getActiveMembership();
-  if (!me.platform_admin) notFound();
-  const api = await getApi();
+  const { api } = await getPlatformFor("businesses.read");
   const [businesses, usage] = await Promise.all([
     api.GET("/platform/businesses").then(unwrap),
     api.GET("/platform/usage", { params: { query: { tenant_id: id, days: 90 } } }).then(unwrap),
@@ -30,8 +30,8 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
 
   return (
     <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
-      <Link href="/platform" className="text-sm text-primary underline-offset-4 hover:underline">
-        {t("platform.title")}
+      <Link href="/platform/businesses" className="text-sm text-primary underline-offset-4 hover:underline">
+        {t("platform.businessesTitle")}
       </Link>
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold" dir="auto">

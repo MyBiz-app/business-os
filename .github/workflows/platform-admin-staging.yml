@@ -1,12 +1,12 @@
 name: Grant platform admin on staging
 
-# Makes an existing staging user a platform admin (sees the platform console). Platform
-# admins are never granted through the API. Started by hand from the Actions tab.
+# Adds an owner to MyBiz's team on staging (sees the whole console). After that, owners
+# manage the team from the console itself. Started by hand from the Actions tab.
 on:
   workflow_dispatch:
     inputs:
       email:
-        description: Email of the staging user (must have signed in once)
+        description: Email of the person (they can sign up before or after)
         required: true
         type: string
 
@@ -26,12 +26,12 @@ jobs:
           EMAIL: ${{ inputs.email }}
         run: |
           granted=$(psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v email="$EMAIL" -tA <<'SQL'
-          INSERT INTO app.platform_admins (user_id)
-          SELECT id FROM app.users WHERE lower(email) = lower(:'email')
+          INSERT INTO app.platform_staff (email, level, added_by)
+          VALUES (lower(:'email'), 'owner', 'staging workflow')
           ON CONFLICT DO NOTHING
-          RETURNING user_id;
+          RETURNING email;
           SQL
           )
           if [ -z "$granted" ]; then
-            echo "::warning::No new grant: the user does not exist yet or is already an admin."
+            echo "::warning::No change: this email is already on the team."
           fi

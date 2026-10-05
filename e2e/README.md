@@ -15,7 +15,7 @@ proposes a booking → confirmed and executed → a platform admin sees the busi
 2. API with the scripted AI model: `cd apps/api && PYTHONPATH=../../e2e:. uv run uvicorn fake_ai_api:app --port 8000`
 3. Web: `pnpm --filter web dev`; client app: `pnpm --filter mobile exec expo start --web --port 8081`
 4. Make an existing local user a platform admin:
-   `docker exec supabase_db_business-os psql -U postgres -c "insert into app.platform_admins select id from app.users where email = 'you@example.com'"`
+   `docker exec supabase_db_business-os psql -U postgres -c "insert into app.platform_staff (email, level) values ('you@example.com', 'owner')"`
 5. From the repository root:
    `uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" python e2e/dod.py you@example.com`
 

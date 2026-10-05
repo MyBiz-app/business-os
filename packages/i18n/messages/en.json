@@ -995,7 +995,101 @@
     "month": "Month",
     "invoices": "Invoices",
     "paid": "Paid",
-    "open": "Open"
+    "open": "Open",
+    "console": "MyBiz console",
+    "nav": {
+      "label": "Console navigation",
+      "overview": "Overview",
+      "businesses": "Businesses",
+      "inbox": "Inbox",
+      "billing": "Billing",
+      "team": "MyBiz team",
+      "audit": "Audit log"
+    },
+    "levels": {
+      "primary_owner": "Primary owner",
+      "owner": "Owner",
+      "manager": "Manager",
+      "employee": "Employee"
+    },
+    "levelHints": {
+      "primary_owner": "Everything. Can't be removed or changed by anyone.",
+      "owner": "Everything, including the team. A partner.",
+      "manager": "Manages employees and gives them permissions they hold themselves.",
+      "employee": "Only the permissions given."
+    },
+    "permissions": {
+      "businesses_read": {
+        "name": "See businesses",
+        "hint": "Every business, its owners, team and clients."
+      },
+      "businesses_act": {
+        "name": "Work inside businesses",
+        "hint": "Enter a business to fix things; the owner sees it."
+      },
+      "billing_manage": {
+        "name": "Billing",
+        "hint": "Trials, modules, invoices and revenue."
+      },
+      "inbox_manage": {
+        "name": "Inbox",
+        "hint": "Contact requests and complaints."
+      },
+      "usage_read": {
+        "name": "Usage",
+        "hint": "AI usage across the platform."
+      },
+      "staff_manage": {
+        "name": "Manage employees",
+        "hint": "Add employees and give them permissions."
+      }
+    },
+    "you": "You · {level}",
+    "seeAll": "See all",
+    "newestBusinesses": "Newest businesses",
+    "latestRequests": "Latest requests",
+    "team": {
+      "title": "MyBiz team",
+      "subtitle": "Who works on MyBiz, and what each person may do. Everyone signs in with the email you add.",
+      "add": "Add a team member",
+      "email": "Email",
+      "level": "Level",
+      "permissions": "Permissions",
+      "allPermissions": "All permissions",
+      "save": "Save",
+      "added": "Saved.",
+      "remove": "Remove",
+      "removeConfirm": "Remove {email} from the MyBiz team?",
+      "disable": "Pause access",
+      "enable": "Resume access",
+      "paused": "Paused",
+      "invited": "Hasn't signed in yet",
+      "protected": "Protected",
+      "rules": "Every level only gives permissions it holds. Only owners add owners and managers. Nobody can change the primary owner or their own entry.",
+      "errors": {
+        "primary_owner_protected": "The primary owner can't be changed or removed.",
+        "not_yourself": "You can't change your own entry.",
+        "cannot_grant_more_than_you_hold": "You can only give permissions you hold yourself.",
+        "employees_do_not_manage_staff": "Employees can't manage the team — make them a manager.",
+        "forbidden": "Your level can't make this change.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Everything the MyBiz team did, newest first.",
+      "when": "When",
+      "who": "Who",
+      "action": "Action",
+      "business": "Business",
+      "details": "Details",
+      "empty": "Nothing yet.",
+      "actions": {
+        "staff_added": "Added a team member",
+        "staff_changed": "Changed a team member",
+        "staff_removed": "Removed a team member"
+      }
+    }
   },
   "permissions": {
     "clients_read": "View clients",

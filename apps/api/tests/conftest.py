@@ -72,6 +72,13 @@ def clean_tables(engine: Engine) -> None:
             )
         ).scalar_one()
         connection.execute(text(f"TRUNCATE {tables} CASCADE"))
+        # The primary owner is part of the schema (migration 0037), not test data.
+        connection.execute(
+            text("""
+                INSERT INTO app.platform_staff (email, level, added_by)
+                VALUES ('adire7399@gmail.com', 'primary_owner', 'migration')
+            """)
+        )
 
 
 class StaticKeySource:
@@ -173,3 +180,25 @@ def studio(client: TestClient, auth: AuthHeaders, engine: Engine) -> dict:
         "room": room,
         "coach": coach,
     }
+
+
+def make_staff(
+    engine: Engine, user_id: UUID, level: str = "owner", permissions: tuple[str, ...] = ()
+) -> str:
+    """Puts a user on MyBiz's own team (the console); returns their email."""
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email) ON CONFLICT DO NOTHING"),
+            {"id": user_id, "email": f"{user_id}@example.com"},
+        )
+        email = connection.execute(
+            text("SELECT lower(email) FROM app.users WHERE id = :id"), {"id": user_id}
+        ).scalar_one()
+        connection.execute(
+            text("""
+                INSERT INTO app.platform_staff (email, level, permissions)
+                VALUES (:email, :level, CAST(:permissions AS text[]))
+            """),
+            {"email": email, "level": level, "permissions": list(permissions)},
+        )
+    return email

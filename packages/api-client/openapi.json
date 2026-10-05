@@ -7833,6 +7833,230 @@
         ]
       }
     },
+    "/platform/me": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Platform Me",
+        "description": "The signed-in team member's level and permissions (the console shows what they hold).",
+        "operationId": "platform_me",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffMe"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/staff": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "List Staff",
+        "operationId": "list_staff",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  },
+                  "type": "array",
+                  "title": "Response List Staff"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/staff/{email}": {
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Save Staff",
+        "description": "Adds a team member or changes one. Nobody changes the primary owner or themselves;\nonly owners handle owners and managers; nobody gives more than they hold.",
+        "operationId": "save_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "title": "Email"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  },
+                  "title": "Response Save Staff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Remove Staff",
+        "operationId": "remove_staff",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StaffMember"
+                  },
+                  "title": "Response Remove Staff"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/audit": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Audit",
+        "description": "What the MyBiz team did, newest first (owners only).",
+        "operationId": "audit",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditEntry"
+                  },
+                  "title": "Response Audit"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-access": {
       "get": {
         "tags": [
@@ -9960,6 +10184,61 @@
           "recipients"
         ],
         "title": "AudienceCount"
+      },
+      "AuditEntry": {
+        "properties": {
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Occurred At"
+          },
+          "actor_email": {
+            "type": "string",
+            "title": "Actor Email"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "tenant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Id"
+          },
+          "tenant_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Name"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "type": "object",
+        "required": [
+          "occurred_at",
+          "actor_email",
+          "action",
+          "tenant_id",
+          "tenant_name",
+          "details"
+        ],
+        "title": "AuditEntry"
       },
       "Billing": {
         "properties": {
@@ -15441,6 +15720,18 @@
         ],
         "title": "PlatformBusiness"
       },
+      "PlatformPermission": {
+        "type": "string",
+        "enum": [
+          "businesses.read",
+          "businesses.act",
+          "billing.manage",
+          "inbox.manage",
+          "usage.read",
+          "staff.manage"
+        ],
+        "title": "PlatformPermission"
+      },
       "Point": {
         "properties": {
           "bucket": {
@@ -17586,6 +17877,142 @@
           "blocks"
         ],
         "title": "StaffHours"
+      },
+      "StaffMe": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "primary_owner",
+              "owner",
+              "manager",
+              "employee"
+            ],
+            "title": "Level"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "level",
+          "permissions"
+        ],
+        "title": "StaffMe"
+      },
+      "StaffMember": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "primary_owner",
+              "owner",
+              "manager",
+              "employee"
+            ],
+            "title": "Level"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions"
+          },
+          "disabled": {
+            "type": "boolean",
+            "title": "Disabled"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "signed_up": {
+            "type": "boolean",
+            "title": "Signed Up",
+            "description": "Has signed in to MyBiz at least once"
+          },
+          "added_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Added By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "level",
+          "permissions",
+          "disabled",
+          "full_name",
+          "signed_up",
+          "added_by",
+          "created_at"
+        ],
+        "title": "StaffMember"
+      },
+      "StaffSave": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "owner",
+              "manager",
+              "employee"
+            ],
+            "title": "Level"
+          },
+          "permissions": {
+            "items": {
+              "$ref": "#/components/schemas/PlatformPermission"
+            },
+            "type": "array",
+            "title": "Permissions",
+            "default": []
+          },
+          "disabled": {
+            "type": "boolean",
+            "title": "Disabled",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "level"
+        ],
+        "title": "StaffSave"
       },
       "StageChange": {
         "properties": {

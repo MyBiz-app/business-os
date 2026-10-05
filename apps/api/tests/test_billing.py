@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.billing import add_months, bill_businesses, periods_due
-from tests.conftest import AuthHeaders, add_member
+from tests.conftest import AuthHeaders, add_member, make_staff
 
 
 def test_months_are_clamped_to_shorter_months() -> None:
@@ -119,10 +119,7 @@ def test_platform_admins_see_billed_revenue(
     admin = uuid4()
     client.get("/me", headers=auth(admin))
     assert client.get("/platform/billing", headers=auth(admin)).status_code == 403
-    with engine.begin() as connection:
-        connection.execute(
-            text("INSERT INTO app.platform_admins (user_id) VALUES (:id)"), {"id": admin}
-        )
+    make_staff(engine, admin)
     [month] = client.get("/platform/billing", headers=auth(admin)).json()
     due = client.get("/billing", headers=studio["headers"]).json()["balance_due"]
     assert month["currency"] == "ILS" and month["invoices"] == 1 and month["open"] == due > 0

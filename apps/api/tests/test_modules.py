@@ -3,7 +3,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from tests.conftest import STUDIO, AuthHeaders, add_member
+from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
 from tests.test_client_app import join, join_code
 
 
@@ -106,10 +106,8 @@ def test_platform_console_is_for_platform_admins(
 
     admin = uuid4()
     client.get("/me", headers=auth(admin))  # creates the profile
+    make_staff(engine, admin)
     with engine.begin() as connection:
-        connection.execute(
-            text("INSERT INTO app.platform_admins (user_id) VALUES (:id)"), {"id": admin}
-        )
         connection.execute(
             text("""
                 INSERT INTO app.usage_events (tenant_id, meter, quantity)

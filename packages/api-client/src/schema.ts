@@ -1848,6 +1848,85 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform Me
+         * @description The signed-in team member's level and permissions (the console shows what they hold).
+         */
+        get: operations["platform_me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/staff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Staff */
+        get: operations["list_staff"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/staff/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Staff
+         * @description Adds a team member or changes one. Nobody changes the primary owner or themselves;
+         *     only owners handle owners and managers; nobody gives more than they hold.
+         */
+        put: operations["save_staff"];
+        post?: never;
+        /** Remove Staff */
+        delete: operations["remove_staff"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Audit
+         * @description What the MyBiz team did, newest first (owners only).
+         */
+        get: operations["audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/support-access": {
         parameters: {
             query?: never;
@@ -2495,6 +2574,26 @@ export interface components {
              * @description Who can be reached (has a phone number)
              */
             recipients: number;
+        };
+        /** AuditEntry */
+        AuditEntry: {
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Actor Email */
+            actor_email: string;
+            /** Action */
+            action: string;
+            /** Tenant Id */
+            tenant_id: string | null;
+            /** Tenant Name */
+            tenant_name: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
         };
         /** Billing */
         Billing: {
@@ -4562,6 +4661,11 @@ export interface components {
             /** Owner Email */
             owner_email: string | null;
         };
+        /**
+         * PlatformPermission
+         * @enum {string}
+         */
+        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage";
         /** Point */
         Point: {
             /**
@@ -5305,6 +5409,64 @@ export interface components {
             user_id: string;
             /** Blocks */
             blocks: components["schemas"]["HoursBlock"][];
+        };
+        /** StaffMe */
+        StaffMe: {
+            /** Email */
+            email: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "primary_owner" | "owner" | "manager" | "employee";
+            /** Permissions */
+            permissions: components["schemas"]["PlatformPermission"][];
+        };
+        /** StaffMember */
+        StaffMember: {
+            /** Email */
+            email: string;
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "primary_owner" | "owner" | "manager" | "employee";
+            /** Permissions */
+            permissions: components["schemas"]["PlatformPermission"][];
+            /** Disabled */
+            disabled: boolean;
+            /** Full Name */
+            full_name: string | null;
+            /**
+             * Signed Up
+             * @description Has signed in to MyBiz at least once
+             */
+            signed_up: boolean;
+            /** Added By */
+            added_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** StaffSave */
+        StaffSave: {
+            /**
+             * Level
+             * @enum {string}
+             */
+            level: "owner" | "manager" | "employee";
+            /**
+             * Permissions
+             * @default []
+             */
+            permissions: components["schemas"]["PlatformPermission"][];
+            /**
+             * Disabled
+             * @default false
+             */
+            disabled: boolean;
         };
         /** StageChange */
         StageChange: {
@@ -10019,6 +10181,143 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BillingMonth"][];
+                };
+            };
+        };
+    };
+    platform_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMe"];
+                };
+            };
+        };
+    };
+    list_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMember"][];
+                };
+            };
+        };
+    };
+    save_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffSave"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMember"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_staff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StaffMember"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEntry"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

@@ -995,7 +995,101 @@
     "month": "חודש",
     "invoices": "חשבוניות",
     "paid": "שולם",
-    "open": "פתוח"
+    "open": "פתוח",
+    "console": "קונסולת MyBiz",
+    "nav": {
+      "label": "ניווט בקונסולה",
+      "overview": "סקירה",
+      "businesses": "עסקים",
+      "inbox": "תיבת פניות",
+      "billing": "חיוב",
+      "team": "צוות MyBiz",
+      "audit": "יומן פעולות"
+    },
+    "levels": {
+      "primary_owner": "בעלים ראשי",
+      "owner": "בעלים",
+      "manager": "מנהל/ת",
+      "employee": "עובד/ת"
+    },
+    "levelHints": {
+      "primary_owner": "הכול. אף אחד לא יכול להסיר או לשנות.",
+      "owner": "הכול, כולל ניהול הצוות. שותף.",
+      "manager": "מנהל/ת עובדים ונותן/ת להם הרשאות שיש לו/ה בעצמו/ה.",
+      "employee": "רק ההרשאות שניתנו."
+    },
+    "permissions": {
+      "businesses_read": {
+        "name": "צפייה בעסקים",
+        "hint": "כל עסק, הבעלים, הצוות והלקוחות שלו."
+      },
+      "businesses_act": {
+        "name": "עבודה בתוך עסקים",
+        "hint": "כניסה לעסק כדי לתקן; הבעלים רואים זאת."
+      },
+      "billing_manage": {
+        "name": "חיוב",
+        "hint": "תקופות ניסיון, מודולים, חשבוניות והכנסות."
+      },
+      "inbox_manage": {
+        "name": "תיבת פניות",
+        "hint": "פניות מהאתר ותלונות."
+      },
+      "usage_read": {
+        "name": "שימוש",
+        "hint": "שימוש ב-AI בכל הפלטפורמה."
+      },
+      "staff_manage": {
+        "name": "ניהול עובדים",
+        "hint": "הוספת עובדים ומתן הרשאות."
+      }
+    },
+    "you": "את/ה · {level}",
+    "seeAll": "לכל הרשימה",
+    "newestBusinesses": "העסקים החדשים",
+    "latestRequests": "הפניות האחרונות",
+    "team": {
+      "title": "צוות MyBiz",
+      "subtitle": "מי עובד ב-MyBiz ומה כל אחד רשאי לעשות. כל אחד מתחבר עם האימייל שהוספת.",
+      "add": "הוספת איש צוות",
+      "email": "אימייל",
+      "level": "רמה",
+      "permissions": "הרשאות",
+      "allPermissions": "כל ההרשאות",
+      "save": "שמירה",
+      "added": "נשמר.",
+      "remove": "הסרה",
+      "removeConfirm": "להסיר את {email} מצוות MyBiz?",
+      "disable": "השהיית גישה",
+      "enable": "חידוש גישה",
+      "paused": "מושהה",
+      "invited": "עוד לא התחבר/ה",
+      "protected": "מוגן",
+      "rules": "כל רמה נותנת רק הרשאות שיש לה. רק בעלים מוסיפים בעלים ומנהלים. אף אחד לא יכול לשנות את הבעלים הראשי או את עצמו.",
+      "errors": {
+        "primary_owner_protected": "אי אפשר לשנות או להסיר את הבעלים הראשי.",
+        "not_yourself": "אי אפשר לשנות את עצמך.",
+        "cannot_grant_more_than_you_hold": "אפשר לתת רק הרשאות שיש לך.",
+        "employees_do_not_manage_staff": "עובדים לא מנהלים צוות — אפשר להפוך אותם למנהלים.",
+        "forbidden": "הרמה שלך לא מאפשרת את השינוי הזה.",
+        "generic": "משהו השתבש. כדאי לנסות שוב."
+      }
+    },
+    "audit": {
+      "title": "יומן פעולות",
+      "subtitle": "כל מה שצוות MyBiz עשה, מהחדש לישן.",
+      "when": "מתי",
+      "who": "מי",
+      "action": "פעולה",
+      "business": "עסק",
+      "details": "פרטים",
+      "empty": "עוד אין כלום.",
+      "actions": {
+        "staff_added": "הוסיף/ה איש צוות",
+        "staff_changed": "שינה/תה איש צוות",
+        "staff_removed": "הסיר/ה איש צוות"
+      }
+    }
   },
   "permissions": {
     "clients_read": "צפייה בלקוחות",
