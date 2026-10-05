@@ -95,6 +95,9 @@ export type Vertical = {
   bookingModes: string[];
   recommendedModules: string[];
   clientFields: ClientField[];
+  /** Starter services and plans a new business gets (inherited when the entry has none). */
+  defaultServices: DefaultService[];
+  defaultPlans: DefaultPlan[];
   children: string[];
 };
 
@@ -125,6 +128,8 @@ function build(): Map<string, Vertical> {
       bookingModes: entry.booking_modes ?? parent?.bookingModes ?? [],
       recommendedModules: entry.recommended_modules ?? parent?.recommendedModules ?? [],
       clientFields: mergeFields(parent?.clientFields ?? [], entry),
+      defaultServices: entry.default_services ?? parent?.defaultServices ?? [],
+      defaultPlans: entry.default_plans ?? parent?.defaultPlans ?? [],
       children: (entry.children ?? []).map((child) => child.key),
     };
     all.set(entry.key, vertical);

@@ -6,6 +6,10 @@ import {
   Check,
   CalendarClock,
   CreditCard,
+  Download,
+  Hand,
+  KeyRound,
+  Lock,
   MessageCircle,
   NotebookPen,
   Receipt,
@@ -18,6 +22,8 @@ import { categories } from "@business-os/verticals";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { BranchesMock } from "@/components/marketing/mocks";
+import { ModuleIcon } from "@/components/modules/module-icon";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { industryTexts } from "@/lib/verticals";
 
@@ -51,11 +57,17 @@ export function SectionHeading({ eyebrow, title, subtitle, id, level = 2 }: { ey
   );
 }
 
-export async function FeatureGrid() {
+/** Every core feature. On the features page, whose own heading already says it, the grid
+ * gets the shorter "all in one place" heading. */
+export async function FeatureGrid({ inFeaturesPage = false }: { inFeaturesPage?: boolean }) {
   const t = await getTranslations("marketing.features");
   return (
     <section aria-labelledby="features-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
-      <SectionHeading id="features-heading" title={t("title")} subtitle={t("subtitle")} />
+      <SectionHeading
+        id="features-heading"
+        title={inFeaturesPage ? t("gridTitle") : t("title")}
+        subtitle={inFeaturesPage ? t("gridSubtitle") : t("subtitle")}
+      />
       <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {FEATURES.map(({ key, Icon }) => (
           <li key={key} className="card card-hover flex flex-col gap-3 p-6">
@@ -172,6 +184,86 @@ export async function CtaBand() {
           </Link>
         </div>
       </div>
+    </section>
+  );
+}
+
+/** One owner, several businesses, each with branches (decision T76). */
+export async function BranchesSection() {
+  const t = await getTranslations("marketing.branches");
+  return (
+    <section aria-labelledby="branches-heading" className="bg-surface/60 py-20">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
+        <div className="flex flex-col gap-5">
+          <p className="text-sm font-semibold text-primary">{t("eyebrow")}</p>
+          <h2 id="branches-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("title")}
+          </h2>
+          <p className="text-lg text-muted">{t("text")}</p>
+          <ul className="flex flex-col gap-2">
+            {(t.raw("points") as string[]).map((point) => (
+              <li key={point} className="flex items-start gap-2 font-medium">
+                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success" />
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <BranchesMock />
+      </div>
+    </section>
+  );
+}
+
+const ADD_ONS = ["client_app", "ai_basic", "crm", "whatsapp", "extra_location"] as const;
+
+/** The add-ons in one row, with a link to their prices. */
+export async function AddOnsStrip() {
+  const t = await getTranslations("marketing.addOns");
+  const tModules = await getTranslations("modules");
+  return (
+    <section aria-labelledby="add-ons-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16">
+      <SectionHeading id="add-ons-heading" title={t("title")} subtitle={t("subtitle")} />
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+        {ADD_ONS.map((key) => (
+          <li key={key} className="card card-hover flex flex-col items-center gap-3 p-5 text-center">
+            <ModuleIcon module={key} size="lg" />
+            <span className="font-semibold">{tModules(`names.${key}`)}</span>
+          </li>
+        ))}
+      </ul>
+      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary">
+        {t("cta")}
+        <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
+      </Link>
+    </section>
+  );
+}
+
+const SAFETY = [
+  { key: "separate", Icon: Lock },
+  { key: "approve", Icon: Hand },
+  { key: "roles", Icon: KeyRound },
+  { key: "yours", Icon: Download },
+] as const;
+
+/** How MyBiz keeps a business's data and actions safe. */
+export async function SafetySection() {
+  const t = await getTranslations("marketing.safety");
+  return (
+    <section aria-labelledby="safety-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
+      <SectionHeading id="safety-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {SAFETY.map(({ key, Icon }) => (
+          <li key={key} className="card flex flex-col gap-3 p-6">
+            <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
+              <Icon className="size-5" />
+            </span>
+            <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>
+            <p className="text-sm text-muted">{t(`items.${key}.text`)}</p>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

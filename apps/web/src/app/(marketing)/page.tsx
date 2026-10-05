@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
-import { CtaBand, Faq, FeatureGrid, IndustryCards, SectionHeading } from "@/components/marketing/sections";
+import { AddOnsStrip, BranchesSection, CtaBand, Faq, FeatureGrid, IndustryCards, SectionHeading } from "@/components/marketing/sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
@@ -112,7 +112,11 @@ export default async function Home() {
         </div>
       </section>
 
+      <BranchesSection />
+
       <IndustryCards />
+
+      <AddOnsStrip />
 
       {/* How it works */}
       <section aria-labelledby="steps-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
