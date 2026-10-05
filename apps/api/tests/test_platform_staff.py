@@ -162,3 +162,42 @@ def test_staff_without_that_permission_stay_outside(
 ) -> None:
     watcher, _ = staff_member(engine, "employee", ("businesses.read",))
     assert client.get("/clients", headers=auth(watcher, studio["tenant_id"])).status_code == 403
+
+
+def test_the_inbox_moves_requests_along(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    staff, staff_email = staff_member(engine, "employee", ("inbox.manage",))
+    headers = auth(staff)
+    client.post(
+        "/public/contact",
+        json={"name": "Dana", "email": "dana@example.com", "message": "Hi", "locale": "he"},
+    )
+    complaint = client.post(
+        "/support-requests",
+        json={"message": "The schedule shows the wrong hour"},
+        headers=studio["headers"],
+    )
+    assert complaint.status_code == 201
+
+    inbox = client.get("/platform/contact-requests", headers=headers).json()
+    assert {r["status"] for r in inbox} == {"new"} and len(inbox) == 2
+    mine = next(r for r in inbox if r["from_business"])
+    assert mine["business"] == "Studio Flow" and mine["tenant_id"] == str(studio["tenant_id"])
+
+    taken = client.patch(
+        f"/platform/contact-requests/{mine['id']}",
+        json={"status": "in_progress", "assignee": "me", "notes": "Called them back"},
+        headers=headers,
+    ).json()
+    updated = next(r for r in taken if r["id"] == mine["id"])
+    assert updated["status"] == "in_progress" and updated["assignee"] == staff_email
+    assert updated["notes"] == "Called them back"
+
+    done = client.patch(
+        f"/platform/contact-requests/{mine['id']}", json={"status": "done"}, headers=headers
+    ).json()
+    assert done[-1]["id"] == mine["id"]  # finished ones sink to the bottom
+
+    other, _ = staff_member(engine, "employee", ("usage.read",))
+    assert client.get("/platform/contact-requests", headers=auth(other)).status_code == 403

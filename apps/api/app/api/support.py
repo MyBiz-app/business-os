@@ -8,6 +8,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
+from sqlalchemy.exc import DBAPIError
 
 from app.api.deps import TenantContext, get_tenant_context
 
@@ -109,3 +110,38 @@ def revoke_support(context: OwnerDep) -> SupportStatus:
         """)
     )
     return _status(context)
+
+
+# --- Writing to MyBiz ------------------------------------------------------------------------
+
+complaints_router = APIRouter(prefix="/support-requests", tags=["settings"])
+
+
+class ComplaintCreate(BaseModel):
+    message: str = Field(min_length=5, max_length=4000)
+
+
+class Complaint(BaseModel):
+    id: UUID
+
+
+@complaints_router.post("", status_code=status.HTTP_201_CREATED)
+def write_to_mybiz(
+    body: ComplaintCreate, context: Annotated[TenantContext, Depends(get_tenant_context)]
+) -> Complaint:
+    """A question or complaint from the business to the MyBiz team; it lands in the console's
+    inbox with the business attached."""
+    locale = context.session.execute(
+        text("SELECT locale FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    try:
+        with context.session.begin_nested():
+            new_id = context.session.execute(
+                text("SELECT app.submit_complaint(:message, :locale)"),
+                {"message": body.message, "locale": locale},
+            ).scalar_one()
+    except DBAPIError as error:
+        if getattr(error.orig, "sqlstate", None) == "P0001":
+            raise HTTPException(status_code=429, detail="too_many_requests") from error
+        raise
+    return Complaint(id=new_id)

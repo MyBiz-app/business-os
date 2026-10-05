@@ -1817,7 +1817,8 @@ export interface paths {
         };
         /**
          * Contact Requests
-         * @description Businesses that wrote in through the marketing site, newest first.
+         * @description The inbox: requests from the marketing site and complaints from businesses. Open ones
+         *     first, then newest.
          */
         get: operations["contact_requests"];
         put?: never;
@@ -1826,6 +1827,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/platform/contact-requests/{request_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Contact Request
+         * @description Moves a request along: status, who on the MyBiz side handles it, internal notes.
+         */
+        patch: operations["update_contact_request"];
         trace?: never;
     };
     "/platform/billing": {
@@ -1944,6 +1965,27 @@ export interface paths {
         post: operations["grant_support"];
         /** Revoke Support */
         delete: operations["revoke_support"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/support-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Write To Mybiz
+         * @description A question or complaint from the business to the MyBiz team; it lands in the console's
+         *     inbox with the business attached.
+         */
+        post: operations["write_to_mybiz"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3297,6 +3339,19 @@ export interface components {
             /** Cancelled Sessions */
             cancelled_sessions: number;
         };
+        /** Complaint */
+        Complaint: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** ComplaintCreate */
+        ComplaintCreate: {
+            /** Message */
+            message: string;
+        };
         /** ContactCreate */
         ContactCreate: {
             /** Name */
@@ -3349,6 +3404,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "new" | "in_progress" | "done";
+            /** Assignee */
+            assignee: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Tenant Id */
+            tenant_id: string | null;
+            /**
+             * From Business
+             * @description A complaint from inside a business, not the site
+             */
+            from_business: boolean;
         };
         /** Conversation */
         Conversation: {
@@ -3795,6 +3866,18 @@ export interface components {
              * @description The latest 50, newest first
              */
             items: components["schemas"]["Notification"][];
+        };
+        /** InboxUpdate */
+        InboxUpdate: {
+            /** Status */
+            status?: ("new" | "in_progress" | "done") | null;
+            /**
+             * Assignee
+             * @description 'me', an email, or '' to clear
+             */
+            assignee?: string | null;
+            /** Notes */
+            notes?: string | null;
         };
         /** InquiryCreate */
         InquiryCreate: {
@@ -10171,6 +10254,41 @@ export interface operations {
             };
         };
     };
+    update_contact_request: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                request_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InboxUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactRequest"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     billing_summary: {
         parameters: {
             query?: never;
@@ -10412,6 +10530,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SupportStatus"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    write_to_mybiz: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComplaintCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Complaint"];
                 };
             };
             /** @description Validation Error */

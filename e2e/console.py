@@ -19,6 +19,7 @@ pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
 manager_email = f"manager{stamp}@example.com"
 employee_email = f"employee{stamp}@example.com"
+inbox_business = f"סטודיו פניות {stamp}"
 a11y: list[str] = []
 
 
@@ -99,6 +100,38 @@ with sync_playwright() as p:
     assert employee.goto(f"{h.BASE}/platform/team").status == 404
     print("3. employee sees only the inbox: ok")
 
+    # A business writes to MyBiz; the request reaches the inbox and is handled there.
+    biz = sign_up(b, f"inbox{stamp}@example.com")
+    biz.wait_for_url("**/onboarding"); h.ready(biz)
+    biz.get_by_label("שם העסק").fill(inbox_business)
+    biz.get_by_role("button", name="המשך").click()
+    biz.get_by_role("button", name="יצירת העסק").click()
+    biz.wait_for_url("**/dashboard")
+    biz.goto(f"{h.BASE}/settings"); h.ready(biz)
+    biz.get_by_label("מה קורה?").fill("היומן מציג שעה לא נכונה, אפשר לעזור?")
+    biz.get_by_role("button", name="שליחה ל-MyBiz").click()
+    expect(biz.get_by_role("status").filter(has_text="נשלח")).to_be_visible()
+
+    owner.goto(f"{h.BASE}/platform/inbox"); h.ready(owner)
+    card = owner.get_by_role("listitem").filter(has_text=inbox_business).first
+    expect(card.get_by_text("מעסק")).to_be_visible()
+    card.get_by_role("button", name="אני מטפל/ת").click(); h.ready(owner)
+    card = owner.get_by_role("listitem").filter(has_text=inbox_business).first
+    expect(card.get_by_text("בטיפול", exact=True)).to_be_visible()
+    card.get_by_label("הערות פנימיות").fill("בדקתי, זה אזור זמן")
+    card.get_by_role("button", name="שמירת הערות").click(); h.ready(owner)
+    check(owner, "inbox-owner")
+    owner.screenshot(path=f"{h.OUT}/console-inbox.png", full_page=True)
+    owner.get_by_role("listitem").filter(has_text=inbox_business).first.get_by_role(
+        "button", name="סימון כטופלה"
+    ).click()
+    h.ready(owner)
+    owner.goto(f"{h.BASE}/platform/inbox"); h.ready(owner)
+    expect(owner.get_by_role("listitem").filter(has_text=inbox_business)).to_have_count(0)
+    owner.goto(f"{h.BASE}/platform/inbox?show=all"); h.ready(owner)
+    expect(owner.get_by_role("listitem").filter(has_text=inbox_business).first.get_by_text("טופלה", exact=True)).to_be_visible()
+    print("5. a business wrote to MyBiz and the inbox handled it: ok")
+
     # An owner can enter a business and fix something; the business's owner sees it.
     owner.goto(f"{h.BASE}/platform/businesses"); h.ready(owner)
     # A business this person doesn't own, so they get in as MyBiz staff.
@@ -117,7 +150,7 @@ with sync_playwright() as p:
     owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$"))
     owner.get_by_role("button", name="יציאה מהעסק").click(); owner.wait_for_url("**/platform")
     h.ready(owner)
-    print(f"5. owner entered {business_name} and added a client (audited): ok")
+    print(f"6. owner entered {business_name} and added a client (audited): ok")
 
     # The audit log (owners only) has every change.
     owner.goto(f"{h.BASE}/platform/audit"); h.ready(owner)
@@ -136,7 +169,7 @@ with sync_playwright() as p:
             ).fetchall()
         )
     assert levels == {manager_email: "manager", employee_email: "employee", PRIMARY: "primary_owner"}, levels
-    print("6. audit log and levels: ok")
+    print("7. audit log and levels: ok")
 
     print("a11y:", a11y or "ok")
     assert not a11y

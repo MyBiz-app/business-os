@@ -1091,6 +1091,29 @@
         "staff_removed": "הסיר/ה איש צוות",
         "platform_change": "ביצע/ה שינוי בעסק"
       }
+    },
+    "inbox": {
+      "title": "תיבת פניות",
+      "subtitle": "פניות מהאתר והודעות מעסקים. הפתוחות קודם.",
+      "statuses": {
+        "new": "חדשה",
+        "in_progress": "בטיפול",
+        "done": "טופלה"
+      },
+      "filter": "להציג",
+      "all": "הכול",
+      "fromBusiness": "מעסק",
+      "fromSite": "מהאתר",
+      "take": "אני מטפל/ת",
+      "assigned": "בטיפול {who}",
+      "unassign": "שחרור",
+      "markDone": "סימון כטופלה",
+      "reopen": "פתיחה מחדש",
+      "notes": "הערות פנימיות",
+      "saveNotes": "שמירת הערות",
+      "openBusiness": "פתיחת העסק",
+      "empty": "אין כאן כלום.",
+      "count": "{count, plural, =0 {אין פניות} one {פנייה אחת} other {# פניות}}"
     }
   },
   "permissions": {
@@ -1317,7 +1340,16 @@
     "actBanner": "את/ה בתוך {name} כצוות MyBiz. כל מה שנפתח או משתנה נרשם עבור הבעלים.",
     "actLeave": "יציאה מהעסק",
     "visitsTitle": "מה MyBiz פתחו כאן",
-    "changed": "בוצע שינוי"
+    "changed": "בוצע שינוי",
+    "writeTitle": "כתיבה ל-MyBiz",
+    "writeIntro": "שאלה, תקלה או תלונה — צוות MyBiz יחזור אליך במייל.",
+    "writeLabel": "מה קורה?",
+    "writeSend": "שליחה ל-MyBiz",
+    "writeSent": "נשלח. נחזור אליך במייל.",
+    "writeErrors": {
+      "too_many_requests": "שלחת כמה הודעות לאחרונה. אפשר לנסות שוב בעוד שעה.",
+      "generic": "משהו השתבש. כדאי לנסות שוב."
+    }
   },
   "receipts": {
     "title": "קבלה מס׳ {number}",

@@ -1091,6 +1091,29 @@
         "staff_removed": "Removed a team member",
         "platform_change": "Changed something in a business"
       }
+    },
+    "inbox": {
+      "title": "Inbox",
+      "subtitle": "Requests from the website and messages from businesses. Open ones first.",
+      "statuses": {
+        "new": "New",
+        "in_progress": "In progress",
+        "done": "Done"
+      },
+      "filter": "Show",
+      "all": "All",
+      "fromBusiness": "From a business",
+      "fromSite": "From the website",
+      "take": "I'll handle it",
+      "assigned": "Handled by {who}",
+      "unassign": "Release",
+      "markDone": "Mark as done",
+      "reopen": "Reopen",
+      "notes": "Internal notes",
+      "saveNotes": "Save notes",
+      "openBusiness": "Open the business",
+      "empty": "Nothing here.",
+      "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}"
     }
   },
   "permissions": {
@@ -1317,7 +1340,16 @@
     "actBanner": "You are inside {name} as MyBiz staff. Everything you open or change is logged for the owner.",
     "actLeave": "Leave the business",
     "visitsTitle": "What MyBiz opened here",
-    "changed": "Changed something"
+    "changed": "Changed something",
+    "writeTitle": "Write to MyBiz",
+    "writeIntro": "A question, a problem or a complaint — the MyBiz team will get back to you by email.",
+    "writeLabel": "What's going on?",
+    "writeSend": "Send to MyBiz",
+    "writeSent": "Sent. We'll get back to you by email.",
+    "writeErrors": {
+      "too_many_requests": "You've sent a few messages recently. Please try again in an hour.",
+      "generic": "Something went wrong. Please try again."
+    }
   },
   "receipts": {
     "title": "Receipt no. {number}",

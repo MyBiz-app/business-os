@@ -7777,7 +7777,7 @@
           "platform"
         ],
         "summary": "Contact Requests",
-        "description": "Businesses that wrote in through the marketing site, newest first.",
+        "description": "The inbox: requests from the marketing site and complaints from businesses. Open ones\nfirst, then newest.",
         "operationId": "contact_requests",
         "responses": {
           "200": {
@@ -7800,6 +7800,69 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/platform/contact-requests/{request_id}": {
+      "patch": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Update Contact Request",
+        "description": "Moves a request along: status, who on the MyBiz side handles it, internal notes.",
+        "operationId": "update_contact_request",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InboxUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContactRequest"
+                  },
+                  "title": "Response Update Contact Request"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/platform/billing": {
@@ -8191,6 +8254,65 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SupportStatus"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support-requests": {
+      "post": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Write To Mybiz",
+        "description": "A question or complaint from the business to the MyBiz team; it lands in the console's\ninbox with the business attached.",
+        "operationId": "write_to_mybiz",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComplaintCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Complaint"
                 }
               }
             }
@@ -12117,6 +12239,35 @@
         ],
         "title": "ClosedDayCreated"
       },
+      "Complaint": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "Complaint"
+      },
+      "ComplaintCreate": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 5,
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "ComplaintCreate"
+      },
       "ContactCreate": {
         "properties": {
           "name": {
@@ -12280,6 +12431,54 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "new",
+              "in_progress",
+              "done"
+            ],
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "tenant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Id"
+          },
+          "from_business": {
+            "type": "boolean",
+            "title": "From Business",
+            "description": "A complaint from inside a business, not the site"
           }
         },
         "type": "object",
@@ -12292,7 +12491,12 @@
           "vertical",
           "message",
           "locale",
-          "created_at"
+          "created_at",
+          "status",
+          "assignee",
+          "notes",
+          "tenant_id",
+          "from_business"
         ],
         "title": "ContactRequest"
       },
@@ -13303,6 +13507,52 @@
           "items"
         ],
         "title": "Inbox"
+      },
+      "InboxUpdate": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "new",
+                  "in_progress",
+                  "done"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "assignee": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignee",
+            "description": "'me', an email, or '' to clear"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "InboxUpdate"
       },
       "InquiryCreate": {
         "properties": {

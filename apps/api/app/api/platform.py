@@ -126,13 +126,43 @@ class ContactRequest(BaseModel):
     message: str | None
     locale: str
     created_at: dt.datetime
+    status: Literal["new", "in_progress", "done"]
+    assignee: str | None
+    notes: str | None
+    tenant_id: UUID | None
+    from_business: bool = Field(description="A complaint from inside a business, not the site")
+
+
+class InboxUpdate(BaseModel):
+    status: Literal["new", "in_progress", "done"] | None = None
+    assignee: str | None = Field(default=None, description="'me', an email, or '' to clear")
+    notes: str | None = Field(default=None, max_length=4000)
 
 
 @router.get("/contact-requests")
 def contact_requests(db: InboxDep) -> list[ContactRequest]:
-    """Businesses that wrote in through the marketing site, newest first."""
+    """The inbox: requests from the marketing site and complaints from businesses. Open ones
+    first, then newest."""
     rows = db.execute(text("SELECT * FROM app.platform_contact_requests()")).mappings()
     return [ContactRequest.model_validate(dict(row)) for row in rows]
+
+
+@router.patch("/contact-requests/{request_id}")
+def update_contact_request(
+    request_id: UUID, body: InboxUpdate, db: InboxDep
+) -> list[ContactRequest]:
+    """Moves a request along: status, who on the MyBiz side handles it, internal notes."""
+    run_rule(
+        db,
+        "SELECT app.platform_inbox_update(:id, :status, :assignee, :notes)",
+        {
+            "id": request_id,
+            "status": body.status,
+            "assignee": body.assignee,
+            "notes": body.notes,
+        },
+    )
+    return contact_requests(db)
 
 
 class BillingMonth(BaseModel):
