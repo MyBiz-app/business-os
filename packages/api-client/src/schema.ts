@@ -3482,8 +3482,11 @@ export interface components {
             phone?: string | null;
             /** Business */
             business?: string | null;
-            /** Vertical */
-            vertical?: ("fitness" | "beauty" | "clinic" | "garage" | "other") | null;
+            /**
+             * Vertical
+             * @description A catalog industry (also a coming-soon one) or "other"
+             */
+            vertical?: string | null;
             /** Message */
             message?: string | null;
             /**
