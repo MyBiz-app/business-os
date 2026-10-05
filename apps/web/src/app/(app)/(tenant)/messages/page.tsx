@@ -9,6 +9,7 @@ import { getTenantFor } from "@/lib/tenant";
 import { deleteTemplate } from "./actions";
 import { Composer } from "./composer";
 import { TemplateForm } from "./templates";
+import { isolate } from "@/lib/bidi";
 
 const SUGGESTIONS = ["reminder", "comeback", "offer", "holiday"] as const;
 
@@ -97,7 +98,7 @@ export default async function MessagesPage() {
                     <form action={deleteTemplate.bind(null, template.id)}>
                       <button
                         type="submit"
-                        aria-label={t("deleteTemplate", { name: template.name })}
+                        aria-label={t("deleteTemplate", { name: isolate(template.name) })}
                         className="rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
                       >
                         <Trash2 aria-hidden="true" className="size-4" />

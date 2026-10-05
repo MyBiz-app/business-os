@@ -2,6 +2,7 @@ import type { components } from "@business-os/api-client";
 import { ArrowRight, BookOpen, Check, CreditCard, Palette, CalendarDays, Sparkles, Tags, Users, UsersRound } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { isolate } from "@/lib/bidi";
 
 type GettingStarted = components["schemas"]["GettingStarted"];
 export type SetupStep = GettingStarted["steps"][number]["key"];
@@ -29,7 +30,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
             <Sparkles aria-hidden="true" className="size-4" />
             {t("title")}
           </p>
-          <h2 className="text-2xl font-extrabold tracking-tight">{t("welcomeTitle", { name: business })}</h2>
+          <h2 className="text-2xl font-extrabold tracking-tight">{t("welcomeTitle", { name: isolate(business) })}</h2>
           <p className="text-muted">{t("welcomeText")}</p>
         </div>
       )}

@@ -13,6 +13,7 @@ import { canManageSettings, canReadReports } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { BusinessSwitcher } from "./business-switcher";
+import { isolate } from "@/lib/bidi";
 
 type MetricValue = components["schemas"]["MetricValue"];
 
@@ -156,7 +157,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             {t(`dashboard.greeting.${partOfDay(tenant.time_zone)}`)} ·{" "}
             {formatDay(today, locale, { weekday: "long", day: "numeric", month: "long" })}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("dashboard.welcome", { name: tenant.name })}</h1>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{t("dashboard.welcome", { name: isolate(tenant.name) })}</h1>
           <p className="text-muted">
             {t("dashboard.yourRole", { role: t(`roles.${tenant.role}`) })} · <span dir="ltr" className="break-all">{me.email}</span>
           </p>

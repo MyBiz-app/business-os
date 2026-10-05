@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/money";
 import { decodePlan, encodePlan, priceLines, trialEndsOn } from "@/lib/signup-plan";
 
 import { FinishForm } from "./finish-form";
+import { isolate } from "@/lib/bidi";
 
 type Catalog = components["schemas"]["Catalog"];
 
@@ -69,7 +70,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
 
       <aside aria-labelledby="finish-plan" className="card flex h-fit flex-col gap-4 p-5 lg:sticky lg:top-24">
         <h2 id="finish-plan" className="font-bold">
-          {t("summary.business", { name: plan.name, vertical: tIndustries(`${plan.vertical}.name`) })}
+          {t("summary.business", { name: isolate(plan.name), vertical: tIndustries(`${plan.vertical}.name`) })}
         </h2>
         <ul className="flex flex-col gap-2">
           {lines.map((line) => (

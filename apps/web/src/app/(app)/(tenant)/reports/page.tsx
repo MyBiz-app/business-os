@@ -7,6 +7,7 @@ import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
+import { ScrollRegion } from "@/components/scroll-region";
 
 type Row = components["schemas"]["BreakdownItem"];
 
@@ -68,7 +69,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {rows.length === 0 ? (
         <p className="text-sm text-muted">{t("noSessions")}</p>
       ) : (
-        <div className="overflow-x-auto">
+        <ScrollRegion labelledBy={id}>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border text-start text-muted">
@@ -93,7 +94,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       )}
     </section>
   );

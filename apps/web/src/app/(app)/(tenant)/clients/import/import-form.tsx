@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useId, useState, useTransition } from "react";
 
+import { FileField } from "@/components/form/file-field";
+
 import { runImport, type ImportField, type ImportResult, type ImportState } from "./actions";
 
 const FIELDS: ImportField[] = [
@@ -29,7 +31,6 @@ export function ImportForm() {
   const [error, setError] = useState<ImportState["error"]>();
   const [source, setSource] = useState("");
   const [pending, startTransition] = useTransition();
-  const fileId = useId();
   const sourceId = useId();
 
   const send = (target: File, mapping: ImportResult["mapping"] | null, commit: boolean) =>
@@ -87,17 +88,12 @@ export function ImportForm() {
   return (
     <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-3 card p-6">
-        <label htmlFor={fileId} className="font-semibold">
-          {t("file")}
-        </label>
-        <input
-          id={fileId}
-          type="file"
+        <FileField
+          label={t("file")}
+          hint={t("fileHint")}
           accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={(event) => choose(event.target.files?.[0] ?? null)}
-          className={CONTROL}
         />
-        <p className="text-sm text-muted">{t("fileHint")}</p>
         {pending && (
           <p role="status" className="text-sm text-muted">
             {t("working")}

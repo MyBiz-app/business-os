@@ -356,7 +356,9 @@
       "invalid": "Please check the details and try again.",
       "generic": "Something went wrong. Please try again."
     },
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "chooseFile": "Choose a file",
+    "noFile": "No file chosen"
   },
   "services": {
     "title": "Services",

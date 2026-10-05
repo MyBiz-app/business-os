@@ -7,6 +7,7 @@ import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
 import { StatusBadge } from "./status-badge";
+import { ScrollRegion } from "@/components/scroll-region";
 
 const PAGE_SIZE = 25;
 const STATUSES = ["active", "lead", "inactive"] as const;
@@ -57,7 +58,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{term("clients")}</h1>
+          <h1 id="clients-heading" className="text-3xl font-bold">{term("clients")}</h1>
           <p className="text-sm text-muted">{t("clients.total", { count: result.total })}</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -140,13 +141,13 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           {search || status || plan || absent ? term("noResults") : term("noClients")}
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-border">
+        <ScrollRegion labelledBy="clients-heading" className="rounded-2xl border border-border">
           <table className="w-full text-start text-sm">
             <thead className="bg-surface text-muted">
               <tr>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.name")}</th>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.phone")}</th>
-                <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.email")}</th>
+                <th scope="col" className="hidden px-4 py-3 text-start font-medium md:table-cell">{t("clients.email")}</th>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.status")}</th>
               </tr>
             </thead>
@@ -162,7 +163,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3" dir="ltr">{client.phone}</td>
-                  <td className="whitespace-nowrap px-4 py-3" dir="ltr">{client.email}</td>
+                  <td className="hidden whitespace-nowrap px-4 py-3 md:table-cell" dir="ltr">{client.email}</td>
                   <td className="px-4 py-3">
                     <StatusBadge status={client.status} />
                   </td>
@@ -170,7 +171,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       )}
 
       {pages > 1 && (

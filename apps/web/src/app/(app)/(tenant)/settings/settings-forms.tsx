@@ -6,6 +6,7 @@ import { useActionState, useState } from "react";
 
 import { CheckboxField, Field, SelectField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
+import { FileField } from "@/components/form/file-field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import { brandStyle } from "@/lib/brand";
@@ -155,14 +156,7 @@ export function LogoForm() {
     <form action={action} className="flex flex-col gap-3">
       <FormError message={error} />
       <FormNotice message={state.saved ? tCommon("saved") : undefined} />
-      <Field
-        label={t("logo")}
-        hint={t("logoHint")}
-        name="logo"
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        required
-      />
+      <FileField label={t("logo")} hint={t("logoHint")} name="logo" accept="image/png,image/jpeg,image/webp" required />
       <div>
         <SubmitButton>{t("uploadLogo")}</SubmitButton>
       </div>

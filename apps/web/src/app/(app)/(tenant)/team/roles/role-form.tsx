@@ -8,6 +8,7 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { deleteRole, saveRole, type TeamState } from "../actions";
+import { isolate } from "@/lib/bidi";
 
 type PermissionKey = "clients_read" | "clients_write" | "clients_privacy" | "catalog_read" | "catalog_write" | "schedule_read"
   | "schedule_write" | "bookings_manage" | "sales_manage" | "reports_read" | "ai_use" | "staff_read"
@@ -64,7 +65,7 @@ export function RoleForm({ role, permissions, grantable }: Props) {
         <form
           action={remove}
           onSubmit={(event) => {
-            if (!window.confirm(t("team.deleteRoleConfirm", { name: role.name }))) event.preventDefault();
+            if (!window.confirm(t("team.deleteRoleConfirm", { name: isolate(role.name) }))) event.preventDefault();
           }}
           className="flex items-center gap-3 border-t border-border pt-3"
         >

@@ -9,6 +9,7 @@ import { getTenantFor } from "@/lib/tenant";
 import { removeTimeOff } from "./actions";
 import { HoursForm } from "./hours-form";
 import { TimeOffForm } from "./time-off";
+import { isolate } from "@/lib/bidi";
 
 export default async function StaffHoursPage({ params }: PageProps<"/team/[userId]/hours">) {
   const { userId } = await params;
@@ -34,7 +35,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("hours.title")}</h1>
         <p className="text-muted">
-          {t("hours.subtitle", { name: member.email })}
+          {t("hours.subtitle", { name: isolate(member.email) })}
         </p>
       </div>
       <section className="card p-6">

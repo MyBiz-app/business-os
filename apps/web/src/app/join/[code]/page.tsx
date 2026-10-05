@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { AppHeader } from "@/components/app-header";
 import { apiAssetUrl, getApi } from "@/lib/api";
 import { brandStyle } from "@/lib/brand";
+import { isolate } from "@/lib/bidi";
 
 /** Public landing page behind a business's QR code: its branding and how to join in the app. */
 export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
@@ -26,7 +27,7 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
         ) : (
           <span aria-hidden className="size-20 rounded-2xl bg-primary" />
         )}
-        <h1 className="text-3xl font-bold">{t("title", { name: business.name })}</h1>
+        <h1 className="text-3xl font-bold">{t("title", { name: isolate(business.name) })}</h1>
         <p className="text-muted">{t("body")}</p>
         <div className="flex flex-col gap-1">
           <p className="text-sm text-muted">{t("codeLabel")}</p>

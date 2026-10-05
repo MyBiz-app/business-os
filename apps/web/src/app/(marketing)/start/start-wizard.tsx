@@ -44,6 +44,7 @@ import {
   VERTICALS,
   withLocations,
 } from "@/lib/signup-plan";
+import { isolate } from "@/lib/bidi";
 
 type Catalog = components["schemas"]["Catalog"];
 
@@ -405,7 +406,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
         <div className="card flex flex-col gap-5 p-6">
           <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
             <p className="font-bold">
-              {t("summary.business", { name: draft.name, vertical: draft.vertical ? tIndustries(`${draft.vertical}.name`) : "" })}
+              {t("summary.business", { name: isolate(draft.name), vertical: draft.vertical ? tIndustries(`${draft.vertical}.name`) : "" })}
             </p>
             <button type="button" onClick={() => go(1)} className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
               {t("summary.edit")}

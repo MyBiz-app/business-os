@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 
 import { askAssistant, decideAction, newConversation } from "./actions";
 import { AskForm } from "./ask-form";
+import { isolate } from "@/lib/bidi";
 
 type PendingAction = components["schemas"]["PendingAction"];
 
@@ -29,8 +30,8 @@ async function ActionCard({ action }: { action: PendingAction }) {
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("needsConfirmation")}</p>
       <p className="font-medium" dir="auto">
         {preview.kind === "cancel_booking"
-          ? t("cancelPreview", { client: preview.client, service: preview.service })
-          : t("bookPreview", { client: preview.client, service: preview.service })}
+          ? t("cancelPreview", { client: isolate(preview.client), service: isolate(preview.service) })
+          : t("bookPreview", { client: isolate(preview.client), service: isolate(preview.service) })}
         {" · "}
         <span dir="ltr">{preview.starts}</span>
       </p>
