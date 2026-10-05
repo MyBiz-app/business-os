@@ -122,6 +122,80 @@ def set_staff_hours(user_id: UUID, blocks: list[HoursBlock], context: WriteDep) 
     return _hours(db, user_id)
 
 
+# --- Time off -------------------------------------------------------------------------------
+
+
+class TimeOffCreate(BaseModel):
+    starts_on: dt.date
+    ends_on: dt.date
+    reason: str | None = Field(default=None, max_length=200)
+
+    @model_validator(mode="after")
+    def ordered(self) -> "TimeOffCreate":
+        if self.ends_on < self.starts_on:
+            raise ValueError("ends_on must not be before starts_on")
+        if (self.ends_on - self.starts_on).days > 366:
+            raise ValueError("at most a year at a time")
+        return self
+
+
+class TimeOff(BaseModel):
+    id: UUID
+    starts_on: dt.date
+    ends_on: dt.date
+    reason: str | None
+
+
+@router.get("/staff/{user_id}/time-off")
+def list_time_off(user_id: UUID, context: ReadDep) -> list[TimeOff]:
+    """The staff member's time off that hasn't ended yet, soonest first."""
+    rows = context.session.execute(
+        text("""
+            SELECT o.id, o.starts_on, o.ends_on, o.reason FROM app.staff_time_off o
+            JOIN app.tenants t ON t.id = o.tenant_id
+            WHERE o.user_id = :id AND o.ends_on >= (now() AT TIME ZONE t.time_zone)::date
+            ORDER BY o.starts_on
+        """),
+        {"id": user_id},
+    ).mappings()
+    return [TimeOff.model_validate(dict(r)) for r in rows]
+
+
+@router.post("/staff/{user_id}/time-off", status_code=status.HTTP_201_CREATED)
+def add_time_off(user_id: UUID, body: TimeOffCreate, context: WriteDep) -> TimeOff:
+    """Blocks whole days; appointments already booked in them stay (the business handles
+    them), but no new ones are offered."""
+    db = context.session
+    member = db.execute(
+        text("SELECT 1 FROM app.tenant_members WHERE user_id = :id"), {"id": user_id}
+    ).scalar()
+    if member is None:
+        raise not_found()
+    row = (
+        db.execute(
+            text("""
+                INSERT INTO app.staff_time_off (tenant_id, user_id, starts_on, ends_on, reason)
+                VALUES (:t, :u, :starts_on, :ends_on, :reason)
+                RETURNING id, starts_on, ends_on, reason
+            """),
+            {"t": context.tenant_id, "u": user_id, **body.model_dump()},
+        )
+        .mappings()
+        .one()
+    )
+    return TimeOff.model_validate(dict(row))
+
+
+@router.delete("/staff/{user_id}/time-off/{time_off_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_time_off(user_id: UUID, time_off_id: UUID, context: WriteDep) -> None:
+    deleted = context.session.execute(
+        text("DELETE FROM app.staff_time_off WHERE id = :id AND user_id = :u RETURNING id"),
+        {"id": time_off_id, "u": user_id},
+    ).scalar()
+    if deleted is None:
+        raise not_found()
+
+
 # --- Free times -------------------------------------------------------------------------------
 
 

@@ -1894,5 +1894,15 @@
     "byStaff": "By staff member",
     "byService": "By service",
     "comments": "Latest comments"
+  },
+  "timeOff": {
+    "title": "Time off",
+    "hint": "No appointments are offered with this staff member on these days. Appointments already booked stay — handle them separately.",
+    "from": "From",
+    "to": "To",
+    "toHint": "Empty = one day",
+    "reason": "Reason (optional)",
+    "add": "Add time off",
+    "remove": "Remove"
   }
 }

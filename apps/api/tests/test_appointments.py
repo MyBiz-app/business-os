@@ -153,3 +153,43 @@ def test_rules(client: TestClient, barber: dict) -> None:
     )
     assert closed.status_code == 201
     assert client.get("/appointments/slots", params=params, headers=headers).json() == []
+
+
+def test_time_off_removes_free_times_and_blocks_booking(client: TestClient, barber: dict) -> None:
+    headers, owner, day = barber["headers"], barber["owner"], barber["day"]
+    haircut = barber["haircut"]["id"]
+    params = {"service_id": haircut, "date": day.isoformat()}
+    assert client.get("/appointments/slots", params=params, headers=headers).json()
+
+    away = client.post(
+        f"/staff/{owner}/time-off",
+        json={"starts_on": day.isoformat(), "ends_on": day.isoformat(), "reason": "Vacation"},
+        headers=headers,
+    )
+    assert away.status_code == 201, away.text
+    assert client.get("/appointments/slots", params=params, headers=headers).json() == []
+    walk_in = client.post("/clients", json={"first_name": "Avi"}, headers=headers).json()
+    refused = client.post(
+        "/appointments",
+        json={
+            "service_id": haircut,
+            "staff_user_id": str(owner),
+            "starts_at": at(day, "10:00"),
+            "client_id": walk_in["id"],
+        },
+        headers=headers,
+    )
+    assert refused.status_code == 409 and refused.json()["detail"] == "outside_hours"
+    [listed] = client.get(f"/staff/{owner}/time-off", headers=headers).json()
+    assert listed["reason"] == "Vacation"
+
+    backwards = client.post(
+        f"/staff/{owner}/time-off",
+        json={"starts_on": day.isoformat(), "ends_on": (day - timedelta(days=1)).isoformat()},
+        headers=headers,
+    )
+    assert backwards.status_code == 422
+    assert (
+        client.delete(f"/staff/{owner}/time-off/{listed['id']}", headers=headers).status_code == 204
+    )
+    assert client.get("/appointments/slots", params=params, headers=headers).json()
