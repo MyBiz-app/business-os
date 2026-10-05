@@ -782,6 +782,15 @@
         "not_reviewable": "אי אפשר לדרג את הביקור הזה.",
         "generic": "משהו השתבש. נסו שוב."
       }
+    },
+    "promo": {
+      "label": "קוד הנחה",
+      "apply": "החלה",
+      "remove": "הסרת הקוד",
+      "applied": "הקוד {code} הוחל",
+      "listPrice": "מחיר מקורי",
+      "discount": "הנחה",
+      "invalid": "הקוד לא תקף לרכישה הזו."
     }
   },
   "join": {
@@ -1904,5 +1913,39 @@
     "reason": "סיבה (לא חובה)",
     "add": "הוספת היעדרות",
     "remove": "הסרה"
+  },
+  "promo": {
+    "title": "קודי הנחה",
+    "subtitle": "קודים שהלקוחות מזינים כשהם קונים מנוי או כרטיסייה באפליקציה.",
+    "code": "קוד",
+    "codeHint": "אותיות באנגלית ומספרים, 3–20 תווים",
+    "kind": "סוג ההנחה",
+    "percent": "אחוזים",
+    "amount": "סכום קבוע",
+    "percentValue": "אחוז הנחה",
+    "amountValue": "סכום ההנחה ({currency})",
+    "plan": "על מה",
+    "allPlans": "כל המנויים והכרטיסיות",
+    "startsOn": "בתוקף מ-",
+    "endsOn": "בתוקף עד",
+    "maxUses": "מספר שימושים",
+    "maxUsesHint": "ריק = ללא הגבלה",
+    "create": "יצירת קוד",
+    "created": "הקוד נוצר.",
+    "percentOff": "{value}% הנחה",
+    "amountOff": "{value} הנחה",
+    "paused": "מושהה",
+    "until": "עד {date}",
+    "uses": "{uses, plural, =0 {עוד לא נוצל} one {נוצל פעם אחת} other {נוצל # פעמים}}",
+    "usesOf": "נוצל {uses} מתוך {max}",
+    "given": "סה״כ הנחה {amount}",
+    "pause": "השהיה",
+    "resume": "הפעלה",
+    "delete": "מחיקה",
+    "errors": {
+      "invalid": "חלק מהפרטים לא תקינים.",
+      "code_taken": "הקוד הזה כבר קיים.",
+      "generic": "משהו השתבש. נסו שוב."
+    }
   }
 }

@@ -21,6 +21,7 @@ from app.api import (
     plans,
     platform,
     privacy,
+    promo_codes,
     receipts,
     reports,
     reviews,
@@ -87,6 +88,7 @@ def create_app() -> FastAPI:
     app.include_router(appointments.router)
     app.include_router(appointments.client_router)
     app.include_router(plans.router)
+    app.include_router(promo_codes.router)
     app.include_router(reports.router)
     app.include_router(reviews.router)
     app.include_router(reviews.client_router)

@@ -34,6 +34,15 @@ with sync_playwright() as p:
         owner.get_by_role("button", name="שמירה").first.click()
     print("1. online sales on: ok")
 
+    # A promo code: 10% off every plan.
+    owner.goto(f"{h.BASE}/plans"); h.ready(owner)
+    promo = owner.get_by_role("region", name="קודי הנחה")
+    promo.get_by_label("קוד").fill("welcome10")
+    promo.get_by_label("אחוז הנחה").fill("10")
+    promo.get_by_role("button", name="יצירת קוד").click()
+    expect(promo.get_by_text("WELCOME10")).to_be_visible()
+    print("1b. promo code created: ok")
+
     with psycopg.connect(h.DATABASE_URL) as conn:
         code = conn.execute("""
             SELECT t.join_code FROM app.tenants t
@@ -63,6 +72,9 @@ with sync_playwright() as p:
     # The (simulated) payment page: a test card, the total, and the pay button.
     member.wait_for_url("**/pay/**")
     expect(member.get_by_text(re.compile("^מצב בדיקה"))).to_be_visible(timeout=15000)
+    member.get_by_label("קוד הנחה").fill("welcome10")
+    member.get_by_role("button", name="החלה").click()
+    expect(member.get_by_text("הקוד WELCOME10 הוחל")).to_be_visible(timeout=15000)
     h.app_ready(member)
     pay_serious = [v["id"] for v in Axe().run(member).response["violations"] if v["impact"] in ("serious", "critical")]
     member.screenshot(path=f"{h.OUT}/payment.png", full_page=True)

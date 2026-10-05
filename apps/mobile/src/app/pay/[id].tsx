@@ -6,7 +6,7 @@ import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, View }
 import { useLocale, useTranslations } from "use-intl";
 
 import { useReducedMotion } from "@/components/motion";
-import { Button, Card, ErrorText, Heading, Screen, elevation, styles } from "@/components/ui";
+import { Button, Card, ErrorText, Field, Heading, Screen, elevation, styles } from "@/components/ui";
 import { unwrap } from "@/lib/api";
 import { tint } from "@/lib/brand";
 import { formatMoney } from "@/lib/money";
@@ -14,6 +14,7 @@ import { useLoad } from "@/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
 type Paid = components["schemas"]["CheckoutPaid"];
+type Checkout = components["schemas"]["Checkout"];
 
 /** How long the simulated payment "processes", so it feels like a real one. */
 const PROCESSING_MS = 1400;
@@ -36,7 +37,14 @@ export default function Pay() {
     if (!business || !id) return null;
     return unwrap(await api.GET("/client/checkouts/{checkout_id}", { params: { ...scope, path: { checkout_id: id } } }));
   }, [api, scope, business, id]);
-  const { data: checkout } = useLoad(load);
+  const { data: loaded } = useLoad(load);
+  // After a promo code is applied (or removed) the API returns the re-priced checkout.
+  const [repriced, setRepriced] = useState<Checkout | null>(null);
+  const checkout = repriced ?? loaded;
+  const tPromo = useTranslations("client.promo");
+  const [code, setCode] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
 
   useEffect(() => {
     if (stage !== "done") return;
@@ -45,6 +53,25 @@ export default function Pay() {
 
   if (!business) return null;
   const amount = checkout ? formatMoney(checkout.amount, checkout.currency, locale) : "";
+
+  const applyCode = async (value: string | null) => {
+    if (!checkout) return;
+    setApplying(true);
+    setPromoError(null);
+    const result = await api
+      .POST("/client/checkouts/{checkout_id}/promo", {
+        params: { ...scope, path: { checkout_id: checkout.id } },
+        body: { code: value },
+      })
+      .catch(() => null);
+    setApplying(false);
+    if (result?.data) {
+      setRepriced(result.data);
+      setCode("");
+    } else {
+      setPromoError(tPromo("invalid"));
+    }
+  };
 
   const pay = async () => {
     if (!checkout) return;
@@ -131,11 +158,64 @@ export default function Pay() {
             <Text style={[styles.muted, { color: palette.muted }]}>{t("plan")}</Text>
             <Text style={[local.value, { color: palette.foreground }]}>{checkout.plan_name}</Text>
           </View>
+          {checkout.discount > 0 && (
+            <>
+              <View style={local.line}>
+                <Text style={[styles.muted, { color: palette.muted }]}>{tPromo("listPrice")}</Text>
+                <Text style={[local.value, { color: palette.muted }]}>
+                  {formatMoney(checkout.list_amount, checkout.currency, locale)}
+                </Text>
+              </View>
+              <View style={local.line}>
+                <Text style={[styles.muted, { color: palette.success }]}>
+                  {tPromo("applied", { code: checkout.promo_code ?? "" })}
+                </Text>
+                <Text style={[local.value, { color: palette.success }]}>
+                  {formatMoney(-checkout.discount, checkout.currency, locale)}
+                </Text>
+              </View>
+            </>
+          )}
           <View style={[local.divider, { backgroundColor: palette.border }]} />
           <View style={local.line}>
             <Text style={[local.totalLabel, { color: palette.foreground }]}>{t("total")}</Text>
             <Text style={[local.total, { color: palette.foreground }]}>{amount}</Text>
           </View>
+        </Card>
+      )}
+
+      {checkout && stage === "ready" && (
+        <Card palette={palette}>
+          {checkout.promo_code ? (
+            <Button
+              label={tPromo("remove")}
+              variant="secondary"
+              palette={palette}
+              busy={applying}
+              onPress={() => void applyCode(null)}
+            />
+          ) : (
+            <>
+              <Field
+                label={tPromo("label")}
+                palette={palette}
+                value={code}
+                onChangeText={(value) => setCode(value.toUpperCase())}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                maxLength={20}
+              />
+              <ErrorText message={promoError} palette={palette} />
+              <Button
+                label={tPromo("apply")}
+                variant="secondary"
+                palette={palette}
+                busy={applying}
+                disabled={code.trim().length < 3}
+                onPress={() => void applyCode(code)}
+              />
+            </>
+          )}
         </Card>
       )}
 
