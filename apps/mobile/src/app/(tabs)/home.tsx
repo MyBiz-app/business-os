@@ -10,12 +10,15 @@ import { assetUrl, unwrap } from "@/lib/api";
 import { tint } from "@/lib/brand";
 import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@/lib/use-load";
+import { verticalOf } from "@/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Branded home: the business, the client's next booking and what's on today. */
 export default function Home() {
   const t = useTranslations("client.home");
   const tHealth = useTranslations("client.health");
+  const tTerms = useTranslations("terms");
+  const tAppointment = useTranslations("client.appointment");
   const health = useHealth();
   const locale = useLocale();
   const formatDay = (day: string) =>
@@ -23,11 +26,16 @@ export default function Home() {
   const { api, scope, business, palette } = useBusiness();
 
   const load = useCallback(async () => {
-    if (!business) return [];
+    if (!business) return { sessions: [], appointments: 0 };
     const start = todayIn(business.time_zone);
-    return unwrap(await api.GET("/client/sessions", { params: { ...scope, query: { start, days: 14 } } }));
+    const [sessions, services] = await Promise.all([
+      api.GET("/client/sessions", { params: { ...scope, query: { start, days: 14 } } }),
+      api.GET("/client/appointments/services", { params: scope }),
+    ]);
+    return { sessions: unwrap(sessions), appointments: services.data?.length ?? 0 };
   }, [api, scope, business]);
-  const { data: sessions, loading, reload } = useLoad(load);
+  const { data, loading, reload } = useLoad(load);
+  const sessions = data?.sessions;
 
   if (!business) return null;
   const today = todayIn(business.time_zone);
@@ -73,10 +81,10 @@ export default function Home() {
       )}
 
       <Heading palette={palette} level={2}>
-        {t("nextBooking")}
+        {tTerms(`${verticalOf(business)}.nextBooking`)}
       </Heading>
       {next ? (
-        <SessionCard session={next} onChange={update} />
+        <SessionCard session={next} onChange={update} showDay />
       ) : (
         <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
       )}
@@ -92,7 +100,19 @@ export default function Home() {
         </>
       )}
 
-      <Button label={t("bookClass")} palette={palette} onPress={() => router.navigate("/schedule")} />
+      {(data?.appointments ?? 0) > 0 ? (
+        <>
+          <Button label={tAppointment("cta")} palette={palette} onPress={() => router.push("/appointment")} />
+          <Button
+            label={tTerms(`${verticalOf(business)}.appTab`)}
+            palette={palette}
+            variant="secondary"
+            onPress={() => router.navigate("/schedule")}
+          />
+        </>
+      ) : (
+        <Button label={t("bookClass")} palette={palette} onPress={() => router.navigate("/schedule")} />
+      )}
     </Screen>
   );
 }
