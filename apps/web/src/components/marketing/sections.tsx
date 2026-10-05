@@ -146,7 +146,7 @@ export async function CtaBand() {
         <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">{t("title")}</h2>
         <p className="relative max-w-xl text-lg text-white/85">{t("text")}</p>
         <div className="relative flex flex-wrap justify-center gap-3">
-          <Link href="/signup" className="rounded-xl bg-white px-6 py-3 text-lg font-semibold text-indigo-700 shadow-lg transition-transform hover:-translate-y-0.5">
+          <Link href="/start" className="rounded-xl bg-white px-6 py-3 text-lg font-semibold text-indigo-700 shadow-lg transition-transform hover:-translate-y-0.5">
             {t("button")}
           </Link>
           <Link href="/contact" className="rounded-xl border border-white/40 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-white/10">

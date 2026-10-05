@@ -1,9 +1,9 @@
 """Emailing client notifications (the send-emails job; see app/jobs.py).
 
-The text comes from the shared translation files (packages/i18n/messages/<locale>.json,
-key "email"), so the job runs from a full checkout of the repository (GitHub Actions), not
-from the API image. A notification is emailed once, within a day of happening; older ones,
-and ones for clients without an email address, are skipped."""
+The text comes from the shared translation files: packages/i18n/messages is the source and
+app/messages holds the API's checked-in copy (pnpm --filter @business-os/i18n export:api), so
+both the API image and the jobs can render emails. A notification is emailed once, within a
+day of happening; older ones, and ones for clients without an email address, are skipped."""
 
 import html
 import json
@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
-MESSAGES_DIR = Path(__file__).resolve().parents[3] / "packages" / "i18n" / "messages"
+MESSAGES_DIR = Path(__file__).resolve().parent / "messages"
 FRESH_FOR = timedelta(days=1)
 MAX_ATTEMPTS = 3
 BATCH = 200
@@ -32,6 +32,17 @@ class Email:
     to: str
     subject: str
     text: str
+    html: str | None = None  # a designed version; otherwise the text is turned into HTML
+
+
+def _html(email: Email) -> str:
+    if email.html is not None:
+        return email.html
+    return (
+        '<div dir="auto">'
+        + "<br>".join(html.escape(line) for line in email.text.split("\n"))
+        + "</div>"
+    )
 
 
 class Sender(Protocol):
@@ -63,7 +74,7 @@ class ResendSender:
                 "to": [email.to],
                 "subject": email.subject,
                 "text": email.text,
-                "html": "<br>".join(html.escape(line) for line in email.text.split("\n")),
+                "html": _html(email),
             }
         ).encode()
         request = urllib.request.Request(
@@ -94,12 +105,7 @@ class SmtpSender:
         message["To"] = email.to
         message["Subject"] = email.subject
         message.set_content(email.text)
-        message.add_alternative(
-            '<div dir="auto">'
-            + "<br>".join(html.escape(line) for line in email.text.split("\n"))
-            + "</div>",
-            subtype="html",
-        )
+        message.add_alternative(_html(email), subtype="html")
         return message
 
     def send(self, email: Email) -> None:
@@ -109,8 +115,12 @@ class SmtpSender:
             server.send_message(self.message(email))
 
 
+def load_all_messages(locale: str, directory: Path = MESSAGES_DIR) -> dict[str, Any]:
+    return json.loads((directory / f"{locale}.json").read_text(encoding="utf-8"))
+
+
 def load_messages(locale: str, directory: Path = MESSAGES_DIR) -> dict[str, Any]:
-    return json.loads((directory / f"{locale}.json").read_text(encoding="utf-8"))["email"]
+    return load_all_messages(locale, directory)["email"]
 
 
 def _fill(template: str, values: dict[str, str]) -> str:

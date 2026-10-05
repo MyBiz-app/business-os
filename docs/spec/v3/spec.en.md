@@ -157,8 +157,8 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | Phase | Content | Status |
 |---|---|---|
 | Foundation | Core, verticals, schedule, clients, plans, client app, AI, reports, modules, billing, CRM, messaging, reviews, promo codes | Done |
-| 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | In progress |
-| 2 — Business web app | Locked modules with previews and upsell; full review and polish | Next |
+| 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
+| 2 — Business web app | Locked modules with previews and upsell; full review and polish | In progress |
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Next |
 | 4 — Apps | Client app polish, business app, MyBiz staff app | After the websites |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |

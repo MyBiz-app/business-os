@@ -64,7 +64,7 @@ export function MarketingHeader() {
           <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-foreground/5">
             {t("login")}
           </Link>
-          <Link href="/signup" className="btn-primary px-4 py-2 text-sm">
+          <Link href="/start" className="btn-primary px-4 py-2 text-sm">
             {t("start")}
           </Link>
         </div>
@@ -94,7 +94,7 @@ export function MarketingHeader() {
             <Link href="/login" className="btn-secondary px-4 py-2.5">
               {t("login")}
             </Link>
-            <Link href="/signup" className="btn-primary px-4 py-2.5">
+            <Link href="/start" className="btn-primary px-4 py-2.5">
               {t("start")}
             </Link>
           </div>

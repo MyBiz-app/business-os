@@ -50,7 +50,7 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
             ))}
           </ul>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/signup" className="btn-primary px-6 py-3 text-lg">
+            <Link href={`/start?vertical=${key}`} className="btn-primary px-6 py-3 text-lg">
               {t("hero.ctaPrimary")}
             </Link>
             <Link href="/contact" className="btn-secondary px-6 py-3 text-lg">
