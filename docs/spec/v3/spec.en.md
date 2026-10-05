@@ -135,8 +135,10 @@ Built in phase 3:
 ## 9. Apps
 
 - Client app (built, Expo; also runs in the browser): join, home, schedule and appointments, bookings and plans, buying with promo codes, receipts, ratings, updates, profile, health declaration.
-- Business app (phase 4): the owner's and staff's day on the go.
-- MyBiz staff app (phase 4): businesses, support, alerts.
+- Business app (built in phase 4): the owner's and staff's day on the go. Today — the day's sessions with check-in of every booked client; Clients — search and a client card with plan, visits and contact; Numbers — the key figures of the last 30 days; Me — profile, language, theme and switching between businesses. Each person sees only what their permissions allow.
+- MyBiz staff app (built in phase 4): Home — what needs attention (open requests, new businesses); Businesses — search and a business card; Inbox — handle requests (take, status, notes); Me. Each staff member sees only what their level and permissions allow.
+- All three apps share one kit (sign-in, theme, language, right-to-left, accessible components), so a fix in one place reaches all of them.
+- Still to do: final polish of the client app and builds for the app stores (at go-live).
 
 ## 10. Simulated services (until go-live)
 
@@ -168,7 +170,7 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
-| 4 — Apps | Client app polish, business app, MyBiz staff app | In progress |
+| 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 Each phase ends with a review: every page and button checked, accessibility and dark mode, tests, and a tidy codebase.
