@@ -4,8 +4,8 @@ _Last updated: 2026-10-05_ · Updated with every merged pull request. Open work 
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** owner review on computer and phone ([#38](https://github.com/adiredri/business-os/issues/38)).
-**Next:** the rest of phase 4 (client app polish, architecture review), then phase 6.
+**Now:** phase 6 — businesses and branches ([#55](https://github.com/adiredri/business-os/issues/55)): one owner, several businesses, each with several branches, and a full demo.
+**Next:** the rest of phase 4 (client app polish, architecture review), then phase 7.
 
 ## Board
 
@@ -18,21 +18,25 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 | 3 — MyBiz console | Team levels and permissions, working inside a business, actions, support inbox, audit | ✅ Done | #29 |
 | 4 — Apps | Business app and MyBiz team app built, shared app kit | 🟡 Mostly done | #35 |
 | 5 — Industries | Category → sub-category template in one catalog ([how to add one](verticals.md)); five main categories with 25 sub-categories; five more coming soon | ✅ Done | #30 |
-| 6 — More categories | Core capabilities that open the future categories | ⚪ Planned | #33 |
+| 6 — Businesses and branches | One owner with several businesses, each with several branches; my businesses, current branch, numbers per branch; full demo | 🔵 In progress | #55 |
+| 7 — More categories | Core capabilities that open the future categories | ⚪ Planned | #33 |
 | Go-live | Real payments, invoicing, email, WhatsApp, AI key, hardening, store builds | ⚪ When the owner decides | #34 |
 
 ## In progress
 
+- [#56](https://github.com/adiredri/business-os/issues/56) Branches everywhere: a current branch, filters and data per branch
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next
 
+- [#57](https://github.com/adiredri/business-os/issues/57) My businesses page and switcher in the menu
+- [#58](https://github.com/adiredri/business-os/issues/58) Full demo: an owner with two businesses (5 and 3 branches) on staging
 - [#39](https://github.com/adiredri/business-os/issues/39) Client app: final polish
 - [#40](https://github.com/adiredri/business-os/issues/40) Architecture review after phase 4
 
 ## Planned
 
-- Phase 6: [#41](https://github.com/adiredri/business-os/issues/41) resources (courts, rooms) ·
+- Phase 7: [#41](https://github.com/adiredri/business-os/issues/41) resources (courts, rooms) ·
   [#42](https://github.com/adiredri/business-os/issues/42) on-site jobs ·
   [#43](https://github.com/adiredri/business-os/issues/43) dependents (pets, children) ·
   [#44](https://github.com/adiredri/business-os/issues/44) quotes, deposits and events ·
