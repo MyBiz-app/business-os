@@ -1,5 +1,8 @@
 # Spec v2 — Working Draft
 
+> The product overview is now [spec v3](../v3/spec.en.md) ([עברית](../v3/spec.he.md)); these chapters
+> keep the detailed design (architecture, data model, AI, pricing rules).
+
 Derived from the owner's Master Spec v1.1 ([`../v1/`](../v1/)) plus the decisions in
 [`../../DECISIONS.md`](../../DECISIONS.md). v1 remains the vision document; v2 is the buildable spec.
 

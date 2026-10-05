@@ -1,19 +1,29 @@
-# business-os
+# MyBiz (codename business-os)
 
-> Codename. Final brand name TBD.
+An operating system for small and medium service businesses — studios and gyms, hair and beauty
+salons, clinics, garages and more — with a branded app for each business's clients and an AI
+assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first, then English.
 
-A modular, multi-tenant **Business Operating System** for small and medium businesses, with an
-**AI Workforce** (finance, marketing, booking, CRM and analyst agents) that answers questions and
-performs confirmed actions.
+| Surface | Who uses it |
+|---|---|
+| Marketing website + sign-up journey | Business owners considering MyBiz |
+| Business web app (CRM) | The business: owner, managers, front desk, staff |
+| MyBiz console | MyBiz's own team: owners, managers, employees |
+| Client app (Expo; also in the browser) | The businesses' clients — they never use a website |
+| Business app / MyBiz staff app | On the go (phase 4) |
 
-- **Markets:** Israel first (Hebrew, RTL), then US / EU (American English, LTR)
-- **First vertical:** boutique fitness studios; designed to extend to barbershops, salons, clinics and more
-- **Pricing model:** build-your-own plan — pay only for the modules, size and usage you need
+## Status and documents
 
-## Status
-
-Prototype complete (Phase 1); Phase 2 (MVP) in progress. Spec: [`docs/spec/v2/`](docs/spec/v2/README.md) ·
-Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md).
+- **Product spec (v3):** [English](docs/spec/v3/spec.en.md) · [עברית](docs/spec/v3/spec.he.md) ·
+  Word: [`docs/spec/MyBiz-Spec-en.docx`](docs/spec/MyBiz-Spec-en.docx),
+  [`docs/spec/MyBiz-Spec-he.docx`](docs/spec/MyBiz-Spec-he.docx)
+  (regenerate with `node scripts/spec-to-docx.cjs he|en`, needs the `docx` npm package).
+- **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) — every product and technical decision.
+- **Detailed v2 chapters:** [`docs/spec/v2/`](docs/spec/v2/README.md) (architecture, data model, AI).
+- **Where we are:** the foundation is built (see the spec's roadmap). Now, one phase at a time:
+  1 marketing website and sign-up journey → 2 business web app → 3 MyBiz console → 4 apps →
+  go-live (real payments, invoicing, email, WhatsApp, AI key).
+- Paid services run in clearly labeled demo / simulated modes until go-live.
 
 ## Repository layout
 
@@ -23,8 +33,8 @@ Decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 | `apps/api` | Backend API: Python 3.13, FastAPI, managed with uv |
 | `apps/mobile` | Mobile app: Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
 | `packages/i18n` | Shared translations (he / en) and locale helpers for web and mobile |
-| `docs/` | Spec and decision log |
-| `scripts/` | Developer machine setup |
+| `docs/` | Spec (v3 overview + Word files, v2 chapters) and decision log |
+| `scripts/` | Developer machine setup, spec → Word |
 
 ## Run locally
 
