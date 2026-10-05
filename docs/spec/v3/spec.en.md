@@ -123,11 +123,14 @@ Phase 2 review: every screen checked on phone and computer, Hebrew/light and Eng
 
 Built: businesses list, business detail, AI usage, contact requests, billing revenue, audited support access granted by owners.
 
-To complete in phase 3:
-- MyBiz team: primary owner, owners, managers, employees, with permission switches.
-- Full visibility: every business, its owners, team and clients.
-- Actions on any business (fix data, change modules, extend a trial, credit an invoice), each written to the audit log.
-- Support inbox (contact requests and complaints) with status.
+Built in phase 3:
+- Its own menu — overview, businesses, inbox, billing, team, audit — where each item appears only for someone who may open it.
+- The MyBiz team: a primary owner nobody can remove, change or disable (even through direct database access), owners (partners), managers (who handle employees with the permissions they hold themselves) and employees. People are added by email before they ever sign in, and access can be paused instead of removed.
+- Permissions: see businesses, work inside businesses, billing, inbox, usage, manage employees. Every level gives only what it holds, and only owners handle owners and managers.
+- Working inside a business: staff who may do it enter any business and work there like a manager, to handle a complaint or fix a mistake — never privacy requests. Every request appears in the business's own log, which its owner reads, with changes marked. Others still need the owner's read-only support grant.
+- Actions for the owner: extend the trial, change the plan, credit an invoice — each written to both logs.
+- Inbox: requests from the website and messages businesses send from Settings, with status (new, in progress, done), someone handling them and internal notes.
+- Audit log (owners only): everything the MyBiz team did.
 
 ## 9. Apps
 
@@ -164,8 +167,8 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | Foundation | Core, verticals, schedule, clients, plans, client app, AI, reports, modules, billing, CRM, messaging, reviews, promo codes | Done |
 | 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
-| 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | In progress |
-| 4 — Apps | Client app polish, business app, MyBiz staff app | After the websites |
+| 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
+| 4 — Apps | Client app polish, business app, MyBiz staff app | In progress |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 Each phase ends with a review: every page and button checked, accessibility and dark mode, tests, and a tidy codebase.
