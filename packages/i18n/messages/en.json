@@ -210,7 +210,8 @@
     "menu": "Menu",
     "clientApp": "Client app",
     "locked": "Not in your plan",
-    "lockedItem": "{name} — not in your plan"
+    "lockedItem": "{name} — not in your plan",
+    "sales": "Sales"
   },
   "terms": {
     "fitness": {
@@ -2305,5 +2306,35 @@
     "password": "Password",
     "changePassword": "Change password",
     "businesses": "Your businesses"
+  },
+  "sales": {
+    "title": "Sales",
+    "subtitle": "Every payment and its receipt, by month.",
+    "previous": "Previous month",
+    "next": "Next month",
+    "total": "Total sales",
+    "count": "{count, plural, =0 {No receipts} one {# receipt} other {# receipts}}",
+    "byMethod": "By payment method",
+    "receipts": "Receipts",
+    "number": "No.",
+    "date": "Date",
+    "client": "Client",
+    "item": "Item",
+    "method": "Method",
+    "amount": "Amount",
+    "empty": "No sales this month yet.",
+    "export": "Export for the accountant (CSV)",
+    "simulated": "Includes sample receipts from test payments — they aren't tax documents.",
+    "csvHeader": [
+      "Receipt",
+      "Date",
+      "Client",
+      "Email",
+      "Item",
+      "Method",
+      "Amount",
+      "Currency",
+      "Sample"
+    ]
   }
 }

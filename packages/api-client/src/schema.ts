@@ -2160,6 +2160,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Sales
+         * @description Receipts issued between two local dates (inclusive, in the business's time zone), with
+         *     totals: the sales page and its export for the accountant.
+         */
+        get: operations["sales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/receipts/{receipt_id}": {
         parameters: {
             query?: never;
@@ -4229,6 +4250,18 @@ export interface components {
              */
             created_at: string;
         };
+        /** MethodTotal */
+        MethodTotal: {
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
+            /** Count */
+            count: number;
+            /** Amount */
+            amount: number;
+        };
         /** MetricValue */
         MetricValue: {
             /**
@@ -4889,6 +4922,37 @@ export interface components {
              * @description Same key, same sale: retries never double-sell
              */
             idempotency_key: string;
+        };
+        /** Sales */
+        Sales: {
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Currency */
+            currency: string;
+            /** Count */
+            count: number;
+            /**
+             * Total
+             * @description Minor units, in the business's currency
+             */
+            total: number;
+            /** By Method */
+            by_method: components["schemas"]["MethodTotal"][];
+            /** Receipts */
+            receipts: components["schemas"]["Receipt"][];
+            /**
+             * Simulated
+             * @description Some receipts are samples from test payments
+             */
+            simulated: boolean;
         };
         /** ScheduleOptions */
         ScheduleOptions: {
@@ -10563,6 +10627,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Receipt"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sales: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Sales"];
                 };
             };
             /** @description Validation Error */

@@ -8916,6 +8916,75 @@
         }
       }
     },
+    "/sales": {
+      "get": {
+        "tags": [
+          "receipts"
+        ],
+        "summary": "Sales",
+        "description": "Receipts issued between two local dates (inclusive, in the business's time zone), with\ntotals: the sales page and its export for the accountant.",
+        "operationId": "sales",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Sales"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/receipts/{receipt_id}": {
       "get": {
         "tags": [
@@ -14608,6 +14677,35 @@
         ],
         "title": "Message"
       },
+      "MethodTotal": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "card",
+              "cash",
+              "transfer",
+              "other"
+            ],
+            "title": "Method"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "amount": {
+            "type": "integer",
+            "title": "Amount"
+          }
+        },
+        "type": "object",
+        "required": [
+          "method",
+          "count",
+          "amount"
+        ],
+        "title": "MethodTotal"
+      },
       "MetricValue": {
         "properties": {
           "key": {
@@ -16386,6 +16484,64 @@
           "idempotency_key"
         ],
         "title": "Sale"
+      },
+      "Sales": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Minor units, in the business's currency"
+          },
+          "by_method": {
+            "items": {
+              "$ref": "#/components/schemas/MethodTotal"
+            },
+            "type": "array",
+            "title": "By Method"
+          },
+          "receipts": {
+            "items": {
+              "$ref": "#/components/schemas/Receipt"
+            },
+            "type": "array",
+            "title": "Receipts"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated",
+            "description": "Some receipts are samples from test payments"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "currency",
+          "count",
+          "total",
+          "by_method",
+          "receipts",
+          "simulated"
+        ],
+        "title": "Sales"
       },
       "ScheduleOptions": {
         "properties": {
