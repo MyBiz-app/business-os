@@ -72,8 +72,12 @@ Demo data: sign up at http://localhost:3000 (the confirmation email arrives in t
 mailbox), then fill your account with a demo studio with months of history:
 
 ```bash
-pnpm db:seed --owner-email you@example.com
+pnpm db:seed --owner-email you@example.com                  # one studio
+pnpm db:seed --owner-email you@example.com --demo owner     # a pilates chain (5 branches) and a barbershop (3)
 ```
+
+On staging the same runs from GitHub: Actions → "Seed staging demo data" → Run workflow, with
+the email of an account that signed up on staging (passwords never pass through the workflow).
 
 Without an AI key the assistant runs in demo mode; payments are simulated (test card) and
 receipts are samples.

@@ -1,30 +1,42 @@
-name: Create demo studio on staging
+name: Seed staging demo data
 
-# Creates a demo fitness studio with months of history on staging, owned by the given user
-# (who must have signed in to the staging site once). Started by hand from the Actions tab.
+# Fills one person's account on staging with demo businesses (decision T78). The person signs
+# up on staging first, so their profile exists; passwords never pass through here. Started by
+# hand from the Actions tab (or the API), never on a push.
 on:
   workflow_dispatch:
     inputs:
       owner_email:
-        description: Email of the staging user who will own the demo studio
+        description: "Email of the account (signed up on staging already)"
         required: true
-        type: string
-      months:
-        description: Months of history
+      demo:
+        description: "studio: one fitness studio; owner: a pilates chain (5 branches) and a barbershop (3)"
+        type: choice
+        options: [owner, studio]
+        default: owner
+      owner_name:
+        description: "Display name for the account (optional)"
         required: false
+      months:
+        description: "Months of history"
         default: "3"
         type: choice
         options: ["1", "2", "3", "6"]
+      replace:
+        description: "Remove this account's earlier copies of the demo businesses first"
+        type: boolean
+        default: true
 
+# Never at the same time as a migration.
 concurrency:
   group: migrate-staging
   cancel-in-progress: false
 
 jobs:
   seed:
-    name: app.seed
+    name: Seed demo businesses
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     environment: staging
     steps:
       - uses: actions/checkout@v4
@@ -35,10 +47,21 @@ jobs:
         working-directory: apps/api
         run: uv sync --locked --no-dev
 
-      - name: Create the demo studio
+      - name: Seed
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           OWNER_EMAIL: ${{ inputs.owner_email }}
+          OWNER_NAME: ${{ inputs.owner_name }}
+          DEMO: ${{ inputs.demo }}
           MONTHS: ${{ inputs.months }}
-        run: uv run python -m app.seed --owner-email "$OWNER_EMAIL" --months "$MONTHS" --seed "$GITHUB_RUN_NUMBER"
+          REPLACE: ${{ inputs.replace }}
+        run: |
+          if [ -z "$API_DATABASE_URL" ]; then
+            echo "::error::Secret STAGING_DATABASE_URL is not set (Settings > Environments > staging)."
+            exit 1
+          fi
+          args=(--owner-email "$OWNER_EMAIL" --demo "$DEMO" --months "$MONTHS" --seed "$GITHUB_RUN_NUMBER")
+          if [ -n "$OWNER_NAME" ]; then args+=(--owner-name "$OWNER_NAME"); fi
+          if [ "$REPLACE" = "true" ]; then args+=(--replace); fi
+          uv run python -m app.seed "${args[@]}"

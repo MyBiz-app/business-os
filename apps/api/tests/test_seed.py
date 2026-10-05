@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
-from app.seed import seed
+from app.seed import seed, seed_demo
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -79,3 +79,54 @@ def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
             .all()
         )
     assert len(invoices) >= 4 and set(invoices) == {"paid"}  # 2 months of data + 90 days before
+
+
+def test_owner_demo_has_two_businesses_with_branches(engine: Engine) -> None:
+    owner = uuid4()
+    email = f"owner-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        first = seed_demo(connection, email, "owner", 1, random.Random(2), owner_name="Owner")
+    # Running it again with --replace leaves one copy of each business.
+    with engine.begin() as connection:
+        tenants = seed_demo(connection, email, "owner", 1, random.Random(3), replace=True)
+
+    with engine.connect() as connection:
+        owned = (
+            connection.execute(
+                text("""
+                SELECT t.id, t.vertical,
+                       (SELECT count(*) FROM app.locations l WHERE l.tenant_id = t.id) AS branches,
+                       (SELECT quantity FROM app.tenant_modules m
+                        WHERE m.tenant_id = t.id AND m.module_key = 'extra_location') AS extra,
+                       (SELECT count(DISTINCT s.location_id) FROM app.sessions s
+                        WHERE s.tenant_id = t.id) AS branches_with_sessions,
+                       (SELECT count(DISTINCT p.location_id) FROM app.payments p
+                        WHERE p.tenant_id = t.id AND p.location_id IS NOT NULL) AS selling_branches,
+                       (SELECT count(*) FROM app.bookings b JOIN app.sessions s
+                            ON s.id = b.session_id JOIN app.services v ON v.id = s.service_id
+                        WHERE b.tenant_id = t.id AND v.booking_mode = 'appointment')
+                           AS appointments
+                FROM app.tenants t JOIN app.tenant_members m ON m.tenant_id = t.id
+                WHERE m.user_id = :owner ORDER BY t.created_at, t.vertical
+            """),
+                {"owner": owner},
+            )
+            .mappings()
+            .all()
+        )
+        name = connection.execute(
+            text("SELECT full_name FROM app.users WHERE id = :id"), {"id": owner}
+        ).scalar_one()
+
+    assert {row["id"] for row in owned} == set(tenants) and not set(first) & set(tenants)
+    by_vertical = {row["vertical"]: row for row in owned}
+    assert by_vertical["pilates"]["branches"] == 5 and by_vertical["pilates"]["extra"] == 4
+    assert by_vertical["barbershop"]["branches"] == 3 and by_vertical["barbershop"]["extra"] == 2
+    for row in owned:
+        assert row["branches_with_sessions"] == row["branches"] == row["selling_branches"]
+        assert row["appointments"] > 0
+    assert name == "Owner"
