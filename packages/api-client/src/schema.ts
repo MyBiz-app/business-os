@@ -1689,6 +1689,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/getting-started": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Getting Started
+         * @description The first-steps checklist on the dashboard, from what the business has set up.
+         */
+        get: operations["getting_started"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/pricing": {
         parameters: {
             query?: never;
@@ -3489,6 +3509,15 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** GettingStarted */
+        GettingStarted: {
+            /** Steps */
+            steps: components["schemas"]["SetupItem"][];
+            /** Done */
+            done: number;
+            /** Total */
+            total: number;
+        };
         /** Grant */
         Grant: {
             /**
@@ -5156,6 +5185,16 @@ export interface components {
             capacity?: number | null;
             /** Status */
             status?: ("scheduled" | "cancelled") | null;
+        };
+        /** SetupItem */
+        SetupItem: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "branding" | "services" | "schedule" | "team" | "clients" | "card";
+            /** Done */
+            done: boolean;
         };
         /** Slot */
         Slot: {
@@ -9624,6 +9663,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WelcomeEmail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    getting_started: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GettingStarted"];
                 };
             };
             /** @description Validation Error */

@@ -98,7 +98,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                       </li>
                     ))}
                   </ul>
-                  <Link href="/signup" className={`mt-auto px-5 py-3 ${popular ? "btn-primary" : "btn-secondary"}`}>
+                  <Link href={`/start?preset=${preset}&currency=${currency}`} className={`mt-auto px-5 py-3 ${popular ? "btn-primary" : "btn-secondary"}`}>
                     {t("cta")}
                   </Link>
                 </article>

@@ -1241,7 +1241,8 @@
       "start": "Start free",
       "menu": "Menu",
       "close": "Close",
-      "dashboard": "Go to dashboard"
+      "dashboard": "Go to dashboard",
+      "guide": "Getting started guide"
     },
     "hero": {
       "eyebrow": "Business management + an AI workforce for small businesses",
@@ -1972,6 +1973,304 @@
       "invalid": "Some details aren't valid.",
       "code_taken": "That code already exists.",
       "generic": "Something went wrong. Please try again."
+    }
+  },
+  "start": {
+    "meta": {
+      "title": "Build your plan",
+      "description": "Build your MyBiz plan in two minutes: choose what your business needs, see the price live, and try everything free for 14 days."
+    },
+    "progress": {
+      "label": "Your progress",
+      "business": "Business",
+      "plan": "Plan",
+      "extras": "Extras",
+      "summary": "Summary",
+      "step": "Step {step} of {total}"
+    },
+    "back": "Back",
+    "next": "Continue",
+    "industry": {
+      "title": "What kind of business do you run?",
+      "subtitle": "We'll set MyBiz up with your industry's words, services and forms."
+    },
+    "business": {
+      "title": "Tell us about {vertical, select, fitness {your studio} beauty {your salon} clinic {your clinic} garage {your garage} other {your business}}",
+      "subtitle": "So we can match the plan to your size. You can change everything later.",
+      "name": "Business name",
+      "namePlaceholder": "For example: {example}",
+      "examples": {
+        "fitness": "Flow Studio",
+        "beauty": "Shira's Salon",
+        "clinic": "Green Clinic",
+        "garage": "Speedy Garage"
+      },
+      "size": "How many active clients do you have?",
+      "sizeHint": "Clients who came at least once in the last three months.",
+      "sizes": {
+        "100": "Up to 100",
+        "300": "101–300",
+        "1000": "301–1,000",
+        "1500": "1,000+"
+      },
+      "staff": "Team members",
+      "locations": "Locations",
+      "decrease": "Fewer {label}",
+      "increase": "More {label}",
+      "currency": "Currency",
+      "currencies": {
+        "ILS": "₪ Shekel",
+        "USD": "$ Dollar",
+        "EUR": "€ Euro"
+      }
+    },
+    "base": {
+      "eyebrow": "Your base plan",
+      "title": "Everything you need to run the day",
+      "subtitle": "Core is always included. It's priced by your number of active clients.",
+      "tier": "Core · up to {count} active clients",
+      "tierCustom": "Core · 1,000+ active clients",
+      "included": [
+        "Schedule, classes and appointments",
+        "Client cards, history and notes",
+        "Memberships, punch cards and sales",
+        "Receipts and payments",
+        "Reports and a live dashboard",
+        "Team, roles and working hours",
+        "Ratings from your clients",
+        "Hebrew and English, phone and computer"
+      ],
+      "locations": "+ {count, plural, one {# extra location} other {# extra locations}} for your branches"
+    },
+    "perMonth": "/ month",
+    "daily": "That's about {price} a day",
+    "offer": {
+      "add": "Yes, add it",
+      "skip": "No thanks",
+      "added": "Added to your plan",
+      "remove": "Remove from plan",
+      "popular": "Recommended for you"
+    },
+    "offers": {
+      "client_app": {
+        "eyebrow": "Client app",
+        "title": "Give your clients their own app?",
+        "text": "Your clients book, cancel and buy on their phone, 24/7, in an app with your logo and colors. You get fewer calls and more bookings.",
+        "points": [
+          "Booking and waitlists without a phone call",
+          "Buying memberships and punch cards in the app",
+          "Ratings after every visit"
+        ]
+      },
+      "ai": {
+        "eyebrow": "AI assistant",
+        "title": "Want an assistant that answers in seconds?",
+        "text": "Ask in plain words, like you'd ask a manager, and get an answer from your real data. With Pro it also prepares the work for you to approve.",
+        "question": "Who hasn't come in for a month?",
+        "answer": "8 clients. 3 of them have a membership that ends this week — want me to prepare a message?",
+        "tiers": {
+          "ai_basic": {
+            "title": "AI Basic",
+            "text": "Answers about your schedule, clients and numbers."
+          },
+          "ai_pro": {
+            "title": "AI Pro",
+            "text": "Everything in Basic, and it prepares bookings and cancellations for your approval."
+          }
+        },
+        "choose": "Choose this",
+        "chosen": "Chosen"
+      },
+      "crm": {
+        "eyebrow": "CRM & leads",
+        "title": "Turn more inquiries into clients?",
+        "text": "Every inquiry from your website, Instagram or a phone call lands on one board, with reminders to follow up — so nobody falls through the cracks.",
+        "points": [
+          "An inquiry form for your website and social",
+          "A board from new inquiry to paying client",
+          "Follow-up reminders and a call log"
+        ],
+        "columns": [
+          "New",
+          "Contacted",
+          "Trial",
+          "Joined"
+        ],
+        "cards": [
+          "Dana · Instagram",
+          "Yossi · Website",
+          "Maya · Referral"
+        ]
+      },
+      "whatsapp": {
+        "eyebrow": "WhatsApp & SMS",
+        "title": "Remind clients on WhatsApp automatically?",
+        "text": "Automatic reminders before every visit cut no-shows. Send updates and offers to the right clients in two clicks.",
+        "points": [
+          "Automatic reminders the day before",
+          "Broadcasts to a group of clients",
+          "Ready-made message templates"
+        ],
+        "message": "Hi Dana! A reminder: tomorrow at 18:00 you have a session with us. See you 💪",
+        "reply": "Thanks, I'll be there!"
+      }
+    },
+    "cart": {
+      "title": "Your plan",
+      "monthly": "Monthly after the trial",
+      "today": "Due today",
+      "free": "Free",
+      "trial": "14 days free, no commitment",
+      "show": "Show your plan",
+      "hide": "Hide your plan",
+      "items": "{count, plural, one {# item} other {# items}}",
+      "addedNotice": "{name} added. Monthly total: {total}",
+      "removedNotice": "{name} removed. Monthly total: {total}"
+    },
+    "summary": {
+      "title": "Your plan is ready",
+      "subtitle": "Here's everything you chose. Nothing is charged today.",
+      "business": "{name} · {vertical}",
+      "edit": "Change",
+      "trialEnds": "Free until {date}. The first charge is on {date}; you can cancel or change the plan any time before.",
+      "monthly": "Monthly total after the trial",
+      "today": "Due today",
+      "terms": "I agree to the <terms>terms of service</terms> and the <privacy>privacy policy</privacy>.",
+      "termsRequired": "Please agree to the terms to continue.",
+      "cta": "Create my account",
+      "haveAccount": "Already have a MyBiz account?",
+      "login": "Sign in and continue",
+      "guarantee": [
+        "No setup fees",
+        "Cancel any time",
+        "Your data stays yours"
+      ]
+    },
+    "finish": {
+      "title": "Last step: payment details",
+      "subtitle": "Add a card for after the trial. Nothing is charged today, and we'll remind you before the first charge.",
+      "card": "Card number",
+      "expiry": "Expiry (MM/YY)",
+      "cvc": "CVC",
+      "holder": "Name on card",
+      "simulated": "Test mode: the card is filled in for you and nothing is charged.",
+      "secure": "Secure, encrypted payment",
+      "submit": "Start my free trial",
+      "invalid": "We couldn't read your plan. Please build it again — it takes a minute.",
+      "rebuild": "Build my plan",
+      "errors": {
+        "invalid": "Some details are missing or incorrect. Please check and try again.",
+        "generic": "Something went wrong. Please try again in a moment."
+      }
+    },
+    "presets": {
+      "starter": "Starter",
+      "growing": "Growing",
+      "ai_powered": "AI-powered"
+    }
+  },
+  "gettingStarted": {
+    "welcomeTitle": "Welcome to MyBiz, {name}! 🎉",
+    "welcomeText": "Your business is ready and your 14-day trial has started. We've sent the details to your email. Here's how to get going:",
+    "title": "Getting started",
+    "progress": "{done} of {total} done",
+    "allDone": "You're all set! Your business is ready for clients.",
+    "guide": "The full guide",
+    "open": "Open",
+    "steps": {
+      "branding": {
+        "title": "Add your logo and colors",
+        "text": "Your clients see them in the app and in every message."
+      },
+      "services": {
+        "title": "Set up your services",
+        "text": "What you offer, how long it takes and what it costs."
+      },
+      "schedule": {
+        "title": "Build your schedule",
+        "text": "Weekly classes or working hours for appointments."
+      },
+      "team": {
+        "title": "Invite your team",
+        "text": "Each person gets their own sign-in and permissions."
+      },
+      "clients": {
+        "title": "Bring in your clients",
+        "text": "Import a list from Excel, or share your join code."
+      },
+      "card": {
+        "title": "Add a card for after the trial",
+        "text": "Nothing is charged until the trial ends."
+      }
+    },
+    "page": {
+      "metaTitle": "Getting started with MyBiz",
+      "metaDescription": "A step-by-step guide to setting up your business on MyBiz: branding, services, schedule, team, clients and the client app.",
+      "eyebrow": "Guide",
+      "title": "Your first day with MyBiz",
+      "subtitle": "Six short steps, about 20 minutes, and your business is ready for clients. Each step has a link straight to the right screen.",
+      "minutes": "~{count} min",
+      "openInApp": "Open in MyBiz",
+      "sections": [
+        {
+          "key": "branding",
+          "minutes": 2,
+          "tips": [
+            "Upload a square logo (PNG or JPG).",
+            "Pick a main color — the client app and emails use it.",
+            "Check your business details, address and time zone."
+          ]
+        },
+        {
+          "key": "services",
+          "minutes": 4,
+          "tips": [
+            "We added starter services for your industry — rename or delete them.",
+            "Set the length, price and number of spots for each service.",
+            "Create plans: memberships, punch cards or single visits."
+          ]
+        },
+        {
+          "key": "schedule",
+          "minutes": 5,
+          "tips": [
+            "Classes: add a weekly session once and it repeats.",
+            "Appointments: set each staff member's working hours.",
+            "Mark holidays and closed days so nobody books them."
+          ]
+        },
+        {
+          "key": "team",
+          "minutes": 3,
+          "tips": [
+            "Invite by email; they choose their own password.",
+            "Pick a role: manager, front desk or staff — or build your own.",
+            "Staff see their own schedule and can check clients in."
+          ]
+        },
+        {
+          "key": "clients",
+          "minutes": 4,
+          "tips": [
+            "Import from Excel or CSV in one go.",
+            "Share your join code or QR — clients join the app on their own.",
+            "Every client card keeps history, plans and notes."
+          ]
+        },
+        {
+          "key": "card",
+          "minutes": 1,
+          "tips": [
+            "Add a card for after the trial; nothing is charged today.",
+            "You can change modules any time in Settings → Modules.",
+            "Invoices are in Settings → Billing."
+          ]
+        }
+      ],
+      "helpTitle": "Need a hand?",
+      "helpText": "Write to us and a real person will answer, usually within a business day.",
+      "helpCta": "Contact us",
+      "startCta": "Haven't joined yet? Build your plan"
     }
   }
 }

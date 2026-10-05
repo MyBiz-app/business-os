@@ -5,14 +5,15 @@ import { safeNext } from "@/lib/navigation";
 
 import { supabaseConfig } from "./env";
 
-const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/check-email", "/forgot-password"]);
+const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/check-email", "/forgot-password", "/start", "/getting-started", "/sitemap.xml", "/robots.txt"]);
+const PUBLIC_ASSETS = ["/opengraph-image", "/twitter-image"];
 const AUTH_PAGES = new Set(["/", "/login", "/signup"]);
 
 // The marketing site and the public pages around sign-in and joining.
 const PUBLIC_PREFIXES = ["/auth/", "/invite/", "/join/", "/inquiry/", "/features", "/industries/", "/pricing", "/about", "/contact", "/legal/"];
 
 function isPublic(pathname: string) {
-  return PUBLIC_PAGES.has(pathname) || PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+  return PUBLIC_PAGES.has(pathname) || [...PUBLIC_PREFIXES, ...PUBLIC_ASSETS].some((prefix) => pathname.startsWith(prefix));
 }
 
 /** Refreshes the session cookie and redirects based on whether the user is signed in. */
@@ -45,7 +46,11 @@ export async function updateSession(request: NextRequest) {
     return redirect;
   };
 
-  if (!signedIn && !isPublic(pathname)) return redirectTo("/login");
+  if (!signedIn && !isPublic(pathname)) {
+    // Come back here after signing in (e.g. the payment step of the sign-up journey).
+    const back = pathname === "/" || pathname === "/dashboard" ? "" : `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;
+    return redirectTo(`/login${back}`);
+  }
   if (signedIn && AUTH_PAGES.has(pathname)) {
     return redirectTo(safeNext(request.nextUrl.searchParams.get("next")) ?? "/dashboard");
   }

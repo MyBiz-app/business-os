@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { ColumnChart } from "@/components/charts/column-chart";
+import { GettingStartedCard } from "@/components/getting-started";
 import { CountUp } from "@/components/motion/count-up";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
@@ -60,6 +61,9 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
   // invoice is unpaid.
   const billing = canManageSettings(tenant) ? (await api.GET("/billing", { params: scope })).data : undefined;
+  // The first-steps checklist, for whoever sets the business up, until it's all done.
+  const setup = canManageSettings(tenant) ? (await api.GET("/tenants/current/getting-started", { params: scope })).data : undefined;
+  const welcome = query.welcome === "1";
   const billingNotice = !billing
     ? null
     : billing.balance_due > 0
@@ -141,6 +145,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
         </Link>
       )}
+      {setup && (welcome || setup.done < setup.total) && <GettingStartedCard setup={setup} welcome={welcome} business={tenant.name} />}
       <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-6 sm:p-8">
         <div
           aria-hidden="true"

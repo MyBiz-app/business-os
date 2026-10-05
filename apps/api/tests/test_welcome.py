@@ -67,3 +67,14 @@ def test_the_welcome_email_is_sent_once(client: TestClient, studio: dict, monkey
 def test_only_the_owner_side_can_send_it(client: TestClient, studio: dict, auth) -> None:
     staff = auth(studio["coach"], studio["tenant_id"])
     assert client.post("/tenants/current/welcome-email", json={}, headers=staff).status_code == 403
+
+
+def test_getting_started_checklist(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    before = client.get("/tenants/current/getting-started", headers=headers).json()
+    steps = {s["key"]: s["done"] for s in before["steps"]}
+    assert steps["services"] and steps["team"]  # the fixture adds a service and a coach
+    assert not steps["card"] and not steps["clients"] and not steps["branding"]
+    client.post("/billing/payment-method", json={"brand": "visa"}, headers=headers)
+    after = client.get("/tenants/current/getting-started", headers=headers).json()
+    assert after["done"] == before["done"] + 1 and after["total"] == 6

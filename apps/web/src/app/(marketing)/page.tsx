@@ -36,7 +36,7 @@ export default async function Home() {
             </h1>
             <p className="max-w-xl text-lg text-muted sm:text-xl">{t("hero.subtitle")}</p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/signup" className="btn-primary px-6 py-3 text-lg">
+              <Link href="/start" className="btn-primary px-6 py-3 text-lg">
                 {t("hero.ctaPrimary")}
               </Link>
               <Link href="/features" className="btn-secondary px-6 py-3 text-lg">

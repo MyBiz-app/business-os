@@ -7422,6 +7422,55 @@
         }
       }
     },
+    "/tenants/current/getting-started": {
+      "get": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Getting Started",
+        "description": "The first-steps checklist on the dashboard, from what the business has set up.",
+        "operationId": "getting_started",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GettingStarted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/public/pricing": {
       "get": {
         "tags": [
@@ -12461,6 +12510,32 @@
         ],
         "title": "FreezeCreate"
       },
+      "GettingStarted": {
+        "properties": {
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/SetupItem"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "done": {
+            "type": "integer",
+            "title": "Done"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "steps",
+          "done",
+          "total"
+        ],
+        "title": "GettingStarted"
+      },
       "Grant": {
         "properties": {
           "id": {
@@ -17201,6 +17276,32 @@
         },
         "type": "object",
         "title": "SessionUpdate"
+      },
+      "SetupItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "branding",
+              "services",
+              "schedule",
+              "team",
+              "clients",
+              "card"
+            ],
+            "title": "Key"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "done"
+        ],
+        "title": "SetupItem"
       },
       "Slot": {
         "properties": {

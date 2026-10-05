@@ -1,7 +1,7 @@
 """The welcome email for a new business (app/welcome.py): sent once, right after sign-up, to
 the owner who signs up; the owner can also look at it again later."""
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, get_args
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -102,3 +102,48 @@ def send_welcome(body: WelcomeRequest, context: SettingsDep) -> WelcomeEmail:
 def preview_welcome(context: SettingsDep) -> WelcomeEmail:
     email = build_welcome(_details(context.session, 0))
     return WelcomeEmail(status="preview", to=email.to, subject=email.subject, html=email.html or "")
+
+
+# --- Getting started -----------------------------------------------------------------------
+
+setup_router = APIRouter(prefix="/tenants/current/getting-started", tags=["tenants"])
+
+SetupStep = Literal["branding", "services", "schedule", "team", "clients", "card"]
+
+
+class SetupItem(BaseModel):
+    key: SetupStep
+    done: bool
+
+
+class GettingStarted(BaseModel):
+    steps: list[SetupItem]
+    done: int
+    total: int
+
+
+@setup_router.get("")
+def getting_started(context: SettingsDep) -> GettingStarted:
+    """The first-steps checklist on the dashboard, from what the business has set up."""
+    row = (
+        context.session.execute(
+            text("""
+                SELECT
+                    (t.logo IS NOT NULL OR t.primary_color IS NOT NULL) AS branding,
+                    EXISTS (SELECT 1 FROM app.services x WHERE x.tenant_id = t.id) AS services,
+                    (EXISTS (SELECT 1 FROM app.sessions x WHERE x.tenant_id = t.id)
+                     OR EXISTS (SELECT 1 FROM app.staff_hours x WHERE x.tenant_id = t.id))
+                        AS schedule,
+                    ((SELECT count(*) FROM app.tenant_members m WHERE m.tenant_id = t.id) > 1
+                     OR EXISTS (SELECT 1 FROM app.invitations x WHERE x.tenant_id = t.id)) AS team,
+                    EXISTS (SELECT 1 FROM app.clients x WHERE x.tenant_id = t.id) AS clients,
+                    EXISTS (SELECT 1 FROM app.billing_accounts b
+                            WHERE b.tenant_id = t.id AND b.card_last4 IS NOT NULL) AS card
+                FROM app.tenants t WHERE t.id = app.current_tenant_id()
+            """)
+        )
+        .mappings()
+        .one()
+    )
+    steps = [SetupItem(key=key, done=bool(row[key])) for key in get_args(SetupStep)]
+    return GettingStarted(steps=steps, done=sum(s.done for s in steps), total=len(steps))

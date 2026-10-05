@@ -12,7 +12,8 @@ export async function MarketingFooter() {
         { href: "/features", label: t("nav.features") },
         { href: "/pricing", label: t("nav.pricing") },
         { href: "/login", label: t("nav.login") },
-        { href: "/signup", label: t("nav.start") },
+        { href: "/start", label: t("nav.start") },
+        { href: "/getting-started", label: t("nav.guide") },
       ],
     },
     {
