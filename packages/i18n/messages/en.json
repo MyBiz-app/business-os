@@ -129,12 +129,6 @@
     "timeZone": "Time zone",
     "currency": "Currency",
     "submit": "Create business",
-    "verticals": {
-      "fitness": "Fitness studio",
-      "beauty": "Barber / beauty salon",
-      "clinic": "Clinic / therapist",
-      "garage": "Garage / car services"
-    },
     "currencies": {
       "ILS": "Israeli shekel (₪)",
       "USD": "US dollar ($)",
@@ -272,7 +266,7 @@
       "visitNotes": "Treatment notes",
       "nextBooking": "Your next visit"
     },
-    "garage": {
+    "automotive": {
       "client": "Customer",
       "clients": "Customers",
       "addClient": "Add customer",
@@ -290,6 +284,25 @@
       "profile": "Vehicle",
       "visitNotes": "Service history",
       "nextBooking": "Your next appointment"
+    },
+    "classes": {
+      "client": "Student",
+      "clients": "Students",
+      "addClient": "Add student",
+      "newClient": "New student",
+      "searchClients": "Search students",
+      "noClients": "No students yet",
+      "noResults": "No students match your search",
+      "schedule": "Class schedule",
+      "newSession": "Class",
+      "noSessions": "No classes",
+      "sessionsToday": "{count, plural, =0 {No classes today} one {One class today} other {# classes today}}",
+      "appTab": "Classes",
+      "appEmpty": "No classes on this day.",
+      "place": "Our school",
+      "profile": "Student details",
+      "visitNotes": "Progress notes",
+      "nextBooking": "Your next lesson"
     }
   },
   "clients": {
@@ -1519,52 +1532,12 @@
       "subtitle": "The same powerful system, with each industry's terms, forms and settings.",
       "more": "Learn more",
       "soon": "Coming soon",
-      "items": {
-        "fitness": {
-          "name": "Studios & gyms",
-          "tagline": "Classes, memberships and health forms.",
-          "points": [
-            "Group classes and waitlists",
-            "Memberships, passes and freezes",
-            "Digital health declaration"
-          ],
-          "heroTitle": "A full studio. No chaos.",
-          "heroText": "Class schedule, waitlists, memberships and passes, health declarations and a branded app for your members."
-        },
-        "beauty": {
-          "name": "Barbers & beauty salons",
-          "tagline": "Appointments, staff and reminders.",
-          "points": [
-            "Appointments by staff and service",
-            "Automatic client reminders",
-            "Treatment history and preferences"
-          ],
-          "heroTitle": "Full chairs, a tidy calendar.",
-          "heroText": "Appointments by barber or stylist, reminders that cut no-shows, and a treatment history for every client."
-        },
-        "clinic": {
-          "name": "Clinics & therapists",
-          "tagline": "Patients, forms and records.",
-          "points": [
-            "Calendar by practitioner and room",
-            "Digital intake and consent forms",
-            "Strict privacy and permissions"
-          ],
-          "heroTitle": "More time for patients.",
-          "heroText": "A calendar by practitioner and room, digital intake and consent forms, and permissions that protect patient privacy."
-        },
-        "garage": {
-          "name": "Garages & car services",
-          "tagline": "Vehicles, work orders and updates.",
-          "points": [
-            "A vehicle card for every client",
-            "Bookings by bay and service",
-            "A heads-up when the car is ready"
-          ],
-          "heroTitle": "Every car, every job, under control.",
-          "heroText": "A vehicle card for every client, bookings by bay, and an automatic update when the car is ready."
-        }
-      }
+      "soonTitle": "More industries coming soon",
+      "soonText": "Sports and facility booking, home services, pet services, events and professional services are on the way.",
+      "all": "All industries",
+      "kinds": "Kinds of {name}",
+      "notify": "Tell me when it opens",
+      "soonPage": "We're building MyBiz for {name} right now. Leave your details and we'll let you know as soon as it opens."
     },
     "ai": {
       "eyebrow": "AI workforce",
@@ -1696,13 +1669,6 @@
       "phone": "Phone (optional)",
       "business": "Business name (optional)",
       "vertical": "Industry",
-      "verticals": {
-        "fitness": "Studio / gym",
-        "beauty": "Barber / beauty",
-        "clinic": "Clinic / therapy",
-        "garage": "Garage / car",
-        "other": "Other"
-      },
       "message": "How can we help?",
       "send": "Send",
       "sent": "Thank you! We got your message and will get back to you soon.",
@@ -1712,7 +1678,8 @@
         "generic": "Something went wrong. Please try again."
       },
       "other": "Or write to us directly",
-      "website": "Website (leave empty)"
+      "website": "Website (leave empty)",
+      "otherVertical": "Other"
     },
     "legal": {
       "draft": "Draft – this document is in progress and will be finalized before launch.",
@@ -1959,52 +1926,6 @@
     "dashboardTrial": "{days, plural, one {1 day} other {# days}} left in your trial. Add a payment method to keep going without a break.",
     "dashboardDue": "You have an open MyBiz invoice of {amount}."
   },
-  "fields": {
-    "notSet": "Not set",
-    "fitness": {
-      "goal": "Goal",
-      "injuries": "Injuries and limitations",
-      "goal_options": {
-        "weight_loss": "Weight loss",
-        "strength": "Strength",
-        "flexibility": "Flexibility",
-        "rehab": "Rehabilitation",
-        "general": "General fitness"
-      }
-    },
-    "beauty": {
-      "hair_type": "Hair type",
-      "color_formula": "Color formula",
-      "allergies": "Sensitivities and allergies",
-      "hair_type_options": {
-        "straight": "Straight",
-        "wavy": "Wavy",
-        "curly": "Curly",
-        "coily": "Coily"
-      }
-    },
-    "clinic": {
-      "id_number": "ID number",
-      "health_fund": "Health fund",
-      "referred_by": "Referred by",
-      "allergies": "Allergies",
-      "health_fund_options": {
-        "clalit": "Clalit",
-        "maccabi": "Maccabi",
-        "meuhedet": "Meuhedet",
-        "leumit": "Leumit",
-        "private": "Private"
-      }
-    },
-    "garage": {
-      "plate": "License plate",
-      "make": "Make",
-      "model": "Model",
-      "year": "Year",
-      "mileage": "Mileage",
-      "next_inspection": "Next inspection"
-    }
-  },
   "visitNotes": {
     "body": "What was done / worth remembering?",
     "about": "About",
@@ -2160,19 +2081,19 @@
     "next": "Continue",
     "industry": {
       "title": "What kind of business do you run?",
-      "subtitle": "We'll set MyBiz up with your industry's words, services and forms."
+      "subtitle": "We'll set MyBiz up with your industry's words, services and forms.",
+      "kindTitle": "What kind of {name} business?",
+      "kindSubtitle": "We'll set it up with the right services, words and client details. You can change everything later.",
+      "otherKind": "Another {name} business",
+      "allIndustries": "All industries",
+      "missing": "Don't see your industry?",
+      "seeAll": "See every industry, including those coming soon"
     },
     "business": {
-      "title": "Tell us about {vertical, select, fitness {your studio} beauty {your salon} clinic {your clinic} garage {your garage} other {your business}}",
+      "title": "Tell us about {yours}",
       "subtitle": "So we can match the plan to your size. You can change everything later.",
       "name": "Business name",
       "namePlaceholder": "For example: {example}",
-      "examples": {
-        "fitness": "Flow Studio",
-        "beauty": "Shira's Salon",
-        "clinic": "Green Clinic",
-        "garage": "Speedy Garage"
-      },
       "size": "How many active clients do you have?",
       "sizeHint": "Clients who came at least once in the last three months.",
       "sizes": {
@@ -2612,5 +2533,338 @@
       "level": "Your level: {level}",
       "permissions": "What you may do"
     }
+  },
+  "verticals": {
+    "fitness": {
+      "name": "Fitness & Training",
+      "tagline": "Classes, memberships and health forms.",
+      "yours": "your studio",
+      "example": "Flow Studio",
+      "points": [
+        "Group classes and waitlists",
+        "Memberships, passes and freezes",
+        "Digital health declaration"
+      ],
+      "heroTitle": "A full studio. No chaos.",
+      "heroText": "Class schedule, waitlists, memberships and passes, health declarations and a branded app for your members."
+    },
+    "beauty": {
+      "name": "Beauty & Spa",
+      "tagline": "Appointments, staff and reminders.",
+      "yours": "your salon",
+      "example": "Shira's Salon",
+      "points": [
+        "Appointments by staff and service",
+        "Automatic client reminders",
+        "Treatment history and preferences"
+      ],
+      "heroTitle": "Full chairs, a tidy calendar.",
+      "heroText": "Appointments by barber or stylist, reminders that cut no-shows, and a treatment history for every client."
+    },
+    "clinic": {
+      "name": "Clinics & Health",
+      "tagline": "Patients, forms and records.",
+      "yours": "your clinic",
+      "example": "Green Clinic",
+      "points": [
+        "Calendar by practitioner and room",
+        "Digital intake and consent forms",
+        "Strict privacy and permissions"
+      ],
+      "heroTitle": "More time for patients.",
+      "heroText": "A calendar by practitioner and room, digital intake and consent forms, and permissions that protect patient privacy."
+    },
+    "classes": {
+      "name": "Classes & Lessons",
+      "tagline": "Weekly classes, private lessons and students.",
+      "yours": "your school",
+      "example": "Rhythm Dance School",
+      "points": [
+        "Weekly classes and private lessons",
+        "Monthly and term plans",
+        "Parents' details for every child"
+      ],
+      "heroTitle": "Every class full, every student known.",
+      "heroText": "A weekly class schedule, private lessons, monthly and term plans, parents' details and a branded app where students book and pay."
+    },
+    "automotive": {
+      "name": "Automotive",
+      "tagline": "Vehicles, work orders and updates.",
+      "yours": "your garage",
+      "example": "Speedy Garage",
+      "points": [
+        "A vehicle card for every client",
+        "Bookings by bay and service",
+        "A heads-up when the car is ready"
+      ],
+      "heroTitle": "Every car, every job, under control.",
+      "heroText": "A vehicle card for every client, bookings by bay, and an automatic update when the car is ready."
+    },
+    "sports": {
+      "name": "Sports & facility booking",
+      "tagline": "Courts, rooms and spaces by the hour.",
+      "points": [
+        "Book a court or a room by the hour",
+        "Academies and teams",
+        "Pay when booking"
+      ],
+      "heroTitle": "Every court and room, booked.",
+      "heroText": "Padel, tennis and football courts, rehearsal and studio rooms, meeting rooms: booked by the hour, paid in advance."
+    },
+    "home_services": {
+      "name": "Home & field services",
+      "tagline": "Jobs at the client's address.",
+      "points": [
+        "The client's address on every job",
+        "Assign a technician",
+        "Quotes and approvals"
+      ],
+      "heroTitle": "Every job on the road, in control.",
+      "heroText": "Cleaning, air conditioning, electricians, plumbers and pest control: jobs at the client's address, technicians, travel time and quotes."
+    },
+    "pets": {
+      "name": "Pet services",
+      "tagline": "Grooming, training and boarding.",
+      "points": [
+        "A profile for every pet",
+        "Grooming and training appointments",
+        "Boarding and day care"
+      ],
+      "heroTitle": "Happy pets, happy owners.",
+      "heroText": "Dog grooming, training, boarding and day care, with a profile for every pet under its owner."
+    },
+    "events": {
+      "name": "Creative & events",
+      "tagline": "Quotes, deposits and event days.",
+      "points": [
+        "Quotes clients approve online",
+        "Deposits and payments",
+        "Every event in one place"
+      ],
+      "heroTitle": "From the first call to the big day.",
+      "heroText": "Photographers and studios, DJs, event suppliers and small venues: quotes, deposits and every event day in one place."
+    },
+    "professional": {
+      "name": "Professional services",
+      "tagline": "Meetings, documents and retainers.",
+      "points": [
+        "Client meetings in one calendar",
+        "Documents per client",
+        "Retainers and billable hours"
+      ],
+      "heroTitle": "Your practice, organized.",
+      "heroText": "Consultants, accountants, lawyers and agencies: client meetings, documents, retainers and billable hours."
+    },
+    "gym": {
+      "name": "Gym",
+      "tagline": "Members, personal training and assessments.",
+      "yours": "your gym",
+      "example": "Iron Gym"
+    },
+    "pilates": {
+      "name": "Pilates studio",
+      "tagline": "Mat and reformer classes, private sessions.",
+      "example": "Core Pilates"
+    },
+    "yoga": {
+      "name": "Yoga studio",
+      "tagline": "Classes for every level, private yoga.",
+      "example": "Shanti Yoga"
+    },
+    "crossfit": {
+      "name": "CrossFit box",
+      "tagline": "WODs, foundations and memberships.",
+      "yours": "your box",
+      "example": "Box 42"
+    },
+    "functional": {
+      "name": "Functional training",
+      "tagline": "Group and small-group training.",
+      "example": "Move Lab"
+    },
+    "personal_trainer": {
+      "name": "Personal trainer",
+      "tagline": "Sessions, packages and assessments.",
+      "yours": "your training business",
+      "example": "Dan Coaching"
+    },
+    "hair_salon": {
+      "name": "Hair salon",
+      "tagline": "Cuts, color and styling.",
+      "example": "Shira's Salon"
+    },
+    "barbershop": {
+      "name": "Barbershop",
+      "tagline": "Haircuts, beards and regulars.",
+      "yours": "your barbershop",
+      "example": "Blade Barbers"
+    },
+    "cosmetics": {
+      "name": "Cosmetics & facials",
+      "tagline": "Facials, brows and skin care.",
+      "yours": "your studio",
+      "example": "Glow Studio"
+    },
+    "nails": {
+      "name": "Nail studio",
+      "tagline": "Manicure, pedicure and extensions.",
+      "yours": "your studio",
+      "example": "Nail Bar"
+    },
+    "laser": {
+      "name": "Laser hair removal",
+      "tagline": "Treatment series and skin details.",
+      "yours": "your clinic",
+      "example": "Smooth Laser"
+    },
+    "spa": {
+      "name": "Spa & massage",
+      "tagline": "Massages, treatments and couples.",
+      "yours": "your spa",
+      "example": "Calm Spa"
+    },
+    "physiotherapy": {
+      "name": "Physiotherapy & rehabilitation",
+      "tagline": "Assessments, treatment series and rehab.",
+      "example": "Move Physio"
+    },
+    "dental": {
+      "name": "Dental clinic",
+      "tagline": "Check-ups, hygienists and treatments.",
+      "example": "Bright Dental"
+    },
+    "nutrition": {
+      "name": "Nutrition",
+      "tagline": "Consultations, follow-ups and coaching.",
+      "example": "Balance Nutrition"
+    },
+    "aesthetics": {
+      "name": "Aesthetic clinic",
+      "tagline": "Consultations and aesthetic treatments.",
+      "example": "Derma Clinic"
+    },
+    "therapy": {
+      "name": "Therapy & coaching",
+      "tagline": "Recurring sessions, private and secure.",
+      "yours": "your practice",
+      "example": "Open Space Therapy"
+    },
+    "dance": {
+      "name": "Dance school",
+      "tagline": "Ballet, hip-hop and contemporary classes.",
+      "example": "Rhythm Dance School"
+    },
+    "martial_arts": {
+      "name": "Martial arts",
+      "tagline": "Classes, belts and age groups.",
+      "yours": "your dojo",
+      "example": "Tiger Dojo"
+    },
+    "music": {
+      "name": "Music lessons",
+      "tagline": "Private lessons for every instrument.",
+      "example": "Note Music School"
+    },
+    "tutoring": {
+      "name": "Tutoring & learning centers",
+      "tagline": "Private lessons, small groups, exam prep.",
+      "yours": "your learning center",
+      "example": "Smart Learning"
+    },
+    "kids_activities": {
+      "name": "Kids' activities",
+      "tagline": "Enrichment classes and toddler groups.",
+      "yours": "your center",
+      "example": "Little Explorers"
+    },
+    "garage": {
+      "name": "Garage",
+      "tagline": "Services, repairs and inspections.",
+      "example": "Speedy Garage"
+    },
+    "detailing": {
+      "name": "Detailing & car wash",
+      "tagline": "Washes, detailing and coatings.",
+      "yours": "your business",
+      "example": "Shine Detailing"
+    },
+    "tires": {
+      "name": "Tires",
+      "tagline": "Punctures, tires and alignment.",
+      "yours": "your shop",
+      "example": "Wheel Pro"
+    }
+  },
+  "clientFields": {
+    "notSet": "Not set",
+    "goal": "Goal",
+    "injuries": "Injuries and limitations",
+    "goal_options": {
+      "weight_loss": "Weight loss",
+      "strength": "Strength",
+      "flexibility": "Flexibility",
+      "rehab": "Rehabilitation",
+      "general": "General fitness"
+    },
+    "id_number": "ID number",
+    "health_fund": "Health fund",
+    "referred_by": "Referred by",
+    "allergies": "Sensitivities and allergies",
+    "health_fund_options": {
+      "clalit": "Clalit",
+      "maccabi": "Maccabi",
+      "meuhedet": "Meuhedet",
+      "leumit": "Leumit",
+      "private": "Private"
+    },
+    "hair_type": "Hair type",
+    "color_formula": "Color formula",
+    "hair_type_options": {
+      "straight": "Straight",
+      "wavy": "Wavy",
+      "curly": "Curly",
+      "coily": "Coily"
+    },
+    "plate": "License plate",
+    "make": "Make",
+    "model": "Model",
+    "year": "Year",
+    "mileage": "Mileage",
+    "next_inspection": "Next inspection",
+    "skin_type": "Skin type",
+    "skin_type_options": {
+      "normal": "Normal",
+      "dry": "Dry",
+      "oily": "Oily",
+      "combination": "Combination",
+      "sensitive": "Sensitive"
+    },
+    "treatment_notes": "Treatment notes",
+    "preferences": "Preferences",
+    "medications": "Medications",
+    "pressure": "Massage pressure",
+    "pressure_options": {
+      "light": "Light",
+      "medium": "Medium",
+      "strong": "Strong"
+    },
+    "health_notes": "Health notes",
+    "injury": "Injury or condition",
+    "dietary_restrictions": "Dietary restrictions",
+    "emergency_contact": "Emergency contact",
+    "level": "Level",
+    "level_options": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "birth_date": "Date of birth",
+    "parent_name": "Parent's name",
+    "parent_phone": "Parent's phone",
+    "belt": "Belt",
+    "instrument": "Instrument",
+    "school_grade": "School grade",
+    "subjects": "Subjects",
+    "tire_size": "Tire size"
   }
 }

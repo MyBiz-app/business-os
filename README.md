@@ -38,6 +38,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 | `apps/staff-app` | MyBiz team app (Expo) |
 | `packages/i18n` | Shared translations (he / en) and locale helpers for the web and the apps |
 | `packages/app-kit` | What the three apps share: API client, design tokens, components, providers |
+| `packages/verticals` | The industry catalog: categories and sub-categories, shared by the API, the web and the apps ([how to add one](docs/verticals.md)) |
 | `docs/` | Spec (v3 overview + Word files, v2 chapters) and decision log |
 | `scripts/` | Developer machine setup, spec → Word |
 

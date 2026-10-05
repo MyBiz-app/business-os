@@ -27,6 +27,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 | `docs/spec/v2/` | Current working spec (source of truth) |
 | `docs/DECISIONS.md` | Decision log |
 | `docs/STATUS.md` | Project status board (done, in progress, next) |
+| `docs/verticals.md` | Industries: the category catalog and how to add a category |
 
 ## Non-negotiable principles
 

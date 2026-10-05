@@ -1,0 +1,7 @@
+{
+  "key": "home_services",
+  "order": 7,
+  "status": "planned",
+  "icon": "wrench",
+  "color": "from-slate-500 to-zinc-700"
+}

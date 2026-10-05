@@ -10,7 +10,7 @@ const PUBLIC_ASSETS = ["/opengraph-image", "/twitter-image"];
 const AUTH_PAGES = new Set(["/", "/login", "/signup"]);
 
 // The marketing site and the public pages around sign-in and joining.
-const PUBLIC_PREFIXES = ["/auth/", "/invite/", "/join/", "/inquiry/", "/features", "/industries/", "/pricing", "/about", "/contact", "/legal/"];
+const PUBLIC_PREFIXES = ["/auth/", "/invite/", "/join/", "/inquiry/", "/features", "/industries", "/pricing", "/about", "/contact", "/legal/"];
 
 function isPublic(pathname: string) {
   return PUBLIC_PAGES.has(pathname) || [...PUBLIC_PREFIXES, ...PUBLIC_ASSETS].some((prefix) => pathname.startsWith(prefix));

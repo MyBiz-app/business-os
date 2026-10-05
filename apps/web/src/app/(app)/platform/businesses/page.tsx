@@ -1,13 +1,16 @@
+import { isVertical } from "@business-os/verticals";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
+import { industryTexts } from "@/lib/verticals";
 
 /** Every business on the platform. */
 export default async function PlatformBusinessesPage() {
   const t = await getTranslations();
+  const { text } = industryTexts(t);
   const locale = await getLocale();
   const { api } = await getPlatformFor("businesses.read");
   const businesses = unwrap(await api.GET("/platform/businesses"));
@@ -40,7 +43,7 @@ export default async function PlatformBusinessesPage() {
                   <Link href={`/platform/businesses/${business.id}`} className="font-medium text-primary underline-offset-4 hover:underline" dir="auto">
                     {business.name}
                   </Link>
-                  <div className="text-xs text-muted">{t(`onboarding.verticals.${business.vertical as "fitness"}`)}</div>
+                  <div className="text-xs text-muted">{isVertical(business.vertical) ? text(business.vertical, "name") : business.vertical}</div>
                 </td>
                 <td className="px-3 py-2" dir="ltr">
                   {business.owner_email ?? "—"}

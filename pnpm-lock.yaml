@@ -186,6 +186,9 @@ importers:
       '@business-os/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@business-os/verticals':
+        specifier: workspace:*
+        version: link:../../packages/verticals
       '@expo/metro-runtime':
         specifier: ~57.0.16
         version: 57.0.16(@expo/log-box@57.0.4)(expo@57.0.26)(react-dom@19.2.3(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.7(supports-color@10.2.2))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.2.18)(react@19.2.3)(supports-color@10.2.2))(react@19.2.3)
@@ -262,6 +265,9 @@ importers:
       '@business-os/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@business-os/verticals':
+        specifier: workspace:*
+        version: link:../../packages/verticals
       '@expo/metro-runtime':
         specifier: ~57.0.16
         version: 57.0.16(@expo/log-box@57.0.4)(expo@57.0.26)(react-dom@19.2.3(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.7(supports-color@10.2.2))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.2.18)(react@19.2.3)(supports-color@10.2.2))(react@19.2.3)
@@ -338,6 +344,9 @@ importers:
       '@business-os/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@business-os/verticals':
+        specifier: workspace:*
+        version: link:../../packages/verticals
       '@expo/metro-runtime':
         specifier: ~57.0.16
         version: 57.0.16(@expo/log-box@57.0.4)(expo@57.0.26)(react-dom@19.2.3(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.7(supports-color@10.2.2))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.2.18)(react@19.2.3)(supports-color@10.2.2))(react@19.2.3)
@@ -411,6 +420,9 @@ importers:
       '@business-os/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@business-os/verticals':
+        specifier: workspace:*
+        version: link:../../packages/verticals
       '@supabase/ssr':
         specifier: 0.12.7
         version: 0.12.7(@supabase/supabase-js@2.117.2)
@@ -491,6 +503,9 @@ importers:
       '@business-os/i18n':
         specifier: workspace:*
         version: link:../i18n
+      '@business-os/verticals':
+        specifier: workspace:*
+        version: link:../verticals
       '@expo/vector-icons':
         specifier: ^15.1.1
         version: 15.1.1(expo-font@57.0.4)(react-native@0.86.3(@babel/core@7.29.7(supports-color@10.2.2))(@react-native/metro-config@0.87.1(@babel/core@7.29.7(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.2.18)(react@19.2.3)(supports-color@10.2.2))(react@19.2.3)
@@ -535,6 +550,12 @@ importers:
         version: 4.14.9(@types/react@19.2.18)(react@19.2.3)
 
   packages/i18n:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/verticals:
     devDependencies:
       typescript:
         specifier: ^5

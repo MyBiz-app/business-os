@@ -12,8 +12,9 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
-PAGES = ["/", "/features", "/industries/fitness", "/industries/beauty", "/industries/clinic",
-         "/industries/garage", "/pricing", "/about", "/contact", "/legal/terms", "/legal/privacy",
+PAGES = ["/", "/features", "/industries", "/industries/fitness", "/industries/beauty",
+         "/industries/clinic", "/industries/classes", "/industries/automotive", "/industries/barbershop",
+         "/industries/pets", "/pricing", "/about", "/contact", "/legal/terms", "/legal/privacy",
          "/legal/accessibility"]  # fmt: skip
 
 

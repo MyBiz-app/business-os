@@ -1,5 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { termsOf } from "@business-os/verticals";
 
 import { unwrap } from "@/lib/api";
 import { addDays, dayOf, formatDay, formatTime, isDay, todayIn, weekStart } from "@/lib/dates";
@@ -14,7 +15,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("schedule.read");
   const tAll = await getTranslations();
-  const term = (key: "schedule" | "newSession" | "noSessions") => tAll(`terms.${tenant.vertical}.${key}` as "terms.fitness.schedule");
+  const term = (key: "schedule" | "newSession" | "noSessions") => tAll(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.schedule");
   const { week } = await searchParams;
 
   const today = todayIn(tenant.time_zone);

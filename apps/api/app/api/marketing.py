@@ -12,6 +12,7 @@ from sqlalchemy.exc import DBAPIError
 
 from app.api.common import blank_to_none
 from app.api.deps import AnonymousSessionDep
+from app.verticals import CATALOG
 
 router = APIRouter(prefix="/public", tags=["public"])
 
@@ -21,11 +22,22 @@ class ContactCreate(BaseModel):
     email: EmailStr
     phone: str | None = Field(default=None, max_length=40)
     business: str | None = Field(default=None, max_length=160)
-    vertical: Literal["fitness", "beauty", "clinic", "garage", "other"] | None = None
+    vertical: str | None = Field(
+        default=None,
+        max_length=40,
+        description='A catalog industry (also a coming-soon one) or "other"',
+    )
     message: str | None = Field(default=None, max_length=4000)
     locale: Literal["he", "en"] = "he"
     # A field people never see: bots that fill every input fill it too.
     website: str | None = Field(default=None, max_length=200)
+
+    @field_validator("vertical")
+    @classmethod
+    def known_vertical(cls, value: str | None) -> str | None:
+        if value is not None and value != "other" and value not in CATALOG:
+            raise ValueError("unknown vertical")
+        return value
 
     @field_validator("name", mode="before")
     @classmethod

@@ -3,7 +3,7 @@ import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, type ColorValue, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { verticalOf } from "@business-os/app-kit/lib/vertical";
+import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { InboxProvider, useInbox } from "@/providers/inbox-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
@@ -57,7 +57,7 @@ function BusinessTabs() {
       <Tabs.Screen
         name="schedule"
         options={{
-          title: business ? tTerms(`${verticalOf(business)}.appTab`) : t("schedule"),
+          title: business ? tTerms(`${termsFor(business)}.appTab`) : t("schedule"),
           tabBarIcon: icon("calendar-outline"),
         }}
       />

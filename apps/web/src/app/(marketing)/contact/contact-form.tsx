@@ -8,12 +8,15 @@ import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
+import { industryOptions, industryTexts } from "@/lib/verticals";
+
 import { type ContactState, sendContact } from "./actions";
 
-const VERTICALS = ["fitness", "beauty", "clinic", "garage", "other"] as const;
-
-export function ContactForm() {
+/** `vertical`: the industry page the visitor came from (?vertical=), preselected. */
+export function ContactForm({ vertical }: { vertical?: string }) {
   const t = useTranslations("marketing.contact");
+  const tAll = useTranslations();
+  const { text } = industryTexts(tAll);
   const [state, action] = useActionState<ContactState, FormData>(sendContact, {});
 
   if (state.sent) {
@@ -37,8 +40,11 @@ export function ContactForm() {
       <SelectField
         label={t("vertical")}
         name="vertical"
-        defaultValue="fitness"
-        options={VERTICALS.map((value) => ({ value, label: t(`verticals.${value}`) }))}
+        defaultValue={vertical ?? "fitness"}
+        options={[
+          ...industryOptions(text, (name) => tAll("start.industry.otherKind", { name }), tAll("marketing.industries.soon")),
+          { value: "other", label: t("otherVertical") },
+        ]}
       />
       <TextAreaField label={t("message")} name="message" maxLength={4000} />
       {/* Hidden from people; bots fill it in (see the API). */}

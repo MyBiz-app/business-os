@@ -1,3 +1,4 @@
+import { isVertical } from "@business-os/verticals";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
@@ -8,8 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: `${t("contact")} · MyBiz` };
 }
 
-export default async function ContactPage() {
+export default async function ContactPage({ searchParams }: PageProps<"/contact">) {
   const t = await getTranslations("marketing.contact");
+  const { vertical } = await searchParams;
   return (
     <main className="enter mx-auto flex w-full max-w-2xl flex-col gap-8 px-6 py-16">
       <div className="flex flex-col gap-3 text-center">
@@ -17,7 +19,7 @@ export default async function ContactPage() {
         <p className="text-lg text-muted">{t("subtitle")}</p>
       </div>
       <section className="card relative p-6 sm:p-8">
-        <ContactForm />
+        <ContactForm vertical={typeof vertical === "string" && isVertical(vertical) ? vertical : undefined} />
       </section>
     </main>
   );

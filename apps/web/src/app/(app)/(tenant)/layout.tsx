@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
+import { termsOf } from "@business-os/verticals";
 
 import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
@@ -22,8 +23,8 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/dashboard", label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", label: t("nav.reports"), icon: "reports", permission: "reports.read" },
     { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
-    { href: "/schedule", label: t(`terms.${tenant.vertical}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
-    { href: "/clients", label: t(`terms.${tenant.vertical}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
+    { href: "/schedule", label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
+    { href: "/clients", label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
     { href: "/clients/join", label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
     { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
     { href: "/messages", label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },

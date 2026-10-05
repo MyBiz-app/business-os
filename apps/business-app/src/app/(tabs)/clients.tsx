@@ -6,7 +6,7 @@ import { useTranslations } from "use-intl";
 import { Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { verticalOf } from "@business-os/app-kit/lib/vertical";
+import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 /** The business's clients, searchable, with a tap into each one. */
@@ -25,11 +25,11 @@ export default function Clients() {
   }, [api, scope, tenant, query]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
-  const vertical = verticalOf(tenant);
+  const terms = termsFor(tenant);
 
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
-      <Heading palette={palette}>{tTerms(`${vertical}.clients`)}</Heading>
+      <Heading palette={palette}>{tTerms(`${terms}.clients`)}</Heading>
       <Field
         label={t("search")}
         palette={palette}

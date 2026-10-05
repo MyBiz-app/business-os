@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { termsOf } from "@business-os/verticals";
 
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
@@ -14,7 +15,7 @@ export default async function NewClientPage() {
 
   return (
     <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-      <h1 className="text-3xl font-bold">{t(`terms.${tenant.vertical}.newClient` as "terms.fitness.newClient")}</h1>
+      <h1 className="text-3xl font-bold">{t(`terms.${termsOf(tenant.vertical)}.newClient` as "terms.fitness.newClient")}</h1>
       <ClientForm action={createClient} submitLabel={t("clients.create")} />
     </main>
   );

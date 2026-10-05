@@ -1,23 +1,20 @@
 "use client";
 
 import type { components } from "@business-os/api-client";
+import { categories, childrenOf, vertical as findVertical } from "@business-os/verticals";
 import {
   ArrowLeft,
   ArrowRight,
   Bot,
-  Car,
   Check,
   ChevronUp,
-  Dumbbell,
   MessageCircle,
   Minus,
   Plus,
-  Scissors,
   ShieldCheck,
   ShoppingBag,
   Smartphone,
   Sparkles,
-  Stethoscope,
   Target,
   X,
 } from "lucide-react";
@@ -27,6 +24,7 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useId, useRef, useState } from "react";
 
 import { OfferPicture } from "@/components/modules/offer-picture";
+import { VerticalIcon } from "@/components/vertical-icon";
 import { formatMoney } from "@/lib/money";
 import {
   CLIENT_SIZES,
@@ -40,11 +38,10 @@ import {
   type Offer,
   priceLines,
   type SignupPlan,
-  type Vertical,
-  VERTICALS,
   withLocations,
 } from "@/lib/signup-plan";
 import { isolate } from "@/lib/bidi";
+import { industryTexts } from "@/lib/verticals";
 
 type Catalog = components["schemas"]["Catalog"];
 
@@ -57,16 +54,10 @@ const GROUPS = [
   { key: "summary", steps: ["summary"] },
 ] as const;
 
-const INDUSTRY_ICONS: Record<Vertical, { Icon: typeof Dumbbell; color: string }> = {
-  fitness: { Icon: Dumbbell, color: "from-indigo-500 to-violet-500" },
-  beauty: { Icon: Scissors, color: "from-pink-500 to-rose-500" },
-  clinic: { Icon: Stethoscope, color: "from-teal-500 to-emerald-500" },
-  garage: { Icon: Car, color: "from-amber-500 to-orange-500" },
-};
 const OFFER_ICONS: Record<Offer, typeof Bot> = { client_app: Smartphone, ai: Bot, crm: Target, whatsapp: MessageCircle };
 
 
-type Draft = Omit<SignupPlan, "vertical"> & { vertical: Vertical | null };
+type Draft = Omit<SignupPlan, "vertical"> & { vertical: string | null };
 
 type Props = {
   catalogs: Partial<Record<Currency, Catalog>>;
@@ -82,10 +73,12 @@ type Props = {
 export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: Props) {
   const t = useTranslations("start");
   const tModules = useTranslations("modules");
-  const tIndustries = useTranslations("marketing.industries.items");
+  const { text } = industryTexts(useTranslations());
   const locale = useLocale();
   const router = useRouter();
   const [stepIndex, setStepIndex] = useState(initial.vertical ? 1 : 0);
+  // The category whose kinds of business are shown in the industry step (null: all categories).
+  const [category, setCategory] = useState<string | null>(findVertical(initial.vertical)?.category ?? null);
   const [draft, setDraft] = useState<Draft>(initial);
   const [notice, setNotice] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
@@ -105,7 +98,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
   useEffect(() => {
     if (moved.current) heading.current?.focus();
     moved.current = true;
-  }, [stepIndex]);
+  }, [stepIndex, category]);
 
   const go = (index: number) => {
     setStepIndex(Math.min(Math.max(0, index), STEPS.length - 1));
@@ -134,11 +127,12 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
     setDraft({ ...merged, modules: withLocations(merged.modules, merged.locations) });
   };
 
+  const recommends = findVertical(draft.vertical)?.recommendedModules ?? [];
   const recommended: Record<Offer, boolean> = {
-    client_app: draft.clients >= 300 || draft.vertical === "fitness" || draft.vertical === "beauty",
+    client_app: draft.clients >= 300 || recommends.includes("client_app"),
     ai: true,
     crm: draft.clients <= 300,
-    whatsapp: draft.vertical !== "fitness",
+    whatsapp: recommends.includes("whatsapp"),
   };
   const recommendedAi: ModuleKey = draft.staff >= 4 ? "ai_pro" : "ai_basic";
 
@@ -169,36 +163,77 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
 
   let content: ReactNode;
   if (step === "industry") {
-    content = (
+    const choose = (vertical: string) => {
+      update({ vertical });
+      next();
+    };
+    const kinds = category ? childrenOf(category) : [];
+    const card = (key: string, chosen: boolean, onClick: () => void, label: string, hint: string) => {
+      const { icon, color } = findVertical(key)!;
+      return (
+        <button
+          type="button"
+          aria-pressed={chosen}
+          onClick={onClick}
+          className={`card card-hover flex w-full items-center gap-4 p-5 text-start ${chosen ? "ring-2 ring-primary" : ""}`}
+        >
+          <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md ${color}`}>
+            <VerticalIcon icon={icon} className="size-7" />
+          </span>
+          <span className="flex flex-col gap-0.5">
+            <span className="text-lg font-bold">{label}</span>
+            <span className="text-sm text-muted">{hint}</span>
+          </span>
+        </button>
+      );
+    };
+    content = category ? (
+      <>
+        <StepHeading
+          eyebrow={
+            <button type="button" onClick={() => setCategory(null)} className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+              {t("industry.allIndustries")}
+            </button>
+          }
+          title={<h1 {...headingProps}>{t("industry.kindTitle", { name: text(category, "name") })}</h1>}
+          subtitle={t("industry.kindSubtitle")}
+        />
+        <ul className="enter-items grid gap-4 sm:grid-cols-2">
+          {kinds.map(({ key }) => (
+            <li key={key}>{card(key, draft.vertical === key, () => choose(key), text(key, "name"), text(key, "tagline"))}</li>
+          ))}
+          <li>
+            {card(category, draft.vertical === category, () => choose(category), t("industry.otherKind", { name: text(category, "name") }), text(category, "tagline"))}
+          </li>
+        </ul>
+      </>
+    ) : (
       <>
         <StepHeading eyebrow={null} title={<h1 {...headingProps}>{t("industry.title")}</h1>} subtitle={t("industry.subtitle")} />
         <ul className="enter-items grid gap-4 sm:grid-cols-2">
-          {VERTICALS.map((vertical) => {
-            const { Icon, color } = INDUSTRY_ICONS[vertical];
-            const chosen = draft.vertical === vertical;
-            return (
-              <li key={vertical}>
-                <button
-                  type="button"
-                  aria-pressed={chosen}
-                  onClick={() => {
-                    update({ vertical });
-                    next();
-                  }}
-                  className={`card card-hover flex w-full items-center gap-4 p-5 text-start ${chosen ? "ring-2 ring-primary" : ""}`}
-                >
-                  <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md ${color}`}>
-                    <Icon className="size-7" />
-                  </span>
-                  <span className="flex flex-col gap-0.5">
-                    <span className="text-lg font-bold">{tIndustries(`${vertical}.name`)}</span>
-                    <span className="text-sm text-muted">{tIndustries(`${vertical}.tagline`)}</span>
-                  </span>
-                </button>
+          {categories()
+            .filter((c) => c.status !== "planned")
+            .map(({ key, children }) => (
+              <li key={key}>
+                {card(
+                  key,
+                  findVertical(draft.vertical)?.category === key,
+                  () => {
+                    if (children.length > 0) setCategory(key);
+                    else choose(key);
+                  },
+                  text(key, "name"),
+                  text(key, "tagline"),
+                )}
               </li>
-            );
-          })}
+            ))}
         </ul>
+        <p className="text-sm text-muted">
+          {t("industry.missing")}{" "}
+          <Link href="/industries" className="font-semibold text-primary underline-offset-4 hover:underline">
+            {t("industry.seeAll")}
+          </Link>
+        </p>
       </>
     );
   } else if (step === "business") {
@@ -206,7 +241,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
       <>
         <StepHeading
           eyebrow={null}
-          title={<h1 {...headingProps}>{t("business.title", { vertical: draft.vertical ?? "other" })}</h1>}
+          title={<h1 {...headingProps}>{t("business.title", { yours: text(draft.vertical ?? "fitness", "yours") })}</h1>}
           subtitle={t("business.subtitle")}
         />
         <form
@@ -220,7 +255,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
           <TextInput
             label={t("business.name")}
             value={draft.name}
-            placeholder={t("business.namePlaceholder", { example: t(`business.examples.${draft.vertical ?? "fitness"}`) })}
+            placeholder={t("business.namePlaceholder", { example: text(draft.vertical ?? "fitness", "example") })}
             onChange={(name) => update({ name })}
           />
           <ChoiceGroup
@@ -406,7 +441,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
         <div className="card flex flex-col gap-5 p-6">
           <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
             <p className="font-bold">
-              {t("summary.business", { name: isolate(draft.name), vertical: draft.vertical ? tIndustries(`${draft.vertical}.name`) : "" })}
+              {t("summary.business", { name: isolate(draft.name), vertical: draft.vertical ? text(draft.vertical, "name") : "" })}
             </p>
             <button type="button" onClick={() => go(1)} className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
               {t("summary.edit")}
@@ -589,10 +624,10 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
 
 type T = ReturnType<typeof useTranslations<"start">>;
 
-function StepHeading({ eyebrow, title, subtitle }: { eyebrow: string | null; title: ReactNode; subtitle: string }) {
+function StepHeading({ eyebrow, title, subtitle }: { eyebrow: ReactNode; title: ReactNode; subtitle: string }) {
   return (
     <div className="flex flex-col gap-2">
-      {eyebrow && <p className="text-sm font-semibold text-primary">{eyebrow}</p>}
+      {eyebrow && <div className="text-sm font-semibold text-primary">{eyebrow}</div>}
       {title}
       <p className="max-w-2xl text-lg text-muted">{subtitle}</p>
     </div>

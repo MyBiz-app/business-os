@@ -1,0 +1,250 @@
+{
+  "key": "automotive",
+  "order": 5,
+  "status": "live",
+  "icon": "car",
+  "color": "from-amber-500 to-orange-500",
+  "terms": "automotive",
+  "client_term": "customer",
+  "booking_modes": [
+    "appointment"
+  ],
+  "cancellation_window_minutes": 1440,
+  "booking_requires_plan": false,
+  "default_preset": "starter",
+  "recommended_modules": [
+    "whatsapp"
+  ],
+  "client_fields": [
+    {
+      "key": "plate",
+      "kind": "text",
+      "max_length": 12
+    },
+    {
+      "key": "make",
+      "kind": "text",
+      "max_length": 40
+    },
+    {
+      "key": "model",
+      "kind": "text",
+      "max_length": 40
+    },
+    {
+      "key": "year",
+      "kind": "number"
+    },
+    {
+      "key": "mileage",
+      "kind": "number"
+    },
+    {
+      "key": "next_inspection",
+      "kind": "date"
+    }
+  ],
+  "default_services": [
+    {
+      "names": {
+        "he": "טיפול תקופתי",
+        "en": "Periodic service"
+      },
+      "duration_minutes": 120,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 60000
+      },
+      "color": "#f59e0b"
+    },
+    {
+      "names": {
+        "he": "החלפת שמן ומסננים",
+        "en": "Oil & filter change"
+      },
+      "duration_minutes": 45,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 25000
+      },
+      "color": "#0ea5e9"
+    },
+    {
+      "names": {
+        "he": "בדיקה לפני טסט",
+        "en": "Pre-inspection check"
+      },
+      "duration_minutes": 60,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 20000
+      },
+      "color": "#10b981"
+    },
+    {
+      "names": {
+        "he": "אבחון תקלה",
+        "en": "Diagnostics"
+      },
+      "duration_minutes": 60,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 30000
+      },
+      "color": "#ef4444"
+    }
+  ],
+  "children": [
+    {
+      "key": "garage",
+      "status": "live"
+    },
+    {
+      "key": "detailing",
+      "status": "live",
+      "client_fields": [
+        {
+          "key": "plate",
+          "kind": "text",
+          "max_length": 12
+        },
+        {
+          "key": "make",
+          "kind": "text",
+          "max_length": 40
+        },
+        {
+          "key": "model",
+          "kind": "text",
+          "max_length": 40
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "שטיפה חיצונית",
+            "en": "Exterior wash"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#0ea5e9"
+        },
+        {
+          "names": {
+            "he": "שטיפה פנים וחוץ",
+            "en": "Full wash, inside and out"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 12000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "דיטיילינג מלא",
+            "en": "Full detailing"
+          },
+          "duration_minutes": 180,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 60000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "ציפוי קרמי",
+            "en": "Ceramic coating"
+          },
+          "duration_minutes": 480,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 250000
+          },
+          "color": "#f59e0b"
+        }
+      ]
+    },
+    {
+      "key": "tires",
+      "status": "live",
+      "client_fields": [
+        {
+          "key": "plate",
+          "kind": "text",
+          "max_length": 12
+        },
+        {
+          "key": "make",
+          "kind": "text",
+          "max_length": 40
+        },
+        {
+          "key": "model",
+          "kind": "text",
+          "max_length": 40
+        },
+        {
+          "key": "tire_size",
+          "kind": "text",
+          "max_length": 20
+        }
+      ],
+      "default_services": [
+        {
+          "names": {
+            "he": "תיקון תקר",
+            "en": "Puncture repair"
+          },
+          "duration_minutes": 20,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#ef4444"
+        },
+        {
+          "names": {
+            "he": "החלפת צמיגים",
+            "en": "Tire replacement"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "כיוון פרונט",
+            "en": "Wheel alignment"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 18000
+          },
+          "color": "#0ea5e9"
+        },
+        {
+          "names": {
+            "he": "איזון גלגלים",
+            "en": "Wheel balancing"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#10b981"
+        }
+      ]
+    }
+  ]
+}

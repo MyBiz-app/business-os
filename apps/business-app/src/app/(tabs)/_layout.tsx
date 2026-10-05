@@ -3,7 +3,7 @@ import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, type ColorValue, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { verticalOf } from "@business-os/app-kit/lib/vertical";
+import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -44,7 +44,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="clients"
         options={{
-          title: tTerms(`${verticalOf(tenant)}.clients`),
+          title: tTerms(`${termsFor(tenant)}.clients`),
           tabBarIcon: icon("people-outline"),
           href: can("clients.read") ? undefined : null,
         }}

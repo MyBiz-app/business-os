@@ -214,7 +214,7 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
 | 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
-| 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | In progress |
+| 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | Done |
 | 6 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories | Planned |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 

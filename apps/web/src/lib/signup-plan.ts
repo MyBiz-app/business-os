@@ -1,22 +1,22 @@
 /** The plan a business owner builds in the sign-up journey (/start), carried to the payment
  * step (/start/finish) in the URL, so it survives the email confirmation in between. The API
  * validates and prices the modules again when the business is created; this is the preview. */
+import { isOpen } from "@business-os/verticals";
 
-export const VERTICALS = ["fitness", "beauty", "clinic", "garage"] as const;
 export const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 /** Active-client sizes offered in the journey (the core plan's tiers; 1500 means 1,000+). */
 export const CLIENT_SIZES = [100, 300, 1000, 1500] as const;
 /** The add-ons offered one per screen, in order. */
 export const OFFERS = ["client_app", "ai", "crm", "whatsapp"] as const;
 
-export type Vertical = (typeof VERTICALS)[number];
 export type Currency = (typeof CURRENCIES)[number];
 export type Offer = (typeof OFFERS)[number];
 export type ModuleKey = "client_app" | "ai_basic" | "ai_pro" | "crm" | "whatsapp" | "extra_location";
 export type Modules = Partial<Record<ModuleKey, number>>;
 
 export type SignupPlan = {
-  vertical: Vertical;
+  /** A catalog industry open for sign-up (category or sub-category). */
+  vertical: string;
   name: string;
   clients: number;
   staff: number;
@@ -95,7 +95,8 @@ export function decodePlan(value: unknown): SignupPlan | null {
   if (typeof raw !== "object" || raw === null) return null;
   const name = typeof raw.name === "string" ? raw.name.trim() : "";
   if (
-    !(VERTICALS as readonly unknown[]).includes(raw.vertical) ||
+    typeof raw.vertical !== "string" ||
+    !isOpen(raw.vertical) ||
     !(CURRENCIES as readonly unknown[]).includes(raw.currency) ||
     !name ||
     name.length > 120 ||
@@ -113,7 +114,7 @@ export function decodePlan(value: unknown): SignupPlan | null {
     modules[key as ModuleKey] = quantity as number;
   }
   return {
-    vertical: raw.vertical as Vertical,
+    vertical: raw.vertical,
     name,
     clients: raw.clients as number,
     staff: raw.staff as number,

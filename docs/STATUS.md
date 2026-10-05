@@ -4,8 +4,8 @@ _Last updated: 2026-10-05_ · Updated with every merged pull request. Open work 
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress.
 
-**Now:** Phase 5 — industries on equal footing (category template, five main categories).
-**Next:** owner review on computer and phone, then the rest of phase 4 and phase 5.
+**Now:** owner review on computer and phone ([#38](https://github.com/adiredri/business-os/issues/38)).
+**Next:** the rest of phase 4 (client app polish, architecture review), then phase 6.
 
 ## Board
 
@@ -17,19 +17,16 @@ whose sub-issues show its progress.
 | 2 — Business web app | Locked modules with previews and upsell, sales page, profiles, full review | ✅ Done | #28 |
 | 3 — MyBiz console | Team levels and permissions, working inside a business, actions, support inbox, audit | ✅ Done | #29 |
 | 4 — Apps | Business app and MyBiz team app built, shared app kit | 🟡 Mostly done | #35 |
-| 5 — Industries | Category → sub-category template in one catalog; five main categories | 🔵 In progress | #30 |
+| 5 — Industries | Category → sub-category template in one catalog ([how to add one](verticals.md)); five main categories with 25 sub-categories; five more coming soon | ✅ Done | #30 |
 | 6 — More categories | Core capabilities that open the future categories | ⚪ Planned | #33 |
 | Go-live | Real payments, invoicing, email, WhatsApp, AI key, hardening, store builds | ⚪ When the owner decides | #34 |
 
 ## In progress
 
-- [#31](https://github.com/adiredri/business-os/issues/31) Industry catalog: one shared template for categories and sub-categories
-- [#32](https://github.com/adiredri/business-os/issues/32) The five main categories with their sub-categories
+- [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next
 
-- [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
-- [#37](https://github.com/adiredri/business-os/issues/37) Industry pages, sign-up and apps driven by the catalog
 - [#39](https://github.com/adiredri/business-os/issues/39) Client app: final polish
 - [#40](https://github.com/adiredri/business-os/issues/40) Architecture review after phase 4
 
@@ -54,5 +51,5 @@ whose sub-issues show its progress.
 ## Health
 
 - CI (lint, typecheck, tests, build) runs on every pull request; `main` is green.
-- About 230 API tests and 26 end-to-end browser flows, including accessibility (WCAG AA) and dark mode.
+- About 270 API tests and 26 end-to-end browser flows, including accessibility (WCAG AA) and dark mode.
 - Paid services run in simulated mode until go-live (spec section 10).

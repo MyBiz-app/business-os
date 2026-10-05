@@ -21,6 +21,7 @@ from app.api.deps import ClientDep, TenantContext, require
 from app.health import FORMS, HealthForm
 from app.notifications import notify
 from app.permissions import Permission
+from app.verticals import CATALOG
 
 router = APIRouter(tags=["health"])
 client_router = APIRouter(prefix="/client", tags=["client"])
@@ -155,7 +156,9 @@ def _business_form(db: Session) -> tuple[HealthForm | None, bool, str]:
             FROM app.tenants WHERE id = app.client_tenant_id()
         """)
     ).one()
-    return FORMS.get(row.vertical), row.requires_health_declaration, row.time_zone
+    pack = CATALOG.get(row.vertical)
+    form = FORMS.get(pack.health_form) if pack and pack.health_form else None
+    return form, row.requires_health_declaration, row.time_zone
 
 
 def _latest(db: Session, client_id: UUID) -> Declaration | None:

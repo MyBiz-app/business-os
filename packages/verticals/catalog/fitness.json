@@ -1,0 +1,322 @@
+{
+  "key": "fitness",
+  "order": 1,
+  "status": "live",
+  "icon": "dumbbell",
+  "color": "from-indigo-500 to-violet-500",
+  "terms": "fitness",
+  "client_term": "member",
+  "booking_modes": [
+    "class",
+    "appointment"
+  ],
+  "cancellation_window_minutes": 120,
+  "booking_requires_plan": true,
+  "health_form": "fitness",
+  "default_preset": "growing",
+  "recommended_modules": [
+    "client_app"
+  ],
+  "client_fields": [
+    {
+      "key": "goal",
+      "kind": "select",
+      "options": [
+        "weight_loss",
+        "strength",
+        "flexibility",
+        "rehab",
+        "general"
+      ]
+    },
+    {
+      "key": "injuries",
+      "kind": "long_text",
+      "max_length": 1000
+    }
+  ],
+  "default_plans": [
+    {
+      "names": {
+        "he": "מנוי חודשי ללא הגבלה",
+        "en": "Monthly unlimited"
+      },
+      "kind": "membership",
+      "validity_days": 30,
+      "prices": {
+        "ILS": 45000,
+        "USD": 12900,
+        "EUR": 11900
+      }
+    },
+    {
+      "names": {
+        "he": "כרטיסייה 10 כניסות",
+        "en": "10-class card"
+      },
+      "kind": "punch_card",
+      "validity_days": 120,
+      "credits": 10,
+      "prices": {
+        "ILS": 60000,
+        "USD": 18000,
+        "EUR": 16000
+      }
+    },
+    {
+      "names": {
+        "he": "כניסה בודדת",
+        "en": "Single class"
+      },
+      "kind": "punch_card",
+      "validity_days": 30,
+      "credits": 1,
+      "prices": {
+        "ILS": 7000,
+        "USD": 2000,
+        "EUR": 1800
+      }
+    }
+  ],
+  "children": [
+    {
+      "key": "gym",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "אימון אישי",
+            "en": "Personal training"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 25000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "הערכת כושר והתאמת תוכנית",
+            "en": "Fitness assessment"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 15000
+          },
+          "color": "#10b981"
+        }
+      ]
+    },
+    {
+      "key": "pilates",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "פילאטיס מזרן",
+            "en": "Mat pilates"
+          },
+          "duration_minutes": 55,
+          "booking_mode": "class",
+          "capacity": 12,
+          "prices": {
+            "ILS": 7000
+          },
+          "color": "#8b5cf6"
+        },
+        {
+          "names": {
+            "he": "פילאטיס מכשירים (רפורמר)",
+            "en": "Reformer pilates"
+          },
+          "duration_minutes": 50,
+          "booking_mode": "class",
+          "capacity": 6,
+          "prices": {
+            "ILS": 12000
+          },
+          "color": "#ec4899"
+        },
+        {
+          "names": {
+            "he": "שיעור פרטי על רפורמר",
+            "en": "Private reformer session"
+          },
+          "duration_minutes": 55,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 28000
+          },
+          "color": "#f59e0b"
+        }
+      ]
+    },
+    {
+      "key": "yoga",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "יוגה ויניאסה",
+            "en": "Vinyasa yoga"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 15,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#14b8a6"
+        },
+        {
+          "names": {
+            "he": "יוגה למתחילים",
+            "en": "Beginners' yoga"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 15,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#22c55e"
+        },
+        {
+          "names": {
+            "he": "שיעור יוגה פרטי",
+            "en": "Private yoga"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 25000
+          },
+          "color": "#6366f1"
+        }
+      ]
+    },
+    {
+      "key": "crossfit",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "אימון היום (WOD)",
+            "en": "WOD"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 16,
+          "prices": {
+            "ILS": 7000
+          },
+          "color": "#ef4444"
+        },
+        {
+          "names": {
+            "he": "שיעור יסודות למתחילים",
+            "en": "Foundations"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "class",
+          "capacity": 6,
+          "prices": {
+            "ILS": 8000
+          },
+          "color": "#f59e0b"
+        }
+      ]
+    },
+    {
+      "key": "functional",
+      "status": "live",
+      "default_services": [
+        {
+          "names": {
+            "he": "אימון פונקציונלי",
+            "en": "Functional training"
+          },
+          "duration_minutes": 50,
+          "booking_mode": "class",
+          "capacity": 12,
+          "prices": {
+            "ILS": 6000
+          },
+          "color": "#0ea5e9"
+        },
+        {
+          "names": {
+            "he": "קבוצה קטנה",
+            "en": "Small group"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "class",
+          "capacity": 5,
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#8b5cf6"
+        }
+      ]
+    },
+    {
+      "key": "personal_trainer",
+      "status": "live",
+      "booking_requires_plan": false,
+      "default_services": [
+        {
+          "names": {
+            "he": "אימון אישי",
+            "en": "Personal training"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 25000
+          },
+          "color": "#6366f1"
+        },
+        {
+          "names": {
+            "he": "אימון זוגי",
+            "en": "Partner training"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 35000
+          },
+          "color": "#ec4899"
+        },
+        {
+          "names": {
+            "he": "הערכת כושר",
+            "en": "Fitness assessment"
+          },
+          "duration_minutes": 45,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 15000
+          },
+          "color": "#10b981"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 10 אימונים אישיים",
+            "en": "10 personal sessions"
+          },
+          "kind": "punch_card",
+          "validity_days": 120,
+          "credits": 10,
+          "prices": {
+            "ILS": 220000
+          }
+        }
+      ]
+    }
+  ]
+}
