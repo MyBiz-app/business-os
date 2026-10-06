@@ -222,7 +222,8 @@
     "clientApp": "Client app",
     "locked": "Not in your plan",
     "lockedItem": "{name} — not in your plan",
-    "sales": "Sales"
+    "sales": "Sales",
+    "resources": "Courts & rooms"
   },
   "terms": {
     "fitness": {
@@ -436,7 +437,8 @@
     "bookingMode": "How it is booked",
     "modes": {
       "class": "Group session – at set times on the schedule",
-      "appointment": "Personal appointment – the client picks a free time"
+      "appointment": "Personal appointment – the client picks a free time",
+      "resource": "A court or room by the hour"
     },
     "appointmentLabel": "Appointment",
     "stats": {
@@ -460,7 +462,9 @@
     "addRoom": "Add room",
     "noRooms": "No rooms yet.",
     "mainBranch": "Main branch",
-    "branchNumber": "Branch {number}"
+    "branchNumber": "Branch {number}",
+    "bookable": "For rent by the hour",
+    "openingHours": "Opening hours: {name}"
   },
   "team": {
     "title": "Team",
@@ -3176,5 +3180,47 @@
       "button": "Create a sample business",
       "error": "We couldn't create a sample business. Please try again."
     }
+  },
+  "resources": {
+    "title": "Courts & rooms",
+    "subtitle": "The day's reservations, court by court, and a new one.",
+    "label": "By the hour",
+    "dayNav": "Choose a day",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "today": "Today",
+    "emptyDay": "No reservations on this day yet.",
+    "noBookableRooms": "No court or room is for rent yet. Mark one as \"for rent by the hour\" in a branch.",
+    "toLocations": "To the branches",
+    "new": "New reservation",
+    "noServices": "Add a service of the kind \"a court or room by the hour\" first.",
+    "addService": "New service",
+    "service": "What",
+    "perHour": "{price} an hour",
+    "length": "How long",
+    "noRoomsForService": "Choose which courts serve this service, on the service's page.",
+    "noSlots": "No free time for this length on this day.",
+    "pastDay": "This day has passed.",
+    "noClients": "No client matches the search.",
+    "client": "For whom",
+    "reserve": "Reserve",
+    "price": "Price: {price}",
+    "errors": {
+      "slot_taken": "Someone just took this time. Choose another.",
+      "outside_hours": "That's outside the opening hours.",
+      "length_not_offered": "This length isn't offered.",
+      "invalid": "Choose a time and a client.",
+      "generic": "Something went wrong. Try again."
+    },
+    "hoursHint": "When it can be reserved, in {branch}. Outside these hours it isn't offered.",
+    "notBookable": "This room isn't for rent yet: mark it \"for rent by the hour\" in the branch.",
+    "serviceHint": "Clients choose how long, between the shortest and the longest, in steps; the price follows the hour.",
+    "minLength": "Shortest",
+    "maxLength": "Longest",
+    "step": "In steps of",
+    "pricePerHour": "Price per hour",
+    "rooms": "Courts and rooms",
+    "roomsHint": "Where this service can be reserved.",
+    "saveRooms": "Save"
   }
 }

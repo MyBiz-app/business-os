@@ -61,7 +61,11 @@ export default async function ServicesPage() {
                     <span className="font-semibold">{service.name}</span>
                     <span className="text-sm text-muted">
                       {t("services.minutes", { count: service.duration_minutes })} ·{" "}
-                      {service.booking_mode === "appointment" ? t("services.appointmentLabel") : t("services.participants", { count: service.capacity })}
+                      {service.booking_mode === "appointment"
+                        ? t("services.appointmentLabel")
+                        : service.booking_mode === "resource"
+                          ? t("resources.label")
+                          : t("services.participants", { count: service.capacity })}
                       {!service.active && ` · ${t("common.inactive")}`}
                     </span>
                   </span>
@@ -75,7 +79,7 @@ export default async function ServicesPage() {
                       <CalendarDays aria-hidden="true" className="size-4" />
                       {t("services.stats.sessions", { count: usageOf.get(service.id)?.sessions ?? 0 })}
                     </span>
-                    {usageOf.get(service.id)?.occupancy != null && service.booking_mode !== "appointment" && (
+                    {usageOf.get(service.id)?.occupancy != null && service.booking_mode === "class" && (
                       <span className="inline-flex items-center gap-1.5">
                         <Gauge aria-hidden="true" className="size-4" />
                         {t("services.stats.occupancy", { value: percent.format((usageOf.get(service.id)?.occupancy ?? 0) / 100) })}

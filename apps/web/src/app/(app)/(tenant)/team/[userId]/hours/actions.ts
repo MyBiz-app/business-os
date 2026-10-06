@@ -4,10 +4,8 @@ import { revalidatePath } from "next/cache";
 
 import { ApiError, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
+import type { Block, HoursState } from "@/lib/hours";
 import { getTenantFor } from "@/lib/tenant";
-
-export type Block = { weekday: number; starts: string; ends: string };
-export type HoursState = { saved?: boolean; error?: "overlapping_hours" | "invalid" | "generic" };
 
 export async function saveHours(userId: string, blocks: Block[]): Promise<HoursState> {
   if (blocks.some((block) => !block.starts || !block.ends || block.ends <= block.starts)) {

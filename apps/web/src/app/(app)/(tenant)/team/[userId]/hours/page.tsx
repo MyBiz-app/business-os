@@ -6,8 +6,10 @@ import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
 
-import { removeTimeOff } from "./actions";
-import { HoursForm } from "./hours-form";
+import { HoursForm } from "@/components/form/hours-form";
+import { toBlocks, weekStartFor } from "@/lib/hours";
+
+import { removeTimeOff, saveHours } from "./actions";
 import { TimeOffForm } from "./time-off";
 import { isolate } from "@/lib/bidi";
 
@@ -24,8 +26,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
   ]);
   const locale = await getLocale();
   const day = (value: string) => formatDay(value, locale, { weekday: "short", day: "numeric", month: "short" });
-  // The week starts on Sunday in Israel and on Monday elsewhere (0 = Monday).
-  const weekStartsOn = tenant.locale === "he" ? 6 : 0;
+  const weekStartsOn = weekStartFor(tenant.locale);
 
   return (
     <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
@@ -39,11 +40,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
         </p>
       </div>
       <section className="card p-6">
-        <HoursForm
-          userId={userId}
-          weekStartsOn={weekStartsOn}
-          initial={hours.blocks.map((block) => ({ weekday: block.weekday, starts: block.starts.slice(0, 5), ends: block.ends.slice(0, 5) }))}
-        />
+        <HoursForm save={saveHours.bind(null, userId)} weekStartsOn={weekStartsOn} initial={toBlocks(hours.blocks)} />
       </section>
 
       <section aria-labelledby="time-off-heading" className="card flex flex-col gap-4 p-6">

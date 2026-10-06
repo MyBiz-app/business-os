@@ -6,11 +6,20 @@ import { useState, useTransition } from "react";
 
 import { FormError, FormNotice } from "@/components/form/form-message";
 
-import { type Block, type HoursState, saveHours } from "./actions";
+import type { Block, HoursState } from "@/lib/hours";
 
-/** Weekly working hours: zero or more time ranges per weekday (0 = Monday). Days are listed
- * from the business's first day of the week (Sunday in Israel). */
-export function HoursForm({ userId, initial, weekStartsOn }: { userId: string; initial: Block[]; weekStartsOn: number }) {
+/** Weekly hours (a staff member's working hours, a court's opening hours): zero or more time
+ * ranges per weekday (0 = Monday). Days are listed from the business's first day of the week
+ * (Sunday in Israel). `save` is a server action bound to whose hours these are. */
+export function HoursForm({
+  save,
+  initial,
+  weekStartsOn,
+}: {
+  save: (blocks: Block[]) => Promise<HoursState>;
+  initial: Block[];
+  weekStartsOn: number;
+}) {
   const t = useTranslations("hours");
   const names = t.raw("weekdays") as string[];
   const [blocks, setBlocks] = useState<Block[]>(initial);
@@ -25,7 +34,7 @@ export function HoursForm({ userId, initial, weekStartsOn }: { userId: string; i
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        startTransition(async () => setState(await saveHours(userId, blocks)));
+        startTransition(async () => setState(await save(blocks)));
       }}
       className="flex flex-col gap-4"
     >
