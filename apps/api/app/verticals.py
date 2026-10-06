@@ -24,14 +24,29 @@ class DefaultPlan:
 
 @dataclass(frozen=True)
 class DefaultService:
-    """A service every new business of the vertical starts with (editable afterwards)."""
+    """A service every new business of the vertical starts with (editable afterwards). For a
+    resource (a court or room by the hour), duration_minutes is the shortest length and prices
+    are per hour."""
 
     names: dict[str, str]  # by locale
     duration_minutes: int
-    booking_mode: str  # "class" | "appointment"
+    booking_mode: str  # "class" | "appointment" | "resource"
     prices: dict[str, int]  # minor units, by currency
     color: str
     capacity: int = 1
+    max_minutes: int | None = None  # resource only
+    step_minutes: int | None = None  # resource only
+
+
+@dataclass(frozen=True)
+class DefaultRoom:
+    """A court or room a new business starts with, in its main branch, for rent by the hour
+    every day from `opens` to `closes`, serving the vertical's resource services."""
+
+    names: dict[str, str]  # by locale
+    opens: str  # "HH:MM", local
+    closes: str
+    capacity: int | None = None
 
 
 @dataclass(frozen=True)
@@ -62,6 +77,7 @@ class VerticalPack:
     recommended_modules: tuple[str, ...] = ()
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
     default_services: tuple[DefaultService, ...] = field(default_factory=tuple)
+    default_rooms: tuple[DefaultRoom, ...] = field(default_factory=tuple)
     client_fields: tuple[ClientField, ...] = field(default_factory=tuple)
 
     @property
@@ -99,6 +115,14 @@ def _service(raw: dict[str, Any]) -> DefaultService:
         prices=_prices(raw["prices"]),
         color=raw["color"],
         capacity=raw.get("capacity", 1),
+        max_minutes=raw.get("max_minutes"),
+        step_minutes=raw.get("step_minutes"),
+    )
+
+
+def _room(raw: dict[str, Any]) -> DefaultRoom:
+    return DefaultRoom(
+        names=raw["names"], opens=raw["opens"], closes=raw["closes"], capacity=raw.get("capacity")
     )
 
 
@@ -151,6 +175,11 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
             tuple(_service(s) for s in raw["default_services"])
             if "default_services" in raw
             else (parent.default_services if parent else ())
+        ),
+        default_rooms=(
+            tuple(_room(r) for r in raw["default_rooms"])
+            if "default_rooms" in raw
+            else (parent.default_rooms if parent else ())
         ),
         client_fields=fields + extra,
     )

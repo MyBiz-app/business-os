@@ -326,6 +326,25 @@
       "profile": "Student details",
       "visitNotes": "Progress notes",
       "nextBooking": "Your next lesson"
+    },
+    "sports": {
+      "client": "Player",
+      "clients": "Players",
+      "addClient": "Add player",
+      "newClient": "New player",
+      "searchClients": "Search players",
+      "noClients": "No players yet",
+      "noResults": "No players match your search",
+      "schedule": "Schedule",
+      "newSession": "New session",
+      "noSessions": "Nothing booked",
+      "sessionsToday": "{count, plural, =0 {Nothing booked today} one {One booking today} other {# bookings today}}",
+      "appTab": "Schedule",
+      "appEmpty": "Nothing on this day.",
+      "place": "The club",
+      "profile": "Player profile",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next booking"
     }
   },
   "clients": {
@@ -2930,7 +2949,9 @@
         "Pay when booking"
       ],
       "heroTitle": "Every court and room, booked.",
-      "heroText": "Padel, tennis and football courts, rehearsal and studio rooms, meeting rooms: booked by the hour, paid in advance."
+      "heroText": "Padel, tennis and football courts, rehearsal and studio rooms, meeting rooms: booked by the hour, paid in advance.",
+      "yours": "The club",
+      "example": "Padel Point"
     },
     "home_services": {
       "name": "Home & field services",
@@ -3114,6 +3135,28 @@
       "tagline": "Punctures, tires and alignment.",
       "yours": "your shop",
       "example": "Wheel Pro"
+    },
+    "padel_tennis": {
+      "name": "Padel & tennis club",
+      "tagline": "Courts by the hour, paid when booked.",
+      "example": "Padel Point"
+    },
+    "football_pitches": {
+      "name": "Football pitches",
+      "tagline": "Five-a-side and full pitches by the hour.",
+      "example": "Goal Arena"
+    },
+    "rehearsal_studios": {
+      "name": "Rehearsal studios",
+      "tagline": "Rooms for bands and musicians, by the hour.",
+      "yours": "The studio",
+      "example": "Loud Rooms"
+    },
+    "meeting_rooms": {
+      "name": "Meeting rooms & coworking",
+      "tagline": "Rooms for meetings and workshops, by the hour.",
+      "yours": "The space",
+      "example": "Work Hub"
     }
   },
   "clientFields": {
@@ -3186,7 +3229,8 @@
     "instrument": "Instrument",
     "school_grade": "School grade",
     "subjects": "Subjects",
-    "tire_size": "Tire size"
+    "tire_size": "Tire size",
+    "company": "Company"
   },
   "businessMenu": {
     "switch": "Switch business",

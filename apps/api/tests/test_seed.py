@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
-from app.seed import seed, seed_demo
+from app.seed import PADEL_CLUB, seed, seed_demo
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -143,3 +143,31 @@ def test_owner_demo_has_two_businesses_with_branches(engine: Engine) -> None:
         assert row["branches_with_sessions"] == row["branches"] == row["selling_branches"]
         assert row["appointments"] > 0
     assert name == "Owner"
+
+
+def test_demo_club_rents_its_courts(engine: Engine) -> None:
+    owner = uuid4()
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'club-owner@example.com')"),
+            {"id": owner},
+        )
+        tenant_id = seed(connection, "club-owner@example.com", 1, random.Random(3), PADEL_CLUB)
+
+    with engine.connect() as connection:
+        reservations, overlapping, paid_twice, courts = connection.execute(
+            text("""
+                SELECT (SELECT count(*) FROM app.sessions WHERE tenant_id = :t AND reserved),
+                       (SELECT count(*) FROM app.sessions a JOIN app.sessions b
+                            ON a.room_id = b.room_id AND a.id < b.id
+                           AND a.starts_at < b.ends_at AND b.starts_at < a.ends_at
+                        WHERE a.tenant_id = :t),
+                       (SELECT count(*) FROM (
+                            SELECT booking_id FROM app.payments
+                            WHERE tenant_id = :t AND booking_id IS NOT NULL
+                            GROUP BY booking_id HAVING count(*) > 1) twice),
+                       (SELECT count(*) FROM app.rooms WHERE tenant_id = :t AND bookable)
+            """),
+            {"t": tenant_id},
+        ).one()
+    assert reservations > 300 and overlapping == 0 and paid_twice == 0 and courts == 3

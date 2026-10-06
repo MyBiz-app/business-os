@@ -85,12 +85,15 @@ def apply_vertical_pack(
         },
     )
     for service in pack.default_services:
+        resource = service.booking_mode == "resource"  # by the hour: prices are per hour
         session.execute(
             text("""
                 INSERT INTO app.services
                     (tenant_id, name, duration_minutes, capacity, booking_mode, price_amount,
-                     price_currency, color)
-                VALUES (:tenant_id, :name, :minutes, :capacity, :mode, :price, :currency, :color)
+                     price_currency, color, min_minutes, max_minutes, step_minutes,
+                     price_per_hour)
+                VALUES (:tenant_id, :name, :minutes, :capacity, :mode, :price, :currency, :color,
+                        :min_minutes, :max_minutes, :step_minutes, :per_hour)
             """),
             {
                 "tenant_id": tenant_id,
@@ -101,6 +104,10 @@ def apply_vertical_pack(
                 "price": service.prices.get(currency, 0),
                 "currency": currency,
                 "color": service.color,
+                "min_minutes": service.duration_minutes if resource else None,
+                "max_minutes": service.max_minutes if resource else None,
+                "step_minutes": service.step_minutes if resource else None,
+                "per_hour": service.prices.get(currency, 0) if resource else None,
             },
         )
     for plan in pack.default_plans:
@@ -120,6 +127,57 @@ def apply_vertical_pack(
                 "currency": currency,
             },
         )
+
+
+def apply_vertical_rooms(
+    session: Session | Connection, tenant_id: UUID, vertical: str, locale: str
+) -> None:
+    """Gives a new business its vertical's starter courts and rooms (once its branches exist):
+    in the main branch, for rent every day, serving the business's resource services."""
+    pack = VERTICAL_PACKS[vertical]
+    if not pack.default_rooms:
+        return
+    location_id = session.execute(
+        text("SELECT id FROM app.locations WHERE tenant_id = :t ORDER BY created_at, id LIMIT 1"),
+        {"t": tenant_id},
+    ).scalar_one()
+    services = (
+        session.execute(
+            text("SELECT id FROM app.services WHERE tenant_id = :t AND booking_mode = 'resource'"),
+            {"t": tenant_id},
+        )
+        .scalars()
+        .all()
+    )
+    for room in pack.default_rooms:
+        room_id = session.execute(
+            text("""
+                INSERT INTO app.rooms (tenant_id, location_id, name, capacity, bookable)
+                VALUES (:t, :location, :name, :capacity, true) RETURNING id
+            """),
+            {
+                "t": tenant_id,
+                "location": location_id,
+                "name": room.names.get(locale, room.names["en"]),
+                "capacity": room.capacity,
+            },
+        ).scalar_one()
+        session.execute(
+            text("""
+                INSERT INTO app.room_hours (tenant_id, room_id, weekday, starts, ends)
+                SELECT :t, :room, d, CAST(:opens AS time), CAST(:closes AS time)
+                FROM generate_series(0, 6) d
+            """),
+            {"t": tenant_id, "room": room_id, "opens": room.opens, "closes": room.closes},
+        )
+        for service_id in services:
+            session.execute(
+                text("""
+                    INSERT INTO app.service_rooms (tenant_id, service_id, room_id)
+                    VALUES (:t, :service, :room)
+                """),
+                {"t": tenant_id, "service": service_id, "room": room_id},
+            )
 
 
 @router.get("/me", tags=["account"])
@@ -172,6 +230,7 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
     apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
     set_modules(session, tenant_id, modules)
     create_first_branches(session, tenant_id, body.locale, 1 + modules.get("extra_location", 0))
+    apply_vertical_rooms(session, tenant_id, body.vertical, body.locale)
     return load_current_tenant(session)
 
 

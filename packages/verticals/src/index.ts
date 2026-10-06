@@ -18,7 +18,7 @@ export const ICONS = [
   "trophy", "wrench", "paw-print", "camera", "briefcase",
 ] as const;
 export const FIELD_KINDS = ["text", "long_text", "number", "date", "select"] as const;
-export const BOOKING_MODES = ["class", "appointment"] as const;
+export const BOOKING_MODES = ["class", "appointment", "resource"] as const;
 export const PRESETS = ["starter", "growing", "ai_powered"] as const;
 export const RECOMMENDABLE = ["client_app", "ai", "crm", "whatsapp"] as const;
 export const LOCALES = ["he", "en"] as const;
@@ -36,11 +36,25 @@ export type ClientField = {
 
 export type DefaultService = {
   names: Record<string, string>;
+  /** For a resource (a court or room by the hour): the shortest length offered. */
   duration_minutes: number;
   booking_mode: (typeof BOOKING_MODES)[number];
+  /** For a resource: the price per hour. */
   prices: Record<string, number>;
   color: string;
   capacity?: number;
+  /** For a resource: the longest length and the step between lengths, in minutes. */
+  max_minutes?: number;
+  step_minutes?: number;
+};
+
+/** A court or room a new business starts with, for rent by the hour every day between
+ * `opens` and `closes` (local "HH:MM"), serving the entry's resource services. */
+export type DefaultRoom = {
+  names: Record<string, string>;
+  capacity?: number;
+  opens: string;
+  closes: string;
 };
 
 export type DefaultPlan = {
@@ -75,6 +89,8 @@ export type Entry = {
   extra_client_fields?: ClientField[];
   default_services?: DefaultService[];
   default_plans?: DefaultPlan[];
+  /** Replaces the parent's starter courts and rooms. */
+  default_rooms?: DefaultRoom[];
   children?: Entry[];
 };
 
@@ -98,6 +114,7 @@ export type Vertical = {
   /** Starter services and plans a new business gets (inherited when the entry has none). */
   defaultServices: DefaultService[];
   defaultPlans: DefaultPlan[];
+  defaultRooms: DefaultRoom[];
   children: string[];
 };
 
@@ -130,6 +147,7 @@ function build(): Map<string, Vertical> {
       clientFields: mergeFields(parent?.clientFields ?? [], entry),
       defaultServices: entry.default_services ?? parent?.defaultServices ?? [],
       defaultPlans: entry.default_plans ?? parent?.defaultPlans ?? [],
+      defaultRooms: entry.default_rooms ?? parent?.defaultRooms ?? [],
       children: (entry.children ?? []).map((child) => child.key),
     };
     all.set(entry.key, vertical);

@@ -1819,9 +1819,266 @@
   {
     "key": "sports",
     "order": 6,
-    "status": "planned",
+    "status": "beta",
     "icon": "trophy",
-    "color": "from-lime-500 to-green-600"
+    "color": "from-lime-500 to-green-600",
+    "terms": "sports",
+    "client_term": "player",
+    "booking_modes": [
+      "resource",
+      "class"
+    ],
+    "cancellation_window_minutes": 1440,
+    "booking_requires_plan": false,
+    "default_preset": "growing",
+    "recommended_modules": [
+      "client_app",
+      "whatsapp"
+    ],
+    "client_fields": [
+      {
+        "key": "level",
+        "kind": "select",
+        "options": [
+          "beginner",
+          "intermediate",
+          "advanced"
+        ]
+      },
+      {
+        "key": "preferences",
+        "kind": "text"
+      }
+    ],
+    "default_services": [
+      {
+        "names": {
+          "he": "מגרש פאדל",
+          "en": "Padel court"
+        },
+        "duration_minutes": 60,
+        "max_minutes": 120,
+        "step_minutes": 30,
+        "booking_mode": "resource",
+        "prices": {
+          "ILS": 16000
+        },
+        "color": "#65a30d"
+      }
+    ],
+    "default_rooms": [
+      {
+        "names": {
+          "he": "מגרש 1",
+          "en": "Court 1"
+        },
+        "capacity": 4,
+        "opens": "07:00",
+        "closes": "23:00"
+      },
+      {
+        "names": {
+          "he": "מגרש 2",
+          "en": "Court 2"
+        },
+        "capacity": 4,
+        "opens": "07:00",
+        "closes": "23:00"
+      }
+    ],
+    "children": [
+      {
+        "key": "padel_tennis",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "מגרש פאדל",
+              "en": "Padel court"
+            },
+            "duration_minutes": 60,
+            "max_minutes": 120,
+            "step_minutes": 30,
+            "booking_mode": "resource",
+            "prices": {
+              "ILS": 16000
+            },
+            "color": "#65a30d"
+          },
+          {
+            "names": {
+              "he": "מגרש טניס",
+              "en": "Tennis court"
+            },
+            "duration_minutes": 60,
+            "max_minutes": 120,
+            "step_minutes": 60,
+            "booking_mode": "resource",
+            "prices": {
+              "ILS": 12000
+            },
+            "color": "#0ea5e9"
+          }
+        ],
+        "default_rooms": [
+          {
+            "names": {
+              "he": "מגרש 1",
+              "en": "Court 1"
+            },
+            "capacity": 4,
+            "opens": "07:00",
+            "closes": "23:00"
+          },
+          {
+            "names": {
+              "he": "מגרש 2",
+              "en": "Court 2"
+            },
+            "capacity": 4,
+            "opens": "07:00",
+            "closes": "23:00"
+          },
+          {
+            "names": {
+              "he": "מגרש 3",
+              "en": "Court 3"
+            },
+            "capacity": 4,
+            "opens": "07:00",
+            "closes": "23:00"
+          }
+        ]
+      },
+      {
+        "key": "football_pitches",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "מגרש כדורגל",
+              "en": "Football pitch"
+            },
+            "duration_minutes": 60,
+            "max_minutes": 120,
+            "step_minutes": 60,
+            "booking_mode": "resource",
+            "prices": {
+              "ILS": 45000
+            },
+            "color": "#16a34a"
+          }
+        ],
+        "default_rooms": [
+          {
+            "names": {
+              "he": "מגרש קט־רגל",
+              "en": "Five-a-side pitch"
+            },
+            "capacity": 12,
+            "opens": "16:00",
+            "closes": "23:00"
+          }
+        ]
+      },
+      {
+        "key": "rehearsal_studios",
+        "status": "beta",
+        "client_fields": [
+          {
+            "key": "instrument",
+            "kind": "text"
+          },
+          {
+            "key": "preferences",
+            "kind": "text"
+          }
+        ],
+        "default_services": [
+          {
+            "names": {
+              "he": "חדר חזרות",
+              "en": "Rehearsal room"
+            },
+            "duration_minutes": 60,
+            "max_minutes": 240,
+            "step_minutes": 60,
+            "booking_mode": "resource",
+            "prices": {
+              "ILS": 9000
+            },
+            "color": "#a855f7"
+          }
+        ],
+        "default_rooms": [
+          {
+            "names": {
+              "he": "חדר א",
+              "en": "Room A"
+            },
+            "capacity": 6,
+            "opens": "10:00",
+            "closes": "23:00"
+          },
+          {
+            "names": {
+              "he": "חדר ב",
+              "en": "Room B"
+            },
+            "capacity": 6,
+            "opens": "10:00",
+            "closes": "23:00"
+          }
+        ]
+      },
+      {
+        "key": "meeting_rooms",
+        "status": "beta",
+        "client_term": "client",
+        "client_fields": [
+          {
+            "key": "company",
+            "kind": "text"
+          }
+        ],
+        "default_services": [
+          {
+            "names": {
+              "he": "חדר ישיבות",
+              "en": "Meeting room"
+            },
+            "duration_minutes": 30,
+            "max_minutes": 480,
+            "step_minutes": 30,
+            "booking_mode": "resource",
+            "prices": {
+              "ILS": 12000
+            },
+            "color": "#64748b"
+          }
+        ],
+        "default_rooms": [
+          {
+            "names": {
+              "he": "חדר ישיבות קטן",
+              "en": "Small meeting room"
+            },
+            "capacity": 6,
+            "opens": "08:00",
+            "closes": "20:00"
+          },
+          {
+            "names": {
+              "he": "חדר ישיבות גדול",
+              "en": "Large meeting room"
+            },
+            "capacity": 14,
+            "opens": "08:00",
+            "closes": "20:00"
+          }
+        ]
+      }
+    ]
   },
   {
     "key": "home_services",

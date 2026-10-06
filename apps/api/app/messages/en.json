@@ -182,6 +182,18 @@
     },
     "tires": {
       "name": "Tires"
+    },
+    "padel_tennis": {
+      "name": "Padel & tennis club"
+    },
+    "football_pitches": {
+      "name": "Football pitches"
+    },
+    "rehearsal_studios": {
+      "name": "Rehearsal studios"
+    },
+    "meeting_rooms": {
+      "name": "Meeting rooms & coworking"
     }
   }
 }
