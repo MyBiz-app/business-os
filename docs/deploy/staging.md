@@ -92,16 +92,27 @@ Emails use the business's language and are sent once, within a day of the event;
 without an email address are skipped. For local testing: `API_EMAIL_PROVIDER=log uv run
 python -m app.jobs send-emails` prints instead of sending.
 
-## Accounts on staging (before an email provider)
+## Auth emails on staging
 
-Staging has no email provider yet ([#48](https://github.com/adiredri/business-os/issues/48)).
-Supabase's built-in email only sends to the project's team members, so for anyone else the
-sign-up **fails and no account is created** (and password-reset emails never arrive).
+Supabase's built-in email only sends to the project's team members (a few per hour), so for
+anyone else a sign-up **fails and no account is created**. Set up real email once:
 
-**Do this once:** Supabase → Authentication → Sign In / Providers → Email → turn off
-"Confirm email". Sign-up then needs no email and logs the person in straight away (the web app
-handles both). Turn it back on once real email is set up.
+1. **An SMTP sender.** Until there is a domain ([#48](https://github.com/adiredri/business-os/issues/48)),
+   a Gmail account with an *App Password* works (Google Account → Security → 2-Step
+   Verification on → App passwords). Production: a domain with Resend or Amazon SES.
+2. **Supabase → Authentication → Emails → SMTP Settings:** enable custom SMTP; host
+   `smtp.gmail.com`, port `465`, username and sender = the Gmail address, password = the app
+   password, sender name `MyBiz`. The password goes only into Supabase.
+3. **Authentication → Rate Limits:** emails per hour, e.g. 100.
+4. **Authentication → URL Configuration:** Site URL = the web address
+   (`https://business-os-alpha-drab.vercel.app`); Redirect URLs: `<web address>/**` and the
+   client app's address with `/**`.
+5. **Authentication → Emails → Templates:** for *Confirm signup*, *Magic link* and *Reset
+   password*, paste the subject and body from `supabase/config.toml` and
+   `supabase/templates/*.html` (confirmation, magic_link, recovery). They link to
+   `/auth/confirm` (works from any browser) and include the 6-digit code the client app asks for.
+6. Keep **Sign In / Providers → Email → Confirm email** on.
 
 *Actions → Confirm an account on staging* confirms an account that was created but not
-confirmed (e.g. from before the setting changed) and creates its app profile; it fails with
-"No account" when the sign-up never went through.
+confirmed and creates its app profile; it fails with "No account" when the sign-up never
+went through.
