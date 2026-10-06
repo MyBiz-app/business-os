@@ -78,6 +78,11 @@ class VerticalPack:
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
     default_services: tuple[DefaultService, ...] = field(default_factory=tuple)
     default_rooms: tuple[DefaultRoom, ...] = field(default_factory=tuple)
+    # Dependents (#43): "pet" or "child" profiles under a client, their details, and whether
+    # a booking must name one.
+    dependents: str | None = None
+    dependent_fields: tuple[ClientField, ...] = field(default_factory=tuple)
+    dependent_required: bool = False
     client_fields: tuple[ClientField, ...] = field(default_factory=tuple)
 
     @property
@@ -176,6 +181,13 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
             if "default_services" in raw
             else (parent.default_services if parent else ())
         ),
+        dependents=get("dependents"),
+        dependent_fields=(
+            tuple(_field(f) for f in raw["dependent_fields"])
+            if "dependent_fields" in raw
+            else (parent.dependent_fields if parent else ())
+        ),
+        dependent_required=get("dependent_required", False),
         default_rooms=(
             tuple(_room(r) for r in raw["default_rooms"])
             if "default_rooms" in raw
@@ -212,7 +224,12 @@ MAX_NUMBER = 10_000_000
 def clean_client_fields(pack: VerticalPack, values: dict[str, object]) -> dict[str, object]:
     """Validates a client's extra fields against the pack; blank values are dropped.
     Raises ValueError with a short reason for unknown fields or invalid values."""
-    definitions = {f.key: f for f in pack.client_fields}
+    return clean_fields(pack.client_fields, values)
+
+
+def clean_fields(fields: tuple[ClientField, ...], values: dict[str, object]) -> dict[str, object]:
+    """Validates extra field values against their definitions; blank values are dropped."""
+    definitions = {f.key: f for f in fields}
     cleaned: dict[str, object] = {}
     for key, value in values.items():
         definition = definitions.get(key)

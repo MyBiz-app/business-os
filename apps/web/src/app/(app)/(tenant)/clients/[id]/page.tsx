@@ -15,6 +15,7 @@ import { whatsappLink } from "@/lib/whatsapp";
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
@@ -75,7 +76,15 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
       {items.map((booking) => (
         <li key={booking.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
           <Link href={`/schedule/${booking.session_id}`} className="flex flex-col underline-offset-4 hover:underline">
-            <span className="font-medium">{booking.service_name}</span>
+            <span className="font-medium">
+              {booking.service_name}
+              {booking.dependent_name && (
+                <span dir="auto" className="font-normal text-muted">
+                  {" "}
+                  · {booking.dependent_name}
+                </span>
+              )}
+            </span>
             <span className="text-sm text-muted">
               {dateFormat.format(new Date(booking.starts_at))} ·{" "}
               <span dir="ltr">{formatTime(booking.starts_at, locale, tenant.time_zone)}</span>
@@ -241,6 +250,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
               branches={branches}
             />
           </section>
+
+          <DependentsSection clientId={client.id} context={context} locked={erased} />
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
 

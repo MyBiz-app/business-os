@@ -665,7 +665,9 @@
       "invalid_transition": "אי אפשר לבצע את השינוי הזה בהרשמה.",
       "invalid_reference": "הלקוח לא זמין. רעננו ונסו שוב.",
       "not_found": "ההרשמה לא נמצאה. רעננו ונסו שוב.",
-      "generic": "משהו השתבש. נסו שוב."
+      "generic": "משהו השתבש. נסו שוב.",
+      "dependent_required": "צריך לבחור מי מגיע.",
+      "unknown_dependent": "הוא כבר לא מופיע בכרטיס הלקוח."
     },
     "noPlan": "ללא מנוי",
     "showAll": "הצגת כל ההיסטוריה ({count})"
@@ -3325,5 +3327,36 @@
       "other": "אחר"
     },
     "recordPayment": "רישום התשלום"
+  },
+  "dependents": {
+    "title": {
+      "pet": "חיות מחמד",
+      "child": "ילדים"
+    },
+    "add": {
+      "pet": "הוספת חיית מחמד",
+      "child": "הוספת ילד/ה"
+    },
+    "none": {
+      "pet": "עדיין אין חיות מחמד.",
+      "child": "עדיין אין ילדים."
+    },
+    "name": "שם",
+    "birthDate": "תאריך לידה",
+    "notes": "הערות",
+    "active": "פעיל",
+    "inactive": "כבר לא מגיע/ה",
+    "edit": "עריכת {name}",
+    "save": "שמירה",
+    "retire": "כבר לא מגיע/ה",
+    "restore": "מגיע/ה שוב",
+    "age": "{years, plural, =0 {פחות משנה} one {שנה} two {שנתיים} other {# שנים}}",
+    "for": "עבור {name}",
+    "bookFor": "רישום {dependent} ({owner})",
+    "withoutDependent": "בלי",
+    "owner": {
+      "pet": "בעלים",
+      "child": "הורה"
+    }
   }
 }

@@ -14,7 +14,15 @@ type Session = components["schemas"]["ScheduledSession"];
 type BookingStatus = Booking["status"];
 type BookingAction = Exclude<BookingStatus, "waitlisted">;
 
-const ERRORS = ["already_booked", "session_cancelled", "invalid_transition", "invalid_reference", "not_found"] as const;
+const ERRORS = [
+  "already_booked",
+  "session_cancelled",
+  "invalid_transition",
+  "invalid_reference",
+  "not_found",
+  "dependent_required",
+  "unknown_dependent",
+] as const;
 type BookingErrorKey = (typeof ERRORS)[number];
 const isKnownError = (value: string | undefined): value is BookingErrorKey =>
   ERRORS.includes(value as BookingErrorKey);
@@ -46,6 +54,7 @@ type Props = {
 
 export async function Roster({ session, context, manageable, search, error }: Props) {
   const t = await getTranslations("bookings");
+  const tDependents = await getTranslations("dependents");
   const tHealth = await getTranslations("health");
   const { api, scope } = context;
   // Problems always show; a missing declaration only matters where the business requires one.
@@ -65,13 +74,28 @@ export async function Roster({ session, context, manageable, search, error }: Pr
   const canBook =
     manageable && session.status === "scheduled" && context.tenant.permissions.includes("clients.read");
 
-  const bookedIds = new Set(bookings.filter((b) => b.status !== "cancelled").map((b) => b.client_id));
-  const matches =
+  // Industries that keep pets / children book one of them; a client may bring several.
+  const dependents = canBook ? unwrap(await api.GET("/dependents/settings", { params: scope })) : null;
+  const perDependent = Boolean(dependents?.kind);
+  const current = bookings.filter((b) => b.status !== "cancelled");
+  const bookedIds = new Set(current.map((b) => b.client_id));
+  const bookedPairs = new Set(current.map((b) => `${b.client_id}:${b.dependent_id ?? ""}`));
+  const found =
     canBook && search
       ? unwrap(
           await api.GET("/clients", { params: { ...scope, query: { search, status: "active", limit: 8 } } }),
-        ).items.filter((client) => !bookedIds.has(client.id))
+        ).items.filter((client) => perDependent || !bookedIds.has(client.id))
       : [];
+  const matches = await Promise.all(
+    found.map(async (client) => ({
+      ...client,
+      dependents: perDependent
+        ? unwrap(
+            await api.GET("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: client.id } } }),
+          ).filter((d) => d.active && !bookedPairs.has(`${client.id}:${d.id}`))
+        : [],
+    })),
+  );
   const full = session.booked >= session.capacity;
 
   const row = (booking: Booking) => (
@@ -80,7 +104,16 @@ export async function Roster({ session, context, manageable, search, error }: Pr
         {booking.waitlist_position && (
           <span className="text-sm tabular-nums text-muted">{booking.waitlist_position}.</span>
         )}
-        <Link href={`/clients/${booking.client_id}`} dir="auto" className="font-medium underline-offset-4 hover:underline">
+        {booking.dependent_name && (
+          <span dir="auto" className="font-semibold">
+            {booking.dependent_name}
+          </span>
+        )}
+        <Link
+          href={`/clients/${booking.client_id}`}
+          dir="auto"
+          className={`underline-offset-4 hover:underline ${booking.dependent_name ? "text-sm text-muted" : "font-medium"}`}
+        >
           {booking.client_name}
         </Link>
         <Pill tone={TONE[booking.status]}>{t(`statuses.${booking.status}`)}</Pill>
@@ -101,7 +134,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
             <form key={next} action={setBookingStatus.bind(null, session.id, booking.id, next)}>
               <button
                 type="submit"
-                aria-label={`${t(`actions.${next}`)} – ${booking.client_name}`}
+                aria-label={`${t(`actions.${next}`)} – ${booking.dependent_name ?? booking.client_name}`}
                 className={`btn-secondary px-2.5 py-1 text-xs font-medium ${next === "cancelled" ? "text-danger" : ""}`}
               >
                 {t(`actions.${next}`)}
@@ -153,18 +186,42 @@ export async function Roster({ session, context, manageable, search, error }: Pr
               {matches.length === 0 && <li className="px-3 py-2 text-sm text-muted">{t("noMatches")}</li>}
               {matches.map((client) => {
                 const name = [client.first_name, client.last_name].filter(Boolean).join(" ");
+                const label = full ? t("addToWaitlist") : t("book");
+                const choices = [
+                  ...client.dependents.map((d) => ({ id: d.id as string | undefined, name: d.name })),
+                  ...(perDependent && !dependents?.required && !bookedPairs.has(`${client.id}:`)
+                    ? [{ id: undefined, name: tDependents("withoutDependent") }]
+                    : []),
+                ];
+                if (perDependent && choices.length === 0) return null;
                 return (
-                  <li key={client.id} className="flex items-center justify-between gap-2 px-3 py-2">
+                  <li key={client.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                     <span dir="auto">{name}</span>
-                    <form action={bookClient.bind(null, session.id, client.id)}>
-                      <button
-                        type="submit"
-                        aria-label={`${full ? t("addToWaitlist") : t("book")} – ${name}`}
-                        className="btn-primary px-3 py-1 text-xs"
-                      >
-                        {full ? t("addToWaitlist") : t("book")}
-                      </button>
-                    </form>
+                    {perDependent ? (
+                      <div className="flex flex-wrap gap-2">
+                        {choices.map((choice) => (
+                          <form key={choice.id ?? "none"} action={bookClient.bind(null, session.id, client.id, choice.id)}>
+                            <button
+                              type="submit"
+                              aria-label={`${label} – ${tDependents("bookFor", { dependent: choice.name, owner: name })}`}
+                              className="btn-primary px-3 py-1 text-xs"
+                            >
+                              <span dir="auto">{choice.name}</span>
+                            </button>
+                          </form>
+                        ))}
+                      </div>
+                    ) : (
+                      <form action={bookClient.bind(null, session.id, client.id, undefined)}>
+                        <button
+                          type="submit"
+                          aria-label={`${label} – ${name}`}
+                          className="btn-primary px-3 py-1 text-xs"
+                        >
+                          {label}
+                        </button>
+                      </form>
+                    )}
                   </li>
                 );
               })}

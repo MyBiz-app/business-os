@@ -14,6 +14,7 @@ from app.api import (
     client_import,
     client_notes,
     clients,
+    dependents,
     leads,
     locations,
     marketing,
@@ -81,6 +82,8 @@ def create_app() -> FastAPI:
     app.include_router(businesses.router)
     app.include_router(client_import.router)
     app.include_router(clients.router)
+    app.include_router(dependents.router)
+    app.include_router(dependents.client_router)
     app.include_router(client_notes.router)
     app.include_router(privacy.router)
     app.include_router(leads.router)

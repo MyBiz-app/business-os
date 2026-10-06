@@ -19,6 +19,7 @@ from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.plans import usable_entitlement
 from app.notifications import notify_booking
 from app.permissions import Permission
+from app.verticals import CATALOG, VerticalPack
 
 router = APIRouter(tags=["bookings"])
 
@@ -40,6 +41,9 @@ TRANSITIONS: dict[str, set[str]] = {
 
 class BookingCreate(BaseModel):
     client_id: UUID
+    dependent_id: UUID | None = Field(
+        default=None, description="Which of the client's pets / children comes (#43)"
+    )
 
 
 class BookingUpdate(BaseModel):
@@ -51,6 +55,8 @@ class Booking(BaseModel):
     session_id: UUID
     client_id: UUID
     client_name: str
+    dependent_id: UUID | None = None
+    dependent_name: str | None = Field(default=None, description="The pet / child who comes")
     plan_name: str | None = Field(description="The client's plan this booking uses, if any")
     status: BookingStatus
     waitlist_position: int | None
@@ -70,12 +76,16 @@ class ClientBooking(BaseModel):
     session_status: Literal["scheduled", "cancelled"]
     status: BookingStatus
     late_cancel: bool
+    dependent_name: str | None = None
     rating: int | None = Field(default=None, description="The client's review of the visit")
 
+
+NO_DEPENDENT = "'00000000-0000-0000-0000-000000000000'::uuid"
 
 BOOKING_SELECT = f"""
     SELECT b.id, b.session_id, b.client_id,
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
+           b.dependent_id, d.name AS dependent_name,
            e.name AS plan_name,
            b.status, b.late_cancel, b.checked_in_at, b.cancelled_at, b.created_at,
            app.waitlist_position(b.id) AS waitlist_position,
@@ -84,6 +94,7 @@ BOOKING_SELECT = f"""
     JOIN app.clients c ON c.id = b.client_id
     JOIN app.tenants t ON t.id = b.tenant_id
     LEFT JOIN app.entitlements e ON e.id = b.entitlement_id
+    LEFT JOIN app.dependents d ON d.id = b.dependent_id
 """
 
 
@@ -132,20 +143,30 @@ def promote_waitlist(db: Session, session_id: UUID) -> None:
 
 
 def place_booking(
-    db: Session, tenant_id: UUID, session_id: UUID, client_id: UUID, *, requires_plan: bool
+    db: Session,
+    tenant_id: UUID,
+    session_id: UUID,
+    client_id: UUID,
+    *,
+    requires_plan: bool,
+    dependent_id: UUID | None = None,
 ) -> UUID:
     """Books the client if a spot is free, otherwise adds them to the waitlist. The booking
-    uses one of the client's plans when one is valid; with `requires_plan`, it must."""
+    uses one of the client's plans when one is valid; with `requires_plan`, it must. A booking
+    can be for one of the client's dependents (a pet, a child); a client can then hold one
+    booking per session and dependent."""
     ensure_not_erased(db, client_id)
+    ensure_dependent(db, tenant_id, client_id, dependent_id)
     session = lock_session(db, session_id)
     if session["status"] == "cancelled":
         raise _conflict("session_cancelled")
     already = db.execute(
-        text("""
+        text(f"""
             SELECT 1 FROM app.bookings
             WHERE session_id = :session_id AND client_id = :client_id AND status <> 'cancelled'
+              AND coalesce(dependent_id, {NO_DEPENDENT}) = coalesce(:dependent_id, {NO_DEPENDENT})
         """),
-        {"session_id": session_id, "client_id": client_id},
+        {"session_id": session_id, "client_id": client_id, "dependent_id": dependent_id},
     ).first()
     if already:
         raise _conflict("already_booked")
@@ -160,16 +181,17 @@ def place_booking(
         return db.execute(
             text("""
                 INSERT INTO app.bookings
-                    (tenant_id, session_id, client_id, entitlement_id, status, waitlisted_at,
-                     created_by)
-                VALUES (:tenant_id, :session_id, :client_id, :entitlement_id, :status,
-                        CASE WHEN :full THEN now() END, app.current_user_id())
+                    (tenant_id, session_id, client_id, dependent_id, entitlement_id, status,
+                     waitlisted_at, created_by)
+                VALUES (:tenant_id, :session_id, :client_id, :dependent_id, :entitlement_id,
+                        :status, CASE WHEN :full THEN now() END, app.current_user_id())
                 RETURNING id
             """),
             {
                 "tenant_id": tenant_id,
                 "session_id": session_id,
                 "client_id": client_id,
+                "dependent_id": dependent_id,
                 "entitlement_id": entitlement_id,
                 "status": "waitlisted" if full else "booked",
                 "full": full,
@@ -177,6 +199,33 @@ def place_booking(
         ).scalar_one()
     except IntegrityError as error:
         raise HTTPException(status_code=422, detail="invalid_reference") from error
+
+
+def ensure_dependent(
+    db: Session, tenant_id: UUID, client_id: UUID, dependent_id: UUID | None
+) -> None:
+    """The dependent must be the client's and active; businesses whose pack says every visit
+    is for a dependent (a groomer: which dog?) require one."""
+    if dependent_id is None:
+        if tenant_pack(db, tenant_id).dependent_required:
+            raise HTTPException(status_code=422, detail="dependent_required")
+        return
+    found = db.execute(
+        text("""
+            SELECT 1 FROM app.dependents
+            WHERE id = :id AND client_id = :client_id AND active
+        """),
+        {"id": dependent_id, "client_id": client_id},
+    ).first()
+    if found is None:
+        raise HTTPException(status_code=422, detail="unknown_dependent")
+
+
+def tenant_pack(db: Session, tenant_id: UUID) -> VerticalPack:
+    vertical = db.execute(
+        text("SELECT vertical FROM app.tenants WHERE id = :id"), {"id": tenant_id}
+    ).scalar_one()
+    return CATALOG[vertical]
 
 
 def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
@@ -215,7 +264,12 @@ def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) ->
     """Books the client if a spot is free, otherwise adds them to the waitlist."""
     # Staff may book without a plan (walk-ins pay at the desk); the roster shows it.
     booking_id = place_booking(
-        context.session, context.tenant_id, session_id, body.client_id, requires_plan=False
+        context.session,
+        context.tenant_id,
+        session_id,
+        body.client_id,
+        requires_plan=False,
+        dependent_id=body.dependent_id,
     )
     notify_booking(context.session, booking_id, "booked_by_studio")
     return _load(context.session, booking_id)
@@ -255,10 +309,12 @@ def list_client_bookings(client_id: UUID, context: ClientsReadDep) -> list[Clien
         text("""
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
+                   d.name AS dependent_name,
                    (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
+            LEFT JOIN app.dependents d ON d.id = b.dependent_id
             WHERE b.client_id = :id
             ORDER BY s.starts_at DESC
             LIMIT 200

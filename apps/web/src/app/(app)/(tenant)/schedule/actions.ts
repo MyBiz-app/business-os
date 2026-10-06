@@ -138,13 +138,13 @@ function refreshSession(sessionId: string) {
   revalidatePath(`/schedule/${sessionId}`);
 }
 
-export async function bookClient(sessionId: string, clientId: string): Promise<void> {
+export async function bookClient(sessionId: string, clientId: string, dependentId: string | undefined): Promise<void> {
   const { api, scope } = await getTenant();
   try {
     unwrap(
       await api.POST("/sessions/{session_id}/bookings", {
         params: { ...scope, path: { session_id: sessionId } },
-        body: { client_id: clientId },
+        body: { client_id: clientId, dependent_id: dependentId ?? null },
       }),
     );
   } catch (error) {
