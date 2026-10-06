@@ -13,6 +13,7 @@ import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { useAddresses } from "@/lib/use-addresses";
 import { useDependents } from "@/lib/use-dependents";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -28,6 +29,7 @@ const KNOWN = [
   "health_declaration_review",
   "dependent_required",
   "unknown_dependent",
+  "address_required",
 ] as const;
 const ME = "me";
 
@@ -35,8 +37,11 @@ const ME = "me";
 export default function Appointment() {
   const t = useTranslations("client.appointment");
   const tDependents = useTranslations("dependents");
+  const tJobs = useTranslations("jobs");
   const dependents = useDependents();
   const [who, setWho] = useState<string | null>(null);
+  const [where, setWhere] = useState<string | null>(null);
+  const addresses = useAddresses();
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const today = business ? todayIn(business.time_zone) : "";
@@ -87,6 +92,9 @@ export default function Appointment() {
       ]
     : [];
   const chosen = choices.find((c) => c.id === who) ?? choices[0] ?? null;
+  // An on-site service happens at one of the client's addresses (#42).
+  const onSite = service?.on_site ?? false;
+  const place = onSite ? (addresses.find((a) => a.id === where) ?? addresses[0] ?? null) : null;
 
   const book = async () => {
     if (!service || !slot) return;
@@ -100,6 +108,7 @@ export default function Appointment() {
           staff_user_id: slot.staff_user_id,
           starts_at: slot.starts_at,
           dependent_id: chosen && chosen.id !== ME ? chosen.id : null,
+          address_id: place?.id ?? null,
         },
       })
       .catch(() => null);
@@ -276,8 +285,27 @@ export default function Appointment() {
               )}
             </>
           )}
+          {onSite && slot && (
+            <>
+              <Text style={[local.step, { color: palette.foreground }]}>{tJobs("where")}</Text>
+              {addresses.length > 0 && (
+                <View role="radiogroup" aria-label={tJobs("where")} style={local.chips}>
+                  {addresses.map((address) => (
+                    <Chip
+                      key={address.id}
+                      label={[address.street, address.city].join(", ")}
+                      selected={place?.id === address.id}
+                      onPress={() => setWhere(address.id)}
+                      palette={palette}
+                    />
+                  ))}
+                </View>
+              )}
+              <Button label={tJobs("addAddress")} variant="secondary" palette={palette} onPress={() => router.push("/addresses")} />
+            </>
+          )}
           <ErrorText message={error} palette={palette} />
-          {slot && (!kind || choices.length > 0) && <Button label={t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => void book()} />}
+          {slot && (!kind || choices.length > 0) && (!onSite || place) && <Button label={t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => void book()} />}
         </>
       )}
     </Screen>

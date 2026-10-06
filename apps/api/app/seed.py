@@ -237,10 +237,20 @@ GROOMING_SALON = BusinessSpec(
     clients=160,
     staff_per_branch=2,
 )
+AC_COMPANY = BusinessSpec(
+    name="אוויר קריר (דמו)",
+    vertical="ac_technicians",
+    color="#0369a1",
+    billing_name="אוויר קריר שירותי מיזוג בע״מ",
+    branches=(BranchSpec("מרכז", "המלאכה 8, ראש העין"),),
+    clients=150,
+    staff_per_branch=3,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
     "pets": (GROOMING_SALON,),
+    "jobs": (AC_COMPANY,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
@@ -925,6 +935,7 @@ def seed(
     _insert(conn, "UPDATE app.clients SET custom_fields = CAST(:fields AS jsonb) WHERE id = :id",
             profile_rows)  # fmt: skip
     dependents = _seed_dependents(conn, tenant_id, spec.vertical, [c.id for c in clients], rng)
+    jobs = _seed_jobs(conn, tenant_id, [c.id for c in clients], rng)
     by_id = {s["id"]: s for s in sessions}
     attended = [b for b in booking_rows if b.get("status") == "checked_in"]
     notes = COACH_NOTES if category == "fitness" else GENERIC_NOTES
@@ -1008,7 +1019,7 @@ def seed(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "
         f"{len(clients)} clients, {lead_count} leads, {len(sessions)} sessions, "
         f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings, "
-        f"{reservations} reservations, {dependents} pets / children."
+        f"{reservations} reservations, {dependents} pets / children, {jobs} on-site jobs."
     )
     return tenant_id
 
@@ -1068,6 +1079,68 @@ def _seed_dependents(
         {"t": tenant_id},
     )
     return len(rows)
+
+
+STREETS = ("הרצל", "ויצמן", "ז׳בוטינסקי", "רוטשילד", "בן גוריון", "סוקולוב", "אחד העם", "הנשיא",
+           "העצמאות", "המייסדים", "הגפן", "התאנה")  # fmt: skip
+CITIES = ("פתח תקווה", "ראש העין", "כפר סבא", "הוד השרון", "רעננה", "תל אביב", "רמת גן", "גבעתיים")
+ENTRY_NOTES = ("קוד בשער 1234#", "אינטרקום לא עובד, להתקשר", "חניה ברחוב בלבד", "כלב בחצר, לצלצל",
+               None, None, None)  # fmt: skip
+
+
+def _seed_jobs(
+    conn: Connection, tenant_id: UUID, client_ids: list[UUID], rng: random.Random
+) -> int:
+    """For on-site services (#42): an address per client and every appointment of those
+    services a job at its client's address, past ones done and today's on the move."""
+    on_site = conn.execute(
+        text("SELECT count(*) FROM app.services WHERE tenant_id = :t AND on_site"),
+        {"t": tenant_id},
+    ).scalar_one()
+    if not on_site:
+        return 0
+    rows = [
+        {
+            "tenant_id": tenant_id,
+            "client_id": client_id,
+            "street": f"{rng.choice(STREETS)} {rng.randint(1, 120)}",
+            "city": rng.choice(CITIES),
+            "details": f"קומה {rng.randint(0, 12)}, דירה {rng.randint(1, 48)}"
+            if rng.random() < 0.7
+            else None,
+            "notes": rng.choice(ENTRY_NOTES),
+        }
+        for client_id in client_ids
+    ]
+    _insert(conn, """
+        INSERT INTO app.client_addresses (tenant_id, client_id, street, city, details, notes)
+        VALUES (:tenant_id, :client_id, :street, :city, :details, :notes)
+    """, rows)  # fmt: skip
+    return conn.execute(
+        text("""
+            WITH jobs AS (
+                SELECT DISTINCT ON (s.id) s.id, sv.travel_minutes, a.id AS address_id,
+                       concat_ws(', ', a.street, a.details, a.city) AS address,
+                       CASE WHEN b.status = 'checked_in' THEN 'done'
+                            WHEN s.starts_at::date = now()::date AND s.starts_at < now()
+                                THEN 'in_progress'
+                            WHEN s.starts_at::date = now()::date
+                                 AND s.starts_at < now() + interval '1 hour' THEN 'on_the_way'
+                            ELSE 'scheduled' END AS job_status
+                FROM app.sessions s
+                JOIN app.services sv ON sv.id = s.service_id AND sv.on_site
+                JOIN app.bookings b ON b.session_id = s.id AND b.status <> 'cancelled'
+                JOIN app.client_addresses a ON a.client_id = b.client_id
+                WHERE s.tenant_id = :t
+                ORDER BY s.id, b.created_at
+            )
+            UPDATE app.sessions s
+            SET travel_minutes = j.travel_minutes, address_id = j.address_id,
+                address = j.address, job_status = j.job_status
+            FROM jobs j WHERE s.id = j.id
+        """),
+        {"t": tenant_id},
+    ).rowcount
 
 
 def seed_demo(
@@ -1500,6 +1573,7 @@ def main() -> None:
         choices=sorted(DEMOS),
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
         "pets: a pet grooming salon with owners and their pets; "
+        "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
         "owner: a pilates chain with five branches and a barbershop with three; "
         "platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",

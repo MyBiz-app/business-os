@@ -68,3 +68,9 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `pets.py <owner email>` (on the pet grooming demo, `--demo pets`): pets under their owners (#43) — the owner's card lists their pets and a new one is added with its details; an appointment is booked for the pet and the roster shows "pet · owner"; then the card in English/dark on a phone.
 
 `pets_app.py <owner email>` (needs `pnpm dev:app`, the pet grooming demo): a new owner adds their dog under "My pets" in the client app and books a grooming appointment for it.
+
+`onsite_jobs.py <owner email>` (on the air-conditioning demo, `--demo jobs`): on-site jobs (#42) — a client's addresses and a new one; a job booked at that address; the job's page with the address, navigation links and on the way → in progress → done (checks the client in); then the job in English/dark on a phone.
+
+`onsite_app.py <owner email>` (needs `pnpm dev:app`, the demo): a new client adds their home under "My addresses" and books an AC service there.
+
+`jobs_app.py <owner email>` (needs `pnpm dev:business`, the demo): the owner opens the team's jobs of the day in the business app and moves one on its way.

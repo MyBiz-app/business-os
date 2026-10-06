@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
-from app.seed import GROOMING_SALON, PADEL_CLUB, seed, seed_demo
+from app.seed import AC_COMPANY, GROOMING_SALON, PADEL_CLUB, seed, seed_demo
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -201,3 +201,26 @@ def test_demo_salon_books_owners_pets(engine: Engine) -> None:
     # A groomer needs to know which pet comes: every owner has one, every booking names one.
     assert pets >= GROOMING_SALON.clients and owners_without == 0
     assert bookings > 100 and without_pet == 0 and foreign == 0
+
+
+def test_demo_ac_company_has_jobs_at_addresses(engine: Engine) -> None:
+    owner = uuid4()
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'ac-owner@example.com')"),
+            {"id": owner},
+        )
+        tenant_id = seed(connection, "ac-owner@example.com", 1, random.Random(9), AC_COMPANY)
+
+    with engine.connect() as connection:
+        jobs, without_address, done, on_site = connection.execute(
+            text("""
+                SELECT count(*) FILTER (WHERE s.job_status IS NOT NULL),
+                       count(*) FILTER (WHERE s.job_status IS NOT NULL AND s.address IS NULL),
+                       count(*) FILTER (WHERE s.job_status = 'done'),
+                       (SELECT count(*) FROM app.services WHERE tenant_id = :t AND on_site)
+                FROM app.sessions s WHERE s.tenant_id = :t
+            """),
+            {"t": tenant_id},
+        ).one()
+    assert on_site >= 3 and jobs > 100 and without_address == 0 and done > 0

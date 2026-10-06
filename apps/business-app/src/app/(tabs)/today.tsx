@@ -31,6 +31,7 @@ export default function Today() {
   const tTerms = useTranslations("terms");
   const tAttention = useTranslations("dashboard.attention");
   const tReserve = useTranslations("business.reserve");
+  const tJobs = useTranslations("jobs");
   const locale = useLocale();
   const { api, scope, tenant, palette, can, branch } = useBusiness();
   const { session: auth } = useSession();
@@ -41,8 +42,8 @@ export default function Today() {
   const [open, setOpen] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0 };
-    const [sessions, attention, courts] = await Promise.all([
+    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0, onSite: false };
+    const [sessions, attention, courts, onSite] = await Promise.all([
       can("schedule.read")
         ? api.GET("/sessions", { params: { ...scope, query: { start: todayIn(timeZone), days: DAYS } } }).then(unwrap)
         : Promise.resolve([] as ScheduledSession[]),
@@ -55,8 +56,13 @@ export default function Today() {
             .then((r) => (r.data ?? []).filter((s) => s.rooms.length > 0).length)
             .catch(() => 0)
         : Promise.resolve(0),
+      // On-site jobs (#42): a technician's day at the clients' addresses.
+      api
+        .GET("/services", { params: { ...scope, query: { active: true } } })
+        .then((r) => (r.data ?? []).some((s) => s.on_site))
+        .catch(() => false),
     ]);
-    return { sessions, attention, courts };
+    return { sessions, attention, courts, onSite };
   }, [api, scope, tenantId, timeZone, can]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
@@ -133,6 +139,8 @@ export default function Today() {
         <Heading palette={palette}>{tenant.name}</Heading>
         {branch && <Text style={[styles.muted, { color: palette.muted }]}>{branch.name}</Text>}
       </View>
+
+      {data?.onSite && <Button label={tJobs("cta")} palette={palette} onPress={() => router.push("/jobs")} />}
 
       {(data?.courts ?? 0) > 0 && (
         <Button label={tReserve("cta")} palette={palette} onPress={() => router.push("/reserve")} />

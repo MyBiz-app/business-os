@@ -11,6 +11,7 @@ import { formatMoney } from "@/lib/money";
 
 import { endSeries, recordVenuePayment, setSessionStatus, updateSession } from "../actions";
 import { SessionForm } from "../session-form";
+import { JobPanel } from "./job-panel";
 import { Roster } from "./roster";
 
 export default async function SessionPage({ params, searchParams }: PageProps<"/schedule/[id]">) {
@@ -97,6 +98,8 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           )}
         </section>
       )}
+
+      <JobPanel session={session} manageable={canManageBookings(tenant)} />
 
       <Roster
         session={session}

@@ -36,6 +36,8 @@ class DefaultService:
     capacity: int = 1
     max_minutes: int | None = None  # resource only
     step_minutes: int | None = None  # resource only
+    on_site: bool = False  # appointment only: at the client's address (#42)
+    travel_minutes: int = 0  # on-site: time to get there, before each job
 
 
 @dataclass(frozen=True)
@@ -122,6 +124,8 @@ def _service(raw: dict[str, Any]) -> DefaultService:
         capacity=raw.get("capacity", 1),
         max_minutes=raw.get("max_minutes"),
         step_minutes=raw.get("step_minutes"),
+        on_site=raw.get("on_site", False),
+        travel_minutes=raw.get("travel_minutes", 0),
     )
 
 

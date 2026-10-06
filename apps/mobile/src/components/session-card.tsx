@@ -42,6 +42,7 @@ type Props = {
 export function SessionCard({ session, onChange, showDay = false, dependents = [] }: Props) {
   const t = useTranslations("client");
   const tDependents = useTranslations("dependents");
+  const tJobs = useTranslations("jobs");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const [busy, setBusy] = useState(false);
@@ -118,6 +119,8 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
   let status: string;
   if (cancelled) status = t("sessionCancelled");
   else if (mine?.status === "waitlisted") status = t("waitlistPosition", { position: mine.waitlist_position ?? 1 });
+  else if (mine && session.job_status && session.job_status !== "scheduled")
+    status = tJobs(`clientStatus.${session.job_status}`);
   else if (kind && mineAll.some((b) => b.dependent_name))
     status = tDependents("booked", { names: mineAll.map((b) => b.dependent_name ?? tDependents("me")).join(", ") });
   else if (mine) status = t("youreBooked");
@@ -150,6 +153,8 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
             {session.service.name}
           </Text>
           {place ? <Text style={[styles.meta, { color: palette.muted }]}>{place}</Text> : null}
+          {/* An on-site job (#42): where the technician comes. */}
+          {session.address ? <Text style={[styles.meta, { color: palette.muted }]}>{session.address}</Text> : null}
           {/* Spots matter for group sessions; a 1:1 appointment has none to show. */}
           {!cancelled && session.capacity > 1 && (
             <View aria-hidden style={[styles.bar, { backgroundColor: tint(palette.muted, 0.18) }]}>

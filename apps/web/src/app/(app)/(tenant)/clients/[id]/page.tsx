@@ -15,6 +15,7 @@ import { whatsappLink } from "@/lib/whatsapp";
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { AddressesSection } from "./addresses-section";
 import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
@@ -252,6 +253,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           </section>
 
           <DependentsSection clientId={client.id} context={context} locked={erased} />
+
+          <AddressesSection clientId={client.id} context={context} locked={erased} />
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
 

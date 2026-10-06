@@ -91,9 +91,10 @@ def apply_vertical_pack(
                 INSERT INTO app.services
                     (tenant_id, name, duration_minutes, capacity, booking_mode, price_amount,
                      price_currency, color, min_minutes, max_minutes, step_minutes,
-                     price_per_hour)
+                     price_per_hour, on_site, travel_minutes)
                 VALUES (:tenant_id, :name, :minutes, :capacity, :mode, :price, :currency, :color,
-                        :min_minutes, :max_minutes, :step_minutes, :per_hour)
+                        :min_minutes, :max_minutes, :step_minutes, :per_hour, :on_site,
+                        :travel_minutes)
             """),
             {
                 "tenant_id": tenant_id,
@@ -108,6 +109,8 @@ def apply_vertical_pack(
                 "max_minutes": service.max_minutes if resource else None,
                 "step_minutes": service.step_minutes if resource else None,
                 "per_hour": service.prices.get(currency, 0) if resource else None,
+                "on_site": service.on_site,
+                "travel_minutes": service.travel_minutes if service.on_site else 0,
             },
         )
     for plan in pack.default_plans:
