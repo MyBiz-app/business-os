@@ -1,6 +1,7 @@
 const DOT = {
   success: "bg-success",
   primary: "bg-primary",
+  warning: "bg-warning",
   danger: "bg-danger",
   muted: "bg-muted",
 } as const;

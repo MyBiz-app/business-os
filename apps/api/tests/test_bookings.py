@@ -237,3 +237,10 @@ def test_filter_by_plan_and_absence(client: TestClient, studio: dict) -> None:
     assert names(plan="valid") == ["Member", "Regular"]
     assert names(plan="none") == ["Lead"]
     assert names(plan="valid", absent_days=14) == ["Member"]
+
+    # The list shows each client's valid plan and last visit at a glance.
+    rows = {c["first_name"]: c for c in client.get("/clients", headers=headers).json()["items"]}
+    assert rows["Regular"]["plan_name"] and rows["Regular"]["plan_ends_on"]
+    assert rows["Regular"]["last_visit"] == (local_today() - timedelta(days=1)).isoformat()
+    assert rows["Member"]["last_visit"] is None
+    assert rows["Lead"]["plan_name"] is None

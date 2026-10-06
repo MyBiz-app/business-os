@@ -387,7 +387,17 @@
         "noShows": "אי־הגעות",
         "rating": "דירוג ממוצע"
       }
-    }
+    },
+    "list": {
+      "plan": "מנוי",
+      "planUntil": "עד {date}",
+      "noPlan": "ללא מנוי בתוקף",
+      "lastVisit": "ביקור אחרון",
+      "never": "עוד לא הגיע/ה",
+      "today": "היום",
+      "daysAgo": "{days, plural, one {אתמול} other {לפני # ימים}}"
+    },
+    "pageOf": "עמוד {page} מתוך {pages}"
   },
   "common": {
     "save": "שמירה",
@@ -494,7 +504,8 @@
     "allBranches": "כל הסניפים",
     "someBranches": "{count} סניפים",
     "branchesHint": "איפה הם עובדים. בלי סימון: כל הסניפים.",
-    "saveBranches": "שמירה"
+    "saveBranches": "שמירה",
+    "count": "{count, plural, one {איש צוות אחד} other {# אנשי צוות}}"
   },
   "invite": {
     "title": "הוזמנת להצטרף",
@@ -1353,7 +1364,16 @@
     "showAll": "הצגת כל ה-{count}",
     "byBranch": "לפי סניף",
     "branch": "סניף",
-    "noBranch": "ללא סניף"
+    "noBranch": "ללא סניף",
+    "heatmap": {
+      "hint": "כמה הגעות היו בכל יום ושעה. ככל שהמשבצת כהה יותר, הייתה יותר תנועה.",
+      "hour": "שעה",
+      "day": "יום",
+      "cell": "{day} {hour}: {count, plural, =0 {אין הגעות} one {הגעה אחת} other {# הגעות}}",
+      "less": "פחות",
+      "more": "יותר",
+      "busiest": "הכי עמוס: {slot}"
+    }
   },
   "email": {
     "greeting": "שלום {name},",

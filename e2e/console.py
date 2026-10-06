@@ -169,7 +169,7 @@ with sync_playwright() as p:
 
     # The audit log (owners only) has every change.
     owner.goto(f"{h.BASE}/platform/audit"); h.ready(owner)
-    rows = owner.get_by_role("region", name="יומן פעולות").locator("tbody tr")
+    rows = owner.get_by_role("group", name="יומן פעולות").locator("tbody tr")
     assert rows.count() >= 5
     expect(rows.filter(has_text="האריך/ה תקופת ניסיון").first).to_be_visible()
     expect(rows.filter(has_text="ביצע/ה שינוי בעסק").first).to_be_visible()

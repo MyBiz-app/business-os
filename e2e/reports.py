@@ -32,7 +32,9 @@ with sync_playwright() as p:
     expect(page.get_by_role("heading", level=1)).to_have_text("דוחות")
     by_class = page.get_by_role("region", name="לפי שירות")
     expect(by_class.get_by_role("row")).to_have_count(6)  # header + 5 classes
-    expect(page.get_by_role("region", name="השעות העמוסות").get_by_role("rowheader").first).to_contain_text(":00")
+    busy = page.get_by_role("region", name="השעות העמוסות")  # day × hour heatmap
+    expect(busy.get_by_role("rowheader")).to_have_count(7)
+    expect(busy).to_contain_text(__import__("re").compile(r"הכי עמוס: יום \S+ \d\d:00"))
     at_risk = page.get_by_role("region", name=__import__("re").compile("שכדאי לפנות"))
     expect(at_risk.get_by_role("link").first).to_be_visible()
     expect(at_risk.locator("ul").first.get_by_role("listitem")).to_have_count(10)

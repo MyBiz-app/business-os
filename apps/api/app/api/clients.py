@@ -89,8 +89,16 @@ class Client(BaseModel):
     erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
 
 
+class ClientListItem(Client):
+    """A row of the clients list: the client plus what the list shows at a glance."""
+
+    plan_name: str | None = Field(description="The plan valid today, if any")
+    plan_ends_on: date | None
+    last_visit: date | None = Field(description="Last check-in, in the business's time zone")
+
+
 class ClientPage(BaseModel):
-    items: list[Client]
+    items: list[ClientListItem]
     total: int
 
 
@@ -190,15 +198,36 @@ def list_clients(
 
     session = context.session
     total = session.execute(text(f"SELECT count(*) FROM app.clients {where}"), params).scalar_one()
+    # The page first, then its plans and last visits: two lookups per page, not per client.
     rows = session.execute(
         text(f"""
-            SELECT {COLUMNS} FROM app.clients {where}
-            ORDER BY first_name, last_name NULLS FIRST, created_at
-            LIMIT :limit OFFSET :offset
+            WITH page AS (
+                SELECT {COLUMNS} FROM app.clients {where}
+                ORDER BY first_name, last_name NULLS FIRST, created_at
+                LIMIT :limit OFFSET :offset
+            ), today AS (
+                SELECT (now() AT TIME ZONE time_zone)::date AS day, time_zone
+                FROM app.tenants WHERE id = app.current_tenant_id()
+            )
+            SELECT page.*, plan.name AS plan_name, plan.ends_on AS plan_ends_on,
+                   (visit.at AT TIME ZONE today.time_zone)::date AS last_visit
+            FROM page CROSS JOIN today
+            LEFT JOIN LATERAL (
+                SELECT e.name, e.ends_on FROM app.entitlements e
+                WHERE e.client_id = page.id AND e.status = 'active'
+                  AND today.day BETWEEN e.starts_on AND e.ends_on
+                ORDER BY e.ends_on DESC LIMIT 1
+            ) plan ON true
+            LEFT JOIN LATERAL (
+                SELECT max(s.starts_at) AS at FROM app.bookings b
+                JOIN app.sessions s ON s.id = b.session_id
+                WHERE b.client_id = page.id AND b.status = 'checked_in'
+            ) visit ON true
+            ORDER BY page.first_name, page.last_name NULLS FIRST, page.created_at
         """),
         params,
     ).mappings()
-    return ClientPage(items=[Client.model_validate(dict(row)) for row in rows], total=total)
+    return ClientPage(items=[ClientListItem.model_validate(dict(row)) for row in rows], total=total)
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
