@@ -94,14 +94,14 @@ python -m app.jobs send-emails` prints instead of sending.
 
 ## Accounts on staging (before an email provider)
 
-Staging has no email provider yet ([#48](https://github.com/adiredri/business-os/issues/48)), so
-sign-up confirmation and password-reset emails do not arrive. Two ways to get in:
+Staging has no email provider yet ([#48](https://github.com/adiredri/business-os/issues/48)).
+Supabase's built-in email only sends to the project's team members, so for anyone else the
+sign-up **fails and no account is created** (and password-reset emails never arrive).
 
-1. **Confirm one account:** sign up on staging with your own password, then run
-   *Actions → Confirm an account on staging* with that email. Log in with the same password.
-2. **Turn confirmation off for staging:** Supabase → Authentication → Sign In / Providers →
-   Email → turn off "Confirm email". Sign-ups then log in straight away (the web app handles
-   both). Turn it back on once real email is set up.
+**Do this once:** Supabase → Authentication → Sign In / Providers → Email → turn off
+"Confirm email". Sign-up then needs no email and logs the person in straight away (the web app
+handles both). Turn it back on once real email is set up.
 
-A forgotten password cannot be reset without email: sign up again with another address (for
-example a Gmail "+" alias such as `name+demo@gmail.com`) and confirm it as above.
+*Actions → Confirm an account on staging* confirms an account that was created but not
+confirmed (e.g. from before the setting changed) and creates its app profile; it fails with
+"No account" when the sign-up never went through.
