@@ -1168,6 +1168,158 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/rooms/{room_id}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Room Hours */
+        get: operations["get_room_hours"];
+        /**
+         * Set Room Hours
+         * @description Replaces the room's weekly opening hours (blocks may not overlap).
+         */
+        put: operations["set_room_hours"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{service_id}/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Service Rooms
+         * @description Which bookable rooms serve a resource service (replaces the list).
+         */
+        put: operations["set_service_rooms"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resource Services */
+        get: operations["resource_services"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Resource Free Times */
+        get: operations["resource_free_times"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/resources/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reserve
+         * @description Reserves a room for a client (a phone call, a walk-in).
+         */
+        post: operations["reserve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Resource Services
+         * @description What the client can reserve, with the rooms that serve each.
+         */
+        get: operations["my_resource_services"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/resources/slots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Resource Free Times */
+        get: operations["my_resource_free_times"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/resources/reservations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reserve Mine
+         * @description The signed-in client reserves a free time (the business's booking rules apply).
+         */
+        post: operations["reserve_mine"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/plans": {
         parameters: {
             query?: never;
@@ -5356,6 +5508,120 @@ export interface components {
             /** Ends On */
             ends_on?: string | null;
         };
+        /** ReservationCreate */
+        ReservationCreate: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /** Minutes */
+            minutes: number;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** ReservationFields */
+        ReservationFields: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /** Minutes */
+            minutes: number;
+        };
+        /** ResourceRoom */
+        ResourceRoom: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /** Capacity */
+            capacity: number | null;
+        };
+        /** ResourceService */
+        ResourceService: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Color */
+            color: string | null;
+            /** Min Minutes */
+            min_minutes: number;
+            /** Max Minutes */
+            max_minutes: number;
+            /** Step Minutes */
+            step_minutes: number;
+            /** Price Per Hour */
+            price_per_hour: number;
+            /** Price Currency */
+            price_currency: string;
+            /** Rooms */
+            rooms: components["schemas"]["ResourceRoom"][];
+        };
+        /** ResourceSlot */
+        ResourceSlot: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /** Room Name */
+            room_name: string;
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+        };
         /** Review */
         Review: {
             /** Approve */
@@ -5460,6 +5726,8 @@ export interface components {
             capacity: number | null;
             /** Active */
             active: boolean;
+            /** Bookable */
+            bookable: boolean;
         };
         /** RoomCreate */
         RoomCreate: {
@@ -5467,6 +5735,21 @@ export interface components {
             name: string;
             /** Capacity */
             capacity?: number | null;
+            /**
+             * Bookable
+             * @description Reserved by the hour (a court, a room)
+             */
+            bookable?: boolean | null;
+        };
+        /** RoomHours */
+        RoomHours: {
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /** Blocks */
+            blocks: components["schemas"]["HoursBlock"][];
         };
         /** RoomOption */
         RoomOption: {
@@ -5491,6 +5774,8 @@ export interface components {
             capacity?: number | null;
             /** Active */
             active?: boolean | null;
+            /** Bookable */
+            bookable?: boolean | null;
         };
         /** Sale */
         Sale: {
@@ -5620,15 +5905,22 @@ export interface components {
             notes: string | null;
             /**
              * Booking Mode
-             * @description appointment: a one-to-one booking with the instructor
+             * @description appointment: a one-to-one booking with the instructor; resource: a room or court reserved by the hour
              * @enum {string}
              */
-            booking_mode: "class" | "appointment";
+            booking_mode: "class" | "appointment" | "resource";
             /**
              * Appointment Client
-             * @description For an appointment: who it is with
+             * @description For an appointment or a reservation: who it is with
              */
             appointment_client: string | null;
+            /**
+             * Price Amount
+             * @description For a reservation: its price, fixed when it was made
+             */
+            price_amount?: number | null;
+            /** Price Currency */
+            price_currency?: string | null;
         };
         /** Selection */
         Selection: {
@@ -5712,7 +6004,7 @@ export interface components {
              * Booking Mode
              * @enum {string}
              */
-            booking_mode: "class" | "appointment";
+            booking_mode: "class" | "appointment" | "resource";
             /** Price Amount */
             price_amount: number;
             /** Price Currency */
@@ -5731,6 +6023,14 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+            /** Min Minutes */
+            min_minutes?: number | null;
+            /** Max Minutes */
+            max_minutes?: number | null;
+            /** Step Minutes */
+            step_minutes?: number | null;
+            /** Price Per Hour */
+            price_per_hour?: number | null;
         };
         /** ServiceCreate */
         ServiceCreate: {
@@ -5752,7 +6052,7 @@ export interface components {
              * @default class
              * @enum {string}
              */
-            booking_mode: "class" | "appointment";
+            booking_mode: "class" | "appointment" | "resource";
             /**
              * Price Amount
              * @description Price in minor units (agorot, cents)
@@ -5769,6 +6069,26 @@ export interface components {
              * @default true
              */
             active: boolean;
+            /**
+             * Min Minutes
+             * @description Resource only
+             */
+            min_minutes?: number | null;
+            /**
+             * Max Minutes
+             * @description Resource only
+             */
+            max_minutes?: number | null;
+            /**
+             * Step Minutes
+             * @description Resource only
+             */
+            step_minutes?: number | null;
+            /**
+             * Price Per Hour
+             * @description Resource only: minor units per hour
+             */
+            price_per_hour?: number | null;
         };
         /** ServiceOption */
         ServiceOption: {
@@ -5809,11 +6129,19 @@ export interface components {
             /** Capacity */
             capacity?: number | null;
             /** Booking Mode */
-            booking_mode?: ("class" | "appointment") | null;
+            booking_mode?: ("class" | "appointment" | "resource") | null;
             /** Price Amount */
             price_amount?: number | null;
             /** Active */
             active?: boolean | null;
+            /** Min Minutes */
+            min_minutes?: number | null;
+            /** Max Minutes */
+            max_minutes?: number | null;
+            /** Step Minutes */
+            step_minutes?: number | null;
+            /** Price Per Hour */
+            price_per_hour?: number | null;
         };
         /** SessionCreate */
         SessionCreate: {
@@ -9364,6 +9692,329 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AppointmentService"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_room_hours: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                room_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_room_hours: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                room_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HoursBlock"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_service_rooms: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceRoom"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resource_services: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceService"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resource_free_times: {
+        parameters: {
+            query: {
+                service_id: string;
+                date: string;
+                minutes: number;
+                room_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceSlot"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reserve: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_resource_services: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceService"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_resource_free_times: {
+        parameters: {
+            query: {
+                service_id: string;
+                date: string;
+                minutes: number;
+                room_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceSlot"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reserve_mine: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReservationFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
                 };
             };
             /** @description Validation Error */

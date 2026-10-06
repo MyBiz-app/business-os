@@ -233,7 +233,8 @@ def list_entitlements(db: Session, client_id: UUID) -> list[Entitlement]:
 def usable_entitlement(db: Session, client_id: UUID, session_id: UUID) -> UUID | None:
     """The entitlement a booking into this session should use: valid on the session's local
     date, not frozen, with a credit left. Unlimited memberships first, then the card that
-    expires soonest. Serialized per client, so two bookings never take the same last credit."""
+    expires soonest. Serialized per client, so two bookings never take the same last credit.
+    Reservations of a court or room (migration 0044) never use a plan."""
     db.execute(
         text("SELECT pg_advisory_xact_lock(hashtextextended(CAST(:id AS text), 0))"),
         {"id": client_id},
@@ -243,7 +244,7 @@ def usable_entitlement(db: Session, client_id: UUID, session_id: UUID) -> UUID |
             WITH day AS (
                 SELECT (s.starts_at AT TIME ZONE t.time_zone)::date AS value
                 FROM app.sessions s JOIN app.tenants t ON t.id = s.tenant_id
-                WHERE s.id = :session_id
+                WHERE s.id = :session_id AND NOT s.reserved  -- reservations are paid by the hour
             )
             SELECT e.id FROM app.entitlements e, day
             WHERE e.client_id = :client_id AND e.status = 'active'

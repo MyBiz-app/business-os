@@ -26,6 +26,7 @@ from app.api import (
     promo_codes,
     receipts,
     reports,
+    resources,
     reviews,
     samples,
     schedule,
@@ -92,6 +93,8 @@ def create_app() -> FastAPI:
     app.include_router(bookings.router)
     app.include_router(appointments.router)
     app.include_router(appointments.client_router)
+    app.include_router(resources.router)
+    app.include_router(resources.client_router)
     app.include_router(plans.router)
     app.include_router(promo_codes.router)
     app.include_router(reports.router)

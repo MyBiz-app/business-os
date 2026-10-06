@@ -17,7 +17,7 @@ ReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 
 LOCATION_COLUMNS = "id, name, address, active, created_at, updated_at"
-ROOM_COLUMNS = "id, location_id, name, capacity, active"
+ROOM_COLUMNS = "id, location_id, name, capacity, active, bookable"
 
 
 def _strip_required(value: str) -> str:
@@ -55,6 +55,9 @@ class LocationUpdate(BaseModel):
 class RoomCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     capacity: int | None = Field(default=None, ge=1, le=1000)
+    bookable: bool | None = Field(
+        default=None, description="Reserved by the hour (a court, a room)"
+    )
 
     @field_validator("name")
     @classmethod
@@ -66,6 +69,7 @@ class RoomUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     capacity: int | None = Field(default=None, ge=1, le=1000)
     active: bool | None = None
+    bookable: bool | None = None
 
 
 class Room(BaseModel):
@@ -74,6 +78,7 @@ class Room(BaseModel):
     name: str
     capacity: int | None
     active: bool
+    bookable: bool
 
 
 class Location(BaseModel):
@@ -167,8 +172,9 @@ def create_room(location_id: UUID, body: RoomCreate, context: WriteDep) -> Room:
     row = (
         context.session.execute(
             text(f"""
-                INSERT INTO app.rooms (tenant_id, location_id, name, capacity)
-                SELECT l.tenant_id, l.id, :name, :capacity FROM app.locations l WHERE l.id = :id
+                INSERT INTO app.rooms (tenant_id, location_id, name, capacity, bookable)
+                SELECT l.tenant_id, l.id, :name, :capacity, coalesce(:bookable, false)
+                FROM app.locations l WHERE l.id = :id
                 RETURNING {ROOM_COLUMNS}
             """),
             {**body.model_dump(), "id": location_id},
@@ -186,7 +192,7 @@ def update_room(room_id: UUID, body: RoomUpdate, context: WriteDep) -> Room:
     changes = {
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()
-        if not (key in {"name", "active"} and value is None)
+        if not (key in {"name", "active", "bookable"} and value is None)
     }
     sql = f"UPDATE app.rooms SET {set_clause(changes)} WHERE id = :id RETURNING {ROOM_COLUMNS}"
     row = (

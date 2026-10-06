@@ -288,7 +288,7 @@ def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
         """),
         {"id": session_id},
     ).scalar()
-    if mode == "appointment":  # appointments are booked at a free time (POST /appointments)
+    if mode != "class":  # appointments and reservations are booked at a free time
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_bookable")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
     requires_plan = context.session.execute(
