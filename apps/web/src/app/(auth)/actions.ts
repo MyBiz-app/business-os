@@ -16,10 +16,14 @@ const KNOWN_ERRORS = new Set([
   "weak_password",
   "user_already_exists",
   "over_email_send_rate_limit",
+  "email_send_failed",
 ]);
 
 /** Maps a Supabase auth error to a translation key under `auth.errors`. */
 function errorKey(error: AuthError): string {
+  // The email could not be sent (e.g. no email provider yet: Supabase's built-in one only
+  // sends to the project's team), so the account was not created.
+  if (error.code === "email_address_not_authorized" || /sending.*email/i.test(error.message)) return "email_send_failed";
   return error.code && KNOWN_ERRORS.has(error.code) ? error.code : "generic";
 }
 
