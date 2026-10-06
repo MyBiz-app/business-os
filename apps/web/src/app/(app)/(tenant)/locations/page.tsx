@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { DoorOpen, MapPin } from "lucide-react";
 import Link from "next/link";
 
 import { unwrap } from "@/lib/api";
@@ -27,18 +28,24 @@ export default async function LocationsPage() {
       {locations.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("locations.empty")}</p>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-4 sm:grid-cols-2">
           {locations.map((location) => (
             <li key={location.id}>
               <Link
                 href={`/locations/${location.id}`}
-                className={`flex flex-col gap-1 card card-hover p-4 ${location.active ? "" : "opacity-60"}`}
+                className={`flex h-full items-start gap-3 card card-hover p-5 ${location.active ? "" : "opacity-60"}`}
               >
-                <span className="font-semibold">{location.name}</span>
-                {location.address && <span className="text-sm text-muted">{location.address}</span>}
-                <span className="text-sm text-muted">
-                  {t("locations.roomsCount", { count: location.rooms.length })}
-                  {!location.active && ` · ${t("common.inactive")}`}
+                <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <MapPin className="size-5" />
+                </span>
+                <span className="flex min-w-0 flex-1 flex-col gap-1">
+                  <span className="font-semibold">{location.name}</span>
+                  {location.address && <span className="text-sm text-muted">{location.address}</span>}
+                  <span className="inline-flex items-center gap-1.5 text-sm text-muted">
+                    <DoorOpen aria-hidden="true" className="size-4" />
+                    {t("locations.roomsCount", { count: location.rooms.length })}
+                    {!location.active && ` · ${t("common.inactive")}`}
+                  </span>
                 </span>
               </Link>
             </li>

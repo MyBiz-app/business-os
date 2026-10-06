@@ -6638,7 +6638,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Plan"
+                    "$ref": "#/components/schemas/PlanListItem"
                   },
                   "title": "Response List Plans"
                 }
@@ -19057,6 +19057,102 @@
           "validity_days"
         ],
         "title": "PlanCreate"
+      },
+      "PlanListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "membership",
+              "punch_card"
+            ],
+            "title": "Kind"
+          },
+          "price_amount": {
+            "type": "integer",
+            "title": "Price Amount"
+          },
+          "price_currency": {
+            "type": "string",
+            "title": "Price Currency"
+          },
+          "validity_days": {
+            "type": "integer",
+            "title": "Validity Days"
+          },
+          "credits": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits"
+          },
+          "active": {
+            "type": "boolean",
+            "title": "Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "holders": {
+            "type": "integer",
+            "title": "Holders",
+            "description": "Clients holding this plan valid today (current branch)"
+          },
+          "sold_last_30_days": {
+            "type": "integer",
+            "title": "Sold Last 30 Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "kind",
+          "price_amount",
+          "price_currency",
+          "validity_days",
+          "credits",
+          "active",
+          "created_at",
+          "updated_at",
+          "holders",
+          "sold_last_30_days"
+        ],
+        "title": "PlanListItem",
+        "description": "A plan in the catalog list, with how it sells (counts only, no money)."
       },
       "PlanUpdate": {
         "properties": {

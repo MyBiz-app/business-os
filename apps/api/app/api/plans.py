@@ -87,6 +87,13 @@ class Plan(BaseModel):
     updated_at: datetime
 
 
+class PlanListItem(Plan):
+    """A plan in the catalog list, with how it sells (counts only, no money)."""
+
+    holders: int = Field(description="Clients holding this plan valid today (current branch)")
+    sold_last_30_days: int
+
+
 EntitlementState = Literal["active", "upcoming", "frozen", "used_up", "expired", "cancelled"]
 
 
@@ -262,18 +269,37 @@ def usable_entitlement(db: Session, client_id: UUID, session_id: UUID) -> UUID |
 @router.get("/plans")
 def list_plans(
     context: CatalogReadDep, active: Annotated[bool | None, Query()] = None
-) -> list[Plan]:
+) -> list[PlanListItem]:
     where, params = (
-        ("WHERE active = :active", {"active": active}) if active is not None else ("", {})
+        ("WHERE p.active = :active", {"active": active}) if active is not None else ("", {})
     )
+    # One pass over the entitlements for all plans; "today" in the business's time zone.
+    columns = ", ".join(f"p.{column.strip()}" for column in PLAN_COLUMNS.split(","))
     rows = context.session.execute(
         text(f"""
-            SELECT {PLAN_COLUMNS} FROM app.plans {where}
-            ORDER BY active DESC, kind, price_amount DESC, name
+            WITH today AS (
+                SELECT (now() AT TIME ZONE time_zone)::date AS day
+                FROM app.tenants WHERE id = app.current_tenant_id()
+            ), sales AS (
+                SELECT e.plan_id,
+                       count(*) FILTER (
+                           WHERE e.status = 'active' AND today.day BETWEEN e.starts_on AND e.ends_on
+                       ) AS holders,
+                       count(*) FILTER (
+                           WHERE e.created_at > now() - interval '30 days'
+                       ) AS sold_last_30_days
+                FROM app.entitlements e CROSS JOIN today
+                WHERE e.location_id IS NULL OR app.in_branch(e.location_id)
+                GROUP BY e.plan_id
+            )
+            SELECT {columns}, coalesce(s.holders, 0) AS holders,
+                   coalesce(s.sold_last_30_days, 0) AS sold_last_30_days
+            FROM app.plans p LEFT JOIN sales s ON s.plan_id = p.id {where}
+            ORDER BY p.active DESC, p.kind, p.price_amount DESC, p.name
         """),
         params,
     ).mappings()
-    return [Plan.model_validate(dict(row)) for row in rows]
+    return [PlanListItem.model_validate(dict(row)) for row in rows]
 
 
 @router.post("/plans", status_code=status.HTTP_201_CREATED)

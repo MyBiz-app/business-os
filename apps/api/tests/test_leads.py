@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
-from tests.conftest import AuthHeaders
+from tests.conftest import STUDIO, AuthHeaders
 from tests.test_client_app import join_code
 
 
@@ -166,3 +166,18 @@ def test_lead_owners_are_the_team(client: TestClient, studio: dict) -> None:
     with_crm(client, studio)
     owners = client.get("/leads/owners", headers=studio["headers"]).json()
     assert {o["user_id"] for o in owners} == {str(studio["owner"]), str(studio["coach"])}
+
+
+def test_lead_owners_are_this_business_only(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    """The owner's memberships in their other businesses don't repeat them in the list."""
+    with_crm(client, studio)
+    other = client.post(
+        "/tenants", json={**STUDIO, "name": "Second"}, headers=auth(studio["owner"])
+    )
+    assert other.status_code == 201, other.text
+    owners = client.get("/leads/owners", headers=studio["headers"]).json()
+    assert sorted(o["user_id"] for o in owners) == sorted(
+        [str(studio["owner"]), str(studio["coach"])]
+    )

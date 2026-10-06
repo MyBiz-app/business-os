@@ -207,7 +207,11 @@ def _check_owner(db: Session, owner_user_id: UUID | None) -> None:
     if owner_user_id is None:
         return
     member = db.execute(
-        text("SELECT 1 FROM app.tenant_members WHERE user_id = :id"), {"id": owner_user_id}
+        text(
+            "SELECT 1 FROM app.tenant_members"
+            " WHERE tenant_id = app.current_tenant_id() AND user_id = :id"
+        ),
+        {"id": owner_user_id},
     ).scalar()
     if member is None:
         raise HTTPException(status_code=422, detail="unknown_owner")
@@ -306,9 +310,12 @@ def lead_owners(context: ReadDep) -> list[LeadOwner]:
     """Team members a lead can be assigned to."""
     rows = context.session.execute(
         text("""
+            -- RLS also shows the caller's own memberships in their other businesses.
             SELECT m.user_id,
                    coalesce(nullif(trim(u.full_name), ''), split_part(u.email, '@', 1)) AS name
-            FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id ORDER BY 2
+            FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
+            WHERE m.tenant_id = app.current_tenant_id()
+            ORDER BY 2
         """)
     ).mappings()
     return [LeadOwner.model_validate(dict(r)) for r in rows]

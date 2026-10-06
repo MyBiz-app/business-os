@@ -5051,6 +5051,53 @@ export interface components {
             active: boolean;
         };
         /**
+         * PlanListItem
+         * @description A plan in the catalog list, with how it sells (counts only, no money).
+         */
+        PlanListItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "membership" | "punch_card";
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /** Validity Days */
+            validity_days: number;
+            /** Credits */
+            credits: number | null;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Holders
+             * @description Clients holding this plan valid today (current branch)
+             */
+            holders: number;
+            /** Sold Last 30 Days */
+            sold_last_30_days: number;
+        };
+        /**
          * PlanUpdate
          * @description The kind and credits are fixed once a plan exists; create a new plan instead.
          */
@@ -9351,7 +9398,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Plan"][];
+                    "application/json": components["schemas"]["PlanListItem"][];
                 };
             };
             /** @description Validation Error */

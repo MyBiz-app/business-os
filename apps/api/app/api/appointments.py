@@ -100,7 +100,11 @@ def set_staff_hours(user_id: UUID, blocks: list[HoursBlock], context: WriteDep) 
     """Replaces the staff member's weekly working hours (blocks may not overlap)."""
     db = context.session
     member = db.execute(
-        text("SELECT 1 FROM app.tenant_members WHERE user_id = :id"), {"id": user_id}
+        text(
+            "SELECT 1 FROM app.tenant_members"
+            " WHERE tenant_id = app.current_tenant_id() AND user_id = :id"
+        ),
+        {"id": user_id},
     ).scalar()
     if member is None:
         raise not_found()
@@ -167,7 +171,11 @@ def add_time_off(user_id: UUID, body: TimeOffCreate, context: WriteDep) -> TimeO
     them), but no new ones are offered."""
     db = context.session
     member = db.execute(
-        text("SELECT 1 FROM app.tenant_members WHERE user_id = :id"), {"id": user_id}
+        text(
+            "SELECT 1 FROM app.tenant_members"
+            " WHERE tenant_id = app.current_tenant_id() AND user_id = :id"
+        ),
+        {"id": user_id},
     ).scalar()
     if member is None:
         raise not_found()
