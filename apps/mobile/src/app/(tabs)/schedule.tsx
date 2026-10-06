@@ -19,6 +19,7 @@ const DAYS = 14;
 export default function Schedule() {
   const t = useTranslations("client.schedule");
   const tAppointment = useTranslations("client.appointment");
+  const tCourt = useTranslations("client.court");
   const tTerms = useTranslations("terms");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
@@ -26,14 +27,20 @@ export default function Schedule() {
   const [day, setDay] = useState(today);
 
   const load = useCallback(async () => {
-    if (!business) return { sessions: [], closed: [], appointments: [] };
+    if (!business) return { sessions: [], closed: [], appointments: [], courts: [] };
     const query = { start: todayIn(business.time_zone), days: DAYS };
-    const [sessions, closed, appointments] = await Promise.all([
+    const [sessions, closed, appointments, courts] = await Promise.all([
       api.GET("/client/sessions", { params: { ...scope, query } }),
       api.GET("/client/closed-days", { params: { ...scope, query } }),
       api.GET("/client/appointments/services", { params: scope }),
+      api.GET("/client/resources", { params: scope }),
     ]);
-    return { sessions: unwrap(sessions), closed: unwrap(closed), appointments: appointments.data ?? [] };
+    return {
+      sessions: unwrap(sessions),
+      closed: unwrap(closed),
+      appointments: appointments.data ?? [],
+      courts: courts.data ?? [],
+    };
   }, [api, scope, business]);
   const { data, loading, reload } = useLoad(load);
   const [overrides, setOverrides] = useState<Record<string, ClientSession>>({});
@@ -66,6 +73,20 @@ export default function Schedule() {
           <View style={local.ctaText}>
             <Text style={[local.ctaTitle, { color: palette.onPrimary }]}>{tAppointment("cta")}</Text>
             <Text style={[local.ctaSub, { color: palette.onPrimary }]}>{tAppointment("ctaText")}</Text>
+          </View>
+          <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={22} color={palette.onPrimary} />
+        </PressableScale>
+      )}
+      {(data?.courts.length ?? 0) > 0 && (
+        <PressableScale
+          accessibilityRole="button"
+          onPress={() => router.push("/court")}
+          style={[local.cta, elevation.raised, { backgroundColor: palette.primary }]}
+        >
+          <Ionicons name="tennisball-outline" size={28} color={palette.onPrimary} />
+          <View style={local.ctaText}>
+            <Text style={[local.ctaTitle, { color: palette.onPrimary }]}>{tCourt("cta")}</Text>
+            <Text style={[local.ctaSub, { color: palette.onPrimary }]}>{tCourt("ctaText")}</Text>
           </View>
           <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={22} color={palette.onPrimary} />
         </PressableScale>

@@ -9,7 +9,7 @@ client into it, like appointments do with a staff member's time."""
 import datetime as dt
 from datetime import UTC, datetime, time, timedelta
 from itertools import pairwise
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -24,6 +24,7 @@ from app.api.client_app import ClientSession, _load_session
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
 from app.api.health import ensure_may_book
+from app.api.plans import issue_receipts_now
 from app.appointments import Hours, free_starts
 from app.notifications import notify_booking
 from app.permissions import Permission
@@ -35,6 +36,7 @@ client_router = APIRouter(prefix="/client", tags=["client"])
 ReadDep = Annotated[TenantContext, Depends(require(Permission.SCHEDULE_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 ManageDep = Annotated[TenantContext, Depends(require(Permission.BOOKINGS_MANAGE))]
+SalesDep = Annotated[TenantContext, Depends(require(Permission.SALES_MANAGE))]
 
 
 class RoomHours(BaseModel):
@@ -81,6 +83,35 @@ class ReservationFields(BaseModel):
 
 class ReservationCreate(ReservationFields):
     client_id: UUID
+
+
+class ClientReservationCreate(ReservationFields):
+    pay: bool = Field(
+        default=False,
+        description="The client agreed to pay now (required when the business is paid in the app)",
+    )
+    idempotency_key: str | None = Field(
+        default=None, min_length=8, max_length=80, description="Same key, same payment"
+    )
+
+
+class ReservationPayment(BaseModel):
+    payment_id: UUID
+    amount: int
+    currency: str
+    method: str
+    simulated: bool
+    receipt_id: UUID
+    receipt_number: int
+
+
+class ClientReservation(BaseModel):
+    session: ClientSession
+    payment: ReservationPayment | None = Field(description="None when paid at the venue")
+
+
+class VenuePayment(BaseModel):
+    method: Literal["card", "cash", "transfer", "other"] = "cash"
 
 
 # --- Opening hours --------------------------------------------------------------------------
@@ -370,11 +401,102 @@ def my_resource_free_times(
     return resource_slots(context.session, service_id, day, minutes, room_id)
 
 
+def _payment(db: Session, payment_id: UUID) -> ReservationPayment:
+    """The payment as its receipt shows it (clients read their receipts, not payments)."""
+    issue_receipts_now(db)
+    row = (
+        db.execute(
+            text("""
+                SELECT payment_id, amount, currency, method, simulated,
+                       id AS receipt_id, number AS receipt_number
+                FROM app.receipts WHERE payment_id = :id
+            """),
+            {"id": payment_id},
+        )
+        .mappings()
+        .one()
+    )
+    return ReservationPayment.model_validate(dict(row))
+
+
+@router.post("/resources/reservations/{booking_id}/payment", status_code=status.HTTP_201_CREATED)
+def pay_at_venue(booking_id: UUID, body: VenuePayment, context: SalesDep) -> ReservationPayment:
+    """Records that a reservation was paid at the venue (once; a receipt is issued)."""
+    db = context.session
+    row = (
+        db.execute(
+            text("""
+                SELECT b.client_id, s.location_id, s.price_amount, s.price_currency,
+                       sv.name || ' · ' || r.name || ' · '
+                           || to_char(s.starts_at AT TIME ZONE t.time_zone, 'DD/MM HH24:MI')
+                           AS description,
+                       (SELECT p.id FROM app.payments p
+                        WHERE p.booking_id = b.id AND p.status = 'succeeded') AS paid
+                FROM app.bookings b
+                JOIN app.sessions s ON s.id = b.session_id AND s.reserved
+                JOIN app.services sv ON sv.id = s.service_id
+                JOIN app.rooms r ON r.id = s.room_id
+                JOIN app.tenants t ON t.id = b.tenant_id
+                WHERE b.id = :id AND b.status <> 'cancelled'
+            """),
+            {"id": booking_id},
+        )
+        .mappings()
+        .first()
+    )
+    if row is None:
+        raise not_found()
+    if row["paid"] is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="already_paid")
+    payment_id = db.execute(
+        text("""
+            INSERT INTO app.payments
+                (tenant_id, client_id, amount, currency, status, provider, method,
+                 idempotency_key, created_by, booking_id, description, location_id)
+            VALUES (:tenant_id, :client_id, :amount, :currency, 'succeeded', 'venue', :method,
+                    'venue-' || CAST(:booking_id AS text), app.current_user_id(), :booking_id,
+                    :description, :location_id)
+            RETURNING id
+        """),
+        {
+            "tenant_id": context.tenant_id,
+            "client_id": row["client_id"],
+            "amount": row["price_amount"] or 0,
+            "currency": row["price_currency"],
+            "method": body.method,
+            "booking_id": booking_id,
+            "description": row["description"],
+            "location_id": row["location_id"],
+        },
+    ).scalar_one()
+    return _payment(db, payment_id)
+
+
 @client_router.post("/resources/reservations", status_code=status.HTTP_201_CREATED)
-def reserve_mine(body: ReservationFields, context: ClientDep) -> ClientSession:
-    """The signed-in client reserves a free time (the business's booking rules apply)."""
+def reserve_mine(body: ClientReservationCreate, context: ClientDep) -> ClientReservation:
+    """The signed-in client reserves a free time (the business's booking rules apply). When
+    the business is paid in the app, the client pays now (simulated until a payment provider
+    is connected): no payment, no reservation."""
     db = context.session
     ensure_may_book(db, context.tenant_id, context.client_id)
+    in_app = (
+        db.execute(
+            text("SELECT resource_payment FROM app.tenants WHERE id = :id"),
+            {"id": context.tenant_id},
+        ).scalar_one()
+        == "app"
+    )
+    if in_app and not (body.pay and body.idempotency_key):
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="payment_required")
     session_id = create_resource_session(db, body)
-    place_booking(db, context.tenant_id, session_id, context.client_id, requires_plan=False)
-    return _load_session(db, session_id)
+    booking_id = place_booking(
+        db, context.tenant_id, session_id, context.client_id, requires_plan=False
+    )
+    payment = None
+    if in_app:
+        payment_id = db.execute(
+            text("SELECT app.pay_reservation(:booking, :key)"),
+            {"booking": booking_id, "key": body.idempotency_key},
+        ).scalar_one()
+        payment = _payment(db, payment_id)
+    return ClientReservation(session=_load_session(db, session_id), payment=payment)

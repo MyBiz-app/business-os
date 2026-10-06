@@ -115,6 +115,7 @@ class ScheduledSession(BaseModel):
         default=None, description="For a reservation: its price, fixed when it was made"
     )
     price_currency: str | None = None
+    paid: bool | None = Field(default=None, description="For a reservation: whether it is paid")
 
 
 class OptionItem(BaseModel):
@@ -156,6 +157,10 @@ SESSION_SELECT = """
            bk.booked, bk.waitlisted, ss.open_ended AS series_open_ended,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
            sv.booking_mode, s.price_amount, s.price_currency,
+           CASE WHEN s.reserved THEN EXISTS (
+               SELECT 1 FROM app.payments p JOIN app.bookings b ON b.id = p.booking_id
+               WHERE b.session_id = s.id AND p.status = 'succeeded'
+           ) END AS paid,
            CASE WHEN sv.booking_mode <> 'class' THEN (
                SELECT trim(c.first_name || ' ' || coalesce(c.last_name, ''))
                FROM app.bookings b JOIN app.clients c ON c.id = b.client_id

@@ -7103,6 +7103,94 @@
         }
       }
     },
+    "/resources/reservations/{booking_id}/payment": {
+      "post": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Pay At Venue",
+        "description": "Records that a reservation was paid at the venue (once; a receipt is issued).",
+        "operationId": "pay_at_venue",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "booking_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Booking Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VenuePayment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationPayment"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/resources": {
       "get": {
         "tags": [
@@ -7262,7 +7350,7 @@
           "client"
         ],
         "summary": "Reserve Mine",
-        "description": "The signed-in client reserves a free time (the business's booking rules apply).",
+        "description": "The signed-in client reserves a free time (the business's booking rules apply). When\nthe business is paid in the app, the client pays now (simulated until a payment provider\nis connected): no payment, no reservation.",
         "operationId": "reserve_mine",
         "security": [
           {
@@ -7286,7 +7374,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReservationFields"
+                "$ref": "#/components/schemas/ClientReservationCreate"
               }
             }
           }
@@ -7297,7 +7385,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ClientSession"
+                  "$ref": "#/components/schemas/ClientReservation"
                 }
               }
             }
@@ -15289,6 +15377,16 @@
             "title": "Online Sales",
             "description": "The client can buy plans in the app"
           },
+          "resource_payment": {
+            "type": "string",
+            "enum": [
+              "app",
+              "venue"
+            ],
+            "title": "Resource Payment",
+            "description": "Reservations: paid in the app when booking, or at the venue",
+            "default": "app"
+          },
           "client_id": {
             "type": "string",
             "format": "uuid",
@@ -15868,6 +15966,83 @@
           "total"
         ],
         "title": "ClientPage"
+      },
+      "ClientReservation": {
+        "properties": {
+          "session": {
+            "$ref": "#/components/schemas/ClientSession"
+          },
+          "payment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReservationPayment"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "None when paid at the venue"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session",
+          "payment"
+        ],
+        "title": "ClientReservation"
+      },
+      "ClientReservationCreate": {
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Service Id"
+          },
+          "room_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Room Id"
+          },
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "minutes": {
+            "type": "integer",
+            "maximum": 1440.0,
+            "minimum": 15.0,
+            "title": "Minutes"
+          },
+          "pay": {
+            "type": "boolean",
+            "title": "Pay",
+            "description": "The client agreed to pay now (required when the business is paid in the app)",
+            "default": false
+          },
+          "idempotency_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 8
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idempotency Key",
+            "description": "Same key, same payment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service_id",
+          "room_id",
+          "starts_at",
+          "minutes"
+        ],
+        "title": "ClientReservationCreate"
       },
       "ClientSession": {
         "properties": {
@@ -20670,38 +20845,50 @@
         ],
         "title": "ReservationCreate"
       },
-      "ReservationFields": {
+      "ReservationPayment": {
         "properties": {
-          "service_id": {
+          "payment_id": {
             "type": "string",
             "format": "uuid",
-            "title": "Service Id"
+            "title": "Payment Id"
           },
-          "room_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Room Id"
-          },
-          "starts_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Starts At"
-          },
-          "minutes": {
+          "amount": {
             "type": "integer",
-            "maximum": 1440.0,
-            "minimum": 15.0,
-            "title": "Minutes"
+            "title": "Amount"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "simulated": {
+            "type": "boolean",
+            "title": "Simulated"
+          },
+          "receipt_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Receipt Id"
+          },
+          "receipt_number": {
+            "type": "integer",
+            "title": "Receipt Number"
           }
         },
         "type": "object",
         "required": [
-          "service_id",
-          "room_id",
-          "starts_at",
-          "minutes"
+          "payment_id",
+          "amount",
+          "currency",
+          "method",
+          "simulated",
+          "receipt_id",
+          "receipt_number"
         ],
-        "title": "ReservationFields"
+        "title": "ReservationPayment"
       },
       "ResourceRoom": {
         "properties": {
@@ -21705,6 +21892,18 @@
               }
             ],
             "title": "Price Currency"
+          },
+          "paid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paid",
+            "description": "For a reservation: whether it is paid"
           }
         },
         "type": "object",
@@ -23178,6 +23377,16 @@
             "title": "Online Sales",
             "description": "Clients can buy plans in the app"
           },
+          "resource_payment": {
+            "type": "string",
+            "enum": [
+              "app",
+              "venue"
+            ],
+            "title": "Resource Payment",
+            "description": "Reservations of courts and rooms: paid in the app or at the venue",
+            "default": "app"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -23458,6 +23667,21 @@
               }
             ],
             "title": "Online Sales"
+          },
+          "resource_payment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "app",
+                  "venue"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource Payment"
           }
         },
         "type": "object",
@@ -23671,6 +23895,23 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VenuePayment": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "card",
+              "cash",
+              "transfer",
+              "other"
+            ],
+            "title": "Method",
+            "default": "cash"
+          }
+        },
+        "type": "object",
+        "title": "VenuePayment"
       },
       "VoidInvoice": {
         "properties": {
