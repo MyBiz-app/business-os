@@ -356,7 +356,20 @@
     "absentAny": "בכל זמן",
     "absentDays": "לא הגיעו {days} ימים",
     "homeBranch": "סניף הבית",
-    "allBranches": "כל הסניפים"
+    "allBranches": "כל הסניפים",
+    "profile": {
+      "contact": "יצירת קשר",
+      "call": "שיחה",
+      "email": "מייל",
+      "never": "עוד לא",
+      "stats": {
+        "visits": "ביקורים",
+        "lastVisit": "ביקור אחרון",
+        "upcoming": "רישומים קרובים",
+        "noShows": "אי־הגעות",
+        "rating": "דירוג ממוצע"
+      }
+    }
   },
   "common": {
     "save": "שמירה",

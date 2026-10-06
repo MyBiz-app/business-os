@@ -15,7 +15,7 @@ import helpers as h
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
 owner_email, member_email = (f"{n}{stamp}@example.com" for n in ("owner", "member"))
-tomorrow = (dt.date.today() + dt.timedelta(days=2)).isoformat()
+tomorrow = (h.local_today() + dt.timedelta(days=2)).isoformat()
 
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
@@ -27,6 +27,7 @@ with sync_playwright() as p:
     owner.wait_for_url("**/check-email**")
     owner.goto(h.confirm_link(owner_email)); owner.wait_for_url("**/onboarding"); h.ready(owner)
     owner.get_by_label("שם העסק").fill("סטודיו עדכונים")
+    owner.get_by_label("סוג העסק").select_option("pilates")  # a class studio
     owner.get_by_role("button", name="המשך").click()
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard")
@@ -87,7 +88,7 @@ with sync_playwright() as p:
     print("3. updates shown, badge cleared after reading: ok | a11y:", serious or "ok")
 
     # The studio closes a day; the member's schedule marks it closed, with the reason.
-    closed_day = (dt.date.today() + dt.timedelta(days=3)).isoformat()
+    closed_day = (h.local_today() + dt.timedelta(days=3)).isoformat()
     owner.goto(f"{h.BASE}/schedule/closed"); h.ready(owner)
     owner.get_by_label("תאריך").fill(closed_day)
     owner.get_by_label("סיבה (לא חובה)").fill("חג")

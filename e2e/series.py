@@ -9,8 +9,8 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 
 email = f"owner{time.time_ns()}@example.com"
-tomorrow = (dt.date.today() + dt.timedelta(days=1)).isoformat()
-next_week = (dt.date.today() + dt.timedelta(days=7)).isoformat()
+tomorrow = (h.local_today() + dt.timedelta(days=1)).isoformat()
+next_week = (h.local_today() + dt.timedelta(days=7)).isoformat()
 
 with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
@@ -25,6 +25,7 @@ with sync_playwright() as p:
     page.wait_for_url("**/onboarding")
     h.ready(page)
     page.get_by_label("שם העסק").fill("סטודיו סדרות")
+    page.get_by_label("סוג העסק").select_option("pilates")  # a class studio
     page.get_by_role("button", name="המשך").click()
     page.get_by_role("button", name="יצירת העסק").click()
     page.wait_for_url("**/dashboard")
@@ -79,14 +80,14 @@ with sync_playwright() as p:
     print("copy week: ok")
 
     # An instructor sees their own classes for today first on the dashboard.
-    today = dt.date.today().isoformat()
+    today = h.local_today().isoformat()
     page.goto(f"{h.BASE}/schedule/new?date={today}"); h.ready(page)
     page.get_by_label("שעת התחלה").fill("23:30")
     page.get_by_label("מדריך/ה").select_option(label=email)
     page.get_by_role("button", name="יצירה").click()
     page.wait_for_url("**/schedule?week=*")
     page.goto(f"{h.BASE}/dashboard"); h.ready(page)
-    mine = page.get_by_role("region", name="השיעור שלך היום")
+    mine = page.get_by_role("region", name=re.compile("שלך היום"))  # the industry's word for a session
     expect(mine.get_by_text("23:30")).to_be_visible()
     print("instructor's classes today on the dashboard: ok")
 
