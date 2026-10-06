@@ -345,6 +345,25 @@
       "profile": "Player profile",
       "visitNotes": "Notes",
       "nextBooking": "Your next booking"
+    },
+    "pets": {
+      "client": "Owner",
+      "clients": "Owners",
+      "addClient": "Add owner",
+      "newClient": "New owner",
+      "searchClients": "Search owners",
+      "noClients": "No owners yet",
+      "noResults": "No owners match your search",
+      "schedule": "Appointments",
+      "newSession": "New appointment",
+      "noSessions": "No appointments",
+      "sessionsToday": "{count, plural, =0 {No appointments today} one {One appointment today} other {# appointments today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The salon",
+      "profile": "Owner details",
+      "visitNotes": "Grooming notes",
+      "nextBooking": "Your next appointment"
     }
   },
   "clients": {
@@ -784,7 +803,9 @@
       "generic": "Something went wrong. Try again.",
       "no_valid_plan": "You need a valid membership or punch card to book. Ask the business.",
       "health_declaration_required": "Please fill in the health declaration before booking.",
-      "health_declaration_review": "The business needs to approve your health declaration before you can book."
+      "health_declaration_review": "The business needs to approve your health declaration before you can book.",
+      "dependent_required": "Choose who's coming.",
+      "unknown_dependent": "That profile isn't active any more."
     },
     "health": {
       "title": "Health declaration",
@@ -871,7 +892,9 @@
         "no_valid_plan": "You need a valid plan to book.",
         "health_declaration_required": "Please fill in the health declaration before booking.",
         "health_declaration_review": "Your health declaration is waiting for review.",
-        "generic": "Something went wrong. Please try again."
+        "generic": "Something went wrong. Please try again.",
+        "dependent_required": "Choose who's coming.",
+        "unknown_dependent": "That profile isn't active any more."
       }
     },
     "review": {
@@ -2975,7 +2998,9 @@
         "Boarding and day care"
       ],
       "heroTitle": "Happy pets, happy owners.",
-      "heroText": "Dog grooming, training, boarding and day care, with a profile for every pet under its owner."
+      "heroText": "Dog grooming, training, boarding and day care, with a profile for every pet under its owner.",
+      "yours": "The salon",
+      "example": "Happy Paws"
     },
     "events": {
       "name": "Creative & events",
@@ -3159,6 +3184,18 @@
       "tagline": "Rooms for meetings and workshops, by the hour.",
       "yours": "The space",
       "example": "Work Hub"
+    },
+    "pet_grooming": {
+      "name": "Pet grooming",
+      "tagline": "Baths, grooming and nails, with a profile per pet."
+    },
+    "dog_training": {
+      "name": "Dog training",
+      "tagline": "Private lessons and puppy classes."
+    },
+    "pet_daycare": {
+      "name": "Doggy day care",
+      "tagline": "Day care by the day or with a pass."
     }
   },
   "clientFields": {
@@ -3232,7 +3269,29 @@
     "school_grade": "School grade",
     "subjects": "Subjects",
     "tire_size": "Tire size",
-    "company": "Company"
+    "company": "Company",
+    "species": "Species",
+    "species_options": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "other": "Other"
+    },
+    "breed": "Breed",
+    "size": "Size",
+    "size_options": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "giant": "Giant"
+    },
+    "weight_kg": "Weight (kg)",
+    "temperament": "Temperament",
+    "temperament_options": {
+      "calm": "Calm",
+      "nervous": "Nervous",
+      "reactive": "Reactive (needs care)"
+    },
+    "vaccinated_until": "Vaccinations valid until"
   },
   "businessMenu": {
     "switch": "Switch business",
@@ -3348,8 +3407,8 @@
     "inactive": "No longer comes",
     "edit": "Edit {name}",
     "save": "Save",
-    "retire": "No longer comes",
-    "restore": "Comes again",
+    "retire": "Mark as no longer coming",
+    "restore": "Mark as coming again",
     "age": "{years, plural, =0 {under a year} one {# year} other {# years}}",
     "for": "For {name}",
     "bookFor": "Book {dependent} ({owner})",
@@ -3357,6 +3416,26 @@
     "owner": {
       "pet": "Owner",
       "child": "Parent"
-    }
+    },
+    "nameRequired": "Enter a name.",
+    "dateFormat": "Write the date as year-month-day, for example 2020-05-31.",
+    "dateHint": "Year-month-day",
+    "saveFailed": "Couldn't save. Try again.",
+    "who": "Who's coming?",
+    "me": "Me",
+    "mine": {
+      "pet": "My pets",
+      "child": "My children"
+    },
+    "mineHint": {
+      "pet": "Add your pets to book for them.",
+      "child": "Add your children to book for them."
+    },
+    "addFirst": {
+      "pet": "Add a pet first, then book for it.",
+      "child": "Add a child first, then book for them."
+    },
+    "count": "{count, plural, =0 {None yet} one {One} other {#}}",
+    "booked": "Booked: {names}"
   }
 }

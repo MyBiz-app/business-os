@@ -28,6 +28,9 @@ from its parent (sub-categories can have sub-categories of their own):
   `color`): the entry's own value, else the parent's.
 - `default_services`, `default_plans`, `default_rooms`: the entry's own list replaces the parent's.
 - `client_fields` replaces the parent's fields; `extra_client_fields` adds to them.
+- Dependents (#43): `dependents` (`pet` / `child`: the industry keeps profiles of who comes under
+  each client), `dependent_fields` (like `client_fields`, labels under `clientFields`, replace
+  the parent's) and `dependent_required` (every booking must name one: a groomer needs the dog).
 - Texts: `verticals.<key>.<text>` from the entry, else from the nearest parent that has it. A
   sub-category needs only `name` and `tagline`.
 
@@ -75,4 +78,5 @@ every open entry.
 A category that needs something the core cannot do yet (jobs at the client's address, pets under
 an owner, quotes and deposits) stays `planned` until that capability is built: see spec section
 4.3 and the phase 7 issues. Courts and rooms by the hour are built (#41): Sports & facilities is
-open as beta.
+open as beta. Dependents are built (#43): Pet services is open as beta, and Kids activities keeps a
+profile per child.

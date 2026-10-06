@@ -12,11 +12,12 @@ import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { fullName } from "@business-os/app-kit/lib/names";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { dependentsFor, termsFor } from "@business-os/app-kit/lib/vertical";
+import { DependentForm } from "@business-os/app-kit/components/dependent-form";
 import { useBusiness } from "@/providers/business-provider";
 
 type Method = components["schemas"]["Sale"]["method"] & string;
-type Panel = "sell" | "note" | "message" | null;
+type Panel = "sell" | "note" | "message" | null | "dependent";
 
 const METHODS: Method[] = ["card", "cash", "transfer", "other"];
 const VISITS_SHOWN = 5;
@@ -36,8 +37,10 @@ export default function ClientScreen() {
   const tStatus = useTranslations("clients.statuses");
   const tMessaging = useTranslations("messaging");
   const tTerms = useTranslations("terms");
+  const tDependents = useTranslations("dependents");
   const locale = useLocale();
   const { api, scope, tenant, palette, can } = useBusiness();
+  const kind = dependentsFor(tenant).kind;
   const [panel, setPanel] = useState<Panel>(null);
   const [planId, setPlanId] = useState<string | null>(null);
   const [method, setMethod] = useState<Method>("card");
@@ -52,7 +55,7 @@ export default function ClientScreen() {
   const load = useCallback(async () => {
     if (!tenantId) return null;
     const path = { client_id: id };
-    const [client, bookings, entitlements, notes, plans] = await Promise.all([
+    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings] = await Promise.all([
       api.GET("/clients/{client_id}", { params: { ...scope, path } }).then(unwrap),
       api.GET("/clients/{client_id}/bookings", { params: { ...scope, path } }).then(unwrap),
       api
@@ -69,9 +72,16 @@ export default function ClientScreen() {
             .then(unwrap)
             .catch(() => [])
         : Promise.resolve([]),
+      // The client's pets / children, in industries that keep them.
+      dependentsFor(tenant).kind
+        ? api.GET("/clients/{client_id}/dependents", { params: { ...scope, path } }).then(unwrap).catch(() => [])
+        : Promise.resolve([]),
+      dependentsFor(tenant).kind
+        ? api.GET("/dependents/settings", { params: scope }).then(unwrap).catch(() => null)
+        : Promise.resolve(null),
     ]);
-    return { client, bookings, entitlements, notes, plans };
-  }, [api, scope, id, tenantId, can]);
+    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings };
+  }, [api, scope, id, tenantId, can, tenant]);
   const { data, loading, reload } = useLoad(load);
 
   const act = async (action: () => Promise<string>) => {
@@ -289,6 +299,41 @@ export default function ClientScreen() {
           ))}
       </Card>
 
+      {kind && data.dependentSettings && (
+        <Card palette={palette}>
+          <SectionTitle
+            title={tDependents(`title.${kind}`)}
+            action={can("clients.write") ? tDependents(`add.${kind}`) : undefined}
+            onAction={() => toggle("dependent")}
+            palette={palette}
+          />
+          {data.dependents.length === 0 && (
+            <Text style={[styles.muted, { color: palette.muted }]}>{tDependents(`none.${kind}`)}</Text>
+          )}
+          {data.dependents.map((dependent) => (
+            <ListRow
+              key={dependent.id}
+              palette={palette}
+              title={dependent.name}
+              subtitle={dependent.notes ?? undefined}
+              trailing={!dependent.active ? <Badge label={tDependents("inactive")} palette={palette} /> : undefined}
+            />
+          ))}
+          {panel === "dependent" && (
+            <DependentForm
+              kind={kind}
+              fields={data.dependentSettings.fields}
+              palette={palette}
+              onSave={async (body) => {
+                unwrap(await api.POST("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: id } }, body }));
+                setPanel(null);
+                await reload();
+              }}
+            />
+          )}
+        </Card>
+      )}
+
       {upcoming.length > 0 && (
         <View style={{ gap: 8 }}>
           <SectionTitle title={t("upcomingTitle")} palette={palette} />
@@ -296,7 +341,7 @@ export default function ClientScreen() {
             <ListRow
               key={booking.id}
               palette={palette}
-              title={booking.service_name}
+              title={booking.dependent_name ? `${booking.service_name} · ${booking.dependent_name}` : booking.service_name}
               subtitle={short(booking.starts_at)}
               trailing={<Badge label={tBookings(`statuses.${booking.status}`)} tone="primary" palette={palette} />}
               onPress={() => router.push(`/session/${booking.session_id}`)}
@@ -314,7 +359,7 @@ export default function ClientScreen() {
             <ListRow
               key={booking.id}
               palette={palette}
-              title={booking.service_name}
+              title={booking.dependent_name ? `${booking.service_name} · ${booking.dependent_name}` : booking.service_name}
               subtitle={short(booking.starts_at)}
               trailing={
                 <Badge

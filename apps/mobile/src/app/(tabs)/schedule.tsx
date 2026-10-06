@@ -11,6 +11,7 @@ import { Heading, Screen, elevation, styles } from "@business-os/app-kit/compone
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useDependents } from "@/lib/use-dependents";
 import { useBusiness } from "@/providers/business-provider";
 
 const DAYS = 14;
@@ -23,6 +24,7 @@ export default function Schedule() {
   const tTerms = useTranslations("terms");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
+  const dependents = useDependents();
   const today = business ? todayIn(business.time_zone) : "";
   const [day, setDay] = useState(today);
 
@@ -143,6 +145,7 @@ export default function Schedule() {
             <SessionCard
               key={session.id}
               session={session}
+              dependents={dependents}
               onChange={(changed) => setOverrides((current) => ({ ...current, [changed.id]: changed }))}
             />
           ))}

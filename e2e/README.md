@@ -64,3 +64,7 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `resources.py <owner email with data>`: courts and rooms by the hour (#41) — a room becomes a court for rent with opening hours, a service by the hour gets its court, and the front desk reserves it from the day grid; then the grid in English/dark on a phone.
 
 `court_app.py <owner email>` (needs `pnpm dev:app`; run `resources.py` first): a new client books a court in the app — length, day, time — pays (simulated) and opens the receipt.
+
+`pets.py <owner email>` (on the pet grooming demo, `--demo pets`): pets under their owners (#43) — the owner's card lists their pets and a new one is added with its details; an appointment is booked for the pet and the roster shows "pet · owner"; then the card in English/dark on a phone.
+
+`pets_app.py <owner email>` (needs `pnpm dev:app`, the pet grooming demo): a new owner adds their dog under "My pets" in the client app and books a grooming appointment for it.

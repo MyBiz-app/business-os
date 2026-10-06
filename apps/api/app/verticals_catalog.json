@@ -1535,6 +1535,21 @@
       {
         "key": "kids_activities",
         "status": "live",
+        "dependents": "child",
+        "dependent_fields": [
+          {
+            "key": "school_grade",
+            "kind": "text"
+          },
+          {
+            "key": "allergies",
+            "kind": "text"
+          },
+          {
+            "key": "emergency_contact",
+            "kind": "text"
+          }
+        ],
         "default_services": [
           {
             "names": {
@@ -2090,9 +2105,200 @@
   {
     "key": "pets",
     "order": 8,
-    "status": "planned",
+    "status": "beta",
     "icon": "paw-print",
-    "color": "from-orange-400 to-amber-600"
+    "color": "from-orange-400 to-amber-600",
+    "terms": "pets",
+    "client_term": "owner",
+    "booking_modes": [
+      "appointment",
+      "class"
+    ],
+    "cancellation_window_minutes": 1440,
+    "booking_requires_plan": false,
+    "default_preset": "starter",
+    "recommended_modules": [
+      "client_app",
+      "whatsapp"
+    ],
+    "client_fields": [
+      {
+        "key": "preferences",
+        "kind": "text"
+      }
+    ],
+    "dependents": "pet",
+    "dependent_required": true,
+    "dependent_fields": [
+      {
+        "key": "species",
+        "kind": "select",
+        "options": [
+          "dog",
+          "cat",
+          "other"
+        ]
+      },
+      {
+        "key": "breed",
+        "kind": "text",
+        "max_length": 80
+      },
+      {
+        "key": "size",
+        "kind": "select",
+        "options": [
+          "small",
+          "medium",
+          "large",
+          "giant"
+        ]
+      },
+      {
+        "key": "weight_kg",
+        "kind": "number"
+      },
+      {
+        "key": "temperament",
+        "kind": "select",
+        "options": [
+          "calm",
+          "nervous",
+          "reactive"
+        ]
+      },
+      {
+        "key": "vaccinated_until",
+        "kind": "date"
+      },
+      {
+        "key": "allergies",
+        "kind": "text"
+      }
+    ],
+    "default_services": [
+      {
+        "names": {
+          "he": "רחצה וסירוק",
+          "en": "Bath & brush"
+        },
+        "duration_minutes": 60,
+        "booking_mode": "appointment",
+        "prices": {
+          "ILS": 15000
+        },
+        "color": "#f97316"
+      },
+      {
+        "names": {
+          "he": "תספורת מלאה",
+          "en": "Full groom"
+        },
+        "duration_minutes": 120,
+        "booking_mode": "appointment",
+        "prices": {
+          "ILS": 28000
+        },
+        "color": "#d97706"
+      },
+      {
+        "names": {
+          "he": "גזיזת ציפורניים",
+          "en": "Nail trim"
+        },
+        "duration_minutes": 15,
+        "booking_mode": "appointment",
+        "prices": {
+          "ILS": 5000
+        },
+        "color": "#a16207"
+      }
+    ],
+    "children": [
+      {
+        "key": "pet_grooming",
+        "status": "beta"
+      },
+      {
+        "key": "dog_training",
+        "status": "beta",
+        "booking_requires_plan": true,
+        "default_services": [
+          {
+            "names": {
+              "he": "אילוף פרטני",
+              "en": "Private training"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 30000
+            },
+            "color": "#ea580c"
+          },
+          {
+            "names": {
+              "he": "קבוצת גורים",
+              "en": "Puppy class"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "class",
+            "capacity": 8,
+            "prices": {
+              "ILS": 9000
+            },
+            "color": "#f59e0b"
+          }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "קורס גורים (6 מפגשים)",
+              "en": "Puppy course (6 sessions)"
+            },
+            "kind": "punch_card",
+            "credits": 6,
+            "validity_days": 90,
+            "prices": {
+              "ILS": 48000
+            }
+          }
+        ]
+      },
+      {
+        "key": "pet_daycare",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "גן כלבים (יום)",
+              "en": "Doggy day care"
+            },
+            "duration_minutes": 540,
+            "booking_mode": "class",
+            "capacity": 15,
+            "prices": {
+              "ILS": 12000
+            },
+            "color": "#f97316"
+          }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "כרטיסייה 10 ימים",
+              "en": "10-day pass"
+            },
+            "kind": "punch_card",
+            "credits": 10,
+            "validity_days": 120,
+            "prices": {
+              "ILS": 100000
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "key": "events",

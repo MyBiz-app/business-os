@@ -30,6 +30,19 @@ export default function Profile() {
 
       <ProfileForm key={business?.client_id} />
 
+      {business?.dependents && (
+        <Card palette={palette}>
+          <Text style={[styles.h2, { color: palette.foreground }]}>{t(`dependents.mine.${business.dependents}`)}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t(`dependents.mineHint.${business.dependents}`)}</Text>
+          <Button
+            label={t(`dependents.mine.${business.dependents}`)}
+            variant="secondary"
+            palette={palette}
+            onPress={() => router.push("/dependents")}
+          />
+        </Card>
+      )}
+
       {health?.form && (
         <Card palette={palette}>
           <Text style={[styles.h2, { color: palette.foreground }]}>{t("client.health.title")}</Text>

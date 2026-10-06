@@ -5,6 +5,7 @@ import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Chip } from "@business-os/app-kit/components/chip";
 import { Button, elevation } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { ApiError } from "@business-os/app-kit/lib/api";
@@ -12,6 +13,9 @@ import { confirm } from "@business-os/app-kit/lib/confirm";
 import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];
+type Dependent = components["schemas"]["Dependent"];
+
+const ME = "me";
 
 const KNOWN_ERRORS = [
   "session_started",
@@ -21,6 +25,8 @@ const KNOWN_ERRORS = [
   "no_valid_plan",
   "health_declaration_required",
   "health_declaration_review",
+  "dependent_required",
+  "unknown_dependent",
 ] as const;
 
 type Props = {
@@ -28,16 +34,20 @@ type Props = {
   onChange: (session: ClientSession) => void;
   /** Also show the day (for lists that span several days, like "your next booking"). */
   showDay?: boolean;
+  /** The client's active pets / children, in industries that keep them: a booking is for one. */
+  dependents?: Dependent[];
 };
 
 /** One session with its spots and the client's book / waitlist / cancel action. */
-export function SessionCard({ session, onChange, showDay = false }: Props) {
+export function SessionCard({ session, onChange, showDay = false, dependents = [] }: Props) {
   const t = useTranslations("client");
+  const tDependents = useTranslations("dependents");
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsHealth, setNeedsHealth] = useState(false);
+  const [who, setWho] = useState<string | null>(null);
   if (!business) return null;
 
   const hours = `${formatTime(session.starts_at, locale, business.time_zone)}–${formatTime(session.ends_at, locale, business.time_zone)}`;
@@ -53,6 +63,17 @@ export function SessionCard({ session, onChange, showDay = false }: Props) {
   const mine = session.my_booking;
   const cancelled = session.status === "cancelled";
   const full = session.spots_left === 0;
+  // Industries that keep pets / children: each booking is for one of them (or the client).
+  const kind = business.dependents;
+  const mineAll = session.my_bookings ?? [];
+  const taken = new Set(mineAll.map((b) => b.dependent_id ?? ME));
+  const choices = kind
+    ? [
+        ...dependents.filter((d) => !taken.has(d.id)).map((d) => ({ id: d.id, name: d.name })),
+        ...(business.dependent_required || taken.has(ME) ? [] : [{ id: ME, name: tDependents("me") }]),
+      ]
+    : [];
+  const chosen = choices.find((c) => c.id === who) ?? choices[0] ?? null;
 
   const run = async (action: () => Promise<{ data?: ClientSession; error?: unknown; response: Response }>) => {
     setBusy(true);
@@ -71,12 +92,17 @@ export function SessionCard({ session, onChange, showDay = false }: Props) {
   };
 
   const book = () =>
-    run(() => api.POST("/client/sessions/{session_id}/bookings", { params: { ...scope, path: { session_id: session.id } } }));
+    run(() =>
+      api.POST("/client/sessions/{session_id}/bookings", {
+        params: { ...scope, path: { session_id: session.id } },
+        body: { dependent_id: chosen && chosen.id !== ME ? chosen.id : null },
+      }),
+    );
 
-  const cancel = async () => {
-    if (!mine) return;
+  const cancel = async (booking = mine) => {
+    if (!booking) return;
     const late =
-      mine.status === "booked" &&
+      booking.status === "booked" &&
       Date.parse(session.starts_at) - Date.now() < business.cancellation_window_minutes * 60_000;
     const ok = await confirm(
       t("cancelTitle"),
@@ -85,13 +111,15 @@ export function SessionCard({ session, onChange, showDay = false }: Props) {
       t("keep"),
     );
     if (ok) {
-      await run(() => api.POST("/client/bookings/{booking_id}/cancel", { params: { ...scope, path: { booking_id: mine.id } } }));
+      await run(() => api.POST("/client/bookings/{booking_id}/cancel", { params: { ...scope, path: { booking_id: booking.id } } }));
     }
   };
 
   let status: string;
   if (cancelled) status = t("sessionCancelled");
   else if (mine?.status === "waitlisted") status = t("waitlistPosition", { position: mine.waitlist_position ?? 1 });
+  else if (kind && mineAll.some((b) => b.dependent_name))
+    status = tDependents("booked", { names: mineAll.map((b) => b.dependent_name ?? tDependents("me")).join(", ") });
   else if (mine) status = t("youreBooked");
   else if (full) status = t("full", { count: session.waitlisted });
   else status = t("spotsLeft", { count: session.spots_left });
@@ -137,7 +165,25 @@ export function SessionCard({ session, onChange, showDay = false }: Props) {
         </View>
         {!cancelled && (
           <View style={styles.action}>
-            {mine ? (
+            {kind ? (
+              choices.length > 0 ? (
+                <Button
+                  label={full ? t("joinWaitlist") : t("book")}
+                  accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}${chosen ? ` – ${chosen.name}` : ""}`}
+                  variant={full ? "secondary" : "primary"}
+                  palette={palette}
+                  busy={busy}
+                  onPress={() => void book()}
+                />
+              ) : !mine ? (
+                <Button
+                  label={tDependents(`add.${kind}`)}
+                  variant="secondary"
+                  palette={palette}
+                  onPress={() => router.push("/dependents")}
+                />
+              ) : null
+            ) : mine ? (
               <Button
                 label={mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")}
                 accessibilityLabel={`${mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")} – ${label}`}
@@ -159,6 +205,47 @@ export function SessionCard({ session, onChange, showDay = false }: Props) {
           </View>
         )}
       </View>
+      {kind && !cancelled && choices.length > 1 && (
+        <View role="radiogroup" aria-label={tDependents("who")} style={styles.who}>
+          <Text style={[styles.meta, { color: palette.muted }]}>{tDependents("who")}</Text>
+          {choices.map((choice) => (
+            <Chip
+              key={choice.id}
+              label={choice.name}
+              selected={chosen?.id === choice.id}
+              onPress={() => setWho(choice.id)}
+              palette={palette}
+            />
+          ))}
+        </View>
+      )}
+      {kind && !cancelled && choices.length === 0 && !mine && (
+        <Text style={[styles.meta, { color: palette.muted }]}>{tDependents(`addFirst.${kind}`)}</Text>
+      )}
+      {kind &&
+        !cancelled &&
+        mineAll.map((booking) => {
+          const name = booking.dependent_name ?? tDependents("me");
+          const action = booking.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking");
+          return (
+            <View key={booking.id} style={styles.mineRow}>
+              <Text style={[styles.meta, styles.bold, { color: palette.primary, flex: 1 }]}>
+                {name}
+                {booking.status === "waitlisted" ? ` · ${t("waitlistPosition", { position: booking.waitlist_position ?? 1 })}` : ""}
+              </Text>
+              <View style={styles.action}>
+                <Button
+                  label={action}
+                  accessibilityLabel={`${action} – ${label} – ${name}`}
+                  variant="danger"
+                  palette={palette}
+                  busy={busy}
+                  onPress={() => void cancel(booking)}
+                />
+              </View>
+            </View>
+          );
+        })}
       {error && (
         <Text accessibilityRole="alert" style={[styles.meta, { color: palette.danger }]}>
           {error}
@@ -186,5 +273,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 17, fontWeight: "700", textAlign: "left" },
   meta: { fontSize: 14, textAlign: "left" },
   bold: { fontWeight: "600" },
+  who: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 },
+  mineRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   strike: { textDecorationLine: "line-through" },
 });

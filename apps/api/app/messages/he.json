@@ -194,6 +194,15 @@
     },
     "meeting_rooms": {
       "name": "חדרי ישיבות וחללי עבודה"
+    },
+    "pet_grooming": {
+      "name": "מספרת כלבים וחתולים"
+    },
+    "dog_training": {
+      "name": "אילוף כלבים"
+    },
+    "pet_daycare": {
+      "name": "גן כלבים"
     }
   }
 }

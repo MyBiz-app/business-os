@@ -33,7 +33,7 @@ def test_prices_cover_every_currency() -> None:
 
 
 def test_planned_categories_are_listed_but_closed() -> None:
-    assert "pets" in CATALOG and "pets" not in VERTICAL_PACKS
+    assert "events" in CATALOG and "events" not in VERTICAL_PACKS
     assert {"fitness", "beauty", "clinic", "classes", "automotive"} <= set(VERTICAL_PACKS)
     for pack in VERTICAL_PACKS.values():
         assert pack.default_preset in PRESETS, pack.key
@@ -63,7 +63,7 @@ def test_every_open_industry_starts_a_business(
 def test_planned_and_unknown_industries_cannot_sign_up(
     client: TestClient, auth: AuthHeaders
 ) -> None:
-    for key in ("pets", "spaceship"):
+    for key in ("events", "spaceship"):
         business = {"name": "Nope", "vertical": key, "locale": "en",
                     "time_zone": "Asia/Jerusalem", "currency": "ILS"}  # fmt: skip
         assert client.post("/tenants", json=business, headers=auth(uuid4())).status_code == 422

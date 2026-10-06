@@ -24,14 +24,18 @@ const STATUS_TONE: Record<PendingAction["status"], string> = {
 
 async function ActionCard({ action }: { action: PendingAction }) {
   const t = await getTranslations("assistant");
-  const preview = action.preview as { kind: string; client: string; service: string; starts: string; full?: boolean };
+  const preview = action.preview as { kind: string; client: string; service: string; starts: string; full?: boolean; dependent?: string };
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-background p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("needsConfirmation")}</p>
       <p className="font-medium" dir="auto">
         {preview.kind === "cancel_booking"
           ? t("cancelPreview", { client: isolate(preview.client), service: isolate(preview.service) })
-          : t("bookPreview", { client: isolate(preview.client), service: isolate(preview.service) })}
+          : t("bookPreview", {
+              // A pet or child comes; their owner / parent books (#43).
+              client: isolate(preview.dependent ? `${preview.dependent} (${preview.client})` : preview.client),
+              service: isolate(preview.service),
+            })}
         {" · "}
         <span dir="ltr">{preview.starts}</span>
       </p>
