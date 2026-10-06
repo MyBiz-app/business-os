@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Avatar } from "@/components/avatar";
+import { Pill, type Tone } from "@/components/pill";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { formatTime } from "@/lib/dates";
@@ -21,6 +22,15 @@ import { MessagesSection } from "../../messages/messages-section";
 import { NotesSection, ProfileSection } from "./profile-section";
 
 /** Bookings arrive newest first; upcoming ones are shown soonest first. */
+const RECENT = 8; // past visits shown before "show the whole history"
+const STATUS_TONE: Record<"booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled", Tone> = {
+  booked: "primary",
+  waitlisted: "warning",
+  checked_in: "success",
+  no_show: "danger",
+  cancelled: "muted",
+};
+
 function splitByNow<T extends { starts_at: string }>(bookings: T[]) {
   const now = Date.now();
   return {
@@ -71,12 +81,12 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
               <span dir="ltr">{formatTime(booking.starts_at, locale, tenant.time_zone)}</span>
             </span>
           </Link>
-          <span className="text-sm text-muted">
+          <Pill tone={booking.session_status === "cancelled" ? "muted" : STATUS_TONE[booking.status]}>
             {booking.session_status === "cancelled"
               ? tBookings("sessionCancelled")
               : tBookings(`statuses.${booking.status}`)}
             {booking.late_cancel && ` · ${tBookings("lateCancel")}`}
-          </span>
+          </Pill>
         </li>
       ))}
     </ul>
@@ -196,7 +206,13 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
             {past.length > 0 && (
               <div className="flex flex-col gap-1">
                 <h3 className="font-semibold">{tBookings("history")}</h3>
-                {bookingList(past)}
+                {bookingList(past.slice(0, RECENT))}
+                {past.length > RECENT && (
+                  <details>
+                    <summary className="cursor-pointer py-2 text-sm text-primary">{tBookings("showAll", { count: past.length })}</summary>
+                    {bookingList(past.slice(RECENT))}
+                  </details>
+                )}
               </div>
             )}
           </section>

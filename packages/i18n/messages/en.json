@@ -595,7 +595,8 @@
       "already_closed": "This day is already closed.",
       "invalid": "Please choose a date.",
       "generic": "Something went wrong. Try again."
-    }
+    },
+    "jumpToDay": "Go to day"
   },
   "bookings": {
     "title": "Bookings",
@@ -637,7 +638,8 @@
       "not_found": "The booking was not found. Refresh and try again.",
       "generic": "Something went wrong. Try again."
     },
-    "noPlan": "No plan"
+    "noPlan": "No plan",
+    "showAll": "Show the whole history ({count})"
   },
   "client": {
     "tabs": {
