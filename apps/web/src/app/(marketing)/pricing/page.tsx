@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { CtaBand, Faq } from "@/components/marketing/sections";
+import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { API_URL } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -46,6 +47,9 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
 
   return (
     <main className="enter flex flex-col">
+      {/* The starting price is the base tier, the same number the cards show. */}
+      <OrganizationData price={base / 100} currency={currency} />
+      <FaqData />
       <section className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-6 pt-16 text-center">
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{t("title")}</h1>
         <p className="text-lg text-muted">{t("subtitle")}</p>
