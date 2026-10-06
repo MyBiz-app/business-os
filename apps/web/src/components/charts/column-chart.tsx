@@ -2,6 +2,7 @@
 
 import { useLocale } from "next-intl";
 import { useId, useState } from "react";
+import { toMajor } from "@/lib/money";
 
 export type Column = { key: string; label: string; value: number; display: string };
 
@@ -40,7 +41,7 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
     maximumFractionDigits: 1,
     ...(unit.kind === "money" ? { style: "currency", currency: unit.currency } : {}),
   });
-  const formatTick = (value: number) => compact.format(unit.kind === "money" ? value / 100 : value);
+  const formatTick = (value: number) => compact.format(unit.kind === "money" ? toMajor(value, unit.currency) : value);
   const [active, setActive] = useState<number | null>(null);
   const max = niceMax(Math.max(...columns.map((c) => c.value), 0));
   const ticks = [0, max / 2, max];

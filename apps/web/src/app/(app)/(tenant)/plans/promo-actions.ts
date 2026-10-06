@@ -9,10 +9,10 @@ import { getTenant } from "@/lib/tenant";
 export type PromoState = { saved?: boolean; error?: "invalid" | "code_taken" | "generic" };
 
 export async function createPromoCode(_state: PromoState, formData: FormData): Promise<PromoState> {
-  const { api, scope } = await getTenant();
+  const { api, scope, tenant } = await getTenant();
   const value = (name: string) => String(formData.get(name) ?? "").trim();
   const kind = value("kind");
-  const amount = kind === "amount" ? toMinorUnits(value("value")) : null;
+  const amount = kind === "amount" ? toMinorUnits(value("value"), tenant.currency) : null;
   const percent = kind === "percent" ? Number(value("value")) : null;
   if ((kind === "amount" && !amount) || (kind === "percent" && !(percent && percent >= 1 && percent <= 100))) {
     return { error: "invalid" };

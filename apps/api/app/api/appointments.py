@@ -115,13 +115,16 @@ def set_staff_hours(user_id: UUID, blocks: list[HoursBlock], context: WriteDep) 
                 status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="overlapping_hours"
             )
     db.execute(text("DELETE FROM app.staff_hours WHERE user_id = :id"), {"id": user_id})
-    for block in ordered:
+    if ordered:  # one statement for the whole week
         db.execute(
             text("""
                 INSERT INTO app.staff_hours (tenant_id, user_id, weekday, starts, ends)
                 VALUES (:tenant_id, :user_id, :weekday, :starts, :ends)
             """),
-            {"tenant_id": context.tenant_id, "user_id": user_id, **block.model_dump()},
+            [
+                {"tenant_id": context.tenant_id, "user_id": user_id, **block.model_dump()}
+                for block in ordered
+            ],
         )
     return _hours(db, user_id)
 

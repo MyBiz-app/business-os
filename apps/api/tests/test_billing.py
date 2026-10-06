@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.billing import add_months, bill_businesses, periods_due
-from tests.conftest import AuthHeaders, add_member, make_staff
+from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
 
 
 def test_months_are_clamped_to_shorter_months() -> None:
@@ -124,3 +124,27 @@ def test_platform_admins_see_billed_revenue(
     due = client.get("/billing", headers=studio["headers"]).json()["balance_due"]
     assert month["currency"] == "ILS" and month["invoices"] == 1 and month["open"] == due > 0
     assert month["month"] <= (datetime.now(UTC).date() - timedelta(days=1)).isoformat()
+
+
+def test_console_lists_one_business_invoices(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    """The console's business page shows that business's invoices, newest first, and only
+    to MyBiz team members who may manage billing."""
+    end_trial(engine, studio["tenant_id"], days_ago=65)
+    run_billing(engine)
+    other = client.post("/tenants", json={**STUDIO, "name": "Other"}, headers=auth(uuid4())).json()
+    end_trial(engine, other["id"], days_ago=40)
+    run_billing(engine)
+    path = f"/platform/businesses/{studio['tenant_id']}/invoices"
+
+    admin = uuid4()
+    client.get("/me", headers=auth(admin))
+    assert client.get(path, headers=auth(admin)).status_code == 403
+    make_staff(engine, admin)
+    invoices = client.get(path, headers=auth(admin)).json()
+
+    own = client.get("/billing", headers=studio["headers"]).json()["invoices"]
+    assert [i["id"] for i in invoices] == [i["id"] for i in own]  # this business only, same order
+    assert len(invoices) == 2 and invoices[0]["number"] > invoices[1]["number"]
+    assert all(i["currency"] == "ILS" and i["total"] > 0 for i in invoices)

@@ -148,6 +148,18 @@ def test_changing_a_series_from_a_date_moves_later_sessions(
     assert start.astimezone(ZoneInfo("Asia/Jerusalem")).strftime("%H:%M") == "19:30"
     roster = client.get(f"/sessions/{booked}/bookings", headers=studio["headers"]).json()
     assert roster[0]["status"] == "booked"  # bookings follow the session
+    with engine.connect() as connection:
+        moved = (
+            connection.execute(
+                text("SELECT payload FROM app.notifications WHERE kind = 'session_moved'")
+            )
+            .scalars()
+            .all()
+        )
+    assert len(moved) == 1  # only Dana, only her session
+    assert moved[0]["session_id"] == booked and moved[0]["service_name"]
+    assert datetime.fromisoformat(moved[0]["starts_at"]) == start
+    assert datetime.fromisoformat(moved[0]["previous_starts_at"]) != start
     # New occurrences from the daily job use the new time too.
     with engine.begin() as connection:
         extend_series(connection, datetime.now(UTC) + timedelta(days=28))
@@ -343,10 +355,22 @@ def test_closed_day_cancels_its_sessions_and_series_skip_it(
     session = client.get(f"/sessions/{first['id']}", headers=studio["headers"]).json()
     assert session["status"] == "cancelled"
     with engine.connect() as connection:
-        kinds = connection.execute(text("SELECT kind FROM app.notifications")).scalars().all()
-    assert "session_cancelled" in kinds  # Dana was booked
+        notes = connection.execute(text("SELECT kind, payload FROM app.notifications")).all()
+    cancelled = [payload for kind, payload in notes if kind == "session_cancelled"]
+    assert len(cancelled) == 1  # Dana was booked
+    assert cancelled[0]["session_id"] == first["id"]
+    assert cancelled[0]["service_name"] and cancelled[0]["starts_at"]
     listed = client.get("/closed-days", headers=studio["headers"]).json()
     assert [d["reason"] for d in listed] == ["Holiday"]
+
+    # Reopening the day: it leaves the list, the cancelled session stays cancelled.
+    reopened = client.delete(f"/closed-days/{listed[0]['id']}", headers=studio["headers"])
+    assert reopened.status_code == 204
+    assert client.get("/closed-days", headers=studio["headers"]).json() == []
+    gone = client.delete(f"/closed-days/{listed[0]['id']}", headers=studio["headers"])
+    assert gone.status_code == 404
+    still = client.get(f"/sessions/{first['id']}", headers=studio["headers"]).json()
+    assert still["status"] == "cancelled"
 
     # A closed day far ahead: the daily job doesn't create a session on it.
     far = local_today() + timedelta(days=HORIZON_DAYS + 14)

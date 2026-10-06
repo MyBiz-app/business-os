@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -75,8 +76,7 @@ export default function Bookings() {
     timeZone: business.time_zone,
   });
   const day = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", timeZone: "UTC" });
-  const money = (amount: number, currency: string) =>
-    new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 2 }).format(amount / 100);
+  const money = (amount: number, currency: string) => formatMoney(amount, currency, locale);
 
   const row = (booking: Booking) => (
     <View key={booking.id} style={local.row}>

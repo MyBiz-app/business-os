@@ -72,7 +72,7 @@ export function PlanForm({ action, plan, currency, submitLabel, readOnly = false
           dir="ltr"
           required
           pattern="\d+([.,]\d{1,2})?"
-          defaultValue={plan ? toMajorUnits(plan.price_amount) : ""}
+          defaultValue={plan ? toMajorUnits(plan.price_amount, currency) : ""}
         />
         <div className="sm:col-span-2">
           <TextAreaField label={t("plans.description")} name="description" maxLength={2000} defaultValue={plan?.description ?? ""} />

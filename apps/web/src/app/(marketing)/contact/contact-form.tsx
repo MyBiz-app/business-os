@@ -40,8 +40,10 @@ export function ContactForm({ vertical }: { vertical?: string }) {
       <SelectField
         label={t("vertical")}
         name="vertical"
-        defaultValue={vertical ?? "fitness"}
+        defaultValue={vertical ?? ""}
         options={[
+          // No industry is assumed: the person picks one, or leaves it empty.
+          { value: "", label: t("chooseVertical") },
           ...industryOptions(text, (name) => tAll("start.industry.otherKind", { name }), tAll("marketing.industries.soon")),
           { value: "other", label: t("otherVertical") },
         ]}
