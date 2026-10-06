@@ -36,7 +36,7 @@ def scan(page, label: str) -> None:
     h.app_ready(page)
     for v in axe.run(page).response["violations"]:
         if v["impact"] in ("serious", "critical"):
-            problems.append(f"{label}: {v['id']} {[n['target'] for n in v['nodes']][:3]}")
+            problems.append(f"{label}: {v['id']} {[(n['target'], n['any'][0]['message'][:120] if n.get('any') else '') for n in v['nodes']][:3]}")
     width = page.evaluate("document.documentElement.scrollWidth - window.innerWidth")
     if width > 1:
         problems.append(f"{label}: horizontal overflow {width}px")

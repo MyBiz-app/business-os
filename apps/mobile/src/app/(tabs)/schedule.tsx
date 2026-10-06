@@ -141,5 +141,5 @@ const local = StyleSheet.create({
   cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 18 },
   ctaText: { flex: 1, gap: 2 },
   ctaTitle: { fontSize: 18, fontWeight: "800", textAlign: "left" },
-  ctaSub: { fontSize: 14, opacity: 0.9, textAlign: "left" },
+  ctaSub: { fontSize: 14, textAlign: "left" }, // full opacity: it sits on the brand color
 });

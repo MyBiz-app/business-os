@@ -1,32 +1,20 @@
-import { locales } from "@business-os/i18n";
 import { router } from "expo-router";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { ProfileForm } from "@/components/profile-form";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
-import type { ThemePreference } from "@business-os/app-kit/lib/preferences";
-import { supabase } from "@business-os/app-kit/lib/supabase";
+import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
-import { useLocaleSetting } from "@business-os/app-kit/providers/i18n-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
-import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 export default function Profile() {
   const t = useTranslations();
   const { session } = useSession();
   const { businesses, business, select, palette } = useBusiness();
-  const { preference, setPreference } = useTheme();
-  const { locale, setLocale } = useLocaleSetting();
   const health = useHealth();
-
-  const themeOptions: { value: ThemePreference; label: string }[] = [
-    { value: "light", label: t("settings.themeLight") },
-    { value: "dark", label: t("settings.themeDark") },
-    { value: "system", label: t("settings.themeSystem") },
-  ];
 
   return (
     <Screen palette={palette}>
@@ -71,22 +59,7 @@ export default function Profile() {
       )}
       <Button label={t("client.profile.joinAnother")} variant="secondary" palette={palette} onPress={() => router.push("/join")} />
 
-      <SegmentedControl
-        label={t("settings.language")}
-        options={locales.map((value) => ({ value, label: t(`locales.${value}`) }))}
-        value={locale}
-        onChange={(value) => void setLocale(value)}
-      />
-      <SegmentedControl label={t("settings.theme")} options={themeOptions} value={preference} onChange={setPreference} />
-
-      <View style={{ marginTop: 12 }}>
-        <Button
-          label={t("client.profile.signOut")}
-          variant="danger"
-          palette={palette}
-          onPress={() => void supabase.auth.signOut().then(() => router.replace("/sign-in"))}
-        />
-      </View>
+      <PreferencesCard palette={palette} signOutVariant="danger" />
     </Screen>
   );
 }
