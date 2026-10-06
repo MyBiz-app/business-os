@@ -24,7 +24,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
-- Business web system (CRM) polish. Round 1 done: clients list with plan and last visit, team avatars, reports heatmap. Round 2 done: plans show holders and recent sales, services show sessions and occupancy. Round 3: client profile history collapses after the last 8 visits with colored statuses, and on phones the schedule has a day strip that jumps to a day
+- Business web system (CRM) polish. Round 1 done: clients list with plan and last visit, team avatars, reports heatmap. Round 2 done: plans show holders and recent sales, services show sessions and occupancy. Round 3 done: shorter client history, phone day strip on the schedule. Final pass: phone header in two rows, team names on their own line, MyBiz console businesses list with search, sort and pages, inbox notes folded, billing summary
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next

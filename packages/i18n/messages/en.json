@@ -1220,6 +1220,29 @@
         "not_found": "Not found.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "list": {
+      "search": "Search business or owner",
+      "searchButton": "Search",
+      "sort": "Sort",
+      "sorts": {
+        "newest": "Newest first",
+        "name": "By name",
+        "clients": "Most clients",
+        "bookings": "Most active (bookings)",
+        "ai": "Most AI"
+      },
+      "count": "{count, plural, =0 {No businesses found} one {One business} other {# businesses}}",
+      "pageOf": "Page {page} of {pages}",
+      "previous": "Previous",
+      "next": "Next",
+      "modulesCount": "{count, plural, one {One module} other {# modules}}"
+    },
+    "billingStats": {
+      "lastMonth": "Billed in {month}",
+      "paidTotal": "Paid in total",
+      "openTotal": "Open to collect",
+      "paidShare": "{value} paid"
     }
   },
   "permissions": {

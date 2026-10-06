@@ -1220,6 +1220,29 @@
         "not_found": "לא נמצא.",
         "generic": "משהו השתבש. כדאי לנסות שוב."
       }
+    },
+    "list": {
+      "search": "חיפוש עסק או בעלים",
+      "searchButton": "חיפוש",
+      "sort": "מיון",
+      "sorts": {
+        "newest": "החדשים קודם",
+        "name": "לפי שם",
+        "clients": "הכי הרבה לקוחות",
+        "bookings": "הכי פעילים (הרשמות)",
+        "ai": "הכי הרבה AI"
+      },
+      "count": "{count, plural, =0 {לא נמצאו עסקים} one {עסק אחד} other {# עסקים}}",
+      "pageOf": "עמוד {page} מתוך {pages}",
+      "previous": "הקודם",
+      "next": "הבא",
+      "modulesCount": "{count, plural, one {מודול אחד} other {# מודולים}}"
+    },
+    "billingStats": {
+      "lastMonth": "חויב ב{month}",
+      "paidTotal": "שולם בסך הכול",
+      "openTotal": "פתוח לגבייה",
+      "paidShare": "{value} שולם"
     }
   },
   "permissions": {

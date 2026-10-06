@@ -49,6 +49,21 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           <span dir="ltr">{business.owner_email}</span> · {business.time_zone} · {business.currency}
         </p>
       </div>
+      <dl className="grid gap-3 sm:grid-cols-4">
+        {(
+          [
+            ["members", business.members],
+            ["clients", business.clients],
+            ["activeClients", business.active_clients],
+            ["aiCredits30d", business.ai_credits_30d],
+          ] as const
+        ).map(([key, value]) => (
+          <div key={key} className="flex flex-col gap-1 card p-4">
+            <dt className="text-sm text-muted">{t(`platform.columns.${key}`)}</dt>
+            <dd className="text-2xl font-semibold">{number.format(value)}</dd>
+          </div>
+        ))}
+      </dl>
       {mayAct && (
         <section aria-labelledby="act-heading" className="card-accent flex flex-col gap-3 p-5">
           <h2 id="act-heading" className="font-semibold">
@@ -91,21 +106,6 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           invoices={invoices}
         />
       )}
-      <dl className="grid gap-3 sm:grid-cols-4">
-        {(
-          [
-            ["members", business.members],
-            ["clients", business.clients],
-            ["activeClients", business.active_clients],
-            ["aiCredits30d", business.ai_credits_30d],
-          ] as const
-        ).map(([key, value]) => (
-          <div key={key} className="flex flex-col gap-1 card p-4">
-            <dt className="text-sm text-muted">{t(`platform.columns.${key}`)}</dt>
-            <dd className="text-2xl font-semibold">{number.format(value)}</dd>
-          </div>
-        ))}
-      </dl>
       <section className="flex flex-col gap-2 card p-6">
         <h2 className="font-semibold">{t("platform.columns.modules")}</h2>
         <p>

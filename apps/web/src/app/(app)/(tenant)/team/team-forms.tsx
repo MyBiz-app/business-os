@@ -98,7 +98,8 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
       <TeamError state={roleState.error ? roleState : removeState} />
       <div className="flex flex-wrap items-center gap-3">
         <Avatar id={userId} name={name ?? email} />
-        <span className="flex min-w-0 flex-1 flex-col">
+        {/* The name keeps its own line on phones; the actions wrap below it. */}
+        <span className="flex min-w-48 flex-1 flex-col">
           <span className="truncate font-medium" dir="auto">
             {name ?? email} {isSelf && <span className="font-normal text-muted">{t("team.you")}</span>}
           </span>

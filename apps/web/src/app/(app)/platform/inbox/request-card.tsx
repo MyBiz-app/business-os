@@ -107,16 +107,20 @@ export function RequestCard({ request, when }: { request: Request; when: string 
         )}
       </div>
 
-      <form action={action} className="flex flex-col gap-2">
-        <FormNotice message={state.saved ? tCommon("saved") : undefined} />
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium">{t("notes")}</span>
-          <textarea name="notes" rows={2} maxLength={4000} defaultValue={request.notes ?? ""} dir="auto" className="control w-full px-3 py-2" />
-        </label>
-        <div>
-          <SubmitButton>{t("saveNotes")}</SubmitButton>
-        </div>
-      </form>
+      {/* Internal notes stay folded until someone needs them (open when there are some). */}
+      <details open={Boolean(request.notes) || state.saved} className="group">
+        <summary className="cursor-pointer text-sm font-medium text-primary">{t("notes")}</summary>
+        <form action={action} className="mt-2 flex flex-col gap-2">
+          <FormNotice message={state.saved ? tCommon("saved") : undefined} />
+          <label className="flex flex-col gap-1.5 text-sm">
+            <span className="sr-only">{t("notes")}</span>
+            <textarea name="notes" rows={2} maxLength={4000} defaultValue={request.notes ?? ""} dir="auto" className="control w-full px-3 py-2" />
+          </label>
+          <div>
+            <SubmitButton>{t("saveNotes")}</SubmitButton>
+          </div>
+        </form>
+      </details>
     </li>
   );
 }
