@@ -57,6 +57,6 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.
 
-`business_app.py <owner email with data>` (needs `pnpm --filter business-app exec expo start --web --port 8082`): the business app — today, a session's roster and check-in, a client, the numbers.
+`business_app.py <owner email with data>` (needs `pnpm --filter business-app exec expo start --web --port 8082`): the business app on a phone — today with its attention lists and the week, a session (check-in, booking someone in, a visit note), clients (filters, a new client, selling a plan, a note, a message), leads (a stage, a call, turning one into a client, a new lead), messages, numbers and settings; then the main screens in English with dark mode. If your local database listens on another port, set `E2E_DATABASE_URL`.
 
 `staff_app.py <team email>` (needs `pnpm --filter staff-app exec expo start --web --port 8083`): the MyBiz team app — what needs attention, businesses, and handling a request.

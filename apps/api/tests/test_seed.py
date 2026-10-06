@@ -70,6 +70,19 @@ def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
     assert set(stages) == {"new", "contacted", "trial", "offer", "won", "lost"}
     assert won_without_client == 0  # won leads are clients
     with engine.connect() as connection:
+        to_clients, to_leads, campaign_recipients, campaign_sent = connection.execute(
+            text("""
+                SELECT count(*) FILTER (WHERE client_id IS NOT NULL),
+                       count(*) FILTER (WHERE lead_id IS NOT NULL),
+                       (SELECT sum(recipients) FROM app.campaigns WHERE tenant_id = :t),
+                       count(*) FILTER (WHERE campaign_id IS NOT NULL)
+                FROM app.messages WHERE tenant_id = :t AND simulated
+            """),
+            {"t": tenant_id},
+        ).one()
+    assert to_clients > 10 and to_leads > 0  # the messages screens have history to show
+    assert campaign_recipients == campaign_sent
+    with engine.connect() as connection:
         invoices = (
             connection.execute(
                 text("SELECT status FROM app.platform_invoices WHERE tenant_id = :t"),
