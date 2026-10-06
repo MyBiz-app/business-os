@@ -30,6 +30,7 @@ def _execute(tenant: TenantContext, tool_name: str, payload: dict[str, Any]) -> 
             UUID(payload["session_id"]),
             UUID(payload["client_id"]),
             requires_plan=False,
+            dependent_id=UUID(payload["dependent_id"]) if payload.get("dependent_id") else None,
         )
         notify_booking(db, booking_id, "booked_by_studio")
         booking_status = db.execute(

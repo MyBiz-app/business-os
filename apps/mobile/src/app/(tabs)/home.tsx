@@ -11,6 +11,7 @@ import { tint } from "@business-os/app-kit/lib/brand";
 import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useDependents } from "@/lib/use-dependents";
 import { useBusiness } from "@/providers/business-provider";
 
 /** Branded home: the business, the client's next booking and what's on today. */
@@ -26,6 +27,7 @@ export default function Home() {
   const formatDay = (day: string) =>
     new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
   const { api, scope, business, palette } = useBusiness();
+  const dependents = useDependents();
 
   const load = useCallback(async () => {
     if (!business) return { sessions: [], appointments: 0, courts: 0, toReview: [] };
@@ -119,7 +121,7 @@ export default function Home() {
         {tTerms(`${termsFor(business)}.nextBooking`)}
       </Heading>
       {next ? (
-        <SessionCard session={next} onChange={update} showDay />
+        <SessionCard session={next} onChange={update} showDay dependents={dependents} />
       ) : (
         <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
       )}
@@ -130,7 +132,7 @@ export default function Home() {
             {t("today")}
           </Heading>
           {todays.map((session) => (
-            <SessionCard key={session.id} session={session} onChange={update} />
+            <SessionCard key={session.id} session={session} onChange={update} dependents={dependents} />
           ))}
         </>
       )}

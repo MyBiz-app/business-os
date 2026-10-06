@@ -228,9 +228,19 @@ PADEL_CLUB = BusinessSpec(
     clients=140,
     staff_per_branch=1,
 )
+GROOMING_SALON = BusinessSpec(
+    name="כפות שמחות (דמו)",
+    vertical="pet_grooming",
+    color="#c2410c",
+    billing_name="כפות שמחות בע״מ",
+    branches=(BranchSpec("רמת השרון", "סוקולוב 40, רמת השרון"),),
+    clients=160,
+    staff_per_branch=2,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
+    "pets": (GROOMING_SALON,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
@@ -914,6 +924,7 @@ def seed(
     ]
     _insert(conn, "UPDATE app.clients SET custom_fields = CAST(:fields AS jsonb) WHERE id = :id",
             profile_rows)  # fmt: skip
+    dependents = _seed_dependents(conn, tenant_id, spec.vertical, [c.id for c in clients], rng)
     by_id = {s["id"]: s for s in sessions}
     attended = [b for b in booking_rows if b.get("status") == "checked_in"]
     notes = COACH_NOTES if category == "fitness" else GENERIC_NOTES
@@ -997,9 +1008,66 @@ def seed(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "
         f"{len(clients)} clients, {lead_count} leads, {len(sessions)} sessions, "
         f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings, "
-        f"{reservations} reservations."
+        f"{reservations} reservations, {dependents} pets / children."
     )
     return tenant_id
+
+
+PET_NAMES = ("רקס", "לונה", "מקס", "בל", "צ׳ארלי", "נלה", "רוקי", "שוקו", "לולה", "בונו", "מילו",
+             "קיווי", "טופי", "סימבה", "פיצה", "ג׳ינג׳ר")  # fmt: skip
+CHILD_NAMES = ("נועה", "איתי", "מאיה", "יואב", "תמר", "אורי", "שירה", "עידו", "ליה", "רועי")
+BREEDS = ("מעורב", "פודל", "שיצו", "גולדן רטריבר", "לברדור", "מלטז", "בורדר קולי", "יורקשייר")
+
+
+def _seed_dependents(
+    conn: Connection, tenant_id: UUID, vertical: str, client_ids: list[UUID], rng: random.Random
+) -> int:
+    """Pets or children for most clients of an industry that keeps them (#43), with the
+    industry's details filled in, and each booking for one of its client's dependents."""
+    pack = VERTICAL_PACKS[vertical]
+    if pack.dependents is None:
+        return 0
+    names = PET_NAMES if pack.dependents == "pet" else CHILD_NAMES
+    rows = []
+    for client_id in client_ids:
+        if not pack.dependent_required and rng.random() < 0.3:
+            continue
+        for name in rng.sample(names, k=rng.choices((1, 2, 3), weights=(70, 25, 5))[0]):
+            details: dict[str, object] = {}
+            for f in pack.dependent_fields:
+                if f.kind == "select":
+                    details[f.key] = rng.choice(f.options[:2] if f.key == "species" else f.options)
+                elif f.key == "breed":
+                    details[f.key] = rng.choice(BREEDS)
+                elif f.key == "weight_kg":
+                    details[f.key] = rng.randint(3, 40)
+            years = rng.randint(1, 12)
+            rows.append(
+                {
+                    "tenant_id": tenant_id,
+                    "client_id": client_id,
+                    "kind": pack.dependents,
+                    "name": name,
+                    "birth": date.today() - timedelta(days=365 * years + rng.randint(0, 300)),
+                    "details": json.dumps(details, ensure_ascii=False),
+                }
+            )
+    _insert(conn, """
+        INSERT INTO app.dependents (tenant_id, client_id, kind, name, birth_date, details)
+        VALUES (:tenant_id, :client_id, :kind, :name, :birth, CAST(:details AS jsonb))
+    """, rows)  # fmt: skip
+    # Every booking is for one of its client's pets / children (when they have any).
+    conn.execute(
+        text("""
+            UPDATE app.bookings b SET dependent_id = (
+                SELECT d.id FROM app.dependents d
+                WHERE d.client_id = b.client_id ORDER BY random() LIMIT 1
+            )
+            WHERE b.tenant_id = :t
+        """),
+        {"t": tenant_id},
+    )
+    return len(rows)
 
 
 def seed_demo(
@@ -1431,8 +1499,9 @@ def main() -> None:
         default="studio",
         choices=sorted(DEMOS),
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
-        "owner: a pilates chain with five branches and a "
-        "barbershop with three; platform: the owner email becomes a MyBiz team owner and the "
+        "pets: a pet grooming salon with owners and their pets; "
+        "owner: a pilates chain with five branches and a barbershop with three; "
+        "platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",
     )
     parser.add_argument("--owner-name", default=None, help="Sets the owner's display name")

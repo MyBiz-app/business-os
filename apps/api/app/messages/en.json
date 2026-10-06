@@ -194,6 +194,15 @@
     },
     "meeting_rooms": {
       "name": "Meeting rooms & coworking"
+    },
+    "pet_grooming": {
+      "name": "Pet grooming"
+    },
+    "dog_training": {
+      "name": "Dog training"
+    },
+    "pet_daycare": {
+      "name": "Doggy day care"
     }
   }
 }

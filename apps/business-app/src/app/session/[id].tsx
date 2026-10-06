@@ -11,6 +11,7 @@ import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { confirm } from "@business-os/app-kit/lib/confirm";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { dependentsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
 type Booking = components["schemas"]["Booking"];
@@ -19,7 +20,16 @@ type ClientListItem = components["schemas"]["ClientListItem"];
 const TONE = { checked_in: "success", no_show: "danger", waitlisted: "primary" } as const;
 const METHODS = ["cash", "card", "transfer", "other"] as const;
 type Method = (typeof METHODS)[number];
-const BOOKING_ERRORS = ["already_booked", "session_cancelled", "invalid_transition", "invalid_reference", "not_found"];
+const BOOKING_ERRORS = [
+  "already_booked",
+  "session_cancelled",
+  "invalid_transition",
+  "invalid_reference",
+  "not_found",
+  "dependent_required",
+  "unknown_dependent",
+];
+const WITHOUT = "without";
 
 /** One session: who's coming, check-in, booking someone in and a note about a visit. */
 export default function SessionScreen() {
@@ -37,6 +47,10 @@ export default function SessionScreen() {
   const [search, setSearch] = useState("");
   const [matches, setMatches] = useState<ClientListItem[] | null>(null);
   const [noteFor, setNoteFor] = useState<Booking | null>(null);
+  // Industries that keep pets / children: tapping a client then asks which one comes.
+  const [picking, setPicking] = useState<{ client: ClientListItem; choices: { id: string; name: string }[] } | null>(null);
+  const tDependents = useTranslations("dependents");
+  const dependents = dependentsFor(tenant);
   const [method, setMethod] = useState<Method>("cash");
   const tResources = useTranslations("resources");
   const [note, setNote] = useState("");
@@ -110,15 +124,28 @@ export default function SessionScreen() {
     }
   };
 
-  const book = (client: ClientListItem) =>
+  const choose = (client: ClientListItem) =>
+    run(`book-${client.id}`, async () => {
+      const theirs = unwrap(
+        await api.GET("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: client.id } } }),
+      ).filter((d) => d.active && !bookedPairs.has(`${client.id}:${d.id}`));
+      const choices = [
+        ...theirs.map((d) => ({ id: d.id, name: d.name })),
+        ...(dependents.required || bookedPairs.has(`${client.id}:`) ? [] : [{ id: WITHOUT, name: tDependents("withoutDependent") }]),
+      ];
+      setPicking({ client, choices });
+    });
+
+  const book = (client: ClientListItem, dependentId?: string) =>
     run(`book-${client.id}`, async () => {
       const booking = unwrap(
         await api.POST("/sessions/{session_id}/bookings", {
           params: { ...scope, path: { session_id: id } },
-          body: { client_id: client.id },
+          body: { client_id: client.id, dependent_id: dependentId && dependentId !== WITHOUT ? dependentId : null },
         }),
       );
-      const name = [client.first_name, client.last_name].filter(Boolean).join(" ");
+      setPicking(null);
+      const name = booking.dependent_name ?? [client.first_name, client.last_name].filter(Boolean).join(" ");
       setNotice(booking.status === "waitlisted" ? tSession("waitlisted", { name }) : tSession("booked", { name }));
       setAdding(false);
       setMatches(null);
@@ -147,7 +174,8 @@ export default function SessionScreen() {
   }
   const { session, bookings } = data;
   const coming = bookings.filter((b) => b.status !== "cancelled");
-  const bookedIds = new Set(coming.map((b) => b.client_id));
+  const bookedIds = dependents.kind ? new Set<string>() : new Set(coming.map((b) => b.client_id));
+  const bookedPairs = new Set(coming.map((b) => `${b.client_id}:${b.dependent_id ?? ""}`));
   const isClass = session.booking_mode === "class";
   const open = session.status !== "cancelled";
 
@@ -246,11 +274,34 @@ export default function SessionScreen() {
                     onPress={() => {
                       setAdding(false);
                       setMatches(null);
+                      setPicking(null);
                     }}
                   />
                 </View>
               </View>
+              {picking && (
+                <View style={{ gap: 8 }}>
+                  <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>
+                    {tDependents("who")} · {[picking.client.first_name, picking.client.last_name].filter(Boolean).join(" ")}
+                  </Text>
+                  {picking.choices.length === 0 ? (
+                    <Text style={[styles.muted, { color: palette.muted }]}>{tDependents(`none.${dependents.kind ?? "pet"}`)}</Text>
+                  ) : (
+                    picking.choices.map((choice) => (
+                      <Button
+                        key={choice.id}
+                        label={choice.name}
+                        variant="secondary"
+                        palette={palette}
+                        busy={busy === `book-${picking.client.id}`}
+                        onPress={() => void book(picking.client, choice.id)}
+                      />
+                    ))
+                  )}
+                </View>
+              )}
               {matches !== null &&
+                !picking &&
                 (matches.filter((c) => !bookedIds.has(c.id)).length === 0 ? (
                   <Text style={[styles.muted, { color: palette.muted }]}>{tBookings("noMatches")}</Text>
                 ) : (
@@ -266,7 +317,7 @@ export default function SessionScreen() {
                           title={name}
                           subtitle={client.plan_name ?? tBookings("noPlan")}
                           accessibilityLabel={`${tBookings("book")}: ${name}`}
-                          onPress={() => void book(client)}
+                          onPress={() => void (dependents.kind ? choose(client) : book(client))}
                           trailing={busy === `book-${client.id}` ? <Text style={{ color: palette.muted }}>…</Text> : undefined}
                         />
                       );
@@ -289,14 +340,14 @@ export default function SessionScreen() {
           return (
             <Card key={booking.id} palette={palette}>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                <Avatar name={booking.client_name} palette={palette} />
+                <Avatar name={booking.dependent_name ?? booking.client_name} palette={palette} />
                 <View style={{ flex: 1, gap: 4 }}>
                   <Text
                     accessibilityRole="link"
                     onPress={() => router.push(`/client/${booking.client_id}`)}
                     style={{ color: palette.foreground, fontWeight: "700", fontSize: 16 }}
                   >
-                    {booking.client_name}
+                    {booking.dependent_name ? `${booking.dependent_name} · ${booking.client_name}` : booking.client_name}
                   </Text>
                   <Text style={{ color: palette.muted, fontSize: 13 }}>{booking.plan_name ?? tBookings("noPlan")}</Text>
                 </View>

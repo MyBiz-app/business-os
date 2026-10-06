@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
-from app.seed import PADEL_CLUB, seed, seed_demo
+from app.seed import GROOMING_SALON, PADEL_CLUB, seed, seed_demo
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -171,3 +171,33 @@ def test_demo_club_rents_its_courts(engine: Engine) -> None:
             {"t": tenant_id},
         ).one()
     assert reservations > 300 and overlapping == 0 and paid_twice == 0 and courts == 3
+
+
+def test_demo_salon_books_owners_pets(engine: Engine) -> None:
+    owner = uuid4()
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'salon-owner@example.com')"),
+            {"id": owner},
+        )
+        tenant_id = seed(connection, "salon-owner@example.com", 1, random.Random(5), GROOMING_SALON)
+
+    with engine.connect() as connection:
+        pets, owners_without, bookings, without_pet, foreign = connection.execute(
+            text("""
+                SELECT (SELECT count(*) FROM app.dependents WHERE tenant_id = :t AND kind = 'pet'),
+                       (SELECT count(*) FROM app.clients c WHERE c.tenant_id = :t
+                            AND NOT EXISTS (SELECT 1 FROM app.dependents d
+                                            WHERE d.client_id = c.id)),
+                       (SELECT count(*) FROM app.bookings WHERE tenant_id = :t),
+                       (SELECT count(*) FROM app.bookings
+                        WHERE tenant_id = :t AND dependent_id IS NULL),
+                       (SELECT count(*) FROM app.bookings b JOIN app.dependents d
+                            ON d.id = b.dependent_id WHERE b.tenant_id = :t
+                           AND d.client_id <> b.client_id)
+            """),
+            {"t": tenant_id},
+        ).one()
+    # A groomer needs to know which pet comes: every owner has one, every booking names one.
+    assert pets >= GROOMING_SALON.clients and owners_without == 0
+    assert bookings > 100 and without_pet == 0 and foreign == 0

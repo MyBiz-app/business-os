@@ -13,17 +13,30 @@ import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { useDependents } from "@/lib/use-dependents";
 import { useBusiness } from "@/providers/business-provider";
 
 type Slot = components["schemas"]["Slot"];
 type Service = components["schemas"]["AppointmentService"];
 
 const DAYS = 14;
-const KNOWN = ["slot_taken", "outside_hours", "no_valid_plan", "health_declaration_required", "health_declaration_review"] as const;
+const KNOWN = [
+  "slot_taken",
+  "outside_hours",
+  "no_valid_plan",
+  "health_declaration_required",
+  "health_declaration_review",
+  "dependent_required",
+  "unknown_dependent",
+] as const;
+const ME = "me";
 
 /** Book a personal appointment: service → staff → day → time. */
 export default function Appointment() {
   const t = useTranslations("client.appointment");
+  const tDependents = useTranslations("dependents");
+  const dependents = useDependents();
+  const [who, setWho] = useState<string | null>(null);
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const today = business ? todayIn(business.time_zone) : "";
@@ -65,6 +78,15 @@ export default function Appointment() {
 
   if (!business) return null;
   const time = (iso: string) => formatTime(iso, locale, business.time_zone);
+  // Industries that keep pets / children: the appointment is for one of them.
+  const kind = business.dependents;
+  const choices = kind
+    ? [
+        ...dependents.map((d) => ({ id: d.id, name: d.name })),
+        ...(business.dependent_required ? [] : [{ id: ME, name: tDependents("me") }]),
+      ]
+    : [];
+  const chosen = choices.find((c) => c.id === who) ?? choices[0] ?? null;
 
   const book = async () => {
     if (!service || !slot) return;
@@ -73,7 +95,12 @@ export default function Appointment() {
     const result = await api
       .POST("/client/appointments", {
         params: scope,
-        body: { service_id: service.id, staff_user_id: slot.staff_user_id, starts_at: slot.starts_at },
+        body: {
+          service_id: service.id,
+          staff_user_id: slot.staff_user_id,
+          starts_at: slot.starts_at,
+          dependent_id: chosen && chosen.id !== ME ? chosen.id : null,
+        },
       })
       .catch(() => null);
     setBusy(false);
@@ -221,8 +248,36 @@ export default function Appointment() {
             )}
           </Card>
 
+          {kind && slot && (
+            <>
+              <Text style={[local.step, { color: palette.foreground }]}>{tDependents("who")}</Text>
+              {choices.length === 0 ? (
+                <Card palette={palette}>
+                  <Text style={[styles.muted, { color: palette.muted }]}>{tDependents(`addFirst.${kind}`)}</Text>
+                  <Button
+                    label={tDependents(`add.${kind}`)}
+                    variant="secondary"
+                    palette={palette}
+                    onPress={() => router.push("/dependents")}
+                  />
+                </Card>
+              ) : (
+                <View role="radiogroup" aria-label={tDependents("who")} style={local.chips}>
+                  {choices.map((choice) => (
+                    <Chip
+                      key={choice.id}
+                      label={choice.name}
+                      selected={chosen?.id === choice.id}
+                      onPress={() => setWho(choice.id)}
+                      palette={palette}
+                    />
+                  ))}
+                </View>
+              )}
+            </>
+          )}
           <ErrorText message={error} palette={palette} />
-          {slot && <Button label={t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => void book()} />}
+          {slot && (!kind || choices.length > 0) && <Button label={t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => void book()} />}
         </>
       )}
     </Screen>
@@ -230,6 +285,7 @@ export default function Appointment() {
 }
 
 const local = StyleSheet.create({
+  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   step: { fontSize: 17, fontWeight: "700", textAlign: "left" },
   list: { gap: 10 },
   service: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderRadius: 18, padding: 14 },

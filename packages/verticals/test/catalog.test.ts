@@ -116,7 +116,15 @@ test("settings, starter content and client fields are valid", () => {
       assert.ok(Number.isInteger(plan.prices.ILS) && plan.prices.ILS! > 0, `${where}: plan ILS price`);
       assert.ok(plan.kind === "membership" || (plan.credits ?? 0) > 0, `${where}: punch card credits`);
     }
-    for (const field of [...(entry.client_fields ?? []), ...(entry.extra_client_fields ?? [])]) {
+    if (entry.dependents !== undefined) {
+      assert.ok(entry.dependents === null || entry.dependents === "pet" || entry.dependents === "child", `${where}: dependents`);
+    }
+    if (entry.dependent_required) assert.ok(vertical(entry.key)!.dependents, `${where}: dependent_required without dependents`);
+    for (const field of [
+      ...(entry.client_fields ?? []),
+      ...(entry.extra_client_fields ?? []),
+      ...(entry.dependent_fields ?? []),
+    ]) {
       assert.match(field.key, /^[a-z][a-z0-9_]*$/, `${where}: field ${field.key}`);
       assert.ok(FIELD_KINDS.includes(field.kind), `${where}: ${field.key} kind`);
       assert.equal(field.kind === "select", (field.options?.length ?? 0) > 0, `${where}: ${field.key} options`);
@@ -136,7 +144,13 @@ test("a sub-category inherits from its parent and overrides only what it sets", 
   assert.equal(termsOf("no-such-industry"), "fitness");
   assert.deepEqual(categories().map((c) => c.key).slice(0, 5), ["fitness", "beauty", "clinic", "classes", "automotive"]);
   assert.ok(childrenOf("beauty").some((c) => c.key === "barbershop"));
-  assert.ok(isOpen("garage") && !isOpen("pets") && !isOpen("nope"));
+  assert.ok(isOpen("garage") && isOpen("pets") && !isOpen("nope"));
+  const grooming = vertical("pet_grooming")!;
+  assert.equal(grooming.dependents, "pet");
+  assert.equal(grooming.dependentRequired, true);
+  assert.ok(grooming.dependentFields.some((f) => f.key === "species"));
+  assert.equal(vertical("kids_activities")!.dependents, "child");
+  assert.equal(vertical("pilates")!.dependents, null);
 });
 
 test("every entry has its texts in every language, with categories complete", () => {
@@ -153,7 +167,7 @@ test("every entry has its texts in every language, with categories complete", ()
       }
       if (v.status !== "planned") {
         assert.ok(lookup(locale, `terms.${v.terms}.clients`), `${locale}: terms.${v.terms}`);
-        for (const field of v.clientFields) {
+        for (const field of [...v.clientFields, ...v.dependentFields]) {
           assert.ok(lookup(locale, `clientFields.${field.key}`), `${locale}: clientFields.${field.key}`);
           for (const option of field.options ?? []) {
             assert.ok(lookup(locale, `clientFields.${field.key}_options.${option}`), `${locale}: ${field.key} option ${option}`);

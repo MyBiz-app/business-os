@@ -29,7 +29,7 @@ def test_only_before_the_first_business(client: TestClient, auth: AuthHeaders) -
 
 
 def test_only_industries_in_the_catalog(client: TestClient, auth: AuthHeaders) -> None:
-    for vertical in ("nope", "pets"):  # unknown, and one that is only planned
+    for vertical in ("nope", "events"):  # unknown, and one that is only planned
         response = client.post(
             "/tenants/sample", json={"vertical": vertical}, headers=auth(uuid4())
         )

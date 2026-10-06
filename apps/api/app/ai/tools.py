@@ -144,10 +144,21 @@ def get_client(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         """),
         {"id": client_id},
     ).mappings()
+    dependents = db.execute(
+        text("""
+            SELECT id, kind, name, details FROM app.dependents
+            WHERE client_id = :id AND active ORDER BY name
+        """),
+        {"id": client_id},
+    ).mappings()
     return {
         "name": row["name"],
         "status": row["status"],
         "joined": str(row["joined"]),
+        "pets_or_children (book one with its id)": [
+            {"id": str(d["id"]), "kind": d["kind"], "name": d["name"], "details": d["details"]}
+            for d in dependents
+        ],
         "profile (the industry's extra fields)": row["custom_fields"],
         "latest_visit_notes": [{"day": str(n["day"]), "note": n["body"]} for n in notes],
         "plans": plans,
@@ -407,6 +418,19 @@ def book_client(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         "full": session["booked"] >= session["capacity"],
     }
     payload = {"session_id": str(session_id), "client_id": str(client_id)}
+    if args.get("dependent_id"):
+        dependent_id = _uuid(args["dependent_id"], "dependent_id")
+        name = ctx.tenant.session.execute(
+            text("""
+                SELECT name FROM app.dependents
+                WHERE id = :id AND client_id = :client_id AND active
+            """),
+            {"id": dependent_id, "client_id": client_id},
+        ).scalar()
+        if name is None:
+            raise ToolError("that pet / child is not one of this client's (see get_client)")
+        preview["dependent"] = name
+        payload["dependent_id"] = str(dependent_id)
     return _propose(ctx, "book_client", payload, preview)
 
 
@@ -527,8 +551,16 @@ TOOLS: dict[str, Tool] = {
         Tool(
             "book_client",
             "Propose booking a client into a session (waitlist if full). Creates a card the user "
-            "must confirm; nothing is booked until they do.",
-            {"session_id": ID, "client_id": ID},
+            "must confirm; nothing is booked until they do. In businesses that keep clients' pets "
+            "or children, name the one who comes (ids from get_client), else an empty string.",
+            {
+                "session_id": ID,
+                "client_id": ID,
+                "dependent_id": {
+                    "type": "string",
+                    "description": "The pet / child who comes (an id from get_client), or ''",
+                },
+            },
             Permission.BOOKINGS_MANAGE,
             book_client,
             module="ai_pro",
