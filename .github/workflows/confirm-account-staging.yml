@@ -2,7 +2,7 @@ name: Confirm an account on staging
 
 # Staging has no email provider yet (issue #48), so sign-up confirmation emails never
 # arrive. The person signs up on staging with their own password; this marks their email as
-# confirmed so they can log in. Passwords never pass through here.
+# confirmed so they can log in, and creates their app profile. Passwords never pass through here.
 on:
   workflow_dispatch:
     inputs:
@@ -27,9 +27,17 @@ jobs:
           EMAIL: ${{ inputs.email }}
         run: |
           confirmed=$(psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v email="$EMAIL" -tA <<'SQL'
-          UPDATE auth.users SET email_confirmed_at = coalesce(email_confirmed_at, now())
-          WHERE lower(email) = lower(:'email')
-          RETURNING email;
+          WITH confirmed AS (
+              UPDATE auth.users SET email_confirmed_at = coalesce(email_confirmed_at, now())
+              WHERE lower(email) = lower(:'email')
+              RETURNING id, email
+          ), profile AS (
+              -- The app's profile, as the first login would create it (the demo generator needs it).
+              INSERT INTO app.users (id, email)
+              SELECT id, lower(email) FROM confirmed
+              ON CONFLICT (id) DO NOTHING
+          )
+          SELECT email FROM confirmed;
           SQL
           )
           if [ -z "$confirmed" ]; then
@@ -37,3 +45,6 @@ jobs:
             exit 1
           fi
           echo "Confirmed: $confirmed. Log in with the password chosen at sign-up."
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v email="$EMAIL" <<'SQL'
+          SELECT id, email, full_name FROM app.users WHERE lower(email) = lower(:'email');
+          SQL

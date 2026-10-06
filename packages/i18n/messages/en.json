@@ -117,7 +117,8 @@
       "user_already_exists": "An account with this email already exists.",
       "over_email_send_rate_limit": "Too many emails were sent. Please wait a minute and try again.",
       "link_invalid": "This link is invalid or has expired. Please try again.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us."
     }
   },
   "onboarding": {
