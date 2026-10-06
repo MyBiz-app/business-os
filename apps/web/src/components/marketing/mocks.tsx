@@ -123,7 +123,7 @@ export async function BranchesMock() {
     <div aria-hidden="true" className="card flex flex-col gap-4 p-5 shadow-2xl">
       <div className="flex items-center justify-between gap-3">
         <span className="flex items-center gap-2 rounded-xl border border-border bg-background/60 px-3 py-2 text-sm font-semibold">
-          <span className="size-6 rounded-lg bg-gradient-to-br from-indigo-500 to-fuchsia-500" />
+          <span className="size-6 rounded-lg bg-gradient-to-br from-brand-from to-brand-to" />
           {t("mock.business")}
           <span className="text-muted">▾</span>
         </span>
@@ -146,7 +146,7 @@ export async function BranchesMock() {
             </span>
             <span className="h-2 overflow-hidden rounded-full bg-foreground/5">
               <span
-                className="block h-full origin-left rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 [animation:grow-x_800ms_cubic-bezier(0.22,1,0.36,1)_both] rtl:origin-right"
+                className="block h-full origin-left rounded-full bg-gradient-to-r from-brand-from to-brand-to [animation:grow-x_800ms_cubic-bezier(0.22,1,0.36,1)_both] rtl:origin-right"
                 style={{ width: `${shares[index]}%`, animationDelay: `${200 + index * 120}ms` }}
               />
             </span>

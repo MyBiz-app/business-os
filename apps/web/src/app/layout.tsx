@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
-import { Heebo } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { localeDirection } from "@/i18n/config";
+import { mainFont } from "./fonts";
 import "./globals.css";
 
-// Heebo covers both Hebrew and Latin with matching metrics.
-const heebo = Heebo({
-  variable: "--font-heebo",
-  subsets: ["hebrew", "latin"],
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("app");
@@ -25,7 +20,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={locale}
       dir={localeDirection[locale]}
-      className={`${heebo.variable} h-full antialiased`}
+      className={`${mainFont.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

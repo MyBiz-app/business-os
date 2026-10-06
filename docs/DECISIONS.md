@@ -114,6 +114,7 @@ When a decision changes, update the row and note the date — do not delete hist
 | X3 | Claude opens and merges its own pull requests once CI is green (owner's standing permission); the owner reviews the result on staging and sends fixes. | DECIDED (2026-10-04) |
 | X4 | Project status is tracked on GitHub (owner, 2026-10-05): `docs/STATUS.md` (and its Hebrew twin `docs/STATUS.he.md`, for the owner) is the board (done, in progress, next, with links) and every open work item is a GitHub issue labeled `status: in progress` or `status: planned`; pull requests close their issues. Both are updated with every merged pull request, not every step. | DECIDED (2026-10-05) |
 | X5 | Order of work (owner, 2026-10-05): finish the marketing website first, then the business web system (CRM), and only then the apps. Modern design along the way. | DECIDED (2026-10-05) |
+| X6 | Modular by design (owner, 2026-10-06): every look-and-feel choice (font, colors, brand gradient, buttons, texts, prices, industries) lives in one place, listed in [`docs/design-system.md`](design-system.md), so changes are safe and quick. Components use tokens, never raw values. | DECIDED (2026-10-06) |
 
 ## Open
 

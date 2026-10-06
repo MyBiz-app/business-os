@@ -171,12 +171,12 @@ export async function CtaBand() {
   const t = await getTranslations("marketing.cta");
   return (
     <section className="px-6 py-20">
-      <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-5 overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-6 py-14 text-center text-white shadow-2xl">
+      <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-5 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-strong-from via-brand-via to-brand-strong-to px-6 py-14 text-center text-white shadow-2xl">
         <div aria-hidden="true" className="pointer-events-none absolute -top-24 -end-24 size-72 rounded-full bg-white/15 blur-3xl" />
         <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">{t("title")}</h2>
         <p className="relative max-w-xl text-lg text-white/85">{t("text")}</p>
         <div className="relative flex flex-wrap justify-center gap-3">
-          <Link href="/start" className="rounded-xl bg-white px-6 py-3 text-lg font-semibold text-indigo-700 shadow-lg transition-transform hover:-translate-y-0.5">
+          <Link href="/start" className="rounded-xl bg-white px-6 py-3 text-lg font-semibold text-brand-ink shadow-lg transition-transform hover:-translate-y-0.5">
             {t("button")}
           </Link>
           <Link href="/contact" className="rounded-xl border border-white/40 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-white/10">

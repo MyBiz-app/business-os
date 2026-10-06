@@ -1,11 +1,11 @@
 # Project status
 
-_Last updated: 2026-10-05_ · Updated with every merged pull request. Open work lives in
+_Last updated: 2026-10-06_ · Updated with every merged pull request. Open work lives in
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** phase 6 — businesses and branches ([#55](https://github.com/adiredri/business-os/issues/55)): one owner, several businesses, each with several branches, and a full demo.
-**Next:** phase 7, and the architecture follow-ups ([#63](https://github.com/adiredri/business-os/issues/63)).
+**Now:** the websites, in order: the marketing site, then the business web system (CRM); the apps after both are complete (decision X5).
+**Next:** phase 7, the apps, and the architecture follow-ups ([#63](https://github.com/adiredri/business-os/issues/63)).
 
 ## Board
 

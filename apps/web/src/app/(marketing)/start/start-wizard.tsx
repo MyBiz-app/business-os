@@ -536,7 +536,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
               <li key={group.key} className="flex flex-col gap-1.5" aria-current={index === groupIndex ? "step" : undefined}>
                 <span
                   className={`h-1.5 rounded-full transition-colors duration-500 ${
-                    index < groupIndex ? "bg-primary" : index === groupIndex ? "bg-gradient-to-r from-indigo-500 to-fuchsia-500" : "bg-foreground/10"
+                    index < groupIndex ? "bg-primary" : index === groupIndex ? "bg-gradient-to-r from-brand-from to-brand-to" : "bg-foreground/10"
                   }`}
                 />
                 <span className={`text-xs font-semibold ${index <= groupIndex ? "text-foreground" : "text-muted"}`}>
@@ -713,7 +713,7 @@ function AddOnRail({
 
 function Badge({ children }: { children: ReactNode }) {
   return (
-    <p className="absolute -top-3 start-5 flex items-center gap-1 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-3 py-1 text-xs font-bold text-white shadow">
+    <p className="absolute -top-3 start-5 flex items-center gap-1 rounded-full bg-gradient-to-r from-brand-from to-brand-to px-3 py-1 text-xs font-bold text-white shadow">
       <Sparkles aria-hidden="true" className="size-3" />
       {children}
     </p>
