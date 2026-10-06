@@ -243,6 +243,23 @@ GENERIC_REVIEWS = {
 }
 
 
+def profile_id(conn: Connection, email: str) -> UUID | None:
+    """The person's profile; created from their sign-up (Supabase auth) when they have not
+    used the app yet, e.g. when they could not log in before their email was confirmed."""
+    if conn.execute(text("SELECT to_regclass('auth.users') IS NOT NULL")).scalar():
+        conn.execute(
+            text("""
+                INSERT INTO app.users (id, email)
+                SELECT id, lower(email) FROM auth.users WHERE lower(email) = lower(:email)
+                ON CONFLICT DO NOTHING
+            """),
+            {"email": email},
+        )
+    return conn.execute(
+        text("SELECT id FROM app.users WHERE lower(email) = lower(:email)"), {"email": email}
+    ).scalar()
+
+
 def seed(
     conn: Connection,
     owner_email: str,
@@ -251,11 +268,9 @@ def seed(
     spec: BusinessSpec = STUDIO,
 ) -> UUID:
     """Creates one demo business owned by `owner_email` and returns its id."""
-    owner = conn.execute(
-        text("SELECT id FROM app.users WHERE lower(email) = lower(:email)"), {"email": owner_email}
-    ).scalar()
+    owner = profile_id(conn, owner_email)
     if owner is None:
-        sys.exit(f"No profile for {owner_email}: sign in to the web app once, then run again.")
+        sys.exit(f"No account for {owner_email}: sign up on the site first, then run again.")
     pack = VERTICAL_PACKS[spec.vertical]
     category = pack.category
 
@@ -905,6 +920,7 @@ def seed_demo(
     """Creates a demo's businesses for one owner. With `replace`, the owner's earlier copies
     of these businesses (same names, owned by them) are removed first."""
     specs = DEMOS[demo]
+    profile_id(conn, owner_email)  # the name below needs the profile
     if owner_name:
         conn.execute(
             text("UPDATE app.users SET full_name = :name WHERE lower(email) = lower(:email)"),
