@@ -29,6 +29,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 | `docs/STATUS.md`, `docs/STATUS.he.md` | Project status board (done, in progress, next), English and Hebrew |
 | `docs/verticals.md` | Industries: the category catalog and how to add a category |
 | `docs/design-system.md` | Design tokens and where to change what (font, colors, buttons, texts, prices) |
+| `docs/integrations.md` | Outside services behind swappable providers: how to add or switch one |
 
 ## Non-negotiable principles
 

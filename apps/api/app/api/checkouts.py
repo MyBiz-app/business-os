@@ -1,5 +1,7 @@
-"""Clients buying plans in the client app (checkouts). Payment is simulated until a payment
-provider is connected; the business turns online sales on in its settings."""
+"""Clients buying plans in the client app (checkouts). The business's payments provider takes
+the payment on its own hosted page and tells us by a webhook (app/api/webhooks.py); with the
+built-in simulated provider the app's "pay" button completes it. The business turns online
+sales on in its settings."""
 
 from datetime import datetime
 from typing import Literal
@@ -13,7 +15,10 @@ from sqlalchemy.exc import DBAPIError
 from app.api.common import not_found
 from app.api.deps import ClientDep
 from app.api.plans import Entitlement, issue_receipts_now, load_entitlement
+from app.core.config import get_settings
 from app.payments import provider_for_business
+from app.providers.choice import choose
+from app.providers.payments import CheckoutRequest, PaymentsUnavailable
 
 router = APIRouter(prefix="/client", tags=["client"])
 
@@ -45,7 +50,7 @@ class CheckoutPaid(BaseModel):
 SELECT = """
     SELECT k.id, k.plan_id, p.name AS plan_name, k.amount, k.list_amount, k.discount,
            (SELECT c.code FROM app.promo_codes c WHERE c.id = k.promo_code_id) AS promo_code,
-           k.currency, k.status, k.provider = 'simulated' AS simulated, NULL AS pay_url,
+           k.currency, k.status, k.provider = 'simulated' AS simulated, k.pay_url,
            k.created_at
     FROM app.checkouts k JOIN app.plans p ON p.id = k.plan_id
 """
@@ -83,7 +88,7 @@ def start_checkout(body: CheckoutCreate, context: ClientDep) -> Checkout:
             "tenant_id": context.tenant_id,
             "client_id": context.client_id,
             "plan_id": body.plan_id,
-            "provider": provider_for_business(),
+            "provider": provider_for_business(db, context.tenant_id),
         },
     ).scalar()
     if checkout_id is None:
@@ -123,6 +128,52 @@ def apply_promo(checkout_id: UUID, body: PromoCodeApply, context: ClientDep) -> 
                 status_code=status.HTTP_409_CONFLICT, detail="not_pending"
             ) from error
         raise
+    return _load(context, checkout_id)
+
+
+@router.post("/checkouts/{checkout_id}/pay-page")
+def pay_page(checkout_id: UUID, context: ClientDep) -> Checkout:
+    """The provider's hosted payment page for the checkout at its current amount (after any
+    promo code). The client pays there; the provider's webhook completes the checkout."""
+    checkout = _load(context, checkout_id)
+    if checkout.simulated or checkout.status != "pending":
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="no_pay_page")
+    db = context.session
+    client = (
+        db.execute(
+            text("""
+                SELECT trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name, c.email,
+                       t.locale
+                FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id WHERE c.id = :id
+            """),
+            {"id": context.client_id},
+        )
+        .mappings()
+        .one()
+    )
+    app_url = get_settings().client_app_url
+    try:
+        hosted = choose(db, context.tenant_id, "payments").instance.create_checkout(
+            CheckoutRequest(
+                checkout_id=str(checkout.id),
+                amount=checkout.amount,
+                currency=checkout.currency,
+                description=checkout.plan_name,
+                client_name=client["name"],
+                client_email=client["email"],
+                success_url=f"{app_url}/pay/{checkout.id}?done=1",
+                cancel_url=f"{app_url}/pay/{checkout.id}",
+                locale=client["locale"],
+            )
+        )
+    except PaymentsUnavailable as error:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="payments_unavailable"
+        ) from error
+    db.execute(
+        text("UPDATE app.checkouts SET pay_url = :url, provider_ref = :ref WHERE id = :id"),
+        {"url": hosted.pay_url, "ref": hosted.provider_ref, "id": checkout_id},
+    )
     return _load(context, checkout_id)
 
 

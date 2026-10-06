@@ -73,7 +73,9 @@
       "app": "באפליקציה, בזמן ההזמנה",
       "venue": "במקום"
     },
-    "resourcePaymentHint": "באפליקציה, ההזמנה מאושרת רק אחרי התשלום."
+    "resourcePaymentHint": "באפליקציה, ההזמנה מאושרת רק אחרי התשלום.",
+    "integrationsLink": "חיבורים לספקים",
+    "integrationsHint": "סליקה, חשבוניות והודעות: באיזה ספק משתמשים."
   },
   "locales": {
     "he": "עברית",
@@ -1187,7 +1189,8 @@
       "inbox": "תיבת פניות",
       "billing": "חיוב",
       "team": "צוות MyBiz",
-      "audit": "יומן פעולות"
+      "audit": "יומן פעולות",
+      "integrations": "ספקים"
     },
     "levels": {
       "primary_owner": "בעלים ראשי",
@@ -1346,6 +1349,21 @@
       "paidTotal": "שולם בסך הכול",
       "openTotal": "פתוח לגבייה",
       "paidShare": "{value} שולם"
+    },
+    "integrations": {
+      "title": "ספקים וחיבורים",
+      "subtitle": "באיזה ספק כל שירות משתמש כברירת מחדל, ואילו ספקים זמינים לעסקים.",
+      "default": "ברירת מחדל",
+      "available": "ספקים זמינים",
+      "simulated": "מדומה",
+      "live": "פעיל",
+      "businesses": "{count, plural, one {עסק אחד} other {# עסקים}}",
+      "howTo": "ספק חדש הוא מחלקה אחת שנרשמת בשרת (ראו docs/integrations.md); ברירת המחדל מוחלפת דרך API_<SERVICE>_PROVIDER.",
+      "capabilities": {
+        "email": "מייל",
+        "ai": "עוזר AI",
+        "storage": "אחסון קבצים"
+      }
     }
   },
   "permissions": {
@@ -1620,7 +1638,9 @@
     "print": "הדפסה",
     "back": "חזרה לכרטיס הלקוח",
     "thanks": "תודה!",
-    "email": "אימייל"
+    "email": "אימייל",
+    "legalDocument": "המסמך החשבונאי מס' {number} הופק אצל ספק החשבוניות",
+    "openDocument": "לפתיחת המסמך"
   },
   "marketing": {
     "nav": {
@@ -3549,6 +3569,34 @@
       "on_the_way": "איש המקצוע בדרך אליך",
       "in_progress": "העבודה בביצוע",
       "done": "הושלם"
+    }
+  },
+  "integrations": {
+    "title": "חיבורים לספקים",
+    "subtitle": "בוחרים ספק לכל שירות. החלפת ספק היא בחירה אחרת כאן; הלקוחות, המחירים וההיסטוריה נשארים כמו שהם.",
+    "provider": "ספק",
+    "builtin": "מובנה",
+    "save": "שמירת החיבור",
+    "change": "החלפת ספק או הגדרות",
+    "disconnect": "ניתוק (חזרה לברירת המחדל)",
+    "platformDefault": "בשימוש: ברירת המחדל של MyBiz.",
+    "connectedOn": "חיבור משלך, מאז {date}.",
+    "secretSet": "שמור (מוסתר)",
+    "secretKeep": "השאירו ריק כדי לשמור את הערך הקיים.",
+    "secretHint": "נשמר מוצפן ולא מוצג שוב.",
+    "capabilities": {
+      "payments": {
+        "title": "סליקה",
+        "hint": "גובה תשלומים בכרטיס מהלקוחות באפליקציה."
+      },
+      "invoicing": {
+        "title": "חשבוניות וקבלות",
+        "hint": "מפיק את המסמך החוקי לכל תשלום."
+      },
+      "messaging": {
+        "title": "וואטסאפ ו-SMS",
+        "hint": "שולח את ההודעות והתזכורות ללקוחות."
+      }
     }
   }
 }

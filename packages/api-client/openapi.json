@@ -2049,6 +2049,326 @@
         }
       }
     },
+    "/webhooks/payments/{provider}/{tenant_id}": {
+      "post": {
+        "tags": [
+          "webhooks"
+        ],
+        "summary": "Payment Webhook",
+        "operationId": "payment_webhook",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Business Integrations",
+        "description": "The business's provider per capability, with the providers it can switch to.",
+        "operationId": "business_integrations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Integration"
+                  },
+                  "title": "Response Business Integrations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/integrations/{capability}": {
+      "put": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Connect",
+        "description": "Connects (or switches to) a provider. Its settings are checked and the provider is built\nonce before saving, so a typo fails here and not on a client's payment.",
+        "operationId": "connect",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "capability",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "payments",
+                "invoicing",
+                "messaging"
+              ],
+              "type": "string",
+              "title": "Capability"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntegrationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Integration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Disconnect",
+        "description": "Removes the business's own connection: the platform's default applies again.",
+        "operationId": "disconnect",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "capability",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "payments",
+                "invoicing",
+                "messaging"
+              ],
+              "type": "string",
+              "title": "Capability"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Integration"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/integrations": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "summary": "Platform Integrations",
+        "description": "The platform's default provider per capability, the providers available, and how many\nbusinesses connected their own (MyBiz console).",
+        "operationId": "platform_integrations",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PlatformCapability"
+                  },
+                  "type": "array",
+                  "title": "Response Platform Integrations"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/clients/{client_id}/notes": {
       "get": {
         "tags": [
@@ -13721,6 +14041,65 @@
         }
       }
     },
+    "/client/checkouts/{checkout_id}/pay-page": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Pay Page",
+        "description": "The provider's hosted payment page for the checkout at its current amount (after any\npromo code). The client pays there; the provider's webhook completes the checkout.",
+        "operationId": "pay_page",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "checkout_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Checkout Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Checkout"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/checkouts/{checkout_id}/simulate-payment": {
       "post": {
         "tags": [
@@ -19728,6 +20107,107 @@
         ],
         "title": "InstructorOption"
       },
+      "Integration": {
+        "properties": {
+          "capability": {
+            "type": "string",
+            "enum": [
+              "payments",
+              "invoicing",
+              "messaging"
+            ],
+            "title": "Capability"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "provider_label": {
+            "type": "string",
+            "title": "Provider Label"
+          },
+          "own": {
+            "type": "boolean",
+            "title": "Own",
+            "description": "The business's own connection (not the platform default)"
+          },
+          "builtin": {
+            "type": "boolean",
+            "title": "Builtin"
+          },
+          "settings": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Settings",
+            "description": "Plain settings (secrets are never returned)"
+          },
+          "secrets_set": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Secrets Set",
+            "description": "Which secret settings have a value"
+          },
+          "connected_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connected At"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderOption"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "required": [
+          "capability",
+          "provider",
+          "provider_label",
+          "own",
+          "builtin",
+          "settings",
+          "secrets_set",
+          "connected_at",
+          "options"
+        ],
+        "title": "Integration"
+      },
+      "IntegrationUpdate": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Provider"
+          },
+          "settings": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Settings",
+            "description": "Every setting of the provider; an empty secret keeps the one already set"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider"
+        ],
+        "title": "IntegrationUpdate"
+      },
       "Invitation": {
         "properties": {
           "id": {
@@ -22370,6 +22850,51 @@
         ],
         "title": "PlatformBusiness"
       },
+      "PlatformCapability": {
+        "properties": {
+          "capability": {
+            "type": "string",
+            "title": "Capability"
+          },
+          "default_provider": {
+            "type": "string",
+            "title": "Default Provider"
+          },
+          "default_label": {
+            "type": "string",
+            "title": "Default Label"
+          },
+          "builtin": {
+            "type": "boolean",
+            "title": "Builtin"
+          },
+          "businesses_connected": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Businesses Connected",
+            "description": "Own connections, by provider"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderOption"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "type": "object",
+        "required": [
+          "capability",
+          "default_provider",
+          "default_label",
+          "builtin",
+          "businesses_connected",
+          "options"
+        ],
+        "title": "PlatformCapability"
+      },
       "PlatformPermission": {
         "type": "string",
         "enum": [
@@ -22651,6 +23176,71 @@
         ],
         "title": "PromoCodeUpdate"
       },
+      "ProviderField": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "secret": {
+            "type": "boolean",
+            "title": "Secret"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "secret",
+          "required"
+        ],
+        "title": "ProviderField"
+      },
+      "ProviderOption": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "builtin": {
+            "type": "boolean",
+            "title": "Builtin",
+            "description": "Works with no outside account (simulated, internal…)"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderField"
+            },
+            "type": "array",
+            "title": "Fields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "label",
+          "description",
+          "builtin",
+          "fields"
+        ],
+        "title": "ProviderOption"
+      },
       "Question": {
         "properties": {
           "text": {
@@ -22857,6 +23447,40 @@
             "type": "boolean",
             "title": "Simulated",
             "description": "A sample from a test payment, not a tax document"
+          },
+          "document_status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "issued",
+              "internal",
+              "failed"
+            ],
+            "title": "Document Status",
+            "description": "The legal document from the business's invoicing provider (X13)",
+            "default": "internal"
+          },
+          "document_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Number"
+          },
+          "document_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Document Url"
           }
         },
         "type": "object",

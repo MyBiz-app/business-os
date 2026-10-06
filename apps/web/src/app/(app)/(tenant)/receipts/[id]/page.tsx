@@ -41,6 +41,19 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
             {t("sample")}
           </p>
         )}
+        {receipt.document_status === "issued" && (
+          <p role="note" className="rounded-xl border border-success/40 bg-success/10 px-4 py-2 text-center text-sm print:hidden">
+            {t("legalDocument", { number: receipt.document_number ?? "" })}
+            {receipt.document_url && (
+              <>
+                {" · "}
+                <a href={receipt.document_url} target="_blank" rel="noreferrer" className="font-semibold text-primary underline-offset-4 hover:underline">
+                  {t("openDocument")}
+                </a>
+              </>
+            )}
+          </p>
+        )}
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
             <p className="text-2xl font-bold" dir="auto">{receipt.business_name}</p>

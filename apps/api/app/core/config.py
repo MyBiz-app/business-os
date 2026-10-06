@@ -37,6 +37,20 @@ class Settings(BaseSettings):
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from
+    # Outside services (decision X13, docs/integrations.md): the platform's default provider
+    # per capability and its settings as a JSON object; a business can connect its own
+    # (settings → Integrations) for payments, invoicing and messaging.
+    payments_provider: str = "simulated"
+    payments_settings: SecretStr | None = None
+    invoicing_provider: str = "internal"
+    invoicing_settings: SecretStr | None = None
+    messaging_provider: str = "simulated"
+    messaging_settings: SecretStr | None = None
+    storage_provider: str = "database"
+    storage_settings: SecretStr | None = None
+    # Encrypts the businesses' provider secrets in the database (a Fernet key).
+    secrets_key: SecretStr | None = None
+
     # Public addresses used in emails (links to the web app and the client app).
     web_url: str = "http://localhost:3000"
     client_app_url: str = "http://localhost:8081"

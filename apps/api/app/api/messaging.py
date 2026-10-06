@@ -19,6 +19,7 @@ from app.api.common import not_found
 from app.api.deps import TenantContext, has_module, require
 from app.metrics import members_at_risk
 from app.permissions import Permission
+from app.providers.choice import choose
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 
@@ -226,16 +227,28 @@ def _send(
     ]
     if not rows:
         return
-    # Simulated delivery: recorded as sent; a provider will send and report the status.
+    # The business's messaging provider (X13): the simulated one marks them sent now; a real
+    # one gets them from the outbox (status queued) in the send-messages job.
+    chosen = choose(db, context.tenant_id, "messaging")
+    simulated = chosen.instance.simulated
     db.execute(
         text("""
             INSERT INTO app.messages
                 (tenant_id, campaign_id, client_id, lead_id, channel, to_phone, body, status,
-                 created_by)
+                 simulated, provider, sent_at, created_by)
             VALUES (:tenant_id, :campaign_id, :client_id, :lead_id, :channel, :to_phone, :body,
-                    'sent', app.current_user_id())
+                    :status, :simulated, :provider, CASE WHEN :simulated THEN now() END,
+                    app.current_user_id())
         """),
-        rows,
+        [
+            {
+                **row,
+                "status": "sent" if simulated else "queued",
+                "simulated": simulated,
+                "provider": chosen.info.name,
+            }
+            for row in rows
+        ],
     )
     db.execute(
         text("""
@@ -245,7 +258,7 @@ def _send(
         {
             "t": context.tenant_id,
             "quantity": len(rows),
-            "details": json.dumps({"channel": channel, "simulated": True}),
+            "details": json.dumps({"channel": channel, "simulated": simulated}),
             "ref": str(campaign_id) if campaign_id else None,
         },
     )

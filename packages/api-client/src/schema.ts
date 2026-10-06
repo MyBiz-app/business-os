@@ -388,6 +388,89 @@ export interface paths {
         patch: operations["update_my_address"];
         trace?: never;
     };
+    "/webhooks/payments/{provider}/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Payment Webhook */
+        post: operations["payment_webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Integrations
+         * @description The business's provider per capability, with the providers it can switch to.
+         */
+        get: operations["business_integrations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/integrations/{capability}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Connect
+         * @description Connects (or switches to) a provider. Its settings are checked and the provider is built
+         *     once before saving, so a typo fails here and not on a client's payment.
+         */
+        put: operations["connect"];
+        post?: never;
+        /**
+         * Disconnect
+         * @description Removes the business's own connection: the platform's default applies again.
+         */
+        delete: operations["disconnect"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/integrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Platform Integrations
+         * @description The platform's default provider per capability, the providers available, and how many
+         *     businesses connected their own (MyBiz console).
+         */
+        get: operations["platform_integrations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}/notes": {
         parameters: {
             query?: never;
@@ -2774,6 +2857,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/checkouts/{checkout_id}/pay-page": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pay Page
+         * @description The provider's hosted payment page for the checkout at its current amount (after any
+         *     promo code). The client pays there; the provider's webhook completes the checkout.
+         */
+        post: operations["pay_page"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/checkouts/{checkout_id}/simulate-payment": {
         parameters: {
             query?: never;
@@ -4924,6 +5028,53 @@ export interface components {
             /** Full Name */
             full_name: string | null;
         };
+        /** Integration */
+        Integration: {
+            /**
+             * Capability
+             * @enum {string}
+             */
+            capability: "payments" | "invoicing" | "messaging";
+            /** Provider */
+            provider: string;
+            /** Provider Label */
+            provider_label: string;
+            /**
+             * Own
+             * @description The business's own connection (not the platform default)
+             */
+            own: boolean;
+            /** Builtin */
+            builtin: boolean;
+            /**
+             * Settings
+             * @description Plain settings (secrets are never returned)
+             */
+            settings: {
+                [key: string]: string;
+            };
+            /**
+             * Secrets Set
+             * @description Which secret settings have a value
+             */
+            secrets_set: string[];
+            /** Connected At */
+            connected_at: string | null;
+            /** Options */
+            options: components["schemas"]["ProviderOption"][];
+        };
+        /** IntegrationUpdate */
+        IntegrationUpdate: {
+            /** Provider */
+            provider: string;
+            /**
+             * Settings
+             * @description Every setting of the provider; an empty secret keeps the one already set
+             */
+            settings?: {
+                [key: string]: string;
+            };
+        };
         /** Invitation */
         Invitation: {
             /**
@@ -5896,6 +6047,26 @@ export interface components {
             /** Owner Email */
             owner_email: string | null;
         };
+        /** PlatformCapability */
+        PlatformCapability: {
+            /** Capability */
+            capability: string;
+            /** Default Provider */
+            default_provider: string;
+            /** Default Label */
+            default_label: string;
+            /** Builtin */
+            builtin: boolean;
+            /**
+             * Businesses Connected
+             * @description Own connections, by provider
+             */
+            businesses_connected: {
+                [key: string]: number;
+            };
+            /** Options */
+            options: components["schemas"]["ProviderOption"][];
+        };
         /**
          * PlatformPermission
          * @enum {string}
@@ -5988,6 +6159,33 @@ export interface components {
             /** Active */
             active: boolean;
         };
+        /** ProviderField */
+        ProviderField: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Secret */
+            secret: boolean;
+            /** Required */
+            required: boolean;
+        };
+        /** ProviderOption */
+        ProviderOption: {
+            /** Name */
+            name: string;
+            /** Label */
+            label: string;
+            /** Description */
+            description: string;
+            /**
+             * Builtin
+             * @description Works with no outside account (simulated, internal…)
+             */
+            builtin: boolean;
+            /** Fields */
+            fields: components["schemas"]["ProviderField"][];
+        };
         /** Question */
         Question: {
             /** Text */
@@ -6079,6 +6277,17 @@ export interface components {
              * @description A sample from a test payment, not a tax document
              */
             simulated: boolean;
+            /**
+             * Document Status
+             * @description The legal document from the business's invoicing provider (X13)
+             * @default internal
+             * @enum {string}
+             */
+            document_status: "pending" | "issued" | "internal" | "failed";
+            /** Document Number */
+            document_number?: string | null;
+            /** Document Url */
+            document_url?: string | null;
         };
         /** Recommendation */
         Recommendation: {
@@ -8387,6 +8596,163 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    payment_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_integrations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Integration"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                capability: "payments" | "invoicing" | "messaging";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IntegrationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Integration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disconnect: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                capability: "payments" | "invoicing" | "messaging";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Integration"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    platform_integrations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlatformCapability"][];
                 };
             };
         };
@@ -13868,6 +14234,39 @@ export interface operations {
                 "application/json": components["schemas"]["PromoCodeApply"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Checkout"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pay_page: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                checkout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {

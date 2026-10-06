@@ -73,7 +73,9 @@
       "app": "In the app, when booking",
       "venue": "At the venue"
     },
-    "resourcePaymentHint": "In the app, a reservation is confirmed only once it's paid."
+    "resourcePaymentHint": "In the app, a reservation is confirmed only once it's paid.",
+    "integrationsLink": "Integrations",
+    "integrationsHint": "Payments, invoices and messages: which provider you use."
   },
   "locales": {
     "he": "עברית",
@@ -1187,7 +1189,8 @@
       "inbox": "Inbox",
       "billing": "Billing",
       "team": "MyBiz team",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "integrations": "Integrations"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -1346,6 +1349,21 @@
       "paidTotal": "Paid in total",
       "openTotal": "Open to collect",
       "paidShare": "{value} paid"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "subtitle": "Which provider each service uses by default, and the providers available to businesses.",
+      "default": "Default",
+      "available": "Providers available",
+      "simulated": "Simulated",
+      "live": "Live",
+      "businesses": "{count, plural, one {# business} other {# businesses}}",
+      "howTo": "A new provider is one class registered in the API (see docs/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
+      "capabilities": {
+        "email": "Email",
+        "ai": "AI assistant",
+        "storage": "File storage"
+      }
     }
   },
   "permissions": {
@@ -1620,7 +1638,9 @@
     "print": "Print",
     "back": "Back to the client",
     "thanks": "Thank you!",
-    "email": "Email"
+    "email": "Email",
+    "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
+    "openDocument": "Open the document"
   },
   "marketing": {
     "nav": {
@@ -3549,6 +3569,34 @@
       "on_the_way": "The technician is on the way",
       "in_progress": "Work in progress",
       "done": "Done"
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Choose the provider for each service. Switching provider is choosing another one here; your clients, prices and history stay as they are.",
+    "provider": "Provider",
+    "builtin": "built in",
+    "save": "Save connection",
+    "change": "Change provider or settings",
+    "disconnect": "Disconnect (back to the default)",
+    "platformDefault": "Using MyBiz's default.",
+    "connectedOn": "Your own connection, since {date}.",
+    "secretSet": "Saved (hidden)",
+    "secretKeep": "Leave empty to keep the saved value.",
+    "secretHint": "Kept encrypted; never shown again.",
+    "capabilities": {
+      "payments": {
+        "title": "Payments",
+        "hint": "Takes your clients' card payments in the app."
+      },
+      "invoicing": {
+        "title": "Invoices and receipts",
+        "hint": "Issues the legal document for every payment."
+      },
+      "messaging": {
+        "title": "WhatsApp and SMS",
+        "hint": "Sends your messages and reminders to clients."
+      }
     }
   }
 }

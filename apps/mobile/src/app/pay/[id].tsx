@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Animated, Easing, Linking, Platform, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { useReducedMotion } from "@business-os/app-kit/components/motion";
@@ -77,6 +77,20 @@ export default function Pay() {
     if (!checkout) return;
     setStage("processing");
     setError(null);
+    if (!checkout.simulated) {
+      // A real provider (X13): the client pays on its secure page; its webhook completes the
+      // checkout, and coming back here shows the plan.
+      try {
+        const page = unwrap(
+          await api.POST("/client/checkouts/{checkout_id}/pay-page", { params: { ...scope, path: { checkout_id: checkout.id } } }),
+        );
+        if (page.pay_url) await Linking.openURL(page.pay_url);
+      } catch {
+        setError(t("failed"));
+      }
+      setStage("ready");
+      return;
+    }
     try {
       const [result] = await Promise.all([
         api.POST("/client/checkouts/{checkout_id}/simulate-payment", {
