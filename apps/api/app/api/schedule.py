@@ -104,10 +104,17 @@ class ScheduledSession(BaseModel):
     )
     status: SessionStatus
     notes: str | None
-    booking_mode: Literal["class", "appointment"] = Field(
-        description="appointment: a one-to-one booking with the instructor"
+    booking_mode: Literal["class", "appointment", "resource"] = Field(
+        description="appointment: a one-to-one booking with the instructor;"
+        " resource: a room or court reserved by the hour"
     )
-    appointment_client: str | None = Field(description="For an appointment: who it is with")
+    appointment_client: str | None = Field(
+        description="For an appointment or a reservation: who it is with"
+    )
+    price_amount: int | None = Field(
+        default=None, description="For a reservation: its price, fixed when it was made"
+    )
+    price_currency: str | None = None
 
 
 class OptionItem(BaseModel):
@@ -148,8 +155,8 @@ SESSION_SELECT = """
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
            bk.booked, bk.waitlisted, ss.open_ended AS series_open_ended,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
-           sv.booking_mode,
-           CASE WHEN sv.booking_mode = 'appointment' THEN (
+           sv.booking_mode, s.price_amount, s.price_currency,
+           CASE WHEN sv.booking_mode <> 'class' THEN (
                SELECT trim(c.first_name || ' ' || coalesce(c.last_name, ''))
                FROM app.bookings b JOIN app.clients c ON c.id = b.client_id
                WHERE b.session_id = s.id AND b.status <> 'cancelled'
