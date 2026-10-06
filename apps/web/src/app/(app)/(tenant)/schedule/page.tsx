@@ -73,14 +73,33 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         </div>
       </div>
 
+      {/* On phones the week is a long column: jump straight to a day (today stands out). */}
+      <nav aria-label={t("jumpToDay")} className="md:hidden">
+        <ul className="grid grid-cols-7 gap-1.5">
+          {days.map((day) => (
+            <li key={day}>
+              <a
+                href={`#day-${day}`}
+                aria-current={day === today ? "date" : undefined}
+                className={`flex flex-col items-center rounded-xl border py-1.5 text-xs transition-colors ${day === today ? "border-primary bg-primary text-on-primary" : "border-border bg-surface hover:bg-foreground/5"}`}
+              >
+                <span>{formatDay(day, locale, { weekday: "short" })}</span>
+                <span className="text-base font-semibold tabular-nums">{formatDay(day, locale, { day: "numeric" })}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
       <ol className="enter-items grid gap-3 md:grid-cols-7">
         {days.map((day) => {
           const daySessions = byDay.get(day) ?? [];
           return (
             <li
               key={day}
+              id={`day-${day}`}
               aria-label={formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })}
-              className={`flex min-h-32 flex-col gap-2 p-2 ${day === today ? "card-accent" : "card"} ${closed.has(day) ? "bg-[repeating-linear-gradient(135deg,transparent_0_8px,color-mix(in_oklab,var(--foreground)_4%,transparent)_8px_16px)]" : ""}`}
+              className={`flex min-h-32 scroll-mt-4 flex-col gap-2 p-2 ${day === today ? "card-accent" : "card"} ${closed.has(day) ? "bg-[repeating-linear-gradient(135deg,transparent_0_8px,color-mix(in_oklab,var(--foreground)_4%,transparent)_8px_16px)]" : ""}`}
             >
               <div className={`flex items-center justify-between gap-1 px-1 pt-1 text-sm font-semibold ${day === today ? "text-primary" : ""}`}>
                 {formatDay(day, locale, { weekday: "short", day: "numeric" })}
