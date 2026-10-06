@@ -68,12 +68,16 @@ class AppointmentCreate(BaseModel):
     staff_user_id: UUID
     starts_at: datetime
     client_id: UUID
+    dependent_id: UUID | None = None
 
 
 class ClientAppointmentCreate(BaseModel):
     service_id: UUID
     staff_user_id: UUID
     starts_at: datetime
+    dependent_id: UUID | None = Field(
+        default=None, description="Which of the client's pets / children comes (#43)"
+    )
 
 
 # --- Working hours ----------------------------------------------------------------------------
@@ -318,7 +322,12 @@ def book_appointment(body: AppointmentCreate, context: ManageDep) -> Booking:
     db = context.session
     session_id = create_appointment_session(db, body.service_id, body.staff_user_id, body.starts_at)
     booking_id = place_booking(
-        db, context.tenant_id, session_id, body.client_id, requires_plan=False
+        db,
+        context.tenant_id,
+        session_id,
+        body.client_id,
+        requires_plan=False,
+        dependent_id=body.dependent_id,
     )
     notify_booking(db, booking_id, "booked_by_studio")
     return _load(db, booking_id)
@@ -349,7 +358,14 @@ def book_my_appointment(body: ClientAppointmentCreate, context: ClientDep) -> Cl
         {"id": context.tenant_id},
     ).scalar_one()
     session_id = create_appointment_session(db, body.service_id, body.staff_user_id, body.starts_at)
-    place_booking(db, context.tenant_id, session_id, context.client_id, requires_plan=requires_plan)
+    place_booking(
+        db,
+        context.tenant_id,
+        session_id,
+        context.client_id,
+        requires_plan=requires_plan,
+        dependent_id=body.dependent_id,
+    )
     return _load_session(db, session_id)
 
 

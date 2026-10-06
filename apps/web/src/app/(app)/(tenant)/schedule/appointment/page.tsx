@@ -38,6 +38,24 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
     api.GET("/clients", { params: { ...scope, query: { limit: 20, status: "active", ...(search ? { search } : {}) } } }).then(unwrap),
   ]);
 
+  // Industries that keep pets / children book one of them (the owner pays).
+  const dependents = unwrap(await api.GET("/dependents/settings", { params: scope }));
+  const choices = (
+    await Promise.all(
+      clients.items.map(async (client) => {
+        const name = [client.first_name, client.last_name].filter(Boolean).join(" ");
+        const detail = client.phone ?? client.email ?? "";
+        if (!dependents.kind) return [{ id: client.id, name, detail }];
+        const theirs = unwrap(
+          await api.GET("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: client.id } } }),
+        ).filter((d) => d.active);
+        return [
+          ...theirs.map((d) => ({ id: `${client.id}|${d.id}`, name: `${d.name} · ${name}`, detail })),
+          ...(dependents.required ? [] : [{ id: client.id, name, detail }]),
+        ];
+      }),
+    )
+  ).flat();
   const terms = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
 
   return (
@@ -104,7 +122,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
             </form>
             {slots.length === 0 ? (
               <p className="text-muted">{t("appointments.noSlots")}</p>
-            ) : clients.items.length === 0 ? (
+            ) : choices.length === 0 ? (
               <p className="text-muted">{terms("noResults")}</p>
             ) : (
               <BookingForm
@@ -115,11 +133,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
                   time: formatTime(slot.starts_at, locale, tenant.time_zone),
                   staff: slot.staff_name,
                 }))}
-                clients={clients.items.map((client) => ({
-                  id: client.id,
-                  name: [client.first_name, client.last_name].filter(Boolean).join(" "),
-                  detail: client.phone ?? client.email ?? "",
-                }))}
+                clients={choices}
               />
             )}
           </section>

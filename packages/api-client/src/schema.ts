@@ -167,6 +167,116 @@ export interface paths {
         patch: operations["update_client"];
         trace?: never;
     };
+    "/dependents/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dependent Settings */
+        get: operations["dependent_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/dependents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Dependents
+         * @description The client's pets / children, active first.
+         */
+        get: operations["client_dependents"];
+        put?: never;
+        /** Add Dependent */
+        post: operations["add_dependent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/dependents/{dependent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Dependent */
+        patch: operations["update_dependent"];
+        trace?: never;
+    };
+    "/client/dependents/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Dependent Settings */
+        get: operations["my_dependent_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/dependents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Dependents
+         * @description The signed-in client's pets / children in this business.
+         */
+        get: operations["my_dependents"];
+        put?: never;
+        /** Add My Dependent */
+        post: operations["add_my_dependent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/dependents/{dependent_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update My Dependent */
+        patch: operations["update_my_dependent"];
+        trace?: never;
+    };
     "/clients/{client_id}/notes": {
         parameters: {
             query?: never;
@@ -2412,7 +2522,8 @@ export interface paths {
         put?: never;
         /**
          * Book Session
-         * @description Books the signed-in client, or puts them on the waitlist when the session is full.
+         * @description Books the signed-in client (or one of their pets / children), or puts them on the
+         *     waitlist when the session is full.
          */
         post: operations["book_session"];
         delete?: never;
@@ -2922,6 +3033,8 @@ export interface components {
              * Format: uuid
              */
             client_id: string;
+            /** Dependent Id */
+            dependent_id?: string | null;
         };
         /** AppointmentService */
         AppointmentService: {
@@ -3112,6 +3225,13 @@ export interface components {
             client_id: string;
             /** Client Name */
             client_name: string;
+            /** Dependent Id */
+            dependent_id?: string | null;
+            /**
+             * Dependent Name
+             * @description The pet / child who comes
+             */
+            dependent_name?: string | null;
             /**
              * Plan Name
              * @description The client's plan this booking uses, if any
@@ -3149,6 +3269,11 @@ export interface components {
              * Format: uuid
              */
             client_id: string;
+            /**
+             * Dependent Id
+             * @description Which of the client's pets / children comes (#43)
+             */
+            dependent_id?: string | null;
         };
         /** BookingUpdate */
         BookingUpdate: {
@@ -3518,6 +3643,11 @@ export interface components {
              * Format: date-time
              */
             starts_at: string;
+            /**
+             * Dependent Id
+             * @description Which of the client's pets / children comes (#43)
+             */
+            dependent_id?: string | null;
         };
         /** ClientBooking */
         ClientBooking: {
@@ -3555,11 +3685,21 @@ export interface components {
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
             /** Late Cancel */
             late_cancel: boolean;
+            /** Dependent Name */
+            dependent_name?: string | null;
             /**
              * Rating
              * @description The client's review of the visit
              */
             rating?: number | null;
+        };
+        /** ClientBookingCreate */
+        ClientBookingCreate: {
+            /**
+             * Dependent Id
+             * @description Which of the client's pets / children comes (#43)
+             */
+            dependent_id?: string | null;
         };
         /** ClientBusiness */
         ClientBusiness: {
@@ -3602,6 +3742,17 @@ export interface components {
              * @enum {string}
              */
             resource_payment: "app" | "venue";
+            /**
+             * Dependents
+             * @description The industry keeps the client's pets / children (#43)
+             */
+            dependents?: ("pet" | "child") | null;
+            /**
+             * Dependent Required
+             * @description Every booking says which pet / child comes
+             * @default false
+             */
+            dependent_required: boolean;
             /**
              * Client Id
              * Format: uuid
@@ -3844,7 +3995,13 @@ export interface components {
             spots_left: number;
             /** Waitlisted */
             waitlisted: number;
+            /** @description The client's first live booking */
             my_booking: components["schemas"]["MyBooking"] | null;
+            /**
+             * My Bookings
+             * @description All the client's live bookings (one per dependent who comes)
+             */
+            my_bookings?: components["schemas"]["MyBooking"][];
         };
         /** ClientUpdate */
         ClientUpdate: {
@@ -4151,6 +4308,91 @@ export interface components {
              * @constant
              */
             accept: true;
+        };
+        /** Dependent */
+        Dependent: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "pet" | "child";
+            /** Name */
+            name: string;
+            /** Birth Date */
+            birth_date: string | null;
+            /**
+             * Details
+             * @description Values of the pack's dependent fields
+             */
+            details: {
+                [key: string]: string | number;
+            };
+            /** Notes */
+            notes: string | null;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** DependentCreate */
+        DependentCreate: {
+            /** Name */
+            name: string;
+            /** Birth Date */
+            birth_date?: string | null;
+            /** Details */
+            details?: {
+                [key: string]: string | number | null;
+            };
+            /** Notes */
+            notes?: string | null;
+        };
+        /**
+         * DependentSettings
+         * @description What the business's industry keeps about dependents (labels come from translations:
+         *     the kind's words under terms, the fields under clientFields).
+         */
+        DependentSettings: {
+            /**
+             * Kind
+             * @description None: the industry keeps none
+             */
+            kind: ("pet" | "child") | null;
+            /**
+             * Required
+             * @description Every booking must say which pet / child comes
+             */
+            required: boolean;
+            /** Fields */
+            fields: components["schemas"]["ClientFieldDefinition"][];
+        };
+        /** DependentUpdate */
+        DependentUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Birth Date */
+            birth_date?: string | null;
+            /** Details */
+            details?: {
+                [key: string]: string | number | null;
+            } | null;
+            /** Notes */
+            notes?: string | null;
+            /** Active */
+            active?: boolean | null;
         };
         /** DirectMessage */
         DirectMessage: {
@@ -5075,6 +5317,13 @@ export interface components {
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
             /** Waitlist Position */
             waitlist_position: number | null;
+            /** Dependent Id */
+            dependent_id?: string | null;
+            /**
+             * Dependent Name
+             * @description The pet / child who comes
+             */
+            dependent_name?: string | null;
         };
         /** MyHealth */
         MyHealth: {
@@ -7249,6 +7498,286 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dependent_settings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependentSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_dependents: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_dependent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_dependent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                dependent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_dependent_settings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DependentSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_dependents: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_my_dependent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependentCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_my_dependent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                dependent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DependentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dependent"];
                 };
             };
             /** @description Validation Error */
@@ -12503,7 +13032,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ClientBookingCreate"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             201: {

@@ -665,7 +665,9 @@
       "invalid_transition": "That change isn't possible for this booking.",
       "invalid_reference": "That client is not available. Refresh and try again.",
       "not_found": "The booking was not found. Refresh and try again.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "dependent_required": "Choose who comes.",
+      "unknown_dependent": "That one isn't on this client's card any more."
     },
     "noPlan": "No plan",
     "showAll": "Show the whole history ({count})"
@@ -3325,5 +3327,36 @@
       "other": "Other"
     },
     "recordPayment": "Record the payment"
+  },
+  "dependents": {
+    "title": {
+      "pet": "Pets",
+      "child": "Children"
+    },
+    "add": {
+      "pet": "Add a pet",
+      "child": "Add a child"
+    },
+    "none": {
+      "pet": "No pets yet.",
+      "child": "No children yet."
+    },
+    "name": "Name",
+    "birthDate": "Date of birth",
+    "notes": "Notes",
+    "active": "Active",
+    "inactive": "No longer comes",
+    "edit": "Edit {name}",
+    "save": "Save",
+    "retire": "No longer comes",
+    "restore": "Comes again",
+    "age": "{years, plural, =0 {under a year} one {# year} other {# years}}",
+    "for": "For {name}",
+    "bookFor": "Book {dependent} ({owner})",
+    "withoutDependent": "Without",
+    "owner": {
+      "pet": "Owner",
+      "child": "Parent"
+    }
   }
 }

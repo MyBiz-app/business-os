@@ -91,6 +91,12 @@ export type Entry = {
   default_plans?: DefaultPlan[];
   /** Replaces the parent's starter courts and rooms. */
   default_rooms?: DefaultRoom[];
+  /** Profiles under a client (#43): pets under an owner or children under a parent. */
+  dependents?: "pet" | "child" | null;
+  /** The details kept about each dependent (replaces the parent's). */
+  dependent_fields?: ClientField[];
+  /** A booking must say which dependent it is for. */
+  dependent_required?: boolean;
   children?: Entry[];
 };
 
@@ -115,6 +121,9 @@ export type Vertical = {
   defaultServices: DefaultService[];
   defaultPlans: DefaultPlan[];
   defaultRooms: DefaultRoom[];
+  dependents: "pet" | "child" | null;
+  dependentFields: ClientField[];
+  dependentRequired: boolean;
   children: string[];
 };
 
@@ -148,6 +157,9 @@ function build(): Map<string, Vertical> {
       defaultServices: entry.default_services ?? parent?.defaultServices ?? [],
       defaultPlans: entry.default_plans ?? parent?.defaultPlans ?? [],
       defaultRooms: entry.default_rooms ?? parent?.defaultRooms ?? [],
+      dependents: entry.dependents !== undefined ? entry.dependents : (parent?.dependents ?? null),
+      dependentFields: entry.dependent_fields ?? parent?.dependentFields ?? [],
+      dependentRequired: entry.dependent_required ?? parent?.dependentRequired ?? false,
       children: (entry.children ?? []).map((child) => child.key),
     };
     all.set(entry.key, vertical);

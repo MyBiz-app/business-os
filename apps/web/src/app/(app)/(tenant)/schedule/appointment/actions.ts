@@ -10,13 +10,14 @@ export type AppointmentState = { error?: "slot_taken" | "outside_hours" | "inval
 /** Books the chosen client into the chosen free time, then opens the appointment. */
 export async function bookAppointment(serviceId: string, _state: AppointmentState, formData: FormData): Promise<AppointmentState> {
   const slot = String(formData.get("slot") ?? "");
-  const clientId = String(formData.get("client_id") ?? "");
+  // "client" or "client|dependent" (who comes, in industries that keep pets / children).
+  const [clientId, dependentId] = String(formData.get("client_id") ?? "").split("|");
   const [staffUserId, startsAt] = slot.split("|");
   if (!staffUserId || !startsAt || !clientId) return { error: "invalid" };
   const { api, scope } = await getTenantFor("bookings.manage");
   const { data, response, error } = await api.POST("/appointments", {
     params: scope,
-    body: { service_id: serviceId, staff_user_id: staffUserId, starts_at: startsAt, client_id: clientId },
+    body: { service_id: serviceId, staff_user_id: staffUserId, starts_at: startsAt, client_id: clientId, dependent_id: dependentId || null },
   });
   if (!data) {
     const detail = (new ApiError(response.status, error).body as { detail?: unknown } | null)?.detail;
