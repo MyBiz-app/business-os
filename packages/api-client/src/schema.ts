@@ -1263,6 +1263,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reports/resources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resource Usage
+         * @description For each bookable room: how many of its open hours were reserved in the period (local
+         *     dates, inclusive), how many reservations, and what they brought in.
+         */
+        get: operations["resource_usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/resources/reservations/{booking_id}/payment": {
         parameters: {
             query?: never;
@@ -5691,6 +5712,39 @@ export interface components {
             /** Price Currency */
             price_currency: string;
         };
+        /** ResourceUsageRow */
+        ResourceUsageRow: {
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /** Room Name */
+            room_name: string;
+            /** Location Name */
+            location_name: string;
+            /**
+             * Open Hours
+             * @description Hours the room was open for reservations in the period
+             */
+            open_hours: number;
+            /**
+             * Reserved Hours
+             * @description Hours reserved (with a live booking)
+             */
+            reserved_hours: number;
+            /** Reservations */
+            reservations: number;
+            /**
+             * Revenue
+             * @description Paid for reservations in the period, minor units
+             */
+            revenue: number;
+            /** Currency */
+            currency: string;
+            /** Occupancy Percent */
+            occupancy_percent: number | null;
+        };
         /** Review */
         Review: {
             /** Approve */
@@ -10005,6 +10059,42 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resource_usage: {
+        parameters: {
+            query: {
+                start: string;
+                end: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceUsageRow"][];
                 };
             };
             /** @description Validation Error */

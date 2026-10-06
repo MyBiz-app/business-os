@@ -1445,7 +1445,13 @@
       "less": "פחות",
       "more": "יותר",
       "busiest": "הכי עמוס: {slot}"
-    }
+    },
+    "byCourt": "מגרשים וחדרים לפי שעה",
+    "court": "מגרש",
+    "reservations": "הזמנות",
+    "reservedHours": "שעות מוזמנות",
+    "hoursOf": "{reserved} מתוך {open}",
+    "courtRevenue": "שולם"
   },
   "email": {
     "greeting": "שלום {name},",
@@ -2763,6 +2769,14 @@
       "to": "אל {name}",
       "send": "שליחה",
       "noPhone": "אין מספר טלפון לשליחה."
+    },
+    "reserve": {
+      "cta": "הזמנת מגרש",
+      "none": "עוד אין מגרש או חדר להשכרה. מגדירים אותם במחשב.",
+      "minutes": "{count} דק׳",
+      "day": "יום",
+      "time": "מגרש ושעה",
+      "reserveFor": "הזמנה עבור {name}"
     }
   },
   "staffApp": {

@@ -94,6 +94,25 @@ with sync_playwright() as p:
     expect(page.get_by_text("ההערה נשמרה בכרטיס")).to_be_visible(timeout=20000)
     print("2b. booked someone in and wrote a visit note: ok")
 
+    # A court by the hour (when the business rents any): reserve it, then take the payment.
+    tab(page, "היום")
+    reserve = page.get_by_role("button", name="הזמנת מגרש")
+    if reserve.count():
+        reserve.first.click()
+        page.get_by_role("heading", name="הזמנה חדשה").wait_for(timeout=30000)
+        page.get_by_role("tablist", name="יום").get_by_role("tab").nth(2).click()
+        page.get_by_role("tablist", name=re.compile("מגרש")).first.get_by_role("tab").first.click()
+        page.get_by_label("חיפוש לקוח לרישום").fill("א")
+        page.get_by_role("button", name="חיפוש", exact=True).click()
+        page.get_by_role("button", name="הזמנה עבור").first.click()
+        page.get_by_role("heading", name="מי מגיע").wait_for(timeout=30000)
+        expect(page.get_by_text("עוד לא שולם")).to_be_visible()
+        page.get_by_role("button", name="רישום התשלום").click()
+        expect(page.get_by_text("שולם", exact=True)).to_be_visible(timeout=20000)
+        check(page, "reservation")
+        print("2c. reserved a court for a client and took the payment: ok")
+        tab(page, "היום")
+
     # Clients: a filter, a new client, then selling a plan and a note on the card.
     tab(page, "מתאמנים")
     page.get_by_role("heading", name="מתאמנים").wait_for(timeout=30000)

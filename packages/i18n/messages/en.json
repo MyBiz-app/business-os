@@ -1445,7 +1445,13 @@
       "less": "Less",
       "more": "More",
       "busiest": "Busiest: {slot}"
-    }
+    },
+    "byCourt": "Courts and rooms by the hour",
+    "court": "Court",
+    "reservations": "Reservations",
+    "reservedHours": "Hours reserved",
+    "hoursOf": "{reserved} of {open}",
+    "courtRevenue": "Paid"
   },
   "email": {
     "greeting": "Hi {name},",
@@ -2763,6 +2769,14 @@
       "to": "To {name}",
       "send": "Send",
       "noPhone": "There is no phone number to send to."
+    },
+    "reserve": {
+      "cta": "New reservation",
+      "none": "No court or room is for rent yet. Set them up on the web.",
+      "minutes": "{count} min",
+      "day": "Day",
+      "time": "Court and time",
+      "reserveFor": "Reserve for {name}"
     }
   },
   "staffApp": {
