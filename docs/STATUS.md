@@ -4,8 +4,8 @@ _Last updated: 2026-10-06_ · Updated with every merged pull request. Open work 
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** the websites, in order: the marketing site, then the business web system (CRM); the apps after both are complete (decision X5).
-**Next:** phase 7, the apps, and the architecture follow-ups ([#63](https://github.com/adiredri/business-os/issues/63)).
+**Now:** the websites are complete (marketing site, business web system and MyBiz console), in content, behaviour and looks. Waiting for the owner: sign-up emails on staging (#48) and the open decisions below.
+**Next:** the apps (decision X5), then phase 7 and the architecture follow-ups ([#63](https://github.com/adiredri/business-os/issues/63)).
 
 ## Board
 
@@ -24,7 +24,8 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
-- Business web system (CRM) polish. Round 1 done: clients list with plan and last visit, team avatars, reports heatmap. Round 2 done: plans show holders and recent sales, services show sessions and occupancy. Round 3 done: shorter client history, phone day strip on the schedule. Final pass done for the business app and the MyBiz console. Marketing site: structured data (product, price, questions) for search results, and the industry page's navs no longer share a name
+- Websites complete. Polished in four rounds: the clients list shows each client's plan and last visit, team avatars, a busy-hours heatmap and occupancy bars in the reports, plans and services show how they are used, a shorter client history, a day strip on the phone schedule, a two-row header on phones, search, sort and pages in the MyBiz console, a billing summary, and structured data for search results.
+- Checked end to end: `dod.py` (sign-up through the AI assistant and the console), a crawl of every page in Hebrew and English on computer and phone with no errors, no accessibility violations and nothing spilling off the screen, in light and dark mode.
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next
