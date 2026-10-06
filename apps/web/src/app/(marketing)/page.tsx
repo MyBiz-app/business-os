@@ -22,7 +22,7 @@ export default async function Home() {
     <main className="enter flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-indigo-500/25 to-fuchsia-500/25 blur-3xl rtl:translate-x-1/2" />
+        <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-from/25 to-brand-to/25 blur-3xl rtl:translate-x-1/2" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
           <div className="flex flex-col items-start gap-6">
             <p className="rounded-full bg-surface px-4 py-1.5 text-sm font-medium text-primary shadow-sm ring-1 ring-border">
@@ -30,7 +30,7 @@ export default async function Home() {
             </p>
             <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl">
               {t("hero.title")}{" "}
-              <span className="bg-gradient-to-br from-indigo-500 to-fuchsia-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-br from-brand-from to-brand-to bg-clip-text text-transparent">
                 {t("hero.titleAccent")}
               </span>
             </h1>

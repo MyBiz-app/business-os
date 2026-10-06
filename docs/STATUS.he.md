@@ -2,10 +2,10 @@
 
 # סטטוס הפרויקט
 
-_עודכן לאחרונה: 05.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/adiredri/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
+_עודכן לאחרונה: 06.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/adiredri/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
 
-**עכשיו:** שלב 6 — עסקים וסניפים ([#55](https://github.com/adiredri/business-os/issues/55)): בעלים אחד, כמה עסקים, לכל אחד כמה סניפים, והדגמה מלאה.
-**הבא בתור:** שלב 7, ותיקוני ההמשך מסקירת הארכיטקטורה ([#63](https://github.com/adiredri/business-os/issues/63)).
+**עכשיו:** האתרים, לפי הסדר: האתר השיווקי, ואחריו מערכת העסק באתר (CRM); האפליקציות אחרי ששניהם הושלמו (החלטה X5).
+**הבא בתור:** שלב 7, האפליקציות, ותיקוני ההמשך מסקירת הארכיטקטורה ([#63](https://github.com/adiredri/business-os/issues/63)).
 
 ## לוח השלבים
 

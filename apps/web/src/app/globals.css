@@ -27,6 +27,13 @@
     0 2px 4px hsl(var(--shadow-color) / 0.06),
     0 10px 24px -6px hsl(var(--shadow-color) / 0.14);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* MyBiz's own brand (logo tile, accents, the call-to-action band) — not a business's color. */
+  --brand-from: #6366f1;
+  --brand-via: #7c3aed;
+  --brand-to: #d946ef;
+  --brand-strong-from: #4f46e5;
+  --brand-strong-to: #c026d3;
+  --brand-ink: #4338ca;
 }
 
 .dark {
@@ -67,7 +74,14 @@
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
-  --font-sans: var(--font-heebo), system-ui, sans-serif;
+  --color-brand-from: var(--brand-from);
+  --color-brand-via: var(--brand-via);
+  --color-brand-to: var(--brand-to);
+  --color-brand-strong-from: var(--brand-strong-from);
+  --color-brand-strong-to: var(--brand-strong-to);
+  --color-brand-ink: var(--brand-ink);
+  /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
+  --font-sans: var(--font-main), system-ui, sans-serif;
 }
 
 body {

@@ -154,7 +154,7 @@ export default async function UpgradePage({ params }: PageProps<"/upgrade/[offer
             <Sparkles aria-hidden="true" className="size-4 text-primary" />
             {t("peek")}
           </figcaption>
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-500/10 to-fuchsia-500/10 p-6">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-from/10 to-brand-to/10 p-6">
             {picture}
             <span aria-hidden="true" className="absolute end-4 top-4 flex size-9 items-center justify-center rounded-full bg-surface shadow">
               <Lock className="size-4 text-muted" />

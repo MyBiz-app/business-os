@@ -12,7 +12,7 @@ export async function AppHeader({ children }: { children?: React.ReactNode }) {
       <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
         <span
           aria-hidden="true"
-          className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white shadow-md transition-transform duration-300 group-hover:rotate-12"
+          className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-from to-brand-to text-white shadow-md transition-transform duration-300 group-hover:rotate-12"
         >
           <Sparkles className="size-4" />
         </span>
