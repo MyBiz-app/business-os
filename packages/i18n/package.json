@@ -6,11 +6,12 @@
   "exports": {
     ".": "./src/index.ts",
     "./messages/*.json": "./messages/*.json",
-    "./dates": "./src/dates.ts"
+    "./dates": "./src/dates.ts",
+    "./money": "./src/money.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts",
+    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts test/money.test.ts",
     "export:api": "node scripts/export-api.mjs"
   },
   "devDependencies": {

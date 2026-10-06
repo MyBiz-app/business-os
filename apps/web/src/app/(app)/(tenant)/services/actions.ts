@@ -8,9 +8,9 @@ import { errorState, type FormState } from "@/lib/form-state";
 import { toMinorUnits } from "@/lib/money";
 import { getTenant } from "@/lib/tenant";
 
-function readForm(formData: FormData) {
+function readForm(formData: FormData, currency: string) {
   const value = (name: string) => String(formData.get(name) ?? "");
-  const price = toMinorUnits(value("price"));
+  const price = toMinorUnits(value("price"), currency);
   if (price === null) return null;
   return {
     name: value("name"),
@@ -25,9 +25,9 @@ function readForm(formData: FormData) {
 }
 
 export async function createService(_state: FormState, formData: FormData): Promise<FormState> {
-  const body = readForm(formData);
+  const { api, scope, tenant } = await getTenant();
+  const body = readForm(formData, tenant.currency);
   if (!body) return { error: "invalid" };
-  const { api, scope } = await getTenant();
   try {
     unwrap(await api.POST("/services", { params: scope, body }));
   } catch (error) {
@@ -42,9 +42,9 @@ export async function updateService(
   _state: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const body = readForm(formData);
+  const { api, scope, tenant } = await getTenant();
+  const body = readForm(formData, tenant.currency);
   if (!body) return { error: "invalid" };
-  const { api, scope } = await getTenant();
   try {
     unwrap(
       await api.PATCH("/services/{service_id}", {

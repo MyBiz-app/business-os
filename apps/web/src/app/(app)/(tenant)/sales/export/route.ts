@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import type { NextRequest } from "next/server";
 
 import { unwrap } from "@/lib/api";
+import { minorDigits, toMajor } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
 import { monthRange } from "../month";
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       r.client_email ?? "",
       r.description,
       tReceipts(`methods.${r.method}`),
-      (r.amount / 100).toFixed(2),
+      toMajor(r.amount, r.currency).toFixed(minorDigits(r.currency)),
       r.currency,
       r.simulated ? "1" : "0",
     ]),

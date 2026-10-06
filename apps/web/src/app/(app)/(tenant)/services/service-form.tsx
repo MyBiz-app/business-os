@@ -71,7 +71,7 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
           inputMode="decimal"
           dir="ltr"
           pattern="\d+([.,]\d{1,2})?"
-          defaultValue={service ? toMajorUnits(service.price_amount) : ""}
+          defaultValue={service ? toMajorUnits(service.price_amount, currency) : ""}
         />
         <Field label={t("services.color")} name="color" type="color" defaultValue={service?.color ?? "#4f46e5"} className="control h-11 w-20 cursor-pointer p-1" />
         <div className="sm:col-span-2">

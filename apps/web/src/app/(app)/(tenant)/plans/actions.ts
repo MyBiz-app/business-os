@@ -10,8 +10,8 @@ import { getTenant } from "@/lib/tenant";
 
 const value = (formData: FormData, name: string) => String(formData.get(name) ?? "");
 
-function readCommon(formData: FormData) {
-  const price = toMinorUnits(value(formData, "price"));
+function readCommon(formData: FormData, currency: string) {
+  const price = toMinorUnits(value(formData, "price"), currency);
   if (price === null) return null;
   return {
     name: value(formData, "name"),
@@ -23,10 +23,10 @@ function readCommon(formData: FormData) {
 }
 
 export async function createPlan(_state: FormState, formData: FormData): Promise<FormState> {
-  const common = readCommon(formData);
+  const { api, scope, tenant } = await getTenant();
+  const common = readCommon(formData, tenant.currency);
   if (!common) return { error: "invalid" };
   const kind = value(formData, "kind") === "punch_card" ? "punch_card" : "membership";
-  const { api, scope } = await getTenant();
   try {
     unwrap(
       await api.POST("/plans", {
@@ -42,9 +42,9 @@ export async function createPlan(_state: FormState, formData: FormData): Promise
 }
 
 export async function updatePlan(planId: string, _state: FormState, formData: FormData): Promise<FormState> {
-  const body = readCommon(formData);
+  const { api, scope, tenant } = await getTenant();
+  const body = readCommon(formData, tenant.currency);
   if (!body) return { error: "invalid" };
-  const { api, scope } = await getTenant();
   try {
     unwrap(await api.PATCH("/plans/{plan_id}", { params: { ...scope, path: { plan_id: planId } }, body }));
   } catch (error) {

@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import { type Catalog, ModulePicker, type Selection } from "@/components/modules/module-picker";
+import { toMajor } from "@/lib/money";
 
 import { type ActionState, extendTrial, setModules, voidInvoice } from "./actions";
 
@@ -99,7 +100,7 @@ export function BusinessActions({
                   <option key={invoice.id} value={invoice.id}>
                     {t("invoice", {
                       number: invoice.number,
-                      amount: format.number(invoice.total / 100, { style: "currency", currency: invoice.currency }),
+                      amount: format.number(toMajor(invoice.total, invoice.currency), { style: "currency", currency: invoice.currency }),
                     })}
                   </option>
                 ))}

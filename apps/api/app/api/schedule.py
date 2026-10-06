@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.bookings import lock_session, promote_waitlist
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
-from app.notifications import live_clients, notify, session_snapshot
+from app.notifications import live_clients, notify, notify_sessions, session_snapshot
 from app.permissions import Permission
 from app.scheduling import local_to_utc, weekly_occurrences
 
@@ -563,17 +563,16 @@ def update_series(series_id: UUID, body: SeriesUpdate, context: WriteDep) -> Ser
     now = datetime.now(dt.UTC)
     for row in changed:
         promote_waitlist(db, row["id"])  # capacity may have grown
-        if row["starts_at"] != row["previous_starts_at"] and row["starts_at"] > now:
-            notify(
-                db,
-                context.tenant_id,
-                live_clients(db, row["id"]),
-                "session_moved",
-                {
-                    **session_snapshot(db, row["id"]),
-                    "previous_starts_at": row["previous_starts_at"],
-                },
-            )
+    moved = [
+        r for r in changed if r["starts_at"] != r["previous_starts_at"] and r["starts_at"] > now
+    ]
+    notify_sessions(
+        db,
+        context.tenant_id,
+        "session_moved",
+        [r["id"] for r in moved],
+        [r["previous_starts_at"] for r in moved],
+    )
     return SeriesUpdated(updated=len(changed))
 
 
@@ -716,15 +715,8 @@ def close_day(body: ClosedDayCreate, context: WriteDep) -> ClosedDayCreated:
         },
     ).all()
     now = datetime.now(dt.UTC)
-    for session_id, starts_at in sessions:
-        if starts_at > now:
-            notify(
-                db,
-                context.tenant_id,
-                live_clients(db, session_id),
-                "session_cancelled",
-                session_snapshot(db, session_id),
-            )
+    upcoming = [session_id for session_id, starts_at in sessions if starts_at > now]
+    notify_sessions(db, context.tenant_id, "session_cancelled", upcoming)
     return ClosedDayCreated(
         closed_day=ClosedDay.model_validate(dict(row)), cancelled_sessions=len(sessions)
     )

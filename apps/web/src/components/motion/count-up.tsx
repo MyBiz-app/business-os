@@ -3,7 +3,7 @@
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 
-import { formatMoney } from "@/lib/money";
+import { formatMoney, minorDigits } from "@/lib/money";
 
 type Props = {
   value: number;
@@ -36,7 +36,7 @@ export function CountUp({ value, kind, currency = "ILS", durationMs = 900 }: Pro
   // While counting, money shows whole units only; the final value is exact.
   const format = (n: number) =>
     kind === "money"
-      ? formatMoney(n === value ? n : Math.round(n / 100) * 100, currency, locale)
+      ? formatMoney(n === value ? n : Math.round(n / 10 ** minorDigits(currency)) * 10 ** minorDigits(currency), currency, locale)
       : kind === "percent"
         ? `${new Intl.NumberFormat(locale).format(Math.round(n))}%`
         : new Intl.NumberFormat(locale).format(Math.round(n));

@@ -70,3 +70,38 @@ def notify_booking(db: Session, booking_id: UUID, kind: str) -> None:
         return
     payload = {**session_snapshot(db, row.session_id), "status": row.status}
     notify(db, row.tenant_id, [row.client_id], kind, payload)
+
+
+def notify_sessions(
+    db: Session,
+    tenant_id: UUID,
+    kind: str,
+    session_ids: list[UUID],
+    previous_starts_at: list[Any] | None = None,
+) -> None:
+    """Tells every live client of each session at once (a closed day, a moved series): one
+    insert for all of them instead of three queries per session. The payload matches
+    `session_snapshot`, plus `previous_starts_at` when the sessions moved."""
+    if not session_ids:
+        return
+    db.execute(
+        text("""
+            INSERT INTO app.notifications (tenant_id, client_id, kind, payload)
+            SELECT :tenant_id, b.client_id, :kind,
+                   jsonb_build_object(
+                       'session_id', s.id::text, 'service_name', sv.name, 'starts_at', s.starts_at
+                   ) || CASE WHEN t.previous IS NULL THEN '{}'::jsonb
+                             ELSE jsonb_build_object('previous_starts_at', t.previous) END
+            FROM unnest(CAST(:ids AS uuid[]), CAST(:previous AS timestamptz[])) AS t(id, previous)
+            JOIN app.sessions s ON s.id = t.id
+            JOIN app.services sv ON sv.id = s.service_id
+            JOIN app.bookings b ON b.session_id = s.id AND b.status IN ('booked', 'waitlisted')
+            ORDER BY s.starts_at, b.created_at
+        """),
+        {
+            "tenant_id": tenant_id,
+            "kind": kind,
+            "ids": [str(i) for i in session_ids],
+            "previous": previous_starts_at or [None] * len(session_ids),
+        },
+    )
