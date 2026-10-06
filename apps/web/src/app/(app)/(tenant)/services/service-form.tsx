@@ -15,6 +15,7 @@ type Service = components["schemas"]["Service"];
 
 const LENGTHS = [30, 45, 60, 90, 120, 150, 180, 240];
 const STEPS = [15, 30, 60];
+const TRAVEL = [0, 15, 30, 45, 60, 90];
 
 type Props = {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
@@ -28,6 +29,7 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
   const t = useTranslations();
   const [state, formAction] = useActionState(action, {});
   const [mode, setMode] = useState<Service["booking_mode"]>(service?.booking_mode ?? "class");
+  const [onSite, setOnSite] = useState(service?.on_site ?? false);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -89,6 +91,27 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
               pattern="\d+([.,]\d{1,2})?"
               defaultValue={service?.price_per_hour != null ? toMajorUnits(service.price_per_hour, currency) : ""}
             />
+          </>
+        )}
+        {mode === "appointment" && (
+          <>
+            <div className="sm:col-span-2">
+              <CheckboxField
+                label={t("jobs.onSite")}
+                name="on_site"
+                checked={onSite}
+                onChange={(event) => setOnSite(event.target.checked)}
+              />
+              <p className="mt-1 text-sm text-muted">{t("jobs.onSiteHint")}</p>
+            </div>
+            {onSite && (
+              <SelectField
+                label={t("jobs.travel")}
+                name="travel_minutes"
+                defaultValue={String(service?.travel_minutes ?? 30)}
+                options={TRAVEL.map((value) => ({ value: String(value), label: t("services.minutes", { count: value }) }))}
+              />
+            )}
           </>
         )}
         {mode === "class" ? (

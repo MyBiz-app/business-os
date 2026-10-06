@@ -364,6 +364,25 @@
       "profile": "Owner details",
       "visitNotes": "Grooming notes",
       "nextBooking": "Your next appointment"
+    },
+    "home_services": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Jobs",
+      "newSession": "New job",
+      "noSessions": "No jobs",
+      "sessionsToday": "{count, plural, =0 {No jobs today} one {One job today} other {# jobs today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "Your place",
+      "profile": "Client details",
+      "visitNotes": "Job notes",
+      "nextBooking": "Your next visit"
     }
   },
   "clients": {
@@ -894,7 +913,8 @@
         "health_declaration_review": "Your health declaration is waiting for review.",
         "generic": "Something went wrong. Please try again.",
         "dependent_required": "Choose who's coming.",
-        "unknown_dependent": "That profile isn't active any more."
+        "unknown_dependent": "That profile isn't active any more.",
+        "address_required": "Choose where the job is."
       }
     },
     "review": {
@@ -1995,7 +2015,8 @@
       "slot_taken": "That time was just taken. Choose another.",
       "outside_hours": "That time is outside working hours.",
       "generic": "Something went wrong. Please try again.",
-      "invalid": "Choose a client and a time."
+      "invalid": "Choose a client and a time.",
+      "address_required": "Choose one of the client's addresses."
     }
   },
   "hours": {
@@ -2984,10 +3005,12 @@
       "points": [
         "The client's address on every job",
         "Assign a technician",
-        "Quotes and approvals"
+        "Travel time between jobs"
       ],
       "heroTitle": "Every job on the road, in control.",
-      "heroText": "Cleaning, air conditioning, electricians, plumbers and pest control: jobs at the client's address, technicians, travel time and quotes."
+      "heroText": "Cleaning, air conditioning, electricians, plumbers and pest control: jobs at the client's address, a technician for each, travel time between jobs and the day's route on the phone.",
+      "yours": "Your business",
+      "example": "Cool Air"
     },
     "pets": {
       "name": "Pet services",
@@ -3196,6 +3219,26 @@
     "pet_daycare": {
       "name": "Doggy day care",
       "tagline": "Day care by the day or with a pass."
+    },
+    "cleaning": {
+      "name": "Cleaning services",
+      "tagline": "Home and office cleaning at the client's place."
+    },
+    "ac_technicians": {
+      "name": "Air conditioning",
+      "tagline": "Service, installation and repairs at home."
+    },
+    "electricians": {
+      "name": "Electricians",
+      "tagline": "Visits and installations, a technician for each job."
+    },
+    "plumbers": {
+      "name": "Plumbers",
+      "tagline": "Visits, unblocking and repairs."
+    },
+    "pest_control": {
+      "name": "Pest control",
+      "tagline": "Treatments for apartments, houses and offices."
     }
   },
   "clientFields": {
@@ -3291,7 +3334,14 @@
       "nervous": "Nervous",
       "reactive": "Reactive (needs care)"
     },
-    "vaccinated_until": "Vaccinations valid until"
+    "vaccinated_until": "Vaccinations valid until",
+    "property_type": "Property",
+    "property_type_options": {
+      "apartment": "Apartment",
+      "house": "House",
+      "office": "Office",
+      "other": "Other"
+    }
   },
   "businessMenu": {
     "switch": "Switch business",
@@ -3437,5 +3487,68 @@
     },
     "count": "{count, plural, =0 {None yet} one {One} other {#}}",
     "booked": "Booked: {names}"
+  },
+  "jobs": {
+    "title": "On-site job",
+    "onSite": "At the client's address (on-site)",
+    "onSiteHint": "The technician goes to the client. Booking asks for the client's address.",
+    "travel": "Time to get there",
+    "travelBefore": "{minutes} min on the road before the job",
+    "noAddress": "No address.",
+    "progress": "Job progress",
+    "undo": "Back one step",
+    "noAddresses": "No clients with an address match. Add an address on the client's card first.",
+    "bookHint": "An on-site job: choose the client and the address.",
+    "statuses": {
+      "scheduled": "Scheduled",
+      "on_the_way": "On the way",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "actions": {
+      "on_the_way": "On my way",
+      "in_progress": "Start the job",
+      "done": "Job done"
+    },
+    "address": {
+      "title": "Addresses",
+      "none": "No addresses yet.",
+      "add": "Add an address",
+      "save": "Save",
+      "edit": "Edit address",
+      "street": "Street and number",
+      "city": "City",
+      "details": "Floor, apartment",
+      "label": "Name",
+      "labelHint": "Home, office…",
+      "notes": "How to get in",
+      "notesHint": "Gate code, parking, intercom",
+      "inactive": "Not in use",
+      "retire": "Stop using",
+      "restore": "Use again",
+      "required": "Enter the street and the city.",
+      "saveFailed": "Couldn't save. Try again."
+    },
+    "myDay": "My jobs",
+    "teamDay": "The team's jobs",
+    "whose": "Whose jobs",
+    "mine": "Mine",
+    "team": "Everyone",
+    "none": "No on-site jobs on this day.",
+    "leaveBy": "Leave by {time}",
+    "call": "Call",
+    "open": "Job details",
+    "statusFailed": "Couldn't update the job. Try again.",
+    "cta": "My jobs today",
+    "where": "Where?",
+    "addAddress": "Add an address",
+    "myAddresses": "My addresses",
+    "myAddressesHint": "Where on-site jobs happen.",
+    "clientStatus": {
+      "scheduled": "Scheduled",
+      "on_the_way": "The technician is on the way",
+      "in_progress": "Work in progress",
+      "done": "Done"
+    }
   }
 }

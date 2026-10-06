@@ -40,6 +40,10 @@ A service with `"booking_mode": "resource"` is a court or room rented by the hou
 `closes`): a new business gets them in its main branch, for rent every day in those hours and
 serving its resource services, so it can take reservations from the first minute.
 
+An appointment service with `"on_site": true` happens at the client's address (#42), with
+`travel_minutes` (0–240) that block the technician before each job; booking asks for one of the
+client's addresses.
+
 Prices are integer minor units per currency. `ILS` is required; `USD` and `EUR` default to rough
 equivalents. A business keeps the key it chose (category or sub-category) in `tenants.vertical`.
 
@@ -79,4 +83,4 @@ A category that needs something the core cannot do yet (jobs at the client's add
 an owner, quotes and deposits) stays `planned` until that capability is built: see spec section
 4.3 and the phase 7 issues. Courts and rooms by the hour are built (#41): Sports & facilities is
 open as beta. Dependents are built (#43): Pet services is open as beta, and Kids activities keeps a
-profile per child.
+profile per child. On-site jobs are built (#42): Home & field services is open as beta.

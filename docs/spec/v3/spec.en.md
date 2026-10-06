@@ -107,7 +107,7 @@ These need one new capability in the core first. Each capability is built once f
 
 | Category | Examples | New capability it needs |
 |---|---|---|
-| Home & field services | cleaning, air conditioning, electricians, plumbers, pest control | On-site jobs: the client's address, travel time, assigning a technician, quotes |
+| Home & field services | cleaning, air conditioning, electricians, plumbers, pest control | On-site jobs: the client's address, travel time, assigning a technician, quotes. **Built (#42): Home & field services is open as beta**; quotes come with #44 |
 | Pet services | dog grooming, training, boarding, dog day care | Dependents: several profiles under one client (pets; also children for Kids & Youth). **Built (#43): Pet services is open as beta** (grooming, training, day care); Kids & Youth keeps a profile per child |
 | Kids & Youth (full) | enrichment centers, camps, toddler gyms | Dependents and parent accounts |
 | Creative & events | photographers and studios, DJs, event suppliers, small venues | Quotes, deposits and event projects |

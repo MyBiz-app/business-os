@@ -2101,9 +2101,253 @@ export const CATALOG: Entry[] = [
   {
     "key": "home_services",
     "order": 7,
-    "status": "planned",
+    "status": "beta",
     "icon": "wrench",
-    "color": "from-slate-500 to-zinc-700"
+    "color": "from-slate-500 to-zinc-700",
+    "terms": "home_services",
+    "client_term": "client",
+    "booking_modes": [
+      "appointment"
+    ],
+    "cancellation_window_minutes": 1440,
+    "booking_requires_plan": false,
+    "default_preset": "starter",
+    "recommended_modules": [
+      "client_app",
+      "whatsapp"
+    ],
+    "client_fields": [
+      {
+        "key": "property_type",
+        "kind": "select",
+        "options": [
+          "apartment",
+          "house",
+          "office",
+          "other"
+        ]
+      },
+      {
+        "key": "preferences",
+        "kind": "text"
+      }
+    ],
+    "default_services": [
+      {
+        "names": {
+          "he": "ביקור טכנאי",
+          "en": "Technician visit"
+        },
+        "duration_minutes": 60,
+        "booking_mode": "appointment",
+        "on_site": true,
+        "travel_minutes": 30,
+        "prices": {
+          "ILS": 25000
+        },
+        "color": "#475569"
+      },
+      {
+        "names": {
+          "he": "תיקון",
+          "en": "Repair"
+        },
+        "duration_minutes": 120,
+        "booking_mode": "appointment",
+        "on_site": true,
+        "travel_minutes": 30,
+        "prices": {
+          "ILS": 45000
+        },
+        "color": "#0f766e"
+      }
+    ],
+    "children": [
+      {
+        "key": "cleaning",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "ניקיון בית",
+              "en": "Home cleaning"
+            },
+            "duration_minutes": 180,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 36000
+            },
+            "color": "#0ea5e9"
+          },
+          {
+            "names": {
+              "he": "ניקיון אחרי שיפוץ",
+              "en": "Post-renovation cleaning"
+            },
+            "duration_minutes": 300,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 45,
+            "prices": {
+              "ILS": 90000
+            },
+            "color": "#6366f1"
+          }
+        ]
+      },
+      {
+        "key": "ac_technicians",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "ניקוי ושירות מזגן",
+              "en": "AC cleaning & service"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 25000
+            },
+            "color": "#0284c7"
+          },
+          {
+            "names": {
+              "he": "התקנת מזגן",
+              "en": "AC installation"
+            },
+            "duration_minutes": 180,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 45,
+            "prices": {
+              "ILS": 80000
+            },
+            "color": "#1d4ed8"
+          },
+          {
+            "names": {
+              "he": "תיקון תקלה",
+              "en": "Fault repair"
+            },
+            "duration_minutes": 90,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 35000
+            },
+            "color": "#dc2626"
+          }
+        ]
+      },
+      {
+        "key": "electricians",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "ביקור חשמלאי",
+              "en": "Electrician visit"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 30000
+            },
+            "color": "#f59e0b"
+          },
+          {
+            "names": {
+              "he": "התקנת גוף תאורה",
+              "en": "Light fitting"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 25000
+            },
+            "color": "#eab308"
+          }
+        ]
+      },
+      {
+        "key": "plumbers",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "ביקור אינסטלטור",
+              "en": "Plumber visit"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 30000
+            },
+            "color": "#0891b2"
+          },
+          {
+            "names": {
+              "he": "פתיחת סתימה",
+              "en": "Unblocking a drain"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 35000
+            },
+            "color": "#155e75"
+          }
+        ]
+      },
+      {
+        "key": "pest_control",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "הדברה לדירה",
+              "en": "Apartment treatment"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 30,
+            "prices": {
+              "ILS": 40000
+            },
+            "color": "#65a30d"
+          },
+          {
+            "names": {
+              "he": "הדברה לבית פרטי",
+              "en": "House treatment"
+            },
+            "duration_minutes": 120,
+            "booking_mode": "appointment",
+            "on_site": true,
+            "travel_minutes": 45,
+            "prices": {
+              "ILS": 70000
+            },
+            "color": "#4d7c0f"
+          }
+        ]
+      }
+    ]
   },
   {
     "key": "pets",

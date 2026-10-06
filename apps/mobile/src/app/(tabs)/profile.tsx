@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
@@ -13,7 +14,20 @@ import { useSession } from "@business-os/app-kit/providers/session-provider";
 export default function Profile() {
   const t = useTranslations();
   const { session } = useSession();
-  const { businesses, business, select, palette } = useBusiness();
+  const { businesses, business, select, palette, api, scope } = useBusiness();
+  // On-site services (#42) happen at the client's addresses.
+  const [onSite, setOnSite] = useState(false);
+  useEffect(() => {
+    if (!business) return;
+    let active = true;
+    void api
+      .GET("/client/appointments/services", { params: scope })
+      .then((r) => active && setOnSite((r.data ?? []).some((s) => s.on_site)))
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [api, scope, business]);
   const health = useHealth();
 
   return (
@@ -29,6 +43,14 @@ export default function Profile() {
       </Card>
 
       <ProfileForm key={business?.client_id} />
+
+      {onSite && (
+        <Card palette={palette}>
+          <Text style={[styles.h2, { color: palette.foreground }]}>{t("jobs.myAddresses")}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("jobs.myAddressesHint")}</Text>
+          <Button label={t("jobs.myAddresses")} variant="secondary" palette={palette} onPress={() => router.push("/addresses")} />
+        </Card>
+      )}
 
       {business?.dependents && (
         <Card palette={palette}>

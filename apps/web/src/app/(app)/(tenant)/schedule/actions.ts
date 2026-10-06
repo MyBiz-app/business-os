@@ -218,3 +218,18 @@ export async function recordVenuePayment(sessionId: string, bookingId: string, f
   );
   revalidatePath(`/schedule/${sessionId}`);
 }
+
+/** Moves an on-site job one step (#42): on the way, in progress, done. */
+export async function setJobStatus(
+  sessionId: string,
+  status: "scheduled" | "on_the_way" | "in_progress" | "done",
+): Promise<void> {
+  const { api, scope } = await getTenant();
+  unwrap(
+    await api.POST("/jobs/{session_id}/status", {
+      params: { ...scope, path: { session_id: sessionId } },
+      body: { status },
+    }),
+  );
+  refreshSession(sessionId);
+}

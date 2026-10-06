@@ -27,7 +27,7 @@ from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionD
 from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
-from app.api.schedule import ClosedDay, ServiceSummary
+from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
 from app.scheduling import local_to_utc
 from app.verticals import CATALOG
 
@@ -132,6 +132,8 @@ class ClientSession(BaseModel):
     capacity: int
     spots_left: int
     waitlisted: int
+    address: str | None = Field(default=None, description="My on-site job: where (#42)")
+    job_status: JobStatus | None = Field(default=None, description="My on-site job's progress")
     my_booking: MyBooking | None = Field(description="The client's first live booking")
     my_bookings: list[MyBooking] = Field(
         default_factory=list,
@@ -202,7 +204,9 @@ CLIENT_SESSION_SELECT = """
            l.name AS location_name, r.name AS room_name,
            greatest(s.capacity - bk.booked, 0) AS spots_left, bk.waitlisted,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
-           mine.items AS my_bookings
+           mine.items AS my_bookings,
+           CASE WHEN mine.items IS NOT NULL THEN s.address END AS address,
+           CASE WHEN mine.items IS NOT NULL THEN s.job_status END AS job_status
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id

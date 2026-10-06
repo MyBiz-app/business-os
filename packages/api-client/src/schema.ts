@@ -277,6 +277,117 @@ export interface paths {
         patch: operations["update_my_dependent"];
         trace?: never;
     };
+    "/clients/{client_id}/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Client Addresses */
+        get: operations["client_addresses"];
+        put?: never;
+        /** Add Address */
+        post: operations["add_address"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/addresses/{address_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Address */
+        patch: operations["update_address"];
+        trace?: never;
+    };
+    "/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Jobs Of Day
+         * @description A day's on-site jobs in order: the signed-in technician's by default.
+         */
+        get: operations["jobs_of_day"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/jobs/{session_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Set Job Status
+         * @description Moves a job one step forward (or back one step): its technician, or anyone who manages
+         *     bookings. Done checks the client in.
+         */
+        post: operations["set_job_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/addresses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Addresses */
+        get: operations["my_addresses"];
+        put?: never;
+        /** Add My Address */
+        post: operations["add_my_address"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/addresses/{address_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update My Address */
+        patch: operations["update_my_address"];
+        trace?: never;
+    };
     "/clients/{client_id}/notes": {
         parameters: {
             query?: never;
@@ -3002,6 +3113,73 @@ export interface components {
             /** Note */
             note: string;
         };
+        /** Address */
+        Address: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /**
+             * Label
+             * @description Home, office…
+             */
+            label: string | null;
+            /** Street */
+            street: string;
+            /** City */
+            city: string;
+            /**
+             * Details
+             * @description Floor, apartment
+             */
+            details: string | null;
+            /**
+             * Notes
+             * @description How to get in: gate code, parking
+             */
+            notes: string | null;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AddressCreate */
+        AddressCreate: {
+            /** Label */
+            label?: string | null;
+            /** Street */
+            street: string;
+            /** City */
+            city: string;
+            /** Details */
+            details?: string | null;
+            /** Notes */
+            notes?: string | null;
+        };
+        /** AddressUpdate */
+        AddressUpdate: {
+            /** Label */
+            label?: string | null;
+            /** Street */
+            street?: string | null;
+            /** City */
+            city?: string | null;
+            /** Details */
+            details?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /** Active */
+            active?: boolean | null;
+        };
         /** Answer */
         Answer: {
             /** Id */
@@ -3035,6 +3213,11 @@ export interface components {
             client_id: string;
             /** Dependent Id */
             dependent_id?: string | null;
+            /**
+             * Address Id
+             * @description On-site services: one of the client's addresses (#42)
+             */
+            address_id?: string | null;
         };
         /** AppointmentService */
         AppointmentService: {
@@ -3055,6 +3238,12 @@ export interface components {
             price_currency: string;
             /** Color */
             color: string | null;
+            /**
+             * On Site
+             * @description At the client's address: needs one (#42)
+             * @default false
+             */
+            on_site: boolean;
         };
         /** AppointmentStaff */
         AppointmentStaff: {
@@ -3648,6 +3837,11 @@ export interface components {
              * @description Which of the client's pets / children comes (#43)
              */
             dependent_id?: string | null;
+            /**
+             * Address Id
+             * @description On-site services: one of the client's addresses (#42)
+             */
+            address_id?: string | null;
         };
         /** ClientBooking */
         ClientBooking: {
@@ -3995,6 +4189,16 @@ export interface components {
             spots_left: number;
             /** Waitlisted */
             waitlisted: number;
+            /**
+             * Address
+             * @description My on-site job: where (#42)
+             */
+            address?: string | null;
+            /**
+             * Job Status
+             * @description My on-site job's progress
+             */
+            job_status?: ("scheduled" | "on_the_way" | "in_progress" | "done") | null;
             /** @description The client's first live booking */
             my_booking: components["schemas"]["MyBooking"] | null;
             /**
@@ -4874,6 +5078,60 @@ export interface components {
             issued_at: string;
             /** Paid At */
             paid_at: string | null;
+        };
+        /**
+         * Job
+         * @description One on-site job in a technician's day.
+         */
+        Job: {
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Booking Id */
+            booking_id: string | null;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Travel Minutes */
+            travel_minutes: number;
+            /** Address */
+            address: string | null;
+            /** Address Notes */
+            address_notes: string | null;
+            /**
+             * Job Status
+             * @enum {string}
+             */
+            job_status: "scheduled" | "on_the_way" | "in_progress" | "done";
+            /** Technician User Id */
+            technician_user_id: string | null;
+            /** Technician Name */
+            technician_name: string | null;
+            /** Client Id */
+            client_id: string | null;
+            /** Client Name */
+            client_name: string | null;
+            /** Client Phone */
+            client_phone: string | null;
+        };
+        /** JobStatusUpdate */
+        JobStatusUpdate: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "scheduled" | "on_the_way" | "in_progress" | "done";
         };
         /** JoinRequest */
         JoinRequest: {
@@ -6298,6 +6556,27 @@ export interface components {
              * @description For a reservation: whether it is paid
              */
             paid?: boolean | null;
+            /**
+             * Address
+             * @description An on-site job: where (#42)
+             */
+            address?: string | null;
+            /**
+             * Address Notes
+             * @description An on-site job: how to get in (gate code, floor)
+             */
+            address_notes?: string | null;
+            /**
+             * Job Status
+             * @description An on-site job's progress
+             */
+            job_status?: ("scheduled" | "on_the_way" | "in_progress" | "done") | null;
+            /**
+             * Travel Minutes
+             * @description Time to get there, before the job
+             * @default 0
+             */
+            travel_minutes: number;
         };
         /** Selection */
         Selection: {
@@ -6408,6 +6687,16 @@ export interface components {
             step_minutes?: number | null;
             /** Price Per Hour */
             price_per_hour?: number | null;
+            /**
+             * On Site
+             * @default false
+             */
+            on_site: boolean;
+            /**
+             * Travel Minutes
+             * @default 0
+             */
+            travel_minutes: number;
         };
         /** ServiceCreate */
         ServiceCreate: {
@@ -6466,6 +6755,18 @@ export interface components {
              * @description Resource only: minor units per hour
              */
             price_per_hour?: number | null;
+            /**
+             * On Site
+             * @description Appointment only: at the client's address
+             * @default false
+             */
+            on_site: boolean;
+            /**
+             * Travel Minutes
+             * @description On-site: time to get there, before each job
+             * @default 0
+             */
+            travel_minutes: number;
         };
         /** ServiceOption */
         ServiceOption: {
@@ -6519,6 +6820,10 @@ export interface components {
             step_minutes?: number | null;
             /** Price Per Hour */
             price_per_hour?: number | null;
+            /** On Site */
+            on_site?: boolean | null;
+            /** Travel Minutes */
+            travel_minutes?: number | null;
         };
         /** SessionCreate */
         SessionCreate: {
@@ -7778,6 +8083,301 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Dependent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_addresses: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_address: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_address: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    jobs_of_day: {
+        parameters: {
+            query: {
+                /** @description Local date */
+                date: string;
+                /** @description One technician; default: the signed-in user */
+                staff_user_id?: string | null;
+                /** @description All technicians (managers) */
+                everyone?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_job_status: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobStatusUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_addresses: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_my_address: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_my_address: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                address_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Address"];
                 };
             };
             /** @description Validation Error */

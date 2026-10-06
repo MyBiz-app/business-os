@@ -99,6 +99,9 @@ test("settings, starter content and client fields are valid", () => {
       }
       assert.match(service.color, /^#[0-9a-f]{6}$/, `${where}: color`);
       if (service.booking_mode === "class") assert.ok((service.capacity ?? 0) > 1, `${where}: class capacity`);
+      if (service.on_site) assert.equal(service.booking_mode, "appointment", `${where}: on-site is an appointment`);
+      const travel = service.travel_minutes ?? 0;
+      assert.ok(Number.isInteger(travel) && travel >= 0 && travel <= 240, `${where}: travel minutes`);
       if (service.booking_mode === "resource") {
         const { duration_minutes: min, max_minutes: max, step_minutes: step } = service;
         assert.ok(max !== undefined && step !== undefined, `${where}: a resource needs max_minutes and step_minutes`);

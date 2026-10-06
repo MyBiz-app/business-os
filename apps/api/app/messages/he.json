@@ -203,6 +203,21 @@
     },
     "pet_daycare": {
       "name": "גן כלבים"
+    },
+    "cleaning": {
+      "name": "שירותי ניקיון"
+    },
+    "ac_technicians": {
+      "name": "מיזוג אוויר"
+    },
+    "electricians": {
+      "name": "חשמלאים"
+    },
+    "plumbers": {
+      "name": "אינסטלטורים"
+    },
+    "pest_control": {
+      "name": "הדברה"
     }
   }
 }

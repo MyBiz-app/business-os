@@ -46,6 +46,9 @@ export type DefaultService = {
   /** For a resource: the longest length and the step between lengths, in minutes. */
   max_minutes?: number;
   step_minutes?: number;
+  /** For an appointment: at the client's address, with time to get there (#42). */
+  on_site?: boolean;
+  travel_minutes?: number;
 };
 
 /** A court or room a new business starts with, for rent by the hour every day between

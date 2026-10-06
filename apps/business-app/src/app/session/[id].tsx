@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
-import { Text, View } from "react-native";
+import { Linking, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
@@ -11,6 +11,7 @@ import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { confirm } from "@business-os/app-kit/lib/confirm";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
 import { dependentsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -50,6 +51,7 @@ export default function SessionScreen() {
   // Industries that keep pets / children: tapping a client then asks which one comes.
   const [picking, setPicking] = useState<{ client: ClientListItem; choices: { id: string; name: string }[] } | null>(null);
   const tDependents = useTranslations("dependents");
+  const tJobs = useTranslations("jobs");
   const dependents = dependentsFor(tenant);
   const [method, setMethod] = useState<Method>("cash");
   const tResources = useTranslations("resources");
@@ -174,6 +176,10 @@ export default function SessionScreen() {
   }
   const { session, bookings } = data;
   const coming = bookings.filter((b) => b.status !== "cancelled");
+  // An on-site job (#42): the next step of its progress.
+  const JOB_STEPS = ["scheduled", "on_the_way", "in_progress", "done"] as const;
+  const jobStep = data?.session.job_status ? JOB_STEPS.indexOf(data.session.job_status) : -1;
+  const nextJob = jobStep >= 0 ? (JOB_STEPS[jobStep + 1] as Exclude<(typeof JOB_STEPS)[number], "scheduled"> | undefined) : undefined;
   const bookedIds = dependents.kind ? new Set<string>() : new Set(coming.map((b) => b.client_id));
   const bookedPairs = new Set(coming.map((b) => `${b.client_id}:${b.dependent_id ?? ""}`));
   const isClass = session.booking_mode === "class";
@@ -324,6 +330,51 @@ export default function SessionScreen() {
                     })
                 ))}
             </View>
+          )}
+        </Card>
+      )}
+
+      {data?.session.job_status && (
+        <Card palette={palette}>
+          <SectionTitle title={tJobs("title")} palette={palette} />
+          <Badge label={tJobs(`statuses.${data.session.job_status}`)} tone="primary" palette={palette} />
+          {data.session.address ? (
+            <Text style={{ color: palette.foreground, textAlign: "left" }}>{data.session.address}</Text>
+          ) : null}
+          {data.session.address_notes ? (
+            <Text style={[styles.muted, { color: palette.muted }]}>{data.session.address_notes}</Text>
+          ) : null}
+          {data.session.address && (
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <View style={{ flex: 1 }}>
+                <Button label="Waze" variant="secondary" palette={palette} onPress={() => void Linking.openURL(wazeLink(data.session.address!))} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  label="Google Maps"
+                  variant="secondary"
+                  palette={palette}
+                  onPress={() => void Linking.openURL(googleMapsLink(data.session.address!))}
+                />
+              </View>
+            </View>
+          )}
+          {manage && nextJob && (
+            <Button
+              label={tJobs(`actions.${nextJob}`)}
+              palette={palette}
+              busy={busy === "job"}
+              onPress={() =>
+                void run("job", async () => {
+                  unwrap(
+                    await api.POST("/jobs/{session_id}/status", {
+                      params: { ...scope, path: { session_id: id } },
+                      body: { status: nextJob },
+                    }),
+                  );
+                })
+              }
+            />
           )}
         </Card>
       )}

@@ -26,6 +26,7 @@ MAX_SERIES_DAYS = 26 * 7  # Series are expanded up front; a background job will 
 DEFAULT_SERIES_DAYS = 12 * 7
 
 SessionStatus = Literal["scheduled", "cancelled"]
+JobStatus = Literal["scheduled", "on_the_way", "in_progress", "done"]
 
 
 class Placement(BaseModel):
@@ -116,6 +117,12 @@ class ScheduledSession(BaseModel):
     )
     price_currency: str | None = None
     paid: bool | None = Field(default=None, description="For a reservation: whether it is paid")
+    address: str | None = Field(default=None, description="An on-site job: where (#42)")
+    address_notes: str | None = Field(
+        default=None, description="An on-site job: how to get in (gate code, floor)"
+    )
+    job_status: JobStatus | None = Field(default=None, description="An on-site job's progress")
+    travel_minutes: int = Field(default=0, description="Time to get there, before the job")
 
 
 class OptionItem(BaseModel):
@@ -166,13 +173,15 @@ SESSION_SELECT = """
                FROM app.bookings b JOIN app.clients c ON c.id = b.client_id
                WHERE b.session_id = s.id AND b.status <> 'cancelled'
                ORDER BY b.created_at LIMIT 1
-           ) END AS appointment_client
+           ) END AS appointment_client,
+           s.address, a.notes AS address_notes, s.job_status, s.travel_minutes
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
     LEFT JOIN app.users u ON u.id = s.instructor_user_id
     LEFT JOIN app.session_series ss ON ss.id = s.series_id
+    LEFT JOIN app.client_addresses a ON a.id = s.address_id
     CROSS JOIN LATERAL app.session_counts(s.id) bk
 """
 

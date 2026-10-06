@@ -21,6 +21,7 @@ from app.api import (
     messaging,
     modules,
     notifications,
+    onsite_jobs,
     plans,
     platform,
     privacy,
@@ -84,6 +85,8 @@ def create_app() -> FastAPI:
     app.include_router(clients.router)
     app.include_router(dependents.router)
     app.include_router(dependents.client_router)
+    app.include_router(onsite_jobs.router)
+    app.include_router(onsite_jobs.client_router)
     app.include_router(client_notes.router)
     app.include_router(privacy.router)
     app.include_router(leads.router)

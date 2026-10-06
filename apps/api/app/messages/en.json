@@ -203,6 +203,21 @@
     },
     "pet_daycare": {
       "name": "Doggy day care"
+    },
+    "cleaning": {
+      "name": "Cleaning services"
+    },
+    "ac_technicians": {
+      "name": "Air conditioning"
+    },
+    "electricians": {
+      "name": "Electricians"
+    },
+    "plumbers": {
+      "name": "Plumbers"
+    },
+    "pest_control": {
+      "name": "Pest control"
     }
   }
 }

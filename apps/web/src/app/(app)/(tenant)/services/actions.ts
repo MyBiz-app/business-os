@@ -26,8 +26,12 @@ function readForm(formData: FormData, currency: string) {
         }
       : {};
   if (mode === "resource" && resource.price_per_hour === null) return null;
+  // An appointment can happen at the client's address, with time to get there (#42).
+  const onSite = mode === "appointment" && formData.get("on_site") === "on";
   return {
     ...resource,
+    on_site: onSite,
+    travel_minutes: onSite ? Number(value("travel_minutes") || 0) : 0,
     name: value("name"),
     description: value("description"),
     duration_minutes: Number(value("duration_minutes")),

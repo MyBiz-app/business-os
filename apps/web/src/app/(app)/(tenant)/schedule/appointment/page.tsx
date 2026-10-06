@@ -38,21 +38,38 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
     api.GET("/clients", { params: { ...scope, query: { limit: 20, status: "active", ...(search ? { search } : {}) } } }).then(unwrap),
   ]);
 
-  // Industries that keep pets / children book one of them (the owner pays).
+  // Industries that keep pets / children book one of them (the owner pays); an on-site
+  // service happens at one of the client's addresses (#42). A choice is "client|dependent|address".
   const dependents = unwrap(await api.GET("/dependents/settings", { params: scope }));
+  const onSite = appointmentServices.find((s) => s.id === serviceId)?.on_site ?? false;
   const choices = (
     await Promise.all(
       clients.items.map(async (client) => {
         const name = [client.first_name, client.last_name].filter(Boolean).join(" ");
         const detail = client.phone ?? client.email ?? "";
-        if (!dependents.kind) return [{ id: client.id, name, detail }];
-        const theirs = unwrap(
-          await api.GET("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: client.id } } }),
-        ).filter((d) => d.active);
-        return [
-          ...theirs.map((d) => ({ id: `${client.id}|${d.id}`, name: `${d.name} · ${name}`, detail })),
-          ...(dependents.required ? [] : [{ id: client.id, name, detail }]),
-        ];
+        const path = { client_id: client.id };
+        const [theirs, addresses] = await Promise.all([
+          dependents.kind
+            ? api.GET("/clients/{client_id}/dependents", { params: { ...scope, path } }).then(unwrap)
+            : Promise.resolve([]),
+          onSite
+            ? api.GET("/clients/{client_id}/addresses", { params: { ...scope, path } }).then(unwrap)
+            : Promise.resolve([]),
+        ]);
+        const who = dependents.kind
+          ? [
+              ...theirs.filter((d) => d.active).map((d) => ({ dependent: d.id, name: `${d.name} · ${name}` })),
+              ...(dependents.required ? [] : [{ dependent: "", name }]),
+            ]
+          : [{ dependent: "", name }];
+        const where = onSite
+          ? addresses
+              .filter((a) => a.active)
+              .map((a) => ({ address: a.id, detail: [a.street, a.details, a.city].filter(Boolean).join(", ") }))
+          : [{ address: "", detail }];
+        return who.flatMap((w) =>
+          where.map((p) => ({ id: `${client.id}|${w.dependent}|${p.address}`, name: w.name, detail: p.detail })),
+        );
       }),
     )
   ).flat();
@@ -123,8 +140,10 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
             {slots.length === 0 ? (
               <p className="text-muted">{t("appointments.noSlots")}</p>
             ) : choices.length === 0 ? (
-              <p className="text-muted">{terms("noResults")}</p>
+              <p className="text-muted">{onSite ? t("jobs.noAddresses") : terms("noResults")}</p>
             ) : (
+              <>
+              {onSite && <p className="text-sm text-muted">{t("jobs.bookHint")}</p>}
               <BookingForm
                 key={`${serviceId}-${staffId}-${day}-${search}`}
                 serviceId={serviceId}
@@ -135,6 +154,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
                 }))}
                 clients={choices}
               />
+              </>
             )}
           </section>
         </>
