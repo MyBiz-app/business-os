@@ -26,10 +26,16 @@ from its parent (sub-categories can have sub-categories of their own):
 - Settings (`terms`, `client_term`, `booking_modes`, `cancellation_window_minutes`,
   `booking_requires_plan`, `health_form`, `default_preset`, `recommended_modules`, `icon`,
   `color`): the entry's own value, else the parent's.
-- `default_services`, `default_plans`: the entry's own list replaces the parent's.
+- `default_services`, `default_plans`, `default_rooms`: the entry's own list replaces the parent's.
 - `client_fields` replaces the parent's fields; `extra_client_fields` adds to them.
 - Texts: `verticals.<key>.<text>` from the entry, else from the nearest parent that has it. A
   sub-category needs only `name` and `tagline`.
+
+A service with `"booking_mode": "resource"` is a court or room rented by the hour: its
+`duration_minutes` is the shortest length, `max_minutes` and `step_minutes` the others, and its
+`prices` are per hour. Such an industry lists `default_rooms` (names, capacity, `opens` and
+`closes`): a new business gets them in its main branch, for rent every day in those hours and
+serving its resource services, so it can take reservations from the first minute.
 
 Prices are integer minor units per currency. `ILS` is required; `USD` and `EUR` default to rough
 equivalents. A business keeps the key it chose (category or sub-category) in `tenants.vertical`.
@@ -66,6 +72,7 @@ footer, sitemap), in the sign-up journey, in onboarding, in the contact form, in
 in the apps. The API test `test_every_open_industry_starts_a_business` creates a business for
 every open entry.
 
-A category that needs something the core cannot do yet (courts and rooms, jobs at the client's
-address, pets under an owner, quotes and deposits) stays `planned` until that capability is
-built: see spec section 4.3 and the phase 7 issues.
+A category that needs something the core cannot do yet (jobs at the client's address, pets under
+an owner, quotes and deposits) stays `planned` until that capability is built: see spec section
+4.3 and the phase 7 issues. Courts and rooms by the hour are built (#41): Sports & facilities is
+open as beta.

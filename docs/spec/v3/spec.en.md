@@ -81,6 +81,7 @@ Chosen because the current core already serves them fully (schedule, appointment
 | Clinics & Health | physiotherapy and rehabilitation, dental clinic, nutrition, aesthetic clinic, therapy and coaching | patients | appointments, treatment series | ID number, health fund, referred by, allergies |
 | Classes & Lessons | dance, martial arts, music lessons, private tutoring, kids' activities | students | weekly classes and private lessons; term and monthly plans | level, parent's contact (for children) |
 | Automotive | garage, detailing and car wash, tires | customers | appointments | plate, make, model, year, mileage, next inspection |
+| Sports & facilities (beta) | padel and tennis clubs, football pitches, rehearsal studios, meeting rooms and coworking | players | courts and rooms by the hour (paid in the app or at the venue) | level, preferences; instrument (studios); company (meeting rooms) |
 
 Several industries in the original list live inside these as sub-categories: wellness and spa (Beauty & Spa); rehabilitation, nutrition, therapy and coaching (Clinics & Health); education, dance, music and kids' activities (Classes & Lessons).
 
@@ -106,7 +107,6 @@ These need one new capability in the core first. Each capability is built once f
 
 | Category | Examples | New capability it needs |
 |---|---|---|
-| Sports & facility booking | football, tennis and padel academies; courts, rehearsal and studio rooms, meeting rooms by the hour | Resources: booking a court, room or space by the hour, alongside or without a staff member |
 | Home & field services | cleaning, air conditioning, electricians, plumbers, pest control | On-site jobs: the client's address, travel time, assigning a technician, quotes |
 | Pet services | dog grooming, training, boarding, dog day care | Dependents: several profiles under one client (pets; also children for Kids & Youth) |
 | Kids & Youth (full) | enrichment centers, camps, toddler gyms | Dependents and parent accounts |
@@ -227,7 +227,7 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
 | 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | Done |
 | 6 — Businesses and branches | One owner with several businesses, each with several branches: my businesses, a current branch, data and numbers per branch, a full demo | In progress |
-| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories | Planned |
+| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories. Done: resources (courts and rooms by the hour), which opened Sports & facilities | In progress |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 The live status of the work — done, in progress and next — is kept in `docs/STATUS.md` and in the repository's GitHub issues, updated with every merged change.

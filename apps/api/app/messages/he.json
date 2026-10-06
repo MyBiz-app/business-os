@@ -182,6 +182,18 @@
     },
     "tires": {
       "name": "פנצ'ריה וצמיגים"
+    },
+    "padel_tennis": {
+      "name": "מועדון פאדל וטניס"
+    },
+    "football_pitches": {
+      "name": "מגרשי כדורגל"
+    },
+    "rehearsal_studios": {
+      "name": "חדרי חזרות"
+    },
+    "meeting_rooms": {
+      "name": "חדרי ישיבות וחללי עבודה"
     }
   }
 }

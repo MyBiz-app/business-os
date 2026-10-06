@@ -99,6 +99,17 @@ test("settings, starter content and client fields are valid", () => {
       }
       assert.match(service.color, /^#[0-9a-f]{6}$/, `${where}: color`);
       if (service.booking_mode === "class") assert.ok((service.capacity ?? 0) > 1, `${where}: class capacity`);
+      if (service.booking_mode === "resource") {
+        const { duration_minutes: min, max_minutes: max, step_minutes: step } = service;
+        assert.ok(max !== undefined && step !== undefined, `${where}: a resource needs max_minutes and step_minutes`);
+        assert.ok(max >= min && (max - min) % step === 0 && step >= 15, `${where}: resource lengths`);
+      }
+    }
+    for (const room of entry.default_rooms ?? []) {
+      for (const locale of LOCALES) assert.ok(room.names[locale]?.trim(), `${where}: room name ${locale}`);
+      assert.match(room.opens, /^\d\d:\d\d$/, `${where}: room opens`);
+      assert.match(room.closes, /^\d\d:\d\d$/, `${where}: room closes`);
+      assert.ok(room.closes > room.opens, `${where}: room hours`);
     }
     for (const plan of entry.default_plans ?? []) {
       for (const locale of LOCALES) assert.ok(plan.names[locale]?.trim(), `${where}: plan name ${locale}`);
@@ -167,4 +178,12 @@ test("a sub-category's text falls back to its category", () => {
   const he = has("he");
   assert.equal(textKey("pilates", "heroTitle", he), "verticals.fitness.heroTitle");
   assert.equal(textKey("pilates", "name", he), "verticals.pilates.name");
+});
+
+test("an industry by the hour starts with courts its services are booked in", () => {
+  for (const v of ALL_VERTICALS.filter((entry) => entry.status !== "planned")) {
+    const resources = v.defaultServices.filter((service) => service.booking_mode === "resource");
+    if (resources.length > 0) assert.ok(v.defaultRooms.length > 0, `${v.key}: resource services need default_rooms`);
+    if (resources.length > 0) assert.ok(v.bookingModes.includes("resource"), `${v.key}: booking_modes`);
+  }
 });

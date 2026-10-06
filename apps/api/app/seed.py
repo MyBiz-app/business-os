@@ -25,7 +25,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import Connection, create_engine, text
 
 from app.api.modules import set_modules
-from app.api.routes import apply_vertical_pack
+from app.api.routes import apply_vertical_pack, apply_vertical_rooms
 from app.billing import bill_businesses
 from app.core.config import get_settings
 from app.health import FITNESS_FORM
@@ -219,8 +219,18 @@ BARBERSHOP = BusinessSpec(
     clients=300,
     staff_per_branch=3,
 )
+PADEL_CLUB = BusinessSpec(
+    name="פאדל פוינט (דמו)",
+    vertical="padel_tennis",
+    color="#4d7c0f",
+    billing_name="פאדל פוינט בע״מ",
+    branches=(BranchSpec("הרצליה", "הנדיב 71, הרצליה"),),
+    clients=140,
+    staff_per_branch=1,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
+    "club": (PADEL_CLUB,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
@@ -975,12 +985,19 @@ def seed(
         else (*(f"מתעניין/ת ב{s['name']}" for s in service_rows), "מה המחירים?", None)
     )
     lead_count = _seed_leads(conn, tenant_id, [owner, *instructors], clients, today, rng, interests)
+    reservations = 0
+    if any(s["booking_mode"] == "resource" for s in service_rows):
+        apply_vertical_rooms(conn, tenant_id, spec.vertical, "he")
+        reservations = _seed_reservations(
+            conn, tenant_id, [c.id for c in clients], start, today, horizon, rng
+        )
     _seed_messages(conn, tenant_id, owner, today, rng)
 
     print(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "
         f"{len(clients)} clients, {lead_count} leads, {len(sessions)} sessions, "
-        f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings."
+        f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings, "
+        f"{reservations} reservations."
     )
     return tenant_id
 
@@ -1123,6 +1140,122 @@ def _seed_messages(conn: Connection, tenant_id: UUID, owner: UUID, today: date,
         VALUES (:tenant_id, :campaign_id, :client_id, :lead_id, 'whatsapp', :to_phone, :body,
                 :status, true, :owner, :at)
     """, rows)  # fmt: skip
+
+
+def _seed_reservations(
+    conn: Connection,
+    tenant_id: UUID,
+    clients: list[UUID],
+    start: date,
+    today: date,
+    horizon: date,
+    rng: random.Random,
+) -> int:
+    """Courts and rooms by the hour: reservations in their opening hours, busier in the
+    evening and at weekends, each with its booking (past ones mostly attended) and, when paid,
+    its payment (in the app, or at the venue for some). No two overlap in a room."""
+    services = (
+        conn.execute(
+            text("""
+            SELECT s.id, s.name, s.min_minutes, s.max_minutes, s.step_minutes, s.price_per_hour,
+                   array_agg(sr.room_id) AS rooms
+            FROM app.services s JOIN app.service_rooms sr ON sr.service_id = s.id
+            WHERE s.tenant_id = :t AND s.booking_mode = 'resource'
+            GROUP BY s.id
+        """),
+            {"t": tenant_id},
+        )
+        .mappings()
+        .all()
+    )
+    rooms = {
+        row.id: row
+        for row in conn.execute(
+            text("SELECT id, name, location_id FROM app.rooms WHERE tenant_id = :t AND bookable"),
+            {"t": tenant_id},
+        )
+    }
+    hours = {
+        (row.room_id, row.weekday): (row.starts, row.ends)
+        for row in conn.execute(
+            text("SELECT room_id, weekday, starts, ends FROM app.room_hours WHERE tenant_id = :t"),
+            {"t": tenant_id},
+        )
+    }
+    by_room = {room: s for s in services for room in s["rooms"]}  # one service per court
+    sessions, bookings, payments = [], [], []
+    now = datetime.now(UTC)
+    day = start
+    while day <= horizon:
+        weekend = day.weekday() in (4, 5)
+        for room_id, service in by_room.items():
+            opening = hours.get((room_id, day.weekday()))
+            if opening is None:
+                continue
+            at = datetime.combine(day, opening[0])
+            close = datetime.combine(day, opening[1])
+            lengths = list(range(service["min_minutes"], service["max_minutes"] + 1,
+                                 service["step_minutes"]))  # fmt: skip
+            while at < close:
+                chance = 0.55 if at.hour >= 17 else 0.3 if weekend or at.hour < 9 else 0.18
+                minutes = rng.choice(lengths)
+                if at + timedelta(minutes=minutes) > close or rng.random() > chance:
+                    at += timedelta(minutes=30)
+                    continue
+                starts = local_to_utc(day, at.time(), TIME_ZONE)
+                ends = starts + timedelta(minutes=minutes)
+                price = (service["price_per_hour"] * minutes + 30) // 60
+                session_id, booking_id = uuid4(), uuid4()
+                client = rng.choice(clients)
+                past = ends < now
+                made = starts - timedelta(days=rng.randint(0, 6), hours=rng.randint(1, 12))
+                sessions.append({
+                    "id": session_id, "tenant_id": tenant_id, "service_id": service["id"],
+                    "location_id": rooms[room_id].location_id, "room_id": room_id,
+                    "starts_at": starts, "ends_at": ends, "price": price, "created_at": made,
+                })  # fmt: skip
+                no_show = past and rng.random() < 0.04
+                bookings.append({
+                    "id": booking_id, "tenant_id": tenant_id, "session_id": session_id,
+                    "client_id": client,
+                    "status": ("no_show" if no_show else "checked_in") if past else "booked",
+                    "checked_in_at": starts if past and not no_show else None, "created_at": made,
+                })  # fmt: skip
+                at_venue = rng.random() < 0.25
+                if not at_venue or past:
+                    payments.append({
+                        "tenant_id": tenant_id, "client_id": client, "amount": price,
+                        "provider": "venue" if at_venue else "simulated",
+                        "method": rng.choice(("cash", "card")) if at_venue else "card",
+                        "key": f"demo-reservation-{booking_id.hex}", "booking_id": booking_id,
+                        "description": f"{service['name']} · {rooms[room_id].name} · "
+                                       f"{day.strftime('%d/%m')} {at.strftime('%H:%M')}",
+                        "location_id": rooms[room_id].location_id,
+                        "created_at": starts if at_venue else made,
+                    })  # fmt: skip
+                at += timedelta(minutes=minutes)
+        day += timedelta(days=1)
+    _insert(conn, """
+        INSERT INTO app.sessions
+            (id, tenant_id, service_id, location_id, room_id, capacity, starts_at, ends_at,
+             reserved, price_amount, price_currency, created_at, updated_at)
+        VALUES (:id, :tenant_id, :service_id, :location_id, :room_id, 1, :starts_at, :ends_at,
+                true, :price, 'ILS', :created_at, :created_at)
+    """, sessions)  # fmt: skip
+    _insert(conn, """
+        INSERT INTO app.bookings
+            (id, tenant_id, session_id, client_id, status, checked_in_at, created_at, updated_at)
+        VALUES (:id, :tenant_id, :session_id, :client_id, :status, :checked_in_at, :created_at,
+                :created_at)
+    """, bookings)  # fmt: skip
+    _insert(conn, """
+        INSERT INTO app.payments
+            (tenant_id, client_id, amount, currency, status, provider, method, idempotency_key,
+             booking_id, description, location_id, created_at)
+        VALUES (:tenant_id, :client_id, :amount, 'ILS', 'succeeded', :provider, :method, :key,
+                :booking_id, :description, :location_id, :created_at)
+    """, payments)  # fmt: skip
+    return len(sessions)
 
 
 def _seed_leads(
@@ -1297,7 +1430,8 @@ def main() -> None:
         "--demo",
         default="studio",
         choices=sorted(DEMOS),
-        help="studio: one fitness studio; owner: a pilates chain with five branches and a "
+        help="studio: one fitness studio; club: a padel club renting courts by the hour; "
+        "owner: a pilates chain with five branches and a "
         "barbershop with three; platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",
     )

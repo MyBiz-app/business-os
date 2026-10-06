@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from uuid import uuid4
 
 import pytest
@@ -74,3 +75,26 @@ def test_contact_form_accepts_any_catalog_industry(client: TestClient) -> None:
         assert client.post("/public/contact", json={**lead, "vertical": key}).status_code == 202
     bad = client.post("/public/contact", json={**lead, "vertical": "spaceship"})
     assert bad.status_code == 422
+
+
+def test_a_new_club_has_courts_ready_to_book(client: TestClient, auth: AuthHeaders) -> None:
+    """Sports & facilities: the starter courts are for rent with opening hours, serve the
+    services by the hour, and have free times from the first minute."""
+    owner = uuid4()
+    business = {"name": "Padel Point", "vertical": "padel_tennis", "locale": "en",
+                "time_zone": "Asia/Jerusalem", "currency": "ILS"}  # fmt: skip
+    tenant_id = client.post("/tenants", json=business, headers=auth(owner)).json()["id"]
+    headers = auth(owner, tenant_id)
+
+    services = {s["name"]: s for s in client.get("/resources", headers=headers).json()}
+    padel = services["Padel court"]
+    assert (padel["min_minutes"], padel["max_minutes"], padel["step_minutes"]) == (60, 120, 30)
+    assert padel["price_per_hour"] == 16000
+    assert [r["name"] for r in padel["rooms"]] == ["Court 1", "Court 2", "Court 3"]
+    day = (date.today() + timedelta(days=3)).isoformat()
+    slots = client.get(
+        "/resources/slots",
+        params={"service_id": padel["id"], "date": day, "minutes": 90},
+        headers=headers,
+    ).json()
+    assert len({s["room_id"] for s in slots}) == 3 and slots[0]["price_amount"] == 24000
