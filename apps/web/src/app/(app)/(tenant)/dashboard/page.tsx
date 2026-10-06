@@ -2,6 +2,8 @@ import type { components } from "@business-os/api-client";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, CreditCard, Gauge, Minus, UserPlus, Users, UserX } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+
+import { AttentionPanel } from "./attention-panel";
 import { termsOf } from "@business-os/verticals";
 
 import { ColumnChart } from "@/components/charts/column-chart";
@@ -184,6 +186,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           {sessionList(mine)}
         </section>
       )}
+
+      <AttentionPanel context={{ api, scope }} />
 
       {reports && (
         <section aria-labelledby="kpi-heading" className="flex flex-col gap-4">

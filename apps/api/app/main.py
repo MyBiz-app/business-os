@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from app.api import (
     appointments,
     assistant,
+    attention,
     billing,
     bookings,
     businesses,
@@ -110,6 +111,7 @@ def create_app() -> FastAPI:
     app.include_router(checkouts.router)
     app.include_router(receipts.router)
     app.include_router(receipts.client_router)
+    app.include_router(attention.router)
     app.include_router(notifications.router)
     app.include_router(health_declarations.router)
     app.include_router(health_declarations.client_router)

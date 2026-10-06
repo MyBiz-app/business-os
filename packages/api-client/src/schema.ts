@@ -2470,6 +2470,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Attention
+         * @description Non-empty lists only, in the order the dashboard shows them.
+         */
+        get: operations["get_attention"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/notifications": {
         parameters: {
             query?: never;
@@ -2720,6 +2740,30 @@ export interface components {
             user_id: string;
             /** Name */
             name: string;
+        };
+        /** AttentionItem */
+        AttentionItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Date */
+            date: string | null;
+        };
+        /** AttentionList */
+        AttentionList: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "inactive" | "plan_ending" | "leads_due" | "health_review";
+            /** Count */
+            count: number;
+            /** Items */
+            items: components["schemas"]["AttentionItem"][];
         };
         /** AudienceCount */
         AudienceCount: {
@@ -11894,6 +11938,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Receipt"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_attention: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AttentionList"][];
                 };
             };
             /** @description Validation Error */
