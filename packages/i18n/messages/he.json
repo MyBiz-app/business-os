@@ -177,7 +177,24 @@
     "bookedToday": "{count, plural, one {רשום/ה אחד/ת} other {# רשומים}}",
     "openSchedule": "ליומן",
     "now": "עכשיו",
-    "done": "הסתיים"
+    "done": "הסתיים",
+    "attention": {
+      "title": "דורש את תשומת לבך",
+      "kinds": {
+        "plan_ending": "מנויים שמסתיימים בלי חידוש",
+        "inactive": "לא הגיעו לאחרונה",
+        "leads_due": "לידים לחזור אליהם",
+        "health_review": "הצהרות בריאות לאישור"
+      },
+      "dates": {
+        "plan_ending": "עד {date}",
+        "inactive": "ביקור אחרון {date}",
+        "leads_due": "מ-{date}",
+        "health_review": "נחתמה {date}"
+      },
+      "never": "עוד לא הגיע/ה",
+      "all": "לכל ה-{count}"
+    }
   },
   "roles": {
     "owner": "בעלים",

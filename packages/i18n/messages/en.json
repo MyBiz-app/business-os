@@ -177,7 +177,24 @@
     "bookedToday": "{count, plural, one {one booking} other {# bookings}}",
     "openSchedule": "Open schedule",
     "now": "Now",
-    "done": "Done"
+    "done": "Done",
+    "attention": {
+      "title": "Needs your attention",
+      "kinds": {
+        "plan_ending": "Plans ending without a renewal",
+        "inactive": "Haven't come in lately",
+        "leads_due": "Leads to call back",
+        "health_review": "Health declarations to review"
+      },
+      "dates": {
+        "plan_ending": "until {date}",
+        "inactive": "last visit {date}",
+        "leads_due": "since {date}",
+        "health_review": "signed {date}"
+      },
+      "never": "no visit yet",
+      "all": "See all {count}"
+    }
   },
   "roles": {
     "owner": "Owner",
