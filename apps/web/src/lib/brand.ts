@@ -32,13 +32,19 @@ export function mix(from: string, to: string, t: number): string {
 }
 
 /** The brand color, darkened (light theme) or lightened (dark theme) just enough to be readable
- * as text on the surface and on a 10% tint of itself (WCAG AA). */
+ * as text on the surface and on a 10% tint of itself, and for text on it (buttons) to be
+ * readable too (WCAG AA). A mid-tone (a purple, say) can pass the first two and fail the last. */
 export function readableOn(hex: string, surface: string): string {
   const toward = luminance(surface) > 0.5 ? "#000000" : WHITE;
   for (let t = 0; t <= 1; t += 0.05) {
     const color = mix(hex, toward, t);
     const tint = mix(surface, color, 0.1);
-    if (contrastRatio(color, surface) >= AA && contrastRatio(color, tint) >= AA) return color;
+    if (
+      contrastRatio(color, surface) >= AA &&
+      contrastRatio(color, tint) >= AA &&
+      contrastRatio(color, textOn(color)) >= AA
+    )
+      return color;
   }
   return toward;
 }
