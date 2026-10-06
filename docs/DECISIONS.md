@@ -117,6 +117,7 @@ When a decision changes, update the row and note the date — do not delete hist
 | X5 | Order of work (owner, 2026-10-05): finish the marketing website first, then the business web system (CRM), and only then the apps. Modern design along the way. | DECIDED (2026-10-05) |
 | X6 | Modular by design (owner, 2026-10-06): every look-and-feel choice (font, colors, brand gradient, buttons, texts, prices, industries) lives in one place, listed in [`docs/design-system.md`](design-system.md), so changes are safe and quick. Components use tokens, never raw values. | DECIDED (2026-10-06) |
 | X7 | Websites done, apps next (owner, 2026-10-06): the three web surfaces (marketing site, business web system, MyBiz console) are complete in content, behaviour and looks. Checked end to end with `dod.py`, and crawled page by page in Hebrew and English on computer and phone: no errors, no serious accessibility violations, nothing spilling off the screen, in light and dark mode. Work moves to the apps, while the owner settles sign-up emails (#48) and the open decisions. | DECIDED (2026-10-06) |
+| X8 | The business app's tabs (2026-10-06): Today · Clients · Leads (or Messages, when the business has WhatsApp but no CRM) · Numbers · Me. Selling a plan, booking someone in and moving a lead are done from the phone; settings, the catalog, the team and billing stay on the web. Built this way for the owner to review on the phone (#84). | PROPOSED (built, waiting for the owner's review) |
 
 ## Open
 

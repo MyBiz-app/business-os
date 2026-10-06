@@ -975,6 +975,7 @@ def seed(
         else (*(f"מתעניין/ת ב{s['name']}" for s in service_rows), "מה המחירים?", None)
     )
     lead_count = _seed_leads(conn, tenant_id, [owner, *instructors], clients, today, rng, interests)
+    _seed_messages(conn, tenant_id, owner, today, rng)
 
     print(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "
@@ -1055,6 +1056,73 @@ LEAD_NOTES = (
     "הגיע/ה לשיעור ניסיון, נהנה/תה",
     "מתלבט/ת בין כרטיסייה למנוי",
 )
+
+
+MESSAGE_BODIES = {
+    "reminder": "היי {first_name}, תזכורת: מחכים לך מחר 🙂",
+    "plan_ending": "היי {first_name}, המנוי שלך מסתיים בקרוב. רוצה שנחדש לך?",
+    "lead": "היי {first_name}, תודה שפנית אלינו! מתי נוח לך להגיע לשיעור ניסיון?",
+    "missing": "היי {first_name}, מזמן לא ראינו אותך! נשמח לראות אותך השבוע.",
+}
+
+
+def _seed_messages(conn: Connection, tenant_id: UUID, owner: UUID, today: date,
+                   rng: random.Random) -> None:  # fmt: skip
+    """A month of (simulated) WhatsApp messages: one campaign to clients who stopped coming,
+    reminders and renewal notes to clients, and first replies to new leads."""
+
+    def recent(days: int) -> datetime:
+        return datetime.combine(today - timedelta(days=rng.randint(0, days)),
+                                time(rng.randint(8, 20), rng.choice((0, 15, 30, 45))),
+                                ZoneInfo(TIME_ZONE))  # fmt: skip
+
+    people = conn.execute(
+        text("""
+            SELECT id, first_name, phone FROM app.clients
+            WHERE tenant_id = :t AND phone IS NOT NULL AND status = 'active'
+        """),
+        {"t": tenant_id},
+    ).all()
+    leads = conn.execute(
+        text("""
+            SELECT id, first_name, phone FROM app.leads
+            WHERE tenant_id = :t AND phone IS NOT NULL
+        """),
+        {"t": tenant_id},
+    ).all()
+    if not people:
+        return
+    missing = rng.sample(people, k=min(12, len(people)))
+    sent_at = recent(20)
+    campaign_id = conn.execute(
+        text("""
+            INSERT INTO app.campaigns
+                (tenant_id, audience, channel, body, recipients, created_by, created_at)
+            VALUES (:t, 'inactive', 'whatsapp', :body, :n, :owner, :at) RETURNING id
+        """),
+        {"t": tenant_id, "body": MESSAGE_BODIES["missing"], "n": len(missing), "owner": owner,
+         "at": sent_at},
+    ).scalar_one()  # fmt: skip
+
+    def row(person, kind: str, at: datetime, *, lead: bool = False, campaign=None) -> dict:
+        return {"tenant_id": tenant_id, "campaign_id": campaign,
+                "client_id": None if lead else person.id, "lead_id": person.id if lead else None,
+                "to_phone": person.phone,
+                "body": MESSAGE_BODIES[kind].replace("{first_name}", person.first_name),
+                "status": "failed" if rng.random() < 0.03 else "sent", "owner": owner,
+                "at": at}  # fmt: skip
+
+    rows = [row(p, "missing", sent_at, campaign=campaign_id) for p in missing]
+    rows += [row(p, rng.choice(("reminder", "plan_ending")), recent(30))
+             for p in rng.sample(people, k=min(18, len(people)))]  # fmt: skip
+    rows += [row(p, "lead", recent(14), lead=True) for p in rng.sample(leads, k=min(6, len(leads)))]
+    _insert(conn, """
+        INSERT INTO app.messages
+            (tenant_id, campaign_id, client_id, lead_id, channel, to_phone, body, status,
+             simulated, created_by, created_at)
+        VALUES (:tenant_id, :campaign_id, :client_id, :lead_id, 'whatsapp', :to_phone, :body,
+                :status, true, :owner, :at)
+    """, rows)  # fmt: skip
 
 
 def _seed_leads(

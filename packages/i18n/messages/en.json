@@ -2593,7 +2593,9 @@
     "tabs": {
       "today": "Today",
       "numbers": "Numbers",
-      "me": "Me"
+      "me": "Me",
+      "leads": "Leads",
+      "messages": "Messages"
     },
     "noBusiness": {
       "title": "This app is for business owners and staff",
@@ -2623,7 +2625,14 @@
         "cancelled": "Cancelled",
         "waitlisted": "Waiting"
       },
-      "saved": "Saved."
+      "saved": "Saved.",
+      "days": "Days of the week",
+      "noneOnDay": "Nothing on this day.",
+      "backToDay": "Back to the day",
+      "sessions": "{count, plural, =0 {Nothing booked} one {# session} other {# sessions}}",
+      "booked": "{count, plural, =0 {No bookings} one {# booking} other {# bookings}}",
+      "attention": "Needs your attention",
+      "full": "Full"
     },
     "clients": {
       "search": "Search",
@@ -2636,7 +2645,25 @@
       "email": "Email",
       "plan": "Plan",
       "noPlan": "No active plan",
-      "notes": "Notes"
+      "notes": "Notes",
+      "add": "Add",
+      "total": "{count, plural, =0 {None} one {# in all} other {# in all}}",
+      "created": "Saved. Here is the new card.",
+      "nameRequired": "A first name is needed.",
+      "visitsTitle": "Recent visits",
+      "upcomingTitle": "Coming up",
+      "noVisits": "No visits yet.",
+      "sell": "Sell a plan",
+      "sold": "Sold: {plan}. The receipt is on its way.",
+      "noPlans": "There are no plans to sell yet. Add them on the web.",
+      "message": "Message",
+      "planUntil": "{plan} · until {date}",
+      "credits": "{left} of {total} left",
+      "searchHint": "Name, phone or email",
+      "more": "Show more",
+      "refine": "There are more: search to find someone.",
+      "noteSaved": "Note saved.",
+      "selected": "Selected"
     },
     "numbers": {
       "title": "Key numbers",
@@ -2660,6 +2687,43 @@
       "save": "Save",
       "branch": "Branch",
       "allBranches": "All branches"
+    },
+    "back": "Back",
+    "error": "Something went wrong. Try again.",
+    "session": {
+      "book": "Book someone in",
+      "close": "Close",
+      "booked": "{name} is booked.",
+      "waitlisted": "The session is full: {name} is on the waiting list.",
+      "cancel": "Cancel booking",
+      "cancelConfirm": "Cancel {name}'s booking?",
+      "yes": "Yes, cancel",
+      "no": "Keep it",
+      "note": "Note",
+      "noteFor": "A note about {name}'s visit",
+      "noteSaved": "Note saved on {name}'s card."
+    },
+    "leads": {
+      "open": "Open",
+      "due": "{count, plural, =0 {Nobody to call back today} one {# to call back today} other {# to call back today}}",
+      "none": "No leads here.",
+      "stage": "Move to",
+      "moved": "Moved to {stage}.",
+      "logged": "Added to the activity.",
+      "converted": "{name} is now a client.",
+      "convertConfirm": "Create a client card for {name} and mark the lead as won?",
+      "yes": "Yes",
+      "no": "Not now",
+      "followUp": "Call back {date}",
+      "added": "The lead is saved.",
+      "log": "Log a call or note"
+    },
+    "messages": {
+      "title": "Messages",
+      "sent": "Sent messages",
+      "to": "To {name}",
+      "send": "Send",
+      "noPhone": "There is no phone number to send to."
     }
   },
   "staffApp": {
@@ -2679,7 +2743,14 @@
       "open": "Open requests",
       "newBusinesses": "New businesses this week",
       "nothing": "Nothing waiting. Enjoy the quiet.",
-      "youAre": "You're signed in as {level}"
+      "youAre": "You're signed in as {level}",
+      "businesses": "Businesses",
+      "activeClients": "Active clients",
+      "bookings": "Bookings, 30 days",
+      "latest": "Open requests",
+      "newest": "New this week",
+      "billing": "Billing, {month}",
+      "paidOpen": "{paid} paid · {open} open"
     },
     "businesses": {
       "search": "Search a business",
@@ -2687,7 +2758,10 @@
       "owner": "Owner",
       "clients": "{count} clients",
       "trialEnds": "Trial ends {date}",
-      "modules": "Modules"
+      "modules": "Modules",
+      "count": "{count, plural, =0 {No businesses} one {# business} other {# businesses}}",
+      "back": "Businesses",
+      "row": "{clients} clients · {modules} modules"
     },
     "inbox": {
       "title": "Inbox",
@@ -2703,6 +2777,29 @@
       "title": "Me",
       "level": "Your level: {level}",
       "permissions": "What you may do"
+    },
+    "business": {
+      "since": "On MyBiz since {date}",
+      "numbers": "The numbers",
+      "emailOwner": "Email the owner",
+      "noModules": "Core only",
+      "extend": "Add {days} days",
+      "statuses": {
+        "open": "Open",
+        "paid": "Paid",
+        "void": "Credited"
+      },
+      "period": "{from} – {to}"
+    },
+    "request": {
+      "back": "Requests",
+      "status": "Status",
+      "notesSaved": "Notes saved.",
+      "updated": "Updated.",
+      "call": "Call",
+      "email": "Email",
+      "error": "Something went wrong. Try again.",
+      "you": "you"
     }
   },
   "verticals": {

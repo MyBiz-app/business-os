@@ -30,6 +30,8 @@ export default function TabsLayout() {
     );
   }
 
+  const crm = tenant.modules.includes("crm");
+
   return (
     <Tabs
       screenOptions={{
@@ -47,6 +49,14 @@ export default function TabsLayout() {
           title: tTerms(`${termsFor(tenant)}.clients`),
           tabBarIcon: icon("people-outline"),
           href: can("clients.read") ? undefined : null,
+        }}
+      />
+      <Tabs.Screen
+        name="inbox"
+        options={{
+          title: crm ? t("leads") : t("messages"),
+          tabBarIcon: icon(crm ? "funnel-outline" : "chatbubbles-outline"),
+          href: can("clients.read") && (crm || tenant.modules.includes("whatsapp")) ? undefined : null,
         }}
       />
       <Tabs.Screen

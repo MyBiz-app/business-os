@@ -4,8 +4,8 @@ _Last updated: 2026-10-06_ · Updated with every merged pull request. Open work 
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** the websites are complete (marketing site, business web system and MyBiz console), in content, behaviour and looks. Waiting for the owner: sign-up emails on staging (#48) and the open decisions below.
-**Next:** the apps (decision X5), then phase 7 and the architecture follow-ups ([#63](https://github.com/adiredri/business-os/issues/63)).
+**Now:** the apps (decision X5). The business app now runs the whole day from the phone ([#84](https://github.com/MyBiz-app/business-os/issues/84)): today and the week, check-in and booking, clients and selling a plan, leads and messages. Waiting for the owner: sign-up emails on staging (#48) and the open decisions below.
+**Next:** the same pass for the client app, then phase 7.
 
 ## Board
 
@@ -16,7 +16,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 | 1 — Marketing website | Full site, sign-up journey (cart, summary, simulated payment), welcome email, getting started | ✅ Done | #27 |
 | 2 — Business web app | Locked modules with previews and upsell, sales page, profiles, full review | ✅ Done | #28 |
 | 3 — MyBiz console | Team levels and permissions, working inside a business, actions, support inbox, audit | ✅ Done | #29 |
-| 4 — Apps | Business app and MyBiz team app built, shared app kit, client app polish, architecture review ([findings](reviews/architecture-2026-10.md)) | ✅ Done | #35 |
+| 4 — Apps | Business app and MyBiz team app built, shared app kit, client app polish, architecture review ([findings](reviews/architecture-2026-10.md)). Second round: the business app runs the whole day (#84) | 🟡 In progress | #35 |
 | 5 — Industries | Category → sub-category template in one catalog ([how to add one](verticals.md)); five main categories with 25 sub-categories; five more coming soon | ✅ Done | #30 |
 | 6 — Businesses and branches | One owner with several businesses, each with several branches. Done: my businesses, business menu, current branch, data and numbers per branch, branches per team member, extra-branch charge follows branches. Demo generator for any industry with branches, and a staging workflow. Staging migrates before the API starts. Demo accounts on staging are ready and seeded | ✅ Done | #55 |
 | 7 — More categories | Core capabilities that open the future categories | ⚪ Planned | #33 |
@@ -24,13 +24,15 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- [#84](https://github.com/MyBiz-app/business-os/issues/84) Business app: the whole day from the phone. Done: today with a day strip for the week and what needs attention; a session with check-in, booking someone in, cancelling and a visit note; clients with filters, a new client, and a full client card (plans and selling one, what's coming up, recent visits, notes, a WhatsApp message); a leads tab by stage with a lead card (call, move the stage, log a call, turn into a client) and a new lead; the messages sent. Shared building blocks in the app kit (back link, list rows, avatars, badges, pill rows). The demo generator now also writes a month of sent messages. Checked end to end with `e2e/business_app.py` in Hebrew/light and English/dark, with no accessibility issues.
+- MyBiz team app, second round: a home with the platform's numbers, this month's billing, open requests and new businesses; businesses with sorting and a business card (numbers, modules, invoices, more trial days); a request card (call, write back, take it, status, internal notes). Checked end to end with `e2e/staff_app.py`.
 - Websites complete. Polished in four rounds: the clients list shows each client's plan and last visit, team avatars, a busy-hours heatmap and occupancy bars in the reports, plans and services show how they are used, a shorter client history, a day strip on the phone schedule, a two-row header on phones, search, sort and pages in the MyBiz console, a billing summary, and structured data for search results.
 - Checked end to end: `dod.py` (sign-up through the AI assistant and the console), a crawl of every page in Hebrew and English on computer and phone with no errors, no accessibility violations and nothing spilling off the screen, in light and dark mode.
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next
 
-- [#63](https://github.com/adiredri/business-os/issues/63) Architecture follow-ups: set-based queries, shared sign-in in the app kit, one money helper, more tests
+- Client app: the same pass (shared building blocks, fuller screens, end-to-end checks)
 
 ## Planned
 
@@ -54,5 +56,5 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 ## Health
 
 - CI (lint, typecheck, tests, build) runs on every pull request; `main` is green.
-- About 290 API tests and 28 end-to-end browser flows, including accessibility (WCAG AA) and dark mode.
+- About 290 API tests and 28 end-to-end browser flows, including accessibility (WCAG AA) and dark mode; the business app flow covers 7 steps on a phone.
 - Paid services run in simulated mode until go-live (spec section 10).
