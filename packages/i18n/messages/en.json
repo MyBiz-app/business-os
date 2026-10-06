@@ -438,7 +438,11 @@
       "class": "Group session – at set times on the schedule",
       "appointment": "Personal appointment – the client picks a free time"
     },
-    "appointmentLabel": "Appointment"
+    "appointmentLabel": "Appointment",
+    "stats": {
+      "sessions": "{count, plural, =0 {No sessions in 30 days} one {One session in 30 days} other {# sessions in 30 days}}",
+      "occupancy": "{value} full"
+    }
   },
   "locations": {
     "title": "Locations",
@@ -934,7 +938,11 @@
       "overlapping_freeze": "That overlaps an existing freeze."
     },
     "validityRange": "Valid {from} – {to}",
-    "paymentMethod": "Payment method"
+    "paymentMethod": "Payment method",
+    "stats": {
+      "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
+      "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
+    }
   },
   "metrics": {
     "revenue": "Revenue",

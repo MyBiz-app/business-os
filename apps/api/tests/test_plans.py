@@ -185,3 +185,16 @@ def test_staff_cannot_sell(
     )
     assert desk_sale.status_code == 201
     assert client.post("/plans", json={}, headers=coach).status_code == 403
+
+
+def test_list_counts_holders_and_recent_sales(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    plan = card(client, headers)
+    sell(client, headers, new_client(client, headers, "Dana"), plan["id"])
+    sell(client, headers, new_client(client, headers, "Noa"), plan["id"])
+
+    listed = {p["id"]: p for p in client.get("/plans", headers=headers).json()}
+    assert listed[plan["id"]]["holders"] == 2
+    assert listed[plan["id"]]["sold_last_30_days"] == 2
+    others = [p for p in listed.values() if p["id"] != plan["id"]]
+    assert all(p["holders"] == 0 for p in others)

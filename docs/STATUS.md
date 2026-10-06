@@ -24,7 +24,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
-- Business web system (CRM) polish, round 1: clients list shows each client's plan and last visit, team page with avatars, reports with a busy-hours heatmap and occupancy bars
+- Business web system (CRM) polish. Round 1 done: clients list with plan and last visit, team avatars, reports heatmap. Round 2: plans show holders and recent sales, services show sessions and occupancy, refreshed cards
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next

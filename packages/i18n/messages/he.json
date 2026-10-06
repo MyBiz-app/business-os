@@ -438,7 +438,11 @@
       "class": "מפגש קבוצתי – בזמנים קבועים ביומן",
       "appointment": "תור אישי – הלקוח בוחר זמן פנוי"
     },
-    "appointmentLabel": "תור אישי"
+    "appointmentLabel": "תור אישי",
+    "stats": {
+      "sessions": "{count, plural, =0 {אין מפגשים ב-30 יום} one {מפגש אחד ב-30 יום} other {# מפגשים ב-30 יום}}",
+      "occupancy": "תפוסה {value}"
+    }
   },
   "locations": {
     "title": "מיקומים",
@@ -934,7 +938,11 @@
       "overlapping_freeze": "יש חפיפה עם הקפאה קיימת."
     },
     "validityRange": "בתוקף {from} – {to}",
-    "paymentMethod": "אמצעי תשלום"
+    "paymentMethod": "אמצעי תשלום",
+    "stats": {
+      "holders": "{count, plural, =0 {אין מחזיקים כרגע} one {לקוח/ה אחד/ת מחזיק/ה עכשיו} other {# לקוחות מחזיקים עכשיו}}",
+      "sold": "{count, plural, =0 {לא נמכר ב-30 יום} one {נמכר פעם אחת ב-30 יום} other {נמכר # פעמים ב-30 יום}}"
+    }
   },
   "metrics": {
     "revenue": "הכנסות",

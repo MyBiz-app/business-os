@@ -1,4 +1,4 @@
-import { TicketPercent } from "lucide-react";
+import { BadgeCheck, Ticket, TicketPercent, TrendingUp, Users } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -43,24 +43,39 @@ export default async function PlansPage() {
       {plans.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("plans.empty")}</p>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2">
+        <ul className="grid gap-4 sm:grid-cols-2">
           {plans.map((plan) => (
             <li key={plan.id}>
               <Link
                 href={`/plans/${plan.id}`}
-                className={`flex flex-col gap-1 card card-hover p-4 ${plan.active ? "" : "opacity-60"}`}
+                className={`flex h-full flex-col gap-4 card card-hover p-5 ${plan.active ? "" : "opacity-60"}`}
               >
-                <span className="flex items-center justify-between gap-2">
-                  <span className="font-semibold">{plan.name}</span>
-                  <span className="text-sm font-medium" dir="ltr">
+                <span className="flex items-start gap-3">
+                  <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                    {plan.kind === "membership" ? <BadgeCheck className="size-5" /> : <Ticket className="size-5" />}
+                  </span>
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="font-semibold">{plan.name}</span>
+                    <span className="text-sm text-muted">
+                      {t(`plans.kinds.${plan.kind}`)} ·{" "}
+                      {plan.credits ? `${t("plans.creditsCount", { count: plan.credits })} · ` : ""}
+                      {t("plans.days", { count: plan.validity_days })}
+                      {!plan.active && ` · ${t("common.inactive")}`}
+                    </span>
+                  </span>
+                  <span className="text-xl font-bold tabular-nums" dir="ltr">
                     {formatMoney(plan.price_amount, plan.price_currency, locale)}
                   </span>
                 </span>
-                <span className="text-sm text-muted">
-                  {t(`plans.kinds.${plan.kind}`)} ·{" "}
-                  {plan.credits ? `${t("plans.creditsCount", { count: plan.credits })} · ` : ""}
-                  {t("plans.days", { count: plan.validity_days })}
-                  {!plan.active && ` · ${t("common.inactive")}`}
+                <span className="mt-auto flex flex-wrap gap-x-4 gap-y-1 border-t border-border pt-3 text-sm text-muted">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Users aria-hidden="true" className="size-4" />
+                    {t("plans.stats.holders", { count: plan.holders })}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <TrendingUp aria-hidden="true" className="size-4" />
+                    {t("plans.stats.sold", { count: plan.sold_last_30_days })}
+                  </span>
                 </span>
               </Link>
             </li>

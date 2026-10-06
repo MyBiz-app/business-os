@@ -13,7 +13,7 @@ export function ScrollRegion({
   children: React.ReactNode;
 }) {
   return (
-    <div role="group" aria-labelledby={labelledBy} aria-label={label} tabIndex={0} className={`overflow-x-auto ${className}`}>
+    <div role="group" aria-labelledby={labelledBy} aria-label={label} tabIndex={0} className={`relative overflow-x-auto ${className}`}>
       {children}
     </div>
   );
