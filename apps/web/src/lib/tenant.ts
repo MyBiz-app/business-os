@@ -51,11 +51,19 @@ export const getTenant = cache(async () => {
 });
 
 /** The business's active branches (empty when the person may not read them). */
-export const getBranches = cache(async () => {
+/** The business's active branches with their rooms (empty without catalog rights). */
+const getActiveLocations = cache(async () => {
   const { tenant, api, scope } = await getTenant();
   if (!tenant.permissions.includes("catalog.read")) return [];
-  return ((await api.GET("/locations", { params: scope })).data ?? []).filter((b) => b.active).map(({ id, name }) => ({ id, name }));
+  return ((await api.GET("/locations", { params: scope })).data ?? []).filter((b) => b.active);
 });
+
+export const getBranches = cache(async () => (await getActiveLocations()).map(({ id, name }) => ({ id, name })));
+
+/** Whether the business rents out courts or rooms by the hour (an active bookable room). */
+export const hasBookableRooms = cache(async () =>
+  (await getActiveLocations()).some((branch) => branch.rooms.some((room) => room.active && room.bookable)),
+);
 
 export async function setActiveBranch(tenantId: string, branchId: string | null) {
   const store = await cookies();

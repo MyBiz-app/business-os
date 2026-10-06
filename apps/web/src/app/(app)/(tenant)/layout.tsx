@@ -7,7 +7,7 @@ import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
-import { getBranches, getTenant } from "@/lib/tenant";
+import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
 import { BranchPicker } from "./_menu/branch-picker";
@@ -18,7 +18,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
   // The branch picker appears once the business has more than one active branch.
-  const branches = await getBranches();
+  const [branches, rents] = await Promise.all([getBranches(), hasBookableRooms()]);
   const currentBranch = branches.find((b) => b.id === branch) ?? null;
 
   // Only what the user's permissions let them open.
@@ -28,6 +28,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/reports", label: t("nav.reports"), icon: "reports", permission: "reports.read" },
     { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
     { href: "/schedule", label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
+    ...(rents ? [{ href: "/resources", label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
     { href: "/clients", label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
     { href: "/clients/join", label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
     { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
