@@ -37,6 +37,8 @@ ReadDep = Annotated[TenantContext, Depends(require(Permission.SCHEDULE_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 ManageDep = Annotated[TenantContext, Depends(require(Permission.BOOKINGS_MANAGE))]
 SalesDep = Annotated[TenantContext, Depends(require(Permission.SALES_MANAGE))]
+ReportsDep = Annotated[TenantContext, Depends(require(Permission.REPORTS_READ))]
+MAX_REPORT_DAYS = 366
 
 
 class RoomHours(BaseModel):
@@ -379,6 +381,126 @@ def reserve(body: ReservationCreate, context: ManageDep) -> Booking:
     )
     notify_booking(db, booking_id, "booked_by_studio")
     return _load(db, booking_id)
+
+
+# --- Reports ----------------------------------------------------------------------------------
+
+
+class ResourceUsage(BaseModel):
+    room_id: UUID
+    room_name: str
+    location_name: str
+    open_hours: float = Field(description="Hours the room was open for reservations in the period")
+    reserved_hours: float = Field(description="Hours reserved (with a live booking)")
+    reservations: int
+    revenue: int = Field(description="Paid for reservations in the period, minor units")
+    currency: str
+
+    @property
+    def occupancy(self) -> float | None:
+        return 100.0 * self.reserved_hours / self.open_hours if self.open_hours else None
+
+
+class ResourceUsageRow(ResourceUsage):
+    occupancy_percent: float | None
+
+
+@router.get("/reports/resources")
+def resource_usage(
+    context: ReportsDep,
+    start: Annotated[dt.date, Query()],
+    end: Annotated[dt.date, Query()],
+) -> list[ResourceUsageRow]:
+    """For each bookable room: how many of its open hours were reserved in the period (local
+    dates, inclusive), how many reservations, and what they brought in."""
+    if end < start or (end - start).days >= MAX_REPORT_DAYS:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="bad_period")
+    db = context.session
+    business = (
+        db.execute(
+            text("SELECT time_zone, currency FROM app.tenants WHERE id = :id"),
+            {"id": context.tenant_id},
+        )
+        .mappings()
+        .one()
+    )
+    rooms = (
+        db.execute(
+            text("""
+            SELECT r.id, r.name, l.name AS location_name
+            FROM app.rooms r JOIN app.locations l ON l.id = r.location_id
+            WHERE r.bookable AND app.in_branch(r.location_id)
+            ORDER BY l.name, r.name
+        """)
+        )
+        .mappings()
+        .all()
+    )
+    if not rooms:
+        return []
+    ids = [r["id"] for r in rooms]
+    hours = db.execute(
+        text("SELECT room_id, weekday, starts, ends FROM app.room_hours WHERE room_id = ANY(:ids)"),
+        {"ids": ids},
+    ).all()
+    closed = set(
+        db.execute(
+            text("SELECT day FROM app.closed_days WHERE day BETWEEN :start AND :end"),
+            {"start": start, "end": end},
+        ).scalars()
+    )
+    weekly: dict[UUID, list[float]] = {room_id: [0.0] * 7 for room_id in ids}
+    for row in hours:
+        length = dt.datetime.combine(start, row.ends) - dt.datetime.combine(start, row.starts)
+        weekly[row.room_id][row.weekday] += length.total_seconds() / 3600
+    days = [start + timedelta(days=i) for i in range((end - start).days + 1)]
+    open_days = [day for day in days if day not in closed]
+    used = {
+        row.room_id: row
+        for row in db.execute(
+            text("""
+                SELECT s.room_id,
+                       count(*) AS reservations,
+                       coalesce(sum(extract(epoch FROM s.ends_at - s.starts_at)) / 3600, 0)
+                           AS reserved_hours,
+                       coalesce(sum((
+                           SELECT sum(p.amount) FROM app.payments p
+                           JOIN app.bookings pb ON pb.id = p.booking_id
+                           WHERE pb.session_id = s.id AND p.status = 'succeeded'
+                       )), 0) AS revenue
+                FROM app.sessions s
+                WHERE s.reserved AND s.status = 'scheduled' AND s.room_id = ANY(:ids)
+                  AND s.starts_at >= :from AND s.starts_at < :to
+                GROUP BY s.room_id
+            """),
+            {
+                "ids": ids,
+                "from": local_to_utc(start, time.min, business["time_zone"]),
+                "to": local_to_utc(end + timedelta(days=1), time.min, business["time_zone"]),
+            },
+        ).all()
+    }
+    result = []
+    for room in rooms:
+        row = used.get(room["id"])
+        usage = ResourceUsage(
+            room_id=room["id"],
+            room_name=room["name"],
+            location_name=room["location_name"],
+            open_hours=sum(weekly[room["id"]][day.weekday()] for day in open_days),
+            reserved_hours=float(row.reserved_hours) if row else 0.0,
+            reservations=row.reservations if row else 0,
+            revenue=int(row.revenue) if row else 0,
+            currency=business["currency"],
+        )
+        occupancy = usage.occupancy
+        result.append(
+            ResourceUsageRow(
+                **usage.model_dump(),
+                occupancy_percent=round(occupancy, 1) if occupancy is not None else None,
+            )
+        )
+    return result
 
 
 # --- Clients ----------------------------------------------------------------------------------

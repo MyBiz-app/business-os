@@ -5,10 +5,11 @@ import { useCallback, useState } from "react";
 import { Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Avatar, BackBar, Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { confirm } from "@business-os/app-kit/lib/confirm";
+import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -16,6 +17,8 @@ type Booking = components["schemas"]["Booking"];
 type ClientListItem = components["schemas"]["ClientListItem"];
 
 const TONE = { checked_in: "success", no_show: "danger", waitlisted: "primary" } as const;
+const METHODS = ["cash", "card", "transfer", "other"] as const;
+type Method = (typeof METHODS)[number];
 const BOOKING_ERRORS = ["already_booked", "session_cancelled", "invalid_transition", "invalid_reference", "not_found"];
 
 /** One session: who's coming, check-in, booking someone in and a note about a visit. */
@@ -34,6 +37,8 @@ export default function SessionScreen() {
   const [search, setSearch] = useState("");
   const [matches, setMatches] = useState<ClientListItem[] | null>(null);
   const [noteFor, setNoteFor] = useState<Booking | null>(null);
+  const [method, setMethod] = useState<Method>("cash");
+  const tResources = useTranslations("resources");
   const [note, setNote] = useState("");
   const timeZone = tenant?.time_zone ?? "UTC";
   const manage = can("bookings.manage");
@@ -166,9 +171,47 @@ export default function SessionScreen() {
             <Badge label={t("cancelled")} tone="danger" palette={palette} />
           )}
           {session.waitlisted > 0 && <Badge label={t("waitlist", { count: session.waitlisted })} palette={palette} />}
+          {session.room_name && <Badge label={session.room_name} palette={palette} />}
           {session.location_name && <Badge label={session.location_name} palette={palette} />}
         </View>
       </View>
+
+      {session.booking_mode === "resource" && session.price_amount != null && (
+        <Card palette={palette}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 18 }}>
+              {formatMoney(session.price_amount, session.price_currency ?? tenant!.currency, locale)}
+            </Text>
+            <Badge label={session.paid ? tResources("paid") : tResources("notPaid")} tone={session.paid ? "success" : "danger"} palette={palette} />
+          </View>
+          {!session.paid && can("sales.manage") && coming[0] && (
+            <>
+              <PillRow<Method>
+                label={tResources("method")}
+                palette={palette}
+                value={method}
+                onChange={setMethod}
+                options={METHODS.map((value) => ({ value, label: tResources(`methods.${value}`) }))}
+              />
+              <Button
+                label={tResources("recordPayment")}
+                palette={palette}
+                busy={busy === "pay"}
+                onPress={() =>
+                  void run("pay", async () => {
+                    unwrap(
+                      await api.POST("/resources/reservations/{booking_id}/payment", {
+                        params: { ...scope, path: { booking_id: coming[0]!.id } },
+                        body: { method },
+                      }),
+                    );
+                  })
+                }
+              />
+            </>
+          )}
+        </Card>
+      )}
 
       <View accessibilityLiveRegion="polite">
         {notice && <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text>}

@@ -7,7 +7,7 @@ import { Pressable, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
@@ -30,6 +30,7 @@ export default function Today() {
   const t = useTranslations("business.today");
   const tTerms = useTranslations("terms");
   const tAttention = useTranslations("dashboard.attention");
+  const tReserve = useTranslations("business.reserve");
   const locale = useLocale();
   const { api, scope, tenant, palette, can, branch } = useBusiness();
   const { session: auth } = useSession();
@@ -40,15 +41,22 @@ export default function Today() {
   const [open, setOpen] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[] };
-    const [sessions, attention] = await Promise.all([
+    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0 };
+    const [sessions, attention, courts] = await Promise.all([
       can("schedule.read")
         ? api.GET("/sessions", { params: { ...scope, query: { start: todayIn(timeZone), days: DAYS } } }).then(unwrap)
         : Promise.resolve([] as ScheduledSession[]),
       // Not essential: the day still shows if this list can't be loaded.
       api.GET("/attention", { params: scope }).then(unwrap).catch(() => [] as AttentionList[]),
+      // Courts and rooms rented by the hour, if the business has any.
+      can("bookings.manage")
+        ? api
+            .GET("/resources", { params: scope })
+            .then((r) => (r.data ?? []).filter((s) => s.rooms.length > 0).length)
+            .catch(() => 0)
+        : Promise.resolve(0),
     ]);
-    return { sessions, attention };
+    return { sessions, attention, courts };
   }, [api, scope, tenantId, timeZone, can]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
@@ -125,6 +133,10 @@ export default function Today() {
         <Heading palette={palette}>{tenant.name}</Heading>
         {branch && <Text style={[styles.muted, { color: palette.muted }]}>{branch.name}</Text>}
       </View>
+
+      {(data?.courts ?? 0) > 0 && (
+        <Button label={tReserve("cta")} palette={palette} onPress={() => router.push("/reserve")} />
+      )}
 
       {can("schedule.read") && (
         <View style={{ gap: 10 }}>

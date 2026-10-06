@@ -18,6 +18,7 @@ from sqlalchemy import text
 
 from app.api import bookings as bookings_api
 from app.api import plans as plans_api
+from app.api import resources as resources_api
 from app.api import schedule as schedule_api
 from app.api.deps import TenantContext
 from app.metrics import METRICS, compute, members_at_risk, previous_period
@@ -201,6 +202,37 @@ def get_session_roster(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]
             for b in roster
         ]
     }
+
+
+def free_courts(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    """Free times of the courts and rooms rented by the hour, on one day, for one length."""
+    day = _date(args["date"], "date")
+    db = ctx.tenant.session
+    found = []
+    for service in resources_api._services(db):
+        if not service.rooms:
+            continue
+        lengths = resources_api.lengths(service)
+        minutes = int(args["minutes"]) if int(args["minutes"]) in lengths else lengths[0]
+        slots = resources_api.resource_slots(db, service.id, day, minutes, None)
+        found.append(
+            {
+                "service": service.name,
+                "price_per_hour": service.price_per_hour,
+                "currency": service.price_currency,
+                "lengths_minutes": lengths,
+                "minutes": minutes,
+                "free": [
+                    {
+                        "room": slot.room_name,
+                        "starts": _local(slot.starts_at, ctx.time_zone)[-5:],
+                        "price": slot.price_amount,
+                    }
+                    for slot in slots[:40]
+                ],
+            }
+        )
+    return {"date": day.isoformat(), "services": found}
 
 
 def get_metrics(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
@@ -430,6 +462,15 @@ TOOLS: dict[str, Tool] = {
             {"start_date": DATE, "days": {"type": "integer"}},
             Permission.SCHEDULE_READ,
             list_sessions,
+        ),
+        Tool(
+            "free_courts",
+            "Courts and rooms rented by the hour: for each such service, its price per hour "
+            "(minor units), the lengths offered and the free start times per court on a local "
+            "date for a length in minutes (the shortest offered when that length isn't).",
+            {"date": DATE, "minutes": {"type": "integer"}},
+            Permission.SCHEDULE_READ,
+            free_courts,
         ),
         Tool(
             "get_session_roster",

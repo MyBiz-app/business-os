@@ -7103,6 +7103,98 @@
         }
       }
     },
+    "/reports/resources": {
+      "get": {
+        "tags": [
+          "resources"
+        ],
+        "summary": "Resource Usage",
+        "description": "For each bookable room: how many of its open hours were reserved in the period (local\ndates, inclusive), how many reservations, and what they brought in.",
+        "operationId": "resource_usage",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResourceUsageRow"
+                  },
+                  "title": "Response Resource Usage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/resources/reservations/{booking_id}/payment": {
       "post": {
         "tags": [
@@ -21048,6 +21140,70 @@
           "price_currency"
         ],
         "title": "ResourceSlot"
+      },
+      "ResourceUsageRow": {
+        "properties": {
+          "room_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Room Id"
+          },
+          "room_name": {
+            "type": "string",
+            "title": "Room Name"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "open_hours": {
+            "type": "number",
+            "title": "Open Hours",
+            "description": "Hours the room was open for reservations in the period"
+          },
+          "reserved_hours": {
+            "type": "number",
+            "title": "Reserved Hours",
+            "description": "Hours reserved (with a live booking)"
+          },
+          "reservations": {
+            "type": "integer",
+            "title": "Reservations"
+          },
+          "revenue": {
+            "type": "integer",
+            "title": "Revenue",
+            "description": "Paid for reservations in the period, minor units"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "occupancy_percent": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occupancy Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "room_id",
+          "room_name",
+          "location_name",
+          "open_hours",
+          "reserved_hours",
+          "reservations",
+          "revenue",
+          "currency",
+          "occupancy_percent"
+        ],
+        "title": "ResourceUsageRow"
       },
       "Review": {
         "properties": {

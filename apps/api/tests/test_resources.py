@@ -1,5 +1,6 @@
 """Resources (#41): courts and rooms reserved by the hour."""
 
+import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import timedelta
 from uuid import uuid4
@@ -11,6 +12,14 @@ from sqlalchemy import Engine, text
 from app.api.resources import price_of
 from tests.conftest import AuthHeaders, local_today
 from tests.test_appointments import at, local_times
+from tests.test_assistant import (  # noqa: F401
+    FakeProvider,
+    ask,
+    calls,
+    conversation,
+    says,
+    use_provider,
+)
 from tests.test_bookings import new_client, set_status
 from tests.test_client_app import join, join_code
 
@@ -353,3 +362,52 @@ def test_other_businesses_see_nothing(client: TestClient, club: dict, auth: Auth
         "/resources/reservations", json=reservation(club, 0, "09:00", 60, dana), headers=theirs
     )
     assert stolen.status_code == 404
+
+
+def test_the_assistant_finds_free_courts(
+    client: TestClient,
+    club: dict,
+    use_provider,  # noqa: F811 (the fixture, imported from test_assistant)
+) -> None:
+    provider = FakeProvider(
+        [calls("free_courts", {"date": club["day"].isoformat(), "minutes": 90}), says("Yes.")]
+    )
+    use_provider(provider)
+    headers = club["headers"]
+    dana = new_client(client, headers, "Dana")
+    client.post(
+        "/resources/reservations", json=reservation(club, 0, "08:00", 120, dana), headers=headers
+    )
+
+    ask(client, headers, conversation(client, headers), "Is a court free on that day?")
+
+    result = json.loads(provider.calls[1]["messages"][-1]["content"][0]["content"])
+    [padel] = result["services"]
+    assert padel["minutes"] == 90 and padel["lengths_minutes"] == [60, 90, 120]
+    first = next(slot for slot in padel["free"] if slot["room"] == "Court 1")
+    assert first == {"room": "Court 1", "starts": "10:00", "price": 18000}
+
+
+def test_court_usage_report(client: TestClient, club: dict) -> None:
+    headers = club["headers"]
+    dana = new_client(client, headers, "Dana")
+    made = client.post(
+        "/resources/reservations", json=reservation(club, 0, "18:00", 90, dana), headers=headers
+    ).json()
+    client.post(
+        f"/resources/reservations/{made['id']}/payment", json={"method": "cash"}, headers=headers
+    )
+    day = club["day"].isoformat()
+    rows = client.get(
+        "/reports/resources", params={"start": day, "end": day}, headers=headers
+    ).json()
+
+    first, second = rows
+    assert (first["room_name"], first["open_hours"], first["reserved_hours"]) == (
+        "Court 1",
+        14.0,
+        1.5,
+    )
+    assert (first["reservations"], first["revenue"]) == (1, 18000)
+    assert first["occupancy_percent"] == round(150 / 14, 1)
+    assert second["reserved_hours"] == 0 and second["occupancy_percent"] == 0
