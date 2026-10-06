@@ -1,6 +1,6 @@
 # Proposal: book courts, rooms and spaces by the hour (#41)
 
-Status: **PROPOSED**, waiting for the owner (decision X9 in [`DECISIONS.md`](../DECISIONS.md)).
+Status: **DECIDED (delegated)**, 2026-10-06: the recommended answer to each question below (decision X9 in [`DECISIONS.md`](../DECISIONS.md)).
 Phase 7, first capability. Opens the "Sports & facilities" category (today "coming soon").
 
 ## The need

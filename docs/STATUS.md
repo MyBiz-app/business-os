@@ -4,8 +4,8 @@ _Last updated: 2026-10-06_ · Updated with every merged pull request. Open work 
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** the apps' second round is merged (#85): the business app runs the whole day from the phone, the MyBiz team app has business and request cards. Phase 7 starts with resources (#41): the proposal waits for the owner (X9). Also waiting: sign-up emails on staging (#48) and the open decisions below.
-**Next:** resources (#41) once approved, in five slices; a lighter pass on the client app.
+**Now:** the apps' second round is merged (#85): the business app runs the whole day from the phone, the MyBiz team app has business and request cards. Phase 7 starts with resources (#41, decision X9): building it in five slices. Also waiting: sign-up emails on staging (#48) and the open decisions below.
+**Next:** resources (#41) slice by slice; a lighter pass on the client app.
 
 ## Board
 
@@ -48,7 +48,6 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## Waiting for the owner's decision
 
-- [#41](https://github.com/MyBiz-app/business-os/issues/41) Resources (courts, rooms) by the hour: the proposal and four questions ([X9](proposals/41-resources.md))
 - [#46](https://github.com/adiredri/business-os/issues/46) Payment provider (O1)
 - [#47](https://github.com/adiredri/business-os/issues/47) Invoicing provider (O2)
 - [#36](https://github.com/adiredri/business-os/issues/36) Final brand name (O3)
