@@ -2743,7 +2743,14 @@
       "open": "Open requests",
       "newBusinesses": "New businesses this week",
       "nothing": "Nothing waiting. Enjoy the quiet.",
-      "youAre": "You're signed in as {level}"
+      "youAre": "You're signed in as {level}",
+      "businesses": "Businesses",
+      "activeClients": "Active clients",
+      "bookings": "Bookings, 30 days",
+      "latest": "Open requests",
+      "newest": "New this week",
+      "billing": "Billing, {month}",
+      "paidOpen": "{paid} paid · {open} open"
     },
     "businesses": {
       "search": "Search a business",
@@ -2751,7 +2758,10 @@
       "owner": "Owner",
       "clients": "{count} clients",
       "trialEnds": "Trial ends {date}",
-      "modules": "Modules"
+      "modules": "Modules",
+      "count": "{count, plural, =0 {No businesses} one {# business} other {# businesses}}",
+      "back": "Businesses",
+      "row": "{clients} clients · {modules} modules"
     },
     "inbox": {
       "title": "Inbox",
@@ -2767,6 +2777,29 @@
       "title": "Me",
       "level": "Your level: {level}",
       "permissions": "What you may do"
+    },
+    "business": {
+      "since": "On MyBiz since {date}",
+      "numbers": "The numbers",
+      "emailOwner": "Email the owner",
+      "noModules": "Core only",
+      "extend": "Add {days} days",
+      "statuses": {
+        "open": "Open",
+        "paid": "Paid",
+        "void": "Credited"
+      },
+      "period": "{from} – {to}"
+    },
+    "request": {
+      "back": "Requests",
+      "status": "Status",
+      "notesSaved": "Notes saved.",
+      "updated": "Updated.",
+      "call": "Call",
+      "email": "Email",
+      "error": "Something went wrong. Try again.",
+      "you": "you"
     }
   },
   "verticals": {

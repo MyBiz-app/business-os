@@ -2743,7 +2743,14 @@
       "open": "פניות פתוחות",
       "newBusinesses": "עסקים חדשים השבוע",
       "nothing": "אין מה לטפל. אפשר לנשום.",
-      "youAre": "את/ה מחובר/ת כ{level}"
+      "youAre": "את/ה מחובר/ת כ{level}",
+      "businesses": "עסקים",
+      "activeClients": "לקוחות פעילים",
+      "bookings": "הרשמות, 30 יום",
+      "latest": "פניות פתוחות",
+      "newest": "חדשים השבוע",
+      "billing": "חיוב, {month}",
+      "paidOpen": "{paid} שולם · {open} פתוח"
     },
     "businesses": {
       "search": "חיפוש עסק",
@@ -2751,7 +2758,10 @@
       "owner": "בעלים",
       "clients": "{count} לקוחות",
       "trialEnds": "הניסיון מסתיים {date}",
-      "modules": "מודולים"
+      "modules": "מודולים",
+      "count": "{count, plural, =0 {אין עסקים} one {עסק אחד} other {# עסקים}}",
+      "back": "עסקים",
+      "row": "{clients} לקוחות · {modules} מודולים"
     },
     "inbox": {
       "title": "פניות",
@@ -2767,6 +2777,29 @@
       "title": "אני",
       "level": "הרמה שלך: {level}",
       "permissions": "מה מותר לך"
+    },
+    "business": {
+      "since": "ב-MyBiz מאז {date}",
+      "numbers": "המספרים",
+      "emailOwner": "מייל לבעלים",
+      "noModules": "ליבה בלבד",
+      "extend": "הוספת {days} ימים",
+      "statuses": {
+        "open": "פתוחה",
+        "paid": "שולמה",
+        "void": "זוכתה"
+      },
+      "period": "{from} – {to}"
+    },
+    "request": {
+      "back": "פניות",
+      "status": "סטטוס",
+      "notesSaved": "ההערות נשמרו.",
+      "updated": "עודכן.",
+      "call": "חיוג",
+      "email": "אימייל",
+      "error": "משהו השתבש. נסו שוב.",
+      "you": "שלך"
     }
   },
   "verticals": {

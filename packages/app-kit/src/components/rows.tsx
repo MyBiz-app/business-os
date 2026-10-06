@@ -180,6 +180,25 @@ export function PillRow<T extends string>({
   );
 }
 
+/** A number with its label, in a grid of tiles (two per row on a phone). */
+export function StatTile({ label, value, palette }: { label: string; value: string; palette: Palette }) {
+  return (
+    <View
+      accessible
+      accessibilityLabel={`${label}: ${value}`}
+      style={[local.stat, { backgroundColor: palette.surface, borderColor: palette.border }]}
+    >
+      <Text style={[local.statLabel, { color: palette.muted }]}>{label}</Text>
+      <Text style={[local.statValue, { color: palette.foreground }]}>{value}</Text>
+    </View>
+  );
+}
+
+/** Lays tiles out two per row, wrapping. */
+export function TileGrid({ children }: { children: React.ReactNode }) {
+  return <View style={local.grid}>{children}</View>;
+}
+
 const local = StyleSheet.create({
   back: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", minHeight: 44 },
   backText: { fontSize: 16, fontWeight: "600" },
@@ -195,6 +214,10 @@ const local = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "700", textAlign: "left" },
   sectionAction: { fontSize: 15, fontWeight: "600" },
   pills: { gap: 8, paddingVertical: 2 },
+  grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  stat: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: 16, padding: 14, gap: 4 },
+  statLabel: { fontSize: 13, fontWeight: "600", textAlign: "left" },
+  statValue: { fontSize: 24, fontWeight: "700", textAlign: "left", fontVariant: ["tabular-nums"] },
   pill: { minWidth: 56, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 14, borderWidth: 1, alignItems: "center", gap: 2 },
   pillSub: { fontSize: 12, fontWeight: "600" },
   pillText: { fontSize: 16, fontWeight: "700" },
