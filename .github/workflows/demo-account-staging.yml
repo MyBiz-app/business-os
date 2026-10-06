@@ -1,0 +1,85 @@
+name: Create a demo account on staging
+
+# Creates a confirmed sign-in for a demo or team account on staging, for when sign-up emails
+# cannot be delivered yet (issue #48). It takes a bcrypt hash of the password, never the
+# password itself; an existing account keeps its id and gets the new password and name.
+# Seed it with "Seed staging demo data", or make it a MyBiz admin with "Grant platform admin".
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: Email of the account
+        required: true
+        type: string
+      password_hash:
+        description: bcrypt hash of the password ($2a$/$2b$...), not the password
+        required: true
+        type: string
+      full_name:
+        description: Display name (optional)
+        required: false
+        type: string
+
+jobs:
+  account:
+    name: Create or update the account
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - name: Install the PostgreSQL client
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Create or update
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          EMAIL: ${{ inputs.email }}
+          HASH: ${{ inputs.password_hash }}
+          NAME: ${{ inputs.full_name }}
+        run: |
+          case "$HASH" in
+            '$2a$'*|'$2b$'*|'$2y$'*) ;;
+            *) echo "::error::password_hash must be a bcrypt hash, not a password."; exit 1 ;;
+          esac
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v email="$EMAIL" -v hash="$HASH" -v name="$NAME" <<'SQL'
+          BEGIN;
+          -- Supabase auth: a confirmed email sign-in (as GoTrue itself would create it).
+          INSERT INTO auth.users (
+              instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+              raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+              confirmation_token, recovery_token, email_change_token_new, email_change
+          )
+          SELECT '00000000-0000-0000-0000-000000000000', gen_random_uuid(), 'authenticated',
+                 'authenticated', lower(:'email'), :'hash', now(),
+                 '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', ''
+          WHERE NOT EXISTS (SELECT 1 FROM auth.users WHERE lower(email) = lower(:'email'));
+
+          UPDATE auth.users
+          SET encrypted_password = :'hash',
+              email_confirmed_at = coalesce(email_confirmed_at, now()), updated_at = now()
+          WHERE lower(email) = lower(:'email');
+
+          INSERT INTO auth.identities (
+              id, user_id, provider_id, provider, identity_data, created_at, updated_at, last_sign_in_at
+          )
+          SELECT gen_random_uuid(), u.id, u.id::text, 'email',
+                 jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
+                 now(), now(), now()
+          FROM auth.users u
+          WHERE lower(u.email) = lower(:'email')
+            AND NOT EXISTS (
+                SELECT 1 FROM auth.identities i WHERE i.user_id = u.id AND i.provider = 'email'
+            );
+
+          -- The app's profile, as the first login would create it.
+          INSERT INTO app.users (id, email, full_name)
+          SELECT id, lower(email), nullif(:'name', '') FROM auth.users
+          WHERE lower(email) = lower(:'email')
+          ON CONFLICT (id) DO UPDATE
+          SET full_name = coalesce(nullif(:'name', ''), app.users.full_name);
+          COMMIT;
+
+          SELECT u.id, u.email, u.email_confirmed_at IS NOT NULL AS confirmed, p.full_name
+          FROM auth.users u JOIN app.users p ON p.id = u.id
+          WHERE lower(u.email) = lower(:'email');
+          SQL
