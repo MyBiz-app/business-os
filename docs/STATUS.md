@@ -24,7 +24,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
-- Owner's demo on staging: waiting for adired7399@gmail.com to sign up, then the seed workflow runs ([#58](https://github.com/adiredri/business-os/issues/58))
+- Demo accounts on staging: created by workflow (no sign-up email needed), then seeded: adired7399@gmail.com as a business owner, adire7399@gmail.com with MyBiz console data ([#58](https://github.com/adiredri/business-os/issues/58))
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next
