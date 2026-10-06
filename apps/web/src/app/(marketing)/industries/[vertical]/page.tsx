@@ -106,8 +106,11 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
 
       {!planned && <ReadySection match={match} />}
 
-      <h2 className="pt-6 text-center text-lg font-semibold">{t("industries.all")}</h2>
-      <nav aria-label={t("nav.industries")} className="mx-auto mt-4 flex flex-wrap justify-center gap-2 px-6">
+      {/* Named by its own heading, so it never collides with the footer's industries nav. */}
+      <h2 id="all-industries" className="pt-6 text-center text-lg font-semibold">
+        {t("industries.all")}
+      </h2>
+      <nav aria-labelledby="all-industries" className="mx-auto mt-4 flex flex-wrap justify-center gap-2 px-6">
         {categories().map((other) => (
           <Link
             key={other.key}

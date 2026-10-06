@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
 import { AddOnsStrip, BranchesSection, CtaBand, Faq, FeatureGrid, IndustryCards, SectionHeading } from "@/components/marketing/sections";
+import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
@@ -20,6 +21,8 @@ export default async function Home() {
 
   return (
     <main className="enter flex flex-col">
+      <OrganizationData />
+      <FaqData />
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-1/2 size-[36rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-from/25 to-brand-to/25 blur-3xl rtl:translate-x-1/2" />
