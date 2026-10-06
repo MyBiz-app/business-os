@@ -35,10 +35,13 @@ export default async function TeamPage() {
       </div>
 
       <section aria-labelledby="members-heading" className="flex flex-col gap-3">
-        <h2 id="members-heading" className="text-lg font-semibold">
-          {t("team.members")}
-        </h2>
-        <ul className="card">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 id="members-heading" className="text-lg font-semibold">
+            {t("team.members")}
+          </h2>
+          <span className="text-sm text-muted">{t("team.count", { count: team.members.length })}</span>
+        </div>
+        <ul className="card overflow-hidden">
           {team.members.map((member) => (
             <MemberRow
               key={`${member.user_id}-${member.role}-${member.custom_role_id}`}
@@ -71,7 +74,7 @@ export default async function TeamPage() {
         {team.invitations.length === 0 ? (
           <p className="text-sm text-muted">{t("team.noPending")}</p>
         ) : (
-          <ul className="rounded-2xl border border-border">
+          <ul className="card">
             {team.invitations.map((invitation) => (
               <li key={invitation.id} className="flex flex-wrap items-center gap-3 border-t border-border px-4 py-3 first:border-t-0">
                 <span className="flex-1 truncate" dir="ltr">

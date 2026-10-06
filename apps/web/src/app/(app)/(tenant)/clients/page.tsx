@@ -1,9 +1,10 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { termsOf } from "@business-os/verticals";
 
 import { Avatar } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
+import { formatDay, todayIn } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
@@ -19,6 +20,7 @@ const ABSENCES = [14, 30, 60] as const;
 
 export default async function ClientsPage({ searchParams }: PageProps<"/clients">) {
   const t = await getTranslations();
+  const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("clients.read");
   const params = await searchParams;
 
@@ -44,6 +46,12 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     }),
   );
   const term = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
+  const today = todayIn(tenant.time_zone);
+  const shortDate = (day: string) => formatDay(day, locale, { day: "numeric", month: "short" });
+  const sinceVisit = (day: string) => {
+    const days = Math.round((Date.parse(today) - Date.parse(day)) / 86_400_000);
+    return days <= 0 ? t("clients.list.today") : days < 30 ? t("clients.list.daysAgo", { days }) : shortDate(day);
+  };
   const pages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
   const pageHref = (target: number) => {
     const query = new URLSearchParams();
@@ -148,7 +156,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
               <tr>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.name")}</th>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.phone")}</th>
-                <th scope="col" className="hidden px-4 py-3 text-start font-medium md:table-cell">{t("clients.email")}</th>
+                <th scope="col" className="hidden px-4 py-3 text-start font-medium xl:table-cell">{t("clients.email")}</th>
+                <th scope="col" className="hidden px-4 py-3 text-start font-medium lg:table-cell">{t("clients.list.plan")}</th>
+                <th scope="col" className="hidden px-4 py-3 text-start font-medium sm:table-cell">{t("clients.list.lastVisit")}</th>
                 <th scope="col" className="px-4 py-3 text-start font-medium">{t("clients.status")}</th>
               </tr>
             </thead>
@@ -164,7 +174,22 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                     </Link>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3" dir="ltr">{client.phone}</td>
-                  <td className="hidden whitespace-nowrap px-4 py-3 md:table-cell" dir="ltr">{client.email}</td>
+                  <td className="hidden max-w-56 truncate px-4 py-3 xl:table-cell" dir="ltr">{client.email}</td>
+                  <td className="hidden px-4 py-3 lg:table-cell">
+                    {client.plan_name ? (
+                      <span className="flex flex-col">
+                        <span className="font-medium">{client.plan_name}</span>
+                        {client.plan_ends_on && (
+                          <span className="text-xs text-muted">{t("clients.list.planUntil", { date: shortDate(client.plan_ends_on) })}</span>
+                        )}
+                      </span>
+                    ) : (
+                      <span className="text-muted">{t("clients.list.noPlan")}</span>
+                    )}
+                  </td>
+                  <td className="hidden whitespace-nowrap px-4 py-3 sm:table-cell">
+                    {client.last_visit ? sinceVisit(client.last_visit) : <span className="text-muted">{t("clients.list.never")}</span>}
+                  </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={client.status} />
                   </td>
@@ -178,7 +203,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       {pages > 1 && (
         <nav aria-label={t("clients.total", { count: result.total })} className="flex items-center justify-between text-sm">
           {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary">{t("clients.previous")}</Link> : <span />}
-          <span className="text-muted">{page} / {pages}</span>
+          <span className="text-muted">{t("clients.pageOf", { page, pages })}</span>
           {page < pages ? <Link href={pageHref(page + 1)} className="text-primary">{t("clients.next")}</Link> : <span />}
         </nav>
       )}

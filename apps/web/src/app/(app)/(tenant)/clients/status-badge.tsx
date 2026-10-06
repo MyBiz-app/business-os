@@ -4,7 +4,7 @@ import { Pill, type Tone } from "@/components/pill";
 
 const TONE: Record<"active" | "lead" | "inactive", Tone> = {
   active: "success",
-  lead: "primary",
+  lead: "warning",
   inactive: "muted",
 };
 

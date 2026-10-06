@@ -9,14 +9,14 @@ import { addDays, formatDay, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
 import { ScrollRegion } from "@/components/scroll-region";
 
+import { BusyHours } from "./busy-hours";
+
 type Row = components["schemas"]["BreakdownItem"];
 
 const PERIODS = { "30": 30, "90": 90 } as const;
 type Period = keyof typeof PERIODS;
 const AT_RISK_DAYS = 14;
 const SHOWN = 10; // members listed before "show all"
-// A Monday, to name ISO weekdays (1 = Monday) in the user's language.
-const MONDAY = "2024-01-01";
 
 export default async function ReportsPage({ searchParams }: PageProps<"/reports">) {
   const t = await getTranslations("reports");
@@ -40,14 +40,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
 
   const number = new Intl.NumberFormat(locale);
   const percent = (value: number | null) => (value === null ? "—" : `${number.format(Math.round(value))}%`);
-  const slotLabel = (key: string) => {
-    const [weekday, hour] = key.split("-").map(Number);
-    const day = formatDay(addDays(MONDAY, weekday - 1), locale, { weekday: "long" });
-    return `${day} ${String(hour).padStart(2, "0")}:00`;
-  };
   const dateLabel = (day: string) => formatDay(day, locale, { day: "numeric", month: "short" });
-  // Busiest slots first, so the table answers "when do people come".
-  const slots = [...bySlot].sort((a, b) => b.attended - a.attended).slice(0, 10);
 
   const memberRow = (member: (typeof atRisk)[number]) => (
     <li key={member.client_id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
@@ -89,7 +82,16 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
                   </th>
                   <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.sessions)}</td>
                   <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.attended)}</td>
-                  <td className="py-2 pe-4 text-end tabular-nums">{percent(row.occupancy)}</td>
+                  <td className="py-2 pe-4">
+                    <span className="flex items-center justify-end gap-2 tabular-nums">
+                      {row.occupancy !== null && (
+                        <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
+                          <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy)}%` }} />
+                        </span>
+                      )}
+                      {percent(row.occupancy)}
+                    </span>
+                  </td>
                   <td className="py-2 text-end tabular-nums">{percent(row.no_show_rate)}</td>
                 </tr>
               ))}
@@ -131,7 +133,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"))}
       {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
       {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
-      {table("by-slot", t("bySlot"), t("slot"), slots, (row) => slotLabel(row.key))}
+      {bySlot.length > 0 && <BusyHours rows={bySlot} locale={locale} />}
       <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 card p-6">
         <div className="flex flex-col gap-1">
           <h2 id="at-risk-heading" className="text-lg font-semibold">

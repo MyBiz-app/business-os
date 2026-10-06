@@ -3474,6 +3474,69 @@ export interface components {
              */
             declarations: components["schemas"]["Declaration"][];
         };
+        /**
+         * ClientListItem
+         * @description A row of the clients list: the client plus what the list shows at a glance.
+         */
+        ClientListItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string | null;
+            /** Email */
+            email: string | null;
+            /** Phone */
+            phone: string | null;
+            /** Date Of Birth */
+            date_of_birth: string | null;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "inactive" | "lead";
+            /** Source */
+            source: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+            /** Custom Fields */
+            custom_fields: {
+                [key: string]: string | number;
+            };
+            /** Home Location Id */
+            home_location_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Erased At
+             * @description Personal data erased on request (privacy)
+             */
+            erased_at: string | null;
+            /**
+             * Plan Name
+             * @description The plan valid today, if any
+             */
+            plan_name: string | null;
+            /** Plan Ends On */
+            plan_ends_on: string | null;
+            /**
+             * Last Visit
+             * @description Last check-in, in the business's time zone
+             */
+            last_visit: string | null;
+        };
         /** ClientNote */
         ClientNote: {
             /**
@@ -3505,7 +3568,7 @@ export interface components {
         /** ClientPage */
         ClientPage: {
             /** Items */
-            items: components["schemas"]["Client"][];
+            items: components["schemas"]["ClientListItem"][];
             /** Total */
             total: number;
         };

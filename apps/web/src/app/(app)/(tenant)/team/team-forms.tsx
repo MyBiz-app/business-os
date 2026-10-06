@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -93,9 +94,10 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
   const current = customRoleId ? `custom:${customRoleId}` : role;
 
   return (
-    <li className="flex flex-col gap-2 border-t border-border px-4 py-3 first:border-t-0">
+    <li className="flex flex-col gap-2 border-t border-border px-5 py-4 transition-colors first:border-t-0 hover:bg-primary/4">
       <TeamError state={roleState.error ? roleState : removeState} />
       <div className="flex flex-wrap items-center gap-3">
+        <Avatar id={userId} name={name ?? email} />
         <span className="flex min-w-0 flex-1 flex-col">
           <span className="truncate font-medium" dir="auto">
             {name ?? email} {isSelf && <span className="font-normal text-muted">{t("team.you")}</span>}
@@ -107,7 +109,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
           )}
         </span>
         {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} />}
-        <Link href={`/team/${userId}/hours`} className="text-sm text-primary underline-offset-4 hover:underline">
+        <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
         </Link>
         <form action={roleAction}>

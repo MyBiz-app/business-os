@@ -18,13 +18,13 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 | 3 — MyBiz console | Team levels and permissions, working inside a business, actions, support inbox, audit | ✅ Done | #29 |
 | 4 — Apps | Business app and MyBiz team app built, shared app kit, client app polish, architecture review ([findings](reviews/architecture-2026-10.md)) | ✅ Done | #35 |
 | 5 — Industries | Category → sub-category template in one catalog ([how to add one](verticals.md)); five main categories with 25 sub-categories; five more coming soon | ✅ Done | #30 |
-| 6 — Businesses and branches | One owner with several businesses, each with several branches. Done: my businesses, business menu, current branch, data and numbers per branch, branches per team member, extra-branch charge follows branches. Demo generator for any industry with branches, and a staging workflow. Staging migrates before the API starts. Left: running the owner's demo once the accounts sign up | 🟡 Almost done | #55 |
+| 6 — Businesses and branches | One owner with several businesses, each with several branches. Done: my businesses, business menu, current branch, data and numbers per branch, branches per team member, extra-branch charge follows branches. Demo generator for any industry with branches, and a staging workflow. Staging migrates before the API starts. Demo accounts on staging are ready and seeded | ✅ Done | #55 |
 | 7 — More categories | Core capabilities that open the future categories | ⚪ Planned | #33 |
 | Go-live | Real payments, invoicing, email, WhatsApp, AI key, hardening, store builds | ⚪ When the owner decides | #34 |
 
 ## In progress
 
-- Demo accounts on staging: created by workflow (no sign-up email needed), then seeded: adired7399@gmail.com as a business owner, adire7399@gmail.com with MyBiz console data ([#58](https://github.com/adiredri/business-os/issues/58))
+- Business web system (CRM) polish, round 1: clients list shows each client's plan and last visit, team page with avatars, reports with a busy-hours heatmap and occupancy bars
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next

@@ -387,7 +387,17 @@
         "noShows": "No-shows",
         "rating": "Average rating"
       }
-    }
+    },
+    "list": {
+      "plan": "Plan",
+      "planUntil": "Until {date}",
+      "noPlan": "No valid plan",
+      "lastVisit": "Last visit",
+      "never": "Not yet",
+      "today": "Today",
+      "daysAgo": "{days, plural, one {Yesterday} other {# days ago}}"
+    },
+    "pageOf": "Page {page} of {pages}"
   },
   "common": {
     "save": "Save",
@@ -494,7 +504,8 @@
     "allBranches": "All branches",
     "someBranches": "{count} branches",
     "branchesHint": "Where they work. None checked means all branches.",
-    "saveBranches": "Save"
+    "saveBranches": "Save",
+    "count": "{count, plural, one {One person} other {# people}}"
   },
   "invite": {
     "title": "You're invited",
@@ -1353,7 +1364,16 @@
     "showAll": "Show all {count}",
     "byBranch": "By branch",
     "branch": "Branch",
-    "noBranch": "No branch"
+    "noBranch": "No branch",
+    "heatmap": {
+      "hint": "Check-ins by day and hour. The darker the square, the busier it was.",
+      "hour": "Hour",
+      "day": "Day",
+      "cell": "{day} {hour}: {count, plural, =0 {no check-ins} one {one check-in} other {# check-ins}}",
+      "less": "Less",
+      "more": "More",
+      "busiest": "Busiest: {slot}"
+    }
   },
   "email": {
     "greeting": "Hi {name},",
