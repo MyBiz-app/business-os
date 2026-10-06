@@ -1,0 +1,39 @@
+name: Confirm an account on staging
+
+# Staging has no email provider yet (issue #48), so sign-up confirmation emails never
+# arrive. The person signs up on staging with their own password; this marks their email as
+# confirmed so they can log in. Passwords never pass through here.
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: Email the person signed up with on staging
+        required: true
+        type: string
+
+jobs:
+  confirm:
+    name: Confirm the email
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - name: Install the PostgreSQL client
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Confirm
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          EMAIL: ${{ inputs.email }}
+        run: |
+          confirmed=$(psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v email="$EMAIL" -tA <<'SQL'
+          UPDATE auth.users SET email_confirmed_at = coalesce(email_confirmed_at, now())
+          WHERE lower(email) = lower(:'email')
+          RETURNING email;
+          SQL
+          )
+          if [ -z "$confirmed" ]; then
+            echo "::error::No account with this email on staging. Sign up first, then run this again."
+            exit 1
+          fi
+          echo "Confirmed: $confirmed. Log in with the password chosen at sign-up."

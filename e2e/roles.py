@@ -25,7 +25,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
     owner = b.new_context(locale="he-IL", viewport={"width": 1280, "height": 900}).new_page()
     signup(owner, owner_email)
-    owner.wait_for_url("**/onboarding")
+    h.to_onboarding(owner)
     h.ready(owner)
     owner.get_by_label("שם העסק").fill("סטודיו תפקידים")
     owner.get_by_role("button", name="המשך").click()

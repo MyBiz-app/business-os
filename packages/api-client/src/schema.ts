@@ -2490,6 +2490,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/sample": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Sample */
+        post: operations["create_sample"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/notifications": {
         parameters: {
             query?: never;
@@ -5419,6 +5436,16 @@ export interface components {
              * @description Some receipts are samples from test payments
              */
             simulated: boolean;
+        };
+        /** SampleCreate */
+        SampleCreate: {
+            /** Vertical */
+            vertical: string;
+        };
+        /** SampleCreated */
+        SampleCreated: {
+            /** Tenant Id */
+            tenant_id: string;
         };
         /** ScheduleOptions */
         ScheduleOptions: {
@@ -11971,6 +11998,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AttentionList"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_sample: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SampleCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SampleCreated"];
                 };
             };
             /** @description Validation Error */

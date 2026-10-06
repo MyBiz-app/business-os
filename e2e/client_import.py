@@ -26,7 +26,7 @@ with sync_playwright() as p:
     page.get_by_label("סיסמה").fill(h.PASSWORD)
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
-    page.goto(h.confirm_link(email)); page.wait_for_url("**/onboarding"); h.ready(page)
+    page.goto(h.confirm_link(email)); h.to_onboarding(page)
     page.get_by_label("שם העסק").fill("סטודיו ייבוא")
     page.get_by_role("button", name="המשך").click()
     page.get_by_role("button", name="יצירת העסק").click()

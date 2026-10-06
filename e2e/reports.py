@@ -20,7 +20,7 @@ with sync_playwright() as p:
     page.get_by_label("סיסמה").fill(h.PASSWORD)
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
-    page.goto(h.confirm_link(email)); page.wait_for_url("**/onboarding")
+    page.goto(h.confirm_link(email)); h.to_onboarding(page)
     subprocess.run(
         ["uv", "run", "--quiet", "python", "-m", "app.seed", "--owner-email", email,
          "--database-url", "postgresql+psycopg://postgres:postgres@127.0.0.1:54322/postgres"],

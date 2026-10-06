@@ -35,7 +35,7 @@ export const getActiveMembership = cache(async () => {
  * current branch (lists, numbers and new records follow it; the API checks it). */
 export const getTenant = cache(async () => {
   const { me, membership } = await getActiveMembership();
-  if (!membership) redirect("/onboarding");
+  if (!membership) redirect("/welcome");
 
   const api = await getApi();
   const branch = (await cookies()).get(branchCookie(membership.tenant_id))?.value;

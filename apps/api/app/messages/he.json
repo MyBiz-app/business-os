@@ -71,5 +71,117 @@
   "locations": {
     "mainBranch": "סניף ראשי",
     "branchNumber": "סניף {number}"
+  },
+  "samples": {
+    "businessName": "{industry} לדוגמה",
+    "branch": "סניף ראשי",
+    "address": "רחוב הדוגמה 1, תל אביב"
+  },
+  "verticals": {
+    "fitness": {
+      "name": "כושר ואימון"
+    },
+    "beauty": {
+      "name": "יופי וספא"
+    },
+    "clinic": {
+      "name": "קליניקות ובריאות"
+    },
+    "classes": {
+      "name": "חוגים ושיעורים"
+    },
+    "automotive": {
+      "name": "רכב"
+    },
+    "sports": {
+      "name": "ספורט והזמנת מתקנים"
+    },
+    "home_services": {
+      "name": "שירותי בית ושטח"
+    },
+    "pets": {
+      "name": "שירותים לחיות מחמד"
+    },
+    "events": {
+      "name": "יצירה ואירועים"
+    },
+    "professional": {
+      "name": "שירותים מקצועיים"
+    },
+    "gym": {
+      "name": "חדר כושר"
+    },
+    "pilates": {
+      "name": "סטודיו לפילאטיס"
+    },
+    "yoga": {
+      "name": "סטודיו ליוגה"
+    },
+    "crossfit": {
+      "name": "CrossFit"
+    },
+    "functional": {
+      "name": "אימון פונקציונלי"
+    },
+    "personal_trainer": {
+      "name": "מאמן אישי"
+    },
+    "hair_salon": {
+      "name": "מספרה"
+    },
+    "barbershop": {
+      "name": "ברברשופ"
+    },
+    "cosmetics": {
+      "name": "קוסמטיקה וטיפולי פנים"
+    },
+    "nails": {
+      "name": "ציפורניים"
+    },
+    "laser": {
+      "name": "הסרת שיער בלייזר"
+    },
+    "spa": {
+      "name": "ספא ועיסויים"
+    },
+    "physiotherapy": {
+      "name": "פיזיותרפיה ושיקום"
+    },
+    "dental": {
+      "name": "מרפאת שיניים"
+    },
+    "nutrition": {
+      "name": "תזונה ודיאטה"
+    },
+    "aesthetics": {
+      "name": "קליניקה אסתטית"
+    },
+    "therapy": {
+      "name": "טיפול רגשי ואימון אישי"
+    },
+    "dance": {
+      "name": "בית ספר לריקוד"
+    },
+    "martial_arts": {
+      "name": "אומנויות לחימה"
+    },
+    "music": {
+      "name": "שיעורי מוזיקה"
+    },
+    "tutoring": {
+      "name": "שיעורים פרטיים ומרכזי לימוד"
+    },
+    "kids_activities": {
+      "name": "חוגי ילדים והעשרה"
+    },
+    "garage": {
+      "name": "מוסך"
+    },
+    "detailing": {
+      "name": "דיטיילינג ושטיפה"
+    },
+    "tires": {
+      "name": "פנצ'ריה וצמיגים"
+    }
   }
 }

@@ -91,3 +91,17 @@ Two providers are supported:
 Emails use the business's language and are sent once, within a day of the event; clients
 without an email address are skipped. For local testing: `API_EMAIL_PROVIDER=log uv run
 python -m app.jobs send-emails` prints instead of sending.
+
+## Accounts on staging (before an email provider)
+
+Staging has no email provider yet ([#48](https://github.com/adiredri/business-os/issues/48)), so
+sign-up confirmation and password-reset emails do not arrive. Two ways to get in:
+
+1. **Confirm one account:** sign up on staging with your own password, then run
+   *Actions → Confirm an account on staging* with that email. Log in with the same password.
+2. **Turn confirmation off for staging:** Supabase → Authentication → Sign In / Providers →
+   Email → turn off "Confirm email". Sign-ups then log in straight away (the web app handles
+   both). Turn it back on once real email is set up.
+
+A forgotten password cannot be reset without email: sign up again with another address (for
+example a Gmail "+" alias such as `name+demo@gmail.com`) and confirm it as above.

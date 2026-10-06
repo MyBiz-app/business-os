@@ -102,7 +102,7 @@ with sync_playwright() as p:
 
     # A business writes to MyBiz; the request reaches the inbox and is handled there.
     biz = sign_up(b, f"inbox{stamp}@example.com")
-    biz.wait_for_url("**/onboarding"); h.ready(biz)
+    h.to_onboarding(biz)
     biz.get_by_label("שם העסק").fill(inbox_business)
     biz.get_by_role("button", name="המשך").click()
     biz.get_by_role("button", name="יצירת העסק").click()

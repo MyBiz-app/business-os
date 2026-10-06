@@ -48,7 +48,7 @@ with sync_playwright() as p:
     page.get_by_label("סיסמה").fill(h.PASSWORD)
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
-    page.goto(h.confirm_link(owner_email)); page.wait_for_url("**/onboarding"); h.ready(page)
+    page.goto(h.confirm_link(owner_email)); h.to_onboarding(page)
 
     # A pizza-like chain (here: a pilates chain) with three branches, and a barbershop with one.
     new_business(page, "פילאטיס פלוס", "pilates")

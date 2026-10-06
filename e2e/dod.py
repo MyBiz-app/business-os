@@ -36,7 +36,7 @@ with sync_playwright() as p:
     owner.get_by_label("סיסמה").fill("Str0ng!Passw0rd")
     owner.get_by_role("button", name="יצירת חשבון").click()
     owner.wait_for_url("**/check-email**")
-    owner.goto(h.confirm_link(owner_email)); owner.wait_for_url("**/onboarding"); h.ready(owner)
+    owner.goto(h.confirm_link(owner_email)); h.to_onboarding(owner)
     owner.get_by_label("שם העסק").fill("סטודיו DoD")
     owner.get_by_label("סוג העסק").select_option("pilates")  # a class studio
     owner.get_by_label("אני רוצה עוזר AI שיכול גם לבצע פעולות (רישומים)").check()

@@ -22,7 +22,7 @@ with sync_playwright() as p:
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
     page.goto(h.confirm_link(email))
-    page.wait_for_url("**/onboarding")
+    h.to_onboarding(page)
     h.ready(page)
     page.get_by_label("שם העסק").fill("סטודיו סדרות")
     page.get_by_label("סוג העסק").select_option("pilates")  # a class studio
