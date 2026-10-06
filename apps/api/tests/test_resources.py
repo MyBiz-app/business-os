@@ -236,17 +236,20 @@ def test_two_at_once_get_one_court(client: TestClient, club: dict, engine: Engin
     assert held == 1
 
 
-def test_clients_reserve_in_the_app_without_a_plan(
-    client: TestClient, club: dict, auth: AuthHeaders
-) -> None:
-    # A club asks no health declaration (the studio fixture's fitness pack does).
+def club_member(client: TestClient, club: dict, auth: AuthHeaders) -> dict:
+    """A client of the club in the app (a club asks no health declaration)."""
     client.patch(
         "/tenants/current", json={"requires_health_declaration": False}, headers=club["headers"]
     )
     user = uuid4()
     join(client, auth, user, join_code(client, club))
-    me = auth(user, club["tenant_id"])
+    return auth(user, club["tenant_id"])
 
+
+def test_clients_reserve_and_pay_in_the_app(
+    client: TestClient, club: dict, auth: AuthHeaders
+) -> None:
+    me = club_member(client, club, auth)
     [service] = client.get("/client/resources", headers=me).json()
     slots = client.get("/client/resources/slots", params=params(club, 90), headers=me).json()
     body = {
@@ -255,23 +258,79 @@ def test_clients_reserve_in_the_app_without_a_plan(
         "starts_at": slots[0]["starts_at"],
         "minutes": 90,
     }
-    made = client.post("/client/resources/reservations", json=body, headers=me)
-    taken = client.post("/client/resources/reservations", json=body, headers=me)
-    # A reservation isn't a class: it can't be joined like one.
-    assert made.status_code == 201, made.text
-    joined = client.post(f"/client/sessions/{made.json()['id']}/bookings", headers=me)
+    unpaid = client.post("/client/resources/reservations", json=body, headers=me)
+    made = client.post(
+        "/client/resources/reservations",
+        json={**body, "pay": True, "idempotency_key": "court-pay-0001"},
+        headers=me,
+    )
+    taken = client.post(
+        "/client/resources/reservations",
+        json={**body, "pay": True, "idempotency_key": "court-pay-0002"},
+        headers=me,
+    )
 
+    # The business is paid in the app (the default): no payment, no reservation.
+    assert unpaid.status_code == 402 and unpaid.json()["detail"] == "payment_required"
     assert len(service["rooms"]) == 2
     assert made.status_code == 201, made.text
-    assert made.json()["my_booking"]["status"] == "booked"
+    reservation = made.json()
+    assert reservation["session"]["my_booking"]["status"] == "booked"
+    payment = reservation["payment"]
+    assert (payment["amount"], payment["currency"], payment["simulated"]) == (18000, "ILS", True)
+    assert payment["receipt_number"] is not None
     assert taken.status_code == 409
+    # A reservation isn't a class: it can't be joined like one.
+    joined = client.post(f"/client/sessions/{reservation['session']['id']}/bookings", headers=me)
     assert joined.status_code == 409
+    receipt = client.get(f"/client/receipts/{payment['receipt_id']}", headers=me).json()
+    assert receipt["description"].startswith("Padel court · Court")
+    sessions = client.get(
+        "/sessions", params={"start": club["day"].isoformat(), "days": 1}, headers=club["headers"]
+    ).json()
+    assert [s["paid"] for s in sessions if s["booking_mode"] == "resource"] == [True]
+
     cancelled = client.post(
-        f"/client/bookings/{made.json()['my_booking']['id']}/cancel", headers=me
+        f"/client/bookings/{reservation['session']['my_booking']['id']}/cancel", headers=me
     )
     assert cancelled.status_code == 200, cancelled.text
     again = client.get("/client/resources/slots", params=params(club, 90), headers=me).json()
     assert again[0]["starts_at"] == slots[0]["starts_at"]
+
+
+def test_paid_at_the_venue(client: TestClient, club: dict, auth: AuthHeaders) -> None:
+    headers = club["headers"]
+    venue = client.patch("/tenants/current", json={"resource_payment": "venue"}, headers=headers)
+    assert venue.json()["resource_payment"] == "venue"
+    me = club_member(client, club, auth)
+    slots = client.get("/client/resources/slots", params=params(club, 60), headers=me).json()
+    made = client.post(
+        "/client/resources/reservations",
+        json={
+            "service_id": club["padel"]["id"],
+            "room_id": slots[0]["room_id"],
+            "starts_at": slots[0]["starts_at"],
+            "minutes": 60,
+        },
+        headers=me,
+    )
+    assert made.status_code == 201, made.text
+    assert made.json()["payment"] is None
+    booking_id = made.json()["session"]["my_booking"]["id"]
+
+    paid = client.post(
+        f"/resources/reservations/{booking_id}/payment", json={"method": "cash"}, headers=headers
+    )
+    twice = client.post(
+        f"/resources/reservations/{booking_id}/payment", json={"method": "card"}, headers=headers
+    )
+    assert paid.status_code == 201, paid.text
+    assert (paid.json()["amount"], paid.json()["method"], paid.json()["simulated"]) == (
+        12000,
+        "cash",
+        False,
+    )
+    assert twice.status_code == 409 and twice.json()["detail"] == "already_paid"
 
 
 def test_other_businesses_see_nothing(client: TestClient, club: dict, auth: AuthHeaders) -> None:

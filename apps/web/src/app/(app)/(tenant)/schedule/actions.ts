@@ -205,3 +205,16 @@ export async function copyWeek(weekStart: string, _state: CopyWeekState, _formDa
     return { error: "generic" };
   }
 }
+
+/** Records that a reservation was paid at the venue (cash, card at the desk…); issues a receipt. */
+export async function recordVenuePayment(sessionId: string, bookingId: string, formData: FormData): Promise<void> {
+  const { api, scope } = await getTenant();
+  const method = String(formData.get("method") ?? "cash");
+  unwrap(
+    await api.POST("/resources/reservations/{booking_id}/payment", {
+      params: { ...scope, path: { booking_id: bookingId } },
+      body: { method: (["card", "cash", "transfer", "other"].includes(method) ? method : "cash") as "card" | "cash" | "transfer" | "other" },
+    }),
+  );
+  revalidatePath(`/schedule/${sessionId}`);
+}

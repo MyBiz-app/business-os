@@ -20,6 +20,7 @@ export default function Home() {
   const tTerms = useTranslations("terms");
   const tAppointment = useTranslations("client.appointment");
   const tReview = useTranslations("client.review");
+  const tCourt = useTranslations("client.court");
   const health = useHealth();
   const locale = useLocale();
   const formatDay = (day: string) =>
@@ -27,16 +28,18 @@ export default function Home() {
   const { api, scope, business, palette } = useBusiness();
 
   const load = useCallback(async () => {
-    if (!business) return { sessions: [], appointments: 0, toReview: [] };
+    if (!business) return { sessions: [], appointments: 0, courts: 0, toReview: [] };
     const start = todayIn(business.time_zone);
-    const [sessions, services, pending] = await Promise.all([
+    const [sessions, services, pending, courts] = await Promise.all([
       api.GET("/client/sessions", { params: { ...scope, query: { start, days: 14 } } }),
       api.GET("/client/appointments/services", { params: scope }),
       api.GET("/client/reviews/pending", { params: scope }),
+      api.GET("/client/resources", { params: scope }),
     ]);
     return {
       sessions: unwrap(sessions),
       appointments: services.data?.length ?? 0,
+      courts: courts.data?.length ?? 0,
       toReview: pending.data ?? [],
     };
   }, [api, scope, business]);
@@ -132,6 +135,9 @@ export default function Home() {
         </>
       )}
 
+      {(data?.courts ?? 0) > 0 && (
+        <Button label={tCourt("cta")} palette={palette} onPress={() => router.push("/court")} />
+      )}
       {(data?.appointments ?? 0) > 0 ? (
         <>
           <Button label={tAppointment("cta")} palette={palette} onPress={() => router.push("/appointment")} />

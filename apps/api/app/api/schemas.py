@@ -78,6 +78,7 @@ class TenantUpdate(BaseModel):
     booking_requires_plan: bool | None = None
     requires_health_declaration: bool | None = None
     online_sales: bool | None = None
+    resource_payment: Literal["app", "venue"] | None = None
 
     @field_validator("name")
     @classmethod
@@ -109,6 +110,10 @@ class Tenant(BaseModel):
         description="Clients need a valid health declaration to book in the app"
     )
     online_sales: bool = Field(description="Clients can buy plans in the app")
+    resource_payment: Literal["app", "venue"] = Field(
+        default="app",
+        description="Reservations of courts and rooms: paid in the app or at the venue",
+    )
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
     permissions: list[str] = Field(description="The current user's effective permissions")

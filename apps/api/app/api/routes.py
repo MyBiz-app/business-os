@@ -35,7 +35,7 @@ def load_current_tenant(session: Session) -> Tenant:
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
-                       t.requires_health_declaration, t.online_sales,
+                       t.requires_health_declaration, t.online_sales, t.resource_payment,
                        t.join_code,
                        coalesce(m.role,
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'

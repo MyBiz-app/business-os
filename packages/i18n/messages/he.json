@@ -67,7 +67,13 @@
     "onlineSales": "לקוחות יכולים לרכוש מנויים באפליקציה",
     "onlineSalesHint": "עד שיחובר ספק סליקה, הרכישות הן תשלומי ניסיון ולא נגבה כסף.",
     "billingLink": "חיוב ומנוי MyBiz",
-    "billingHint": "תקופת ניסיון, אמצעי תשלום וחשבוניות."
+    "billingHint": "תקופת ניסיון, אמצעי תשלום וחשבוניות.",
+    "resourcePayment": "תשלום על מגרשים וחדרים לפי שעה",
+    "resourcePayments": {
+      "app": "באפליקציה, בזמן ההזמנה",
+      "venue": "במקום"
+    },
+    "resourcePaymentHint": "באפליקציה, ההזמנה מאושרת רק אחרי התשלום."
   },
   "locales": {
     "he": "עברית",
@@ -873,6 +879,35 @@
       "listPrice": "מחיר מקורי",
       "discount": "הנחה",
       "invalid": "הקוד לא תקף לרכישה הזו."
+    },
+    "court": {
+      "cta": "הזמנת מגרש",
+      "ctaText": "בוחרים יום, שעה ולכמה זמן",
+      "title": "הזמנת מגרש",
+      "none": "עוד אין כאן מה להזמין.",
+      "what": "מה",
+      "perHour": "{price} לשעה",
+      "length": "לכמה זמן",
+      "where": "איזה מגרש",
+      "anyCourt": "כל מגרש",
+      "noSlots": "אין זמן פנוי ביום הזה באורך הזה.",
+      "simulated": "תשלום לדוגמה: לא מתבצע חיוב.",
+      "venueHint": "התשלום במקום.",
+      "payAndReserve": "תשלום {price} והזמנה",
+      "reserve": "הזמנה ל-{time}",
+      "booked": "הוזמן!",
+      "bookedBody": "{service}, {room}, {date}, {from}–{to}.",
+      "paid": "שולם {price}.",
+      "payAtVenue": "{price}, לתשלום במקום.",
+      "receipt": "הקבלה",
+      "errors": {
+        "slot_taken": "מישהו בדיוק הזמין את הזמן הזה. בחרו זמן אחר.",
+        "outside_hours": "זה מחוץ לשעות הפתיחה.",
+        "length_not_offered": "האורך הזה לא מוצע.",
+        "health_declaration_required": "קודם ממלאים הצהרת בריאות.",
+        "health_declaration_review": "הצהרת הבריאות שלך ממתינה לעסק.",
+        "generic": "משהו השתבש. נסו שוב."
+      }
     }
   },
   "join": {
@@ -3221,6 +3256,16 @@
     "pricePerHour": "מחיר לשעה",
     "rooms": "מגרשים וחדרים",
     "roomsHint": "איפה אפשר להזמין את השירות הזה.",
-    "saveRooms": "שמירה"
+    "saveRooms": "שמירה",
+    "paid": "שולם",
+    "notPaid": "עוד לא שולם",
+    "method": "אמצעי תשלום",
+    "methods": {
+      "cash": "מזומן",
+      "card": "כרטיס אשראי",
+      "transfer": "העברה בנקאית",
+      "other": "אחר"
+    },
+    "recordPayment": "רישום התשלום"
   }
 }

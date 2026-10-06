@@ -62,3 +62,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `staff_app.py <team email of a MyBiz owner>` (needs `pnpm --filter staff-app exec expo start --web --port 8083`, and a fresh `app.seed --demo platform`: it marks one new request done): the MyBiz team app on a phone — the numbers and what needs attention, sorting and opening a business (numbers, modules, invoices, more trial days), handling a request (take it, notes, done); then the main screens in English with dark mode.
 
 `resources.py <owner email with data>`: courts and rooms by the hour (#41) — a room becomes a court for rent with opening hours, a service by the hour gets its court, and the front desk reserves it from the day grid; then the grid in English/dark on a phone.
+
+`court_app.py <owner email>` (needs `pnpm dev:app`; run `resources.py` first): a new client books a court in the app — length, day, time — pays (simulated) and opens the receipt.

@@ -1263,6 +1263,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/resources/reservations/{booking_id}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pay At Venue
+         * @description Records that a reservation was paid at the venue (once; a receipt is issued).
+         */
+        post: operations["pay_at_venue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/resources": {
         parameters: {
             query?: never;
@@ -1311,7 +1331,9 @@ export interface paths {
         put?: never;
         /**
          * Reserve Mine
-         * @description The signed-in client reserves a free time (the business's booking rules apply).
+         * @description The signed-in client reserves a free time (the business's booking rules apply). When
+         *     the business is paid in the app, the client pays now (simulated until a payment provider
+         *     is connected): no payment, no reservation.
          */
         post: operations["reserve_mine"];
         delete?: never;
@@ -3553,6 +3575,13 @@ export interface components {
              */
             online_sales: boolean;
             /**
+             * Resource Payment
+             * @description Reservations: paid in the app when booking, or at the venue
+             * @default app
+             * @enum {string}
+             */
+            resource_payment: "app" | "venue";
+            /**
              * Client Id
              * Format: uuid
              */
@@ -3723,6 +3752,43 @@ export interface components {
             items: components["schemas"]["ClientListItem"][];
             /** Total */
             total: number;
+        };
+        /** ClientReservation */
+        ClientReservation: {
+            session: components["schemas"]["ClientSession"];
+            /** @description None when paid at the venue */
+            payment: components["schemas"]["ReservationPayment"] | null;
+        };
+        /** ClientReservationCreate */
+        ClientReservationCreate: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /** Minutes */
+            minutes: number;
+            /**
+             * Pay
+             * @description The client agreed to pay now (required when the business is paid in the app)
+             * @default false
+             */
+            pay: boolean;
+            /**
+             * Idempotency Key
+             * @description Same key, same payment
+             */
+            idempotency_key?: string | null;
         };
         /** ClientSession */
         ClientSession: {
@@ -5533,25 +5599,28 @@ export interface components {
              */
             client_id: string;
         };
-        /** ReservationFields */
-        ReservationFields: {
+        /** ReservationPayment */
+        ReservationPayment: {
             /**
-             * Service Id
+             * Payment Id
              * Format: uuid
              */
-            service_id: string;
+            payment_id: string;
+            /** Amount */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /** Method */
+            method: string;
+            /** Simulated */
+            simulated: boolean;
             /**
-             * Room Id
+             * Receipt Id
              * Format: uuid
              */
-            room_id: string;
-            /**
-             * Starts At
-             * Format: date-time
-             */
-            starts_at: string;
-            /** Minutes */
-            minutes: number;
+            receipt_id: string;
+            /** Receipt Number */
+            receipt_number: number;
         };
         /** ResourceRoom */
         ResourceRoom: {
@@ -5921,6 +5990,11 @@ export interface components {
             price_amount?: number | null;
             /** Price Currency */
             price_currency?: string | null;
+            /**
+             * Paid
+             * @description For a reservation: whether it is paid
+             */
+            paid?: boolean | null;
         };
         /** Selection */
         Selection: {
@@ -6445,6 +6519,13 @@ export interface components {
              */
             online_sales: boolean;
             /**
+             * Resource Payment
+             * @description Reservations of courts and rooms: paid in the app or at the venue
+             * @default app
+             * @enum {string}
+             */
+            resource_payment: "app" | "venue";
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -6520,6 +6601,8 @@ export interface components {
             requires_health_declaration?: boolean | null;
             /** Online Sales */
             online_sales?: boolean | null;
+            /** Resource Payment */
+            resource_payment?: ("app" | "venue") | null;
         };
         /** TestCardRequest */
         TestCardRequest: {
@@ -6617,6 +6700,15 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** VenuePayment */
+        VenuePayment: {
+            /**
+             * Method
+             * @default cash
+             * @enum {string}
+             */
+            method: "card" | "cash" | "transfer" | "other";
         };
         /** VoidInvoice */
         VoidInvoice: {
@@ -9926,6 +10018,45 @@ export interface operations {
             };
         };
     };
+    pay_at_venue: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VenuePayment"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReservationPayment"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     my_resource_services: {
         parameters: {
             query?: never;
@@ -10004,7 +10135,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ReservationFields"];
+                "application/json": components["schemas"]["ClientReservationCreate"];
             };
         };
         responses: {
@@ -10014,7 +10145,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ClientSession"];
+                    "application/json": components["schemas"]["ClientReservation"];
                 };
             };
             /** @description Validation Error */

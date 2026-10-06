@@ -7,7 +7,9 @@ import { dayOf, formatDay, formatTime } from "@/lib/dates";
 import { canManageBookings, canWriteSchedule } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
-import { endSeries, setSessionStatus, updateSession } from "../actions";
+import { formatMoney } from "@/lib/money";
+
+import { endSeries, recordVenuePayment, setSessionStatus, updateSession } from "../actions";
 import { SessionForm } from "../session-form";
 import { Roster } from "./roster";
 
@@ -32,6 +34,15 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const day = dayOf(session.starts_at, tenant.time_zone);
   const minutes = Math.round((Date.parse(session.ends_at) - Date.parse(session.starts_at)) / 60000);
   const cancelled = session.status === "cancelled";
+  // A reservation of a court or room: its time and room come from the reservation itself, so
+  // it isn't edited like a class (cancel the booking to free the court).
+  const reservation = session.booking_mode === "resource";
+  const reservedBy = reservation
+    ? (await api.GET("/sessions/{session_id}/bookings", { params: { ...scope, path: { session_id: id } } }).then(unwrap)).find(
+        (b) => b.status !== "cancelled",
+      )
+    : undefined;
+  const tResources = await getTranslations("resources");
   const endedParam = first(query.ended)?.split("-").map(Number);
   const ended = endedParam?.length === 2 && endedParam.every(Number.isFinite) ? endedParam : null;
 
@@ -61,6 +72,32 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
         )}
       </div>
 
+      {reservation && session.price_amount != null && (
+        <section aria-labelledby="payment-heading" className="card flex flex-col gap-3 p-6">
+          <h2 id="payment-heading" className="text-lg font-semibold">
+            {session.room_name} · {formatMoney(session.price_amount, session.price_currency ?? tenant.currency, locale)}
+          </h2>
+          <p className={session.paid ? "font-medium text-success" : "text-muted"}>{session.paid ? tResources("paid") : tResources("notPaid")}</p>
+          {!session.paid && reservedBy && tenant.permissions.includes("sales.manage") && (
+            <form action={recordVenuePayment.bind(null, session.id, reservedBy.id)} className="flex flex-wrap items-end gap-3">
+              <label className="flex flex-col gap-1.5 text-sm font-medium">
+                {tResources("method")}
+                <select name="method" defaultValue="cash" className="control px-3 py-2 font-normal">
+                  {(["cash", "card", "transfer", "other"] as const).map((method) => (
+                    <option key={method} value={method}>
+                      {tResources(`methods.${method}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button type="submit" className="btn-primary px-4 py-2">
+                {tResources("recordPayment")}
+              </button>
+            </form>
+          )}
+        </section>
+      )}
+
       <Roster
         session={session}
         context={context}
@@ -69,30 +106,32 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
         error={first(query.error)}
       />
 
-      <section aria-labelledby="details-heading" className="flex flex-col gap-4 card p-6">
-        <h2 id="details-heading" className="text-lg font-semibold">
-          {t("details")}
-        </h2>
-        <SessionForm
-          key={`${session.starts_at}-${session.ends_at}-${session.capacity}-${session.room_id}-${session.instructor_user_id}-${session.notes}`}
-          action={updateSession.bind(null, session.id, session.series_id ? { id: session.series_id, date: day } : null)}
-          options={options}
-          defaults={{
-            service_id: session.service.id,
-            date: day,
-            start_time: formatTime(session.starts_at, "en-GB", tenant.time_zone),
-            duration_minutes: minutes,
-            capacity: session.capacity,
-            place: session.location_id ? `${session.location_id}:${session.room_id ?? ""}` : "",
-            instructor_user_id: session.instructor_user_id,
-            notes: session.notes,
-          }}
-          submitLabel={tCommon("save")}
-          lockService
-          readOnly={!writable}
-          inSeries={!!session.series_id}
-        />
-      </section>
+      {!reservation && (
+        <section aria-labelledby="details-heading" className="flex flex-col gap-4 card p-6">
+          <h2 id="details-heading" className="text-lg font-semibold">
+            {t("details")}
+          </h2>
+          <SessionForm
+            key={`${session.starts_at}-${session.ends_at}-${session.capacity}-${session.room_id}-${session.instructor_user_id}-${session.notes}`}
+            action={updateSession.bind(null, session.id, session.series_id ? { id: session.series_id, date: day } : null)}
+            options={options}
+            defaults={{
+              service_id: session.service.id,
+              date: day,
+              start_time: formatTime(session.starts_at, "en-GB", tenant.time_zone),
+              duration_minutes: minutes,
+              capacity: session.capacity,
+              place: session.location_id ? `${session.location_id}:${session.room_id ?? ""}` : "",
+              instructor_user_id: session.instructor_user_id,
+              notes: session.notes,
+            }}
+            submitLabel={tCommon("save")}
+            lockService
+            readOnly={!writable}
+            inSeries={!!session.series_id}
+          />
+        </section>
+      )}
 
       {writable && session.series_id && session.series_open_ended && (
         <form action={endSeries.bind(null, session.series_id, session.id, day)}>
@@ -102,7 +141,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
         </form>
       )}
 
-      {writable && (
+      {writable && !reservation && (
         <form action={setSessionStatus.bind(null, session.id, cancelled ? "scheduled" : "cancelled")}>
           <button type="submit" className={`text-sm underline-offset-4 hover:underline ${cancelled ? "text-primary" : "text-danger"}`}>
             {cancelled ? t("restoreSession") : t("cancelSession")}

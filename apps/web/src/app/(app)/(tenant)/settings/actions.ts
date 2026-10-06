@@ -24,6 +24,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           booking_requires_plan: formData.get("booking_requires_plan") === "on",
           requires_health_declaration: formData.get("requires_health_declaration") === "on",
           online_sales: formData.get("online_sales") === "on",
+          resource_payment: value("resource_payment") === "venue" ? "venue" : "app",
         },
       }),
     );

@@ -67,7 +67,13 @@
     "onlineSales": "Clients can buy plans in the app",
     "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged.",
     "billingLink": "MyBiz billing",
-    "billingHint": "Trial, payment method and invoices."
+    "billingHint": "Trial, payment method and invoices.",
+    "resourcePayment": "Courts and rooms by the hour are paid",
+    "resourcePayments": {
+      "app": "In the app, when booking",
+      "venue": "At the venue"
+    },
+    "resourcePaymentHint": "In the app, a reservation is confirmed only once it's paid."
   },
   "locales": {
     "he": "עברית",
@@ -873,6 +879,35 @@
       "listPrice": "Price",
       "discount": "Discount",
       "invalid": "This code isn't valid for this purchase."
+    },
+    "court": {
+      "cta": "Book a court",
+      "ctaText": "Pick a day, a time and how long",
+      "title": "Book a court",
+      "none": "Nothing to book here yet.",
+      "what": "What",
+      "perHour": "{price} an hour",
+      "length": "How long",
+      "where": "Which court",
+      "anyCourt": "Any",
+      "noSlots": "No free time on this day for this length.",
+      "simulated": "Test payment: no money is charged.",
+      "venueHint": "You pay at the venue.",
+      "payAndReserve": "Pay {price} and book",
+      "reserve": "Book for {time}",
+      "booked": "Booked!",
+      "bookedBody": "{service}, {room}, {date}, {from}–{to}.",
+      "paid": "Paid {price}.",
+      "payAtVenue": "{price}, paid at the venue.",
+      "receipt": "The receipt",
+      "errors": {
+        "slot_taken": "Someone just booked this time. Pick another.",
+        "outside_hours": "That's outside the opening hours.",
+        "length_not_offered": "This length isn't offered.",
+        "health_declaration_required": "Fill in the health declaration first.",
+        "health_declaration_review": "Your health declaration is waiting for the business.",
+        "generic": "Something went wrong. Try again."
+      }
     }
   },
   "join": {
@@ -3221,6 +3256,16 @@
     "pricePerHour": "Price per hour",
     "rooms": "Courts and rooms",
     "roomsHint": "Where this service can be reserved.",
-    "saveRooms": "Save"
+    "saveRooms": "Save",
+    "paid": "Paid",
+    "notPaid": "Not paid yet",
+    "method": "Paid by",
+    "methods": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    },
+    "recordPayment": "Record the payment"
   }
 }
