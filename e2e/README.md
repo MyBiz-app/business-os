@@ -43,6 +43,8 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `signup_journey.py`: the whole sign-up journey — the plan builder with its live cart, the account, the email confirmation, the simulated payment, and the dashboard with its first-steps checklist — on a phone in Hebrew and on a wide screen in English with dark mode.
 
+`welcome.py`: a new account lands on the welcome page and explores a sample business with fictitious data.
+
 `branches.py`: one owner with two businesses and several branches — the business menu, "My businesses", the branch picker and a new client filed under the current branch.
 
 `upgrade.py`: a module the business doesn't have stays in the menu, locked; its preview shows what changes on the invoice, and "add to plan" turns it on.

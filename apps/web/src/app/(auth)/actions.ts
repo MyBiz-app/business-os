@@ -41,14 +41,16 @@ export async function login(_state: FormState, formData: FormData): Promise<Form
 export async function signup(_state: FormState, formData: FormData): Promise<FormState> {
   const email = field(formData, "email");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password: String(formData.get("password") ?? ""),
     options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm` },
   });
   if (error) return { error: errorKey(error), email };
-  // Where to go after the email link is confirmed (e.g. back to an invitation).
   const next = safeNext(formData.get("next"));
+  // Email confirmation turned off (e.g. on staging, before an email provider): signed in now.
+  if (data.session) redirect(next ?? "/dashboard");
+  // Where to go after the email link is confirmed (e.g. back to an invitation).
   if (next) {
     (await cookies()).set(AUTH_NEXT_COOKIE, next, { path: "/", maxAge: 60 * 60 * 24, httpOnly: true, sameSite: "lax" });
   }

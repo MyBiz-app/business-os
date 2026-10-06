@@ -27,6 +27,7 @@ from app.api import (
     receipts,
     reports,
     reviews,
+    samples,
     schedule,
     services,
     staff,
@@ -112,6 +113,7 @@ def create_app() -> FastAPI:
     app.include_router(receipts.router)
     app.include_router(receipts.client_router)
     app.include_router(attention.router)
+    app.include_router(samples.router)
     app.include_router(notifications.router)
     app.include_router(health_declarations.router)
     app.include_router(health_declarations.client_router)

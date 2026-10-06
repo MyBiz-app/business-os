@@ -1,4 +1,4 @@
-// Copies the translations the API itself renders (emails, module names, default branch names) into the API package,
+// Copies the translations the API itself renders (emails, module names, default branch names, sample businesses) into the API package,
 // because the API's container image is built from apps/api alone. The copy is checked in;
 // test/messages.test.mjs fails when it is out of date.
 //
@@ -18,6 +18,8 @@ export function apiMessages(locale) {
     email: all.email,
     modules: { names: all.modules.names },
     locations: { mainBranch: all.locations.mainBranch, branchNumber: all.locations.branchNumber },
+    samples: all.samples,
+    verticals: Object.fromEntries(Object.entries(all.verticals).map(([key, texts]) => [key, { name: texts.name }])),
   };
 }
 

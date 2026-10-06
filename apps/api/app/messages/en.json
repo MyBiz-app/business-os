@@ -71,5 +71,117 @@
   "locations": {
     "mainBranch": "Main branch",
     "branchNumber": "Branch {number}"
+  },
+  "samples": {
+    "businessName": "Sample {industry}",
+    "branch": "Main branch",
+    "address": "1 Sample Street"
+  },
+  "verticals": {
+    "fitness": {
+      "name": "Fitness & Training"
+    },
+    "beauty": {
+      "name": "Beauty & Spa"
+    },
+    "clinic": {
+      "name": "Clinics & Health"
+    },
+    "classes": {
+      "name": "Classes & Lessons"
+    },
+    "automotive": {
+      "name": "Automotive"
+    },
+    "sports": {
+      "name": "Sports & facility booking"
+    },
+    "home_services": {
+      "name": "Home & field services"
+    },
+    "pets": {
+      "name": "Pet services"
+    },
+    "events": {
+      "name": "Creative & events"
+    },
+    "professional": {
+      "name": "Professional services"
+    },
+    "gym": {
+      "name": "Gym"
+    },
+    "pilates": {
+      "name": "Pilates studio"
+    },
+    "yoga": {
+      "name": "Yoga studio"
+    },
+    "crossfit": {
+      "name": "CrossFit box"
+    },
+    "functional": {
+      "name": "Functional training"
+    },
+    "personal_trainer": {
+      "name": "Personal trainer"
+    },
+    "hair_salon": {
+      "name": "Hair salon"
+    },
+    "barbershop": {
+      "name": "Barbershop"
+    },
+    "cosmetics": {
+      "name": "Cosmetics & facials"
+    },
+    "nails": {
+      "name": "Nail studio"
+    },
+    "laser": {
+      "name": "Laser hair removal"
+    },
+    "spa": {
+      "name": "Spa & massage"
+    },
+    "physiotherapy": {
+      "name": "Physiotherapy & rehabilitation"
+    },
+    "dental": {
+      "name": "Dental clinic"
+    },
+    "nutrition": {
+      "name": "Nutrition"
+    },
+    "aesthetics": {
+      "name": "Aesthetic clinic"
+    },
+    "therapy": {
+      "name": "Therapy & coaching"
+    },
+    "dance": {
+      "name": "Dance school"
+    },
+    "martial_arts": {
+      "name": "Martial arts"
+    },
+    "music": {
+      "name": "Music lessons"
+    },
+    "tutoring": {
+      "name": "Tutoring & learning centers"
+    },
+    "kids_activities": {
+      "name": "Kids' activities"
+    },
+    "garage": {
+      "name": "Garage"
+    },
+    "detailing": {
+      "name": "Detailing & car wash"
+    },
+    "tires": {
+      "name": "Tires"
+    }
   }
 }

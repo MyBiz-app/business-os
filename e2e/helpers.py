@@ -91,3 +91,10 @@ def local_today():
     from zoneinfo import ZoneInfo
 
     return _dt.datetime.now(ZoneInfo("Asia/Jerusalem")).date()
+
+
+def to_onboarding(page) -> None:
+    """After sign-up: the welcome page (decision T79), then "set up my business"."""
+    page.wait_for_url("**/welcome")
+    page.get_by_role("link", name=re.compile("^להקמת העסק|^Set up my business")).click()
+    page.wait_for_url("**/onboarding"); ready(page)

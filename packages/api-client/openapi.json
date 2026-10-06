@@ -12109,6 +12109,52 @@
         }
       }
     },
+    "/tenants/sample": {
+      "post": {
+        "tags": [
+          "tenants"
+        ],
+        "summary": "Create Sample",
+        "operationId": "create_sample",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SampleCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SampleCreated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/client/notifications": {
       "get": {
         "tags": [
@@ -20076,6 +20122,32 @@
           "simulated"
         ],
         "title": "Sales"
+      },
+      "SampleCreate": {
+        "properties": {
+          "vertical": {
+            "type": "string",
+            "title": "Vertical"
+          }
+        },
+        "type": "object",
+        "required": [
+          "vertical"
+        ],
+        "title": "SampleCreate"
+      },
+      "SampleCreated": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id"
+        ],
+        "title": "SampleCreated"
       },
       "ScheduleOptions": {
         "properties": {

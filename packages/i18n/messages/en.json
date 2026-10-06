@@ -3001,5 +3001,26 @@
     "activeClients": "Active clients",
     "revenue": "Revenue this month",
     "enter": "Open {name}"
+  },
+  "samples": {
+    "businessName": "Sample {industry}",
+    "branch": "Main branch",
+    "address": "1 Sample Street"
+  },
+  "welcome": {
+    "title": "Welcome to MyBiz",
+    "subtitle": "Your account is ready. Set up your business now, or first look around a sample business with fictitious data.",
+    "create": {
+      "title": "Set up my business",
+      "text": "A name, an industry and a few short questions. In a few minutes your business is ready, with services and plans that fit the industry.",
+      "button": "Set up my business"
+    },
+    "sample": {
+      "title": "Explore a sample business",
+      "text": "A business full of fictitious clients, classes or appointments, sales and leads, to see how everything works. Set up your real business any time from the business menu.",
+      "industry": "Industry",
+      "button": "Create a sample business",
+      "error": "We couldn't create a sample business. Please try again."
+    }
   }
 }
