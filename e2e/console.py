@@ -118,6 +118,7 @@ with sync_playwright() as p:
     card.get_by_role("button", name="אני מטפל/ת").click(); h.ready(owner)
     card = owner.get_by_role("listitem").filter(has_text=inbox_business).first
     expect(card.get_by_text("בטיפול", exact=True)).to_be_visible()
+    card.locator("summary", has_text="הערות פנימיות").click()  # folded until needed
     card.get_by_label("הערות פנימיות").fill("בדקתי, זה אזור זמן")
     card.get_by_role("button", name="שמירת הערות").click(); h.ready(owner)
     check(owner, "inbox-owner")

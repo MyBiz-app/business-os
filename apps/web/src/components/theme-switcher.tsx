@@ -36,7 +36,7 @@ export function ThemeSwitcher() {
           aria-pressed={current === value}
           title={t(label)}
           onClick={() => setTheme(value)}
-          className={`flex size-8 items-center justify-center rounded-lg transition-colors ${
+          className={`flex size-7 items-center justify-center rounded-lg transition-colors sm:size-8 ${
             current === value ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"
           }`}
         >
