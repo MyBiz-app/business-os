@@ -1794,7 +1794,8 @@
       },
       "other": "Or write to us directly",
       "website": "Website (leave empty)",
-      "otherVertical": "Other"
+      "otherVertical": "Other",
+      "chooseVertical": "Choose an industry (optional)"
     },
     "legal": {
       "draft": "Draft – this document is in progress and will be finalized before launch.",
@@ -2276,7 +2277,9 @@
         "ILS": "₪ Shekel",
         "USD": "$ Dollar",
         "EUR": "€ Euro"
-      }
+      },
+      "yoursGeneric": "your business",
+      "exampleGeneric": "Dana's business"
     },
     "base": {
       "eyebrow": "Your base plan",

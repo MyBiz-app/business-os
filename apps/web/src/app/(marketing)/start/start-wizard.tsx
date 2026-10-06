@@ -243,7 +243,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
       <>
         <StepHeading
           eyebrow={null}
-          title={<h1 {...headingProps}>{t("business.title", { yours: text(draft.vertical ?? "fitness", "yours") })}</h1>}
+          title={<h1 {...headingProps}>{t("business.title", { yours: draft.vertical ? text(draft.vertical, "yours") : t("business.yoursGeneric") })}</h1>}
           subtitle={t("business.subtitle")}
         />
         <form
@@ -257,7 +257,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn }: P
           <TextInput
             label={t("business.name")}
             value={draft.name}
-            placeholder={t("business.namePlaceholder", { example: text(draft.vertical ?? "fitness", "example") })}
+            placeholder={t("business.namePlaceholder", { example: draft.vertical ? text(draft.vertical, "example") : t("business.exampleGeneric") })}
             onChange={(name) => update({ name })}
           />
           <ChoiceGroup
