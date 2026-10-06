@@ -116,6 +116,9 @@ anyone else a sign-up **fails and no account is created**. Set up real email onc
 *Actions → Create a demo account on staging* creates a confirmed sign-in (or updates its
 password and name) for demo and team accounts. It takes a **bcrypt hash** of the password, never
 the password: `python -c "import bcrypt; print(bcrypt.hashpw(b'...', bcrypt.gensalt()).decode())"`.
+Then *Seed staging demo data* fills it: `owner` gives a business owner two businesses with
+branches; `platform` gives a MyBiz owner a console to look at (six small customer businesses
+with invoices, and a few contact requests). Both are safe to re-run with *replace*.
 
 *Actions → Confirm an account on staging* confirms an account that was created but not
 confirmed and creates its app profile; it fails with "No account" when the sign-up never

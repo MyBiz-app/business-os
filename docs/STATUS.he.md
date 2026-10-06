@@ -24,7 +24,7 @@ _עודכן לאחרונה: 06.10.2026_ · מתעדכן עם כל מיזוג (Pu
 
 ## בעבודה
 
-- ההדגמה שלך באתר הבדיקות: מחכה להרשמה של adired7399@gmail.com, ואז מריצים את מחולל הנתונים ([#58](https://github.com/adiredri/business-os/issues/58))
+- חשבונות ההדגמה באתר הבדיקות: נוצרים ב-workflow (בלי מייל הרשמה) ומתמלאים בנתונים: adired7399@gmail.com כבעל עסקים, adire7399@gmail.com עם נתונים לקונסולת MyBiz ([#58](https://github.com/adiredri/business-os/issues/58))
 - [#38](https://github.com/adiredri/business-os/issues/38) סקירה שלך על המחשב והטלפון
 
 ## הבא בתור

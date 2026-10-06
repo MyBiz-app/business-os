@@ -222,7 +222,83 @@ BARBERSHOP = BusinessSpec(
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
+    "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
+
+# The platform demo: small businesses of several industries, each with a fictitious owner, so
+# the MyBiz console has businesses, invoices and requests to show.
+PLATFORM_BUSINESSES: tuple[tuple[BusinessSpec, str], ...] = tuple(
+    (
+        BusinessSpec(
+            name=name,
+            vertical=vertical,
+            color=color,
+            billing_name=f"{name} בע״מ",
+            branches=(BranchSpec(branch, address),),
+            clients=clients,
+            staff_per_branch=2,
+        ),
+        owner,
+    )
+    for name, vertical, color, branch, address, clients, owner in (
+        ("יוגה בגבעה", "yoga", "#059669", "זכרון יעקב", "המייסדים 40, זכרון יעקב", 90, "מיכל לוי"),
+        (
+            "קרוספיט צפון",
+            "crossfit",
+            "#dc2626",
+            "קריית ביאליק",
+            "דרך עכו 210, קריית ביאליק",
+            120,
+            "רון אברהם",
+        ),
+        (
+            "פיזיו פלוס",
+            "physiotherapy",
+            "#0284c7",
+            "פתח תקווה",
+            "ז׳בוטינסקי 100, פתח תקווה",
+            70,
+            "ד״ר נועה שגיא",
+        ),
+        ("סטודיו מחול רונה", "dance", "#db2777", "רחובות", "הרצל 150, רחובות", 110, "רונה כהן"),
+        ("מספרת הדר", "hair_salon", "#a16207", "באר שבע", "רגר 30, באר שבע", 80, "הדר מזרחי"),
+        ("מוסך המומחים", "garage", "#475569", "חולון", "המלאכה 12, חולון", 60, "יוסי ביטון"),
+    )
+)
+PLATFORM_REQUESTS = (
+    (
+        "שירה גולן",
+        "shira@example.invalid",
+        "סטודיו שירה",
+        "pilates",
+        "מעוניינת להעביר את הסטודיו מהמערכת הקודמת, אפשר עזרה בייבוא לקוחות?",
+        "new",
+    ),
+    (
+        "עמית ברק",
+        "amit@example.invalid",
+        "ברק כושר",
+        "gym",
+        "יש לנו שלושה סניפים, כמה עולה סניף נוסף?",
+        "new",
+    ),
+    (
+        "ליאת חן",
+        "liat@example.invalid",
+        "קליניקת ליאת",
+        "aesthetics",
+        "רוצה לשמוע על אפליקציית הלקוחות עם הלוגו שלנו",
+        "in_progress",
+    ),
+    (
+        "דני פרץ",
+        "dani@example.invalid",
+        "פרץ גראז׳",
+        "garage",
+        "שאלה על חשבוניות ללקוחות עסקיים",
+        "done",
+    ),
+)
 
 # Staff hours for appointments: weekday (0 = Monday) -> (opens, closes); Friday until 14:00.
 WORK_HOURS = {6: (9, 19), 0: (9, 19), 1: (9, 19), 2: (9, 19), 3: (9, 19), 4: (9, 14)}
@@ -1057,6 +1133,95 @@ def _seed_leads(
     return len(lead_rows)
 
 
+def seed_platform(
+    conn: Connection,
+    staff_email: str,
+    months: int,
+    rng: random.Random,
+    staff_name: str | None = None,
+    replace: bool = False,
+) -> list[UUID]:
+    """MyBiz's own demo: `staff_email` becomes the primary owner of the MyBiz team, and the
+    platform gets small businesses of several industries (fictitious owners), their monthly
+    invoices (some paid by card, some still open) and requests from the contact form."""
+    from app.billing import bill_businesses  # billing imports nothing from here
+
+    profile_id(conn, staff_email)
+    if staff_name:
+        conn.execute(
+            text("UPDATE app.users SET full_name = :name WHERE lower(email) = lower(:email)"),
+            {"name": staff_name, "email": staff_email},
+        )
+    conn.execute(
+        text("""
+            INSERT INTO app.platform_staff (email, level, added_by)
+            VALUES (lower(:email), 'owner', 'demo generator') ON CONFLICT DO NOTHING
+        """),
+        {"email": staff_email},
+    )
+    if replace:
+        conn.execute(
+            text("""
+                DELETE FROM app.tenants t WHERE EXISTS (
+                    SELECT 1 FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
+                    WHERE m.tenant_id = t.id AND u.email LIKE 'demo-owner-%@example.invalid'
+                )
+            """)
+        )
+        conn.execute(text("DELETE FROM app.contact_requests WHERE email LIKE '%@example.invalid'"))
+    tenants = []
+    for index, (spec, owner_name) in enumerate(PLATFORM_BUSINESSES, start=1):
+        email = f"demo-owner-{index}@example.invalid"
+        conn.execute(
+            text("""
+                INSERT INTO app.users (id, email, full_name) VALUES (gen_random_uuid(), :e, :n)
+                ON CONFLICT DO NOTHING
+            """),
+            {"e": email, "n": owner_name},
+        )
+        tenant_id = seed(conn, email, months, rng, spec)
+        if index % 3:  # two in three pay by card; the rest have open invoices
+            conn.execute(
+                text("""
+                    INSERT INTO app.billing_accounts
+                        (tenant_id, billing_name, billing_email, card_brand, card_last4, card_exp)
+                    VALUES (:t, :name, :email, 'visa', :last4, '12/29')
+                    ON CONFLICT (tenant_id) DO UPDATE SET card_last4 = EXCLUDED.card_last4
+                """),
+                {
+                    "t": tenant_id,
+                    "name": spec.billing_name,
+                    "email": email,
+                    "last4": f"{4000 + index * 7}",
+                },
+            )
+        bill_businesses(conn, tenant_id=tenant_id)
+        tenants.append(tenant_id)
+    for name, email, business, vertical, message, status in PLATFORM_REQUESTS:
+        conn.execute(
+            text("""
+                INSERT INTO app.contact_requests
+                    (name, email, business, vertical, message, locale, status, created_at)
+                VALUES (:name, :email, :business, :vertical, :message, 'he', :status,
+                        now() - make_interval(days => :days))
+            """),
+            {
+                "name": name,
+                "email": email,
+                "business": business,
+                "vertical": vertical,
+                "message": message,
+                "status": status,
+                "days": rng.randint(0, 12),
+            },
+        )
+    print(
+        f"Platform demo: {len(tenants)} businesses, {len(PLATFORM_REQUESTS)} requests, "
+        f"{staff_email} is a MyBiz owner."
+    )
+    return tenants
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--owner-email", required=True)
@@ -1065,7 +1230,8 @@ def main() -> None:
         default="studio",
         choices=sorted(DEMOS),
         help="studio: one fitness studio; owner: a pilates chain with five branches and a "
-        "barbershop with three",
+        "barbershop with three; platform: the owner email becomes a MyBiz team owner and the "
+        "platform gets small businesses, invoices and requests",
     )
     parser.add_argument("--owner-name", default=None, help="Sets the owner's display name")
     parser.add_argument(
@@ -1080,6 +1246,16 @@ def main() -> None:
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
+        if args.demo == "platform":
+            seed_platform(
+                conn,
+                args.owner_email,
+                args.months,
+                random.Random(args.seed),
+                staff_name=args.owner_name,
+                replace=args.replace,
+            )
+            return
         seed_demo(
             conn,
             args.owner_email,
