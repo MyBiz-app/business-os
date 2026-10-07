@@ -9,6 +9,7 @@ import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@busines
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
+import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { fullName } from "@business-os/app-kit/lib/names";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -38,6 +39,7 @@ export default function ClientScreen() {
   const tMessaging = useTranslations("messaging");
   const tTerms = useTranslations("terms");
   const tDependents = useTranslations("dependents");
+  const tQuotes = useTranslations("quotes");
   const locale = useLocale();
   const { api, scope, tenant, palette, can } = useBusiness();
   const kind = dependentsFor(tenant).kind;
@@ -55,7 +57,7 @@ export default function ClientScreen() {
   const load = useCallback(async () => {
     if (!tenantId) return null;
     const path = { client_id: id };
-    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings] = await Promise.all([
+    const [client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes] = await Promise.all([
       api.GET("/clients/{client_id}", { params: { ...scope, path } }).then(unwrap),
       api.GET("/clients/{client_id}/bookings", { params: { ...scope, path } }).then(unwrap),
       api
@@ -79,8 +81,13 @@ export default function ClientScreen() {
       dependentsFor(tenant).kind
         ? api.GET("/dependents/settings", { params: scope }).then(unwrap).catch(() => null)
         : Promise.resolve(null),
+      // The client's quotes (#44).
+      api
+        .GET("/quotes", { params: { ...scope, query: { client_id: id } } })
+        .then(unwrap)
+        .catch(() => []),
     ]);
-    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings };
+    return { client, bookings, entitlements, notes, plans, dependents, dependentSettings, quotes };
   }, [api, scope, id, tenantId, can, tenant]);
   const { data, loading, reload } = useLoad(load);
 
@@ -332,6 +339,22 @@ export default function ClientScreen() {
             />
           )}
         </Card>
+      )}
+
+      {data.quotes.length > 0 && (
+        <View style={{ gap: 8 }}>
+          <SectionTitle title={tQuotes("title")} palette={palette} />
+          {data.quotes.map((quote) => (
+            <ListRow
+              key={quote.id}
+              palette={palette}
+              title={`#${quote.number} · ${quote.title}`}
+              subtitle={formatMoney(quote.total, quote.currency, locale)}
+              trailing={<Badge label={tQuotes(`statuses.${quote.status}`)} tone={quote.status === "accepted" ? "success" : "muted"} palette={palette} />}
+              onPress={() => void Linking.openURL(`${WEB_URL}/quotes/${quote.id}`)}
+            />
+          ))}
+        </View>
       )}
 
       {upcoming.length > 0 && (

@@ -218,6 +218,18 @@
     },
     "pest_control": {
       "name": "הדברה"
+    },
+    "photographers": {
+      "name": "צלמים וסטודיו"
+    },
+    "djs": {
+      "name": "תקליטנים ונגנים"
+    },
+    "event_suppliers": {
+      "name": "ספקי אירועים"
+    },
+    "small_venues": {
+      "name": "מקומות אירוח קטנים"
     }
   }
 }

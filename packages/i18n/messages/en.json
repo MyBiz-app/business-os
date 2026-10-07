@@ -231,7 +231,8 @@
     "locked": "Not in your plan",
     "lockedItem": "{name} — not in your plan",
     "sales": "Sales",
-    "resources": "Courts & rooms"
+    "resources": "Courts & rooms",
+    "quotes": "Quotes"
   },
   "terms": {
     "fitness": {
@@ -385,6 +386,25 @@
       "profile": "Client details",
       "visitNotes": "Job notes",
       "nextBooking": "Your next visit"
+    },
+    "events": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Calendar",
+      "newSession": "New meeting",
+      "noSessions": "No meetings",
+      "sessionsToday": "{count, plural, =0 {No meetings today} one {One meeting today} other {# meetings today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The studio",
+      "profile": "Event details",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next meeting"
     }
   },
   "clients": {
@@ -3054,7 +3074,9 @@
         "Every event in one place"
       ],
       "heroTitle": "From the first call to the big day.",
-      "heroText": "Photographers and studios, DJs, event suppliers and small venues: quotes, deposits and every event day in one place."
+      "heroText": "Photographers and studios, DJs, event suppliers and small venues: quotes, deposits and every event day in one place.",
+      "yours": "Your studio",
+      "example": "Golden Hour Studio"
     },
     "professional": {
       "name": "Professional services",
@@ -3259,6 +3281,22 @@
     "pest_control": {
       "name": "Pest control",
       "tagline": "Treatments for apartments, houses and offices."
+    },
+    "photographers": {
+      "name": "Photographers & studios",
+      "tagline": "Shoots, events and albums, from quote to delivery."
+    },
+    "djs": {
+      "name": "DJs & musicians",
+      "tagline": "Event dates held with a deposit."
+    },
+    "event_suppliers": {
+      "name": "Event suppliers",
+      "tagline": "Design, catering and rentals with quotes."
+    },
+    "small_venues": {
+      "name": "Small venues",
+      "tagline": "Tours, quotes and event days."
     }
   },
   "clientFields": {
@@ -3360,6 +3398,14 @@
       "apartment": "Apartment",
       "house": "House",
       "office": "Office",
+      "other": "Other"
+    },
+    "event_type": "Event type",
+    "event_type_options": {
+      "wedding": "Wedding",
+      "bar_mitzvah": "Bar / bat mitzvah",
+      "birthday": "Birthday",
+      "corporate": "Corporate",
       "other": "Other"
     }
   },
@@ -3596,6 +3642,101 @@
       "messaging": {
         "title": "WhatsApp and SMS",
         "hint": "Sends your messages and reminders to clients."
+      }
+    }
+  },
+  "quotes": {
+    "title": "Quotes",
+    "subtitle": "Send a quote, the client accepts it with one tap and pays the deposit.",
+    "new": "New quote",
+    "back": "All quotes",
+    "none": "No quotes here yet.",
+    "noneForClient": "No quotes for this client yet.",
+    "filter": "Filter by status",
+    "filters": {
+      "all": "All",
+      "draft": "Drafts",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "expired": "Expired"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "expired": "Expired"
+    },
+    "client": "Client",
+    "chooseClient": "Choose a client",
+    "titleField": "Title",
+    "titleHint": "For example: Wedding photography, AC installation",
+    "lines": "What's included",
+    "lineDescription": "Item {number}",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "amount": "Amount",
+    "addLine": "Add an item",
+    "removeLine": "Remove item {number}",
+    "total": "Total",
+    "deposit": "Deposit (%)",
+    "depositHint": "Paid on acceptance; 0 for none.",
+    "validUntilField": "Valid until",
+    "eventDate": "Event date",
+    "eventHint": "If the quote is for an event.",
+    "eventTime": "Start time",
+    "eventPlace": "Place",
+    "notes": "Terms and notes",
+    "notesHint": "What's included, cancellation terms…",
+    "saveDraft": "Save draft",
+    "edit": "Edit",
+    "send": "Send to the client",
+    "draftHint": "A draft can be edited. Once sent, the client can open it by its private link.",
+    "share": "Send and share",
+    "copyLink": "Copy the link",
+    "copied": "Copied",
+    "preview": "As the client sees it",
+    "copyAsNew": "Copy as a new version",
+    "whatsappText": "Hi {name}, here is your quote for {title}: {link}",
+    "acceptedBy": "Accepted by {name} on {date}",
+    "paid": "Paid",
+    "due": "Left to pay",
+    "method": "Payment method",
+    "recordPayment": "Record a payment",
+    "event": "The event",
+    "eventOn": "event {date}",
+    "eventsLink": "Events",
+    "eventsTitle": "Upcoming events",
+    "eventsSubtitle": "Accepted quotes with an event date, soonest first.",
+    "noEvents": "No upcoming events.",
+    "leftToPay": "{amount} left to pay",
+    "fullyPaid": "Fully paid",
+    "depositOf": "Deposit: {percent}% ({amount})",
+    "paidSoFar": "Paid: {amount}",
+    "balance": "left: {amount}",
+    "validUntil": "Valid until {date}",
+    "public": {
+      "title": "Quote {number}",
+      "for": "for {name}",
+      "missing": "Quote not found",
+      "answer": "Your answer",
+      "name": "Your full name",
+      "nameHint": "Writing your name confirms you accept the quote and its terms.",
+      "accept": "Accept the quote",
+      "decline": "Decline",
+      "acceptedBy": "Accepted by {name}. Thank you!",
+      "payDeposit": "Pay the deposit · {amount}",
+      "depositPaid": "The deposit is paid. See you soon!",
+      "processing": "Your payment is being confirmed; refresh in a moment.",
+      "declined": "You declined this quote.",
+      "expired": "This quote has expired. Ask the business for a new one.",
+      "errors": {
+        "name_required": "Write your name to accept.",
+        "expired": "This quote has expired.",
+        "already_answered": "This quote was already answered.",
+        "generic": "Something went wrong. Try again."
       }
     }
   }

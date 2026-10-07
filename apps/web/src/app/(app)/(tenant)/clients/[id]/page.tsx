@@ -20,6 +20,7 @@ import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
+import { QuotesSection } from "./quotes-section";
 import { MessagesSection } from "../../messages/messages-section";
 import { NotesSection, ProfileSection } from "./profile-section";
 
@@ -226,6 +227,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
               </div>
             )}
           </section>
+
+          <QuotesSection clientId={client.id} context={context} locked={erased} />
 
           <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 

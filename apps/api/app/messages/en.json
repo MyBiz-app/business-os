@@ -218,6 +218,18 @@
     },
     "pest_control": {
       "name": "Pest control"
+    },
+    "photographers": {
+      "name": "Photographers & studios"
+    },
+    "djs": {
+      "name": "DJs & musicians"
+    },
+    "event_suppliers": {
+      "name": "Event suppliers"
+    },
+    "small_venues": {
+      "name": "Small venues"
     }
   }
 }

@@ -2550,9 +2550,139 @@ export const CATALOG: Entry[] = [
   {
     "key": "events",
     "order": 9,
-    "status": "planned",
+    "status": "beta",
     "icon": "camera",
-    "color": "from-fuchsia-500 to-purple-600"
+    "color": "from-fuchsia-500 to-purple-600",
+    "terms": "events",
+    "client_term": "client",
+    "booking_modes": [
+      "appointment"
+    ],
+    "cancellation_window_minutes": 2880,
+    "booking_requires_plan": false,
+    "default_preset": "growing",
+    "recommended_modules": [
+      "client_app",
+      "whatsapp",
+      "crm"
+    ],
+    "client_fields": [
+      {
+        "key": "event_type",
+        "kind": "select",
+        "options": [
+          "wedding",
+          "bar_mitzvah",
+          "birthday",
+          "corporate",
+          "other"
+        ]
+      },
+      {
+        "key": "preferences",
+        "kind": "text"
+      }
+    ],
+    "default_services": [
+      {
+        "names": {
+          "he": "פגישת תכנון",
+          "en": "Planning meeting"
+        },
+        "duration_minutes": 60,
+        "booking_mode": "appointment",
+        "prices": {
+          "ILS": 10000
+        },
+        "color": "#a21caf"
+      }
+    ],
+    "children": [
+      {
+        "key": "photographers",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "פגישת היכרות",
+              "en": "Intro meeting"
+            },
+            "duration_minutes": 30,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 5000
+            },
+            "color": "#c026d3"
+          },
+          {
+            "names": {
+              "he": "צילומי סטודיו",
+              "en": "Studio session"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 60000
+            },
+            "color": "#7c3aed"
+          }
+        ]
+      },
+      {
+        "key": "djs",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "פגישת תכנון מוזיקה",
+              "en": "Music planning meeting"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 10000
+            },
+            "color": "#db2777"
+          }
+        ]
+      },
+      {
+        "key": "event_suppliers",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "פגישת תכנון",
+              "en": "Planning meeting"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 10000
+            },
+            "color": "#9333ea"
+          }
+        ]
+      },
+      {
+        "key": "small_venues",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "סיור במקום",
+              "en": "Venue tour"
+            },
+            "duration_minutes": 30,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 5000
+            },
+            "color": "#6d28d9"
+          }
+        ]
+      }
+    ]
   },
   {
     "key": "professional",

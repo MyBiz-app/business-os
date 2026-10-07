@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
-from app.seed import AC_COMPANY, GROOMING_SALON, PADEL_CLUB, seed, seed_demo
+from app.seed import AC_COMPANY, GROOMING_SALON, PADEL_CLUB, PHOTO_STUDIO, seed, seed_demo
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -224,3 +224,30 @@ def test_demo_ac_company_has_jobs_at_addresses(engine: Engine) -> None:
             {"t": tenant_id},
         ).one()
     assert on_site >= 3 and jobs > 100 and without_address == 0 and done > 0
+
+
+def test_demo_photo_studio_has_quotes_and_events(engine: Engine) -> None:
+    owner = uuid4()
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'photo-owner@example.com')"),
+            {"id": owner},
+        )
+        tenant_id = seed(connection, "photo-owner@example.com", 1, random.Random(11), PHOTO_STUDIO)
+
+    with engine.connect() as connection:
+        quotes, accepted, paid_quotes, receipts, numbers = connection.execute(
+            text("""
+                SELECT count(*), count(*) FILTER (WHERE status = 'accepted'),
+                       (SELECT count(DISTINCT quote_id) FROM app.payments
+                        WHERE tenant_id = :t AND quote_id IS NOT NULL),
+                       (SELECT count(*) FROM app.receipts r JOIN app.payments p
+                            ON p.id = r.payment_id WHERE p.tenant_id = :t
+                           AND p.quote_id IS NOT NULL),
+                       count(DISTINCT number)
+                FROM app.quotes WHERE tenant_id = :t
+            """),
+            {"t": tenant_id},
+        ).one()
+    assert quotes >= 30 and accepted > 10 and paid_quotes == accepted
+    assert receipts >= accepted and numbers == quotes

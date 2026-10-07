@@ -76,3 +76,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `jobs_app.py <owner email>` (needs `pnpm dev:business`, the demo): the owner opens the team's jobs of the day in the business app and moves one on its way.
 
 `integrations.py <owner email> <MyBiz team owner email>`: settings → Integrations lists the payments, invoicing and messaging providers; connecting one and going back to the default; the console lists every service with its default (English/dark on a phone).
+
+`quotes.py <owner email>` (on the photography demo, `--demo events`): quotes (#44) — a new quote with lines and an event saved as a draft and sent; the client opens the private link with no sign-in (English/dark phone), accepts with their name and pays the deposit; the business sees it paid and the event listed.
