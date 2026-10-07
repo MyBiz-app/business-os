@@ -11,6 +11,7 @@ import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 import { whatsappLink } from "@/lib/whatsapp";
+import { vertical } from "@business-os/verticals";
 
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
@@ -21,6 +22,7 @@ import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
 import { QuotesSection } from "./quotes-section";
+import { DocumentsSection, TimeSection } from "./work-section";
 import { MessagesSection } from "../../messages/messages-section";
 import { NotesSection, ProfileSection } from "./profile-section";
 
@@ -126,6 +128,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
       ? [{ key: "rating" as const, Icon: Star, value: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reviews.average) }]
       : []),
   ];
+  // Time and monthly billing (#45): for industries that bill by time (their pack says so).
+  const workSections = vertical(tenant.vertical)?.timeBilling ?? false;
   const whatsapp = client.phone ? whatsappLink(client.phone, tenant.time_zone) : null;
 
   return (
@@ -229,6 +233,10 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           </section>
 
           <QuotesSection clientId={client.id} context={context} locked={erased} />
+
+          {workSections && <TimeSection clientId={client.id} context={context} locked={erased} />}
+
+          <DocumentsSection clientId={client.id} context={context} locked={erased} />
 
           <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 

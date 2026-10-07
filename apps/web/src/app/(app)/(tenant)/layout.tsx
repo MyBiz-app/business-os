@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { termsOf } from "@business-os/verticals";
+import { termsOf, vertical } from "@business-os/verticals";
 
 import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
@@ -36,6 +36,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/services", label: t("nav.services"), icon: "services", permission: "catalog.read" },
     { href: "/plans", label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
     { href: "/quotes", label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
+    ...(vertical(tenant.vertical)?.timeBilling ? [{ href: "/time", label: t("nav.time"), icon: "time" as const, permission: "clients.read" }] : []),
     { href: "/sales", label: t("nav.sales"), icon: "sales", permission: "reports.read" },
     { href: "/locations", label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
   ];

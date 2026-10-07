@@ -3,7 +3,15 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
-from app.seed import AC_COMPANY, GROOMING_SALON, PADEL_CLUB, PHOTO_STUDIO, seed, seed_demo
+from app.seed import (
+    AC_COMPANY,
+    ACCOUNTING_FIRM,
+    GROOMING_SALON,
+    PADEL_CLUB,
+    PHOTO_STUDIO,
+    seed,
+    seed_demo,
+)
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -251,3 +259,31 @@ def test_demo_photo_studio_has_quotes_and_events(engine: Engine) -> None:
         ).one()
     assert quotes >= 30 and accepted > 10 and paid_quotes == accepted
     assert receipts >= accepted and numbers == quotes
+
+
+def test_demo_accounting_firm_bills_by_time(engine: Engine) -> None:
+    owner = uuid4()
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, 'cpa-owner@example.com')"),
+            {"id": owner},
+        )
+        tenant_id = seed(connection, "cpa-owner@example.com", 1, random.Random(13), ACCOUNTING_FIRM)
+
+    with engine.connect() as connection:
+        retainers, entries, bills, unbilled_past, documents, signed = connection.execute(
+            text("""
+                SELECT (SELECT count(*) FROM app.retainers WHERE tenant_id = :t),
+                       (SELECT count(*) FROM app.time_entries WHERE tenant_id = :t),
+                       (SELECT count(*) FROM app.quotes WHERE tenant_id = :t AND kind = 'bill'),
+                       (SELECT count(*) FROM app.time_entries WHERE tenant_id = :t
+                          AND bill_id IS NULL
+                          AND day < date_trunc('month', now())::date),
+                       (SELECT count(*) FROM app.client_documents WHERE tenant_id = :t),
+                       (SELECT count(*) FROM app.client_documents
+                        WHERE tenant_id = :t AND signed_at IS NOT NULL)
+            """),
+            {"t": tenant_id},
+        ).one()
+    assert retainers == ACCOUNTING_FIRM.clients and entries > 200 and bills > 60
+    assert unbilled_past == 0 and documents > 30 and signed > 10

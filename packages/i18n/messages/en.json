@@ -232,7 +232,8 @@
     "lockedItem": "{name} — not in your plan",
     "sales": "Sales",
     "resources": "Courts & rooms",
-    "quotes": "Quotes"
+    "quotes": "Quotes",
+    "time": "My time"
   },
   "terms": {
     "fitness": {
@@ -404,6 +405,25 @@
       "place": "The studio",
       "profile": "Event details",
       "visitNotes": "Notes",
+      "nextBooking": "Your next meeting"
+    },
+    "professional": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Meetings",
+      "newSession": "New meeting",
+      "noSessions": "No meetings",
+      "sessionsToday": "{count, plural, =0 {No meetings today} one {One meeting today} other {# meetings today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The office",
+      "profile": "Client details",
+      "visitNotes": "Meeting notes",
       "nextBooking": "Your next meeting"
     }
   },
@@ -2403,7 +2423,7 @@
       "otherKind": "Another {name} business",
       "allIndustries": "All industries",
       "missing": "Don't see your industry?",
-      "seeAll": "See every industry, including those coming soon"
+      "seeAll": "See every industry and its kinds of business"
     },
     "business": {
       "title": "Tell us about {yours}",
@@ -3087,7 +3107,9 @@
         "Retainers and billable hours"
       ],
       "heroTitle": "Your practice, organized.",
-      "heroText": "Consultants, accountants, lawyers and agencies: client meetings, documents, retainers and billable hours."
+      "heroText": "Consultants, accountants, lawyers and agencies: client meetings, documents, retainers and billable hours.",
+      "yours": "Your practice",
+      "example": "Levi & Partners"
     },
     "gym": {
       "name": "Gym",
@@ -3297,6 +3319,22 @@
     "small_venues": {
       "name": "Small venues",
       "tagline": "Tours, quotes and event days."
+    },
+    "consultants": {
+      "name": "Consultants",
+      "tagline": "Meetings, retainers and billable hours."
+    },
+    "accountants": {
+      "name": "Accountants & bookkeepers",
+      "tagline": "Clients' papers, monthly retainers and reports."
+    },
+    "lawyers": {
+      "name": "Lawyers",
+      "tagline": "Consultations, documents to sign and hours."
+    },
+    "agencies": {
+      "name": "Agencies",
+      "tagline": "Retainers, hours and deliverables per client."
     }
   },
   "clientFields": {
@@ -3737,7 +3775,85 @@
         "expired": "This quote has expired.",
         "already_answered": "This quote was already answered.",
         "generic": "Something went wrong. Try again."
-      }
+      },
+      "billTitle": "Bill {number}",
+      "billDue": "To pay",
+      "billPaid": "Paid",
+      "payTitle": "Payment",
+      "payBill": "Pay · {amount}",
+      "billThanks": "Paid in full. Thank you!"
     }
+  },
+  "bills": {
+    "title": "Bill {month}",
+    "retainer": "Retainer {month}",
+    "hours": "Hours {month}",
+    "hoursBeyond": "Hours {month} beyond the retainer"
+  },
+  "documents": {
+    "title": "Documents",
+    "none": "No documents yet.",
+    "add": "Upload a document",
+    "file": "File",
+    "fileHint": "PDF, image, Word or Excel, up to 10 MB.",
+    "name": "Name (optional)",
+    "kind": "Type",
+    "kinds": {
+      "contract": "Contract",
+      "report": "Report",
+      "client_file": "From the client",
+      "other": "Other"
+    },
+    "shareWithClient": "The client sees it in the app",
+    "askToSign": "Ask the client to sign",
+    "upload": "Upload",
+    "fromClient": "From the client",
+    "shared": "Shared",
+    "share": "Share",
+    "unshare": "Stop sharing",
+    "signedBy": "Signed by {name} · {date}",
+    "waitingSignature": "Waiting for signature",
+    "delete": "Delete {name}",
+    "mine": "My documents",
+    "mineHint": "Documents the business shared with you.",
+    "open": "Open",
+    "sign": "Sign",
+    "signName": "Your full name",
+    "signHint": "Writing your name signs the document.",
+    "signFailed": "Couldn't sign. Try again."
+  },
+  "time": {
+    "title": "Time and billing",
+    "unbilled": "{hours} h not billed",
+    "none": "No time logged yet.",
+    "day": "Day",
+    "hours": "Hours",
+    "what": "What was done",
+    "billable": "Billable",
+    "log": "Log time",
+    "hoursShort": "{hours} h",
+    "billed": "Bill #{number}",
+    "notBillable": "Not billable",
+    "month": "Month",
+    "bill": "Bill the month",
+    "nothingToBill": "Nothing to bill for that month.",
+    "billFailed": "Couldn't create the bill. Try again.",
+    "myTitle": "My time",
+    "mySubtitle": "What you logged in the last 30 days.",
+    "myNone": "No time logged in the last 30 days. Log time on a client's card.",
+    "today": "Today",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "retainer": {
+      "edit": "Retainer and hourly rate",
+      "monthly": "Monthly fee",
+      "monthlyHint": "0 for hourly billing only.",
+      "included": "Hours included",
+      "rate": "Hourly rate",
+      "save": "Save",
+      "summary": "Retainer {amount} a month with {hours} h included; {rate} an hour beyond.",
+      "hourly": "Billed by the hour: {rate}."
+    },
+    "logged": "Time logged."
   }
 }

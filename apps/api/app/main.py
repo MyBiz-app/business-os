@@ -15,6 +15,7 @@ from app.api import (
     client_notes,
     clients,
     dependents,
+    documents,
     integrations,
     leads,
     locations,
@@ -37,6 +38,7 @@ from app.api import (
     services,
     staff,
     support,
+    time_billing,
     webhooks,
     welcome,
 )
@@ -94,6 +96,10 @@ def create_app() -> FastAPI:
     app.include_router(quotes.router)
     app.include_router(quotes.public_router)
     app.include_router(quotes.client_router)
+    app.include_router(documents.router)
+    app.include_router(documents.client_router)
+    app.include_router(documents.public_router)
+    app.include_router(time_billing.router)
     app.include_router(integrations.router)
     app.include_router(client_notes.router)
     app.include_router(privacy.router)

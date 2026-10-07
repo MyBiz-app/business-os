@@ -77,6 +77,12 @@
     "branch": "Main branch",
     "address": "1 Sample Street"
   },
+  "bills": {
+    "title": "Bill {month}",
+    "retainer": "Retainer {month}",
+    "hours": "Hours {month}",
+    "hoursBeyond": "Hours {month} beyond the retainer"
+  },
   "verticals": {
     "fitness": {
       "name": "Fitness & Training"
@@ -230,6 +236,18 @@
     },
     "small_venues": {
       "name": "Small venues"
+    },
+    "consultants": {
+      "name": "Consultants"
+    },
+    "accountants": {
+      "name": "Accountants & bookkeepers"
+    },
+    "lawyers": {
+      "name": "Lawyers"
+    },
+    "agencies": {
+      "name": "Agencies"
     }
   }
 }

@@ -255,12 +255,22 @@ PHOTO_STUDIO = BusinessSpec(
     clients=120,
     staff_per_branch=2,
 )
+ACCOUNTING_FIRM = BusinessSpec(
+    name="לוי ושות׳ רואי חשבון (דמו)",
+    vertical="accountants",
+    color="#0e7490",
+    billing_name="לוי ושות׳ רואי חשבון",
+    branches=(BranchSpec("רמת גן", "ז׳בוטינסקי 35, רמת גן"),),
+    clients=60,
+    staff_per_branch=3,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
     "pets": (GROOMING_SALON,),
     "jobs": (AC_COMPANY,),
     "events": (PHOTO_STUDIO,),
+    "office": (ACCOUNTING_FIRM,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
@@ -947,6 +957,9 @@ def seed(
     dependents = _seed_dependents(conn, tenant_id, spec.vertical, [c.id for c in clients], rng)
     jobs = _seed_jobs(conn, tenant_id, [c.id for c in clients], rng)
     quotes = _seed_quotes(conn, tenant_id, owner, [c.id for c in clients], pack, today, rng)
+    hours = _seed_practice(
+        conn, tenant_id, [owner, *instructors], [c.id for c in clients], pack, today, rng
+    )
     by_id = {s["id"]: s for s in sessions}
     attended = [b for b in booking_rows if b.get("status") == "checked_in"]
     notes = COACH_NOTES if category == "fitness" else GENERIC_NOTES
@@ -1031,7 +1044,7 @@ def seed(
         f"{len(clients)} clients, {lead_count} leads, {len(sessions)} sessions, "
         f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings, "
         f"{reservations} reservations, {dependents} pets / children, {jobs} on-site jobs, "
-        f"{quotes} quotes."
+        f"{quotes} quotes, {hours} hours logged."
     )
     return tenant_id
 
@@ -1269,6 +1282,187 @@ def _seed_quotes(
                 )
         count += 1
     return count
+
+
+WORK_DONE = ("הנהלת חשבונות חודשית", "דיווח מע״מ", "התאמות בנק", "פגישה עם הלקוח",
+             "הכנת דוח רווח והפסד", "תכנון מס", "שיחה עם רשות המסים", "תלושי שכר")  # fmt: skip
+DOCUMENTS = (
+    ("הסכם התקשרות.pdf", "contract", True, True),
+    ("דוח שנתי 2025.pdf", "report", True, False),
+    ("טופס 106.pdf", "client_file", False, False),
+)
+SAMPLE_PDF = (
+    b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]"
+    b"/Count 1>>endobj 3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 144]>>endobj\n"
+    b"trailer<</Root 1 0 R>>\n%%EOF"
+)
+
+
+def _seed_practice(
+    conn: Connection,
+    tenant_id: UUID,
+    staff: list[UUID],
+    client_ids: list[UUID],
+    pack: object,
+    today: date,
+    rng: random.Random,
+) -> int:
+    """For industries that bill by time (#45): retainers, three months of time entries, the
+    past months billed (most bills paid), and documents (an engagement letter signed, a report
+    shared, a client's own paper)."""
+    if not getattr(pack, "time_billing", False):
+        return 0
+    minutes_total = 0
+    first_this_month = today.replace(day=1)
+    for client_id in client_ids:
+        monthly = rng.choice((0, 150000, 250000, 400000))
+        rate = rng.choice((30000, 40000, 50000))
+        included = 0 if monthly == 0 else rng.choice((240, 480, 600))
+        conn.execute(
+            text("""
+                INSERT INTO app.retainers
+                    (tenant_id, client_id, monthly_amount, included_minutes, hourly_rate,
+                     currency)
+                VALUES (:t, :c, :m, :i, :r, 'ILS')
+            """),
+            {"t": tenant_id, "c": client_id, "m": monthly, "i": included, "r": rate},
+        )
+        for back in (2, 1, 0):
+            month_start = (first_this_month - timedelta(days=28 * back)).replace(day=1)
+            month_end = (month_start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+            last_day = min(month_end, today)
+            worked = 0
+            entry_ids = []
+            for _ in range(rng.randint(2, 6)):
+                minutes = rng.choice((30, 45, 60, 90, 120, 180))
+                day = month_start + timedelta(days=rng.randint(0, (last_day - month_start).days))
+                worked += minutes
+                entry_ids.append(
+                    conn.execute(
+                        text("""
+                            INSERT INTO app.time_entries
+                                (tenant_id, client_id, user_id, day, minutes, description,
+                                 billable)
+                            VALUES (:t, :c, :u, :d, :m, :w, true) RETURNING id
+                        """),
+                        {
+                            "t": tenant_id,
+                            "c": client_id,
+                            "u": rng.choice(staff),
+                            "d": day,
+                            "m": minutes,
+                            "w": rng.choice(WORK_DONE),
+                        },
+                    ).scalar_one()
+                )
+            minutes_total += worked
+            if back == 0:
+                continue  # this month is not billed yet
+            extra = max(worked - included, 0) if monthly else worked
+            lines = ([("ריטיינר", 1, monthly)] if monthly else []) + (
+                [("שעות עבודה", round(extra / 60, 2), rate)] if extra else []
+            )
+            if not lines:
+                continue
+            number = conn.execute(
+                text("""
+                    INSERT INTO app.quote_counters AS c (tenant_id, last) VALUES (:t, 1001)
+                    ON CONFLICT (tenant_id) DO UPDATE SET last = c.last + 1 RETURNING last
+                """),
+                {"t": tenant_id},
+            ).scalar_one()
+            billed_at = datetime.combine(month_end + timedelta(days=1), time(9, 0), tzinfo=UTC)
+            bill_id = conn.execute(
+                text("""
+                    INSERT INTO app.quotes
+                        (tenant_id, client_id, number, kind, title, status, currency,
+                         deposit_percent, period_start, period_end, sent_at, accepted_at,
+                         created_by, created_at)
+                    VALUES (:t, :c, :n, 'bill', :title, 'accepted', 'ILS', 100, :s, :e, :at,
+                            :at, :u, :at)
+                    RETURNING id
+                """),
+                {
+                    "t": tenant_id,
+                    "c": client_id,
+                    "n": number,
+                    "title": f"חשבון {month_start:%m/%Y}",
+                    "s": month_start,
+                    "e": month_end,
+                    "at": billed_at,
+                    "u": staff[0],
+                },
+            ).scalar_one()
+            total = 0
+            for position, (description, quantity, price) in enumerate(lines):
+                total += round(quantity * price)
+                conn.execute(
+                    text("""
+                        INSERT INTO app.quote_lines
+                            (tenant_id, quote_id, position, description, quantity, unit_price)
+                        VALUES (:t, :q, :p, :d, :n, :u)
+                    """),
+                    {
+                        "t": tenant_id,
+                        "q": bill_id,
+                        "p": position,
+                        "d": description,
+                        "n": quantity,
+                        "u": price,
+                    },
+                )
+            conn.execute(
+                text("UPDATE app.time_entries SET bill_id = :b WHERE id = ANY(:ids)"),
+                {"b": bill_id, "ids": entry_ids},
+            )
+            if back == 2 or rng.random() < 0.7:  # older bills are paid, most recent ones too
+                conn.execute(
+                    text("""
+                        INSERT INTO app.payments
+                            (tenant_id, client_id, amount, currency, status, provider, method,
+                             idempotency_key, quote_id, description, created_at)
+                        VALUES (:t, :c, :a, 'ILS', 'succeeded', 'simulated', 'transfer', :k,
+                                :q, :d, :at)
+                    """),
+                    {
+                        "t": tenant_id,
+                        "c": client_id,
+                        "a": total,
+                        "k": f"seed-bill-{bill_id}",
+                        "q": bill_id,
+                        "d": f"חשבון {month_start:%m/%Y} · {number}",
+                        "at": billed_at + timedelta(days=rng.randint(1, 10)),
+                    },
+                )
+        for name, kind, shared, sign in DOCUMENTS:
+            if rng.random() < 0.6:
+                conn.execute(
+                    text("""
+                        INSERT INTO app.client_documents
+                            (tenant_id, client_id, name, kind, content_type, size, content,
+                             shared, uploaded_by_client, sign_requested, signed_at,
+                             signed_name)
+                        SELECT :t, c.id, :name, :kind, 'application/pdf', :size, :content,
+                               :shared, :by_client, :sign,
+                               CASE WHEN :sign THEN now() - interval '20 days' END,
+                               CASE WHEN :sign
+                                    THEN trim(c.first_name || ' ' || coalesce(c.last_name, ''))
+                               END
+                        FROM app.clients c WHERE c.id = :c
+                    """),
+                    {
+                        "t": tenant_id,
+                        "c": client_id,
+                        "name": name,
+                        "kind": kind,
+                        "size": len(SAMPLE_PDF),
+                        "content": SAMPLE_PDF,
+                        "shared": shared,
+                        "by_client": kind == "client_file",
+                        "sign": sign,
+                    },
+                )
+    return minutes_total // 60
 
 
 def seed_demo(
@@ -1703,6 +1897,7 @@ def main() -> None:
         "pets: a pet grooming salon with owners and their pets; "
         "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
         "events: a photography studio with quotes, deposits and events; "
+        "office: an accounting firm with retainers, time, bills and documents; "
         "owner: a pilates chain with five branches and a barbershop with three; "
         "platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",

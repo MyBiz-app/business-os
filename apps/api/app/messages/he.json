@@ -77,6 +77,12 @@
     "branch": "סניף ראשי",
     "address": "רחוב הדוגמה 1, תל אביב"
   },
+  "bills": {
+    "title": "חשבון {month}",
+    "retainer": "ריטיינר {month}",
+    "hours": "שעות עבודה {month}",
+    "hoursBeyond": "שעות עבודה {month} מעבר לריטיינר"
+  },
   "verticals": {
     "fitness": {
       "name": "כושר ואימון"
@@ -230,6 +236,18 @@
     },
     "small_venues": {
       "name": "מקומות אירוח קטנים"
+    },
+    "consultants": {
+      "name": "יועצים"
+    },
+    "accountants": {
+      "name": "רואי חשבון ומנהלי חשבונות"
+    },
+    "lawyers": {
+      "name": "עורכי דין"
+    },
+    "agencies": {
+      "name": "סוכנויות"
     }
   }
 }

@@ -85,6 +85,7 @@ class VerticalPack:
     dependents: str | None = None
     dependent_fields: tuple[ClientField, ...] = field(default_factory=tuple)
     dependent_required: bool = False
+    time_billing: bool = False  # time entries, retainers and monthly bills (#45)
     client_fields: tuple[ClientField, ...] = field(default_factory=tuple)
 
     @property
@@ -192,6 +193,7 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
             else (parent.dependent_fields if parent else ())
         ),
         dependent_required=get("dependent_required", False),
+        time_billing=get("time_billing", False),
         default_rooms=(
             tuple(_room(r) for r in raw["default_rooms"])
             if "default_rooms" in raw

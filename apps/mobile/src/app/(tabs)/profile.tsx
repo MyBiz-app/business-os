@@ -18,6 +18,7 @@ export default function Profile() {
   // On-site services (#42) happen at the client's addresses.
   const [onSite, setOnSite] = useState(false);
   const [hasQuotes, setHasQuotes] = useState(false);
+  const [hasDocuments, setHasDocuments] = useState(false);
   useEffect(() => {
     if (!business) return;
     let active = true;
@@ -29,6 +30,11 @@ export default function Profile() {
     void api
       .GET("/client/quotes", { params: scope })
       .then((r) => active && setHasQuotes((r.data ?? []).length > 0))
+      .catch(() => undefined);
+    // Documents the business shared with me (#45).
+    void api
+      .GET("/client/documents", { params: scope })
+      .then((r) => active && setHasDocuments((r.data ?? []).length > 0))
       .catch(() => undefined);
     return () => {
       active = false;
@@ -49,6 +55,14 @@ export default function Profile() {
       </Card>
 
       <ProfileForm key={business?.client_id} />
+
+      {hasDocuments && (
+        <Card palette={palette}>
+          <Text style={[styles.h2, { color: palette.foreground }]}>{t("documents.mine")}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("documents.mineHint")}</Text>
+          <Button label={t("documents.mine")} variant="secondary" palette={palette} onPress={() => router.push("/documents")} />
+        </Card>
+      )}
 
       {hasQuotes && (
         <Card palette={palette}>

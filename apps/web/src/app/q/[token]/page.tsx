@@ -55,10 +55,14 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
           <p dir="auto" className="text-sm font-semibold text-primary">{found.business_name}</p>
           <div className="flex flex-wrap items-center gap-3">
             <h1 dir="auto" className="text-3xl font-bold">{found.title}</h1>
-            <Pill tone={TONE[found.status] ?? "muted"}>{t(`statuses.${found.status}`)}</Pill>
+            {found.kind === "bill" ? (
+              <Pill tone={found.paid >= found.total ? "success" : "primary"}>{found.paid >= found.total ? t("public.billPaid") : t("public.billDue")}</Pill>
+            ) : (
+              <Pill tone={TONE[found.status] ?? "muted"}>{t(`statuses.${found.status}`)}</Pill>
+            )}
           </div>
           <p className="text-sm text-muted">
-            {t("public.title", { number: found.number })} · {t("public.for", { name: found.client_name })}
+            {t(found.kind === "bill" ? "public.billTitle" : "public.title", { number: found.number })} · {t("public.for", { name: found.client_name })}
           </p>
         </div>
 
@@ -100,7 +104,7 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
               </tr>
             </tfoot>
           </table>
-          {found.deposit_percent > 0 && (
+          {found.deposit_percent > 0 && found.kind !== "bill" && (
             <p className="text-sm">{t("depositOf", { percent: found.deposit_percent, amount: money(deposit) })}</p>
           )}
           {found.paid > 0 && (
@@ -122,16 +126,16 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
         {found.status === "accepted" && (
           <section aria-labelledby="accepted-heading" className="card flex flex-col gap-3 p-6">
             <h2 id="accepted-heading" className="font-semibold">
-              {t("public.acceptedBy", { name: found.accepted_name ?? "" })}
+              {found.kind === "bill" ? t("public.payTitle") : t("public.acceptedBy", { name: found.accepted_name ?? "" })}
             </h2>
             {found.deposit_due > 0 ? (
               <form action={payDeposit.bind(null, token, `deposit-${token.slice(0, 16)}-${found.paid}`)}>
                 <button type="submit" className="btn-primary px-5 py-2.5">
-                  {t("public.payDeposit", { amount: money(found.deposit_due) })}
+                  {t(found.kind === "bill" ? "public.payBill" : "public.payDeposit", { amount: money(found.deposit_due) })}
                 </button>
               </form>
             ) : (
-              <p className="text-sm text-success">{t("public.depositPaid")}</p>
+              <p className="text-sm text-success">{t(found.kind === "bill" ? "public.billThanks" : "public.depositPaid")}</p>
             )}
           </section>
         )}
