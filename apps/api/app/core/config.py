@@ -51,6 +51,18 @@ class Settings(BaseSettings):
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
 
+    # Rate limits per caller (app/rate_limit.py). Off by default in local development and
+    # tests (everything comes from one address there); on everywhere else unless set.
+    rate_limits: bool | None = None
+    # Behind the hosting proxy, count the first X-Forwarded-For address (the visitor).
+    trust_forwarded_for: bool = False
+
+    @property
+    def rate_limits_on(self) -> bool:
+        if self.rate_limits is not None:
+            return self.rate_limits
+        return self.environment not in ("local", "test")
+
     # Public addresses used in emails (links to the web app and the client app).
     web_url: str = "http://localhost:3000"
     api_url: str = "http://localhost:8000"  # this API's public address (signed file links)

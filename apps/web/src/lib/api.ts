@@ -2,6 +2,8 @@ import "server-only";
 
 import { type ApiClient, createApiClient } from "@business-os/api-client";
 
+import { headers } from "next/headers";
+
 import { createClient } from "@/lib/supabase/server";
 
 export type { Me, Role, Tenant } from "@business-os/api-client";
@@ -33,12 +35,23 @@ export class ApiError extends Error {
   }
 }
 
+/** The visitor's address, passed on so the API's rate limits count each visitor rather than
+ * this server (the API trusts it only behind the hosting proxy). */
+async function forwardedFor(): Promise<Record<string, string>> {
+  const incoming = await headers();
+  const address = incoming.get("x-forwarded-for")?.split(",")[0]?.trim() || incoming.get("x-real-ip");
+  return address ? { "X-Forwarded-For": address } : {};
+}
+
 async function authHeaders(): Promise<Record<string, string>> {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  return session ? { Authorization: `Bearer ${session.access_token}` } : {};
+  return {
+    ...(await forwardedFor()),
+    ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+  };
 }
 
 /** Uploads a file (multipart) to the API as the signed-in user, scoped to a tenant. */

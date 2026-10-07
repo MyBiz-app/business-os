@@ -53,6 +53,19 @@ only) and not the transaction pooler (port 6543).
 4. **Vercel**: *Add New → Project*, import this repository, Root Directory `apps/web`; add the
    environment variables above; deploy.
 
+## Health and rate limits
+
+- `GET /health`: the process is up (Render's health check). `GET /health/ready`: the database
+  answers too (503 when it doesn't); point uptime monitoring here.
+- Rate limits per visitor (`app/rate_limit.py`): 20 public form posts and 120 public reads a
+  minute (`/public/…`: join pages, quote links, inquiries, the contact form, file links), 600
+  webhook calls, and a ceiling of 1,200 calls a minute for everything; over a limit the API
+  answers 429 with `Retry-After`. On in every environment except local development
+  (`API_RATE_LIMITS=false` turns them off). Behind Render's proxy `API_TRUST_FORWARDED_FOR=true`
+  counts the visitor's address; the web forwards its visitors' addresses to the API.
+- Counts are kept per API process. With more than one instance, a shared store (Redis) plugs
+  in behind `LimiterStore` in the same file.
+
 ## Notes
 
 - Supabase's built-in email sender only delivers to members of the Supabase organization and
