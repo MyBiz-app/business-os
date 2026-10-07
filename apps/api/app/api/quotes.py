@@ -524,6 +524,8 @@ class ClientQuote(BaseModel):
     title: str
     status: QuoteStatus
     total: int
+    paid: int = 0
+    deposit_due: int = Field(default=0, description="What's left to pay now (accepted ones)")
     currency: str
     event_starts_at: datetime | None
     token: str = Field(description="Opens the quote by its private link")
@@ -535,7 +537,10 @@ def my_quotes(context: ClientDep) -> list[ClientQuote]:
     rows = context.session.execute(
         text(f"""
             SELECT q.number, q.kind, q.title, {EXPIRED} AS status,
-                   app.quote_total(q.id) AS total,
+                   app.quote_total(q.id) AS total, app.quote_paid(q.id) AS paid,
+                   CASE WHEN q.status = 'accepted' THEN greatest(
+                       round(app.quote_total(q.id) * q.deposit_percent / 100.0)::integer
+                       - app.quote_paid(q.id), 0) ELSE 0 END AS deposit_due,
                    q.currency, q.event_starts_at, q.token
             FROM app.quotes q JOIN app.tenants t ON t.id = q.tenant_id
             WHERE q.client_id = app.current_client_id() AND q.status <> 'draft'

@@ -419,7 +419,7 @@
       "newSession": "New meeting",
       "noSessions": "No meetings",
       "sessionsToday": "{count, plural, =0 {No meetings today} one {One meeting today} other {# meetings today}}",
-      "appTab": "Book",
+      "appTab": "Meetings",
       "appEmpty": "Nothing on this day.",
       "place": "The office",
       "profile": "Client details",
@@ -796,7 +796,13 @@
       "nextBooking": "Your next booking",
       "noUpcoming": "No upcoming bookings yet.",
       "today": "Today",
-      "bookClass": "Book a class"
+      "bookClass": "Book a class",
+      "waiting": "Waiting for you",
+      "payBill": "Pay bill {number}",
+      "payDeposit": "Pay the deposit for quote {number}",
+      "answerQuote": "Answer quote {number}",
+      "signDocument": "Sign “{name}”",
+      "signHint": "Sign by writing your name"
     },
     "schedule": {
       "title": "Schedule",
@@ -825,7 +831,8 @@
       "bought": "Done! {plan} is now in your plans.",
       "buyFailed": "The purchase didn't go through. Try again.",
       "receipts": "Receipts",
-      "noReceipts": "No receipts yet."
+      "noReceipts": "No receipts yet.",
+      "showAll": "Show all ({count})"
     },
     "profile": {
       "title": "Profile",
@@ -840,7 +847,15 @@
       "save": "Save details",
       "saved": "Saved.",
       "saveFailed": "Couldn't save. Try again.",
-      "firstNameRequired": "Please enter your first name."
+      "firstNameRequired": "Please enter your first name.",
+      "account": "In my account",
+      "toSign": "{count, plural, one {# to sign} other {# to sign}}",
+      "toPay": "To pay",
+      "toAnswer": "Needs an answer",
+      "quotesAndBills": "Quotes and bills",
+      "receipts": "My receipts",
+      "receiptsHint": "Every payment, with its receipt",
+      "noReceipts": "No payments yet."
     },
     "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
     "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",

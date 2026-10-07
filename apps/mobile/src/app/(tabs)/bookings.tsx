@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
+import { Badge, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -14,6 +15,14 @@ import { useBusiness } from "@/providers/business-provider";
 type Booking = components["schemas"]["ClientBooking"];
 type Entitlement = components["schemas"]["Entitlement"];
 type Plan = components["schemas"]["Plan"];
+
+const TONE: Partial<Record<Booking["status"], "primary" | "success" | "danger" | "muted">> = {
+  booked: "primary",
+  checked_in: "success",
+  no_show: "danger",
+};
+/** History shows the latest visits first; the rest on request. */
+const HISTORY_PAGE = 10;
 
 const CURRENT = new Set<Entitlement["state"]>(["active", "upcoming", "frozen"]);
 
@@ -44,6 +53,7 @@ export default function Bookings() {
   }, [api, scope, business]);
   const { data, loading, reload } = useLoad(load);
   const [buying, setBuying] = useState<string | null>(null);
+  const [allHistory, setAllHistory] = useState(false);
   const [purchase, setPurchase] = useState<{ ok: boolean; message: string } | null>(null);
 
   // Coming back from the payment page shows the new plan.
@@ -89,10 +99,14 @@ export default function Bookings() {
           <Text style={[local.meta, { color: palette.muted }]}>{tReview("rated", { count: booking.rating })}</Text>
         ) : null}
       </View>
-      <Text style={[local.status, { color: booking.status === "booked" ? palette.primary : palette.muted }]}>
-        {booking.session_status === "cancelled" ? tStatus("sessionCancelled") : tStatus(`statuses.${booking.status}`)}
-        {booking.late_cancel ? ` · ${tStatus("lateCancel")}` : ""}
-      </Text>
+      <Badge
+        label={
+          (booking.session_status === "cancelled" ? tStatus("sessionCancelled") : tStatus(`statuses.${booking.status}`)) +
+          (booking.late_cancel ? ` · ${tStatus("lateCancel")}` : "")
+        }
+        tone={TONE[booking.session_status === "cancelled" ? "cancelled" : booking.status] ?? "muted"}
+        palette={palette}
+      />
     </View>
   );
 
@@ -196,10 +210,13 @@ export default function Bookings() {
       )}
       {data?.past.length ? (
         <>
-          <Heading palette={palette} level={2}>
-            {t("history")}
-          </Heading>
-          <Card palette={palette}>{data.past.map(row)}</Card>
+          <SectionTitle
+            title={t("history")}
+            action={!allHistory && data.past.length > HISTORY_PAGE ? t("showAll", { count: data.past.length }) : undefined}
+            onAction={() => setAllHistory(true)}
+            palette={palette}
+          />
+          <Card palette={palette}>{(allHistory ? data.past : data.past.slice(0, HISTORY_PAGE)).map(row)}</Card>
         </>
       ) : null}
     </Screen>

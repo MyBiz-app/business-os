@@ -33,7 +33,9 @@ export default function Quotes() {
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <BackBar label={tProfile("title")} palette={palette} onPress={() => router.back()} />
-      <Heading palette={palette}>{t("title")}</Heading>
+      <Heading palette={palette}>
+        {data?.some((q) => q.kind === "bill") ? tProfile("quotesAndBills") : t("title")}
+      </Heading>
       {data && data.length === 0 && (
         <Card palette={palette}>
           <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>
@@ -43,9 +45,23 @@ export default function Quotes() {
         <ListRow
           key={quote.token}
           palette={palette}
-          title={`#${quote.number} · ${quote.title}`}
-          subtitle={formatMoney(quote.total, quote.currency, locale)}
-          trailing={<Badge label={t(`statuses.${quote.status}`)} tone={TONE[quote.status]} palette={palette} />}
+          title={quote.kind === "bill" ? `${t("public.billTitle", { number: quote.number })} · ${quote.title}` : `#${quote.number} · ${quote.title}`}
+          subtitle={
+            quote.deposit_due > 0
+              ? `${formatMoney(quote.total, quote.currency, locale)} · ${t("leftToPay", { amount: formatMoney(quote.deposit_due, quote.currency, locale) })}`
+              : formatMoney(quote.total, quote.currency, locale)
+          }
+          trailing={
+            quote.kind === "bill" ? (
+              <Badge
+                label={t(quote.deposit_due > 0 ? "public.billDue" : "public.billPaid")}
+                tone={quote.deposit_due > 0 ? "primary" : "success"}
+                palette={palette}
+              />
+            ) : (
+              <Badge label={t(`statuses.${quote.status}`)} tone={TONE[quote.status]} palette={palette} />
+            )
+          }
           onPress={() => void Linking.openURL(`${WEB_URL}/q/${quote.token}`)}
         />
       ))}

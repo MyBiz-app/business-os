@@ -1,16 +1,20 @@
 import { dayOf, todayIn } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
+import { Badge, ListRow } from "@business-os/app-kit/components/rows";
 import { Button, Card, elevation, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
+import { WEB_URL } from "@business-os/app-kit/lib/env";
+import { formatMoney } from "@business-os/app-kit/lib/money";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { useAccount } from "@/lib/use-account";
 import { useDependents } from "@/lib/use-dependents";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -28,6 +32,7 @@ export default function Home() {
     new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
   const { api, scope, business, palette } = useBusiness();
   const dependents = useDependents();
+  const account = useAccount();
 
   const load = useCallback(async () => {
     if (!business) return { sessions: [], appointments: 0, courts: 0, toReview: [] };
@@ -94,6 +99,42 @@ export default function Home() {
               onPress={() => router.push("/health")}
             />
           )}
+        </Card>
+      )}
+
+      {account.toPay.length + account.toAnswer.length + account.toSign.length > 0 && (
+        <Card palette={palette}>
+          <Text accessibilityRole="header" style={[local.reviewTitle, { color: palette.foreground }]}>
+            {t("waiting")}
+          </Text>
+          {account.toPay.map((quote) => (
+            <ListRow
+              key={`pay-${quote.token}`}
+              palette={palette}
+              title={t(quote.kind === "bill" ? "payBill" : "payDeposit", { number: quote.number })}
+              subtitle={quote.title}
+              trailing={<Badge label={formatMoney(quote.deposit_due, quote.currency, locale)} tone="primary" palette={palette} />}
+              onPress={() => void Linking.openURL(`${WEB_URL}/q/${quote.token}`)}
+            />
+          ))}
+          {account.toAnswer.map((quote) => (
+            <ListRow
+              key={`answer-${quote.token}`}
+              palette={palette}
+              title={t("answerQuote", { number: quote.number })}
+              subtitle={`${quote.title} · ${formatMoney(quote.total, quote.currency, locale)}`}
+              onPress={() => void Linking.openURL(`${WEB_URL}/q/${quote.token}`)}
+            />
+          ))}
+          {account.toSign.map((document) => (
+            <ListRow
+              key={`sign-${document.id}`}
+              palette={palette}
+              title={t("signDocument", { name: document.name })}
+              subtitle={t("signHint")}
+              onPress={() => router.push("/documents")}
+            />
+          ))}
         </Card>
       )}
 

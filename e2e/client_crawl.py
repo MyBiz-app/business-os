@@ -19,7 +19,7 @@ import helpers as h
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 owner_email = sys.argv[1]
 client_email = f"crawl{time.time_ns()}@example.com"
-SCREENS = ["home", "schedule", "bookings", "updates", "profile"]
+SCREENS = ["home", "schedule", "bookings", "updates", "profile", "receipts", "quotes", "documents"]
 axe = Axe()
 problems: list[str] = []
 

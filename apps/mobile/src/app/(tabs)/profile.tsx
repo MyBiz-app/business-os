@@ -1,12 +1,13 @@
 import { router } from "expo-router";
-import { useEffect, useState } from "react";
 import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { ProfileForm } from "@/components/profile-form";
+import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
+import { useAccount } from "@/lib/use-account";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
@@ -14,33 +15,21 @@ import { useSession } from "@business-os/app-kit/providers/session-provider";
 export default function Profile() {
   const t = useTranslations();
   const { session } = useSession();
-  const { businesses, business, select, palette, api, scope } = useBusiness();
-  // On-site services (#42) happen at the client's addresses.
-  const [onSite, setOnSite] = useState(false);
-  const [hasQuotes, setHasQuotes] = useState(false);
-  const [hasDocuments, setHasDocuments] = useState(false);
-  useEffect(() => {
-    if (!business) return;
-    let active = true;
-    void api
-      .GET("/client/appointments/services", { params: scope })
-      .then((r) => active && setOnSite((r.data ?? []).some((s) => s.on_site)))
-      .catch(() => undefined);
-    // Quotes the business sent me (#44).
-    void api
-      .GET("/client/quotes", { params: scope })
-      .then((r) => active && setHasQuotes((r.data ?? []).length > 0))
-      .catch(() => undefined);
-    // Documents the business shared with me (#45).
-    void api
-      .GET("/client/documents", { params: scope })
-      .then((r) => active && setHasDocuments((r.data ?? []).length > 0))
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [api, scope, business]);
+  const { businesses, business, select, palette } = useBusiness();
+  // Quotes and bills (#44, #45), documents (#45) and addresses for on-site services (#42).
+  const account = useAccount();
   const health = useHealth();
+  const hasBills = account.quotes.some((q) => q.kind === "bill");
+  const quotesTitle = hasBills ? t("client.profile.quotesAndBills") : t("quotes.title");
+  const quotesBadge =
+    account.toPay.length > 0
+      ? { label: t("client.profile.toPay"), tone: "primary" as const }
+      : account.toAnswer.length > 0
+        ? { label: t("client.profile.toAnswer"), tone: "primary" as const }
+        : null;
+  const healthTone = health?.state === "ok" ? "success" : health?.state === "needs_review" ? "muted" : "danger";
+  const hasAccountRows =
+    account.documents.length > 0 || account.quotes.length > 0 || account.receipts > 0 || account.onSite || !!business?.dependents || !!health?.form;
 
   return (
     <Screen palette={palette}>
@@ -54,62 +43,67 @@ export default function Profile() {
         </Text>
       </Card>
 
-      <ProfileForm key={business?.client_id} />
-
-      {hasDocuments && (
-        <Card palette={palette}>
-          <Text style={[styles.h2, { color: palette.foreground }]}>{t("documents.mine")}</Text>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("documents.mineHint")}</Text>
-          <Button label={t("documents.mine")} variant="secondary" palette={palette} onPress={() => router.push("/documents")} />
-        </Card>
+      {hasAccountRows && <SectionTitle title={t("client.profile.account")} palette={palette} />}
+      {account.documents.length > 0 && (
+        <ListRow
+          palette={palette}
+          title={t("documents.mine")}
+          subtitle={t("documents.mineHint")}
+          trailing={
+            account.toSign.length > 0 ? (
+              <Badge label={t("client.profile.toSign", { count: account.toSign.length })} tone="danger" palette={palette} />
+            ) : null
+          }
+          onPress={() => router.push("/documents")}
+        />
       )}
-
-      {hasQuotes && (
-        <Card palette={palette}>
-          <Text style={[styles.h2, { color: palette.foreground }]}>{t("quotes.title")}</Text>
-          <Button label={t("quotes.title")} variant="secondary" palette={palette} onPress={() => router.push("/quotes")} />
-        </Card>
+      {account.quotes.length > 0 && (
+        <ListRow
+          palette={palette}
+          title={quotesTitle}
+          trailing={quotesBadge ? <Badge label={quotesBadge.label} tone={quotesBadge.tone} palette={palette} /> : null}
+          onPress={() => router.push("/quotes")}
+        />
       )}
-
-      {onSite && (
-        <Card palette={palette}>
-          <Text style={[styles.h2, { color: palette.foreground }]}>{t("jobs.myAddresses")}</Text>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("jobs.myAddressesHint")}</Text>
-          <Button label={t("jobs.myAddresses")} variant="secondary" palette={palette} onPress={() => router.push("/addresses")} />
-        </Card>
+      {account.receipts > 0 && (
+        <ListRow
+          palette={palette}
+          title={t("client.profile.receipts")}
+          subtitle={t("client.profile.receiptsHint")}
+          onPress={() => router.push("/receipts")}
+        />
       )}
-
+      {account.onSite && (
+        <ListRow
+          palette={palette}
+          title={t("jobs.myAddresses")}
+          subtitle={t("jobs.myAddressesHint")}
+          onPress={() => router.push("/addresses")}
+        />
+      )}
       {business?.dependents && (
-        <Card palette={palette}>
-          <Text style={[styles.h2, { color: palette.foreground }]}>{t(`dependents.mine.${business.dependents}`)}</Text>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t(`dependents.mineHint.${business.dependents}`)}</Text>
-          <Button
-            label={t(`dependents.mine.${business.dependents}`)}
-            variant="secondary"
-            palette={palette}
-            onPress={() => router.push("/dependents")}
-          />
-        </Card>
+        <ListRow
+          palette={palette}
+          title={t(`dependents.mine.${business.dependents}`)}
+          subtitle={t(`dependents.mineHint.${business.dependents}`)}
+          onPress={() => router.push("/dependents")}
+        />
+      )}
+      {health?.form && (
+        <ListRow
+          palette={palette}
+          title={t("client.health.title")}
+          subtitle={t(`health.states.${health.state}`)}
+          trailing={
+            health.state === "ok" ? null : (
+              <Badge label={t(health.state === "expiring" ? "client.health.update" : "client.health.fill")} tone={healthTone} palette={palette} />
+            )
+          }
+          onPress={() => router.push("/health")}
+        />
       )}
 
-      {health?.form && (
-        <Card palette={palette}>
-          <Text style={[styles.h2, { color: palette.foreground }]}>{t("client.health.title")}</Text>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t(`health.states.${health.state}`)}</Text>
-          <Button
-            label={
-              health.state === "ok"
-                ? t("client.health.view")
-                : health.state === "expiring"
-                  ? t("client.health.update")
-                  : t("client.health.fill")
-            }
-            variant={health.state === "ok" ? "secondary" : "primary"}
-            palette={palette}
-            onPress={() => router.push("/health")}
-          />
-        </Card>
-      )}
+      <ProfileForm key={business?.client_id} />
 
       {businesses && businesses.length > 1 && (
         <SegmentedControl

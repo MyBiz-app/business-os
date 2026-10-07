@@ -419,7 +419,7 @@
       "newSession": "פגישה חדשה",
       "noSessions": "אין פגישות",
       "sessionsToday": "{count, plural, =0 {אין פגישות היום} one {פגישה אחת היום} other {# פגישות היום}}",
-      "appTab": "קביעה",
+      "appTab": "פגישות",
       "appEmpty": "אין כלום ביום הזה.",
       "place": "המשרד",
       "profile": "פרטי הלקוח",
@@ -796,7 +796,13 @@
       "nextBooking": "השיעור הבא שלך",
       "noUpcoming": "עדיין אין הרשמות קרובות.",
       "today": "היום",
-      "bookClass": "הרשמה לשיעור"
+      "bookClass": "הרשמה לשיעור",
+      "waiting": "מחכה לך",
+      "payBill": "לתשלום: חשבון {number}",
+      "payDeposit": "לתשלום: מקדמה להצעה {number}",
+      "answerQuote": "לאשר הצעת מחיר {number}",
+      "signDocument": "לחתום על „{name}”",
+      "signHint": "חותמים בכתיבת השם"
     },
     "schedule": {
       "title": "מערכת שעות",
@@ -825,7 +831,8 @@
       "bought": "בוצע! {plan} נוסף למנויים שלך.",
       "buyFailed": "הרכישה לא הושלמה. נסו שוב.",
       "receipts": "קבלות",
-      "noReceipts": "עדיין אין קבלות."
+      "noReceipts": "עדיין אין קבלות.",
+      "showAll": "הצגת הכול ({count})"
     },
     "profile": {
       "title": "פרופיל",
@@ -840,7 +847,15 @@
       "save": "שמירת הפרטים",
       "saved": "נשמר.",
       "saveFailed": "השמירה נכשלה. נסו שוב.",
-      "firstNameRequired": "יש להזין שם פרטי."
+      "firstNameRequired": "יש להזין שם פרטי.",
+      "account": "בחשבון שלי",
+      "toSign": "{count, plural, one {אחד לחתימה} other {# לחתימה}}",
+      "toPay": "לתשלום",
+      "toAnswer": "מחכה לתשובה",
+      "quotesAndBills": "הצעות מחיר וחשבונות",
+      "receipts": "הקבלות שלי",
+      "receiptsHint": "כל התשלומים, עם הקבלות",
+      "noReceipts": "עדיין אין תשלומים."
     },
     "spotsLeft": "{count, plural, one {נשאר מקום אחד} other {נשארו # מקומות}}",
     "full": "מלא{count, plural, =0 {} one { · ממתין אחד} other { · # ממתינים}}",

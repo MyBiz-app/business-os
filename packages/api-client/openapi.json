@@ -20389,6 +20389,17 @@
             "type": "integer",
             "title": "Total"
           },
+          "paid": {
+            "type": "integer",
+            "title": "Paid",
+            "default": 0
+          },
+          "deposit_due": {
+            "type": "integer",
+            "title": "Deposit Due",
+            "description": "What's left to pay now (accepted ones)",
+            "default": 0
+          },
           "currency": {
             "type": "string",
             "title": "Currency"
