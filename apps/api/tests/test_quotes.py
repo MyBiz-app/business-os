@@ -178,6 +178,11 @@ def test_clients_see_their_sent_quotes_only(
     mine = client.get("/client/quotes", headers=auth(user, studio["tenant_id"])).json()
     assert [q["title"] for q in mine] == ["Sent"]
     assert mine[0]["token"] == sent["token"] and draft["id"]
+    assert mine[0]["deposit_due"] == 0 and mine[0]["paid"] == 0  # nothing due before accepting
+    client.post(f"/public/quotes/{sent['token']}/answer", json={"accept": True, "name": "Dana"})
+    accepted = client.get("/client/quotes", headers=auth(user, studio["tenant_id"])).json()[0]
+    due = round(accepted["total"] * sent["deposit_percent"] / 100)
+    assert accepted["status"] == "accepted" and accepted["deposit_due"] == due
 
 
 def test_quotes_are_isolated_between_businesses(

@@ -4718,6 +4718,17 @@ export interface components {
             status: "draft" | "sent" | "accepted" | "declined" | "expired";
             /** Total */
             total: number;
+            /**
+             * Paid
+             * @default 0
+             */
+            paid: number;
+            /**
+             * Deposit Due
+             * @description What's left to pay now (accepted ones)
+             * @default 0
+             */
+            deposit_due: number;
             /** Currency */
             currency: string;
             /** Event Starts At */

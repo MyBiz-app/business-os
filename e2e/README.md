@@ -80,3 +80,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `quotes.py <owner email>` (on the photography demo, `--demo events`): quotes (#44) — a new quote with lines and an event saved as a draft and sent; the client opens the private link with no sign-in (English/dark phone), accepts with their name and pays the deposit; the business sees it paid and the event listed.
 
 `practice.py <owner email>` (on the accounting demo, `--demo office`): documents, time and bills (#45) — log time, set the retainer, upload a contract shared and asking to sign, bill the month and open the bill's link to pay (English/dark phone), and My time.
+
+`client_account.py <owner email>` (on the accounting demo, `--demo office`): the client app's account round (#98) — a new client sees a bill to pay, a quote to answer and a contract to sign on the home screen and in "In my account", signs the contract, and home stops asking (Hebrew/light, profile in dark).
