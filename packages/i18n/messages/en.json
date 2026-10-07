@@ -127,6 +127,11 @@
       "link_invalid": "This link is invalid or has expired. Please try again.",
       "generic": "Something went wrong. Please try again.",
       "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us."
+    },
+    "oauth": {
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "or": "or with email"
     }
   },
   "onboarding": {
@@ -2607,7 +2612,8 @@
       "errors": {
         "invalid": "Some details are missing or incorrect. Please check and try again.",
         "generic": "Something went wrong. Please try again in a moment."
-      }
+      },
+      "later": "Not now – explore a sample business first"
     },
     "presets": {
       "starter": "Starter",
