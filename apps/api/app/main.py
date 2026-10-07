@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Request
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from sqlalchemy import Engine, text
 
 from app.api import (
     appointments,
@@ -46,11 +50,18 @@ from app.api import health as health_declarations
 from app.api import settings as business_settings
 from app.api.routes import router
 from app.core.config import get_settings
+from app.core.db import get_engine
+from app.rate_limit import MemoryStore, limiter
 
 
 class HealthResponse(BaseModel):
     status: str
     environment: str
+
+
+class ReadyResponse(BaseModel):
+    status: str
+    database: str
 
 
 def create_app() -> FastAPI:
@@ -71,6 +82,9 @@ def create_app() -> FastAPI:
         response.headers.setdefault("Referrer-Policy", "no-referrer")
         return response
 
+    if settings.rate_limits_on:
+        app.middleware("http")(limiter(MemoryStore(), trust_forwarded=settings.trust_forwarded_for))
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
@@ -83,6 +97,20 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["system"])
     def health() -> HealthResponse:
         return HealthResponse(status="ok", environment=settings.environment)
+
+    @app.get("/health/ready", tags=["system"], responses={503: {"model": ReadyResponse}})
+    def ready(engine: Annotated[Engine, Depends(get_engine)]) -> ReadyResponse:
+        """Ready to serve: the database answers. Monitoring polls this; /health only says the
+        process is up."""
+        try:
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+        except Exception:
+            return JSONResponse(  # type: ignore[return-value]
+                ReadyResponse(status="unavailable", database="unreachable").model_dump(),
+                status_code=503,
+            )
+        return ReadyResponse(status="ok", database="ok")
 
     app.include_router(router)
     app.include_router(businesses.router)
