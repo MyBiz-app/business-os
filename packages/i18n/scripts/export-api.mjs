@@ -19,6 +19,7 @@ export function apiMessages(locale) {
     modules: { names: all.modules.names },
     locations: { mainBranch: all.locations.mainBranch, branchNumber: all.locations.branchNumber },
     samples: all.samples,
+    bills: all.bills,
     verticals: Object.fromEntries(Object.entries(all.verticals).map(([key, texts]) => [key, { name: texts.name }])),
   };
 }

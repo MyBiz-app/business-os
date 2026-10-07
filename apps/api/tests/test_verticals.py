@@ -1,3 +1,4 @@
+from dataclasses import replace
 from datetime import date, timedelta
 from uuid import uuid4
 
@@ -33,7 +34,9 @@ def test_prices_cover_every_currency() -> None:
 
 
 def test_planned_categories_are_listed_but_closed() -> None:
-    assert "professional" in CATALOG and "professional" not in VERTICAL_PACKS
+    # Every category is open today; a planned one would be listed but closed.
+    assert all(p.key in VERTICAL_PACKS for p in CATALOG.values() if p.is_open)
+    assert all(p.key not in VERTICAL_PACKS for p in CATALOG.values() if not p.is_open)
     assert {"fitness", "beauty", "clinic", "classes", "automotive"} <= set(VERTICAL_PACKS)
     for pack in VERTICAL_PACKS.values():
         assert pack.default_preset in PRESETS, pack.key
@@ -61,9 +64,11 @@ def test_every_open_industry_starts_a_business(
 
 
 def test_planned_and_unknown_industries_cannot_sign_up(
-    client: TestClient, auth: AuthHeaders
+    client: TestClient, auth: AuthHeaders, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    for key in ("professional", "spaceship"):
+    planned = replace(CATALOG["fitness"], key="coming_soon", status="planned")
+    monkeypatch.setitem(CATALOG, "coming_soon", planned)  # in the catalog, not open
+    for key in ("coming_soon", "spaceship"):
         business = {"name": "Nope", "vertical": key, "locale": "en",
                     "time_zone": "Asia/Jerusalem", "currency": "ILS"}  # fmt: skip
         assert client.post("/tenants", json=business, headers=auth(uuid4())).status_code == 422

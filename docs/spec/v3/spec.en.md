@@ -111,7 +111,7 @@ These need one new capability in the core first. Each capability is built once f
 | Pet services | dog grooming, training, boarding, dog day care | Dependents: several profiles under one client (pets; also children for Kids & Youth). **Built (#43): Pet services is open as beta** (grooming, training, day care); Kids & Youth keeps a profile per child |
 | Kids & Youth (full) | enrichment centers, camps, toddler gyms | Dependents and parent accounts |
 | Creative & events | photographers and studios, DJs, event suppliers, small venues | Quotes, deposits and event projects. **Built (#44): Creative & events is open as beta** |
-| Professional services | consultants, accountants, lawyers, agencies | Documents and retainers, time-based billing |
+| Professional services | consultants, accountants, lawyers, agencies | Documents and retainers, time-based billing. **Built (#45): Professional services is open as beta** |
 
 Until a category opens, interested businesses can leave their details through the contact form, which records the industry.
 

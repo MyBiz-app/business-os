@@ -100,6 +100,8 @@ export type Entry = {
   dependent_fields?: ClientField[];
   /** A booking must say which dependent it is for. */
   dependent_required?: boolean;
+  /** Time entries, retainers and monthly bills on the client card (#45). */
+  time_billing?: boolean;
   children?: Entry[];
 };
 
@@ -127,6 +129,7 @@ export type Vertical = {
   dependents: "pet" | "child" | null;
   dependentFields: ClientField[];
   dependentRequired: boolean;
+  timeBilling: boolean;
   children: string[];
 };
 
@@ -163,6 +166,7 @@ function build(): Map<string, Vertical> {
       dependents: entry.dependents !== undefined ? entry.dependents : (parent?.dependents ?? null),
       dependentFields: entry.dependent_fields ?? parent?.dependentFields ?? [],
       dependentRequired: entry.dependent_required ?? parent?.dependentRequired ?? false,
+      timeBilling: entry.time_billing ?? parent?.timeBilling ?? false,
       children: (entry.children ?? []).map((child) => child.key),
     };
     all.set(entry.key, vertical);

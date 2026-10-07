@@ -73,6 +73,9 @@ class QuoteCreate(QuoteFields):
 class QuoteSummary(BaseModel):
     id: UUID
     number: int
+    kind: Literal["quote", "bill"] = Field(
+        default="quote", description="bill: a month of time and retainer (#45)"
+    )
     title: str
     client_id: UUID
     client_name: str
@@ -102,6 +105,9 @@ class PublicQuote(BaseModel):
     """What the client sees by the private link."""
 
     number: int
+    kind: Literal["quote", "bill"] = "quote"
+    period_start: dt.date | None = None
+    period_end: dt.date | None = None
     title: str
     status: QuoteStatus
     currency: str
@@ -149,7 +155,7 @@ EXPIRED = """
               < (now() AT TIME ZONE t.time_zone)::date THEN 'expired' ELSE q.status END
 """
 SUMMARY = f"""
-    SELECT q.id, q.number, q.title, q.client_id,
+    SELECT q.id, q.number, q.kind, q.title, q.client_id,
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
            {EXPIRED} AS status, q.currency,
            app.quote_total(q.id) AS total, app.quote_paid(q.id) AS paid,
@@ -514,6 +520,7 @@ def pay_deposit(token: str, body: DepositPayment, session: AnonymousSessionDep) 
 
 class ClientQuote(BaseModel):
     number: int
+    kind: Literal["quote", "bill"] = "quote"
     title: str
     status: QuoteStatus
     total: int
@@ -527,7 +534,8 @@ def my_quotes(context: ClientDep) -> list[ClientQuote]:
     """The client's quotes in this business (sent ones), newest first."""
     rows = context.session.execute(
         text(f"""
-            SELECT q.number, q.title, {EXPIRED} AS status, app.quote_total(q.id) AS total,
+            SELECT q.number, q.kind, q.title, {EXPIRED} AS status,
+                   app.quote_total(q.id) AS total,
                    q.currency, q.event_starts_at, q.token
             FROM app.quotes q JOIN app.tenants t ON t.id = q.tenant_id
             WHERE q.client_id = app.current_client_id() AND q.status <> 'draft'

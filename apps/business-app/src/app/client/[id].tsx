@@ -1,5 +1,6 @@
 import type { components } from "@business-os/api-client";
 import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
+import { todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Linking, Text, View } from "react-native";
@@ -13,7 +14,7 @@ import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { fullName } from "@business-os/app-kit/lib/names";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { dependentsFor, termsFor } from "@business-os/app-kit/lib/vertical";
+import { billsByTime, dependentsFor, termsFor } from "@business-os/app-kit/lib/vertical";
 import { DependentForm } from "@business-os/app-kit/components/dependent-form";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -43,6 +44,10 @@ export default function ClientScreen() {
   const locale = useLocale();
   const { api, scope, tenant, palette, can } = useBusiness();
   const kind = dependentsFor(tenant).kind;
+  const tTime = useTranslations("time");
+  const timeBilling = billsByTime(tenant);
+  const [hours, setHours] = useState("");
+  const [work, setWork] = useState("");
   const [panel, setPanel] = useState<Panel>(null);
   const [planId, setPlanId] = useState<string | null>(null);
   const [method, setMethod] = useState<Method>("card");
@@ -338,6 +343,39 @@ export default function ClientScreen() {
               }}
             />
           )}
+        </Card>
+      )}
+
+      {timeBilling && (
+        <Card palette={palette}>
+          <SectionTitle title={tTime("title")} palette={palette} />
+          <Field label={tTime("hours")} palette={palette} value={hours} onChangeText={setHours} inputMode="decimal" placeholder="1.5" />
+          <Field label={tTime("what")} palette={palette} value={work} onChangeText={setWork} maxLength={500} />
+          <Button
+            label={tTime("log")}
+            palette={palette}
+            busy={busy}
+            disabled={!(Number(hours.replace(",", ".")) > 0) || !work.trim()}
+            onPress={() =>
+              void act(async () => {
+                unwrap(
+                  await api.POST("/time", {
+                    params: scope,
+                    body: {
+                      client_id: id,
+                      day: todayIn(tenant?.time_zone ?? "UTC"),
+                      minutes: Math.round(Number(hours.replace(",", ".")) * 60),
+                      description: work,
+                      billable: true,
+                    },
+                  }),
+                );
+                setHours("");
+                setWork("");
+                return tTime("logged");
+              })
+            }
+          />
         </Card>
       )}
 

@@ -53,6 +53,7 @@ class Settings(BaseSettings):
 
     # Public addresses used in emails (links to the web app and the client app).
     web_url: str = "http://localhost:3000"
+    api_url: str = "http://localhost:8000"  # this API's public address (signed file links)
     client_app_url: str = "http://localhost:8081"
     business_app_url: str = "http://localhost:8082"
     staff_app_url: str = "http://localhost:8083"

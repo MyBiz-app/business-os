@@ -83,4 +83,4 @@ A category that needs something the core cannot do yet (jobs at the client's add
 an owner, quotes and deposits) stays `planned` until that capability is built: see spec section
 4.3 and the phase 7 issues. Courts and rooms by the hour are built (#41): Sports & facilities is
 open as beta. Dependents are built (#43): Pet services is open as beta, and Kids activities keeps a
-profile per child. On-site jobs are built (#42): Home & field services is open as beta. Quotes and deposits are built (#44): Creative & events is open as beta.
+profile per child. On-site jobs are built (#42): Home & field services is open as beta. Quotes and deposits are built (#44): Creative & events is open as beta. Documents, retainers and time billing are built (#45): Professional services is open as beta (`"time_billing": true` in a pack shows time and monthly bills on the client card). Every category is now open.

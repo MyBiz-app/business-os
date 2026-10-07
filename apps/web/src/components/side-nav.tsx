@@ -4,6 +4,7 @@ import {
   BarChart3,
   Building2,
   Inbox,
+  Clock,
   FileSignature,
   Plug,
   ScrollText,
@@ -53,6 +54,7 @@ const ICONS = {
   audit: ScrollText,
   integrations: Plug,
   quotes: FileSignature,
+  time: Clock,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;

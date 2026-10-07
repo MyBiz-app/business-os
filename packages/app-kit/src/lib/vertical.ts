@@ -25,3 +25,9 @@ export function dependentsFor(business: { vertical?: string | null } | null | un
   const entry = business?.vertical && isVertical(business.vertical) ? vertical(business.vertical) : undefined;
   return { kind: entry?.dependents ?? null, required: entry?.dependentRequired ?? false };
 }
+
+/** Whether a business's industry bills by time (#45): time entries on the client card. */
+export function billsByTime(business: { vertical?: string | null } | null | undefined): boolean {
+  const entry = business?.vertical && isVertical(business.vertical) ? vertical(business.vertical) : undefined;
+  return entry?.timeBilling ?? false;
+}
