@@ -30,6 +30,7 @@ export default async function SettingsPage() {
         {[
           { href: "/settings/modules", title: t("modulesLink"), hint: t("modulesHint") },
           { href: "/settings/billing", title: t("billingLink"), hint: t("billingHint") },
+          { href: "/settings/integrations", title: t("integrationsLink"), hint: t("integrationsHint") },
         ].map((link) => (
           <Link key={link.href} href={link.href} className="flex items-center justify-between gap-3 card card-hover p-6">
             <span className="flex flex-col gap-1">

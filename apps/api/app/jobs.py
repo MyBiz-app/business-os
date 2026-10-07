@@ -6,6 +6,8 @@
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; see app/billing.py)
+    uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
+    uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
@@ -18,9 +20,11 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, create_engine, text
 
+from app import outbox
 from app.billing import bill_businesses
 from app.core.config import get_settings
 from app.email import MESSAGES_DIR, load_messages, render, send_emails, sender_from_settings
+from app.providers.choice import choose
 from app.scheduling import weekly_occurrences
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
@@ -195,15 +199,22 @@ def message_reminders(
     )
     texts: dict[str, dict] = {}
     per_tenant: dict[object, int] = {}
+    simulated: dict[object, tuple[bool, str]] = {}
     for row in rows:
+        if row["tenant_id"] not in simulated:  # the business's messaging provider (X13)
+            chosen = choose(conn, row["tenant_id"], "messaging")
+            simulated[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
+        is_simulated, provider = simulated[row["tenant_id"]]
         locale = row["locale"] if row["locale"] in ("he", "en") else "en"
         texts.setdefault(locale, load_messages(locale, messages_dir))
         _subject, body = render(texts[locale], row["kind"], row["payload"], row)
         conn.execute(
             text("""
                 INSERT INTO app.messages
-                    (tenant_id, client_id, channel, to_phone, body, status, notification_id)
-                VALUES (:t, :c, 'whatsapp', :phone, :body, 'sent', :n)
+                    (tenant_id, client_id, channel, to_phone, body, status, notification_id,
+                     simulated, provider, sent_at)
+                VALUES (:t, :c, 'whatsapp', :phone, :body, :status, :n, :simulated, :provider,
+                        CASE WHEN :simulated THEN now() END)
             """),
             {
                 "t": row["tenant_id"],
@@ -211,6 +222,9 @@ def message_reminders(
                 "phone": row["phone"].strip(),
                 "body": body[:1100],
                 "n": row["id"],
+                "status": "sent" if is_simulated else "queued",
+                "simulated": is_simulated,
+                "provider": provider,
             },
         )
         per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
@@ -223,6 +237,14 @@ def message_reminders(
             {"t": tenant_id, "n": count, "details": AUTOMATED_DETAILS},
         )
     return len(rows)
+
+
+def send_messages(conn: Connection) -> dict[str, int]:
+    return outbox.send_messages(conn)
+
+
+def issue_documents(conn: Connection) -> dict[str, int]:
+    return outbox.issue_documents(conn)
 
 
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
@@ -239,6 +261,8 @@ JOBS = {
     "send-emails": send_notification_emails,
     "message-reminders": message_reminders,
     "bill-businesses": bill_businesses,
+    "send-messages": send_messages,
+    "issue-documents": issue_documents,
 }
 
 

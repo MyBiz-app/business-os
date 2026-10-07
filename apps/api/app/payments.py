@@ -1,12 +1,19 @@
-"""Payment providers for client checkouts (see migration 0019).
+"""Payment providers for client checkouts (see migrations 0019 and 0048, decision X13).
 
-Only the simulated provider exists until the business's payment provider is chosen (O1).
-A real provider will add: creating a hosted payment page for a checkout (returning its URL),
-and verifying the provider's webhook before completing the checkout on a system connection."""
+The business's payments provider (its own connection, or the platform default) is chosen in
+app/providers/choice.py; `simulated` until a real provider is connected (O1, #46)."""
+
+from uuid import UUID
+
+from sqlalchemy.orm import Session
+
+from app.providers.choice import choose
 
 SIMULATED = "simulated"
 
 
-def provider_for_business() -> str:
-    """The provider new checkouts use."""
-    return SIMULATED
+def provider_for_business(db: Session | None = None, tenant_id: UUID | None = None) -> str:
+    """The provider new checkouts of the business use."""
+    if db is None:
+        return SIMULATED
+    return choose(db, tenant_id, "payments").info.name

@@ -74,3 +74,5 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 `onsite_app.py <owner email>` (needs `pnpm dev:app`, the demo): a new client adds their home under "My addresses" and books an AC service there.
 
 `jobs_app.py <owner email>` (needs `pnpm dev:business`, the demo): the owner opens the team's jobs of the day in the business app and moves one on its way.
+
+`integrations.py <owner email> <MyBiz team owner email>`: settings → Integrations lists the payments, invoicing and messaging providers; connecting one and going back to the default; the console lists every service with its default (English/dark on a phone).

@@ -4,6 +4,7 @@ import {
   BarChart3,
   Building2,
   Inbox,
+  Plug,
   ScrollText,
   Wallet,
   Bot,
@@ -49,6 +50,7 @@ const ICONS = {
   inbox: Inbox,
   billing: Wallet,
   audit: ScrollText,
+  integrations: Plug,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;

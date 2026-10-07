@@ -54,3 +54,17 @@ jobs:
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
         run: uv run python -m app.jobs message-reminders
+
+      - name: Send queued messages through each business's provider
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
+        run: uv run python -m app.jobs send-messages
+
+      - name: Issue receipts' documents with each business's invoicing provider
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
+        run: uv run python -m app.jobs issue-documents

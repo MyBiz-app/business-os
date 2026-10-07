@@ -34,11 +34,18 @@ class Receipt(BaseModel):
     currency: str
     method: Literal["card", "cash", "transfer", "other"]
     simulated: bool = Field(description="A sample from a test payment, not a tax document")
+    document_status: Literal["pending", "issued", "internal", "failed"] = Field(
+        default="internal",
+        description="The legal document from the business's invoicing provider (X13)",
+    )
+    document_number: str | None = None
+    document_url: str | None = None
 
 
 SELECT = """
     SELECT id, number, issued_at, business_name, client_id, client_name, client_email,
-           description, amount, currency, method, simulated
+           description, amount, currency, method, simulated, document_status,
+           document_number, document_url
     FROM app.receipts
 """
 
