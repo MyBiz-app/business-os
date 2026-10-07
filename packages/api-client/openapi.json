@@ -4339,6 +4339,168 @@
         }
       }
     },
+    "/bills/preview": {
+      "get": {
+        "tags": [
+          "time"
+        ],
+        "summary": "Billing Preview",
+        "description": "What billing the month would bill each client, before billing anyone.",
+        "operationId": "billing_preview",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+              "description": "YYYY-MM",
+              "title": "Month"
+            },
+            "description": "YYYY-MM"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BillPreview"
+                  },
+                  "title": "Response Billing Preview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/bills/run": {
+      "post": {
+        "tags": [
+          "time"
+        ],
+        "summary": "Billing Run",
+        "description": "Bills the month for the chosen clients at once. A client the month was already billed\nfor, or with nothing to bill, is skipped (bill them one by one from their card if needed).",
+        "operationId": "billing_run",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingRun"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingRunResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/integrations": {
       "get": {
         "tags": [
@@ -18175,6 +18337,68 @@
         ],
         "title": "AuditEntry"
       },
+      "BillPreview": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "client_name": {
+            "type": "string",
+            "title": "Client Name"
+          },
+          "monthly_amount": {
+            "type": "integer",
+            "title": "Monthly Amount"
+          },
+          "included_minutes": {
+            "type": "integer",
+            "title": "Included Minutes"
+          },
+          "worked_minutes": {
+            "type": "integer",
+            "title": "Worked Minutes",
+            "description": "Unbilled billable minutes in the month"
+          },
+          "extra_minutes": {
+            "type": "integer",
+            "title": "Extra Minutes",
+            "description": "Billed at the hourly rate"
+          },
+          "hourly_rate": {
+            "type": "integer",
+            "title": "Hourly Rate"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "billed": {
+            "type": "boolean",
+            "title": "Billed",
+            "description": "The month already has a bill for this client"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "client_name",
+          "monthly_amount",
+          "included_minutes",
+          "worked_minutes",
+          "extra_minutes",
+          "hourly_rate",
+          "total",
+          "currency",
+          "billed"
+        ],
+        "title": "BillPreview"
+      },
       "BillRequest": {
         "properties": {
           "month": {
@@ -18332,6 +18556,58 @@
           "open"
         ],
         "title": "BillingMonth"
+      },
+      "BillingRun": {
+        "properties": {
+          "month": {
+            "type": "string",
+            "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+            "title": "Month",
+            "description": "YYYY-MM"
+          },
+          "client_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Client Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month",
+          "client_ids"
+        ],
+        "title": "BillingRun"
+      },
+      "BillingRunResult": {
+        "properties": {
+          "bills": {
+            "items": {
+              "$ref": "#/components/schemas/Quote"
+            },
+            "type": "array",
+            "title": "Bills"
+          },
+          "skipped": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Skipped",
+            "description": "Already billed for the month, or nothing to bill"
+          }
+        },
+        "type": "object",
+        "required": [
+          "bills",
+          "skipped"
+        ],
+        "title": "BillingRunResult"
       },
       "Body_import_clients": {
         "properties": {

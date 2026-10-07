@@ -233,7 +233,8 @@
     "sales": "Sales",
     "resources": "Courts & rooms",
     "quotes": "Quotes",
-    "time": "My time"
+    "time": "My time",
+    "billingRun": "Billing"
   },
   "terms": {
     "fitness": {
@@ -3870,5 +3871,30 @@
       "hourly": "Billed by the hour: {rate}."
     },
     "logged": "Time logged."
+  },
+  "billingRun": {
+    "title": "Billing the month",
+    "subtitle": "Every client with a retainer or unbilled time, and what each would be billed. Choose who to bill and bill them all at once.",
+    "chooseMonth": "Choose the month",
+    "show": "Show",
+    "clientsToBill": "Clients to bill",
+    "totalToBill": "Total to bill",
+    "alreadyBilled": "Already billed",
+    "none": "No client has a retainer or unbilled time in this month.",
+    "tableCaption": "What each client would be billed",
+    "choose": "Bill",
+    "chooseClient": "Bill {name}",
+    "client": "Client",
+    "fee": "Monthly fee",
+    "hours": "Hours worked",
+    "extra": "Beyond the retainer",
+    "total": "Total",
+    "billed": "Billed",
+    "run": "{count, plural, =0 {Choose clients to bill} one {Bill one client} other {Bill # clients}}",
+    "failed": "Couldn't bill. Try again.",
+    "doneTitle": "Billing done",
+    "done": "{count, plural, =0 {Nobody was billed} one {One bill created; the client pays it by its link} other {# bills created; each client pays by their link}}",
+    "skipped": "{count, plural, one {One client was skipped (already billed or nothing to bill).} other {# clients were skipped (already billed or nothing to bill).}}",
+    "billFor": "Bill #{number} · {name}"
   }
 }

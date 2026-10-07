@@ -8,6 +8,7 @@ points to its bill and is never billed again."""
 
 import calendar
 import datetime as dt
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Annotated
 from uuid import UUID
@@ -236,15 +237,41 @@ def _hours(minutes: int) -> str:
     return f"{minutes / 60:.2f}".rstrip("0").rstrip(".")
 
 
-@router.post("/clients/{client_id}/bills", status_code=status.HTTP_201_CREATED)
-def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
-    """Bills a client's month: the retainer fee, and the unbilled billable time of the month
-    beyond the minutes it includes at its hourly rate (all of it when there is no fee)."""
-    db = context.session
-    ensure_not_erased(db, client_id)
-    year, month = (int(part) for part in body.month.split("-"))
-    first = dt.date(year, month, 1)
-    last = dt.date(year, month, calendar.monthrange(year, month)[1])
+def _month(value: str) -> tuple[dt.date, dt.date]:
+    year, month = (int(part) for part in value.split("-"))
+    return dt.date(year, month, 1), dt.date(year, month, calendar.monthrange(year, month)[1])
+
+
+def _words(db, tenant_id: UUID) -> dict[str, str]:
+    """The bill's words in the business's language (the client reads them)."""
+    locale = db.execute(
+        text("SELECT locale FROM app.tenants WHERE id = :id"), {"id": tenant_id}
+    ).scalar_one()
+    return load_all_messages(locale if locale in ("he", "en") else "en")["bills"]
+
+
+@dataclass
+class _Draft:
+    """A client's month as a bill, before it is written."""
+
+    fee: int
+    included: int
+    rate: int
+    worked: int
+    extra: int
+    lines: list[dict]
+    entry_ids: list[UUID]
+
+    @property
+    def total(self) -> int:
+        return sum(round(float(line["quantity"]) * line["unit_price"]) for line in self.lines)
+
+
+def _draft(
+    db, client_id: UUID, first: dt.date, last: dt.date, words: dict, *, lock: bool
+) -> _Draft:
+    """The retainer fee, and the month's unbilled billable time beyond the minutes it includes
+    at its hourly rate (all of it when there is no fee)."""
     retainer = (
         db.execute(
             text("SELECT * FROM app.retainers WHERE client_id = :id AND active"),
@@ -254,11 +281,11 @@ def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
         .first()
     )
     entries = db.execute(
-        text("""
+        text(f"""
             SELECT id, minutes FROM app.time_entries
             WHERE client_id = :id AND billable AND bill_id IS NULL
               AND day BETWEEN :first AND :last
-            FOR UPDATE
+            {"FOR UPDATE" if lock else ""}
         """),
         {"id": client_id, "first": first, "last": last},
     ).all()
@@ -267,12 +294,7 @@ def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
     included = retainer["included_minutes"] if retainer else 0
     rate = retainer["hourly_rate"] if retainer else 0
     extra = max(worked - included, 0) if fee else worked
-    # The bill's words in the business's language (the client reads them).
-    locale = db.execute(
-        text("SELECT locale FROM app.tenants WHERE id = :id"), {"id": context.tenant_id}
-    ).scalar_one()
-    words = load_all_messages(locale if locale in ("he", "en") else "en")["bills"]
-    period = f"{month:02d}/{year}"
+    period = f"{first.month:02d}/{first.year}"
     lines: list[dict] = []
     if fee:
         lines.append(
@@ -290,9 +312,14 @@ def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
                 "unit_price": rate,
             }
         )
-    if not lines:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="nothing_to_bill")
-    title = words["title"].replace("{month}", period)
+    return _Draft(fee, included, rate, worked, extra, lines, [e.id for e in entries])
+
+
+def _write_bill(
+    context: TenantContext, client_id: UUID, first: dt.date, last: dt.date, draft: _Draft, words
+) -> UUID:
+    db = context.session
+    title = words["title"].replace("{month}", f"{first.month:02d}/{first.year}")
     bill_id = db.execute(
         text("""
             INSERT INTO app.quotes
@@ -313,12 +340,129 @@ def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
         """),
         [
             {"t": context.tenant_id, "q": bill_id, "position": i, **line}
-            for i, line in enumerate(lines)
+            for i, line in enumerate(draft.lines)
         ],
     )
-    if entries:
+    if draft.entry_ids:
         db.execute(
             text("UPDATE app.time_entries SET bill_id = :bill WHERE id = ANY(:ids)"),
-            {"bill": bill_id, "ids": [e.id for e in entries]},
+            {"bill": bill_id, "ids": draft.entry_ids},
         )
-    return _load(db, bill_id)
+    return bill_id
+
+
+@router.post("/clients/{client_id}/bills", status_code=status.HTTP_201_CREATED)
+def bill_month(client_id: UUID, body: BillRequest, context: SalesDep) -> Quote:
+    """Bills a client's month: the retainer fee, and the unbilled billable time of the month
+    beyond the minutes it includes at its hourly rate (all of it when there is no fee)."""
+    db = context.session
+    ensure_not_erased(db, client_id)
+    first, last = _month(body.month)
+    words = _words(db, context.tenant_id)
+    draft = _draft(db, client_id, first, last, words, lock=True)
+    if not draft.lines:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="nothing_to_bill")
+    return _load(db, _write_bill(context, client_id, first, last, draft, words))
+
+
+class BillPreview(BaseModel):
+    client_id: UUID
+    client_name: str
+    monthly_amount: int
+    included_minutes: int
+    worked_minutes: int = Field(description="Unbilled billable minutes in the month")
+    extra_minutes: int = Field(description="Billed at the hourly rate")
+    hourly_rate: int
+    total: int
+    currency: str
+    billed: bool = Field(description="The month already has a bill for this client")
+
+
+class BillingRun(BaseModel):
+    month: str = Field(pattern=r"^\d{4}-(0[1-9]|1[0-2])$", description="YYYY-MM")
+    client_ids: list[UUID] = Field(min_length=1, max_length=500)
+
+
+class BillingRunResult(BaseModel):
+    bills: list[Quote]
+    skipped: list[UUID] = Field(description="Already billed for the month, or nothing to bill")
+
+
+def _candidates(db, first: dt.date, last: dt.date) -> list[dict]:
+    """Clients with an active retainer or unbilled billable time in the month."""
+    rows = db.execute(
+        text("""
+            SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
+                   EXISTS (
+                       SELECT 1 FROM app.quotes q
+                       WHERE q.client_id = c.id AND q.kind = 'bill' AND q.period_start = :first
+                   ) AS billed
+            FROM app.clients c
+            WHERE c.erased_at IS NULL AND (
+                EXISTS (SELECT 1 FROM app.retainers r WHERE r.client_id = c.id AND r.active)
+                OR EXISTS (
+                    SELECT 1 FROM app.time_entries e
+                    WHERE e.client_id = c.id AND e.billable AND e.bill_id IS NULL
+                      AND e.day BETWEEN :first AND :last
+                )
+            )
+            ORDER BY c.first_name, c.last_name
+        """),
+        {"first": first, "last": last},
+    ).mappings()
+    return [dict(row) for row in rows]
+
+
+@router.get("/bills/preview")
+def billing_preview(
+    context: SalesDep,
+    month: Annotated[str, Query(pattern=r"^\d{4}-(0[1-9]|1[0-2])$", description="YYYY-MM")],
+) -> list[BillPreview]:
+    """What billing the month would bill each client, before billing anyone."""
+    db = context.session
+    first, last = _month(month)
+    words = _words(db, context.tenant_id)
+    currency = db.execute(
+        text("SELECT currency FROM app.tenants WHERE id = :id"), {"id": context.tenant_id}
+    ).scalar_one()
+    previews = []
+    for client in _candidates(db, first, last):
+        draft = _draft(db, client["id"], first, last, words, lock=False)
+        previews.append(
+            BillPreview(
+                client_id=client["id"],
+                client_name=client["name"],
+                monthly_amount=draft.fee,
+                included_minutes=draft.included,
+                worked_minutes=draft.worked,
+                extra_minutes=draft.extra if draft.rate else 0,
+                hourly_rate=draft.rate,
+                total=draft.total,
+                currency=currency,
+                billed=client["billed"],
+            )
+        )
+    return previews
+
+
+@router.post("/bills/run")
+def billing_run(body: BillingRun, context: SalesDep) -> BillingRunResult:
+    """Bills the month for the chosen clients at once. A client the month was already billed
+    for, or with nothing to bill, is skipped (bill them one by one from their card if needed)."""
+    db = context.session
+    first, last = _month(body.month)
+    words = _words(db, context.tenant_id)
+    eligible = {c["id"]: c for c in _candidates(db, first, last)}
+    bills, skipped = [], []
+    for client_id in dict.fromkeys(body.client_ids):
+        candidate = eligible.get(client_id)
+        draft = (
+            _draft(db, client_id, first, last, words, lock=True)
+            if candidate and not candidate["billed"]
+            else None
+        )
+        if draft is None or not draft.lines:
+            skipped.append(client_id)
+            continue
+        bills.append(_load(db, _write_bill(context, client_id, first, last, draft, words)))
+    return BillingRunResult(bills=bills, skipped=skipped)
