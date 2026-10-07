@@ -1,10 +1,10 @@
 # Project status
 
-_Last updated: 2026-10-06_ · Updated with every merged pull request. Open work lives in
+_Last updated: 2026-10-07_ · Updated with every merged pull request. Open work lives in
 [GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
-**Now:** the apps' second round is merged (#85): the business app runs the whole day from the phone, the MyBiz team app has business and request cards. Phase 7: resources (#41) are done and opened Sports & facilities; dependents (#43) opened Pet services; on-site jobs (#42, decision X11) opened Home & field services. Also waiting: sign-up emails on staging (#48) and the open decisions below.
+**Now:** phase 7 is done: documents, retainers and time billing (#45) opened Professional services, so all ten categories in the catalog are open. Every outside service sits behind a swappable provider (X13). Also waiting: sign-up emails on staging (#48) and the open decisions below.
 **Next:** phase 7 is complete — all ten categories are open. Next: polishing the beta categories, the client app's round, and go-live work (#34) when the owner chooses providers. Real providers are connected last (go-live), behind the new integrations layer.
 
 ## Board
@@ -42,11 +42,6 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## Planned
 
-- Phase 7: [#41](https://github.com/adiredri/business-os/issues/41) resources (courts, rooms) ·
-  [#42](https://github.com/adiredri/business-os/issues/42) on-site jobs ·
-  [#43](https://github.com/adiredri/business-os/issues/43) dependents (pets, children) ·
-  [#44](https://github.com/adiredri/business-os/issues/44) quotes, deposits and events ·
-  [#45](https://github.com/adiredri/business-os/issues/45) documents and retainers
 - Go-live: [#48](https://github.com/adiredri/business-os/issues/48) domain and email ·
   [#49](https://github.com/adiredri/business-os/issues/49) WhatsApp and SMS ·
   [#50](https://github.com/adiredri/business-os/issues/50) Claude API key ·
