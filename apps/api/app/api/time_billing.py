@@ -8,6 +8,7 @@ points to its bill and is never billed again."""
 
 import calendar
 import datetime as dt
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Annotated
@@ -235,6 +236,9 @@ def set_retainer(client_id: UUID, body: RetainerUpdate, context: SalesDep) -> Re
 
 def _hours(minutes: int) -> str:
     return f"{minutes / 60:.2f}".rstrip("0").rstrip(".")
+
+
+MONTH = re.compile(r"\d{4}-(0[1-9]|1[0-2])")
 
 
 def _month(value: str) -> tuple[dt.date, dt.date]:

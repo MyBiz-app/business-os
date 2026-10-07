@@ -12,9 +12,18 @@ from fastapi import HTTPException, status
 from sqlalchemy import text
 
 from app.ai.tools import TOOLS, payload_hash
+from app.api import time_billing
 from app.api.bookings import cancel_booking, lock_session, place_booking
 from app.api.deps import TenantContext, has_module
 from app.notifications import notify_booking
+
+# What each action changed, for the audit log: the entity type and its id in the result.
+ENTITY = {
+    "book_client": ("booking", lambda result: result["booking_id"]),
+    "cancel_booking": ("booking", lambda result: result["booking_id"]),
+    "log_time": ("time_entry", lambda result: result["time_entry_id"]),
+    "bill_month": ("quote", lambda result: result["bills"][0]),
+}
 
 
 def _conflict(detail: str) -> HTTPException:
@@ -48,6 +57,15 @@ def _execute(tenant: TenantContext, tool_name: str, payload: dict[str, Any]) -> 
         cancel_booking(db, booking_id, row.session_id)
         notify_booking(db, booking_id, "booking_cancelled_by_studio")
         return {"booking_id": str(booking_id), "status": "cancelled"}
+    if tool_name == "log_time":
+        entry = time_billing.log_time(time_billing.TimeEntryCreate(**payload), tenant)
+        return {"time_entry_id": str(entry.id)}
+    if tool_name == "bill_month":
+        # Re-validated now: a client billed since the card was made is skipped.
+        result = time_billing.billing_run(time_billing.BillingRun(**payload), tenant)
+        if not result.bills:
+            raise _conflict("nothing_to_bill")
+        return {"bills": [str(bill.id) for bill in result.bills], "skipped": len(result.skipped)}
     raise _conflict("unknown_action")
 
 
@@ -114,13 +132,15 @@ def decide(tenant: TenantContext, user_id: UUID, action_id: UUID, confirm: bool)
             INSERT INTO app.audit_log
                 (tenant_id, actor_type, actor_id, on_behalf_of, action, entity_type, entity_id,
                  details)
-            VALUES (:tenant_id, 'ai', NULL, :user_id, :action, 'booking', :entity_id, :details)
+            VALUES (:tenant_id, 'ai', NULL, :user_id, :action, :entity_type, :entity_id,
+                    :details)
         """),
         {
             "tenant_id": tenant.tenant_id,
             "user_id": user_id,
             "action": f"assistant.{action['tool_name']}",
-            "entity_id": result["booking_id"],
+            "entity_type": ENTITY[action["tool_name"]][0],
+            "entity_id": ENTITY[action["tool_name"]][1](result),
             "details": json.dumps(
                 {"pending_action_id": str(action_id), "payload": action["payload"], **result}
             ),

@@ -1158,7 +1158,9 @@
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
     },
-    "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything."
+    "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything.",
+    "logTimePreview": "Log {hours} h for {client}: {description}",
+    "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all"
   },
   "modules": {
     "title": "Modules and plan",

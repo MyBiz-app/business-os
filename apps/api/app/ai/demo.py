@@ -15,6 +15,9 @@ from app.ai.gateway import LLMResponse, Usage
 MODEL = "demo"
 
 INTENTS: dict[str, tuple[str, ...]] = {
+    "balances": ("חייב", "חוב", "לא שילמ", "יתרה", "יתרות", "owe", "unpaid", "balance",
+                 "outstanding"),
+    "hours": ("שעות", "כמה זמן", "hours", "time logged", "logged"),
     "book": ("רשמ", "רשום", "תרשום", "להירשם", "book", "sign up", "enroll"),
     "leads": ("ליד", "מתעניינ", "פניות", "לחזור", "lead", "pipeline", "follow up", "inquir"),
     "inactive": ("לא הגיע", "לא הגיעו", "נעדר", "לפנות", "נטש", "inactive", "haven't come",
@@ -36,6 +39,7 @@ TEXT = {
             "- מה המחירים של המנויים?\n"
             "- למי צריך לחזור מהלידים?\n"
             "- תרשום את דנה לשיעור מחר\n"
+            "- מי עוד חייב לי כסף?\n"
             "כשיוגדר מפתח AI, אענה על כל שאלה."
         ),
         "metrics": "ב-30 הימים האחרונים:",
@@ -64,6 +68,14 @@ TEXT = {
         "leads": "הלידים לפי שלב:",
         "leads_due": "צריך לחזור היום אל:",
         "no_leads_due": "אין לידים שמחכים לחזרה היום.",
+        "balances": "סך הכול פתוח לתשלום: {total}",
+        "balances_list": "הכי גדולים:",
+        "no_balances": "אין חובות פתוחים על הצעות מחיר וחשבונות.",
+        "awaiting": "הצעות מחיר שמחכות לתשובה: {count}",
+        "bill_no": "חשבון {number}",
+        "quote_no": "הצעה {number}",
+        "hours": "החודש נרשמו {hours} שעות; {unbilled} שעות לחיוב עוד לא חויבו.",
+        "hours_clients": "לפי לקוח:",
         "stages": {
             "new": "חדש",
             "contacted": "נוצר קשר",
@@ -83,6 +95,7 @@ TEXT = {
             "- What do the plans cost?\n"
             "- Which leads need a follow-up?\n"
             "- Book Dana into tomorrow's class\n"
+            "- Who still owes me money?\n"
             "With an AI key set up, I can answer anything."
         ),
         "metrics": "In the last 30 days:",
@@ -111,6 +124,14 @@ TEXT = {
         "leads": "Leads by stage:",
         "leads_due": "Follow up today with:",
         "no_leads_due": "No leads are waiting for a follow-up today.",
+        "balances": "Open to collect in all: {total}",
+        "balances_list": "The largest:",
+        "no_balances": "No open balances on quotes and bills.",
+        "awaiting": "Quotes waiting for an answer: {count}",
+        "bill_no": "Bill {number}",
+        "quote_no": "Quote {number}",
+        "hours": "This month {hours} hours were logged; {unbilled} billable aren't billed yet.",
+        "hours_clients": "By client:",
         "stages": {
             "new": "New",
             "contacted": "Contacted",
@@ -132,9 +153,15 @@ def _tool(name: str, args: dict[str, Any], step: int) -> LLMResponse:
     return LLMResponse([block], "tool_use", MODEL, Usage())
 
 
-def _intent(question: str) -> str:
+# Intents that only make sense when their tool is offered ("hours" at a studio is about classes).
+REQUIRES = {"balances": "open_balances", "hours": "logged_time"}
+
+
+def _intent(question: str, available: set[str]) -> str:
     lowered = question.lower()
     for intent, words in INTENTS.items():
+        if intent in REQUIRES and REQUIRES[intent] not in available:
+            continue
         if any(word in lowered for word in words):
             return intent
     return "help"
@@ -174,7 +201,9 @@ class DemoProvider:
             if block.get("type") == "tool_result"
         ]
         available = {tool["name"] for tool in tools}
-        answer = self._answer(_intent(question), question, today, results, available, locale)
+        answer = self._answer(
+            _intent(question, available), question, today, results, available, locale
+        )
         if answer.stop_reason == "tool_use":
             return answer
         label = TEXT[locale]["label"]
@@ -288,6 +317,50 @@ class DemoProvider:
                     else t["days"].format(count=p["validity_days"])
                 )
                 lines.append(f"- {p['name']}: {{money:{p['price_minor_units']}}} · {extra}")
+            return _text("\n".join(lines))
+
+        if intent == "balances" and "open_balances" in available:
+            if not results:
+                return _tool("open_balances", {}, step)
+            result = results[-1]
+            owed = sorted(result.get("owed", []), key=lambda o: -o["left"])
+            awaiting = result.get("awaiting_answer", [])
+            lines = [t["balances"].format(total=f"{{money:{result.get('owed_total', 0)}}}")]
+            if owed:
+                lines.append(t["balances_list"])
+                for o in owed[:10]:
+                    number = t["bill_no" if o["kind"] == "bill" else "quote_no"]
+                    lines.append(
+                        f"- {o['client']} · {number.format(number=o['number'])}: "
+                        f"{{money:{o['left']}}}"
+                    )
+            else:
+                lines = [t["no_balances"]]
+            if awaiting:
+                lines += ["", t["awaiting"].format(count=len(awaiting))]
+            return _text("\n".join(lines))
+
+        if intent == "hours" and "logged_time" in available:
+            if not results:
+                return _tool(
+                    "logged_time",
+                    {
+                        "start_date": today.replace(day=1).isoformat(),
+                        "end_date": today.isoformat(),
+                        "client_id": "",
+                    },
+                    step,
+                )
+            result = results[-1]
+            lines = [
+                t["hours"].format(
+                    hours=f"{result.get('hours', 0):g}",
+                    unbilled=f"{result.get('billable_unbilled_hours', 0):g}",
+                )
+            ]
+            if result.get("per_client"):
+                lines.append(t["hours_clients"])
+                lines += [f"- {c['name']}: {c['hours']:g}" for c in result["per_client"][:8]]
             return _text("\n".join(lines))
 
         if intent == "book":
