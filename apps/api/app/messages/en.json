@@ -65,7 +65,18 @@
       "agent_finance": "Finance agent",
       "agent_marketing": "Marketing agent",
       "whatsapp": "WhatsApp",
-      "extra_location": "Extra locations"
+      "extra_location": "Extra locations",
+      "client_app_branded": "Branded app in the stores",
+      "crm_automation": "Leads on autopilot",
+      "whatsapp_ai": "AI on WhatsApp",
+      "pack_plus": "Plus bundle (space and messages)",
+      "pack_max": "Max bundle (space and messages)",
+      "support_priority": "Priority support",
+      "support_vip": "VIP support",
+      "setup_guided": "Guided setup",
+      "setup_full": "Done-for-you setup",
+      "noSupport": "Standard support",
+      "noPack": "Included amount"
     }
   },
   "locations": {
