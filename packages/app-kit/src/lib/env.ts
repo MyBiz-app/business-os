@@ -6,6 +6,7 @@ import Constants from "expo-constants";
 const devHost = Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL || `http://${devHost}:8000`;
+export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL || `http://${devHost}:3000`;
 
 export const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || `http://${devHost}:54321`;
 

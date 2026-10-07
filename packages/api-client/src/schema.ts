@@ -405,6 +405,208 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/quotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Quotes
+         * @description Quotes, newest first; by client or status (expired = sent and past its date).
+         */
+        get: operations["list_quotes"];
+        put?: never;
+        /** Create Quote */
+        post: operations["create_quote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/quotes/{quote_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Quote */
+        get: operations["get_quote"];
+        /**
+         * Update Quote
+         * @description Rewrites a draft (a sent quote is changed by copying it).
+         */
+        put: operations["update_quote"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/quotes/{quote_id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Quote
+         * @description Marks a draft as sent: its private link now works. Sending again is harmless.
+         */
+        post: operations["send_quote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/quotes/{quote_id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Quote
+         * @description A new draft with the same client, lines and terms (a new version of a sent quote).
+         */
+        post: operations["copy_quote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/quotes/{quote_id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record Quote Payment
+         * @description Staff record a payment for an accepted quote (the deposit or the balance, at the venue
+         *     or by transfer); never more than what is left.
+         */
+        post: operations["record_quote_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Events
+         * @description Event projects: accepted quotes with an event date in the window, soonest first.
+         */
+        get: operations["events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/quotes/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public Quote */
+        get: operations["public_quote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/quotes/{token}/answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Answer Quote
+         * @description Accepts (with a name) or declines a sent quote that is still valid.
+         */
+        post: operations["answer_quote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/quotes/{token}/deposit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pay Deposit
+         * @description Pays the deposit of an accepted quote through the business's payments provider (X13):
+         *     the simulated one records it now; a real one returns its payment page, and its webhook
+         *     records the payment.
+         */
+        post: operations["pay_deposit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/quotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Quotes
+         * @description The client's quotes in this business (sent ones), newest first.
+         */
+        get: operations["my_quotes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/integrations": {
         parameters: {
             query?: never;
@@ -3285,7 +3487,17 @@ export interface components {
             active?: boolean | null;
         };
         /** Answer */
-        Answer: {
+        "Answer-Input": {
+            /** Accept */
+            accept: boolean;
+            /**
+             * Name
+             * @description Who accepts
+             */
+            name?: string | null;
+        };
+        /** Answer */
+        "Answer-Output": {
             /** Id */
             id: string;
             /** Question */
@@ -4223,6 +4435,29 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** ClientQuote */
+        ClientQuote: {
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "sent" | "accepted" | "declined" | "expired";
+            /** Total */
+            total: number;
+            /** Currency */
+            currency: string;
+            /** Event Starts At */
+            event_starts_at: string | null;
+            /**
+             * Token
+             * @description Opens the quote by its private link
+             */
+            token: string;
+        };
         /** ClientReservation */
         ClientReservation: {
             session: components["schemas"]["ClientSession"];
@@ -4566,7 +4801,7 @@ export interface components {
              * Answers
              * @description The questions exactly as signed, with answers
              */
-            answers: components["schemas"]["Answer"][];
+            answers: components["schemas"]["Answer-Output"][];
             /** Statement */
             statement: string;
             /**
@@ -4701,6 +4936,65 @@ export interface components {
             notes?: string | null;
             /** Active */
             active?: boolean | null;
+        };
+        /** DepositPayment */
+        DepositPayment: {
+            /** Idempotency Key */
+            idempotency_key: string;
+        };
+        /** DepositResult */
+        DepositResult: {
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "sent" | "accepted" | "declined" | "expired";
+            /** Currency */
+            currency: string;
+            /** Lines */
+            lines: components["schemas"]["QuoteLine-Output"][];
+            /** Total */
+            total: number;
+            /** Paid */
+            paid: number;
+            /** Deposit Percent */
+            deposit_percent: number;
+            /** Deposit Due */
+            deposit_due: number;
+            /** Valid Until */
+            valid_until: string | null;
+            /** Event Starts At */
+            event_starts_at: string | null;
+            /** Event Place */
+            event_place: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Accepted At */
+            accepted_at: string | null;
+            /** Accepted Name */
+            accepted_name: string | null;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Business Locale
+             * @enum {string}
+             */
+            business_locale: "he" | "en";
+            /** Business Color */
+            business_color: string | null;
+            /** Time Zone */
+            time_zone: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Pay Url
+             * @description A real payments provider: pay the deposit on its page
+             */
+            pay_url?: string | null;
         };
         /** DirectMessage */
         DirectMessage: {
@@ -6186,6 +6480,58 @@ export interface components {
             /** Fields */
             fields: components["schemas"]["ProviderField"][];
         };
+        /**
+         * PublicQuote
+         * @description What the client sees by the private link.
+         */
+        PublicQuote: {
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "sent" | "accepted" | "declined" | "expired";
+            /** Currency */
+            currency: string;
+            /** Lines */
+            lines: components["schemas"]["QuoteLine-Output"][];
+            /** Total */
+            total: number;
+            /** Paid */
+            paid: number;
+            /** Deposit Percent */
+            deposit_percent: number;
+            /** Deposit Due */
+            deposit_due: number;
+            /** Valid Until */
+            valid_until: string | null;
+            /** Event Starts At */
+            event_starts_at: string | null;
+            /** Event Place */
+            event_place: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Accepted At */
+            accepted_at: string | null;
+            /** Accepted Name */
+            accepted_name: string | null;
+            /** Business Name */
+            business_name: string;
+            /**
+             * Business Locale
+             * @enum {string}
+             */
+            business_locale: "he" | "en";
+            /** Business Color */
+            business_color: string | null;
+            /** Time Zone */
+            time_zone: string;
+            /** Client Name */
+            client_name: string;
+        };
         /** Question */
         Question: {
             /** Text */
@@ -6204,6 +6550,163 @@ export interface components {
             /** Wants Ai Actions */
             wants_ai_actions: boolean;
         };
+        /** Quote */
+        Quote: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Status
+             * @description expired: sent and past its date
+             * @enum {string}
+             */
+            status: "draft" | "sent" | "accepted" | "declined" | "expired";
+            /** Currency */
+            currency: string;
+            /** Total */
+            total: number;
+            /** Paid */
+            paid: number;
+            /**
+             * Deposit Due
+             * @description What's left of the deposit (accepted quotes)
+             */
+            deposit_due: number;
+            /** Event Starts At */
+            event_starts_at: string | null;
+            /** Event Place */
+            event_place: string | null;
+            /** Valid Until */
+            valid_until: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Lines */
+            lines: components["schemas"]["QuoteLine-Output"][];
+            /** Deposit Percent */
+            deposit_percent: number;
+            /** Notes */
+            notes: string | null;
+            /**
+             * Token
+             * @description The private link: /q/{token}
+             */
+            token: string;
+            /** Sent At */
+            sent_at: string | null;
+            /** Accepted At */
+            accepted_at: string | null;
+            /** Accepted Name */
+            accepted_name: string | null;
+            /** Declined At */
+            declined_at: string | null;
+        };
+        /** QuoteCreate */
+        QuoteCreate: {
+            /** Title */
+            title: string;
+            /** Lines */
+            lines: components["schemas"]["QuoteLine-Input"][];
+            /**
+             * Deposit Percent
+             * @default 0
+             */
+            deposit_percent: number;
+            /** Valid Until */
+            valid_until?: string | null;
+            /**
+             * Event Date
+             * @description The event's local date, if any
+             */
+            event_date?: string | null;
+            /**
+             * Event Time
+             * @description The event's local start time
+             */
+            event_time?: string | null;
+            /** Event Place */
+            event_place?: string | null;
+            /**
+             * Notes
+             * @description Terms, what's included
+             */
+            notes?: string | null;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+        };
+        /** QuoteFields */
+        QuoteFields: {
+            /** Title */
+            title: string;
+            /** Lines */
+            lines: components["schemas"]["QuoteLine-Input"][];
+            /**
+             * Deposit Percent
+             * @default 0
+             */
+            deposit_percent: number;
+            /** Valid Until */
+            valid_until?: string | null;
+            /**
+             * Event Date
+             * @description The event's local date, if any
+             */
+            event_date?: string | null;
+            /**
+             * Event Time
+             * @description The event's local start time
+             */
+            event_time?: string | null;
+            /** Event Place */
+            event_place?: string | null;
+            /**
+             * Notes
+             * @description Terms, what's included
+             */
+            notes?: string | null;
+        };
+        /** QuoteLine */
+        "QuoteLine-Input": {
+            /** Description */
+            description: string;
+            /** Quantity */
+            quantity: number | string;
+            /**
+             * Unit Price
+             * @description Minor units
+             */
+            unit_price: number;
+        };
+        /** QuoteLine */
+        "QuoteLine-Output": {
+            /** Description */
+            description: string;
+            /** Quantity */
+            quantity: string;
+            /**
+             * Unit Price
+             * @description Minor units
+             */
+            unit_price: number;
+        };
         /** QuoteOut */
         QuoteOut: {
             /** Currency */
@@ -6218,6 +6721,53 @@ export interface components {
             };
             /** Total */
             total: number;
+        };
+        /** QuoteSummary */
+        QuoteSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Status
+             * @description expired: sent and past its date
+             * @enum {string}
+             */
+            status: "draft" | "sent" | "accepted" | "declined" | "expired";
+            /** Currency */
+            currency: string;
+            /** Total */
+            total: number;
+            /** Paid */
+            paid: number;
+            /**
+             * Deposit Due
+             * @description What's left of the deposit (accepted quotes)
+             */
+            deposit_due: number;
+            /** Event Starts At */
+            event_starts_at: string | null;
+            /** Event Place */
+            event_place: string | null;
+            /** Valid Until */
+            valid_until: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** RatingGroup */
         RatingGroup: {
@@ -7167,6 +7717,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** StaffPayment */
+        StaffPayment: {
+            /**
+             * Amount
+             * @description Minor units
+             */
+            amount: number;
+            /**
+             * Method
+             * @default cash
+             * @enum {string}
+             */
+            method: "cash" | "card" | "transfer" | "other";
+            /** Idempotency Key */
+            idempotency_key: string;
         };
         /** StaffSave */
         StaffSave: {
@@ -8618,6 +9184,431 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_quotes: {
+        parameters: {
+            query?: {
+                client_id?: string | null;
+                status?: ("draft" | "sent" | "accepted" | "declined" | "expired") | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_quote: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_quote: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_quote: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_quote: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_quote: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_quote_payment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                quote_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StaffPayment"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    events: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    public_quote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicQuote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    answer_quote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Answer-Input"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicQuote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pay_deposit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DepositPayment"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DepositResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_quotes: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientQuote"][];
+                };
             };
             /** @description Validation Error */
             422: {

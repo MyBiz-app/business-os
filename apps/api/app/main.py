@@ -27,6 +27,7 @@ from app.api import (
     platform,
     privacy,
     promo_codes,
+    quotes,
     receipts,
     reports,
     resources,
@@ -90,6 +91,9 @@ def create_app() -> FastAPI:
     app.include_router(onsite_jobs.router)
     app.include_router(onsite_jobs.client_router)
     app.include_router(webhooks.router)
+    app.include_router(quotes.router)
+    app.include_router(quotes.public_router)
+    app.include_router(quotes.client_router)
     app.include_router(integrations.router)
     app.include_router(client_notes.router)
     app.include_router(privacy.router)

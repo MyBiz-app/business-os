@@ -17,12 +17,18 @@ export default function Profile() {
   const { businesses, business, select, palette, api, scope } = useBusiness();
   // On-site services (#42) happen at the client's addresses.
   const [onSite, setOnSite] = useState(false);
+  const [hasQuotes, setHasQuotes] = useState(false);
   useEffect(() => {
     if (!business) return;
     let active = true;
     void api
       .GET("/client/appointments/services", { params: scope })
       .then((r) => active && setOnSite((r.data ?? []).some((s) => s.on_site)))
+      .catch(() => undefined);
+    // Quotes the business sent me (#44).
+    void api
+      .GET("/client/quotes", { params: scope })
+      .then((r) => active && setHasQuotes((r.data ?? []).length > 0))
       .catch(() => undefined);
     return () => {
       active = false;
@@ -43,6 +49,13 @@ export default function Profile() {
       </Card>
 
       <ProfileForm key={business?.client_id} />
+
+      {hasQuotes && (
+        <Card palette={palette}>
+          <Text style={[styles.h2, { color: palette.foreground }]}>{t("quotes.title")}</Text>
+          <Button label={t("quotes.title")} variant="secondary" palette={palette} onPress={() => router.push("/quotes")} />
+        </Card>
+      )}
 
       {onSite && (
         <Card palette={palette}>

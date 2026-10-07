@@ -10,9 +10,9 @@ on:
         description: "Email of the account (signed up on staging already)"
         required: true
       demo:
-        description: "studio: one fitness studio; club: a padel club renting courts by the hour; pets: a pet grooming salon with owners and their pets; jobs: an air-conditioning company with on-site jobs at clients addresses; owner: a pilates chain (5 branches) and a barbershop (3); platform: MyBiz console data (6 customer businesses, contact requests) for a platform owner"
+        description: "studio: one fitness studio; club: a padel club renting courts by the hour; pets: a pet grooming salon with owners and their pets; jobs: an air-conditioning company with on-site jobs at clients addresses; events: a photography studio with quotes, deposits and events; owner: a pilates chain (5 branches) and a barbershop (3); platform: MyBiz console data (6 customer businesses, contact requests) for a platform owner"
         type: choice
-        options: [owner, studio, club, pets, jobs, platform]
+        options: [owner, studio, club, pets, jobs, events, platform]
         default: owner
       owner_name:
         description: "Display name for the account (optional)"

@@ -231,7 +231,8 @@
     "locked": "לא בחבילה שלך",
     "lockedItem": "{name} — לא בחבילה שלך",
     "sales": "מכירות",
-    "resources": "מגרשים וחדרים"
+    "resources": "מגרשים וחדרים",
+    "quotes": "הצעות מחיר"
   },
   "terms": {
     "fitness": {
@@ -385,6 +386,25 @@
       "profile": "פרטי הלקוח",
       "visitNotes": "הערות עבודה",
       "nextBooking": "הביקור הבא שלך"
+    },
+    "events": {
+      "client": "לקוח/ה",
+      "clients": "לקוחות",
+      "addClient": "הוספת לקוח/ה",
+      "newClient": "לקוח/ה חדש/ה",
+      "searchClients": "חיפוש לקוחות",
+      "noClients": "עדיין אין לקוחות",
+      "noResults": "אין לקוחות שמתאימים לחיפוש",
+      "schedule": "יומן",
+      "newSession": "פגישה חדשה",
+      "noSessions": "אין פגישות",
+      "sessionsToday": "{count, plural, =0 {אין פגישות היום} one {פגישה אחת היום} other {# פגישות היום}}",
+      "appTab": "קביעה",
+      "appEmpty": "אין כלום ביום הזה.",
+      "place": "הסטודיו",
+      "profile": "פרטי האירוע",
+      "visitNotes": "הערות",
+      "nextBooking": "הפגישה הבאה שלך"
     }
   },
   "clients": {
@@ -3054,7 +3074,9 @@
         "כל אירוע במקום אחד"
       ],
       "heroTitle": "מהשיחה הראשונה ועד היום הגדול.",
-      "heroText": "צלמים ואולפנים, DJs, ספקי אירועים ואולמות קטנים: הצעות מחיר, מקדמות וכל יום אירוע במקום אחד."
+      "heroText": "צלמים ואולפנים, DJs, ספקי אירועים ואולמות קטנים: הצעות מחיר, מקדמות וכל יום אירוע במקום אחד.",
+      "yours": "הסטודיו שלך",
+      "example": "סטודיו שעת זהב"
     },
     "professional": {
       "name": "שירותים מקצועיים",
@@ -3259,6 +3281,22 @@
     "pest_control": {
       "name": "הדברה",
       "tagline": "טיפולים לדירות, בתים ומשרדים."
+    },
+    "photographers": {
+      "name": "צלמים וסטודיו",
+      "tagline": "צילומים, אירועים ואלבומים, מהצעת המחיר ועד המסירה."
+    },
+    "djs": {
+      "name": "תקליטנים ונגנים",
+      "tagline": "תאריכי אירועים שנשמרים עם מקדמה."
+    },
+    "event_suppliers": {
+      "name": "ספקי אירועים",
+      "tagline": "עיצוב, קייטרינג והשכרות עם הצעות מחיר."
+    },
+    "small_venues": {
+      "name": "מקומות אירוח קטנים",
+      "tagline": "סיורים, הצעות מחיר וימי אירוע."
     }
   },
   "clientFields": {
@@ -3360,6 +3398,14 @@
       "apartment": "דירה",
       "house": "בית פרטי",
       "office": "משרד",
+      "other": "אחר"
+    },
+    "event_type": "סוג אירוע",
+    "event_type_options": {
+      "wedding": "חתונה",
+      "bar_mitzvah": "בר/בת מצווה",
+      "birthday": "יום הולדת",
+      "corporate": "אירוע חברה",
       "other": "אחר"
     }
   },
@@ -3596,6 +3642,101 @@
       "messaging": {
         "title": "וואטסאפ ו-SMS",
         "hint": "שולח את ההודעות והתזכורות ללקוחות."
+      }
+    }
+  },
+  "quotes": {
+    "title": "הצעות מחיר",
+    "subtitle": "שולחים הצעת מחיר, הלקוח מאשר בלחיצה ומשלם מקדמה.",
+    "new": "הצעת מחיר חדשה",
+    "back": "כל הצעות המחיר",
+    "none": "עדיין אין כאן הצעות מחיר.",
+    "noneForClient": "עדיין אין הצעות מחיר ללקוח הזה.",
+    "filter": "סינון לפי מצב",
+    "filters": {
+      "all": "הכול",
+      "draft": "טיוטות",
+      "sent": "נשלחו",
+      "accepted": "אושרו",
+      "declined": "נדחו",
+      "expired": "פג תוקף"
+    },
+    "statuses": {
+      "draft": "טיוטה",
+      "sent": "נשלחה",
+      "accepted": "אושרה",
+      "declined": "נדחתה",
+      "expired": "פג תוקף"
+    },
+    "client": "לקוח/ה",
+    "chooseClient": "בחירת לקוח/ה",
+    "titleField": "כותרת",
+    "titleHint": "למשל: צילום חתונה, התקנת מזגן",
+    "lines": "מה כלול",
+    "lineDescription": "פריט {number}",
+    "description": "תיאור",
+    "quantity": "כמות",
+    "unitPrice": "מחיר ליחידה",
+    "amount": "סכום",
+    "addLine": "הוספת פריט",
+    "removeLine": "הסרת פריט {number}",
+    "total": "סה״כ",
+    "deposit": "מקדמה (%)",
+    "depositHint": "משולמת עם האישור; 0 בלי מקדמה.",
+    "validUntilField": "בתוקף עד",
+    "eventDate": "תאריך האירוע",
+    "eventHint": "אם ההצעה היא לאירוע.",
+    "eventTime": "שעת התחלה",
+    "eventPlace": "מקום",
+    "notes": "תנאים והערות",
+    "notesHint": "מה כלול, תנאי ביטול…",
+    "saveDraft": "שמירת טיוטה",
+    "edit": "עריכה",
+    "send": "שליחה ללקוח",
+    "draftHint": "טיוטה אפשר לערוך. אחרי השליחה הלקוח יכול לפתוח אותה בקישור פרטי.",
+    "share": "שליחה ושיתוף",
+    "copyLink": "העתקת הקישור",
+    "copied": "הועתק",
+    "preview": "כמו שהלקוח רואה",
+    "copyAsNew": "העתקה כגרסה חדשה",
+    "whatsappText": "היי {name}, מצורפת הצעת המחיר עבור {title}: {link}",
+    "acceptedBy": "אושרה על ידי {name} ב-{date}",
+    "paid": "שולם",
+    "due": "נותר לתשלום",
+    "method": "אמצעי תשלום",
+    "recordPayment": "רישום תשלום",
+    "event": "האירוע",
+    "eventOn": "אירוע {date}",
+    "eventsLink": "אירועים",
+    "eventsTitle": "אירועים קרובים",
+    "eventsSubtitle": "הצעות מחיר שאושרו עם תאריך אירוע, הקרובות קודם.",
+    "noEvents": "אין אירועים קרובים.",
+    "leftToPay": "נותרו {amount} לתשלום",
+    "fullyPaid": "שולם במלואו",
+    "depositOf": "מקדמה: {percent}% ({amount})",
+    "paidSoFar": "שולם: {amount}",
+    "balance": "נותר: {amount}",
+    "validUntil": "בתוקף עד {date}",
+    "public": {
+      "title": "הצעת מחיר {number}",
+      "for": "עבור {name}",
+      "missing": "הצעת המחיר לא נמצאה",
+      "answer": "התשובה שלך",
+      "name": "השם המלא שלך",
+      "nameHint": "כתיבת השם מאשרת שקראת ואת/ה מאשר/ת את ההצעה ותנאיה.",
+      "accept": "אישור ההצעה",
+      "decline": "לא תודה",
+      "acceptedBy": "אושרה על ידי {name}. תודה!",
+      "payDeposit": "תשלום המקדמה · {amount}",
+      "depositPaid": "המקדמה שולמה. נתראה!",
+      "processing": "התשלום מאומת; רעננו בעוד רגע.",
+      "declined": "דחית את ההצעה הזו.",
+      "expired": "תוקף ההצעה פג. אפשר לבקש מהעסק הצעה חדשה.",
+      "errors": {
+        "name_required": "כדי לאשר צריך לכתוב שם.",
+        "expired": "תוקף ההצעה פג.",
+        "already_answered": "כבר ענית על ההצעה הזו.",
+        "generic": "משהו השתבש. נסו שוב."
       }
     }
   }

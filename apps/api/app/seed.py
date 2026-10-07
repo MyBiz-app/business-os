@@ -246,11 +246,21 @@ AC_COMPANY = BusinessSpec(
     clients=150,
     staff_per_branch=3,
 )
+PHOTO_STUDIO = BusinessSpec(
+    name="סטודיו שעת זהב (דמו)",
+    vertical="photographers",
+    color="#a21caf",
+    billing_name="שעת זהב צילום בע״מ",
+    branches=(BranchSpec("יפו", "יפת 30, תל אביב-יפו"),),
+    clients=120,
+    staff_per_branch=2,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
     "pets": (GROOMING_SALON,),
     "jobs": (AC_COMPANY,),
+    "events": (PHOTO_STUDIO,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
@@ -936,6 +946,7 @@ def seed(
             profile_rows)  # fmt: skip
     dependents = _seed_dependents(conn, tenant_id, spec.vertical, [c.id for c in clients], rng)
     jobs = _seed_jobs(conn, tenant_id, [c.id for c in clients], rng)
+    quotes = _seed_quotes(conn, tenant_id, owner, [c.id for c in clients], pack, today, rng)
     by_id = {s["id"]: s for s in sessions}
     attended = [b for b in booking_rows if b.get("status") == "checked_in"]
     notes = COACH_NOTES if category == "fitness" else GENERIC_NOTES
@@ -1019,7 +1030,8 @@ def seed(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "
         f"{len(clients)} clients, {lead_count} leads, {len(sessions)} sessions, "
         f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings, "
-        f"{reservations} reservations, {dependents} pets / children, {jobs} on-site jobs."
+        f"{reservations} reservations, {dependents} pets / children, {jobs} on-site jobs, "
+        f"{quotes} quotes."
     )
     return tenant_id
 
@@ -1141,6 +1153,122 @@ def _seed_jobs(
         """),
         {"t": tenant_id},
     ).rowcount
+
+
+QUOTE_PACKAGES = (
+    ("צילום חתונה", (("חבילת יום מלא", 1, 850000), ("שעת צילום נוספת", 2, 60000),
+                     ("אלבום מעוצב", 1, 180000))),
+    ("צילום בר מצווה", (("צילומי חוץ", 1, 250000), ("צילום האירוע", 1, 450000))),
+    ("צילומי משפחה", (("סשן חוץ של שעה", 1, 90000), ("תמונות מעובדות", 20, 3000))),
+    ("אירוע חברה", (("צילום כנס חצי יום", 1, 320000), ("עריכה ומסירה מהירה", 1, 80000))),
+)  # fmt: skip
+PLACES = ("גן אירועים, הרצליה", "אולם ביפו", "בית הכנסת הגדול, רמת גן", "חוף הצוק, תל אביב",
+          "מלון בירושלים")  # fmt: skip
+
+
+def _seed_quotes(
+    conn: Connection,
+    tenant_id: UUID,
+    owner: UUID,
+    client_ids: list[UUID],
+    pack: object,
+    today: date,
+    rng: random.Random,
+) -> int:
+    """Quotes for an industry that works by quotes (#44): drafts, sent, accepted with deposits
+    (some fully paid) and events in the coming months, a few declined."""
+    if getattr(pack, "category", None) != "events":
+        return 0
+    count = 0
+    for client_id in rng.sample(client_ids, k=min(45, len(client_ids))):
+        title, lines = rng.choice(QUOTE_PACKAGES)
+        status = rng.choices(("draft", "sent", "accepted", "declined"), weights=(10, 25, 55, 10))[0]
+        created = today - timedelta(days=rng.randint(1, 60))
+        event = today + timedelta(days=rng.randint(5, 200))
+        number = conn.execute(
+            text("""
+                INSERT INTO app.quote_counters AS c (tenant_id, last) VALUES (:t, 1001)
+                ON CONFLICT (tenant_id) DO UPDATE SET last = c.last + 1 RETURNING last
+            """),
+            {"t": tenant_id},
+        ).scalar_one()
+        quote_id = conn.execute(
+            text("""
+                INSERT INTO app.quotes
+                    (tenant_id, client_id, number, title, status, currency, deposit_percent,
+                     valid_until, event_starts_at, event_place, notes, sent_at, accepted_at,
+                     accepted_name, declined_at, created_by, created_at)
+                SELECT :t, c.id, :number, :title, :status, 'ILS', 30, :valid, :event,
+                       :place, 'כולל עריכה ומסירה תוך 30 יום.',
+                       CASE WHEN :status <> 'draft' THEN CAST(:created AS timestamptz) END,
+                       CASE WHEN :status = 'accepted'
+                            THEN CAST(:created AS timestamptz) + interval '2 days' END,
+                       CASE WHEN :status = 'accepted'
+                            THEN trim(c.first_name || ' ' || coalesce(c.last_name, '')) END,
+                       CASE WHEN :status = 'declined'
+                            THEN CAST(:created AS timestamptz) + interval '3 days' END,
+                       :owner, :created
+                FROM app.clients c WHERE c.id = :client
+                RETURNING id
+            """),
+            {
+                "t": tenant_id,
+                "client": client_id,
+                "number": number,
+                "title": title,
+                "status": status,
+                "valid": created + timedelta(days=30),
+                "event": datetime.combine(event, time(17, 0), tzinfo=UTC),
+                "place": rng.choice(PLACES),
+                "created": datetime.combine(created, time(10, 0), tzinfo=UTC),
+                "owner": owner,
+            },
+        ).scalar_one()
+        total = 0
+        for position, (description, quantity, price) in enumerate(lines):
+            total += quantity * price
+            conn.execute(
+                text("""
+                    INSERT INTO app.quote_lines
+                        (tenant_id, quote_id, position, description, quantity, unit_price)
+                    VALUES (:t, :q, :p, :d, :n, :u)
+                """),
+                {
+                    "t": tenant_id,
+                    "q": quote_id,
+                    "p": position,
+                    "d": description,
+                    "n": quantity,
+                    "u": price,
+                },
+            )
+        if status == "accepted":
+            payments = [round(total * 0.3)]
+            if rng.random() < 0.3:
+                payments.append(total - payments[0])  # the balance too
+            for i, amount in enumerate(payments):
+                conn.execute(
+                    text("""
+                        INSERT INTO app.payments
+                            (tenant_id, client_id, amount, currency, status, provider, method,
+                             idempotency_key, quote_id, description, created_at)
+                        VALUES (:t, :c, :a, 'ILS', 'succeeded', 'simulated', :m, :k, :q, :d, :at)
+                    """),
+                    {
+                        "t": tenant_id,
+                        "c": client_id,
+                        "a": amount,
+                        "m": "card" if i == 0 else "transfer",
+                        "k": f"seed-quote-{quote_id}-{i}",
+                        "q": quote_id,
+                        "d": f"{title} · {number}",
+                        "at": datetime.combine(
+                            created + timedelta(days=2 + i * 20), time(12, 0), tzinfo=UTC
+                        ),
+                    },
+                )
+        count += 1
+    return count
 
 
 def seed_demo(
@@ -1574,6 +1702,7 @@ def main() -> None:
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
         "pets: a pet grooming salon with owners and their pets; "
         "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
+        "events: a photography studio with quotes, deposits and events; "
         "owner: a pilates chain with five branches and a barbershop with three; "
         "platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",

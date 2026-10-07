@@ -97,6 +97,12 @@ if ("payments", "testpay") not in REGISTRY.providers:
             )
 
 
+def signed(event: dict, secret: bytes = b"k") -> tuple[bytes, str]:
+    """A notification as the stand-in payments provider sends it."""
+    raw = json.dumps(event).encode()
+    return raw, hmac.new(secret, raw, hashlib.sha256).hexdigest()
+
+
 def connect(client: TestClient, headers: dict, capability: str, provider: str, **settings):
     return client.put(
         f"/integrations/{capability}",
