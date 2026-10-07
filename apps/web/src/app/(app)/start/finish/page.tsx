@@ -45,6 +45,9 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
         <Link href="/start" className="btn-primary px-5 py-3">
           {t("finish.rebuild")}
         </Link>
+        <Link href="/welcome?fresh=1" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+          {t("finish.later")}
+        </Link>
       </main>
     );
   }
@@ -67,6 +70,9 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
           <Lock aria-hidden="true" className="size-4" />
           {t("finish.secure")}
         </p>
+        <Link href="/welcome?fresh=1" className="w-fit text-sm text-muted underline underline-offset-4 hover:text-foreground">
+          {t("finish.later")}
+        </Link>
       </section>
 
       <aside aria-labelledby="finish-plan" className="card flex h-fit flex-col gap-4 p-5 lg:sticky lg:top-24">

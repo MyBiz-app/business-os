@@ -3,15 +3,23 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { resumePath } from "@/lib/resume";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { SampleForm } from "./sample-form";
 
 /** Where a new account lands (decision T79): create the business now, or first explore a
- * sample business filled with fictitious data. People who already have a business go on. */
-export default async function WelcomePage() {
+ * sample business filled with fictitious data. People who already have a business go on,
+ * and people who planned one in the sign-up journey return to its payment step. */
+export default async function WelcomePage({ searchParams }: PageProps<"/welcome">) {
   const { membership } = await getActiveMembership();
   if (membership) redirect("/dashboard");
+  // Signed up from the journey or an invitation, then signed in some other way (e.g. the
+  // confirmation link opened in another browser): carry on from there, not from scratch.
+  if (!(await searchParams).fresh) {
+    const resume = await resumePath();
+    if (resume) redirect(resume);
+  }
   const t = await getTranslations("welcome");
 
   return (

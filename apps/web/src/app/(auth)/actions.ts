@@ -4,8 +4,10 @@ import type { AuthError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { OAUTH_PROVIDERS, type OAuthProvider } from "@/lib/auth-providers";
 import { AUTH_NEXT_COOKIE, safeNext } from "@/lib/navigation";
 import { siteOrigin } from "@/lib/origin";
+import { resumeMetadata } from "@/lib/resume";
 import { createClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; notice?: string; email?: string };
@@ -42,16 +44,34 @@ export async function login(_state: FormState, formData: FormData): Promise<Form
   redirect(safeNext(formData.get("next")) ?? "/dashboard");
 }
 
+/** Google or Apple: off to the provider, back through /auth/confirm, then on to `next`. */
+export async function oauthSignIn(formData: FormData): Promise<void> {
+  const provider = String(formData.get("provider") ?? "") as OAuthProvider;
+  if (!OAUTH_PROVIDERS.includes(provider)) redirect("/login");
+  const next = safeNext(formData.get("next"));
+  // The return trip is in this same browser, so the destination can wait in a cookie (the
+  // redirect address stays fixed, as Supabase's allow list wants).
+  if (next) {
+    (await cookies()).set(AUTH_NEXT_COOKIE, next, { path: "/", maxAge: 60 * 60, httpOnly: true, sameSite: "lax" });
+  }
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: `${await siteOrigin()}/auth/confirm` },
+  });
+  redirect(error || !data.url ? "/login?error=link_invalid" : data.url);
+}
+
 export async function signup(_state: FormState, formData: FormData): Promise<FormState> {
   const email = field(formData, "email");
   const supabase = await createClient();
+  const next = safeNext(formData.get("next"));
   const { data, error } = await supabase.auth.signUp({
     email,
     password: String(formData.get("password") ?? ""),
-    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm` },
+    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm`, data: resumeMetadata(next) },
   });
   if (error) return { error: errorKey(error), email };
-  const next = safeNext(formData.get("next"));
   // Email confirmation turned off (e.g. on staging, before an email provider): signed in now.
   if (data.session) redirect(next ?? "/dashboard");
   // Where to go after the email link is confirmed (e.g. back to an invitation).
