@@ -1,7 +1,8 @@
 """Documents, time and monthly bills (#45) on the accounting demo
 (`python -m app.seed --owner-email <owner> --demo office`): on a client's card the accountant
 logs time, sets the retainer, uploads a contract shared with the client and asking to sign it,
-bills the month, and the bill opens by its private link to pay; "My time" shows the hours.
+bills the month, and the bill opens by its private link to pay; "My time" shows the hours;
+then "Billing the month" bills every client at once.
 Hebrew/light on a wide screen, the bill's link in English/dark on a phone.
 
 Usage: python e2e/practice.py <owner email of the demo> (its password is helpers.PASSWORD)"""
@@ -78,7 +79,7 @@ with sync_playwright() as p:
     documents.locator("select[name=kind]").select_option("contract")
     documents.get_by_label("לבקש מהלקוח לחתום").check()
     documents.get_by_role("button", name="העלאה").click()
-    expect(documents.get_by_role("link", name="הסכם התקשרות 2026")).to_be_visible()
+    expect(documents.get_by_role("link", name="הסכם התקשרות 2026").first).to_be_visible()
     expect(documents.get_by_text("ממתין לחתימה").first).to_be_visible()
     check(page, "client-card")
     print("3. contract uploaded, shared and waiting for the client's signature: ok")
@@ -105,6 +106,25 @@ with sync_playwright() as p:
     expect(page.get_by_text("הכנת דוח מע״מ").first).to_be_visible()
     check(page, "my-time")
     print("5. My time shows the logged work: ok")
+
+    # 6. Billing the month for every client at once (this month: its time isn't billed yet).
+    with psycopg.connect(h.DATABASE_URL) as conn:
+        month = conn.execute(
+            "SELECT to_char(now() AT TIME ZONE time_zone, 'YYYY-MM') FROM app.tenants WHERE id = %s",
+            (tenant_id,),
+        ).fetchone()[0]
+    page.goto(f"{h.BASE}/bills?month={month}"); h.ready(page)
+    expect(page.get_by_role("heading", name="חיוב חודשי", level=1)).to_be_visible()
+    rows = page.get_by_role("table").get_by_role("checkbox", checked=True)
+    chosen = rows.count()
+    assert chosen > 1, f"expected several clients to bill, got {chosen}"
+    check(page, "billing-run")
+    page.get_by_role("button", name=re.compile(f"^חיוב {chosen} לקוחות")).click()
+    expect(page.get_by_role("heading", name=re.compile(f"נוצרו {chosen} חשבונות"))).to_be_visible(timeout=30000)
+    check(page, "billing-run-done")
+    page.goto(f"{h.BASE}/bills?month={month}"); h.ready(page)
+    expect(page.get_by_role("table").get_by_role("checkbox", checked=True)).to_have_count(0)
+    print(f"6. billed {chosen} clients at once for {month}; a second look shows them billed: ok")
     b.close()
 
 if issues:

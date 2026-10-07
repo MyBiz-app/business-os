@@ -201,3 +201,51 @@ def test_signed_links_open_one_file_for_a_while(
     assert verify(sign("document:x:y", ttl=-1)) is None  # expired
     other = upload(client, studio["headers"], joined["client_id"], "private.pdf")
     assert client.post(f"/client/documents/{other['id']}/link", headers=me).status_code == 404
+
+
+def test_billing_run_previews_and_bills_the_month(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    dana = new_client(client, headers, "Dana")
+    noa = new_client(client, headers, "Noa")
+    idle = new_client(client, headers, "Idle")  # neither a retainer nor time: not listed
+    client.put(
+        f"/clients/{dana}/retainer",
+        json={"monthly_amount": 200000, "included_minutes": 120, "hourly_rate": 30000},
+        headers=headers,
+    )
+    for who, minutes in ((dana, 180), (noa, 90)):
+        client.post(
+            "/time",
+            json={"client_id": who, "day": "2026-09-08", "minutes": minutes, "description": "Work"},
+            headers=headers,
+        )
+    client.put(
+        f"/clients/{noa}/retainer",
+        json={"monthly_amount": 0, "included_minutes": 0, "hourly_rate": 20000},
+        headers=headers,
+    )
+
+    preview = client.get("/bills/preview", params={"month": "2026-09"}, headers=headers)
+    assert preview.status_code == 200, preview.text
+    rows = {row["client_id"]: row for row in preview.json()}
+    assert set(rows) == {dana, noa} and idle not in rows
+    assert rows[dana]["total"] == 200000 + 30000 and rows[dana]["extra_minutes"] == 60
+    assert rows[noa]["total"] == 30000 and rows[noa]["billed"] is False
+
+    run = client.post(
+        "/bills/run", json={"month": "2026-09", "client_ids": [dana, noa, idle]}, headers=headers
+    )
+    assert run.status_code == 200, run.text
+    result = run.json()
+    assert sorted(b["total"] for b in result["bills"]) == [30000, 230000]
+    assert result["skipped"] == [idle]
+
+    # Once billed, the month is marked and a second run bills nobody twice.
+    again = client.get("/bills/preview", params={"month": "2026-09"}, headers=headers).json()
+    assert all(row["billed"] for row in again if row["client_id"] == dana)
+    second = client.post(
+        "/bills/run", json={"month": "2026-09", "client_ids": [dana, noa]}, headers=headers
+    ).json()
+    assert second["bills"] == [] and set(second["skipped"]) == {dana, noa}
+    bad = client.get("/bills/preview", params={"month": "2026-13"}, headers=headers)
+    assert bad.status_code == 422

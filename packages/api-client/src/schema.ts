@@ -833,6 +833,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/bills/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Billing Preview
+         * @description What billing the month would bill each client, before billing anyone.
+         */
+        get: operations["billing_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bills/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Billing Run
+         * @description Bills the month for the chosen clients at once. A client the month was already billed
+         *     for, or with nothing to bill, is skipped (bill them one by one from their card if needed).
+         */
+        post: operations["billing_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/integrations": {
         parameters: {
             query?: never;
@@ -3854,6 +3895,41 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** BillPreview */
+        BillPreview: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /** Monthly Amount */
+            monthly_amount: number;
+            /** Included Minutes */
+            included_minutes: number;
+            /**
+             * Worked Minutes
+             * @description Unbilled billable minutes in the month
+             */
+            worked_minutes: number;
+            /**
+             * Extra Minutes
+             * @description Billed at the hourly rate
+             */
+            extra_minutes: number;
+            /** Hourly Rate */
+            hourly_rate: number;
+            /** Total */
+            total: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Billed
+             * @description The month already has a bill for this client
+             */
+            billed: boolean;
+        };
         /** BillRequest */
         BillRequest: {
             /**
@@ -3921,6 +3997,26 @@ export interface components {
              * @description Minor units
              */
             open: number;
+        };
+        /** BillingRun */
+        BillingRun: {
+            /**
+             * Month
+             * @description YYYY-MM
+             */
+            month: string;
+            /** Client Ids */
+            client_ids: string[];
+        };
+        /** BillingRunResult */
+        BillingRunResult: {
+            /** Bills */
+            bills: components["schemas"]["Quote"][];
+            /**
+             * Skipped
+             * @description Already billed for the month, or nothing to bill
+             */
+            skipped: string[];
         };
         /** Body_import_clients */
         Body_import_clients: {
@@ -10748,6 +10844,79 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_preview: {
+        parameters: {
+            query: {
+                /** @description YYYY-MM */
+                month: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillPreview"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BillingRun"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingRunResult"];
                 };
             };
             /** @description Validation Error */
