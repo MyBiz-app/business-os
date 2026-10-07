@@ -20,6 +20,7 @@ from app.api import bookings as bookings_api
 from app.api import plans as plans_api
 from app.api import resources as resources_api
 from app.api import schedule as schedule_api
+from app.api import time_billing as time_api
 from app.api.deps import TenantContext
 from app.metrics import METRICS, compute, members_at_risk, previous_period
 from app.permissions import Permission
@@ -49,6 +50,7 @@ class Tool:
     permission: Permission
     run: Callable[[ToolContext, dict[str, Any]], dict[str, Any]]
     module: str | None = None  # extra module the tool needs (actions need AI Pro)
+    feature: str | None = None  # an industry feature it needs (e.g. time_billing)
 
     def definition(self) -> dict[str, Any]:
         return {
@@ -354,6 +356,106 @@ def lead_pipeline(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
 # --- Write tools: pending actions ------------------------------------------------------------
 
 
+def open_balances(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
+    """Quotes and bills: what clients still owe on accepted ones, and sent quotes awaiting an
+    answer."""
+    rows = ctx.tenant.session.execute(
+        text("""
+            SELECT q.number, q.kind, q.title, q.status, q.currency,
+                   trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client,
+                   app.quote_total(q.id) AS total, app.quote_paid(q.id) AS paid, q.sent_at
+            FROM app.quotes q JOIN app.clients c ON c.id = q.client_id
+            WHERE q.status IN ('sent', 'accepted')
+            ORDER BY q.sent_at
+        """)
+    ).mappings()
+    owed, awaiting = [], []
+    for row in rows:
+        item = {
+            "number": row["number"],
+            "kind": row["kind"],
+            "client": row["client"],
+            "title": row["title"],
+            "total": row["total"],
+            "currency": row["currency"],
+        }
+        if row["status"] == "accepted" and row["total"] > row["paid"]:
+            owed.append({**item, "paid": row["paid"], "left": row["total"] - row["paid"]})
+        elif row["status"] == "sent":
+            awaiting.append(item)
+    return {
+        "amounts": "minor units",
+        "owed_total": sum(o["left"] for o in owed),
+        "owed": owed[:MAX_ROWS],
+        "awaiting_answer": awaiting[:MAX_ROWS],
+    }
+
+
+def logged_time(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    """Time logged in a period: totals per client and per staff member, and what isn't billed."""
+    start, end = _date(args["start_date"], "start_date"), _date(args["end_date"], "end_date")
+    client_id = _uuid(args["client_id"], "client_id") if args.get("client_id") else None
+    entries = time_api.time_entries(
+        context=ctx.tenant, client_id=client_id, mine=False, start=start, end=end
+    )
+    per_client: dict[str, int] = {}
+    per_staff: dict[str, int] = {}
+    for entry in entries:
+        per_client[entry.client_name] = per_client.get(entry.client_name, 0) + entry.minutes
+        per_staff[entry.user_name] = per_staff.get(entry.user_name, 0) + entry.minutes
+    unbilled = sum(e.minutes for e in entries if e.billable and e.bill_id is None)
+
+    def top(totals: dict[str, int]) -> list[dict[str, Any]]:
+        ranked = sorted(totals.items(), key=lambda item: -item[1])[:MAX_ROWS]
+        return [{"name": name, "hours": round(minutes / 60, 2)} for name, minutes in ranked]
+
+    return {
+        "hours": round(sum(e.minutes for e in entries) / 60, 2),
+        "billable_unbilled_hours": round(unbilled / 60, 2),
+        "per_client": top(per_client),
+        "per_staff": top(per_staff),
+        "recent": [
+            {
+                "date": e.day.isoformat(),
+                "client": e.client_name,
+                "by": e.user_name,
+                "hours": round(e.minutes / 60, 2),
+                "description": e.description,
+            }
+            for e in entries[:10]
+        ],
+    }
+
+
+def _month_arg(value: str) -> str:
+    if not time_api.MONTH.fullmatch(value or ""):
+        raise ToolError("month must be YYYY-MM")
+    return value
+
+
+def billing_preview(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    """What billing the month would bill each client (retainer fee and hours beyond it)."""
+    rows = time_api.billing_preview(context=ctx.tenant, month=_month_arg(args["month"]))
+    to_bill = [r for r in rows if not r.billed and r.total > 0]
+    return {
+        "amounts": "minor units",
+        "clients_to_bill": len(to_bill),
+        "total_to_bill": sum(r.total for r in to_bill),
+        "already_billed": [r.client_name for r in rows if r.billed][:MAX_ROWS],
+        "clients": [
+            {
+                "client_id": str(r.client_id),
+                "name": r.client_name,
+                "monthly_fee": r.monthly_amount,
+                "hours_worked": round(r.worked_minutes / 60, 2),
+                "hours_beyond": round(r.extra_minutes / 60, 2),
+                "total": r.total,
+            }
+            for r in to_bill[:MAX_ROWS]
+        ],
+    }
+
+
 def payload_hash(tool_name: str, payload: dict[str, Any]) -> str:
     canonical = json.dumps({"tool": tool_name, "payload": payload}, sort_keys=True)
     return hashlib.sha256(canonical.encode()).hexdigest()
@@ -456,6 +558,55 @@ def cancel_booking(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         **_session_preview(ctx, row["session_id"]),
     }
     return _propose(ctx, "cancel_booking", {"booking_id": str(booking_id)}, preview)
+
+
+def log_time(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    client_id = _uuid(args["client_id"], "client_id")
+    client = get_client(ctx, {"client_id": str(client_id)})
+    day = _date(args["date"], "date")
+    minutes = args["minutes"]
+    if not isinstance(minutes, int) or not 1 <= minutes <= 1440:
+        raise ToolError("minutes must be between 1 and 1440")
+    description = str(args["description"]).strip()[:500]
+    if not description:
+        raise ToolError("say what was done (description)")
+    preview = {
+        "kind": "log_time",
+        "client": client["name"],
+        "date": day.isoformat(),
+        "hours": round(minutes / 60, 2),
+        "description": description,
+    }
+    payload = {
+        "client_id": str(client_id),
+        "day": day.isoformat(),
+        "minutes": minutes,
+        "description": description,
+    }
+    return _propose(ctx, "log_time", payload, preview)
+
+
+def bill_month(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    month = _month_arg(args["month"])
+    rows = {
+        str(r.client_id): r
+        for r in time_api.billing_preview(context=ctx.tenant, month=month)
+        if not r.billed and r.total > 0
+    }
+    wanted = args.get("client_ids") or list(rows)
+    chosen = [rows[c] for c in dict.fromkeys(wanted) if c in rows]
+    if not chosen:
+        raise ToolError("nothing to bill for that month (see billing_preview)")
+    preview = {
+        "kind": "bill_month",
+        "month": month,
+        "clients": len(chosen),
+        "names": [r.client_name for r in chosen][:5],
+        "total": sum(r.total for r in chosen),
+        "currency": chosen[0].currency,
+    }
+    payload = {"month": month, "client_ids": [str(r.client_id) for r in chosen]}
+    return _propose(ctx, "bill_month", payload, preview)
 
 
 DATE = {"type": "string", "description": "Local date, YYYY-MM-DD"}
@@ -573,16 +724,77 @@ TOOLS: dict[str, Tool] = {
             cancel_booking,
             module="ai_pro",
         ),
+        Tool(
+            "open_balances",
+            "Quotes and bills: what each client still owes on accepted ones (total, paid, left) "
+            "and sent quotes still waiting for the client's answer.",
+            {},
+            Permission.SALES_MANAGE,
+            open_balances,
+        ),
+        Tool(
+            "logged_time",
+            "Time staff logged for clients between two local dates (inclusive): hours per "
+            "client and per staff member, billable hours not billed yet, and the latest entries. "
+            "client_id narrows it to one client, or ''.",
+            {"start_date": DATE, "end_date": DATE, "client_id": {**ID, "description": "or ''"}},
+            Permission.CLIENTS_READ,
+            logged_time,
+            feature="time_billing",
+        ),
+        Tool(
+            "billing_preview",
+            "Billing a month (YYYY-MM): each client with a retainer or unbilled time, the "
+            "monthly fee, hours worked and beyond the retainer, and the total; who is billed.",
+            {"month": {"type": "string", "description": "YYYY-MM"}},
+            Permission.SALES_MANAGE,
+            billing_preview,
+            feature="time_billing",
+        ),
+        Tool(
+            "log_time",
+            "Propose logging the user's own time for a client: a local date, minutes and what "
+            "was done. Creates a card the user must confirm.",
+            {
+                "client_id": ID,
+                "date": DATE,
+                "minutes": {"type": "integer"},
+                "description": {"type": "string"},
+            },
+            Permission.CLIENTS_READ,
+            log_time,
+            module="ai_pro",
+            feature="time_billing",
+        ),
+        Tool(
+            "bill_month",
+            "Propose billing a month (YYYY-MM) for clients (ids from billing_preview; an empty "
+            "list bills everyone not billed yet). Each gets a bill they pay by its link. "
+            "Creates a card the user must confirm.",
+            {
+                "month": {"type": "string", "description": "YYYY-MM"},
+                "client_ids": {"type": "array", "items": {"type": "string"}},
+            },
+            Permission.SALES_MANAGE,
+            bill_month,
+            module="ai_pro",
+            feature="time_billing",
+        ),
     )
 }
 
 
 def _allowed(tool: Tool, permissions: frozenset[str], modules: set[str]) -> bool:
-    return tool.permission in permissions and (tool.module is None or tool.module in modules)
+    return (
+        tool.permission in permissions
+        and (tool.module is None or tool.module in modules)
+        and (tool.feature is None or tool.feature in modules)
+    )
 
 
 def tools_for(permissions: frozenset[str], modules: set[str]) -> list[Tool]:
-    """Only the tools the user's permissions and the business's modules allow are offered."""
+    """Only the tools the user's permissions and the business's modules (and its industry's
+    features, given in the same set) allow are offered."""
     return [tool for tool in TOOLS.values() if _allowed(tool, permissions, modules)]
 
 

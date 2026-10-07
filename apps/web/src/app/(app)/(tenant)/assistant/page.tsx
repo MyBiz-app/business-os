@@ -5,6 +5,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
+import { formatMoney } from "@/lib/money";
 import { canUseAssistant } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
@@ -24,21 +25,67 @@ const STATUS_TONE: Record<PendingAction["status"], string> = {
 
 async function ActionCard({ action }: { action: PendingAction }) {
   const t = await getTranslations("assistant");
-  const preview = action.preview as { kind: string; client: string; service: string; starts: string; full?: boolean; dependent?: string };
+  const preview = action.preview as {
+    kind: string;
+    client?: string;
+    service?: string;
+    starts?: string;
+    full?: boolean;
+    dependent?: string;
+    date?: string;
+    hours?: number;
+    description?: string;
+    month?: string;
+    clients?: number;
+    names?: string[];
+    total?: number;
+    currency?: string;
+  };
+  const locale = await getLocale();
+  const monthLabel = (month: string) =>
+    new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-15T12:00:00Z`));
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-background p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("needsConfirmation")}</p>
-      <p className="font-medium" dir="auto">
-        {preview.kind === "cancel_booking"
-          ? t("cancelPreview", { client: isolate(preview.client), service: isolate(preview.service) })
-          : t("bookPreview", {
-              // A pet or child comes; their owner / parent books (#43).
-              client: isolate(preview.dependent ? `${preview.dependent} (${preview.client})` : preview.client),
-              service: isolate(preview.service),
+      {preview.kind === "log_time" ? (
+        <p className="font-medium" dir="auto">
+          {t("logTimePreview", {
+            hours: new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(preview.hours ?? 0),
+            client: isolate(preview.client ?? ""),
+            description: isolate(preview.description ?? ""),
+          })}
+          {" · "}
+          <span dir="ltr">{preview.date}</span>
+        </p>
+      ) : preview.kind === "bill_month" ? (
+        <>
+          <p className="font-medium" dir="auto">
+            {t("billMonthPreview", {
+              count: preview.clients ?? 0,
+              month: monthLabel(preview.month ?? ""),
+              total: formatMoney(preview.total ?? 0, preview.currency ?? "ILS", locale),
             })}
-        {" · "}
-        <span dir="ltr">{preview.starts}</span>
-      </p>
+          </p>
+          {preview.names && preview.names.length > 0 && (
+            <p className="text-sm text-muted" dir="auto">
+              {preview.names.map((name) => isolate(name)).join(", ")}
+              {(preview.clients ?? 0) > preview.names.length ? "…" : ""}
+            </p>
+          )}
+        </>
+      ) : (
+        <p className="font-medium" dir="auto">
+          {preview.kind === "cancel_booking"
+            ? t("cancelPreview", { client: isolate(preview.client ?? ""), service: isolate(preview.service ?? "") })
+            : t("bookPreview", {
+                // A pet or child comes; their owner / parent books (#43).
+                client: isolate(preview.dependent ? `${preview.dependent} (${preview.client})` : (preview.client ?? "")),
+                service: isolate(preview.service ?? ""),
+              })}
+          {" · "}
+          <span dir="ltr">{preview.starts}</span>
+        </p>
+      )}
       {preview.full && <p className="text-sm text-muted">{t("fullWaitlist")}</p>}
       {action.status === "pending" ? (
         <div className="flex gap-2">
