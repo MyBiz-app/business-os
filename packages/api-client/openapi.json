@@ -13889,7 +13889,7 @@
           "modules"
         ],
         "summary": "Add Tenant Module",
-        "description": "Adds one module to the plan (the \"add to plan\" button on a locked module). Choosing an AI\ntier replaces the other one; adding a module the plan already has changes nothing.",
+        "description": "Adds one module to the plan (the \"add to plan\" button on a locked module). Choosing an AI\ntier (or any tier of a group) replaces the other one; adding a module the plan already has\nchanges nothing.",
         "operationId": "add_tenant_module",
         "security": [
           {
@@ -13904,13 +13904,22 @@
             "schema": {
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ],
               "type": "string",
@@ -19430,13 +19439,22 @@
                 "type": "string",
                 "enum": [
                   "client_app",
+                  "client_app_branded",
                   "ai_basic",
                   "ai_pro",
                   "crm",
+                  "crm_automation",
                   "analytics_pro",
                   "agent_finance",
                   "agent_marketing",
                   "whatsapp",
+                  "whatsapp_ai",
+                  "pack_plus",
+                  "pack_max",
+                  "support_priority",
+                  "support_vip",
+                  "setup_guided",
+                  "setup_full",
                   "extra_location"
                 ]
               },
@@ -19468,13 +19486,22 @@
             "type": "string",
             "enum": [
               "client_app",
+              "client_app_branded",
               "ai_basic",
               "ai_pro",
               "crm",
+              "crm_automation",
               "analytics_pro",
               "agent_finance",
               "agent_marketing",
               "whatsapp",
+              "whatsapp_ai",
+              "pack_plus",
+              "pack_max",
+              "support_priority",
+              "support_vip",
+              "setup_guided",
+              "setup_full",
               "extra_location"
             ],
             "title": "Key"
@@ -19497,13 +19524,22 @@
               "type": "string",
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ]
             },
@@ -19515,18 +19551,48 @@
               "type": "string",
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ]
             },
             "type": "array",
             "title": "Requires All"
+          },
+          "group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group",
+            "description": "Tiers of one thing: at most one per group"
+          },
+          "billing": {
+            "type": "string",
+            "enum": [
+              "monthly",
+              "once"
+            ],
+            "title": "Billing",
+            "description": "\"once\": charged with the first invoice only"
           }
         },
         "type": "object",
@@ -19536,7 +19602,9 @@
           "available",
           "per_unit",
           "requires_any",
-          "requires_all"
+          "requires_all",
+          "group",
+          "billing"
         ],
         "title": "CatalogModule"
       },
@@ -27142,22 +27210,62 @@
             "propertyNames": {
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ]
             },
             "type": "object",
             "title": "Lines"
           },
+          "once": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "enum": [
+                "client_app",
+                "client_app_branded",
+                "ai_basic",
+                "ai_pro",
+                "crm",
+                "crm_automation",
+                "analytics_pro",
+                "agent_finance",
+                "agent_marketing",
+                "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
+                "extra_location"
+              ]
+            },
+            "type": "object",
+            "title": "Once",
+            "description": "One-time services, with the first invoice"
+          },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Monthly"
           }
         },
         "type": "object",
@@ -27166,6 +27274,7 @@
           "core",
           "core_tier",
           "lines",
+          "once",
           "total"
         ],
         "title": "QuoteOut"
@@ -27478,13 +27587,22 @@
             "propertyNames": {
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ]
             },
@@ -28847,13 +28965,22 @@
             "propertyNames": {
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ]
             },
@@ -30532,13 +30659,22 @@
             "propertyNames": {
               "enum": [
                 "client_app",
+                "client_app_branded",
                 "ai_basic",
                 "ai_pro",
                 "crm",
+                "crm_automation",
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
                 "whatsapp",
+                "whatsapp_ai",
+                "pack_plus",
+                "pack_max",
+                "support_priority",
+                "support_vip",
+                "setup_guided",
+                "setup_full",
                 "extra_location"
               ]
             },

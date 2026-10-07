@@ -1187,7 +1187,18 @@
       "agent_finance": "Finance agent",
       "agent_marketing": "Marketing agent",
       "whatsapp": "WhatsApp",
-      "extra_location": "Extra locations"
+      "extra_location": "Extra locations",
+      "client_app_branded": "Branded app in the stores",
+      "crm_automation": "Leads on autopilot",
+      "whatsapp_ai": "AI on WhatsApp",
+      "pack_plus": "Plus bundle (space and messages)",
+      "pack_max": "Max bundle (space and messages)",
+      "support_priority": "Priority support",
+      "support_vip": "VIP support",
+      "setup_guided": "Guided setup",
+      "setup_full": "Done-for-you setup",
+      "noSupport": "Standard support",
+      "noPack": "Included amount"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -1199,9 +1210,20 @@
       "whatsapp": "Messages to clients and leads: broadcasts to a segment, templates and a send log.",
       "analytics_pro": "Deeper reports: cohorts, retention, revenue per client and per branch, with exports.",
       "agent_finance": "An AI agent that follows payments, debts and renewals, and prepares reminders for your approval.",
-      "agent_marketing": "An AI agent that finds clients to win back and drafts campaigns for your approval."
+      "agent_marketing": "An AI agent that finds clients to win back and drafts campaigns for your approval.",
+      "client_app_branded": "Your business's own app on the App Store and Google Play, published and updated by our team.",
+      "crm_automation": "Facebook and Instagram ad leads land on the board, and a follow-up goes out automatically.",
+      "whatsapp_ai": "Answers clients on WhatsApp 24/7 and offers free slots for you to confirm. Needs AI.",
+      "pack_plus": "20 GB for files and 1,000 messages a month.",
+      "pack_max": "100 GB for files and 5,000 messages a month.",
+      "support_priority": "Chat and phone, an answer within 4 business hours.",
+      "support_vip": "A personal account manager, a monthly call and an answer within an hour.",
+      "noSupport": "Email and help center, an answer by the next business day.",
+      "noPack": "2 GB for files and 200 messages a month."
     },
-    "followsBranches": "Follows your active branches"
+    "followsBranches": "Follows your active branches",
+    "supportTier": "Support",
+    "packTier": "Space and messages"
   },
   "platform": {
     "title": "MyBiz console",
@@ -1897,7 +1919,8 @@
       "seeAll": "See all prices",
       "note": "Launch prices, subject to change.",
       "currency": "Currency",
-      "modulesText": "Add only what your business needs. Turn any add-on on or off whenever you like."
+      "modulesText": "Add only what your business needs. Turn any add-on on or off whenever you like.",
+      "oneTime": "one-time"
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -2434,7 +2457,9 @@
       "plan": "Plan",
       "extras": "Extras",
       "summary": "Summary",
-      "step": "Step {step} of {total}"
+      "step": "Step {step} of {total}",
+      "services": "Services",
+      "flight": "{percent}% of the way"
     },
     "back": "Back",
     "next": "Continue",
@@ -2490,7 +2515,11 @@
         "Ratings from your clients",
         "Hebrew and English, phone and computer"
       ],
-      "locations": "+ {count, plural, one {# extra location} other {# extra locations}} for your branches"
+      "locations": "+ {count, plural, one {# extra location} other {# extra locations}} for your branches",
+      "pick": "Pick the size that fits you today. You move up only when the business grows.",
+      "custom": "Custom price",
+      "current": "Your size",
+      "clients": "active clients"
     },
     "perMonth": "/ month",
     "daily": "That's about {price} a day",
@@ -2510,7 +2539,27 @@
           "Booking and waitlists without a phone call",
           "Buying memberships and punch cards in the app",
           "Ratings after every visit"
-        ]
+        ],
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "The MyBiz client app, with your name and colors",
+            "points": [
+              "Booking and waitlists without a call",
+              "Buying memberships and class packs",
+              "A rating after every visit"
+            ]
+          },
+          "pro": {
+            "name": "Pro · your own app",
+            "tagline": "An app under your name in the stores, with your icon",
+            "points": [
+              "Everything in Basic",
+              "Your business's app on the App Store and Google Play",
+              "Our team publishes and updates it for you"
+            ]
+          }
+        }
       },
       "ai": {
         "eyebrow": "AI assistant",
@@ -2529,7 +2578,27 @@
           }
         },
         "choose": "Choose this",
-        "chosen": "Chosen"
+        "chosen": "Chosen",
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "Answers about your schedule, clients and numbers",
+            "points": [
+              "Ask in plain words",
+              "Answers from your real data",
+              "Available any time"
+            ]
+          },
+          "pro": {
+            "name": "Pro",
+            "tagline": "Everything in Basic, and it prepares the work",
+            "points": [
+              "Prepares bookings and cancellations for you to confirm",
+              "Knows who owes money and what awaits an answer",
+              "Every action waits for your OK"
+            ]
+          }
+        }
       },
       "crm": {
         "eyebrow": "CRM & leads",
@@ -2550,7 +2619,27 @@
           "Dana · Instagram",
           "Yossi · Website",
           "Maya · Referral"
-        ]
+        ],
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "A tidy lead board, from inquiry to client",
+            "points": [
+              "An inquiry form for your site and socials",
+              "A board from new inquiry to paying client",
+              "Follow-up reminders and a call log"
+            ]
+          },
+          "pro": {
+            "name": "Pro · leads on autopilot",
+            "tagline": "Ad leads arrive by themselves, and follow-ups run by themselves",
+            "points": [
+              "Everything in Basic",
+              "Facebook and Instagram ad leads straight to the board",
+              "An automatic follow-up to a lead who didn't reply"
+            ]
+          }
+        }
       },
       "whatsapp": {
         "eyebrow": "WhatsApp & SMS",
@@ -2562,7 +2651,123 @@
           "Ready-made message templates"
         ],
         "message": "Hi Dana! A reminder: tomorrow at 18:00 you have a session with us. See you 💪",
-        "reply": "Thanks, I'll be there!"
+        "reply": "Thanks, I'll be there!",
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "Automatic reminders and updates",
+            "points": [
+              "Automatic reminders the day before",
+              "Broadcasts to a group of clients",
+              "Ready message templates"
+            ]
+          },
+          "pro": {
+            "name": "Pro · AI on WhatsApp",
+            "tagline": "Answers your clients on WhatsApp, even at night",
+            "points": [
+              "Everything in Basic",
+              "Answers common questions 24/7",
+              "Offers a free slot and passes it to you to confirm"
+            ]
+          }
+        }
+      },
+      "pack": {
+        "eyebrow": "Space and messages",
+        "title": "How much space and messaging do you need?",
+        "text": "Like luggage on a flight: the basics are included, and if you know you'll need more, a bigger bundle up front saves you money.",
+        "plans": {
+          "included": {
+            "name": "Basic",
+            "tagline": "Enough for most businesses at the start",
+            "points": [
+              "2 GB for files and documents",
+              "200 messages a month"
+            ]
+          },
+          "plus": {
+            "name": "Plus",
+            "tagline": "For a business that talks to its clients a lot",
+            "points": [
+              "20 GB for files and documents",
+              "1,000 messages a month"
+            ]
+          },
+          "max": {
+            "name": "Max",
+            "tagline": "For a big business or several branches",
+            "points": [
+              "100 GB for files and documents",
+              "5,000 messages a month"
+            ]
+          }
+        }
+      },
+      "support": {
+        "eyebrow": "Support",
+        "title": "How close would you like us to be?",
+        "text": "Like picking a seat: everyone gets there, but some like the window.",
+        "plans": {
+          "standard": {
+            "name": "Standard",
+            "tagline": "We're here when you need us",
+            "points": [
+              "Email and help center",
+              "An answer by the next business day"
+            ]
+          },
+          "priority": {
+            "name": "Priority",
+            "tagline": "Fast answers, by chat and phone",
+            "points": [
+              "Chat and phone",
+              "An answer within 4 business hours",
+              "Front of the queue"
+            ]
+          },
+          "vip": {
+            "name": "VIP",
+            "tagline": "A personal account manager, just for you",
+            "points": [
+              "A personal account manager",
+              "A monthly call about your numbers",
+              "An answer within an hour"
+            ]
+          }
+        }
+      },
+      "setup": {
+        "eyebrow": "Setup",
+        "title": "Who sets the business up?",
+        "text": "A one-time fee, only if you want it: charged with the first invoice after the trial.",
+        "plans": {
+          "self": {
+            "name": "Myself",
+            "tagline": "A step-by-step guide",
+            "points": [
+              "A first-steps checklist",
+              "Short guides on every screen"
+            ]
+          },
+          "guided": {
+            "name": "Guided setup",
+            "tagline": "We set it up together, on a video call",
+            "points": [
+              "45 minutes with one of our experts",
+              "Services, plans and team ready by the end of the call"
+            ]
+          },
+          "full": {
+            "name": "Done for you",
+            "tagline": "You arrive, everything is ready",
+            "points": [
+              "Clients, memberships and schedule imported from your old system",
+              "The whole business set up",
+              "A training call for your team"
+            ]
+          }
+        }
       }
     },
     "cart": {
@@ -2576,7 +2781,8 @@
       "items": "{count, plural, one {# item} other {# items}}",
       "addedNotice": "{name} added. Monthly total: {total}",
       "removedNotice": "{name} removed. Monthly total: {total}",
-      "emptyHint": "Add-ons you choose show up here. You can change them any time."
+      "emptyHint": "Add-ons you choose show up here. You can change them any time.",
+      "once": "One-time, with the first invoice"
     },
     "summary": {
       "title": "Your plan is ready",
@@ -2592,10 +2798,16 @@
       "haveAccount": "Already have a MyBiz account?",
       "login": "Sign in and continue",
       "guarantee": [
-        "No setup fees",
+        "No mandatory setup fee",
         "Cancel any time",
         "Your data stays yours"
-      ]
+      ],
+      "pass": "Your boarding pass",
+      "from": "Today",
+      "to": "Your business, live",
+      "trial": "14 days free",
+      "once": "One-time (with the first invoice)",
+      "celebrate": "What a plan! One more step and you're off"
     },
     "finish": {
       "title": "Last step: payment details",
@@ -2619,6 +2831,26 @@
       "starter": "Starter",
       "growing": "Growing",
       "ai_powered": "AI-powered"
+    },
+    "account": {
+      "eyebrow": "Before take-off",
+      "title": "Let's save your plan",
+      "subtitle": "Sign up in one tap and nothing you choose gets lost. Or carry on and create your account at the end.",
+      "email": "Continue – I'll sign up with email at the end",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "tier": {
+      "choose": "Choose",
+      "chosen": "Chosen",
+      "included": "Included",
+      "free": "Free",
+      "once": "one-time",
+      "onceNote": "One-time, with the first invoice after the trial",
+      "recommended": "Recommended for you",
+      "bestValue": "Best value",
+      "noThanks": "No thanks, skip {name}",
+      "needsAi": "Includes AI Basic (+{price} a month), since you haven't chosen AI yet"
     }
   },
   "gettingStarted": {

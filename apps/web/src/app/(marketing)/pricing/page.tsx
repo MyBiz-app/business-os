@@ -168,7 +168,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                     <span className="text-2xl font-extrabold">
                       + <bdi>{money(module.price)}</bdi>
                     </span>
-                    <span className="text-sm text-muted">{t("perMonth")}</span>
+                    <span className="text-sm text-muted">{module.billing === "once" ? t("oneTime") : t("perMonth")}</span>
                   </p>
                 </li>
               ))}
