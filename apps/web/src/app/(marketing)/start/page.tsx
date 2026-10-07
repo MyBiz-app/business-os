@@ -6,6 +6,8 @@ import Link from "next/link";
 
 import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
+import { enabledProviders } from "@/lib/auth-providers";
+import { createClient } from "@/lib/supabase/server";
 import { CURRENCIES, type Currency, trialEndsOn, withLocations } from "@/lib/signup-plan";
 
 import { StartWizard } from "./start-wizard";
@@ -57,6 +59,11 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
   const currency = requestedCurrency && catalogs[requestedCurrency] ? requestedCurrency : locale === "he" && catalogs.ILS ? "ILS" : (Object.keys(catalogs)[0] as Currency);
   const preset = typeof query.preset === "string" ? query.preset : "";
   const presetModules = Object.values(catalogs)[0]!.presets[preset] ?? [];
+  const { data: claims } = await (await createClient()).auth.getClaims();
+  const signedIn = Boolean(claims?.claims);
+  const search = new URLSearchParams(
+    Object.entries(query).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+  ).toString();
 
   return (
     <main className="flex flex-col">
@@ -72,6 +79,9 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
           modules: withLocations(Object.fromEntries(presetModules.map((key) => [key, 1])), 1),
         }}
         trialEndsOn={trialEndsOn()}
+        providers={signedIn ? [] : await enabledProviders()}
+        signedIn={signedIn}
+        returnTo={search ? `/start?${search}` : "/start"}
         illustrations={{
           client_app: <PhoneMock />,
           ai: <ChatMock question={t("offers.ai.question")} answer={t("offers.ai.answer")} />,

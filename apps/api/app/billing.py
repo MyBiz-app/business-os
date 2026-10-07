@@ -3,7 +3,8 @@ monthly invoice in arrears for the modules it has on, priced like the configurat
 active clients at the end of the period + modules). With a (test) card on file the invoice is
 charged at once; otherwise it stays open until the owner pays it.
 
-Periods run month to month from the day the trial ends (in the business's time zone)."""
+Periods run month to month from the day the trial ends (in the business's time zone). One-time
+services (setup) are charged with the first invoice."""
 
 import calendar
 import json
@@ -90,6 +91,14 @@ def bill_businesses(
                 {"key": key, "quantity": modules[key], "amount": amount}
                 for key, amount in priced.lines.items()
             ]
+            total = priced.total
+            # One-time services (the setup bought in the sign-up journey) ride on the first one.
+            if period.start == anchor:
+                lines += [
+                    {"key": key, "quantity": 1, "amount": amount}
+                    for key, amount in priced.once.items()
+                ]
+                total += sum(priced.once.values())
             charged = tenant.card_last4 is not None
             inserted = conn.execute(
                 text("""
@@ -107,7 +116,7 @@ def bill_businesses(
                     "currency": tenant.currency,
                     "clients": clients,
                     "lines": json.dumps(lines),
-                    "total": priced.total,
+                    "total": total,
                     "status": "paid" if charged else "open",
                     "now": now,
                     "paid_at": now if charged else None,

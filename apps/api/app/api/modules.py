@@ -12,6 +12,7 @@ from app.modules import (
     CORE_TIERS,
     MODULES,
     PRESETS,
+    Billing,
     ModuleKey,
     PresetKey,
     Questionnaire,
@@ -35,6 +36,8 @@ class CatalogModule(BaseModel):
     per_unit: bool
     requires_any: list[ModuleKey]
     requires_all: list[ModuleKey]
+    group: str | None = Field(description="Tiers of one thing: at most one per group")
+    billing: Billing = Field(description='"once": charged with the first invoice only')
 
 
 class CoreTier(BaseModel):
@@ -71,7 +74,8 @@ class QuoteOut(BaseModel):
     core: int
     core_tier: int | None
     lines: dict[ModuleKey, int]
-    total: int
+    once: dict[ModuleKey, int] = Field(description="One-time services, with the first invoice")
+    total: int = Field(description="Monthly")
 
 
 class TenantModules(BaseModel):
@@ -106,6 +110,8 @@ def build_catalog(currency: str) -> Catalog:
                 per_unit=m.per_unit,
                 requires_any=list(m.requires_any),
                 requires_all=list(m.requires_all),
+                group=m.group,
+                billing=m.billing,
             )
             for m in MODULES.values()
         ],
@@ -135,6 +141,7 @@ def _quote_out(selection: dict[str, int], active_clients: int, currency: str) ->
         core=result.core,
         core_tier=result.core_tier,
         lines=result.lines,  # type: ignore[arg-type]
+        once=result.once,  # type: ignore[arg-type]
         total=result.total,
     )
 
@@ -213,12 +220,14 @@ def put_tenant_modules(body: Selection, context: SettingsDep) -> TenantModules:
 @router.post("/tenants/current/modules/{key}")
 def add_tenant_module(key: ModuleKey, context: SettingsDep) -> TenantModules:
     """Adds one module to the plan (the "add to plan" button on a locked module). Choosing an AI
-    tier replaces the other one; adding a module the plan already has changes nothing."""
+    tier (or any tier of a group) replaces the other one; adding a module the plan already has
+    changes nothing."""
     db = context.session
     selection = enabled_modules(db)
     if key not in selection:
-        if key in ("ai_basic", "ai_pro"):
-            selection.pop("ai_pro" if key == "ai_basic" else "ai_basic", None)
+        group = MODULES[key].group
+        for other in [k for k in selection if group and MODULES[k].group == group]:
+            selection.pop(other)
         selection[key] = 1
         check_selection(selection)
         set_modules(db, context.tenant_id, selection)

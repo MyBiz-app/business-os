@@ -77,6 +77,23 @@ def test_invoices_after_the_trial(client: TestClient, studio: dict, engine: Engi
     assert again.json()["detail"] == "not_open"
 
 
+def test_one_time_setup_rides_on_the_first_invoice(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"setup_guided": 1}}, headers=headers)
+    end_trial(engine, studio["tenant_id"], days_ago=65)
+    run_billing(engine)
+
+    second, first = client.get("/billing", headers=headers).json()["invoices"][:2]
+    lines = client.get(f"/billing/invoices/{first['id']}", headers=headers).json()["lines"]
+    assert [(line["key"], line["amount"]) for line in lines] == [
+        ("core", 9900),
+        ("setup_guided", 24900),
+    ]
+    assert first["total"] == 9900 + 24900 and second["total"] == 9900
+
+
 def test_card_on_file_is_charged_automatically(
     client: TestClient, studio: dict, engine: Engine
 ) -> None:

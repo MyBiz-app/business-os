@@ -308,3 +308,15 @@ body {
     transform: scaleX(0);
   }
 }
+
+/* A short burst of confetti (the sign-up journey's summary). Purely decorative. */
+@keyframes confetti {
+  from {
+    opacity: 1;
+    transform: translateY(-20px) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(260px) rotate(540deg);
+  }
+}

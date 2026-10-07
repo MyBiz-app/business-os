@@ -65,7 +65,18 @@
       "agent_finance": "סוכן כספים",
       "agent_marketing": "סוכן שיווק",
       "whatsapp": "וואטסאפ",
-      "extra_location": "סניפים נוספים"
+      "extra_location": "סניפים נוספים",
+      "client_app_branded": "אפליקציה ממותגת בחנויות",
+      "crm_automation": "לידים על טייס אוטומטי",
+      "whatsapp_ai": "עוזר AI בוואטסאפ",
+      "pack_plus": "חבילת Plus (מקום והודעות)",
+      "pack_max": "חבילת Max (מקום והודעות)",
+      "support_priority": "תמיכה בעדיפות",
+      "support_vip": "תמיכת VIP",
+      "setup_guided": "הקמה מלווה",
+      "setup_full": "הקמה מלאה בשבילך",
+      "noSupport": "תמיכה רגילה",
+      "noPack": "הכמות הכלולה"
     }
   },
   "locations": {

@@ -149,3 +149,41 @@ def test_adding_one_module_to_the_plan(client: TestClient, studio: dict, auth) -
     assert soon.status_code == 422 and soon.json()["detail"] == "module_not_available"
     staff = auth(studio["coach"], studio["tenant_id"])
     assert client.post("/tenants/current/modules/whatsapp", headers=staff).status_code == 403
+
+
+def test_tiers_and_one_time_services(client: TestClient, auth: AuthHeaders) -> None:
+    headers = auth(uuid4())
+    quote = client.post(
+        "/modules/quote",
+        json={
+            "modules": {"client_app": 1, "client_app_branded": 1, "support_vip": 1, "setup_full": 1}
+        },
+        headers=headers,
+    ).json()
+    # The setup is a one-time service, kept apart from the monthly total.
+    assert quote["once"] == {"setup_full": 69000}
+    assert quote["total"] == 9900 + 4900 + 9900 + 14900
+    two_supports = client.post(
+        "/modules/quote",
+        json={"modules": {"support_priority": 1, "support_vip": 1}},
+        headers=headers,
+    )
+    assert two_supports.json()["detail"] == "choose_one_tier"
+    branded_alone = client.post(
+        "/modules/quote", json={"modules": {"client_app_branded": 1}}, headers=headers
+    )
+    assert branded_alone.json()["detail"] == "missing_dependency"
+    whatsapp_ai = client.post(
+        "/modules/quote", json={"modules": {"whatsapp": 1, "whatsapp_ai": 1}}, headers=headers
+    )
+    assert whatsapp_ai.json()["detail"] == "missing_dependency"  # needs an AI tier
+    catalog = client.get("/public/pricing").json()
+    setup = next(m for m in catalog["modules"] if m["key"] == "setup_guided")
+    assert setup["billing"] == "once" and setup["group"] == "setup"
+
+
+def test_adding_a_tier_replaces_its_group(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    client.post("/tenants/current/modules/support_priority", headers=headers)
+    upgraded = client.post("/tenants/current/modules/support_vip", headers=headers).json()
+    assert "support_vip" in upgraded["modules"] and "support_priority" not in upgraded["modules"]
