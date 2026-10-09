@@ -42,6 +42,26 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 | `docs/verticals.md` | Industries: the category catalog and how to add a category |
 | `docs/design-system.md` | Design tokens and where to change what (font, colors, buttons, texts, prices) |
 | `docs/integrations.md` | Outside services behind swappable providers: how to add or switch one |
+| `docs/claude-code.md` | How to run Claude Code on this repo cheaply: model choice, `/compact`, `/clear`, measuring usage |
+
+## Working efficiently (Claude Code)
+
+- The map above is the project structure; don't rediscover it. Search (`rg`, Grep/Glob) before
+  opening files, and read only the files and line ranges the task needs. Don't re-read an unchanged file.
+- Never open whole generated or bulky files: `packages/api-client/openapi.json` and
+  `packages/api-client/src/schema.ts` (generated, ~1.3 MB together; grep with a pattern instead),
+  lockfiles, `node_modules/`, `.next/`, `.turbo/`, `dist/`, `docs/spec/v1/` (.docx).
+- `docs/DECISIONS.md`, `docs/STATUS.md` and `docs/STATUS.he.md` are long: find the section
+  (`rg -n '^## ' <file>`), read only that range, and make a small edit there.
+- Scope to the task: a UI change doesn't need the backend read, and vice versa.
+- Test the affected area first (`uv run pytest tests/test_<area>.py` in `apps/api`,
+  `pnpm --filter <package> test|typecheck|lint`); run the full suite when the change is risky
+  (auth, tenant isolation, migrations, shared packages) or before merging. Never skip validation
+  for security, tenant isolation or data integrity to save effort.
+- Don't rerun a failing command unchanged; change the diagnosis first. Trim long output
+  (`| tail -n 40`, `-q`, `--tb=short`).
+- Do small or sequential work directly. Use a subagent only for genuinely parallel or isolated
+  work, with a narrow scope and a defined deliverable.
 
 ## Non-negotiable principles
 
