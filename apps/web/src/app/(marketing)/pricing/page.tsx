@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { CtaBand, Faq } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
@@ -17,7 +18,7 @@ const PRESETS = ["starter", "growing", "ai_powered"] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
-  return { title: `${t("pricing")} · MyBiz` };
+  return { title: `${t("pricing")} · ${BRAND.name}` };
 }
 
 async function loadCatalog(currency: string): Promise<Catalog | null> {

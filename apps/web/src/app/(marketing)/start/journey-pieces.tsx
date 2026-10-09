@@ -4,6 +4,7 @@
 // boarding pass, confetti and form controls (decision X18 split them out of start-wizard.tsx).
 
 import { Check, Minus, Plane, Plus, Sparkles, Ticket } from "lucide-react";
+import { BRAND } from "@business-os/i18n/brand";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useId } from "react";
 
@@ -132,7 +133,7 @@ export function BoardingPass({ title, name, vertical, from, via, to, date }: Rec
       <div className="mt-5 flex items-center gap-3 border-t border-dashed border-white/50 pt-5">
         <div className="flex flex-col">
           <span className="text-xs font-medium">{from}</span>
-          <span className="font-bold">MyBiz</span>
+          <span className="font-bold">{BRAND.name}</span>
         </div>
         <div className="flex flex-1 items-center gap-2">
           <span aria-hidden="true" className="h-px flex-1 border-t-2 border-dotted border-white/70" />
