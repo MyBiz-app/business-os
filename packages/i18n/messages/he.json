@@ -3093,8 +3093,16 @@
     },
     "numbers": {
       "title": "מספרים מרכזיים",
-      "period": "{count} הימים האחרונים",
-      "empty": "אין עדיין מספרים."
+      "period": "{count} הימים האחרונים, לעומת {count} הימים שלפניהם",
+      "periodBranch": "{branch} · {count} הימים האחרונים, לעומת {count} הימים שלפניהם",
+      "days": "{count} ימים",
+      "empty": "אין עדיין מספרים.",
+      "vsBefore": "{change} לעומת קודם",
+      "trend": "מגמה",
+      "noTrend": "עדיין אין מה להציג לתקופה הזו.",
+      "weekOf": "שבוע של {date}",
+      "best": "הכי טוב: {when}, {value}",
+      "breakdownLine": "{sessions, plural, one {מפגש אחד} other {# מפגשים}} · {attended, plural, one {הגעה אחת} other {# הגעות}} · {occupancy} תפוסה"
     },
     "me": {
       "title": "אני",
