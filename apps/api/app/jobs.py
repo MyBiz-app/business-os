@@ -239,6 +239,96 @@ def message_reminders(
     return len(rows)
 
 
+FOLLOW_UP_AFTER_DAYS = 2  # a lead nobody has touched for this long gets one follow-up
+FOLLOW_UP_WITHIN_DAYS = 30  # older leads are left to the team
+FOLLOW_UP_DETAILS = json.dumps({"channel": "whatsapp", "automated": True, "lead_follow_up": True})
+
+
+def follow_up_leads(
+    conn: Connection, now: datetime | None = None, messages_dir: Path = MESSAGES_DIR
+) -> int:
+    """Leads on autopilot (#104, module crm_automation): a new or contacted lead with a phone
+    that nobody has touched for two days gets one WhatsApp follow-up, written on its timeline.
+    Needs the WhatsApp module too; never twice for the same lead."""
+    now = now or datetime.now(UTC)
+    rows = (
+        conn.execute(
+            text("""
+                SELECT l.id, l.tenant_id, l.first_name, l.phone, l.interest,
+                       t.name AS business, t.locale
+                FROM app.leads l
+                JOIN app.tenants t ON t.id = l.tenant_id
+                WHERE l.stage IN ('new', 'contacted')
+                  AND nullif(trim(l.phone), '') IS NOT NULL
+                  AND l.created_at > :now - make_interval(days => :within)
+                  AND coalesce((SELECT max(a.occurred_at) FROM app.lead_activities a
+                                WHERE a.lead_id = l.id), l.created_at)
+                      < :now - make_interval(days => :after)
+                  AND (SELECT count(*) FROM app.tenant_modules m WHERE m.tenant_id = l.tenant_id
+                       AND m.module_key IN ('crm_automation', 'whatsapp')) = 2
+                  AND NOT EXISTS (SELECT 1 FROM app.messages x
+                                  WHERE x.lead_id = l.id AND x.created_by IS NULL)
+                ORDER BY l.created_at
+            """),
+            {"now": now, "within": FOLLOW_UP_WITHIN_DAYS, "after": FOLLOW_UP_AFTER_DAYS},
+        )
+        .mappings()
+        .all()
+    )
+    texts: dict[str, dict] = {}
+    per_tenant: dict[object, int] = {}
+    providers: dict[object, tuple[bool, str]] = {}
+    for row in rows:
+        if row["tenant_id"] not in providers:  # the business's messaging provider (X13)
+            chosen = choose(conn, row["tenant_id"], "messaging")
+            providers[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
+        simulated, provider = providers[row["tenant_id"]]
+        locale = row["locale"] if row["locale"] in ("he", "en") else "en"
+        texts.setdefault(locale, load_messages(locale, messages_dir))
+        interest = (row["interest"] or "").strip()
+        template = texts[locale]["leadFollowUp"]["withInterest" if interest else "plain"]
+        body = (
+            template.replace("{name}", row["first_name"])
+            .replace("{business}", row["business"])
+            .replace("{interest}", interest[:200])
+        )[:1100]
+        conn.execute(
+            text("""
+                INSERT INTO app.messages
+                    (tenant_id, lead_id, channel, to_phone, body, status, simulated, provider,
+                     sent_at)
+                VALUES (:t, :l, 'whatsapp', :phone, :body, :status, :simulated, :provider,
+                        CASE WHEN :simulated THEN now() END)
+            """),
+            {
+                "t": row["tenant_id"],
+                "l": row["id"],
+                "phone": row["phone"].strip(),
+                "body": body,
+                "status": "sent" if simulated else "queued",
+                "simulated": simulated,
+                "provider": provider,
+            },
+        )
+        conn.execute(
+            text("""
+                INSERT INTO app.lead_activities (tenant_id, lead_id, kind, note)
+                VALUES (:t, :l, 'message', :note)
+            """),
+            {"t": row["tenant_id"], "l": row["id"], "note": body[:2000]},
+        )
+        per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
+    for tenant_id, count in per_tenant.items():
+        conn.execute(
+            text("""
+                INSERT INTO app.usage_events (tenant_id, meter, quantity, details, source_ref)
+                VALUES (:t, 'messages', :n, CAST(:details AS jsonb), 'lead-follow-ups')
+            """),
+            {"t": tenant_id, "n": count, "details": FOLLOW_UP_DETAILS},
+        )
+    return len(rows)
+
+
 def send_messages(conn: Connection) -> dict[str, int]:
     return outbox.send_messages(conn)
 
@@ -260,6 +350,7 @@ JOBS = {
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
     "message-reminders": message_reminders,
+    "follow-up-leads": follow_up_leads,
     "bill-businesses": bill_businesses,
     "send-messages": send_messages,
     "issue-documents": issue_documents,

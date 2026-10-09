@@ -428,3 +428,36 @@ def test_reminders_also_go_out_on_whatsapp_with_the_module(
     [message] = client.get("/messages", params={"client_id": dana}, headers=headers).json()
     assert message["channel"] == "whatsapp" and "Pilates" in message["body"]
     assert "Dana" in message["body"]
+
+
+def test_untouched_leads_get_one_follow_up_on_autopilot(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import follow_up_leads
+
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"crm": 1}}, headers=headers)
+    lead = client.post(
+        "/leads",
+        json={"first_name": "Lior", "phone": "052-3333333", "interest": "Pilates"},
+        headers=headers,
+    ).json()
+    quiet = client.post("/leads", json={"first_name": "NoPhone"}, headers=headers).json()
+    later = datetime.now(UTC) + timedelta(days=3)
+
+    with engine.begin() as connection:
+        assert follow_up_leads(connection, later) == 0  # no autopilot or WhatsApp yet
+    modules = {"crm": 1, "crm_automation": 1, "whatsapp": 1}
+    client.put("/tenants/current/modules", json={"modules": modules}, headers=headers)
+    with engine.begin() as connection:
+        assert follow_up_leads(connection, datetime.now(UTC)) == 0  # too soon
+        sent = follow_up_leads(connection, later)
+        again = follow_up_leads(connection, later + timedelta(days=3))
+
+    assert sent == 1 and again == 0
+    [message] = client.get("/messages", params={"lead_id": lead["id"]}, headers=headers).json()
+    assert message["channel"] == "whatsapp" and "Lior" in message["body"]
+    assert "Pilates" in message["body"] and "Studio Flow" in message["body"]
+    timeline = client.get(f"/leads/{lead['id']}", headers=headers).json()
+    assert any(a["kind"] == "message" for a in timeline["activities"])
+    assert client.get("/messages", params={"lead_id": quiet["id"]}, headers=headers).json() == []
