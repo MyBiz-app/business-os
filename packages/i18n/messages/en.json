@@ -3104,6 +3104,19 @@
       "best": "Best: {when}, {value}",
       "breakdownLine": "{sessions, plural, one {# session} other {# sessions}} · {attended, plural, one {# check-in} other {# check-ins}} · {occupancy} full"
     },
+    "quotes": {
+      "saved": "Saved.",
+      "sent": "Sent. The client can open it by its link.",
+      "sendAgain": "Send to the client again",
+      "whatsapp": "Send on WhatsApp",
+      "share": "Share the link",
+      "paymentRecorded": "Payment recorded.",
+      "depositDue": "Deposit left to pay: {amount}",
+      "noEnd": "No end date",
+      "validFor": "{count} days",
+      "forClient": "For {name}",
+      "invalid": "Add a title, and give every item a description, a quantity and a price."
+    },
     "me": {
       "title": "Me",
       "business": "Business",

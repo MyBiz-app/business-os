@@ -10,7 +10,6 @@ import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@busines
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
-import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { fullName } from "@business-os/app-kit/lib/names";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -379,17 +378,29 @@ export default function ClientScreen() {
         </Card>
       )}
 
-      {data.quotes.length > 0 && (
+      {(data.quotes.length > 0 || can("sales.manage")) && (
         <View style={{ gap: 8 }}>
-          <SectionTitle title={tQuotes("title")} palette={palette} />
+          <SectionTitle
+            title={tQuotes("title")}
+            action={can("sales.manage") ? tQuotes("new") : undefined}
+            onAction={() => router.push(`/quote/edit?client=${id}`)}
+            palette={palette}
+          />
+          {data.quotes.length === 0 && (
+            <Text style={[styles.muted, { color: palette.muted }]}>{tQuotes("noneForClient")}</Text>
+          )}
           {data.quotes.map((quote) => (
             <ListRow
               key={quote.id}
               palette={palette}
               title={`#${quote.number} · ${quote.title}`}
-              subtitle={formatMoney(quote.total, quote.currency, locale)}
+              subtitle={
+                quote.status === "accepted" && quote.total > quote.paid
+                  ? tQuotes("leftToPay", { amount: formatMoney(quote.total - quote.paid, quote.currency, locale) })
+                  : formatMoney(quote.total, quote.currency, locale)
+              }
               trailing={<Badge label={tQuotes(`statuses.${quote.status}`)} tone={quote.status === "accepted" ? "success" : "muted"} palette={palette} />}
-              onPress={() => void Linking.openURL(`${WEB_URL}/quotes/${quote.id}`)}
+              onPress={() => router.push(`/quote/${quote.id}`)}
             />
           ))}
         </View>
