@@ -461,3 +461,33 @@ def test_untouched_leads_get_one_follow_up_on_autopilot(
     timeline = client.get(f"/leads/{lead['id']}", headers=headers).json()
     assert any(a["kind"] == "message" for a in timeline["activities"])
     assert client.get("/messages", params={"lead_id": quiet["id"]}, headers=headers).json() == []
+
+
+def test_expired_data_is_deleted_by_its_retention_period(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import purge_expired
+
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"crm": 1}}, headers=headers)
+    old = client.post("/leads", json={"first_name": "Old"}, headers=headers).json()
+    fresh = client.post("/leads", json={"first_name": "Fresh"}, headers=headers).json()
+    client.post(
+        "/public/contact",
+        json={"name": "Dana", "email": "dana@example.com", "message": "Hi", "locale": "he"},
+    )
+    later = datetime.now(UTC) + timedelta(days=400)  # past 12 months, before 24
+    with engine.begin() as connection:
+        # The fresh lead was touched a month before then.
+        connection.execute(
+            text("UPDATE app.leads SET updated_at = :at WHERE id = :id"),
+            {"at": later - timedelta(days=30), "id": fresh["id"]},
+        )
+        connection.execute(
+            text("UPDATE app.lead_activities SET occurred_at = :at WHERE lead_id = :id"),
+            {"at": later - timedelta(days=30), "id": fresh["id"]},
+        )
+        deleted = purge_expired(connection, later)
+        leads = connection.execute(text("SELECT id::text FROM app.leads")).scalars().all()
+    assert deleted["leads"] == 1 and deleted["contact_requests"] == 1
+    assert old["id"] not in leads and fresh["id"] in leads

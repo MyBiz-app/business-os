@@ -37,9 +37,10 @@ quotes and time; they now cover them (`app/api/privacy.py`, migration 0055, test
 
 ## Decisions and work before go-live
 
-1. **Retention periods** (owner's decision): how long to keep leads that never became clients,
-   website contact requests, messages and the AI assistant's conversations, and a closed
-   business's data after it leaves. Nothing is deleted automatically today.
+1. **Retention periods**: decided (X20). Leads that never became clients, contact requests and
+   the AI assistant's conversations are kept 12 months, the message log 24 months; the daily
+   `purge-expired` job deletes the rest. A business that leaves is deleted 90 days after it
+   leaves, once an account-closing flow exists.
 2. **The AI assistant's conversations** may name clients; they are not in the client export or
    erasure yet. With the real AI provider (#50) they also leave our servers: the provider's
    data terms belong in the privacy notice.

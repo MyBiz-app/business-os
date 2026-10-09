@@ -335,6 +335,36 @@ def follow_up_leads(
     return len(rows)
 
 
+# How long data is kept (decision X20). A business that leaves (90 days) waits for an
+# account-closing flow.
+RETENTION_MONTHS = {"leads": 12, "contact_requests": 12, "ai_conversations": 12, "messages": 24}
+
+
+def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, int]:
+    """Deletes what has passed its time: leads that never became clients and nobody touched,
+    website and in-app requests, the AI assistant's conversations, and the message log."""
+    now = now or datetime.now(UTC)
+
+    def before(kind: str) -> datetime:
+        return now - timedelta(days=round(RETENTION_MONTHS[kind] * 30.44))
+
+    statements = {
+        "leads": """
+            DELETE FROM app.leads l
+            WHERE l.client_id IS NULL
+              AND greatest(l.updated_at, coalesce((SELECT max(a.occurred_at)
+                  FROM app.lead_activities a WHERE a.lead_id = l.id), l.updated_at)) < :before
+        """,
+        "contact_requests": "DELETE FROM app.contact_requests WHERE created_at < :before",
+        "ai_conversations": "DELETE FROM app.ai_conversations WHERE updated_at < :before",
+        "messages": "DELETE FROM app.messages WHERE created_at < :before",
+    }
+    return {
+        kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
+        for kind, sql in statements.items()
+    }
+
+
 def send_messages(conn: Connection) -> dict[str, int]:
     return outbox.send_messages(conn)
 
@@ -357,6 +387,7 @@ JOBS = {
     "send-emails": send_notification_emails,
     "message-reminders": message_reminders,
     "follow-up-leads": follow_up_leads,
+    "purge-expired": purge_expired,
     "bill-businesses": bill_businesses,
     "send-messages": send_messages,
     "issue-documents": issue_documents,

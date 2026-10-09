@@ -61,6 +61,12 @@ jobs:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
         run: uv run python -m app.jobs follow-up-leads
 
+      - name: Delete data past its retention period (decision X20)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs purge-expired
+
       - name: Send queued messages through each business's provider
         working-directory: apps/api
         env:

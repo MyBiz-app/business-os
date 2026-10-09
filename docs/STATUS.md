@@ -37,6 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **Data is kept only as long as decided (X20).** A daily job (`purge-expired`, scheduled on staging) deletes leads that never became clients and nobody touched for 12 months, website requests and AI assistant conversations after 12 months, and the message log after 24 months.
 - **Team members work in their branches (#64, X19).** A member assigned to branches sees only those: the branch picker lists only theirs, "all branches" means all of theirs, and lists and numbers follow it. Owners and managers see every branch.
 - **Code restructured for growth (X18).** The demo generator is the `app/seed` package, the sign-up wizard is split into the journey, the cart and its pieces, `apps/mobile` is now `apps/client-app`, and the API's logic is grouped by area (`schedule`, `commerce`, `messaging`, `catalog`, `reports`, `core`). Behavior is unchanged: the full API suite passes and the API schema is identical (#122–#125). After pulling, run `pnpm install` once.
 - **Leads on autopilot (#104).** With the leads-on-autopilot add-on and WhatsApp, a new or contacted lead with a phone that nobody has touched for two days gets one follow-up message (mentioning what they asked about), written on the lead's timeline. A daily job (`follow-up-leads`), scheduled on staging. Lead ads from Facebook / Instagram come with the real providers.
