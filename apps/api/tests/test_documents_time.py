@@ -2,6 +2,7 @@
 
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
@@ -249,3 +250,17 @@ def test_billing_run_previews_and_bills_the_month(client: TestClient, studio: di
     assert second["bills"] == [] and set(second["skipped"]) == {dana, noa}
     bad = client.get("/bills/preview", params={"month": "2026-13"}, headers=headers)
     assert bad.status_code == 422
+
+
+def test_links_are_never_signed_with_the_public_development_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from app.core.config import get_settings
+    from app.providers.secrets import SecretsKeyMissing
+    from app.signed_links import sign
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "environment", "staging")
+    monkeypatch.setattr(settings, "secrets_key", None)
+    with pytest.raises(SecretsKeyMissing):
+        sign("document:x:y")

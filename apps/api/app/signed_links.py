@@ -9,14 +9,21 @@ import hmac
 import time
 
 from app.core.config import get_settings
-from app.providers.secrets import DEV_KEY
+from app.providers.secrets import DEV_KEY, SecretsKeyMissing
 
 TTL_SECONDS = 600
 
 
 def _key() -> bytes:
+    """Derived from API_SECRETS_KEY. The development key is public (it is in this repository),
+    so outside local development and tests a missing key fails instead of signing with it."""
     settings = get_settings()
-    secret = settings.secrets_key.get_secret_value().encode() if settings.secrets_key else DEV_KEY
+    if settings.secrets_key is not None:
+        secret = settings.secrets_key.get_secret_value().encode()
+    elif settings.environment in ("local", "test"):
+        secret = DEV_KEY
+    else:
+        raise SecretsKeyMissing("API_SECRETS_KEY is required to sign links")
     return hashlib.sha256(b"signed-links:" + secret).digest()
 
 
