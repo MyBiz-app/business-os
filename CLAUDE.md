@@ -23,8 +23,19 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 
 | Path | What |
 |---|---|
+| `apps/api` | Python API (FastAPI, Alembic migrations, tests) |
+| `apps/web` | Next.js: marketing site, business web app, MyBiz console |
+| `apps/mobile`, `apps/business-app`, `apps/staff-app` | Expo apps: the clients' app, the business app, the MyBiz team app |
+| `packages/app-kit` | Shared screens, components and providers for the Expo apps |
+| `packages/i18n` | Translations (`he`, `en`) and locale-aware formatting (money) |
+| `packages/verticals` | The industry catalog (categories, sub-categories, packs) |
+| `packages/api-client` | Typed API client generated from the API's OpenAPI schema |
+| `supabase/` | Local Supabase config and auth email templates |
+| `e2e/` | End-to-end checks (Playwright, Python) |
 | `docs/spec/v1/` | Original owner spec (Hebrew + English .docx) |
-| `docs/spec/v2/` | Current working spec (source of truth) |
+| `docs/spec/v2/` | Detailed v2 chapters (architecture, data model, AI) |
+| `docs/spec/v3/` | Current product spec (source of truth), English and Hebrew |
+| `docs/proposals/`, `docs/reviews/` | Design proposals per feature; architecture reviews |
 | `docs/DECISIONS.md` | Decision log |
 | `docs/STATUS.md`, `docs/STATUS.he.md` | Project status board (done, in progress, next), English and Hebrew |
 | `docs/verticals.md` | Industries: the category catalog and how to add a category |

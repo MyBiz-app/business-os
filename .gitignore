@@ -39,3 +39,6 @@ Thumbs.db
 !.vscode/extensions.json
 !.vscode/settings.json
 *.log
+
+# Local Claude Code preferences (permission mode); shared skills live in .claude/skills
+.claude/config.json
