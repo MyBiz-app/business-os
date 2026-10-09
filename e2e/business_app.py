@@ -2,8 +2,9 @@
 the day: today with what needs attention and the week's days, a session's roster (check-in,
 booking someone in, a visit note), clients (filters, a new client, selling a plan, a note, a
 message), leads (moving a stage, logging a call, turning one into a client, a new lead), the
-messages sent, the numbers and their own settings. Then the main screens again in English with
-dark mode. Accessibility (axe, serious and critical) is checked on every screen.
+messages sent, the numbers (a period, the trend, breakdowns, clients to reach out to) and their
+own settings. Then the main screens again in English with dark mode. Accessibility (axe, serious
+and critical) is checked on every screen.
 
 Usage: python e2e/business_app.py <owner email of a business with data (app.seed)>"""
 
@@ -183,7 +184,12 @@ with sync_playwright() as p:
 
     tab(page, "מספרים")
     page.get_by_role("heading", name="מספרים מרכזיים").wait_for(timeout=30000)
-    expect(page.get_by_text("הכנסות")).to_be_visible()
+    expect(page.get_by_text("הכנסות").first).to_be_visible()
+    expect(page.get_by_role("heading", name="מגמה")).to_be_visible()
+    expect(page.get_by_role("heading", name="לפי שירות")).to_be_visible()
+    expect(page.get_by_role("heading", name=re.compile("שכדאי לפנות"))).to_be_visible()
+    page.get_by_role("tab", name="90 ימים").click()
+    expect(page.get_by_text("90 הימים האחרונים", exact=False)).to_be_visible(timeout=30000)
     check(page, "numbers")
     tab(page, "אני")
     page.get_by_role("heading", name="אני").wait_for(timeout=30000)

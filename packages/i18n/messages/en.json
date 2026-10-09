@@ -3093,8 +3093,16 @@
     },
     "numbers": {
       "title": "Key numbers",
-      "period": "Last {count} days",
-      "empty": "No numbers yet."
+      "period": "Last {count} days, compared with the {count} days before",
+      "periodBranch": "{branch} · last {count} days, compared with the {count} days before",
+      "days": "{count} days",
+      "empty": "No numbers yet.",
+      "vsBefore": "{change} vs. before",
+      "trend": "Trend",
+      "noTrend": "Nothing to show for this period yet.",
+      "weekOf": "Week of {date}",
+      "best": "Best: {when}, {value}",
+      "breakdownLine": "{sessions, plural, one {# session} other {# sessions}} · {attended, plural, one {# check-in} other {# check-ins}} · {occupancy} full"
     },
     "me": {
       "title": "Me",
