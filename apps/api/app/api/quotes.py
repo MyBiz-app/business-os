@@ -23,10 +23,10 @@ from sqlalchemy.orm import Session
 from app.api.common import blank_to_none, ensure_not_erased, not_found
 from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
 from app.core.config import get_settings
-from app.permissions import Permission
+from app.core.permissions import Permission
 from app.providers.choice import choose
 from app.providers.payments import CheckoutRequest, PaymentsUnavailable
-from app.scheduling import local_to_utc
+from app.schedule.scheduling import local_to_utc
 
 router = APIRouter(tags=["quotes"])
 public_router = APIRouter(prefix="/public/quotes", tags=["quotes"])

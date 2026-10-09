@@ -12,7 +12,7 @@ from sqlalchemy import text
 from app.ai.gateway import LLMProvider, LLMResponse, ProviderBusy, ProviderUnavailable, credits
 from app.ai.tools import ToolContext, run_tool, tools_for
 from app.api.deps import TenantContext, has_module
-from app.verticals import CATALOG
+from app.catalog.verticals import CATALOG
 
 MAX_STEPS = 8  # model calls per user message
 STEP_LIMIT_NOTE = "<context>Step limit reached. Answer with what you have.</context>"

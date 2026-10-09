@@ -12,7 +12,7 @@ describes the product side (section 4); this page is the how-to.
 | The catalog: one file per category, with its sub-categories under `children` | `packages/verticals/catalog/*.json` |
 | Types, inheritance and lookups for the web and the apps | `packages/verticals/src/index.ts` |
 | Copies the rest of the system reads (generated, checked in) | `packages/verticals/src/catalog.generated.ts`, `apps/api/app/verticals_catalog.json` |
-| The API's view (packs used when a business is created, client fields, health forms) | `apps/api/app/verticals.py` |
+| The API's view (packs used when a business is created, client fields, health forms) | `apps/api/app/catalog/verticals.py` |
 | Texts: name, tagline, benefits, industry page, "your studio", an example name | `verticals.<key>` in `packages/i18n/messages/{he,en}.json` |
 | Industry words in the interface (clients, schedule, …) | `terms.<set>` in the translations |
 | Client field labels and their choices | `clientFields.<key>`, `clientFields.<key>_options.<option>` |

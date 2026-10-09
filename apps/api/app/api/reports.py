@@ -1,4 +1,4 @@
-"""Business KPIs from the metrics layer (app/metrics.py)."""
+"""Business KPIs from the metrics layer (app/reports/metrics.py)."""
 
 import datetime as dt
 from typing import Annotated, Literal
@@ -7,7 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from app.api.deps import TenantContext, require
-from app.metrics import (
+from app.core.permissions import Permission
+from app.reports.metrics import (
     METRICS,
     Dimension,
     Grain,
@@ -19,7 +20,6 @@ from app.metrics import (
     previous_period,
     series,
 )
-from app.permissions import Permission
 
 router = APIRouter(prefix="/metrics", tags=["reports"])
 

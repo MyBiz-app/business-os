@@ -74,8 +74,8 @@ class VerticalPack:
     client_term: str  # what the business calls its clients
     cancellation_window_minutes: int  # default booking policy for new businesses
     booking_requires_plan: bool  # clients need a valid plan to book in the client app
-    default_preset: str  # modules a new business starts with (app/modules.py PRESETS)
-    health_form: str | None = None  # app/health.py FORMS key clients sign before booking
+    default_preset: str  # modules a new business starts with (app/commerce/modules.py PRESETS)
+    health_form: str | None = None  # app/catalog/health.py FORMS key clients sign before booking
     recommended_modules: tuple[str, ...] = ()
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
     default_services: tuple[DefaultService, ...] = field(default_factory=tuple)
@@ -100,7 +100,7 @@ class VerticalPack:
 
 # The industry catalog (packages/verticals/catalog/*.json), copied here by
 # `pnpm verticals:export` because the API's image is built from apps/api alone.
-CATALOG_PATH = Path(__file__).with_name("verticals_catalog.json")
+CATALOG_PATH = Path(__file__).resolve().parent.parent / "verticals_catalog.json"
 
 
 def _prices(raw: dict[str, int]) -> dict[str, int]:

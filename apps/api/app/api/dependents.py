@@ -22,8 +22,8 @@ from app.api.bookings import tenant_pack
 from app.api.clients import ClientFieldDefinition
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import ClientDep, TenantContext, require
-from app.permissions import Permission
-from app.verticals import clean_fields
+from app.catalog.verticals import clean_fields
+from app.core.permissions import Permission
 
 router = APIRouter(tags=["dependents"])
 client_router = APIRouter(prefix="/client", tags=["client"])

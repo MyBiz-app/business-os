@@ -17,9 +17,9 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import TenantContext, has_module, require
-from app.metrics import members_at_risk
-from app.permissions import Permission
+from app.core.permissions import Permission
 from app.providers.choice import choose
+from app.reports.metrics import members_at_risk
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 

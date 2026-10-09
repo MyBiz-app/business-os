@@ -15,7 +15,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
-from app.modules import quote
+from app.commerce.modules import quote
 
 MAX_PERIODS_PER_RUN = 24  # a business that was never billed catches up at most two years
 

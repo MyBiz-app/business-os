@@ -10,7 +10,7 @@ so the API is where access is decided (principle 1).
 | # | Finding | Severity | Fix |
 |---|---|---|---|
 | S1 | A payment webhook completed any checkout whose id it named, whatever business its address named. A business can connect a real payments provider with its own secret, so it could sign a notification with that secret and mark another business's checkout as paid (it would need that checkout's random id). | Medium | `app.complete_provider_checkout` now takes the business from the webhook's address and refuses a checkout of another business (migration 0054). Tested in `test_integrations.py`. |
-| S2 | Signed file links fell back to the development key when `API_SECRETS_KEY` was missing, in every environment. That key is public (it is in the repository), so anyone could forge a link to a document whose ids they knew. | Medium | Outside local development and tests, a missing key now fails instead of signing (`app/signed_links.py`), like provider secrets already did. Tested in `test_documents_time.py`. Staging and production must set `API_SECRETS_KEY`. |
+| S2 | Signed file links fell back to the development key when `API_SECRETS_KEY` was missing, in every environment. That key is public (it is in the repository), so anyone could forge a link to a document whose ids they knew. | Medium | Outside local development and tests, a missing key now fails instead of signing (`app/core/signed_links.py`), like provider secrets already did. Tested in `test_documents_time.py`. Staging and production must set `API_SECRETS_KEY`. |
 
 ## Checked and sound
 

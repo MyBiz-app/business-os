@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
 
-    # Rate limits per caller (app/rate_limit.py). Off by default in local development and
+    # Rate limits per caller (app/core/rate_limit.py). Off by default in local development and
     # tests (everything comes from one address there); on everywhere else unless set.
     rate_limits: bool | None = None
     # Behind the hosting proxy, count the first X-Forwarded-For address (the visitor).

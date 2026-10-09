@@ -5,8 +5,8 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from app.modules import PRESETS
-from app.verticals import CATALOG, VERTICAL_PACKS
+from app.catalog.verticals import CATALOG, VERTICAL_PACKS
+from app.commerce.modules import PRESETS
 from tests.conftest import AuthHeaders
 
 

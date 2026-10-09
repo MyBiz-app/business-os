@@ -11,10 +11,11 @@ from sqlalchemy import Connection, text
 
 from app.api.modules import set_modules
 from app.api.routes import apply_vertical_pack, apply_vertical_rooms
-from app.billing import bill_businesses
-from app.health import FITNESS_FORM
-from app.modules import PRESETS
-from app.scheduling import local_to_utc
+from app.catalog.health import FITNESS_FORM
+from app.catalog.verticals import VERTICAL_PACKS
+from app.commerce.billing import bill_businesses
+from app.commerce.modules import PRESETS
+from app.schedule.scheduling import local_to_utc
 from app.seed.activity import (
     COACH_NOTES,
     LEAD_INTERESTS,
@@ -44,7 +45,6 @@ from app.seed.common import (
     profile_id,
 )
 from app.seed.industries import _seed_dependents, _seed_jobs, _seed_practice, _seed_quotes
-from app.verticals import VERTICAL_PACKS
 
 
 def seed(

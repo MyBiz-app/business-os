@@ -21,8 +21,8 @@ from sqlalchemy.orm import Session
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import ClientDep, TenantContext, require
 from app.api.schedule import JobStatus
-from app.permissions import Permission
-from app.scheduling import local_to_utc
+from app.core.permissions import Permission
+from app.schedule.scheduling import local_to_utc
 
 router = APIRouter(tags=["jobs"])
 client_router = APIRouter(prefix="/client", tags=["client"])

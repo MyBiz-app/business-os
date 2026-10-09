@@ -8,11 +8,11 @@ from sqlalchemy.orm import Session
 from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.modules import check_selection, set_modules
 from app.api.schemas import Me, Membership, SupportAccess, Tenant, TenantCreate
+from app.catalog.verticals import VERTICAL_PACKS
+from app.commerce.modules import PRESETS
 from app.core.db import set_tenant
-from app.email import load_all_messages
-from app.modules import PRESETS
-from app.permissions import effective_permissions
-from app.verticals import VERTICAL_PACKS
+from app.core.permissions import effective_permissions
+from app.messaging.email import load_all_messages
 
 router = APIRouter()
 

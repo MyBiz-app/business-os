@@ -8,8 +8,8 @@ from uuid import UUID
 
 from sqlalchemy import Connection, text
 
+from app.catalog.verticals import VERTICAL_PACKS
 from app.seed.common import _insert
-from app.verticals import VERTICAL_PACKS
 
 PET_NAMES = ("רקס", "לונה", "מקס", "בל", "צ׳ארלי", "נלה", "רוקי", "שוקו", "לולה", "בונו", "מילו",
              "קיווי", "טופי", "סימבה", "פיצה", "ג׳ינג׳ר")  # fmt: skip

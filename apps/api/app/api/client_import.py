@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.clients import ClientSource
 from app.api.deps import TenantContext, require
-from app.importing import (
+from app.catalog.importing import (
     MAX_BYTES,
     ImportField,
     ImportFileError,
@@ -23,7 +23,7 @@ from app.importing import (
     read_table,
     suggest_mapping,
 )
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 

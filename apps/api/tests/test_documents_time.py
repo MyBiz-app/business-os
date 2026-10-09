@@ -186,7 +186,7 @@ def test_isolated_between_businesses(client: TestClient, studio: dict, auth: Aut
 def test_signed_links_open_one_file_for_a_while(
     client: TestClient, studio: dict, auth: AuthHeaders
 ) -> None:
-    from app.signed_links import sign, verify
+    from app.core.signed_links import sign, verify
 
     user = uuid4()
     joined = join(client, auth, user, join_code(client, studio))
@@ -256,8 +256,8 @@ def test_links_are_never_signed_with_the_public_development_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from app.core.config import get_settings
+    from app.core.signed_links import sign
     from app.providers.secrets import SecretsKeyMissing
-    from app.signed_links import sign
 
     settings = get_settings()
     monkeypatch.setattr(settings, "environment", "staging")

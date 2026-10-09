@@ -33,7 +33,7 @@ Each outside capability has, in `apps/api/app/providers/`:
   document's number and link (`internal` keeps the receipt as the document).
 - **Messaging**: messages go to an outbox; the business's messaging provider sends them
   (`send-messages` job) and records the provider's id and status. `simulated` marks them sent.
-- **Email, AI**: already behind interfaces (`app/email.py`, `app/ai/gateway.py`); they are
+- **Email, AI**: already behind interfaces (`app/messaging/email.py`, `app/ai/gateway.py`); they are
   registered the same way.
 
 ## Secrets

@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session
 from app.api.bookings import cancel_booking, lock_session
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 from app.providers.choice import choose
 
 router = APIRouter(prefix="/clients", tags=["clients"])

@@ -5,7 +5,7 @@ from uuid import UUID
 
 from sqlalchemy import Connection, text
 
-from app.billing import bill_businesses
+from app.commerce.billing import bill_businesses
 from app.seed.business import seed
 from app.seed.common import PLATFORM_BUSINESSES, PLATFORM_REQUESTS, profile_id
 

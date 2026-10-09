@@ -43,7 +43,7 @@ export type SignupPlan = {
 
 /** The choices on each add-on screen, from the basic one up (2–4 per screen, decision X16).
  * A tier with no modules is what every plan already has ("included"). Prices come from the
- * catalog, so they change in one place (apps/api/app/modules.py). */
+ * catalog, so they change in one place (apps/api/app/commerce/modules.py). */
 export const OFFER_TIERS: Record<Offer, { key: string; modules: ModuleKey[] }[]> = {
   client_app: [
     { key: "basic", modules: ["client_app"] },

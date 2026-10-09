@@ -7,7 +7,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, time, timedelta
 
-from app.scheduling import local_to_utc
+from app.schedule.scheduling import local_to_utc
 
 STEP_MINUTES = 15  # offered start times are on a quarter-hour grid
 

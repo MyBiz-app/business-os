@@ -1,4 +1,4 @@
-from app.permissions import ROLE_PERMISSIONS, Permission
+from app.core.permissions import ROLE_PERMISSIONS, Permission
 
 # The full matrix, written out so that any change to who-can-do-what is a visible diff.
 EXPECTED = {

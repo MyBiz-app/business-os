@@ -17,9 +17,9 @@ from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.plans import usable_entitlement
-from app.notifications import notify_booking
-from app.permissions import Permission
-from app.verticals import CATALOG, VerticalPack
+from app.catalog.verticals import CATALOG, VerticalPack
+from app.core.permissions import Permission
+from app.messaging.notifications import notify_booking
 
 router = APIRouter(tags=["bookings"])
 

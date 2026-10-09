@@ -28,8 +28,8 @@ from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
 from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
-from app.scheduling import local_to_utc
-from app.verticals import CATALOG
+from app.catalog.verticals import CATALOG
+from app.schedule.scheduling import local_to_utc
 
 public_router = APIRouter(tags=["client"])
 router = APIRouter(prefix="/client", tags=["client"])

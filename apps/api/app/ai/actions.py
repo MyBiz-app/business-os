@@ -15,7 +15,7 @@ from app.ai.tools import TOOLS, payload_hash
 from app.api import time_billing
 from app.api.bookings import cancel_booking, lock_session, place_booking
 from app.api.deps import TenantContext, has_module
-from app.notifications import notify_booking
+from app.messaging.notifications import notify_booking
 
 # What each action changed, for the audit log: the entity type and its id in the result.
 ENTITY = {

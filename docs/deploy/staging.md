@@ -58,7 +58,7 @@ only) and not the transaction pooler (port 6543).
 
 - `GET /health`: the process is up (Render's health check). `GET /health/ready`: the database
   answers too (503 when it doesn't); point uptime monitoring here.
-- Rate limits per visitor (`app/rate_limit.py`): 20 public form posts and 120 public reads a
+- Rate limits per visitor (`app/core/rate_limit.py`): 20 public form posts and 120 public reads a
   minute (`/public/…`: join pages, quote links, inquiries, the contact form, file links), 600
   webhook calls, and a ceiling of 1,200 calls a minute for everything; over a limit the API
   answers 429 with `Retry-After`. On in every environment except local development

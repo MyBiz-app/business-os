@@ -1,6 +1,6 @@
 name: Send notification emails on staging
 
-# Emails pending client notifications (apps/api/app/email.py). Does nothing until the
+# Emails pending client notifications (apps/api/app/messaging/email.py). Does nothing until the
 # repository variable EMAIL_PROVIDER is set (Settings → Secrets and variables → Actions →
 # Variables): `gmail` (free, no domain: EMAIL_FROM is the Gmail address, the secret
 # EMAIL_API_KEY its app password) or `resend` (EMAIL_API_KEY is the Resend key).

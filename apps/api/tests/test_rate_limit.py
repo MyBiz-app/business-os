@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
-from app.rate_limit import MemoryStore, Rule, limiter
+from app.core.rate_limit import MemoryStore, Rule, limiter
 
 RULES = (
     Rule("public-write", "/public/", 2, methods=frozenset({"POST"})),

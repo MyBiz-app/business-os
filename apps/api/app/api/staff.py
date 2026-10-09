@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.common import not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
-from app.permissions import ROLE_PERMISSIONS, Permission
+from app.core.permissions import ROLE_PERMISSIONS, Permission
 
 router = APIRouter(tags=["staff"])
 

@@ -3,9 +3,9 @@
     uv run python -m app.jobs extend-series [--database-url URL]
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
-    uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
+    uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
-    uv run python -m app.jobs bill-businesses (simulated platform billing; see app/billing.py)
+    uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
 
@@ -20,12 +20,18 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, create_engine, text
 
-from app import outbox
-from app.billing import bill_businesses
+from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
-from app.email import MESSAGES_DIR, load_messages, render, send_emails, sender_from_settings
+from app.messaging import outbox
+from app.messaging.email import (
+    MESSAGES_DIR,
+    load_messages,
+    render,
+    send_emails,
+    sender_from_settings,
+)
 from app.providers.choice import choose
-from app.scheduling import weekly_occurrences
+from app.schedule.scheduling import weekly_occurrences
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
 
