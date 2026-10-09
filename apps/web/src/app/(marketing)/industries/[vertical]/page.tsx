@@ -65,15 +65,15 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
           </ul>
           <div className="flex flex-wrap justify-center gap-3">
             {planned ? (
-              <Link href={`/contact?vertical=${key}`} className="btn-primary px-6 py-3 text-lg">
+              <Link href={`/contact?vertical=${key}`} className="btn-primary btn-lg">
                 {t("industries.notify")}
               </Link>
             ) : (
               <>
-                <Link href={`/start?vertical=${key}`} className="btn-primary px-6 py-3 text-lg">
+                <Link href={`/start?vertical=${key}`} className="btn-primary btn-lg">
                   {t("hero.ctaPrimary")}
                 </Link>
-                <Link href={`/contact?vertical=${key}`} className="btn-secondary px-6 py-3 text-lg">
+                <Link href={`/contact?vertical=${key}`} className="btn-secondary btn-lg">
                   {t("cta.contact")}
                 </Link>
               </>

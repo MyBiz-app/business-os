@@ -70,7 +70,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
 
       {catalog && (
         <>
-          <section aria-label={t("presetsTitle")} className="mx-auto grid w-full max-w-6xl gap-5 px-6 py-12 md:grid-cols-3">
+          <section aria-label={t("presetsTitle")} className="swipe mx-auto w-full max-w-6xl gap-5 px-6 py-12 sm:grid md:grid-cols-3">
             {PRESETS.map((preset) => {
               const popular = preset === "growing";
               return (
@@ -149,24 +149,24 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
               {[...catalog.modules].sort((x, y) => Number(y.available) - Number(x.available)).map((module) => (
                 <li
                   key={module.key}
-                  className={`card group flex flex-col gap-3 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
+                  className={`card group grid grid-cols-[auto_1fr] items-start gap-x-4 gap-y-1 p-4 transition-[transform,box-shadow] sm:flex sm:flex-col sm:gap-3 sm:p-5 duration-300 hover:-translate-y-0.5 hover:shadow-lg ${
                     module.available ? "" : "opacity-80"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="row-span-3 flex flex-col items-start gap-2 sm:row-span-1 sm:flex-row sm:justify-between sm:gap-3">
                     <ModuleIcon module={module.key} />
                     {!module.available && (
                       <span className="rounded-full bg-foreground/8 px-2.5 py-1 text-xs font-semibold text-muted">{tModules("comingSoon")}</span>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold">{tModules(`names.${module.key}` as "names.client_app")}</h3>
+                  <h3 className="font-bold sm:text-lg">{tModules(`names.${module.key}` as "names.client_app")}</h3>
                   <p className="flex-1 text-sm text-muted">
                     {module.key === "extra_location"
                       ? tModules("descriptions.extra_location", { price: money(module.price) })
                       : tModules(`descriptions.${module.key}` as "descriptions.client_app")}
                   </p>
-                  <p className="flex items-baseline gap-1 border-t border-border pt-3">
-                    <span className="text-2xl font-extrabold">
+                  <p className="flex items-baseline gap-1 sm:border-t sm:border-border sm:pt-3">
+                    <span className="text-lg font-extrabold sm:text-2xl">
                       + <bdi>{money(module.price)}</bdi>
                     </span>
                     <span className="text-sm text-muted">{module.billing === "once" ? t("oneTime") : t("perMonth")}</span>

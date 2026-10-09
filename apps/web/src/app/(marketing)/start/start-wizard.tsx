@@ -96,7 +96,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const [cartOpen, setCartOpen] = useState(false);
   const [terms, setTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
+  // Add-ons the person said "no thanks" to, so Continue reads as a choice, not a skip.
+  const [declined, setDeclined] = useState<Offer[]>([]);
   const heading = useRef<HTMLHeadingElement>(null);
+  const tierList = useRef<HTMLUListElement>(null);
+  const termsBox = useRef<HTMLInputElement>(null);
   const moved = useRef(false);
 
   const step = steps[stepIndex];
@@ -110,6 +114,18 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     if (moved.current) heading.current?.focus();
     moved.current = true;
   }, [stepIndex, category]);
+
+  // On a phone the choices swipe sideways: open each screen on the chosen (or suggested) one.
+  useEffect(() => {
+    const list = tierList.current;
+    const card = list?.querySelector<HTMLElement>("[data-chosen=true]") ?? list?.querySelector<HTMLElement>("[data-suggested=true]");
+    if (!list || !card || list.scrollWidth <= list.clientWidth) return;
+    const rtl = getComputedStyle(list).direction === "rtl";
+    const gutter = parseFloat(getComputedStyle(list).scrollPaddingInlineStart) || 0;
+    const listBox = list.getBoundingClientRect();
+    const cardBox = card.getBoundingClientRect();
+    list.scrollLeft += rtl ? cardBox.right - listBox.right + gutter : cardBox.left - listBox.left - gutter;
+  }, [stepIndex]);
 
   const go = (index: number) => {
     setStepIndex(Math.min(Math.max(0, index), steps.length - 1));
@@ -131,6 +147,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     const modules = chooseTier(offer, tier, draft.modules, catalog);
     setDraft({ ...draft, modules });
     const chosen = tier && tierOf(offer, modules);
+    setDeclined((list) => (tier ? list.filter((item) => item !== offer) : [...new Set([...list, offer])]));
     announce(chosen ? "cart.addedNotice" : "cart.removedNotice", chosen ? `${offerName(offer)} · ${tierName(offer, chosen)}` : offerName(offer), modules);
   };
   const removeModule = (key: ModuleKey) => {
@@ -167,6 +184,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const finish = () => {
     if (!terms) {
       setTermsError(true);
+      termsBox.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      termsBox.current?.focus({ preventScroll: true });
       return;
     }
     if (!draft.vertical) return;
@@ -178,7 +197,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     ? `/login?next=${encodeURIComponent(`/start/finish?p=${encodePlan({ ...draft, vertical: draft.vertical })}`)}`
     : "/login";
 
-  const headingProps = { ref: heading, tabIndex: -1, className: "text-3xl font-extrabold tracking-tight outline-none sm:text-4xl" };
+  const headingProps = { ref: heading, tabIndex: -1, className: "text-3xl font-extrabold tracking-tight outline-none sm:text-4xl lg:short:text-3xl" };
   const daily = (amount: number) => t("daily", { price: money(Math.round(amount / 30)) });
 
   // ---- The steps --------------------------------------------------------------------------
@@ -410,7 +429,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     const picture = tiers.length === 2 ? (illustrations[offer] ?? (offer === "crm" || offer === "whatsapp" ? <OfferPicture offer={offer} /> : null)) : null;
     content = (
       <>
-        <div className="grid items-center gap-6 xl:grid-cols-[1fr_15rem]">
+        {/* The picture only where there is room for it and the choices below it (wide and tall). */}
+        <div className="grid items-center gap-6 xl:[@media(min-height:56rem)]:grid-cols-[1fr_15rem]">
           <StepHeading
             eyebrow={
               <span className="flex items-center gap-2">
@@ -420,9 +440,9 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             title={<h1 {...headingProps}>{t(`offers.${offer}.title`)}</h1>}
             subtitle={t(`offers.${offer}.text`)}
           />
-          {picture && <div aria-hidden="true" className="hidden max-h-56 overflow-hidden xl:block">{picture}</div>}
+          {picture && <div aria-hidden="true" className="hidden max-h-56 overflow-hidden xl:[@media(min-height:56rem)]:block">{picture}</div>}
         </div>
-        <ul className={`enter-items grid gap-4 pt-3 ${tiers.length >= 3 ? "md:grid-cols-3" : "sm:grid-cols-2"}`}>
+        <ul ref={tierList} className={`enter-items swipe gap-4 [--swipe-gutter:1rem] sm:grid sm:pt-3 ${tiers.length >= 3 ? "sm:grid-cols-2 md:grid-cols-3" : "sm:grid-cols-2"}`}>
           {tiers.map((tier, index) => {
             const chosen = tier.modules.length === 0 ? current === null : current === tier.key;
             const price = tierPrice(offer, tier.key, catalog);
@@ -440,6 +460,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                   badge={badge}
                   premium={top}
                   chosen={chosen}
+                  suggested={suggested[offer] === tier.key}
                   price={
                     tier.modules.length === 0 ? (
                       <span className="text-2xl font-extrabold">{t(isOnce(offer) ? "tier.free" : "tier.included")}</span>
@@ -462,10 +483,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                         : null
                   }
                   action={chosen ? t("tier.chosen") : t("tier.choose")}
-                  onChoose={() => {
-                    setTier(offer, tier.modules.length === 0 ? null : tier.key);
-                    next();
-                  }}
+                  onChoose={() => setTier(offer, tier.modules.length === 0 ? null : tier.key)}
                 />
               </li>
             );
@@ -474,12 +492,13 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         {tiers.every((tier) => tier.modules.length > 0) && (
           <button
             type="button"
-            onClick={() => {
-              if (current) setTier(offer, null);
-              next();
-            }}
-            className="w-fit text-sm font-semibold text-muted underline underline-offset-4 hover:text-foreground"
+            aria-pressed={declined.includes(offer)}
+            onClick={() => setTier(offer, null)}
+            className={`flex w-fit items-center gap-1.5 text-sm font-semibold underline-offset-4 hover:text-foreground ${
+              declined.includes(offer) ? "text-foreground" : "text-muted underline"
+            }`}
           >
+            {declined.includes(offer) && <Check aria-hidden="true" className="size-4 text-success" />}
             {t("tier.noThanks", { name: offerName(offer) })}
           </button>
         )}
@@ -534,6 +553,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         <div className="flex flex-col gap-2">
           <label className="flex items-start gap-3 text-sm">
             <input
+              ref={termsBox}
               type="checkbox"
               checked={terms}
               onChange={(event) => {
@@ -584,9 +604,36 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const showContinue = step === "business" || step === "base";
   const percent = Math.round((stepIndex / (steps.length - 1)) * 100);
 
+  const decided = isOffer && (tierOf(step as Offer, draft.modules) !== null || declined.includes(step as Offer) || OFFER_TIERS[step as Offer].some((tier) => tier.modules.length === 0));
+  const arrow = <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />;
+  const backButton =
+    stepIndex > 0 ? (
+      <button type="button" onClick={back} aria-label={t("back")} className="btn-secondary size-11 shrink-0 sm:size-auto sm:px-4 sm:py-2.5">
+        <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" /> <span className="max-sm:sr-only">{t("back")}</span>
+      </button>
+    ) : null;
+  const forwardButton = showContinue ? (
+    <button
+      type={step === "business" ? "submit" : "button"}
+      form={step === "business" ? "business-form" : undefined}
+      onClick={step === "business" ? undefined : next}
+      className="btn-primary px-5 py-2.5 sm:px-6"
+    >
+      {t("next")} {arrow}
+    </button>
+  ) : isOffer ? (
+    <button type="button" onClick={next} className={`${decided ? "btn-primary" : "btn-secondary"} px-5 py-2.5 sm:px-6`}>
+      {decided ? t("next") : t("skip")} {arrow}
+    </button>
+  ) : step === "summary" ? (
+    <button type="button" onClick={finish} className="btn-primary px-5 py-2.5 sm:px-6 sm:text-lg">
+      {t("summary.cta")} {arrow}
+    </button>
+  ) : null;
+
   return (
-    <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 pb-32 pt-8 sm:px-6 lg:grid-cols-[1fr_20rem] lg:pb-16">
-      <div className="flex min-w-0 flex-col gap-6">
+    <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 pb-36 pt-6 sm:px-6 lg:grid-cols-[1fr_20rem] lg:pb-16 lg:pt-8">
+      <div className="flex min-w-0 flex-col gap-6 lg:short:gap-4">
         <nav aria-label={t("progress.label")} className="flex flex-col gap-2">
           <FlightPath percent={percent} />
           <ol className="grid grid-cols-5 gap-2">
@@ -600,7 +647,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
               </li>
             ))}
           </ol>
-          <p className="text-xs text-muted">
+          <p className="text-xs text-muted lg:short:hidden">
             {t("progress.step", { step: stepIndex + 1, total: steps.length })} · {t("progress.flight", { percent })}
           </p>
         </nav>
@@ -616,58 +663,36 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           />
         )}
 
-        <section key={step} className="enter relative flex flex-col gap-6">
+        <section key={step} className="enter relative flex flex-col gap-6 lg:short:gap-4">
           {content}
         </section>
 
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {stepIndex > 0 ? (
-            <button type="button" onClick={back} className="btn-secondary px-4 py-2.5">
-              <ArrowLeft aria-hidden="true" className="size-4 rtl:rotate-180" /> {t("back")}
-            </button>
-          ) : (
-            <span />
+        {/* Back and Continue: a floating bar at the bottom of the steps on wide screens (on phones
+            they sit in the bar with the plan, so they are always within reach). */}
+        <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-3 rounded-2xl bg-surface/90 p-3 shadow-lg ring-1 ring-border backdrop-blur lg:flex">
+          {backButton ?? <span />}
+          {stepIndex > 0 && step !== "summary" && (
+            <p className="hidden text-sm text-muted xl:block">{t("progress.step", { step: stepIndex + 1, total: steps.length })}</p>
           )}
-          {isOffer && tierOf(step as Offer, draft.modules) !== null && (
-            <button type="button" onClick={next} className="btn-primary px-6 py-3">
-              {t("next")} <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-            </button>
-          )}
-          {showContinue && (
-            <button
-              type={step === "business" ? "submit" : "button"}
-              form={step === "business" ? "business-form" : undefined}
-              onClick={step === "business" ? undefined : next}
-              className="btn-primary px-6 py-3"
-            >
-              {t("next")} <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-            </button>
-          )}
-          {step === "summary" && (
-            <div className="flex flex-col items-end gap-2">
-              <button type="button" onClick={finish} className="btn-primary px-6 py-3 text-lg">
-                {t("summary.cta")} <ArrowRight aria-hidden="true" className="size-5 rtl:rotate-180" />
-              </button>
-              {!signedIn && (
-                <p className="text-sm text-muted">
-                  {t("summary.haveAccount")}{" "}
-                  <Link
-                    href={loginHref}
-                    onClick={(event) => {
-                      if (!terms) {
-                        event.preventDefault();
-                        setTermsError(true);
-                      }
-                    }}
-                    className="font-semibold text-primary underline-offset-4 hover:underline"
-                  >
-                    {t("summary.login")}
-                  </Link>
-                </p>
-              )}
-            </div>
-          )}
+          {forwardButton}
         </div>
+        {step === "summary" && !signedIn && (
+          <p className="text-sm text-muted lg:text-end">
+            {t("summary.haveAccount")}{" "}
+            <Link
+              href={loginHref}
+              onClick={(event) => {
+                if (!terms) {
+                  event.preventDefault();
+                  setTermsError(true);
+                }
+              }}
+              className="font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              {t("summary.login")}
+            </Link>
+          </p>
+        )}
       </div>
 
       <Cart
@@ -680,6 +705,14 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         onToggle={() => setCartOpen((value) => !value)}
         onRemove={removeModule}
         t={t}
+        actions={
+          backButton || forwardButton ? (
+            <>
+              {backButton}
+              {forwardButton}
+            </>
+          ) : null
+        }
       />
       <p aria-live="polite" className="sr-only">
         {notice}

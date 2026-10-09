@@ -68,7 +68,7 @@ export async function FeatureGrid({ inFeaturesPage = false }: { inFeaturesPage?:
         title={inFeaturesPage ? t("gridTitle") : t("title")}
         subtitle={inFeaturesPage ? t("gridSubtitle") : t("subtitle")}
       />
-      <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="enter-items swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4">
         {FEATURES.map(({ key, Icon }) => (
           <li key={key} className="card card-hover flex flex-col gap-3 p-6">
             <span className="icon-tile size-11">
@@ -91,7 +91,7 @@ export async function IndustryCards() {
   return (
     <section aria-labelledby="industries-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
       <SectionHeading id="industries-heading" title={t("title")} subtitle={t("subtitle")} />
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
         {open.map(({ key, icon, color }) => (
           <li key={key}>
             <Link href={`/industries/${key}`} className="card card-hover group flex h-full flex-col gap-4 p-6">
@@ -176,10 +176,10 @@ export async function CtaBand() {
         <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">{t("title")}</h2>
         <p className="relative max-w-xl text-lg text-white/85">{t("text")}</p>
         <div className="relative flex flex-wrap justify-center gap-3">
-          <Link href="/start" className="rounded-xl bg-white px-6 py-3 text-lg font-semibold text-brand-ink shadow-lg transition-transform hover:-translate-y-0.5">
+          <Link href="/start" className="btn-lg rounded-xl bg-white font-semibold text-brand-ink shadow-lg transition-transform hover:-translate-y-0.5">
             {t("button")}
           </Link>
-          <Link href="/contact" className="rounded-xl border border-white/40 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-white/10">
+          <Link href="/contact" className="btn-lg rounded-xl border border-white/40 font-semibold text-white transition-colors hover:bg-white/10">
             {t("contact")}
           </Link>
         </div>
