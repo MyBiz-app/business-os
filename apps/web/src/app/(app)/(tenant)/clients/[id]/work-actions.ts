@@ -20,7 +20,10 @@ export async function uploadDocument(clientId: string, _state: FormState, formDa
   body.set("shared", formData.get("shared") === "on" ? "true" : "false");
   body.set("sign_requested", formData.get("sign_requested") === "on" ? "true" : "false");
   const response = await apiFetch(`/clients/${encodeURIComponent(clientId)}/documents`, { method: "POST", body }, tenant.id);
-  if (!response.ok) return { error: response.status === 422 ? "invalid" : "generic" };
+  if (!response.ok) {
+    // 409: the business's space for files is full (#104).
+    return { error: response.status === 422 ? "invalid" : response.status === 409 ? "storage_full" : "generic" };
+  }
   revalidatePath(`/clients/${clientId}`);
   return { saved: true };
 }

@@ -171,6 +171,16 @@ def get_billing(context: SettingsDep) -> Billing:
     )
 
 
+@router.get("/usage")
+def get_usage(context: SettingsDep) -> Usage:
+    """This month's space and messages, for the warnings on the dashboard and in the app."""
+    db = context.session
+    time_zone = db.execute(
+        text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    return usage(db, datetime.now(ZoneInfo(time_zone)).date())
+
+
 def usage(db: Session, today: date) -> Usage:
     """Messages counted from usage events since the 1st of the business's month, and the
     files the business keeps now."""
@@ -183,7 +193,7 @@ def usage(db: Session, today: date) -> Usage:
                  WHERE u.meter = 'messages'
                    AND u.occurred_at >= (CAST(:start AS date)::timestamp AT TIME ZONE t.time_zone))
                     AS messages,
-                (SELECT coalesce(sum(d.size), 0) FROM app.client_documents d) AS storage
+                app.storage_used() AS storage
             FROM app.tenants t WHERE t.id = app.current_tenant_id()
         """),
         {"start": month_start},

@@ -522,7 +522,8 @@
     "add": "Add",
     "errors": {
       "invalid": "Please check the details and try again.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "storage_full": "Your space for files is full. Delete some files or choose a bigger bundle in Billing."
     },
     "loading": "Loading…",
     "chooseFile": "Choose a file",
@@ -2327,7 +2328,11 @@
         "included": "Basic",
         "pack_plus": "Plus",
         "pack_max": "Max"
-      }
+      },
+      "nearMessages": "You've used {percent}% of this month's messages. They keep going to your clients; a bigger bundle covers more.",
+      "overMessages": "You've passed this month's messages ({percent}%). They keep going to your clients; choose a bigger bundle.",
+      "nearStorage": "Your files take {percent}% of your space.",
+      "overStorage": "Your space for files is full: new files can't be added. Delete some or choose a bigger bundle."
     }
   },
   "visitNotes": {

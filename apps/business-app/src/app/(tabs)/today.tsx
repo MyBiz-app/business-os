@@ -1,14 +1,16 @@
 import type { components } from "@business-os/api-client";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { addDays, dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
+import { usageWarnings } from "@business-os/i18n/usage";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Linking, Pressable, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
@@ -30,6 +32,7 @@ export default function Today() {
   const t = useTranslations("business.today");
   const tTerms = useTranslations("terms");
   const tAttention = useTranslations("dashboard.attention");
+  const tUsage = useTranslations("billing.usage");
   const tReserve = useTranslations("business.reserve");
   const tJobs = useTranslations("jobs");
   const locale = useLocale();
@@ -42,8 +45,8 @@ export default function Today() {
   const [open, setOpen] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0, onSite: false };
-    const [sessions, attention, courts, onSite] = await Promise.all([
+    if (!tenantId) return { sessions: [] as ScheduledSession[], attention: [] as AttentionList[], courts: 0, onSite: false, usage: null };
+    const [sessions, attention, courts, onSite, usage] = await Promise.all([
       can("schedule.read")
         ? api.GET("/sessions", { params: { ...scope, query: { start: todayIn(timeZone), days: DAYS } } }).then(unwrap)
         : Promise.resolve([] as ScheduledSession[]),
@@ -61,8 +64,12 @@ export default function Today() {
         .GET("/services", { params: { ...scope, query: { active: true } } })
         .then((r) => (r.data ?? []).some((s) => s.on_site))
         .catch(() => false),
+      // Space and messages against the bundle (#104), for whoever manages the business.
+      can("business.settings")
+        ? api.GET("/billing/usage", { params: scope }).then(unwrap).catch(() => null)
+        : Promise.resolve(null),
     ]);
-    return { sessions, attention, courts, onSite };
+    return { sessions, attention, courts, onSite, usage };
   }, [api, scope, tenantId, timeZone, can]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
@@ -171,6 +178,20 @@ export default function Today() {
           {list(sessions)}
         </View>
       )}
+      {data?.usage &&
+        usageWarnings(data.usage).map(({ key, percent }) => (
+          <Card key={key} palette={palette}>
+            <Text style={{ color: key.startsWith("over") ? palette.danger : palette.foreground, fontWeight: "600", textAlign: "left" }}>
+              {tUsage(key, { percent })}
+            </Text>
+            <Button
+              label={tUsage("more")}
+              variant="secondary"
+              palette={palette}
+              onPress={() => void Linking.openURL(`${WEB_URL}/settings/billing`)}
+            />
+          </Card>
+        ))}
       {attention.length > 0 && (
         <View style={{ gap: 10 }}>
           <SectionTitle title={t("attention")} palette={palette} />
