@@ -3104,6 +3104,19 @@
       "best": "הכי טוב: {when}, {value}",
       "breakdownLine": "{sessions, plural, one {מפגש אחד} other {# מפגשים}} · {attended, plural, one {הגעה אחת} other {# הגעות}} · {occupancy} תפוסה"
     },
+    "quotes": {
+      "saved": "נשמר.",
+      "sent": "נשלח. הלקוח יכול לפתוח את ההצעה בקישור שלה.",
+      "sendAgain": "שליחה חוזרת ללקוח",
+      "whatsapp": "שליחה בוואטסאפ",
+      "share": "שיתוף הקישור",
+      "paymentRecorded": "התשלום נרשם.",
+      "depositDue": "נשאר לשלם מהמקדמה: {amount}",
+      "noEnd": "בלי תאריך סיום",
+      "validFor": "{count} ימים",
+      "forClient": "עבור {name}",
+      "invalid": "צריך כותרת, ולכל פריט תיאור, כמות ומחיר."
+    },
     "me": {
       "title": "אני",
       "business": "עסק",
