@@ -213,3 +213,43 @@ def test_my_businesses_shows_each_business_with_its_branches(
     assert by_name["Pizza"]["revenue_month"] == 0 and by_name["Pizza"]["active_clients"] == 0
     assert by_name["Gym"]["role"] == "staff" and by_name["Gym"]["revenue_month"] is None
     assert {b["tenant_id"] for b in found} == {pizza["id"], barber["id"], gym["id"]}
+
+
+def test_a_member_kept_to_branches_sees_only_theirs(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    headers = studio["headers"]
+    north = studio["location"]["id"]
+    south = client.post("/locations", json={"name": "South"}, headers=headers).json()["id"]
+    east = client.post("/locations", json={"name": "East"}, headers=headers).json()["id"]
+    day = local_today() + timedelta(days=1)
+    for branch in (north, south, east):
+        client.post(
+            "/sessions",
+            json={
+                "service_id": studio["service"]["id"],
+                "date": day.isoformat(),
+                "start_time": "09:00",
+                "location_id": branch,
+            },
+            headers=headers,
+        )
+    coach = str(studio["coach"])
+    client.put(f"/staff/{coach}/branches", json={"location_ids": [south, east]}, headers=headers)
+    mine = auth(studio["coach"], studio["tenant_id"])
+
+    def seen(h: dict) -> list[str]:
+        found = client.get("/sessions", params={"start": day, "days": 1}, headers=h)
+        assert found.status_code == 200, found.text
+        return sorted(s["location_id"] for s in found.json())
+
+    both = sorted([south, east])
+    assert sorted(b["id"] for b in client.get("/locations", headers=mine).json()) == both
+    assert seen(mine) == both  # "all branches" is all of theirs
+    assert seen({**mine, "X-Location-Id": east}) == [east]
+    assert seen({**mine, "X-Location-Id": north}) == both  # never another branch
+    assert len(seen(headers)) == 3  # the owner sees every branch
+
+    # Kept to a single branch, they always work in it.
+    client.put(f"/staff/{coach}/branches", json={"location_ids": [east]}, headers=headers)
+    assert seen(mine) == [east]

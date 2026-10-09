@@ -1320,7 +1320,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Locations */
+        /**
+         * List Locations
+         * @description The business's branches; a member kept to some branches sees only theirs (#64).
+         */
         get: operations["list_locations"];
         put?: never;
         /** Create Location */

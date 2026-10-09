@@ -32,11 +32,12 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
    3. Paste the client ID and secret into Supabase and enable Google. The button appears on the site by itself within 5 minutes.
 4. **Apple sign-in** (optional, later). Needs a paid [Apple Developer](https://developer.apple.com/programs/) account.
 5. **Change the demo accounts' temporary passwords.** Never share the new ones.
-6. **Open decisions:** #46 payments provider (it brings Apple Pay / Google Pay), #47 invoicing provider, #36 brand name, #64 branch restriction.
+6. **Open decisions:** #46 payments provider (it brings Apple Pay / Google Pay) and #47 invoicing provider, connected when the business starts operating (X21); #36 brand name (MyBiz for now).
 7. **The owner's fixes and polish report**, before go-live.
 
 ## In progress
 
+- **Team members work in their branches (#64, X19).** A member assigned to branches sees only those: the branch picker lists only theirs, "all branches" means all of theirs, and lists and numbers follow it. Owners and managers see every branch.
 - **Code restructured for growth (X18).** The demo generator is the `app/seed` package, the sign-up wizard is split into the journey, the cart and its pieces, `apps/mobile` is now `apps/client-app`, and the API's logic is grouped by area (`schedule`, `commerce`, `messaging`, `catalog`, `reports`, `core`). Behavior is unchanged: the full API suite passes and the API schema is identical (#122–#125). After pulling, run `pnpm install` once.
 - **Leads on autopilot (#104).** With the leads-on-autopilot add-on and WhatsApp, a new or contacted lead with a phone that nobody has touched for two days gets one follow-up message (mentioning what they asked about), written on the lead's timeline. A daily job (`follow-up-leads`), scheduled on staging. Lead ads from Facebook / Instagram come with the real providers.
 - **Space and messages per bundle (#104).** The billing page shows this month's messages and the files kept against the business's bundle (Basic 2 GB and 200 messages, Plus 20 GB and 1,000, Max 100 GB and 5,000), amber from 80% and red when over, with a link to a bigger bundle. Over the bundle (X17, soft limit): messages keep going, new files stop, and the owner sees a warning from 80% on the dashboard and in the business app.
@@ -77,7 +78,6 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - [#46](https://github.com/MyBiz-app/business-os/issues/46) Payment provider (O1)
 - [#47](https://github.com/MyBiz-app/business-os/issues/47) Invoicing provider (O2)
 - [#36](https://github.com/MyBiz-app/business-os/issues/36) Final brand name (O3)
-- [#64](https://github.com/MyBiz-app/business-os/issues/64) Does a team member's branch assignment restrict what they see?
 
 ## Health
 

@@ -7020,6 +7020,7 @@
           "locations"
         ],
         "summary": "List Locations",
+        "description": "The business's branches; a member kept to some branches sees only theirs (#64).",
         "operationId": "list_locations",
         "security": [
           {

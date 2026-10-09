@@ -623,7 +623,7 @@
     "branchesOf": "Branches of {email}",
     "allBranches": "All branches",
     "someBranches": "{count} branches",
-    "branchesHint": "Where they work. None checked means all branches.",
+    "branchesHint": "They see only the branches checked here (owners and managers always see all). None checked means all branches.",
     "saveBranches": "Save",
     "count": "{count, plural, one {One person} other {# people}}"
   },
