@@ -8,12 +8,20 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { BRAND_NAME, LOGO_INK, MARK, glyph, gradient, markSvg } from "../src/index.ts";
+import { LOGO_INK, MARK, glyph, gradient, markSvg } from "../src/index.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = resolve(here, "../../..");
 const assets = resolve(here, "../assets");
 const font = join(root, "apps/web/src/app/(marketing)/fonts/Heebo-ExtraBold.ttf");
+
+// The name lives in @business-os/i18n: brand.json once it exists, the English app name until then.
+const i18n = join(root, "packages/i18n");
+const name = existsSync(join(i18n, "brand.json"))
+  ? JSON.parse(readFileSync(join(i18n, "brand.json"), "utf8")).name
+  : JSON.parse(readFileSync(join(i18n, "messages/en.json"), "utf8")).app.name;
+// The wordmark colors the last capitalised word ("Biz" in "MyBiz"); a name without one stays in ink.
+const [, lead, accent] = /^(.+?)([A-Z][^A-Z]*)$/.exec(name) ?? [null, name, ""];
 
 /** The M alone on a transparent canvas, scaled into the middle (Android adaptive and monochrome). */
 function glyphSvg({ ink, core, scale }) {
@@ -36,7 +44,7 @@ function wordmarkSvg(ink) {
     `${gradient("t", 'gradientUnits="userSpaceOnUse" x1="150" y1="0" x2="250" y2="0"')}</defs>` +
     `<rect width="64" height="64" rx="${MARK.tileRadius}" fill="url(#g)"/>${glyph({ ink: "#FFFFFF", core: "url(#g)" })}` +
     `<text x="80" y="47" font-family="Heebo, Arial, Helvetica, sans-serif" font-size="44" font-weight="800" letter-spacing="-0.5" fill="${ink}">` +
-    `${BRAND_NAME.lead}<tspan fill="url(#t)">${BRAND_NAME.accent}</tspan></text></svg>`;
+    `${lead}<tspan fill="url(#t)">${accent}</tspan></text></svg>`;
 }
 
 const chrome = process.env.CHROME_PATH ??

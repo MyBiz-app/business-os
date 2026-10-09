@@ -1,12 +1,10 @@
 /**
- * The MyBiz brand in one place: the product name, the logo's colors and the geometry of its mark.
- * Every logo file (web favicon, app icons, wordmarks) is drawn from these values by
+ * The MyBiz logo in one place: its colors and the geometry of its mark. The product name is not
+ * here: it comes from `@business-os/i18n` (the single source for the name). Every logo file (web
+ * favicon, app icons, wordmarks) is drawn from these values and that name by
  * `pnpm --filter @business-os/brand build:assets`, and the web draws the mark from them inline,
- * so renaming the product or recoloring the logo is a change here plus one script run.
+ * so recoloring or renaming is a change in one place plus one script run.
  */
-
-/** The product name as written in logos. User-facing text still comes from i18n (`app.name`). */
-export const BRAND_NAME = { lead: "My", accent: "Biz" } as const;
 
 /** The logo gradient, top-left to bottom-right: violet, blue, sky. */
 export const LOGO_GRADIENT = ["#7C3AED", "#3B82F6", "#0EA5E9"] as const;
