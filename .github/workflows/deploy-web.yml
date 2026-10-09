@@ -1,0 +1,59 @@
+name: Deploy web to Vercel
+
+# The Vercel team is on the Hobby plan, which can't deploy a private repository owned by a
+# GitHub organization through its Git integration. This workflow builds the web app here and
+# uploads the result with the Vercel CLI instead: every push to main that touches the web app
+# goes to production, and it can be started by hand from the Actions tab.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "packages/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-web
+  cancel-in-progress: false
+
+env:
+  # Not secrets: they only name the Vercel team and project.
+  VERCEL_ORG_ID: team_KwKjSLwpf7CxSCUP92Fbx6qK
+  VERCEL_PROJECT_ID: prj_85Py3VI8ZWxIAg3s2SpBlUGowJ08
+  VERCEL_CLI: vercel@59.26.0
+
+jobs:
+  deploy:
+    name: Build and deploy to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Check the Vercel token
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Secret VERCEL_TOKEN is not set (Settings > Environments > staging)."
+            exit 1
+          fi
+
+      - name: Pull the project settings and production environment variables
+        run: npx --yes "$VERCEL_CLI" pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Build
+        run: npx --yes "$VERCEL_CLI" build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy
+        run: npx --yes "$VERCEL_CLI" deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
