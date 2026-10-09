@@ -60,8 +60,15 @@ with sync_playwright() as p:
     check(page, "3-base")
     page.get_by_role("button", name="המשך").click()
 
+    def proceed() -> None:
+        page.get_by_role("button", name="המשך").click()
+
     def choose(index: int) -> None:
-        page.locator("main ul li button[aria-pressed]").nth(index).click()
+        # Choosing only marks the choice (the person can still compare); Continue moves on.
+        card = page.locator("main ul li button[aria-pressed]").nth(index)
+        card.click()
+        expect(card).to_have_attribute("aria-pressed", "true")
+        proceed()
 
     expect(page.get_by_role("heading", level=1)).to_have_text("לתת ללקוחות אפליקציה משלך?")
     expect(page.get_by_role("button", name="לבחור")).to_have_count(2)  # basic and pro
@@ -73,7 +80,9 @@ with sync_playwright() as p:
     choose(1)  # AI Pro
     expect(page.get_by_role("heading", level=1)).to_have_text("להפוך יותר פניות ללקוחות?")
     check(page, "6-crm")
+    expect(page.get_by_role("button", name="דלג")).to_be_visible()  # nothing chosen yet
     page.get_by_role("button", name=re.compile("^לא תודה")).click()
+    proceed()
     expect(page.get_by_role("heading", level=1)).to_have_text("להזכיר ללקוחות בוואטסאפ אוטומטית?")
     choose(0)  # WhatsApp basic
     # The extras: space and messages (basic is included), support, and setup (one-time).

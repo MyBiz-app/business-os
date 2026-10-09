@@ -39,10 +39,10 @@ export default async function Home() {
             </h1>
             <p className="max-w-xl text-lg text-muted sm:text-xl">{t("hero.subtitle")}</p>
             <div className="flex flex-wrap gap-3">
-              <Link href="/start" className="btn-primary px-6 py-3 text-lg">
+              <Link href="/start" className="btn-primary btn-lg">
                 {t("hero.ctaPrimary")}
               </Link>
-              <Link href="/features" className="btn-secondary px-6 py-3 text-lg">
+              <Link href="/features" className="btn-secondary btn-lg">
                 {t("hero.ctaSecondary")}
               </Link>
             </div>
@@ -124,7 +124,7 @@ export default async function Home() {
       {/* How it works */}
       <section aria-labelledby="steps-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
         <SectionHeading id="steps-heading" title={t("steps.title")} />
-        <ol className="grid gap-4 md:grid-cols-3">
+        <ol className="swipe gap-4 sm:grid md:grid-cols-3">
           {steps.map((step, index) => (
             <li key={step.title} className="card flex flex-col gap-3 p-6">
               <span aria-hidden="true" className="btn-primary size-10 text-lg">

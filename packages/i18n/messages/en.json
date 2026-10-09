@@ -1219,6 +1219,8 @@
       "pack_max": "100 GB for files and 5,000 messages a month.",
       "support_priority": "Chat and phone, an answer within 4 business hours.",
       "support_vip": "A personal account manager, a monthly call and an answer within an hour.",
+      "setup_guided": "A setup session with the MyBiz team: services, prices and staff set up together.",
+      "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
       "noPack": "2 GB for files and 200 messages a month."
     },
@@ -2494,6 +2496,7 @@
     },
     "back": "Back",
     "next": "Continue",
+    "skip": "Skip",
     "industry": {
       "title": "What kind of business do you run?",
       "subtitle": "We'll set MyBiz up with your industry's words, services and forms.",

@@ -4,6 +4,8 @@
 
 /* Dark mode follows the `dark` class set by next-themes. */
 @custom-variant dark (&:where(.dark, .dark *));
+/* Short screens (a laptop with its browser bars): tighter vertical spacing. */
+@custom-variant short (@media (max-height: 50rem));
 
 /* Design tokens. Use logical utilities (ms-*, ps-*, start-*, text-start) — never left/right.
  * Surfaces: `background` is the page canvas, `surface` the raised cards on it. Accents are
@@ -96,6 +98,19 @@ body {
 
 ::selection {
   background: color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+/* Large desktop screens (a 27" monitor) get a slightly larger type scale, so every rem-based
+   size (text, spacing, the max page width) grows with the screen instead of floating in it. */
+@media (min-width: 112rem) {
+  html {
+    font-size: 106.25%;
+  }
+}
+@media (min-width: 150rem) {
+  html {
+    font-size: 118.75%;
+  }
 }
 
 :focus-visible {
@@ -208,6 +223,16 @@ body {
   }
 }
 
+/* The large call to action (hero, bands): comfortable on a phone, generous on a wide screen. */
+@utility btn-lg {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+  @media (width >= 40rem) {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.125rem;
+  }
+}
+
 /* Text inputs, selects and text areas. */
 @utility control {
   border-radius: 0.75rem;
@@ -223,6 +248,32 @@ body {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 18%, transparent);
+  }
+}
+
+/* ---- Layout ----------------------------------------------------------------------------- */
+
+/* A row of cards that swipes sideways on a phone (the next card peeks in) and is an ordinary
+   grid from the small breakpoint up. --swipe-gutter is the page's side padding. */
+@utility swipe {
+  @media (width < 40rem) {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin-inline: calc(-1 * var(--swipe-gutter, 1.5rem));
+    padding-inline: var(--swipe-gutter, 1.5rem);
+    padding-block: 0.75rem;
+    scroll-padding-inline: var(--swipe-gutter, 1.5rem);
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    & > * {
+      flex: 0 0 82%;
+      scroll-snap-align: start;
+    }
   }
 }
 

@@ -3,6 +3,7 @@
 // The plan so far in the sign-up journey: the cart, the summary lines and the add-ons rail.
 
 import { Check, ChevronUp, ShoppingBag, X } from "lucide-react";
+import type { ReactNode } from "react";
 
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { type ModuleKey, OFFERS, type Offer, type PriceLine } from "@/lib/signup-plan";
@@ -99,7 +100,8 @@ export function AddOnRail({
 
 export type CartLine = PriceLine & { label: string };
 
-/** The plan so far: a card beside the steps on wide screens, a bar at the bottom on phones. */
+/** The plan so far: a card beside the steps on wide screens; on phones and tablets a bar at the
+ * bottom with the total (tap to see the plan) and the step's Back and Continue buttons. */
 export function Cart({
   lines,
   once,
@@ -110,6 +112,7 @@ export function Cart({
   onToggle,
   onRemove,
   t,
+  actions,
 }: {
   lines: CartLine[];
   once: CartLine[];
@@ -120,6 +123,7 @@ export function Cart({
   onToggle: () => void;
   onRemove: (key: ModuleKey) => void;
   t: T;
+  actions: ReactNode;
 }) {
   const list = (items: CartLine[]) => (
     <ul className="flex flex-col gap-2">
@@ -201,25 +205,31 @@ export function Cart({
             <p className="text-center text-sm font-semibold text-primary">{t("cart.trial")}</p>
           </div>
         )}
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          aria-controls="cart-sheet"
-          className="flex w-full items-center justify-between gap-3 px-4 py-3"
-        >
-          <span className="flex items-center gap-2 text-sm font-semibold">
-            <ShoppingBag aria-hidden="true" className="size-5 text-primary" />
-            {open ? t("cart.hide") : t("cart.show")}
-            <span className="text-muted">· {t("cart.items", { count: lines.length + once.length })}</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <span key={total} className="animate-[pop_360ms_var(--ease-out)_both] text-lg font-extrabold">
-              <bdi>{money(total)}</bdi>
+        <div className="flex items-center gap-2 px-3 py-2.5 sm:px-4">
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            aria-controls="cart-sheet"
+            aria-label={`${open ? t("cart.hide") : t("cart.show")} · ${t("cart.items", { count: lines.length + once.length })}`}
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-xl py-1.5 text-start"
+          >
+            <span className="relative shrink-0">
+              <ShoppingBag aria-hidden="true" className="size-6 text-primary" />
+              <span aria-hidden="true" className="absolute -end-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[0.625rem] font-bold text-on-primary">
+                {lines.length + once.length}
+              </span>
             </span>
-            <ChevronUp aria-hidden="true" className={`size-5 transition-transform ${open ? "" : "rotate-180"}`} />
-          </span>
-        </button>
+            <span className="flex min-w-0 flex-col leading-tight">
+              <span key={total} className="animate-[pop_360ms_var(--ease-out)_both] text-lg font-extrabold">
+                <bdi>{money(total)}</bdi>
+              </span>
+              <span className="truncate text-xs text-muted">{open ? t("cart.hide") : t("cart.show")}</span>
+            </span>
+            <ChevronUp aria-hidden="true" className={`size-5 shrink-0 text-muted transition-transform ${open ? "" : "rotate-180"}`} />
+          </button>
+          {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+        </div>
       </div>
     </>
   );

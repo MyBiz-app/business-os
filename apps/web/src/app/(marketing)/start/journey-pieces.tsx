@@ -29,7 +29,7 @@ export function StepHeading({ eyebrow, title, subtitle }: { eyebrow: ReactNode; 
     <div className="flex flex-col gap-2">
       {eyebrow && <div className="text-sm font-semibold text-primary">{eyebrow}</div>}
       {title}
-      <p className="max-w-2xl text-lg text-muted">{subtitle}</p>
+      <p className="max-w-2xl text-base text-muted sm:text-lg lg:short:text-base">{subtitle}</p>
     </div>
   );
 }
@@ -62,6 +62,7 @@ export function TierCard({
   badge,
   premium,
   chosen,
+  suggested = false,
   price,
   note,
   action,
@@ -75,6 +76,8 @@ export function TierCard({
   badge: string | null;
   premium: boolean;
   chosen: boolean;
+  /** Recommended from the answers so far: the card a phone opens the swipe row on. */
+  suggested?: boolean;
   price: ReactNode;
   note: string | null;
   action: string;
@@ -82,7 +85,9 @@ export function TierCard({
 }) {
   return (
     <div
-      className={`relative flex h-full flex-col gap-4 p-5 transition-transform duration-300 ${
+      data-chosen={chosen}
+      data-suggested={suggested}
+      className={`relative flex h-full flex-col gap-4 p-4 transition-transform duration-300 sm:p-5 ${
         chosen ? "card-accent ring-2 ring-primary" : premium ? "card-accent card-hover" : "card card-hover"
       } ${premium ? "md:-translate-y-2" : ""}`}
     >
