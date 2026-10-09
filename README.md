@@ -15,6 +15,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 
 ## Status and documents
 
+- **Start here:** [`docs/README.md`](docs/README.md) ([עברית](docs/README.he.md)) — where every document is, how the system is built, and the outside services today and at go-live.
 - **Product spec (v3):** [English](docs/spec/v3/spec.en.md) · [עברית](docs/spec/v3/spec.he.md) ·
   Word: [`docs/spec/MyBiz-Spec-en.docx`](docs/spec/MyBiz-Spec-en.docx),
   [`docs/spec/MyBiz-Spec-he.docx`](docs/spec/MyBiz-Spec-he.docx)
@@ -22,9 +23,9 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 - **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) — every product and technical decision.
 - **Status:** [`docs/STATUS.md`](docs/STATUS.md) ([Hebrew](docs/STATUS.he.md)) — what is done, in progress and next; open work in GitHub issues.
 - **Detailed v2 chapters:** [`docs/spec/v2/`](docs/spec/v2/README.md) (architecture, data model, AI).
-- **Where we are:** the foundation is built (see the spec's roadmap). Now, one phase at a time:
-  1 marketing website and sign-up journey → 2 business web app → 3 MyBiz console → 4 apps →
-  go-live (real payments, invoicing, email, WhatsApp, AI key).
+- **Where we are:** phases 1–3 and 5–7 are done and every category in the catalog is open; the
+  apps (phase 4) are in their last round; go-live (real payments, invoicing, email, WhatsApp,
+  AI key) comes when the owner picks providers. See the status board.
 - Paid services run in clearly labeled demo / simulated modes until go-live.
 
 ## Repository layout

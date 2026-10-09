@@ -224,10 +224,10 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
-| 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
+| 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | In progress: second round on the business app done; client app polish and store builds remain |
 | 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | Done |
-| 6 — Businesses and branches | One owner with several businesses, each with several branches: my businesses, a current branch, data and numbers per branch, a full demo | In progress |
-| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories. Done: resources (courts and rooms by the hour), which opened Sports & facilities | In progress |
+| 6 — Businesses and branches | One owner with several businesses, each with several branches: my businesses, a current branch, data and numbers per branch, a full demo | Done |
+| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories. All built: resources (#41), dependents (#43), on-site jobs (#42), quotes and deposits (#44), documents, retainers and time billing (#45); every category in the catalog is open | Done |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 The live status of the work — done, in progress and next — is kept in `docs/STATUS.md` and in the repository's GitHub issues, updated with every merged change.
