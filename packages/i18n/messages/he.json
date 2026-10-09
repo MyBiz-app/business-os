@@ -2315,7 +2315,20 @@
     "activeClients": "{count} לקוחות פעילים בסוף התקופה",
     "paidWith": "שולם בכרטיס שמסתיים ב-{last4} ב-{date}",
     "dashboardTrial": "{days, plural, one {נשאר יום אחד} other {נשארו # ימים}} לתקופת הניסיון. הוסיפו אמצעי תשלום כדי להמשיך בלי הפסקה.",
-    "dashboardDue": "יש חשבונית פתוחה של MyBiz בסך {amount}."
+    "dashboardDue": "יש חשבונית פתוחה של MyBiz בסך {amount}.",
+    "usage": {
+      "title": "מקום והודעות · {pack}",
+      "since": "מאז {date}",
+      "messages": "הודעות החודש",
+      "storage": "קבצים",
+      "of": "{used} מתוך {included}",
+      "more": "צריכים יותר? בחרו חבילה גדולה יותר",
+      "packs": {
+        "included": "בסיסית",
+        "pack_plus": "Plus",
+        "pack_max": "Max"
+      }
+    }
   },
   "visitNotes": {
     "body": "מה נעשה / מה חשוב לזכור?",

@@ -37,6 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **Space and messages per bundle (#104).** The billing page shows this month's messages and the files kept against the business's bundle (Basic 2 GB and 200 messages, Plus 20 GB and 1,000, Max 100 GB and 5,000), amber from 80% and red when over, with a link to a bigger bundle. What happens over the limit waits for the owner's decision.
 - **Support and setup tiers are delivered (#104).** Requests from a business with priority or VIP support come first in the MyBiz inbox (console and team app) and show their tier. A business that buys guided or full setup gets a setup task in the same inbox, once, so the team reaches out.
 - **Business app: quotes from the phone.** The client card has "New quote": a title, items with quantities and prices, a deposit and how long it's valid, saved as a draft and edited on the phone. A quote opens in the app (no more jumping to the website): send it on WhatsApp or share its link (sending marks the draft as sent), record what the client paid once they accept, or copy a sent quote as a new version. Checked in `e2e/business_app.py`.
 - **Business app: the numbers.** The Numbers tab picks a period (7, 30 or 90 days) and shows each key number with its change from the period before, a revenue or check-ins trend (by day, or by week for 90 days) with the best day, sessions by service (and by branch when there are several), and the clients to reach out to, each opening their client card. Checked in `e2e/business_app.py`.

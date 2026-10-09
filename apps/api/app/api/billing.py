@@ -14,8 +14,9 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
-from app.api.modules import QuoteOut, _tenant_modules
+from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
 from app.billing import add_months
+from app.modules import allowance
 from app.permissions import Permission
 
 router = APIRouter(prefix="/billing", tags=["billing"])
@@ -72,6 +73,17 @@ class Invoice(InvoiceSummary):
     simulated: bool
 
 
+class Usage(BaseModel):
+    """This calendar month's use against the business's bundle (space and messages)."""
+
+    pack: Literal["pack_plus", "pack_max"] | None = Field(description="None: the included one")
+    month_start: date
+    messages: int = Field(description="Messages sent this month (all channels)")
+    messages_included: int
+    storage_bytes: int = Field(description="Files kept now")
+    storage_included_bytes: int
+
+
 class Billing(BaseModel):
     trial_ends_at: datetime
     in_trial: bool
@@ -82,6 +94,7 @@ class Billing(BaseModel):
     details: BillingDetails
     invoices: list[InvoiceSummary]
     balance_due: int = Field(description="Sum of open invoices, minor units")
+    usage: Usage
 
 
 class TestCardRequest(BaseModel):
@@ -154,6 +167,34 @@ def get_billing(context: SettingsDep) -> Billing:
         details=_details(account),
         invoices=invoices,
         balance_due=sum(i.total for i in invoices if i.status == "open"),
+        usage=usage(db, today),
+    )
+
+
+def usage(db: Session, today: date) -> Usage:
+    """Messages counted from usage events since the 1st of the business's month, and the
+    files the business keeps now."""
+    pack, allowed = allowance(enabled_modules(db))
+    month_start = today.replace(day=1)
+    row = db.execute(
+        text("""
+            SELECT
+                (SELECT coalesce(sum(u.quantity), 0) FROM app.usage_events u
+                 WHERE u.meter = 'messages'
+                   AND u.occurred_at >= (CAST(:start AS date)::timestamp AT TIME ZONE t.time_zone))
+                    AS messages,
+                (SELECT coalesce(sum(d.size), 0) FROM app.client_documents d) AS storage
+            FROM app.tenants t WHERE t.id = app.current_tenant_id()
+        """),
+        {"start": month_start},
+    ).one()
+    return Usage(
+        pack=pack,  # type: ignore[arg-type]
+        month_start=month_start,
+        messages=int(row.messages),
+        messages_included=allowed.messages,
+        storage_bytes=int(row.storage),
+        storage_included_bytes=allowed.storage_bytes,
     )
 
 

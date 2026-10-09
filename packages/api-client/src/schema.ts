@@ -3988,6 +3988,7 @@ export interface components {
              * @description Sum of open invoices, minor units
              */
             balance_due: number;
+            usage: components["schemas"]["Usage"];
         };
         /** BillingDetails */
         BillingDetails: {
@@ -8715,6 +8716,36 @@ export interface components {
              * @default []
              */
             pending_actions: components["schemas"]["PendingAction"][];
+        };
+        /**
+         * Usage
+         * @description This calendar month's use against the business's bundle (space and messages).
+         */
+        Usage: {
+            /**
+             * Pack
+             * @description None: the included one
+             */
+            pack: ("pack_plus" | "pack_max") | null;
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /**
+             * Messages
+             * @description Messages sent this month (all channels)
+             */
+            messages: number;
+            /** Messages Included */
+            messages_included: number;
+            /**
+             * Storage Bytes
+             * @description Files kept now
+             */
+            storage_bytes: number;
+            /** Storage Included Bytes */
+            storage_included_bytes: number;
         };
         /** UsagePoint */
         UsagePoint: {

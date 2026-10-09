@@ -6,6 +6,7 @@ from sqlalchemy import Engine, text
 
 from app.billing import add_months, bill_businesses, periods_due
 from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
+from tests.test_documents_time import PDF, upload
 
 
 def test_months_are_clamped_to_shorter_months() -> None:
@@ -44,6 +45,26 @@ def test_new_business_is_in_trial(client: TestClient, studio: dict) -> None:
     assert billing["in_trial"] is True and billing["trial_days_left"] == 14
     assert billing["invoices"] == [] and billing["payment_method"] is None
     assert billing["estimate"]["total"] > 0
+
+
+def test_usage_counts_against_the_bundle(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    usage = client.get("/billing", headers=headers).json()["usage"]
+    assert usage["pack"] is None and usage["messages"] == 0 and usage["storage_bytes"] == 0
+    assert usage["messages_included"] == 200 and usage["storage_included_bytes"] == 2 * 1024**3
+
+    modules = {"whatsapp": 1, "pack_plus": 1}
+    client.put("/tenants/current/modules", json={"modules": modules}, headers=headers)
+    dana = client.post(
+        "/clients", json={"first_name": "Dana", "phone": "050-1111111"}, headers=headers
+    ).json()["id"]
+    sent = client.post("/messages/direct", json={"client_id": dana, "body": "Hi"}, headers=headers)
+    assert sent.status_code == 201, sent.text
+    upload(client, headers, dana, "terms.pdf")
+
+    usage = client.get("/billing", headers=headers).json()["usage"]
+    assert usage["pack"] == "pack_plus" and usage["messages_included"] == 1000
+    assert usage["messages"] == 1 and usage["storage_bytes"] == len(PDF)
 
 
 def test_invoices_after_the_trial(client: TestClient, studio: dict, engine: Engine) -> None:
