@@ -1683,6 +1683,10 @@
       "clientApp": "The client app",
       "help": "Questions? Just reply to this email or write to us on the contact page: {contact}",
       "signature": "Good luck,\nThe MyBiz team"
+    },
+    "leadFollowUp": {
+      "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
+      "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
     }
   },
   "support": {

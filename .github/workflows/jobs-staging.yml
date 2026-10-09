@@ -55,6 +55,12 @@ jobs:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
         run: uv run python -m app.jobs message-reminders
 
+      - name: Follow up leads nobody has touched (leads on autopilot)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+        run: uv run python -m app.jobs follow-up-leads
+
       - name: Send queued messages through each business's provider
         working-directory: apps/api
         env:
