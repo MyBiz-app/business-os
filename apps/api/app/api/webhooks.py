@@ -35,10 +35,11 @@ async def payment_webhook(
         with session.begin_nested():
             session.execute(
                 text("""
-                    SELECT app.complete_provider_checkout(:id, :provider, :ref, :amount,
-                                                          :currency)
+                    SELECT app.complete_provider_checkout(:tenant, :id, :provider, :ref,
+                                                          :amount, :currency)
                 """),
                 {
+                    "tenant": tenant_id,
                     "id": event.checkout_id,
                     "provider": provider,
                     "ref": event.provider_ref,

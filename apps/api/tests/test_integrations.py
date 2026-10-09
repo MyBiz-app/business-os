@@ -16,7 +16,7 @@ from app.providers.invoicing import InvoiceDocument, IssuedDocument
 from app.providers.messaging import OutgoingMessage, SendResult
 from app.providers.payments import CheckoutRequest, HostedCheckout, PaymentEvent, WebhookRejected
 from app.providers.registry import REGISTRY, SettingField, register
-from tests.conftest import AuthHeaders, add_member, make_staff
+from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
 from tests.test_checkouts import setup
 from tests.test_messaging import add_client, with_messaging
 
@@ -185,6 +185,17 @@ def test_checkout_through_a_payment_provider(
         headers={"x-signature": hmac.new(b"k", wrong, hashlib.sha256).hexdigest()},
     )
     assert mismatch.status_code == 409
+
+    # Another business signing with its own secret can't complete this business's checkout.
+    owner = uuid4()
+    other = client.post("/tenants", json={**STUDIO, "name": "Other"}, headers=auth(owner)).json()
+    connect(client, auth(owner, other["id"]), "payments", "testpay", terminal="2", secret="evil")
+    borrowed = client.post(
+        f"/webhooks/payments/testpay/{other['id']}",
+        content=raw,
+        headers={"x-signature": hmac.new(b"evil", raw, hashlib.sha256).hexdigest()},
+    )
+    assert borrowed.status_code == 404
 
     paid = client.post(url, content=raw, headers={"x-signature": signature})
     assert paid.status_code == 204, paid.text
