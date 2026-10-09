@@ -277,6 +277,7 @@ function Bars({
         {points.map((point) => (
           <View
             key={point.bucket}
+            role="img"
             accessible
             accessibilityLabel={`${label(point.bucket)}: ${value(point.value)}`}
             style={{
