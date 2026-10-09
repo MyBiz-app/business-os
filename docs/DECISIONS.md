@@ -131,6 +131,7 @@ When a decision changes, update the row and note the date — do not delete hist
 | X19 | A team member's branches limit what they see (#64, owner, 2026-10-09): a member assigned to branches works only in them; the branch picker lists only theirs, "all branches" means all of theirs, and choosing another branch falls back to theirs. Owners and managers always see every branch; no branches assigned means all. Lists and numbers follow it (`app.in_branch`). | DECIDED (2026-10-09) |
 | X20 | How long data is kept (owner, 2026-10-09): leads that never became clients, website contact requests and AI assistant conversations for 12 months, the message log for 24 months; a business that leaves is deleted 90 days after it leaves. A daily job deletes what has passed its time. | DECIDED (2026-10-09) |
 | X21 | The brand name is MyBiz for now and must be easy to change (owner, 2026-10-09): one place holds it; paid providers are prepared behind the integrations layer but connected only when the business starts operating, free ones may be connected now. | DECIDED (2026-10-09) |
+| X22 | The MyBiz logo (owner, 2026-10-09): a networked "M" (five nodes) in a rounded tile with a violet → blue → sky gradient, adapted from the owner's draft. The tile carries its own colors, so the same mark reads on light and dark pages; the wordmark is "My" in ink and "Biz" in the gradient. Everything is drawn from `packages/brand`, so a final name (O3) or new colors is one edit and one script run. | DECIDED (2026-10-09) |
 
 ## Open
 

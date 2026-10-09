@@ -28,6 +28,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 | `apps/client-app`, `apps/business-app`, `apps/staff-app` | Expo apps: the clients' app, the business app, the MyBiz team app |
 | `packages/app-kit` | Shared screens, components and providers for the Expo apps |
 | `packages/i18n` | Translations (`he`, `en`) and locale-aware formatting (money) |
+| `packages/brand` | The MyBiz logo and brand name: one source for the web mark, favicon and app icons |
 | `packages/verticals` | The industry catalog (categories, sub-categories, packs) |
 | `packages/api-client` | Typed API client generated from the API's OpenAPI schema |
 | `supabase/` | Local Supabase config and auth email templates |
