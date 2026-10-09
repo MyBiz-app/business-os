@@ -34,7 +34,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 |---|---|
 | `apps/web` | Business web app: Next.js, Tailwind, next-intl (he / en), light / dark |
 | `apps/api` | Backend API: Python 3.13, FastAPI, managed with uv |
-| `apps/mobile` | Client app: Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
+| `apps/client-app` | Client app: Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
 | `apps/business-app` | Business app for owners and staff on the go (Expo) |
 | `apps/staff-app` | MyBiz team app (Expo) |
 | `packages/i18n` | Shared translations (he / en) and locale helpers for the web and the apps |
@@ -63,7 +63,7 @@ pnpm dev                            # starts API (port 8000) and web (port 3000)
 | http://127.0.0.1:54323 | Supabase Studio (browse the database) |
 | http://127.0.0.1:54324 | Test mailbox (sign-up and password-reset emails) |
 
-The apps run separately: `pnpm --filter mobile exec expo start --web` (clients, port 8081),
+The apps run separately: `pnpm --filter client-app exec expo start --web` (clients, port 8081),
 `pnpm --filter business-app exec expo start --web --port 8082` (the business),
 `pnpm --filter staff-app exec expo start --web --port 8083` (the MyBiz team).
 
@@ -92,7 +92,7 @@ pnpm dev:app
 Mobile (in a second terminal), with the phone on the same Wi-Fi as the computer:
 
 ```bash
-pnpm dev:mobile                     # scan the QR code with the iPhone camera → opens in Expo Go
+pnpm dev:client-app                  # scan the QR code with the iPhone camera → opens in Expo Go
 ```
 
 ## Troubleshooting

@@ -13,7 +13,7 @@ proposes a booking → confirmed and executed → a platform admin sees the busi
 
 1. `supabase start`, then `cd apps/api && uv run alembic upgrade head`
 2. API with the scripted AI model: `cd apps/api && PYTHONPATH=../../e2e:. uv run uvicorn fake_ai_api:app --port 8000`
-3. Web: `pnpm --filter web dev`; client app: `pnpm --filter mobile exec expo start --web --port 8081`
+3. Web: `pnpm --filter web dev`; client app: `pnpm --filter client-app exec expo start --web --port 8081`
 4. Make an existing local user a platform admin:
    `docker exec supabase_db_business-os psql -U postgres -c "insert into app.platform_staff (email, level) values ('you@example.com', 'owner')"`
 5. From the repository root:
