@@ -1368,7 +1368,7 @@
     },
     "inbox": {
       "title": "Inbox",
-      "subtitle": "Requests from the website and messages from businesses. Open ones first.",
+      "subtitle": "Requests from the website, messages from businesses and setup tasks. Open ones first, VIP and priority support on top.",
       "statuses": {
         "new": "New",
         "in_progress": "In progress",
@@ -1387,7 +1387,16 @@
       "saveNotes": "Save notes",
       "openBusiness": "Open the business",
       "empty": "Nothing here.",
-      "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}"
+      "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}",
+      "setupTask": "Setup task",
+      "tiers": {
+        "priority": "Priority support",
+        "vip": "VIP support"
+      },
+      "setup": {
+        "setup_guided": "Bought guided setup: book a setup session with them.",
+        "setup_full": "Bought setup done for them: reach out to collect their details and set the business up."
+      }
     },
     "actions": {
       "title": "Actions for the owner",

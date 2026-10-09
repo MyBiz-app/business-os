@@ -2844,8 +2844,8 @@ export interface paths {
         };
         /**
          * Contact Requests
-         * @description The inbox: requests from the marketing site and complaints from businesses. Open ones
-         *     first, then newest.
+         * @description The inbox: requests from the marketing site, complaints from businesses and setup tasks.
+         *     Open ones first, VIP and priority support before standard, then newest.
          */
         get: operations["contact_requests"];
         put?: never;
@@ -5102,6 +5102,20 @@ export interface components {
              * @description A complaint from inside a business, not the site
              */
             from_business: boolean;
+            /**
+             * Kind
+             * @description setup_*: the business bought setup by the MyBiz team
+             * @default request
+             * @enum {string}
+             */
+            kind: "request" | "setup_guided" | "setup_full";
+            /**
+             * Tier
+             * @description The business's support tier; open requests by tier
+             * @default standard
+             * @enum {string}
+             */
+            tier: "standard" | "priority" | "vip";
         };
         /** Conversation */
         Conversation: {

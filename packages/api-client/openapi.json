@@ -14818,7 +14818,7 @@
           "platform"
         ],
         "summary": "Contact Requests",
-        "description": "The inbox: requests from the marketing site and complaints from businesses. Open ones\nfirst, then newest.",
+        "description": "The inbox: requests from the marketing site, complaints from businesses and setup tasks.\nOpen ones first, VIP and priority support before standard, then newest.",
         "operationId": "contact_requests",
         "responses": {
           "200": {
@@ -21479,6 +21479,28 @@
             "type": "boolean",
             "title": "From Business",
             "description": "A complaint from inside a business, not the site"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "request",
+              "setup_guided",
+              "setup_full"
+            ],
+            "title": "Kind",
+            "description": "setup_*: the business bought setup by the MyBiz team",
+            "default": "request"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "standard",
+              "priority",
+              "vip"
+            ],
+            "title": "Tier",
+            "description": "The business's support tier; open requests by tier",
+            "default": "standard"
           }
         },
         "type": "object",
