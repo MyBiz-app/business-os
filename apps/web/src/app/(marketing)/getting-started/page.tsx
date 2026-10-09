@@ -2,12 +2,13 @@ import { ArrowRight, Check, Clock, LifeBuoy } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { SETUP_STEPS, type SetupStep } from "@/components/getting-started";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("gettingStarted.page");
-  return { title: `${t("metaTitle")} · MyBiz`, description: t("metaDescription") };
+  return { title: `${t("metaTitle")} · ${BRAND.name}`, description: t("metaDescription") };
 }
 
 type Section = { key: SetupStep; minutes: number; tips: string[] };

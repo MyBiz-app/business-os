@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { VerticalIcon } from "@/components/vertical-icon";
 import { apiAssetUrl, getApi, unwrap } from "@/lib/api";
@@ -15,7 +16,7 @@ import { switchBusiness } from "../(tenant)/_menu/actions";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("businesses");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** Every business the person belongs to, side by side: its industry, branches and the numbers of

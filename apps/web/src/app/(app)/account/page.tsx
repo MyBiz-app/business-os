@@ -2,6 +2,7 @@ import { KeyRound } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { getActiveMembership } from "@/lib/tenant";
 
@@ -9,7 +10,7 @@ import { ProfileForm } from "./profile-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** The signed-in person's own profile, whatever their role. */

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { SubmitButton } from "@/components/form/submit-button";
 import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
@@ -19,7 +20,7 @@ export async function generateMetadata({ params }: PageProps<"/upgrade/[offer]">
   const { offer } = await params;
   if (!isUpgrade(offer)) return {};
   const t = await getTranslations("start.offers");
-  return { title: `${t(`${offer}.eyebrow`)} · MyBiz` };
+  return { title: `${t(`${offer}.eyebrow`)} · ${BRAND.name}` };
 }
 
 /** A module the business doesn't have: what it does, a peek, and what adding it changes on the

@@ -8,6 +8,7 @@ same value in several files, it should become a token here first.
 
 | I want to change… | Edit | Notes |
 |---|---|---|
+| The product's name ("MyBiz" for now, X21) | `packages/i18n/brand.json` | Translations write "MyBiz" and every app swaps it for this name (`@business-os/i18n/brand`); then `pnpm --filter @business-os/i18n export:api` for the API's copy. The store names live in each Expo app's `app.json` (`expo.name`). The logo and icons are separate assets. |
 | The website's font | `apps/web/src/app/fonts.ts` | Swap `Heebo` for another `next/font/google` font with Hebrew + Latin (Rubik, Assistant, Noto Sans Hebrew…). Exposed as `--font-main`. |
 | UI colors (page, cards, text, borders, success/danger/warning) | `apps/web/src/app/globals.css` → `:root` (light) and `.dark` (dark) | Components use only these tokens (`bg-surface`, `text-muted`, `border-border`…), never raw hex. |
 | The default accent (buttons, links, focus) | `--primary` / `--on-primary` in `globals.css` | A business's own brand color overrides it inside its pages (`.brand`, set by `lib/brand.ts`). |

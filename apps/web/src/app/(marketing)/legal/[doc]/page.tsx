@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { BRAND } from "@business-os/i18n/brand";
 
 const DOCS = ["terms", "privacy", "accessibility"] as const;
 type Doc = (typeof DOCS)[number];
@@ -13,7 +14,7 @@ export async function generateMetadata({ params }: PageProps<"/legal/[doc]">): P
   const { doc } = await params;
   if (!DOCS.includes(doc as Doc)) return {};
   const t = await getTranslations("marketing.legal");
-  return { title: `${t(`${doc as Doc}.title`)} · MyBiz` };
+  return { title: `${t(`${doc as Doc}.title`)} · ${BRAND.name}` };
 }
 
 /** Terms, privacy and accessibility: drafts until legal review before launch. */

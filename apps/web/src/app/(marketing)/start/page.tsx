@@ -3,6 +3,7 @@ import { isOpen } from "@business-os/verticals";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
@@ -16,7 +17,7 @@ type Catalog = components["schemas"]["Catalog"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("start.meta");
-  return { title: `${t("title")} · MyBiz`, description: t("description") };
+  return { title: `${t("title")} · ${BRAND.name}`, description: t("description") };
 }
 
 async function loadCatalog(currency: Currency): Promise<Catalog | null> {

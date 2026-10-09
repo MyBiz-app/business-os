@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
@@ -12,7 +13,7 @@ type Filter = (typeof FILTERS)[number];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.inbox");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** The console's inbox: requests from the website and messages from businesses. */
