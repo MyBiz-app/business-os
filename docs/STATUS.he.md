@@ -2,7 +2,7 @@
 
 # סטטוס הפרויקט
 
-_עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/adiredri/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
+_עודכן לאחרונה: 09.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/MyBiz-app/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
 
 **עכשיו:** שלב 7 הושלם: מסמכים, ריטיינרים וחיוב לפי זמן (#45) פתחו את השירותים המקצועיים, וכך כל עשר הקטגוריות בקטלוג פתוחות. כל שירות חיצוני יושב מאחורי ספק שאפשר להחליף (X13). ממתינים לך גם: מיילי ההרשמה באתר הבדיקות (#48) וההחלטות הפתוחות למטה.
 **הבא בתור:** שלב 7 הושלם — כל עשר הקטגוריות פתוחות. בהמשך: ליטוש קטגוריות הבטא, סבב על אפליקציית הלקוחות, והעלייה לאוויר (#34) כשתבחר ספקים. החיבור לספקים האמיתיים — בסוף (עלייה לאוויר), דרך שכבת החיבורים החדשה.
@@ -32,7 +32,7 @@ _עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pu
    3. מעתיקים את ה-Client ID וה-Client Secret ל-Supabase ומפעילים את Google. הכפתור יופיע באתר לבד, תוך 5 דקות לכל היותר.
 4. **התחברות עם Apple** (אופציונלי, אפשר בהמשך). צריך חשבון [Apple Developer](https://developer.apple.com/programs/) בתשלום שנתי. אחרי שיש חשבון, אדריך אותך.
 5. **להחליף את הסיסמאות הזמניות** של חשבונות הדמו. **לא לשלוח לי** את הסיסמה החדשה.
-6. **החלטות פתוחות:** [#46](https://github.com/adiredri/business-os/issues/46) ספק סליקה (ממנו יגיעו גם Apple Pay ו-Google Pay), [#47](https://github.com/adiredri/business-os/issues/47) ספק חשבוניות, [#36](https://github.com/adiredri/business-os/issues/36) שם המותג, [#64](https://github.com/adiredri/business-os/issues/64) הגבלת עובד לסניפים.
+6. **החלטות פתוחות:** [#46](https://github.com/MyBiz-app/business-os/issues/46) ספק סליקה (ממנו יגיעו גם Apple Pay ו-Google Pay), [#47](https://github.com/MyBiz-app/business-os/issues/47) ספק חשבוניות, [#36](https://github.com/MyBiz-app/business-os/issues/36) שם המותג, [#64](https://github.com/MyBiz-app/business-os/issues/64) הגבלת עובד לסניפים.
 7. **דוח התיקונים והשיפורים** שלך, לפני העלייה לאוויר.
 
 ## בעבודה
@@ -53,7 +53,7 @@ _עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pu
 - אפליקציית צוות MyBiz, סבב שני: מסך בית עם המספרים של הפלטפורמה, החיוב של החודש, פניות פתוחות ועסקים חדשים; עסקים עם מיון וכרטיס עסק (מספרים, מודולים, חשבוניות, הארכת ניסיון); כרטיס פנייה (חיוג, מענה, לקיחה לטיפול, סטטוס, הערות פנימיות). נבדק מקצה לקצה (`e2e/staff_app.py`).
 - האתרים הושלמו. ליטשנו בארבעה סבבים: ברשימת הלקוחות רואים מנוי וביקור אחרון, בדף הצוות ראשי תיבות, בדוחות מפת חום של השעות העמוסות ופסי תפוסה, במנויים ובשירותים רואים כמה משתמשים בהם, היסטוריית הלקוח מקוצרת, בטלפון יש שורת ימים בלוח השיעורים וכותרת של שתי שורות, בקונסולת MyBiz יש חיפוש, מיון ועמודים וסיכום חיוב, ובאתר השיווקי סימון מובנה לתוצאות החיפוש בגוגל.
 - נבדק מקצה לקצה: תרחיש הסיום המלא (מהרשמה ועד עוזר ה-AI והקונסולה), וסריקה של כל הדפים בעברית ובאנגלית במחשב ובטלפון — בלי שגיאות, בלי בעיות נגישות ובלי גלישה מהמסך, במצב בהיר וכהה.
-- [#38](https://github.com/adiredri/business-os/issues/38) סקירה שלך על המחשב והטלפון
+- [#38](https://github.com/MyBiz-app/business-os/issues/38) סקירה שלך על המחשב והטלפון
 
 ## הבא בתור
 
@@ -62,17 +62,17 @@ _עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pu
 ## מתוכנן
 
 - עלייה לאוויר:
-  [#48](https://github.com/adiredri/business-os/issues/48) דומיין ומייל ·
-  [#49](https://github.com/adiredri/business-os/issues/49) וואטסאפ ו-SMS ·
-  [#50](https://github.com/adiredri/business-os/issues/50) מפתח Claude API ·
-  [#51](https://github.com/adiredri/business-os/issues/51) הקשחה ובניות לחנויות
+  [#48](https://github.com/MyBiz-app/business-os/issues/48) דומיין ומייל ·
+  [#49](https://github.com/MyBiz-app/business-os/issues/49) וואטסאפ ו-SMS ·
+  [#50](https://github.com/MyBiz-app/business-os/issues/50) מפתח Claude API ·
+  [#51](https://github.com/MyBiz-app/business-os/issues/51) הקשחה ובניות לחנויות
 
 ## מחכה להחלטה שלך
 
-- [#46](https://github.com/adiredri/business-os/issues/46) ספק סליקה (O1)
-- [#47](https://github.com/adiredri/business-os/issues/47) ספק חשבוניות (O2)
-- [#36](https://github.com/adiredri/business-os/issues/36) שם המותג הסופי (O3)
-- [#64](https://github.com/adiredri/business-os/issues/64) האם שיוך עובד לסניפים מגביל את מה שהוא רואה?
+- [#46](https://github.com/MyBiz-app/business-os/issues/46) ספק סליקה (O1)
+- [#47](https://github.com/MyBiz-app/business-os/issues/47) ספק חשבוניות (O2)
+- [#36](https://github.com/MyBiz-app/business-os/issues/36) שם המותג הסופי (O3)
+- [#64](https://github.com/MyBiz-app/business-os/issues/64) האם שיוך עובד לסניפים מגביל את מה שהוא רואה?
 
 ## בריאות המערכת
 

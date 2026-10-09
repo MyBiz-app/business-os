@@ -110,7 +110,7 @@ python -m app.jobs send-emails` prints instead of sending.
 Supabase's built-in email only sends to the project's team members (a few per hour), so for
 anyone else a sign-up **fails and no account is created**. Set up real email once:
 
-1. **An SMTP sender.** Until there is a domain ([#48](https://github.com/adiredri/business-os/issues/48)),
+1. **An SMTP sender.** Until there is a domain ([#48](https://github.com/MyBiz-app/business-os/issues/48)),
    a Gmail account with an *App Password* works (Google Account → Security → 2-Step
    Verification on → App passwords). Production: a domain with Resend or Amazon SES.
 2. **Supabase → Authentication → Emails → SMTP Settings:** enable custom SMTP; host

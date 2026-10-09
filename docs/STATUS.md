@@ -1,7 +1,7 @@
 # Project status
 
-_Last updated: 2026-10-07_ · Updated with every merged pull request. Open work lives in
-[GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
+_Last updated: 2026-10-09_ · Updated with every merged pull request. Open work lives in
+[GitHub issues](https://github.com/MyBiz-app/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 **Now:** phase 7 is done: documents, retainers and time billing (#45) opened Professional services, so all ten categories in the catalog are open. Every outside service sits behind a swappable provider (X13). Also waiting: sign-up emails on staging (#48) and the open decisions below.
@@ -53,7 +53,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - MyBiz team app, second round: a home with the platform's numbers, this month's billing, open requests and new businesses; businesses with sorting and a business card (numbers, modules, invoices, more trial days); a request card (call, write back, take it, status, internal notes). Checked end to end with `e2e/staff_app.py`.
 - Websites complete. Polished in four rounds: the clients list shows each client's plan and last visit, team avatars, a busy-hours heatmap and occupancy bars in the reports, plans and services show how they are used, a shorter client history, a day strip on the phone schedule, a two-row header on phones, search, sort and pages in the MyBiz console, a billing summary, and structured data for search results.
 - Checked end to end: `dod.py` (sign-up through the AI assistant and the console), a crawl of every page in Hebrew and English on computer and phone with no errors, no accessibility violations and nothing spilling off the screen, in light and dark mode.
-- [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
+- [#38](https://github.com/MyBiz-app/business-os/issues/38) Owner review on computer and phone
 
 ## Next
 
@@ -61,17 +61,17 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## Planned
 
-- Go-live: [#48](https://github.com/adiredri/business-os/issues/48) domain and email ·
-  [#49](https://github.com/adiredri/business-os/issues/49) WhatsApp and SMS ·
-  [#50](https://github.com/adiredri/business-os/issues/50) Claude API key ·
-  [#51](https://github.com/adiredri/business-os/issues/51) hardening and store builds
+- Go-live: [#48](https://github.com/MyBiz-app/business-os/issues/48) domain and email ·
+  [#49](https://github.com/MyBiz-app/business-os/issues/49) WhatsApp and SMS ·
+  [#50](https://github.com/MyBiz-app/business-os/issues/50) Claude API key ·
+  [#51](https://github.com/MyBiz-app/business-os/issues/51) hardening and store builds
 
 ## Waiting for the owner's decision
 
-- [#46](https://github.com/adiredri/business-os/issues/46) Payment provider (O1)
-- [#47](https://github.com/adiredri/business-os/issues/47) Invoicing provider (O2)
-- [#36](https://github.com/adiredri/business-os/issues/36) Final brand name (O3)
-- [#64](https://github.com/adiredri/business-os/issues/64) Does a team member's branch assignment restrict what they see?
+- [#46](https://github.com/MyBiz-app/business-os/issues/46) Payment provider (O1)
+- [#47](https://github.com/MyBiz-app/business-os/issues/47) Invoicing provider (O2)
+- [#36](https://github.com/MyBiz-app/business-os/issues/36) Final brand name (O3)
+- [#64](https://github.com/MyBiz-app/business-os/issues/64) Does a team member's branch assignment restrict what they see?
 
 ## Health
 
