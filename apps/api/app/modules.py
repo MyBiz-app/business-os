@@ -95,6 +95,29 @@ MODULES: dict[str, Module] = {
     )
 }
 
+# What a business may use each month: the included amounts, or a bigger bundle's (#104).
+GB = 1024**3
+
+
+@dataclass(frozen=True)
+class Allowance:
+    storage_bytes: int
+    messages: int
+
+
+ALLOWANCES: dict[str | None, Allowance] = {
+    None: Allowance(storage_bytes=2 * GB, messages=200),
+    "pack_plus": Allowance(storage_bytes=20 * GB, messages=1000),
+    "pack_max": Allowance(storage_bytes=100 * GB, messages=5000),
+}
+
+
+def allowance(modules: "dict[str, int] | list[str]") -> tuple[str | None, Allowance]:
+    """The business's bundle (None: the included one) and what it allows."""
+    pack = next((key for key in ("pack_max", "pack_plus") if key in modules), None)
+    return pack, ALLOWANCES[pack]
+
+
 # Core is required and priced by the number of active clients (the price floor).
 CORE_TIERS: tuple[tuple[int | None, dict[str, int]], ...] = (
     (100, {"ILS": 9900, "USD": 2900, "EUR": 2700}),

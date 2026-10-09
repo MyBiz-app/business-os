@@ -18504,6 +18504,9 @@
             "type": "integer",
             "title": "Balance Due",
             "description": "Sum of open invoices, minor units"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
           }
         },
         "type": "object",
@@ -18516,7 +18519,8 @@
           "payment_method",
           "details",
           "invoices",
-          "balance_due"
+          "balance_due",
+          "usage"
         ],
         "title": "Billing"
       },
@@ -31176,6 +31180,60 @@
           "text"
         ],
         "title": "Turn"
+      },
+      "Usage": {
+        "properties": {
+          "pack": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pack_plus",
+                  "pack_max"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack",
+            "description": "None: the included one"
+          },
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "messages": {
+            "type": "integer",
+            "title": "Messages",
+            "description": "Messages sent this month (all channels)"
+          },
+          "messages_included": {
+            "type": "integer",
+            "title": "Messages Included"
+          },
+          "storage_bytes": {
+            "type": "integer",
+            "title": "Storage Bytes",
+            "description": "Files kept now"
+          },
+          "storage_included_bytes": {
+            "type": "integer",
+            "title": "Storage Included Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pack",
+          "month_start",
+          "messages",
+          "messages_included",
+          "storage_bytes",
+          "storage_included_bytes"
+        ],
+        "title": "Usage",
+        "description": "This calendar month's use against the business's bundle (space and messages)."
       },
       "UsagePoint": {
         "properties": {

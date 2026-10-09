@@ -2315,7 +2315,20 @@
     "activeClients": "{count} active clients at the end of the period",
     "paidWith": "Paid with the card ending {last4} on {date}",
     "dashboardTrial": "{days, plural, one {1 day} other {# days}} left in your trial. Add a payment method to keep going without a break.",
-    "dashboardDue": "You have an open MyBiz invoice of {amount}."
+    "dashboardDue": "You have an open MyBiz invoice of {amount}.",
+    "usage": {
+      "title": "Space and messages · {pack}",
+      "since": "Since {date}",
+      "messages": "Messages this month",
+      "storage": "Files",
+      "of": "{used} of {included}",
+      "more": "Need more? Choose a bigger bundle",
+      "packs": {
+        "included": "Basic",
+        "pack_plus": "Plus",
+        "pack_max": "Max"
+      }
+    }
   },
   "visitNotes": {
     "body": "What was done / worth remembering?",

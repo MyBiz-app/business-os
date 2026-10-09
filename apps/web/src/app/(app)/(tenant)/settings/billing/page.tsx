@@ -1,4 +1,4 @@
-import { CreditCard, FlaskConical, Receipt, Sparkles } from "lucide-react";
+import { CreditCard, FlaskConical, Luggage, Receipt, Sparkles } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -29,6 +29,12 @@ export default async function BillingPage() {
   const money = (amount: number, currency = billing.estimate.currency) => formatMoney(amount, currency, locale);
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "long", year: "numeric" });
   const method = billing.payment_method;
+  const usage = billing.usage;
+  const number = new Intl.NumberFormat(locale);
+  const bytes = (value: number) =>
+    value >= 1024 ** 3
+      ? new Intl.NumberFormat(locale, { style: "unit", unit: "gigabyte", maximumFractionDigits: 1 }).format(value / 1024 ** 3)
+      : new Intl.NumberFormat(locale, { style: "unit", unit: "megabyte", maximumFractionDigits: 1 }).format(value / 1024 ** 2);
   const estimateLines = [
     { key: "core", label: tModules("core"), amount: billing.estimate.core },
     ...Object.entries(billing.estimate.lines).map(([key, amount]) => ({
@@ -89,6 +95,33 @@ export default async function BillingPage() {
           <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-2 text-sm font-medium">
             {t("balanceDue", { amount: money(billing.balance_due) })}
           </p>
+        )}
+      </section>
+
+      <section aria-labelledby="usage-heading" className="card flex flex-col gap-4 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 id="usage-heading" className="flex items-center gap-2 text-lg font-semibold">
+            <Luggage aria-hidden="true" className="size-5 text-primary" />
+            {t("usage.title", { pack: t(`usage.packs.${usage.pack ?? "included"}`) })}
+          </h2>
+          <span className="text-sm text-muted">{t("usage.since", { date: day(usage.month_start) })}</span>
+        </div>
+        <Meter
+          label={t("usage.messages")}
+          used={usage.messages}
+          included={usage.messages_included}
+          text={t("usage.of", { used: number.format(usage.messages), included: number.format(usage.messages_included) })}
+        />
+        <Meter
+          label={t("usage.storage")}
+          used={usage.storage_bytes}
+          included={usage.storage_included_bytes}
+          text={t("usage.of", { used: bytes(usage.storage_bytes), included: bytes(usage.storage_included_bytes) })}
+        />
+        {usage.pack !== "pack_max" && (
+          <Link href="/settings/modules" className="self-start text-sm font-medium text-primary underline-offset-4 hover:underline">
+            {t("usage.more")}
+          </Link>
         )}
       </section>
 
@@ -223,5 +256,30 @@ export default async function BillingPage() {
         )}
       </section>
     </main>
+  );
+}
+
+/** How much of a monthly allowance is used: a bar that turns amber from 80% and red when over. */
+function Meter({ label, used, included, text }: { label: string; used: number; included: number; text: string }) {
+  const percent = included > 0 ? Math.round((used / included) * 100) : 0;
+  const tone = percent >= 100 ? "bg-danger" : percent >= 80 ? "bg-warning" : "bg-primary";
+  return (
+    <div className="flex flex-col gap-1.5">
+      <p className="flex items-baseline justify-between gap-3 text-sm">
+        <span className="font-medium">{label}</span>
+        <bdi className="tabular-nums text-muted">{text}</bdi>
+      </p>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.min(percent, 100)}
+        aria-valuetext={text}
+        className="h-2 overflow-hidden rounded-full bg-foreground/10"
+      >
+        <div className={`h-full rounded-full ${tone}`} style={{ width: `${Math.min(Math.max(percent, used > 0 ? 1 : 0), 100)}%` }} />
+      </div>
+    </div>
   );
 }
