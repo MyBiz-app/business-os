@@ -1,8 +1,10 @@
 """Privacy requests about one client: export everything we hold, or erase their personal data.
 
 Erasure keeps the client row (as "Deleted client") so bookings, plans and payments keep their
-history; payments must be kept for accounting. It clears the personal fields, removes health
-declarations and notifications, frees upcoming bookings and unlinks the client app account.
+history; payments, receipts, quotes and bills must be kept for accounting. It clears the
+personal fields, removes health declarations, notifications, notes, messages, addresses (and
+the copies on-site jobs keep), pets and children and documents, frees upcoming bookings and
+unlinks the client app account.
 Both actions are for owners (permission `clients.privacy`) and are written to the audit log."""
 
 import json
@@ -19,6 +21,7 @@ from app.api.bookings import cancel_booking, lock_session
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
 from app.permissions import Permission
+from app.providers.choice import choose
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -167,6 +170,49 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "addresses": _rows(
+            db,
+            """
+            SELECT label, street, city, details, notes, active, created_at
+            FROM app.client_addresses WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "dependents": _rows(
+            db,
+            """
+            SELECT kind, name, birth_date, details, notes, active, created_at
+            FROM app.dependents WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "documents": _rows(
+            db,
+            """
+            SELECT name, kind, content_type, size, shared, uploaded_by_client, sign_requested,
+                   signed_at, signed_name, created_at
+            FROM app.client_documents WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "quotes": _rows(
+            db,
+            """
+            SELECT q.number, q.kind, q.title, q.status, q.currency, app.quote_total(q.id) AS total,
+                   q.event_starts_at, q.event_place, q.sent_at, q.accepted_at, q.accepted_name,
+                   q.declined_at, q.created_at
+            FROM app.quotes q WHERE q.client_id = :id ORDER BY q.number
+            """,
+            client_id,
+        ),
+        "time_entries": _rows(
+            db,
+            """
+            SELECT day, minutes, description, billable, created_at
+            FROM app.time_entries WHERE client_id = :id ORDER BY day
+            """,
+            client_id,
+        ),
         "health_declarations": _rows(
             db,
             """
@@ -233,9 +279,38 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         """),
         {"id": client_id},
     )
+    # Addresses go, and so do the copies on-site jobs keep of them.
+    db.execute(
+        text("""
+            UPDATE app.sessions SET address = NULL
+            WHERE address_id IN (SELECT id FROM app.client_addresses WHERE client_id = :id)
+        """),
+        {"id": client_id},
+    )
+    db.execute(text("DELETE FROM app.client_addresses WHERE client_id = :id"), {"id": client_id})
+    # Pets and children (bookings keep the visit, without who came).
+    db.execute(text("DELETE FROM app.dependents WHERE client_id = :id"), {"id": client_id})
+    # Documents, from the storage provider too.
+    keys = db.execute(
+        text("DELETE FROM app.client_documents WHERE client_id = :id RETURNING storage_key"),
+        {"id": client_id},
+    ).scalars()
+    storage = None
+    for key in [k for k in keys if k]:
+        storage = storage or choose(db, None, "storage").instance
+        storage.delete(key)
     locale = db.execute(
         text("SELECT locale FROM app.tenants WHERE id = app.current_tenant_id()")
     ).scalar_one()
+    # Quotes and bills stay (commercial records, like payments), without the name typed to
+    # accept them.
+    db.execute(
+        text("""
+            UPDATE app.quotes SET accepted_name = :name
+            WHERE client_id = :id AND accepted_name IS NOT NULL
+        """),
+        {"name": ERASED_NAME.get(locale, ERASED_NAME["en"]), "id": client_id},
+    )
     db.execute(
         text("""
             UPDATE app.clients
