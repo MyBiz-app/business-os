@@ -76,7 +76,11 @@ export default function RequestScreen() {
               tone={request.status === "new" ? "danger" : request.status === "done" ? "success" : "primary"}
               palette={palette}
             />
-            <Badge label={request.from_business ? tInbox("fromBusiness") : tInbox("fromSite")} palette={palette} />
+            <Badge
+              label={request.kind !== "request" ? tInbox("setupTask") : request.from_business ? tInbox("fromBusiness") : tInbox("fromSite")}
+              palette={palette}
+            />
+            {request.tier !== "standard" && <Badge label={tInbox(`tiers.${request.tier}`)} tone="primary" palette={palette} />}
           </View>
         </View>
       </View>
@@ -84,6 +88,9 @@ export default function RequestScreen() {
         {[when, request.business, request.vertical ? industryName(tRoot, request.vertical) : null].filter(Boolean).join(" · ")}
       </Text>
 
+      {request.kind !== "request" && (
+        <Text style={{ color: palette.foreground, fontWeight: "600", textAlign: "left" }}>{tInbox(`setup.${request.kind}`)}</Text>
+      )}
       {request.message ? (
         <Card palette={palette}>
           <Text style={{ color: palette.foreground, fontSize: 16, textAlign: "left" }}>{request.message}</Text>

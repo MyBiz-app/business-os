@@ -15,6 +15,7 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 export default function Inbox() {
   const t = useTranslations("staffApp.inbox");
   const tStatus = useTranslations("platform.inbox.statuses");
+  const tInbox = useTranslations("platform.inbox");
   const locale = useLocale();
   const { api, can } = useStaff();
   const { palette } = useTheme();
@@ -69,7 +70,12 @@ export default function Inbox() {
               palette={palette}
               leading={<Avatar name={request.name} palette={palette} />}
               title={request.business ? `${request.name} · ${request.business}` : request.name}
-              subtitle={[when.format(new Date(request.created_at)), request.from_business ? t("fromBusiness") : null, request.message]
+              subtitle={[
+                when.format(new Date(request.created_at)),
+                request.tier !== "standard" ? tInbox(`tiers.${request.tier}`) : null,
+                request.kind !== "request" ? tInbox(`setup.${request.kind}`) : request.from_business ? t("fromBusiness") : null,
+                request.message,
+              ]
                 .filter(Boolean)
                 .join(" · ")}
               trailing={

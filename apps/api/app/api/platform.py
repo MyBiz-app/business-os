@@ -133,6 +133,12 @@ class ContactRequest(BaseModel):
     notes: str | None
     tenant_id: UUID | None
     from_business: bool = Field(description="A complaint from inside a business, not the site")
+    kind: Literal["request", "setup_guided", "setup_full"] = Field(
+        default="request", description="setup_*: the business bought setup by the MyBiz team"
+    )
+    tier: Literal["standard", "priority", "vip"] = Field(
+        default="standard", description="The business's support tier; open requests by tier"
+    )
 
 
 class InboxUpdate(BaseModel):
@@ -143,8 +149,8 @@ class InboxUpdate(BaseModel):
 
 @router.get("/contact-requests")
 def contact_requests(db: InboxDep) -> list[ContactRequest]:
-    """The inbox: requests from the marketing site and complaints from businesses. Open ones
-    first, then newest."""
+    """The inbox: requests from the marketing site, complaints from businesses and setup tasks.
+    Open ones first, VIP and priority support before standard, then newest."""
     rows = db.execute(text("SELECT * FROM app.platform_contact_requests()")).mappings()
     return [ContactRequest.model_validate(dict(row)) for row in rows]
 
