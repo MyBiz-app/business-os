@@ -1,10 +1,12 @@
 from datetime import UTC, date, datetime, timedelta
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.billing import add_months, bill_businesses, periods_due
+from app.modules import ALLOWANCES, Allowance
 from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
 from tests.test_documents_time import PDF, upload
 
@@ -65,6 +67,25 @@ def test_usage_counts_against_the_bundle(client: TestClient, studio: dict) -> No
     usage = client.get("/billing", headers=headers).json()["usage"]
     assert usage["pack"] == "pack_plus" and usage["messages_included"] == 1000
     assert usage["messages"] == 1 and usage["storage_bytes"] == len(PDF)
+
+
+def test_uploads_stop_at_the_space_allowance(
+    client: TestClient, studio: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    headers = studio["headers"]
+    monkeypatch.setitem(ALLOWANCES, None, Allowance(storage_bytes=len(PDF) * 2, messages=200))
+    dana = client.post("/clients", json={"first_name": "Dana"}, headers=headers).json()["id"]
+    upload(client, headers, dana, "one.pdf")
+    upload(client, headers, dana, "two.pdf")
+    full = client.post(
+        f"/clients/{dana}/documents",
+        files={"file": ("three.pdf", PDF, "application/pdf")},
+        data={"name": "three.pdf"},
+        headers=headers,
+    )
+    assert full.status_code == 409 and full.json()["detail"] == "storage_full"
+    usage = client.get("/billing/usage", headers=headers).json()
+    assert usage["storage_bytes"] == usage["storage_included_bytes"] == len(PDF) * 2
 
 
 def test_invoices_after_the_trial(client: TestClient, studio: dict, engine: Engine) -> None:

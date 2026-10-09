@@ -1,9 +1,10 @@
 import type { components } from "@business-os/api-client";
-import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, CreditCard, Gauge, Minus, UserPlus, Users, UserX } from "lucide-react";
+import { ArrowDownRight, ArrowRight, ArrowUpRight, Banknote, CalendarCheck, CreditCard, Gauge, Luggage, Minus, UserPlus, Users, UserX } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { AttentionPanel } from "./attention-panel";
+import { usageWarnings } from "@business-os/i18n/usage";
 import { termsOf } from "@business-os/verticals";
 
 import { ColumnChart } from "@/components/charts/column-chart";
@@ -74,6 +75,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       : billing.in_trial && !billing.payment_method && billing.trial_days_left <= 7
         ? t("billing.dashboardTrial", { days: billing.trial_days_left })
         : null;
+
+  // Space and messages: warn from 80% of the bundle (#104). Messages keep going over it; new
+  // files stop.
+  const usageNotices = billing ? usageWarnings(billing.usage).map(({ key, percent }) => t(`billing.usage.${key}`, { percent })) : [];
 
   const number = new Intl.NumberFormat(locale);
   // Rounded, with a sign; never "-0".
@@ -148,6 +153,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
         </Link>
       )}
+      {usageNotices.map((notice) => (
+        <Link
+          key={notice}
+          href="/settings/billing"
+          className="flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm font-medium transition-colors hover:bg-warning/15"
+        >
+          <Luggage aria-hidden="true" className="size-5 shrink-0" />
+          <span className="flex-1">{notice}</span>
+          <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+        </Link>
+      ))}
       {setup && (welcome || setup.done < setup.total) && <GettingStartedCard setup={setup} welcome={welcome} business={tenant.name} />}
       <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-6 sm:p-8">
         <div
