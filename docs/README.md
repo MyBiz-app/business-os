@@ -78,7 +78,7 @@ flowchart LR
 
 | Part | Service | Deploys from |
 |---|---|---|
-| Web | Vercel (Frankfurt) | `main`, a preview for every pull request |
+| Web | Vercel (Frankfurt) | `main`, deployed by GitHub Actions |
 | API | Render (Frankfurt, free plan: sleeps after 15 minutes idle) | `main` |
 | Database, sign-in, files | Supabase (Frankfurt) | migrations run on every API start and from GitHub Actions |
 | Scheduled work | GitHub Actions | background jobs, notification emails, demo data, migrations |
