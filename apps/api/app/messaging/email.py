@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
-MESSAGES_DIR = Path(__file__).resolve().parent / "messages"
+MESSAGES_DIR = Path(__file__).resolve().parent.parent / "messages"
 FRESH_FOR = timedelta(days=1)
 MAX_ATTEMPTS = 3
 BATCH = 200

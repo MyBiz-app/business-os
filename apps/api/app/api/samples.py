@@ -14,10 +14,10 @@ from sqlalchemy import text
 
 from app.api.deps import SessionDep, UserDep
 from app.api.routes import ensure_profile
+from app.catalog.verticals import CATALOG, VERTICAL_PACKS
 from app.core.db import EngineDep
-from app.email import load_all_messages
+from app.messaging.email import load_all_messages
 from app.seed import BranchSpec, BusinessSpec, seed
-from app.verticals import CATALOG, VERTICAL_PACKS
 
 router = APIRouter(prefix="/tenants", tags=["tenants"])
 

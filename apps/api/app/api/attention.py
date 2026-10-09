@@ -11,8 +11,8 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from app.api.deps import TenantDep, has_module
-from app.metrics import members_at_risk
-from app.permissions import Permission
+from app.core.permissions import Permission
+from app.reports.metrics import members_at_risk
 
 router = APIRouter(prefix="/attention", tags=["reports"])
 

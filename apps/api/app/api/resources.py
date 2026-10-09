@@ -25,10 +25,10 @@ from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
 from app.api.health import ensure_may_book
 from app.api.plans import issue_receipts_now
-from app.appointments import Hours, free_starts
-from app.notifications import notify_booking
-from app.permissions import Permission
-from app.scheduling import local_to_utc
+from app.core.permissions import Permission
+from app.messaging.notifications import notify_booking
+from app.schedule.appointments import Hours, free_starts
+from app.schedule.scheduling import local_to_utc
 
 router = APIRouter(tags=["resources"])
 client_router = APIRouter(prefix="/client", tags=["client"])

@@ -11,8 +11,8 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
-from app.permissions import Permission
-from app.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
+from app.catalog.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 

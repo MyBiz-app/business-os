@@ -52,7 +52,7 @@ flowchart LR
   | Path | What |
   |---|---|
   | `apps/web` | Next.js: the marketing site and sign-up journey, the business web app (CRM), the MyBiz console |
-  | `apps/api` | FastAPI: every endpoint, database migrations (Alembic), background jobs, the AI assistant, tests |
+  | `apps/api` | FastAPI: every endpoint (`app/api/`), the domain logic grouped by area (`app/schedule`, `commerce`, `messaging`, `catalog`, `reports`), database migrations (Alembic), background jobs, the AI assistant, tests |
   | `apps/client-app` | The clients' app (Expo, also runs in the browser) |
   | `apps/business-app` | The business app for owners and staff on the go (Expo) |
   | `apps/staff-app` | The MyBiz team app (Expo) |

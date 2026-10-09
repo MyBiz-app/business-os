@@ -11,7 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.outbox import issue_documents, send_messages
+from app.messaging.outbox import issue_documents, send_messages
 from app.providers.invoicing import InvoiceDocument, IssuedDocument
 from app.providers.messaging import OutgoingMessage, SendResult
 from app.providers.payments import CheckoutRequest, HostedCheckout, PaymentEvent, WebhookRejected

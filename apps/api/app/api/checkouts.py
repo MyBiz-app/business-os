@@ -15,8 +15,8 @@ from sqlalchemy.exc import DBAPIError
 from app.api.common import not_found
 from app.api.deps import ClientDep
 from app.api.plans import Entitlement, issue_receipts_now, load_entitlement
+from app.commerce.payments import provider_for_business
 from app.core.config import get_settings
-from app.payments import provider_for_business
 from app.providers.choice import choose
 from app.providers.payments import CheckoutRequest, PaymentsUnavailable
 

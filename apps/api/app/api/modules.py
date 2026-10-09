@@ -8,7 +8,7 @@ from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.api.deps import TenantContext, TenantDep, UserDep, require
-from app.modules import (
+from app.commerce.modules import (
     CORE_TIERS,
     MODULES,
     PRESETS,
@@ -20,7 +20,7 @@ from app.modules import (
     recommend,
     validate,
 )
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(tags=["modules"])
 public_router = APIRouter(tags=["public"])

@@ -23,7 +23,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 
 | Path | What |
 |---|---|
-| `apps/api` | Python API (FastAPI, Alembic migrations, tests) |
+| `apps/api` | Python API (FastAPI, Alembic migrations, tests). In `app/`: `api/` the endpoints, domain logic in `schedule/`, `commerce/`, `messaging/`, `catalog/`, `reports/`, plus `core/`, `providers/`, `ai/`, `seed/` and `jobs.py` |
 | `apps/web` | Next.js: marketing site, business web app, MyBiz console |
 | `apps/client-app`, `apps/business-app`, `apps/staff-app` | Expo apps: the clients' app, the business app, the MyBiz team app |
 | `packages/app-kit` | Shared screens, components and providers for the Expo apps |

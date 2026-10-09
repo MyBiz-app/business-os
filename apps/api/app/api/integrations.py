@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import TenantContext, require
 from app.api.platform import StaffDep
-from app.permissions import Permission
+from app.core.permissions import Permission
 from app.providers.choice import platform_default
 from app.providers.registry import (
     CAPABILITIES,

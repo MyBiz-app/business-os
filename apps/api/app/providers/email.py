@@ -1,8 +1,8 @@
-"""Email: the senders in app/email.py, registered like every other provider."""
+"""Email: the senders in app/messaging/email.py, registered like every other provider."""
 
 from email.utils import parseaddr
 
-from app.email import LogSender, ResendSender, Sender, SmtpSender
+from app.messaging.email import LogSender, ResendSender, Sender, SmtpSender
 from app.providers.registry import SettingField, register
 
 FROM = SettingField("from", "From address (Name <address>)", required=False)

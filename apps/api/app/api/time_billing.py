@@ -22,8 +22,8 @@ from sqlalchemy.exc import IntegrityError
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, require
 from app.api.quotes import Quote, _load
-from app.email import load_all_messages
-from app.permissions import Permission
+from app.core.permissions import Permission
+from app.messaging.email import load_all_messages
 
 router = APIRouter(tags=["time"])
 

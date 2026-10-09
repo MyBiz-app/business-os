@@ -13,9 +13,9 @@ from sqlalchemy.orm import Session
 from app.api.bookings import lock_session, promote_waitlist
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
-from app.notifications import live_clients, notify, notify_sessions, session_snapshot
-from app.permissions import Permission
-from app.scheduling import local_to_utc, weekly_occurrences
+from app.core.permissions import Permission
+from app.messaging.notifications import live_clients, notify, notify_sessions, session_snapshot
+from app.schedule.scheduling import local_to_utc, weekly_occurrences
 
 router = APIRouter(tags=["schedule"])
 

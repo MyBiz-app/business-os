@@ -5,7 +5,7 @@ from zoneinfo import available_timezones
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.verticals import VERTICAL_PACKS
+from app.catalog.verticals import VERTICAL_PACKS
 
 Locale = Literal["he", "en"]
 Role = Literal["owner", "manager", "staff", "front_desk"]

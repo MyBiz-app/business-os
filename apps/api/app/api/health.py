@@ -18,10 +18,10 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
-from app.health import FORMS, HealthForm
-from app.notifications import notify
-from app.permissions import Permission
-from app.verticals import CATALOG
+from app.catalog.health import FORMS, HealthForm
+from app.catalog.verticals import CATALOG
+from app.core.permissions import Permission
+from app.messaging.notifications import notify
 
 router = APIRouter(tags=["health"])
 client_router = APIRouter(prefix="/client", tags=["client"])

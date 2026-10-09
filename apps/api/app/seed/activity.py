@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
-from app.scheduling import local_to_utc
+from app.schedule.scheduling import local_to_utc
 from app.seed.common import FIRST_NAMES, LAST_NAMES, TIME_ZONE, Client, _insert
 
 REVIEW_COMMENTS = {

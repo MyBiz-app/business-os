@@ -244,7 +244,7 @@ def test_todays_booked_clients_are_reminded_once(
     client: TestClient, studio: dict, engine: Engine
 ) -> None:
     from app.jobs import remind_sessions
-    from app.scheduling import local_to_utc
+    from app.schedule.scheduling import local_to_utc
 
     today = local_today()
     later_today = client.post(
@@ -395,7 +395,7 @@ def test_reminders_also_go_out_on_whatsapp_with_the_module(
     client: TestClient, studio: dict, engine: Engine
 ) -> None:
     from app.jobs import message_reminders, remind_sessions
-    from app.scheduling import local_to_utc
+    from app.schedule.scheduling import local_to_utc
 
     headers = studio["headers"]
     today = local_today()

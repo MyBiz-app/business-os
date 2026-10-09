@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/promo-codes", tags=["plans"])
 

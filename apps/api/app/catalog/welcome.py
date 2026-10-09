@@ -6,8 +6,8 @@ import html
 from dataclasses import dataclass
 from datetime import date
 
-from app.email import Email, load_all_messages
-from app.modules import CORE_TIERS, quote
+from app.commerce.modules import CORE_TIERS, quote
+from app.messaging.email import Email, load_all_messages
 
 
 @dataclass(frozen=True)

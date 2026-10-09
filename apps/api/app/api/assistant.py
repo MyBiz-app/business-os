@@ -14,7 +14,7 @@ from app.ai import actions, assistant
 from app.ai.gateway import LLMProvider, ProviderBusy, ProviderUnavailable, get_provider
 from app.api.common import not_found
 from app.api.deps import TenantContext, UserDep, has_module, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 

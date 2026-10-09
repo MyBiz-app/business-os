@@ -1,5 +1,5 @@
-"""The business's MyBiz subscription (simulated, see app/billing.py): trial, plan, test card,
-billing details and invoices. Owners and anyone with `business.settings`."""
+"""The business's MyBiz subscription (simulated, see app/commerce/billing.py): trial, plan,
+test card, billing details and invoices. Owners and anyone with `business.settings`."""
 
 from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Literal
@@ -15,9 +15,9 @@ from sqlalchemy.orm import Session
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
-from app.billing import add_months
-from app.modules import allowance
-from app.permissions import Permission
+from app.commerce.billing import add_months
+from app.commerce.modules import allowance
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 

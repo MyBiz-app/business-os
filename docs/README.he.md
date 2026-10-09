@@ -53,7 +53,7 @@ flowchart LR
   | נתיב | מה |
   |---|---|
   | `apps/web` | ‏Next.js: האתר השיווקי ומסע ההרשמה, מערכת העסק (CRM), קונסולת MyBiz |
-  | `apps/api` | ‏FastAPI: כל נקודות הקצה, מיגרציות של מסד הנתונים (Alembic), משימות רקע, עוזר ה-AI, בדיקות |
+  | `apps/api` | ‏FastAPI: כל נקודות הקצה (`app/api/`), הלוגיקה מקובצת לפי תחום (`app/schedule`, `commerce`, `messaging`, `catalog`, `reports`), מיגרציות של מסד הנתונים (Alembic), משימות רקע, עוזר ה-AI, בדיקות |
   | `apps/client-app` | אפליקציית הלקוחות (Expo, רצה גם בדפדפן) |
   | `apps/business-app` | אפליקציית העסק לבעלים ולצוות בדרכים (Expo) |
   | `apps/staff-app` | אפליקציית צוות MyBiz ‏(Expo) |

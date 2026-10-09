@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser, get_current_user
 from app.core.db import EngineDep, open_session, session_scope, set_tenant
-from app.permissions import Permission, effective_permissions
+from app.core.permissions import Permission, effective_permissions
 
 UserDep = Annotated[CurrentUser, Depends(get_current_user)]
 

@@ -17,7 +17,7 @@ same value in several files, it should become a token here first.
 | Add-on icons and colors | `apps/web/src/components/modules/module-icon.tsx` | One entry per module; used by pricing, sign-up and cart. |
 | Industry icons, colors, services, plans, client fields | `packages/verticals/catalog/*.json` | Then `pnpm verticals:export`. See [verticals.md](verticals.md). |
 | Any text the user sees (Hebrew / English) | `packages/i18n/messages/he.json`, `en.json` | No text is hard-coded in components. |
-| Module prices and presets | `apps/api/app/modules.py` | The pricing page and sign-up read them from the API. |
+| Module prices and presets | `apps/api/app/commerce/modules.py` | The pricing page and sign-up read them from the API. |
 | Marketing page sections (hero, features, branches, safety, FAQ, CTA) | `apps/web/src/components/marketing/sections.tsx` and the page files under `app/(marketing)/` | Each section is a component; pages compose them. |
 | Mobile apps' colors and spacing | `packages/app-kit/src/lib/theme.ts` | Shared by the client, business and team apps. |
 

@@ -12,7 +12,7 @@ from sqlalchemy.exc import DBAPIError
 
 from app.api.common import blank_to_none
 from app.api.deps import AnonymousSessionDep
-from app.verticals import CATALOG
+from app.catalog.verticals import CATALOG
 
 router = APIRouter(prefix="/public", tags=["public"])
 

@@ -82,7 +82,7 @@ export type Entry = {
   booking_modes?: string[];
   cancellation_window_minutes?: number;
   booking_requires_plan?: boolean;
-  /** The health declaration clients sign before booking (app/health.py FORMS), if any. */
+  /** The health declaration clients sign before booking (app/catalog/health.py FORMS), if any. */
   health_form?: string | null;
   default_preset?: string;
   recommended_modules?: string[];

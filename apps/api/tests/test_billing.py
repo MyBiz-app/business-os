@@ -5,8 +5,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.billing import add_months, bill_businesses, periods_due
-from app.modules import ALLOWANCES, Allowance
+from app.commerce.billing import add_months, bill_businesses, periods_due
+from app.commerce.modules import ALLOWANCES, Allowance
 from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
 from tests.test_documents_time import PDF, upload
 

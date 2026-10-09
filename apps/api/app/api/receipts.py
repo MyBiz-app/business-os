@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(tags=["receipts"])
 client_router = APIRouter(prefix="/client", tags=["client"])

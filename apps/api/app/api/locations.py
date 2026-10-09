@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(tags=["locations"])
 

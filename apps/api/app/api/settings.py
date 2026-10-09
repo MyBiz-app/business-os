@@ -11,7 +11,7 @@ from app.api.common import not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, require
 from app.api.routes import load_current_tenant
 from app.api.schemas import Tenant, TenantUpdate
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(tags=["settings"])
 

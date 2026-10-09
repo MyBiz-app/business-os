@@ -22,8 +22,8 @@ from app.api import resources as resources_api
 from app.api import schedule as schedule_api
 from app.api import time_billing as time_api
 from app.api.deps import TenantContext
-from app.metrics import METRICS, compute, members_at_risk, previous_period
-from app.permissions import Permission
+from app.core.permissions import Permission
+from app.reports.metrics import METRICS, compute, members_at_risk, previous_period
 
 PENDING_ACTION_TTL = dt.timedelta(minutes=15)
 MAX_ROWS = 25

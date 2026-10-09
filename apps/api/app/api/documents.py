@@ -18,11 +18,11 @@ from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
+from app.commerce.modules import allowance
 from app.core.config import get_settings
-from app.modules import allowance
-from app.permissions import Permission
+from app.core.permissions import Permission
+from app.core.signed_links import sign, verify
 from app.providers.choice import choose
-from app.signed_links import sign, verify
 
 router = APIRouter(tags=["documents"])
 public_router = APIRouter(tags=["documents"])

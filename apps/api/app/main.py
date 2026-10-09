@@ -51,7 +51,7 @@ from app.api import settings as business_settings
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.db import get_engine
-from app.rate_limit import MemoryStore, limiter
+from app.core.rate_limit import MemoryStore, limiter
 
 
 class HealthResponse(BaseModel):

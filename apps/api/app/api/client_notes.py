@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, TenantDep, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/clients/{client_id}/notes", tags=["clients"])
 

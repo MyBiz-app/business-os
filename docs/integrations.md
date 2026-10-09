@@ -11,7 +11,7 @@ it is a new provider class, or a different choice in settings.
 | Payments | `payments.py`: `PaymentProvider` — `create_checkout`, `parse_webhook`, `refund` | `simulated` | each business (settings → Integrations), else `API_PAYMENTS_PROVIDER` |
 | Invoicing | `invoicing.py`: `InvoiceProvider` — `issue` | `internal` (MyBiz receipts) | each business, else `API_INVOICING_PROVIDER` |
 | Messaging | `messaging.py`: `MessageProvider` — `send` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
-| Email | `email.py` (senders in `app/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
+| Email | `email.py` (senders in `app/messaging/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
 | AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_ANTHROPIC_API_KEY` |
 | Storage | `storage.py`: `StorageProvider` | `database` | the platform: `API_STORAGE_PROVIDER` |
 
@@ -20,7 +20,7 @@ it is a new provider class, or a different choice in settings.
   platform default — returns the provider instance. Everything else calls this.
 - `secrets.py`: business secrets are encrypted with `API_SECRETS_KEY` (a Fernet key; required
   outside local development) and never returned by the API.
-- `app/outbox.py`: the `send-messages` and `issue-documents` jobs hand work to each business's
+- `app/messaging/outbox.py`: the `send-messages` and `issue-documents` jobs hand work to each business's
   provider and keep failures for a retry (up to 5 attempts).
 - `app/api/webhooks.py`: `POST /webhooks/payments/{provider}/{tenant_id}`; the provider verifies
   the signature, then the checkout is completed for exactly its amount.

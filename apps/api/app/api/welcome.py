@@ -1,4 +1,4 @@
-"""The welcome email for a new business (app/welcome.py): sent once, right after sign-up, to
+"""The welcome email for a new business (app/catalog/welcome.py): sent once, right after sign-up, to
 the owner who signs up; the owner can also look at it again later."""
 
 from typing import Annotated, Literal, get_args
@@ -10,11 +10,11 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.deps import TenantContext, require
+from app.catalog.welcome import WelcomeDetails, build_welcome
+from app.commerce.payments import provider_for_business
 from app.core.config import get_settings
-from app.email import sender_from_settings
-from app.payments import provider_for_business
-from app.permissions import Permission
-from app.welcome import WelcomeDetails, build_welcome
+from app.core.permissions import Permission
+from app.messaging.email import sender_from_settings
 
 router = APIRouter(prefix="/tenants/current/welcome-email", tags=["tenants"])
 

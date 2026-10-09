@@ -6,7 +6,7 @@ from uuid import uuid4
 import pytest
 from fastapi.testclient import TestClient
 
-from app.verticals import CATALOG, ClientField
+from app.catalog.verticals import CATALOG, ClientField
 from tests.conftest import STUDIO, AuthHeaders
 from tests.test_bookings import book, new_client, new_session
 from tests.test_client_app import member, upcoming
