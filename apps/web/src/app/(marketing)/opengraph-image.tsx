@@ -1,3 +1,4 @@
+import { markSvg } from "@business-os/brand";
 import { messages as all } from "@business-os/i18n";
 import { BRAND } from "@business-os/i18n/brand";
 import { ImageResponse } from "next/og";
@@ -11,6 +12,7 @@ import { visualRtl } from "@/lib/visual-rtl";
 // right only, so each Hebrew line is passed in visual order.
 const messages = all.he;
 const hero = messages.marketing.hero;
+const mark = `data:image/svg+xml;base64,${Buffer.from(markSvg()).toString("base64")}`;
 const FONTS = join(process.cwd(), "src/app/(marketing)/fonts");
 const [medium, extraBold] = await Promise.all([
   readFile(join(FONTS, "Heebo-Medium.ttf")),
@@ -41,9 +43,7 @@ export default function OpengraphImage() {
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 44, fontWeight: 800 }}>
           {BRAND.name}
-          <div style={{ width: 72, height: 72, borderRadius: 20, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            M
-          </div>
+          <img src={mark} width={72} height={72} alt="" />
         </div>
         <div style={{ marginTop: 48, fontSize: 80, fontWeight: 800, lineHeight: 1.1 }}>{visualRtl(hero.title)}</div>
         <div style={{ fontSize: 80, fontWeight: 800, lineHeight: 1.1, opacity: 0.85 }}>{visualRtl(hero.titleAccent)}</div>

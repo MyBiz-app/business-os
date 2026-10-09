@@ -1,11 +1,12 @@
 "use client";
 
-import { Menu, Sparkles, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { BrandMark } from "@/components/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
@@ -45,12 +46,7 @@ export function MarketingHeader() {
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/75 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
-          <span
-            aria-hidden="true"
-            className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-from to-brand-to text-white shadow-md transition-transform duration-300 group-hover:rotate-12"
-          >
-            <Sparkles className="size-4" />
-          </span>
+          <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />
           {tApp("name")}
         </Link>
 

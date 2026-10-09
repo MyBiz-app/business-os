@@ -417,6 +417,9 @@ importers:
       '@business-os/api-client':
         specifier: workspace:*
         version: link:../../packages/api-client
+      '@business-os/brand':
+        specifier: workspace:*
+        version: link:../../packages/brand
       '@business-os/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
@@ -551,6 +554,12 @@ importers:
       use-intl:
         specifier: 4.14.9
         version: 4.14.9(@types/react@19.2.18)(react@19.2.3)
+
+  packages/brand:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
   packages/i18n:
     devDependencies:
