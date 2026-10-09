@@ -1,7 +1,7 @@
 # Project status
 
-_Last updated: 2026-10-07_ · Updated with every merged pull request. Open work lives in
-[GitHub issues](https://github.com/adiredri/business-os/issues); each phase is an `epic` issue
+_Last updated: 2026-10-09_ · Updated with every merged pull request. Open work lives in
+[GitHub issues](https://github.com/MyBiz-app/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 **Now:** phase 7 is done: documents, retainers and time billing (#45) opened Professional services, so all ten categories in the catalog are open. Every outside service sits behind a swappable provider (X13). Also waiting: sign-up emails on staging (#48) and the open decisions below.
@@ -22,6 +22,19 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 | 7 — More categories | Core capabilities that open the future categories. Done: courts and rooms by the hour (#41), which opened Sports & facilities; pets and children under a client (#43), which opened Pet services; on-site jobs (#42), which opened Home & field services; quotes and deposits (#44), which opened Creative & events; documents, retainers and time billing (#45), which opened Professional services | ✅ Done | #33 |
 | Go-live | Real payments, invoicing, email, WhatsApp, AI key, hardening, store builds | ⚪ When the owner decides | #34 |
 
+## What the owner needs to do (actions, when convenient)
+
+1. **Supabase email templates** (5 min). This prevents the "email link opened in another browser" bug. In [Supabase → Authentication → Emails → Templates](https://supabase.com/dashboard/project/_/auth/templates), paste each file from [`supabase/templates/`](../supabase/templates/) into Confirm signup, Magic link and Reset password: `confirmation.html`, `magic_link.html`, `recovery.html`.
+2. **Supabase redirect URLs** (2 min). In [Authentication → URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration), set Site URL to `https://business-os-alpha-drab.vercel.app` and include `https://business-os-alpha-drab.vercel.app/auth/confirm` in Redirect URLs.
+3. **Google sign-in** (about 10 min):
+   1. In [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials), create an OAuth client of type Web application.
+   2. Add the Callback URL shown in [Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers) as an authorized redirect URI.
+   3. Paste the client ID and secret into Supabase and enable Google. The button appears on the site by itself within 5 minutes.
+4. **Apple sign-in** (optional, later). Needs a paid [Apple Developer](https://developer.apple.com/programs/) account.
+5. **Change the demo accounts' temporary passwords.** Never share the new ones.
+6. **Open decisions:** #46 payments provider (it brings Apple Pay / Google Pay), #47 invoicing provider, #36 brand name, #64 branch restriction.
+7. **The owner's fixes and polish report**, before go-live.
+
 ## In progress
 
 - **The sign-up journey, low-cost-airline style (X16).** Every screen now offers 2–4 priced choices (basic, pro, and more): a branded app in the stores, AI Pro, leads on autopilot, AI replies on WhatsApp. Three new paid screens: space and messages (included / Plus / Max), support (standard / priority / VIP) and setup by our team (myself / guided / done for you, one-time, charged with the first invoice). The size of the business is picked from four priced cards, progress is a plane flying along the route, the cart keeps one-time fees apart, and the summary is a boarding pass with confetti. An optional first screen offers Google / Apple sign-in. The business settings let you change the support and bundle tiers too. Checked in `e2e/signup_journey.py`.
@@ -40,7 +53,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - MyBiz team app, second round: a home with the platform's numbers, this month's billing, open requests and new businesses; businesses with sorting and a business card (numbers, modules, invoices, more trial days); a request card (call, write back, take it, status, internal notes). Checked end to end with `e2e/staff_app.py`.
 - Websites complete. Polished in four rounds: the clients list shows each client's plan and last visit, team avatars, a busy-hours heatmap and occupancy bars in the reports, plans and services show how they are used, a shorter client history, a day strip on the phone schedule, a two-row header on phones, search, sort and pages in the MyBiz console, a billing summary, and structured data for search results.
 - Checked end to end: `dod.py` (sign-up through the AI assistant and the console), a crawl of every page in Hebrew and English on computer and phone with no errors, no accessibility violations and nothing spilling off the screen, in light and dark mode.
-- [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
+- [#38](https://github.com/MyBiz-app/business-os/issues/38) Owner review on computer and phone
 
 ## Next
 
@@ -48,17 +61,17 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## Planned
 
-- Go-live: [#48](https://github.com/adiredri/business-os/issues/48) domain and email ·
-  [#49](https://github.com/adiredri/business-os/issues/49) WhatsApp and SMS ·
-  [#50](https://github.com/adiredri/business-os/issues/50) Claude API key ·
-  [#51](https://github.com/adiredri/business-os/issues/51) hardening and store builds
+- Go-live: [#48](https://github.com/MyBiz-app/business-os/issues/48) domain and email ·
+  [#49](https://github.com/MyBiz-app/business-os/issues/49) WhatsApp and SMS ·
+  [#50](https://github.com/MyBiz-app/business-os/issues/50) Claude API key ·
+  [#51](https://github.com/MyBiz-app/business-os/issues/51) hardening and store builds
 
 ## Waiting for the owner's decision
 
-- [#46](https://github.com/adiredri/business-os/issues/46) Payment provider (O1)
-- [#47](https://github.com/adiredri/business-os/issues/47) Invoicing provider (O2)
-- [#36](https://github.com/adiredri/business-os/issues/36) Final brand name (O3)
-- [#64](https://github.com/adiredri/business-os/issues/64) Does a team member's branch assignment restrict what they see?
+- [#46](https://github.com/MyBiz-app/business-os/issues/46) Payment provider (O1)
+- [#47](https://github.com/MyBiz-app/business-os/issues/47) Invoicing provider (O2)
+- [#36](https://github.com/MyBiz-app/business-os/issues/36) Final brand name (O3)
+- [#64](https://github.com/MyBiz-app/business-os/issues/64) Does a team member's branch assignment restrict what they see?
 
 ## Health
 

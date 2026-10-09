@@ -2,7 +2,7 @@
 
 # סטטוס הפרויקט
 
-_עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/adiredri/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
+_עודכן לאחרונה: 09.10.2026_ · מתעדכן עם כל מיזוג (Pull Request). העבודה הפתוחה מנוהלת ב-[Issues ב-GitHub](https://github.com/MyBiz-app/business-os/issues): כל שלב הוא משימת־אב (`epic`), ותתי־המשימות שלו מראות את ההתקדמות. ([English version](STATUS.md))
 
 **עכשיו:** שלב 7 הושלם: מסמכים, ריטיינרים וחיוב לפי זמן (#45) פתחו את השירותים המקצועיים, וכך כל עשר הקטגוריות בקטלוג פתוחות. כל שירות חיצוני יושב מאחורי ספק שאפשר להחליף (X13). ממתינים לך גם: מיילי ההרשמה באתר הבדיקות (#48) וההחלטות הפתוחות למטה.
 **הבא בתור:** שלב 7 הושלם — כל עשר הקטגוריות פתוחות. בהמשך: ליטוש קטגוריות הבטא, סבב על אפליקציית הלקוחות, והעלייה לאוויר (#34) כשתבחר ספקים. החיבור לספקים האמיתיים — בסוף (עלייה לאוויר), דרך שכבת החיבורים החדשה.
@@ -22,6 +22,19 @@ _עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pu
 | 7 — קטגוריות נוספות | יכולות ליבה שפותחות את הקטגוריות העתידיות. הושלם: מגרשים וחדרים לפי שעה (#41), שפתחו את ספורט והזמנת מתקנים; חיות מחמד וילדים תחת לקוח (#43), שפתחו את השירותים לחיות מחמד; עבודות בשטח (#42), שפתחו את שירותי הבית והשטח; הצעות מחיר ומקדמות (#44), שפתחו את יצירה ואירועים; מסמכים, ריטיינרים וחיוב לפי זמן (#45), שפתחו את השירותים המקצועיים | ✅ הושלם | #33 |
 | עלייה לאוויר | סליקה אמיתית, חשבוניות, מייל, וואטסאפ, מפתח AI, הקשחה, בניות לחנויות | ⚪ כשתחליט | #34 |
 
+## מה אני צריך ממך (פעולות, מתי שנוח)
+
+1. **תבניות המייל ב-Supabase** (5 דקות). זה מה שמונע את הבאג של "הקישור במייל נפתח בדפדפן אחר". נכנסים ל-[Supabase → Authentication → Emails → Templates](https://supabase.com/dashboard/project/_/auth/templates), ובכל אחת משלוש התבניות (Confirm signup, Magic link, Reset password) מדביקים את התוכן של הקובץ המתאים מ-[`supabase/templates/`](../supabase/templates/): `confirmation.html`, `magic_link.html`, `recovery.html`.
+2. **כתובות החזרה ב-Supabase** (2 דקות). ב-[Authentication → URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) צריך ש-Site URL יהיה `https://business-os-alpha-drab.vercel.app`, וש-Redirect URLs יכלול את `https://business-os-alpha-drab.vercel.app/auth/confirm`.
+3. **התחברות עם Google** (כ-10 דקות):
+   1. ב-[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) יוצרים OAuth client מסוג Web application.
+   2. ב-Authorized redirect URIs מדביקים את ה-Callback URL שמופיע ב-[Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers). הכתובת נראית כך: `https://<project>.supabase.co/auth/v1/callback`.
+   3. מעתיקים את ה-Client ID וה-Client Secret ל-Supabase ומפעילים את Google. הכפתור יופיע באתר לבד, תוך 5 דקות לכל היותר.
+4. **התחברות עם Apple** (אופציונלי, אפשר בהמשך). צריך חשבון [Apple Developer](https://developer.apple.com/programs/) בתשלום שנתי. אחרי שיש חשבון, אדריך אותך.
+5. **להחליף את הסיסמאות הזמניות** של חשבונות הדמו. **לא לשלוח לי** את הסיסמה החדשה.
+6. **החלטות פתוחות:** [#46](https://github.com/MyBiz-app/business-os/issues/46) ספק סליקה (ממנו יגיעו גם Apple Pay ו-Google Pay), [#47](https://github.com/MyBiz-app/business-os/issues/47) ספק חשבוניות, [#36](https://github.com/MyBiz-app/business-os/issues/36) שם המותג, [#64](https://github.com/MyBiz-app/business-os/issues/64) הגבלת עובד לסניפים.
+7. **דוח התיקונים והשיפורים** שלך, לפני העלייה לאוויר.
+
 ## בעבודה
 
 - **מסע ההרשמה בסגנון חברת לואו-קוסט (X16).** בכל מסך יש עכשיו 2–4 אפשרויות עם מחיר (בסיסי, פרו ומעלה): אפליקציה ממותגת בחנויות, AI Pro, לידים על טייס אוטומטי ועוזר AI בוואטסאפ. נוספו שלושה מסכים בתשלום: מקום והודעות (כלול / Plus / Max), תמיכה (רגילה / עדיפות / VIP) והקמה על ידי הצוות שלנו (בעצמי / מלווה / עושים בשבילך). ההקמה היא תשלום חד-פעמי שמחויב עם החשבונית הראשונה. גודל העסק נבחר מארבעה כרטיסים עם מחיר, ההתקדמות מוצגת כמטוס שטס לאורך המסלול, הסל מפריד בין תשלום חודשי לחד-פעמי, והסיכום הוא כרטיס עלייה למטוס עם קונפטי. מסך פתיחה אופציונלי מציע הרשמה עם Google / Apple. גם בהגדרות העסק אפשר לשנות את רמת התמיכה ואת החבילה. נבדק ב-`e2e/signup_journey.py`.
@@ -40,7 +53,7 @@ _עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pu
 - אפליקציית צוות MyBiz, סבב שני: מסך בית עם המספרים של הפלטפורמה, החיוב של החודש, פניות פתוחות ועסקים חדשים; עסקים עם מיון וכרטיס עסק (מספרים, מודולים, חשבוניות, הארכת ניסיון); כרטיס פנייה (חיוג, מענה, לקיחה לטיפול, סטטוס, הערות פנימיות). נבדק מקצה לקצה (`e2e/staff_app.py`).
 - האתרים הושלמו. ליטשנו בארבעה סבבים: ברשימת הלקוחות רואים מנוי וביקור אחרון, בדף הצוות ראשי תיבות, בדוחות מפת חום של השעות העמוסות ופסי תפוסה, במנויים ובשירותים רואים כמה משתמשים בהם, היסטוריית הלקוח מקוצרת, בטלפון יש שורת ימים בלוח השיעורים וכותרת של שתי שורות, בקונסולת MyBiz יש חיפוש, מיון ועמודים וסיכום חיוב, ובאתר השיווקי סימון מובנה לתוצאות החיפוש בגוגל.
 - נבדק מקצה לקצה: תרחיש הסיום המלא (מהרשמה ועד עוזר ה-AI והקונסולה), וסריקה של כל הדפים בעברית ובאנגלית במחשב ובטלפון — בלי שגיאות, בלי בעיות נגישות ובלי גלישה מהמסך, במצב בהיר וכהה.
-- [#38](https://github.com/adiredri/business-os/issues/38) סקירה שלך על המחשב והטלפון
+- [#38](https://github.com/MyBiz-app/business-os/issues/38) סקירה שלך על המחשב והטלפון
 
 ## הבא בתור
 
@@ -49,17 +62,17 @@ _עודכן לאחרונה: 07.10.2026_ · מתעדכן עם כל מיזוג (Pu
 ## מתוכנן
 
 - עלייה לאוויר:
-  [#48](https://github.com/adiredri/business-os/issues/48) דומיין ומייל ·
-  [#49](https://github.com/adiredri/business-os/issues/49) וואטסאפ ו-SMS ·
-  [#50](https://github.com/adiredri/business-os/issues/50) מפתח Claude API ·
-  [#51](https://github.com/adiredri/business-os/issues/51) הקשחה ובניות לחנויות
+  [#48](https://github.com/MyBiz-app/business-os/issues/48) דומיין ומייל ·
+  [#49](https://github.com/MyBiz-app/business-os/issues/49) וואטסאפ ו-SMS ·
+  [#50](https://github.com/MyBiz-app/business-os/issues/50) מפתח Claude API ·
+  [#51](https://github.com/MyBiz-app/business-os/issues/51) הקשחה ובניות לחנויות
 
 ## מחכה להחלטה שלך
 
-- [#46](https://github.com/adiredri/business-os/issues/46) ספק סליקה (O1)
-- [#47](https://github.com/adiredri/business-os/issues/47) ספק חשבוניות (O2)
-- [#36](https://github.com/adiredri/business-os/issues/36) שם המותג הסופי (O3)
-- [#64](https://github.com/adiredri/business-os/issues/64) האם שיוך עובד לסניפים מגביל את מה שהוא רואה?
+- [#46](https://github.com/MyBiz-app/business-os/issues/46) ספק סליקה (O1)
+- [#47](https://github.com/MyBiz-app/business-os/issues/47) ספק חשבוניות (O2)
+- [#36](https://github.com/MyBiz-app/business-os/issues/36) שם המותג הסופי (O3)
+- [#64](https://github.com/MyBiz-app/business-os/issues/64) האם שיוך עובד לסניפים מגביל את מה שהוא רואה?
 
 ## בריאות המערכת
 
