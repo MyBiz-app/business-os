@@ -44,3 +44,12 @@ with Opus, implement it with Sonnet. For a pure UI or docs task, `/model sonnet`
 - Cache reads are cheaper than fresh input but are not free, and they grow with every turn of a
   long conversation, because each turn re-reads the whole context. Shorter sessions (`/clear`)
   and smaller files read into context are what bring them down.
+
+## How the Claude app project is set up (2026-10-09)
+
+- New threads start on Sonnet by default. Heavy tasks (architecture, security and tenant
+  isolation, schema and migrations, hard debugging) are started on Opus per task. Threads that
+  were already running keep the model they started with.
+- The coordinator can't be stopped from waking on thread messages (platform behavior), so it
+  keeps each wake small: memory is updated only on decisions and milestones, and it relays
+  between threads only when they would collide.
