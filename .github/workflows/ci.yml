@@ -16,7 +16,8 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        image: postgres:17
+        # The official image through AWS's public mirror: Docker Hub rate-limits shared runners.
+        image: public.ecr.aws/docker/library/postgres:17
         env:
           POSTGRES_PASSWORD: postgres
         ports:
