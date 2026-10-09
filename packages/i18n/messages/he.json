@@ -623,7 +623,7 @@
     "branchesOf": "הסניפים של {email}",
     "allBranches": "כל הסניפים",
     "someBranches": "{count} סניפים",
-    "branchesHint": "איפה הם עובדים. בלי סימון: כל הסניפים.",
+    "branchesHint": "הם רואים רק את הסניפים המסומנים כאן (בעלים ומנהלים תמיד רואים הכל). בלי סימון: כל הסניפים.",
     "saveBranches": "שמירה",
     "count": "{count, plural, one {איש צוות אחד} other {# אנשי צוות}}"
   },

@@ -122,7 +122,11 @@ def _one_location(session: Session, location_id: UUID) -> Location:
 
 @router.get("/locations")
 def list_locations(context: ReadDep) -> list[Location]:
-    return _load_locations(context.session)
+    """The business's branches; a member kept to some branches sees only theirs (#64)."""
+    locations = _load_locations(context.session)
+    if context.branches is None:
+        return locations
+    return [location for location in locations if location.id in context.branches]
 
 
 @router.post("/locations", status_code=status.HTTP_201_CREATED)
