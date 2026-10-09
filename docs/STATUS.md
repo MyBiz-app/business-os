@@ -37,6 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **The product's name in one place (X21).** "MyBiz" is a working name: it now comes from `packages/i18n/brand.json`, which feeds every translation, page title, the invoice and the share picture, and the API's texts. Renaming is one file (plus the store names in each app's `app.json`), see [design-system.md](design-system.md).
 - **Data is kept only as long as decided (X20).** A daily job (`purge-expired`, scheduled on staging) deletes leads that never became clients and nobody touched for 12 months, website requests and AI assistant conversations after 12 months, and the message log after 24 months.
 - **Team members work in their branches (#64, X19).** A member assigned to branches sees only those: the branch picker lists only theirs, "all branches" means all of theirs, and lists and numbers follow it. Owners and managers see every branch.
 - **Code restructured for growth (X18).** The demo generator is the `app/seed` package, the sign-up wizard is split into the journey, the cart and its pieces, `apps/mobile` is now `apps/client-app`, and the API's logic is grouped by area (`schedule`, `commerce`, `messaging`, `catalog`, `reports`, `core`). Behavior is unchanged: the full API suite passes and the API schema is identical (#122–#125). After pulling, run `pnpm install` once.

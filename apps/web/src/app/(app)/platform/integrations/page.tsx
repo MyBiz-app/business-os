@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
@@ -8,7 +9,7 @@ import { getPlatform } from "@/lib/platform";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.integrations");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** The platform's providers (X13): the default per capability, the providers available, and how

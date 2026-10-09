@@ -24,7 +24,10 @@ export function apiMessages(locale) {
   };
 }
 
-export const serialize = (value) => `${JSON.stringify(value, null, 2)}\n`;
+// The product's name comes from brand.json (decision X21), as in src/brand.ts.
+const BRAND = JSON.parse(readFileSync(join(root, "brand.json"), "utf8")).name;
+
+export const serialize = (value) => `${JSON.stringify(value, null, 2).split("MyBiz").join(BRAND)}\n`;
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   for (const locale of LOCALES) {

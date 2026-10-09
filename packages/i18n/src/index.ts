@@ -1,5 +1,6 @@
 import en from "../messages/en.json";
 import he from "../messages/he.json";
+import { withBrand } from "./brand";
 
 export const locales = ["he", "en"] as const;
 export type Locale = (typeof locales)[number];
@@ -8,7 +9,8 @@ export const defaultLocale: Locale = "he";
 
 export type Messages = typeof en;
 
-export const messages: Record<Locale, Messages> = { he, en };
+// The product's name comes from brand.json (decision X21).
+export const messages: Record<Locale, Messages> = { he: withBrand(he), en: withBrand(en) };
 
 export const localeDirection: Record<Locale, "rtl" | "ltr"> = {
   he: "rtl",

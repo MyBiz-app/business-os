@@ -1,6 +1,6 @@
 /**
  * The MyBiz logo in one place: its colors and the geometry of its mark. The product name is not
- * here: it comes from `@business-os/i18n` (the single source for the name). Every logo file (web
+ * here: it comes from `BRAND.name` in `@business-os/i18n/brand` (its single home). Every logo file (web
  * favicon, app icons, wordmarks) is drawn from these values and that name by
  * `pnpm --filter @business-os/brand build:assets`, and the web draws the mark from them inline,
  * so recoloring or renaming is a change in one place plus one script run.

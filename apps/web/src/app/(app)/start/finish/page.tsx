@@ -3,6 +3,7 @@ import { Check, Lock } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { API_URL } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -16,7 +17,7 @@ type Catalog = components["schemas"]["Catalog"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("start.finish");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 async function loadCatalog(currency: string): Promise<Catalog | null> {

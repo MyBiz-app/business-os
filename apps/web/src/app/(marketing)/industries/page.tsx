@@ -2,6 +2,7 @@ import { categories, childrenOf } from "@business-os/verticals";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { CtaBand, SectionHeading } from "@/components/marketing/sections";
 import { VerticalIcon } from "@/components/vertical-icon";
@@ -9,7 +10,7 @@ import { industryTexts } from "@/lib/verticals";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.industries");
-  return { title: `${t("title")} · MyBiz`, description: t("subtitle") };
+  return { title: `${t("title")} · ${BRAND.name}`, description: t("subtitle") };
 }
 
 /** Every industry: the open categories with their kinds of business, then the ones coming soon. */

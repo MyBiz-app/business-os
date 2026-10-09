@@ -8,7 +8,8 @@
     "./messages/*.json": "./messages/*.json",
     "./dates": "./src/dates.ts",
     "./money": "./src/money.ts",
-    "./usage": "./src/usage.ts"
+    "./usage": "./src/usage.ts",
+    "./brand": "./src/brand.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

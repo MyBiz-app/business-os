@@ -15,11 +15,8 @@ const root = resolve(here, "../../..");
 const assets = resolve(here, "../assets");
 const font = join(root, "apps/web/src/app/(marketing)/fonts/Heebo-ExtraBold.ttf");
 
-// The name lives in @business-os/i18n: brand.json once it exists, the English app name until then.
-const i18n = join(root, "packages/i18n");
-const name = existsSync(join(i18n, "brand.json"))
-  ? JSON.parse(readFileSync(join(i18n, "brand.json"), "utf8")).name
-  : JSON.parse(readFileSync(join(i18n, "messages/en.json"), "utf8")).app.name;
+// The product's name has one home: @business-os/i18n's brand.json (BRAND.name).
+const name = JSON.parse(readFileSync(join(root, "packages/i18n/brand.json"), "utf8")).name;
 // The wordmark colors the last capitalised word ("Biz" in "MyBiz"); a name without one stays in ink.
 const [, lead, accent] = /^(.+?)([A-Z][^A-Z]*)$/.exec(name) ?? [null, name, ""];
 
