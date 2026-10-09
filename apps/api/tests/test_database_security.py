@@ -77,6 +77,24 @@ def test_public_roles_cannot_reach_app_tables(engine: Engine) -> None:
     assert grants == []
 
 
+def test_alembic_version_is_locked(engine: Engine) -> None:
+    # Alembic keeps its table in `public`, which Supabase's Data API exposes.
+    [(rls,)] = _query(
+        engine,
+        "SELECT relrowsecurity FROM pg_class WHERE oid = 'public.alembic_version'::regclass",
+    )
+    assert rls
+    grants = _query(
+        engine,
+        """
+        SELECT grantee FROM information_schema.role_table_grants
+        WHERE table_schema = 'public' AND table_name = 'alembic_version'
+          AND grantee IN ('PUBLIC', 'anon', 'authenticated')
+        """,
+    )
+    assert grants == []
+
+
 def test_api_sends_security_headers(client: TestClient) -> None:
     response = client.get("/health")
 
