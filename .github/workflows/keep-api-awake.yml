@@ -1,0 +1,23 @@
+name: Keep the staging API awake
+
+# Render's free plan puts the API to sleep after 15 minutes without traffic; the first request
+# then waits up to a minute and the web app shows an error. A request every 10 minutes during
+# Israeli daytime keeps it awake. The free plan's 750 hours a month cover one service running
+# all month. Remove this when the API moves to a paid plan, which never sleeps.
+on:
+  schedule:
+    - cron: "*/10 4-21 * * *"  # every 10 minutes, 04:00–21:59 UTC (07:00–00:59 in Israel)
+  workflow_dispatch:
+
+concurrency:
+  group: keep-api-awake
+  cancel-in-progress: true
+
+jobs:
+  ping:
+    name: Ping /health/ready
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping
+        run: curl --silent --show-error --fail --max-time 120 https://business-os-api-staging.onrender.com/health/ready
