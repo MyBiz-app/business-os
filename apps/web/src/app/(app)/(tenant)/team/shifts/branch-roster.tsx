@@ -1,17 +1,17 @@
-import { AlertTriangle, ArrowRightLeft, Plus } from "lucide-react";
+import { AlertTriangle, ArrowRightLeft, Plus, ShieldAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { Avatar } from "@/components/avatar";
 import { formatDay } from "@/lib/dates";
 
-import type { BoardPerson, BoardShift } from "./shift-board";
+import type { BoardGap, BoardPerson, BoardShift } from "./shift-board";
 
 type Branch = { id: string; name: string; color: string };
 
 /** Who is on and when, a day at a time with one column per branch, so branches compare side
  * by side. The branch name and color head every column. */
-export function BranchRoster({ days, today, locale, branches, shifts, people, editHref, addHref }: { days: string[]; today: string; locale: string; branches: Branch[]; shifts: BoardShift[]; people: BoardPerson[]; editHref?: (shiftId: string) => string; addHref?: (day: string, branchId: string) => string }) {
+export function BranchRoster({ days, today, locale, branches, shifts, people, gaps = [], editHref, addHref }: { days: string[]; today: string; locale: string; branches: Branch[]; shifts: BoardShift[]; people: BoardPerson[]; gaps?: BoardGap[]; editHref?: (shiftId: string) => string; addHref?: (day: string, branchId: string) => string }) {
   const t = useTranslations("shifts");
   const person = new Map(people.map((p) => [p.id, p]));
   return (
@@ -34,6 +34,15 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, ed
                       <span dir="auto" className="truncate">{branch.name}</span>
                       <span className="ms-auto text-xs font-normal text-muted">{t("onShift", { count: new Set(here.map((s) => s.userId)).size })}</span>
                     </div>
+                    {gaps
+                      .filter((g) => g.day === day && g.locationId === branch.id)
+                      .map((g) => (
+                        <p key={`${g.starts}-${g.ends}`} className="flex items-center gap-1.5 rounded-lg bg-warning/10 px-2 py-1 text-xs">
+                          <ShieldAlert aria-hidden="true" className="size-3.5 shrink-0 text-warning" />
+                          <span dir="ltr" className="tabular-nums">{g.starts}–{g.ends}</span>
+                          <span>{t("coverage.gap", { have: g.have, needed: g.needed })}</span>
+                        </p>
+                      ))}
                     {here.length === 0 ? (
                       <p className="py-2 text-sm text-muted">{t("nobody")}</p>
                     ) : (

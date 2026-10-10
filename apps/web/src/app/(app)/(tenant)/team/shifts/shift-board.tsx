@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ArrowRightLeft, Copy, Plane, Plus, Trash2, X } from "lucide-react";
+import { AlertTriangle, ArrowRightLeft, BookmarkPlus, Copy, Plane, Plus, ShieldAlert, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 
@@ -10,7 +10,7 @@ import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import { formatDay } from "@/lib/dates";
 
-import { copyShiftsDay, copyShiftsWeek, type CopyState, deleteShift, saveShift, type ShiftState } from "./actions";
+import { copyShiftsDay, copyShiftsWeek, type CopyState, deleteShift, deleteTemplate, saveShift, saveTemplate, type ShiftState, type TemplateState } from "./actions";
 
 export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null };
 export type BoardShift = {
@@ -31,6 +31,9 @@ export type BoardShift = {
 };
 /** Days a person is away, keyed `userId:day`; the value is the reason, if given. */
 export type Away = Record<string, string | null>;
+export type BoardTemplate = { id: string; locationId: string; name: string; starts: string; ends: string; position: string | null };
+/** A stretch where a branch has fewer people on shift than its coverage rules ask. */
+export type BoardGap = { locationId: string; locationName: string; day: string; starts: string; ends: string; needed: number; have: number };
 type Branch = { id: string; name: string; color: string };
 export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string };
 
@@ -48,8 +51,10 @@ export function ShiftBoard(props: {
   weekStart: string;
   copyMode?: "week" | "day" | null;
   compact?: boolean;
+  templates?: BoardTemplate[];
+  gaps?: BoardGap[];
 }) {
-  const { days, today, locale, people, shifts, away = {}, branches, canEdit, weekStart, copyMode = null, compact = false } = props;
+  const { days, today, locale, people, shifts, away = {}, branches, canEdit, weekStart, copyMode = null, compact = false, templates = [], gaps = [] } = props;
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -110,6 +115,12 @@ export function ShiftBoard(props: {
               {t("awayLegend")}
             </li>
           )}
+          {gaps.length > 0 && (
+            <li className="flex items-center gap-1.5">
+              <ShieldAlert aria-hidden="true" className="size-3.5 text-warning" />
+              {t("coverage.legend")}
+            </li>
+          )}
         </ul>
         {canEdit && copyMode && (
           <div className="flex flex-col items-end gap-1">
@@ -164,6 +175,12 @@ export function ShiftBoard(props: {
                     {formatDay(day, locale, { day: "numeric" })}
                   </span>
                   <span className="mt-0.5 block text-[0.6875rem] font-normal">{t("onShift", { count: covered(day) })}</span>
+                  {gaps.some((g) => g.day === day) && (
+                    <span className="mt-0.5 flex items-center justify-center gap-1 text-[0.6875rem] font-medium text-warning" title={t("coverage.short", { count: gaps.filter((g) => g.day === day).length })}>
+                      <ShieldAlert aria-hidden="true" className="size-3" />
+                      <span className="sr-only">{t("coverage.short", { count: gaps.filter((g) => g.day === day).length })}</span>
+                    </span>
+                  )}
                 </th>
               ))}
             </tr>
@@ -248,7 +265,7 @@ export function ShiftBoard(props: {
           );
         })}
       </div>
-      {editing && <ShiftDialog key={`${editing.shift?.id ?? "new"}-${editing.userId}-${editing.day}`} editing={editing} people={people} branches={branches} away={away} onClose={() => setEditing(null)} />}
+      {editing && <ShiftDialog key={`${editing.shift?.id ?? "new"}-${editing.userId}-${editing.day}`} editing={editing} people={people} branches={branches} templates={templates} away={away} onClose={() => setEditing(null)} />}
     </div>
   );
 }
@@ -262,7 +279,7 @@ function AwayChip({ reason, label }: { reason: string | null; label: string }) {
   );
 }
 
-export function ShiftDialog({ editing, people, branches, away = {}, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; away?: Away; onClose: () => void }) {
+export function ShiftDialog({ editing, people, branches, templates = [], away = {}, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; templates?: BoardTemplate[]; away?: Away; onClose: () => void }) {
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);
@@ -271,6 +288,16 @@ export function ShiftDialog({ editing, people, branches, away = {}, onClose }: {
   const [deleting, startDelete] = useTransition();
   const [picked, setPicked] = useState({ userId: editing.userId, day: editing.day });
   const pickedAway = `${picked.userId}:${picked.day}` in away;
+  const [locationId, setLocationId] = useState(shift?.locationId ?? editing.locationId ?? people.find((p) => p.id === editing.userId)?.homeId ?? branches[0]?.id ?? "");
+  const [starts, setStarts] = useState(shift?.starts ?? "09:00");
+  const [ends, setEnds] = useState(shift?.ends ?? "17:00");
+  const [position, setPosition] = useState(shift?.position ?? "");
+  const here = templates.filter((tpl) => tpl.locationId === locationId);
+  const apply = (tpl: BoardTemplate) => {
+    setStarts(tpl.starts);
+    setEnds(tpl.ends);
+    if (tpl.position) setPosition(tpl.position);
+  };
 
   useEffect(() => {
     dialog.current?.showModal();
@@ -310,15 +337,17 @@ export function ShiftDialog({ editing, people, branches, away = {}, onClose }: {
         />
         <SelectField label={t("person")} name="user_id" defaultValue={editing.userId} options={people.map((p) => ({ value: p.id, label: p.name }))} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label={t("branch")} name="location_id" defaultValue={shift?.locationId ?? editing.locationId ?? people.find((p) => p.id === editing.userId)?.homeId ?? branches[0]?.id} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
+          <SelectField label={t("branch")} name="location_id" value={locationId} onChange={(e) => setLocationId(e.target.value)} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
           <Field label={t("date")} name="day" type="date" defaultValue={editing.day} required dir="ltr" />
         </div>
         {branches.length > 1 && <p className="-mt-2 text-xs text-muted">{t("coverHint")}</p>}
+        <TemplatePicker templates={here} onApply={apply} />
         <div className="grid grid-cols-2 gap-4">
-          <Field label={t("starts")} name="starts" type="time" step={900} defaultValue={shift?.starts ?? "09:00"} required dir="ltr" />
-          <Field label={t("ends")} name="ends" type="time" step={900} defaultValue={shift?.ends ?? "17:00"} required dir="ltr" />
+          <Field label={t("starts")} name="starts" type="time" step={900} value={starts} onChange={(e) => setStarts(e.target.value)} required dir="ltr" />
+          <Field label={t("ends")} name="ends" type="time" step={900} value={ends} onChange={(e) => setEnds(e.target.value)} required dir="ltr" />
         </div>
-        <Field label={t("position")} name="position" defaultValue={shift?.position ?? ""} maxLength={60} placeholder={t("positionPlaceholder")} dir="auto" />
+        <Field label={t("position")} name="position" value={position} onChange={(e) => setPosition(e.target.value)} maxLength={60} placeholder={t("positionPlaceholder")} dir="auto" />
+        <SaveAsTemplate locationId={locationId} starts={starts} ends={ends} position={position} />
         <Field label={t("note")} name="note" defaultValue={shift?.note ?? ""} maxLength={200} dir="auto" />
         {pickedAway && (
           <p role="status" className="flex items-center gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm">
@@ -361,5 +390,76 @@ export function ShiftDialog({ editing, people, branches, away = {}, onClose }: {
         </div>
       </form>
     </dialog>
+  );
+}
+
+/** The branch's saved shift types: one click fills the times (and position). */
+function TemplatePicker({ templates, onApply }: { templates: BoardTemplate[]; onApply: (template: BoardTemplate) => void }) {
+  const t = useTranslations("shifts");
+  const [, startDelete] = useTransition();
+  if (templates.length === 0) return null;
+  return (
+    <div className="flex flex-col gap-1.5">
+      <span className="text-sm font-medium">{t("templates.apply")}</span>
+      <ul className="flex flex-wrap gap-2">
+        {templates.map((tpl) => (
+          <li key={tpl.id} className="flex items-center rounded-full border border-border bg-surface-2 text-sm">
+            <button type="button" onClick={() => onApply(tpl)} className="rounded-s-full px-3 py-1 font-medium transition-colors hover:text-primary">
+              <span dir="auto">{tpl.name}</span> <span dir="ltr" className="tabular-nums text-muted">{tpl.starts}–{tpl.ends}</span>
+            </button>
+            <button type="button" onClick={() => startDelete(() => deleteTemplate(tpl.id))} aria-label={t("templates.remove", { name: tpl.name })} className="rounded-e-full px-2 py-1 text-muted transition-colors hover:text-danger">
+              <X aria-hidden="true" className="size-3.5" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** Keeps the times above as a named shift type of the branch. */
+function SaveAsTemplate({ locationId, starts, ends, position }: { locationId: string; starts: string; ends: string; position: string }) {
+  const t = useTranslations("shifts");
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [state, setState] = useState<TemplateState>({});
+  const [saving, startSave] = useTransition();
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="btn-ghost -mt-1 self-start px-2 py-1 text-sm">
+        <BookmarkPlus aria-hidden="true" className="size-4" />
+        {t("templates.save")}
+      </button>
+    );
+  }
+  const save = () =>
+    startSave(async () => {
+      const result = await saveTemplate(locationId, name.trim(), starts, ends, position.trim());
+      setState(result);
+      if (result.saved) {
+        setOpen(false);
+        setName("");
+      }
+    });
+  return (
+    <div className="flex flex-col gap-2 rounded-xl bg-surface-2 p-3">
+      <div className="flex flex-wrap items-end gap-2">
+        <label className="flex min-w-40 flex-1 flex-col gap-1 text-sm font-medium">
+          {t("templates.name")}
+          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder={t("templates.namePlaceholder")} dir="auto" className="control px-3 py-1.5 font-normal" />
+        </label>
+        <button type="button" disabled={saving || name.trim() === ""} aria-busy={saving} onClick={save} className="btn-primary px-3 py-1.5 text-sm">
+          {t("templates.saveDo", { times: `${starts}–${ends}` })}
+        </button>
+        <button type="button" onClick={() => setOpen(false)} className="btn-ghost px-3 py-1.5 text-sm">
+          {t("templates.cancel")}
+        </button>
+      </div>
+      {state.error && (
+        <p role="alert" className="text-xs text-danger">
+          {state.error === "name_taken" ? t("templates.nameTaken") : t("errors.invalid")}
+        </p>
+      )}
+    </div>
   );
 }

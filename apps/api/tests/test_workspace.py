@@ -502,3 +502,88 @@ def test_each_branch_has_a_planning_rhythm(client: TestClient, studio: dict) -> 
         == 404
     )
     assert client.get("/shifts/planning", headers=headers).json()[0]["days"] == 10
+
+
+def test_shift_templates_are_named_per_branch(client: TestClient, studio: dict) -> None:
+    headers, branch = studio["headers"], studio["location"]["id"]
+    morning = {"location_id": branch, "name": " Morning ", "starts": "07:00", "ends": "15:00"}
+    created = client.post("/shift-templates", json=morning, headers=headers)
+    assert created.status_code == 201 and created.json()["name"] == "Morning"
+    night = {"location_id": branch, "name": "Night", "starts": "22:00", "ends": "06:00"}
+    assert client.post("/shift-templates", json=night, headers=headers).status_code == 201
+    same_name = client.post(
+        "/shift-templates", json={**morning, "name": "morning"}, headers=headers
+    )
+    assert same_name.status_code == 409 and same_name.json()["detail"] == "template_name_taken"
+    zero = {**morning, "name": "Zero", "ends": "07:00"}
+    assert client.post("/shift-templates", json=zero, headers=headers).status_code == 422
+
+    listed = client.get("/shift-templates", headers=headers).json()
+    assert [t["name"] for t in listed] == ["Morning", "Night"]
+    other = client.get("/shift-templates", params={"location_id": str(uuid4())}, headers=headers)
+    assert other.json() == []
+    gone = client.delete(f"/shift-templates/{created.json()['id']}", headers=headers)
+    assert gone.status_code == 204
+    assert (
+        client.delete(f"/shift-templates/{created.json()['id']}", headers=headers).status_code
+        == 404
+    )
+
+
+def test_coverage_rules_flag_understaffed_stretches(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    tomorrow = local_today() + timedelta(days=1)
+    rule = {"weekday": tomorrow.weekday(), "starts_minute": 8 * 60, "ends_minute": 18 * 60}
+    rules = {"rules": [{**rule, "min_staff": 2}]}
+    saved = client.put(f"/locations/{branch}/coverage-rules", json=rules, headers=headers)
+    assert saved.status_code == 200 and saved.json() == rules
+    backwards = {"rules": [{**rule, "ends_minute": 8 * 60, "min_staff": 1}]}
+    assert (
+        client.put(
+            f"/locations/{branch}/coverage-rules", json=backwards, headers=headers
+        ).status_code
+        == 422
+    )
+
+    def gaps() -> list[dict]:
+        return client.get(
+            "/shifts/coverage",
+            params={"start": local_today().isoformat(), "days": 3},
+            headers=headers,
+        ).json()
+
+    # Nobody works: the whole stretch is short by two.
+    assert [(g["starts_minute"], g["ends_minute"], g["needed"], g["have"]) for g in gaps()] == [
+        (480, 1080, 2, 0)
+    ]
+    # One person 9-15: short by one in the morning and afternoon, short by two in between? No:
+    # 9-15 has one of two, 8-9 and 15-18 have none.
+    client.post(
+        "/shifts",
+        json={"user_id": coach, "location_id": branch, "starts_at": at(1, 9), "ends_at": at(1, 15)},
+        headers=headers,
+    )
+    assert [(g["starts_minute"], g["ends_minute"], g["have"]) for g in gaps()] == [
+        (480, 540, 0),
+        (540, 900, 1),
+        (900, 1080, 0),
+    ]
+    # Time off for that person removes them from the count.
+    day = tomorrow.isoformat()
+    client.post(
+        f"/staff/{coach}/time-off", json={"starts_on": day, "ends_on": day}, headers=headers
+    )
+    assert [(g["starts_minute"], g["ends_minute"], g["have"]) for g in gaps()] == [(480, 1080, 0)]
+    # Managers set rules; the team only reads them.
+    coach_headers = auth(studio["coach"], studio["tenant_id"])
+    assert (
+        client.get(f"/locations/{branch}/coverage-rules", headers=coach_headers).status_code == 200
+    )
+    assert (
+        client.put(
+            f"/locations/{branch}/coverage-rules", json=rules, headers=coach_headers
+        ).status_code
+        == 403
+    )

@@ -13,16 +13,19 @@ import { TimeGrid, type GridEvent } from "@/components/calendar-board/time-grid"
 import { branchColor, minutesIn } from "@/lib/calendar";
 import { addDays, dayOf, formatDay, formatTime, isDay, todayIn } from "@/lib/dates";
 import { branchLimit, isRange, RANGES, type Range, rangeOfCadence, stepWindow, windowOf } from "@/lib/shift-window";
+import { minuteToTime } from "@/lib/coverage";
 import { weekStartFor } from "@/lib/hours";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { BranchRoster } from "./branch-roster";
+import { CoverageBanner } from "./coverage-banner";
+import { CoverageSettings } from "./coverage-settings";
 import { EditFromUrl } from "./edit-from-url";
 import { PlanningSettings } from "./planning-settings";
 import { SaveShiftsDefault } from "./save-default";
 import { Segmented } from "./segmented";
-import { type BoardPerson, type BoardShift, type Editing, ShiftBoard } from "./shift-board";
+import { type BoardGap, type BoardPerson, type BoardShift, type BoardTemplate, type Editing, ShiftBoard } from "./shift-board";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("shifts");
@@ -104,10 +107,21 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   const limit = view === "branches" ? branchLimit(range) : branches.length;
   const shown = (requested.length ? requested : branches.map((b) => b.id)).slice(0, limit);
   const allShown = shown.length === branches.length;
-  const [shifts, awayRanges] = await Promise.all([
-    api.GET("/shifts", { params: { ...scope, query: { start: win.start, days: win.days, ...(allShown ? {} : { location_id: shown }) } } }).then(unwrap),
+  const branchFilter = allShown ? {} : { location_id: shown };
+  const canEdit = canManageTeam(tenant);
+  const [shifts, awayRanges, rawTemplates, rawGaps, ruleSets] = await Promise.all([
+    api.GET("/shifts", { params: { ...scope, query: { start: win.start, days: win.days, ...branchFilter } } }).then(unwrap),
     api.GET("/shifts/time-off", { params: { ...scope, query: { start: win.start, days: win.days } } }).then(unwrap),
+    api.GET("/shift-templates", { params: scope }).then(unwrap),
+    api.GET("/shifts/coverage", { params: { ...scope, query: { start: win.start, days: win.days, ...branchFilter } } }).then(unwrap),
+    canEdit
+      ? Promise.all(branches.map(async (b) => ({ id: b.id, rules: (await api.GET("/locations/{location_id}/coverage-rules", { params: { ...scope, path: { location_id: b.id } } })).data?.rules ?? [] })))
+      : Promise.resolve([]),
   ]);
+  const templates: BoardTemplate[] = rawTemplates.map((x) => ({ id: x.id, locationId: x.location_id, name: x.name, starts: x.starts.slice(0, 5), ends: x.ends.slice(0, 5), position: x.position ?? null }));
+  const gaps: BoardGap[] = rawGaps.map((g) => ({ locationId: g.location_id, locationName: g.location_name, day: g.day, starts: minuteToTime(g.starts_minute), ends: minuteToTime(g.ends_minute), needed: g.needed, have: g.have }));
+  // Monday first, as the coverage rules count weekdays.
+  const weekdays = Array.from({ length: 7 }, (_, i) => formatDay(addDays("2024-01-01", i), locale, { weekday: "long" }));
 
   const href = (changes: Record<string, string | undefined>) => {
     // "all" keeps every branch when the saved default is a narrower set.
@@ -179,7 +193,6 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         ? formatDay(win.start, locale, { month: "long", year: "numeric" })
         : `${formatDay(win.start, locale, { day: "numeric", month: "short" })} – ${formatDay(last, locale, { day: "numeric", month: "short", year: "numeric" })}`;
   const showToday = !days.includes(today);
-  const canEdit = canManageTeam(tenant);
   const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((id) => b.includes(id));
   const savedView = tenant.shifts_default_view ?? "people";
   const savedRange = tenant.shifts_default_range ?? rangeOfCadence(rhythm.get(savedBranches[0] ?? branches[0]?.id)?.cadence);
@@ -253,6 +266,8 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         </div>
       )}
 
+      <CoverageBanner gaps={gaps} locale={locale} showBranch={branches.length > 1} />
+
       {showSave && <SaveShiftsDefault view={view} range={range} branches={currentSet} />}
 
       {gridView ? (
@@ -269,7 +284,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           dayHref={range === "week" ? href({ range: "day", date: "__day__" }) : null}
         />
       ) : view === "branches" ? (
-        <BranchRoster days={days} today={today} locale={locale} branches={branchList.filter((b) => shown.includes(b.id))} shifts={boardShifts} people={people} editHref={canEdit ? (id) => href({ edit: id }) : undefined} addHref={canEdit ? (day, branchId) => href({ add: `${day}:${branchId}` }) : undefined} />
+        <BranchRoster gaps={gaps} days={days} today={today} locale={locale} branches={branchList.filter((b) => shown.includes(b.id))} shifts={boardShifts} people={people} editHref={canEdit ? (id) => href({ edit: id }) : undefined} addHref={canEdit ? (day, branchId) => href({ add: `${day}:${branchId}` }) : undefined} />
       ) : (
         <ShiftBoard
           key={`${win.start}-${win.days}`}
@@ -284,9 +299,12 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           copyMode={range === "week" ? "week" : range === "day" ? "day" : null}
           weekStart={win.start}
           compact={win.days > 7}
+          templates={templates}
+          gaps={gaps}
         />
       )}
-      {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} closeHref={href({ edit: undefined, add: undefined })} away={away} />}
+      {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} templates={templates} closeHref={href({ edit: undefined, add: undefined })} away={away} />}
+      {canEdit && <CoverageSettings weekdays={weekdays} branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, rules: ruleSets.find((r) => r.id === b.id)?.rules ?? [] }))} />}
       {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
     </main>
   );

@@ -1804,6 +1804,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shift-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Shift Templates */
+        get: operations["list_shift_templates"];
+        put?: never;
+        /** Create Shift Template */
+        post: operations["create_shift_template"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shift-templates/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Shift Template */
+        delete: operations["delete_shift_template"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/coverage-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Coverage Rules */
+        get: operations["get_coverage_rules"];
+        /**
+         * Set Coverage Rules
+         * @description Replaces the branch's whole set of rules.
+         */
+        put: operations["set_coverage_rules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Shift Coverage
+         * @description Where a branch has fewer people on shift than its coverage rules ask, day by day. People
+         *     away on time off do not count. Branches without rules are never listed.
+         */
+        get: operations["shift_coverage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/options": {
         parameters: {
             query?: never;
@@ -5628,6 +5705,60 @@ export interface components {
             /** Price */
             price: number;
         };
+        /** CoverageGap */
+        CoverageGap: {
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Starts Minute */
+            starts_minute: number;
+            /** Ends Minute */
+            ends_minute: number;
+            /** Needed */
+            needed: number;
+            /**
+             * Have
+             * @description People on shift through the stretch
+             */
+            have: number;
+        };
+        /** CoverageRule */
+        CoverageRule: {
+            /**
+             * Weekday
+             * @description 0 = Monday
+             */
+            weekday: number;
+            /**
+             * Starts Minute
+             * @description Minutes from midnight
+             */
+            starts_minute: number;
+            /**
+             * Ends Minute
+             * @description Minutes from midnight; 1440 = end of day
+             */
+            ends_minute: number;
+            /**
+             * Min Staff
+             * @description People needed on shift at the same time
+             */
+            min_staff: number;
+        };
+        /** CoverageRules */
+        CoverageRules: {
+            /** Rules */
+            rules: components["schemas"]["CoverageRule"][];
+        };
         /** CreatedInvitation */
         CreatedInvitation: {
             /**
@@ -8944,6 +9075,63 @@ export interface components {
              * Format: date-time
              */
             ends_at: string;
+        };
+        /** ShiftTemplate */
+        ShiftTemplate: {
+            /**
+             * Name
+             * @description E.g. "Morning"
+             */
+            name: string;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             * @description Earlier than `starts`: the shift runs past midnight
+             */
+            ends: string;
+            /** Position */
+            position?: string | null;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** ShiftTemplateCreate */
+        ShiftTemplateCreate: {
+            /**
+             * Name
+             * @description E.g. "Morning"
+             */
+            name: string;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             * @description Earlier than `starts`: the shift runs past midnight
+             */
+            ends: string;
+            /** Position */
+            position?: string | null;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
         };
         /** ShiftUpdate */
         ShiftUpdate: {
@@ -14307,6 +14495,225 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CopiedShifts"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_shift_templates: {
+        parameters: {
+            query?: {
+                /** @description Only these branches */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShiftTemplate"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_shift_template: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShiftTemplateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShiftTemplate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_shift_template: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_coverage_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_coverage_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoverageRules"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shift_coverage: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+                /** @description Only these branches */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageGap"][];
                 };
             };
             /** @description Validation Error */
