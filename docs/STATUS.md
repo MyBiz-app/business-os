@@ -37,6 +37,8 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **Shifts: a roster is a draft until published.** Managers plan shifts as drafts (dashed, marked "Draft"); the team and the phone view see only published shifts. A bar above the board counts the drafts and has "Publish now". The owner sets the rhythm in a "Publishing the roster" panel (daily / weekly / monthly, weekday or day of month, time; default every Sunday 08:00, or manual only). An hourly job (`publish-shifts`, new workflow `jobs-hourly-staging.yml`) publishes what is due. Migration 0067; existing shifts count as published. Staff notification on publish needs a staff notification channel, not built yet.
+
 - **Shifts: understaffed stretches are marked everywhere.** Phone day cards list each stretch where a branch has fewer people on shift than its coverage rules ask, and the branch time grid shades those stretches in the branch column.
 - **Client app: load errors no longer look like empty accounts.** Home, bookings, receipts, quotes, documents, addresses and family members show a "couldn't load" card with a Try again button when the request fails (shared `LoadError` in app-kit).
 - **Creative & events: richer starter services (beta).** Photographers, DJs, event suppliers and small venues now start with two or three ready services each (event coverage, a private-event set, site visit and quote, private venue hire, tasting and menu planning) instead of one.

@@ -1,3 +1,4 @@
+import datetime as dt
 from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
@@ -123,6 +124,11 @@ class TenantUpdate(BaseModel):
         max_length=3,
         description="Branches the shifts board opens with; empty means all of them",
     )
+    shifts_publish_auto: bool | None = None
+    shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
+    shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
+    shifts_publish_day: int | None = Field(default=None, ge=1, le=28)
+    shifts_publish_time: dt.time | None = None
     legal_entity_type: LegalEntityType | None = None
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
@@ -196,6 +202,15 @@ class Tenant(BaseModel):
     shifts_default_branches: list[UUID] = Field(
         default_factory=list,
         description="Branches the shifts board opens with; empty: all of them",
+    )
+    shifts_publish_auto: bool = Field(
+        default=True, description="Publish the shifts roster on schedule"
+    )
+    shifts_publish_cadence: Literal["daily", "weekly", "monthly"] = "weekly"
+    shifts_publish_weekday: int = Field(default=6, description="Weekly: 0 = Monday, 6 = Sunday")
+    shifts_publish_day: int = Field(default=1, description="Monthly: day of the month, 1-28")
+    shifts_publish_time: dt.time = Field(
+        default=dt.time(8), description="Local time the roster goes out"
     )
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")

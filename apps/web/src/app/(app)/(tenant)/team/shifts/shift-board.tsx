@@ -28,6 +28,8 @@ export type BoardShift = {
   isCover: boolean;
   homeName: string | null;
   warning: "timeOff" | "outsideHours" | null;
+  /** Planned but not yet published: only managers see it. */
+  draft: boolean;
 };
 /** Days a person is away, keyed `userId:day`; the value is the reason, if given. */
 export type Away = Record<string, string | null>;
@@ -72,8 +74,8 @@ export function ShiftBoard(props: {
       type="button"
       disabled={!canEdit}
       onClick={() => setEditing({ shift, userId: person.id, day })}
-      className="flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default"
-      style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} 12%, var(--surface))` }}
+      className={`flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default ${shift.draft ? "border border-dashed border-border" : ""}`}
+      style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} ${shift.draft ? 5 : 12}%, var(--surface))` }}
       aria-label={`${person.name}: ${shift.starts}–${shift.ends} ${shift.locationName}${shift.position ? `, ${shift.position}` : ""}`}
     >
       <span className="flex w-full items-center gap-1 font-semibold tabular-nums" dir="ltr">
@@ -85,6 +87,7 @@ export function ShiftBoard(props: {
           {shift.position ?? shift.locationName}
         </span>
       )}
+      {shift.draft && <span className="mt-0.5 rounded-full bg-warning/15 px-1.5 text-[0.6875rem] font-medium text-warning">{t("publish.draft")}</span>}
       {shift.isCover && (
         <span className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 px-1.5 text-[0.6875rem] font-medium text-primary">
           <ArrowRightLeft aria-hidden="true" className="size-3 shrink-0" />

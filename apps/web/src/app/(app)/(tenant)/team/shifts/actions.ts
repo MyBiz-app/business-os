@@ -149,3 +149,36 @@ export async function saveCoverageRules(locationId: string, rules: CoverageRuleI
   revalidatePath("/team/shifts");
   return { saved: true };
 }
+
+export type PublishState = { published?: number; error?: boolean };
+
+/** Makes the draft shifts of the visible stretch visible to the team. */
+export async function publishShifts(start: string, days: number, branches: string[]): Promise<PublishState> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  const { data } = await api.POST("/shifts/publish", { params: scope, body: { start, days, location_id: branches.length ? branches : null } });
+  if (!data) return { error: true };
+  revalidatePath("/team/shifts");
+  revalidatePath("/schedule");
+  return { published: data.published };
+}
+
+export type PublishingState = { saved?: boolean; error?: boolean };
+
+/** How the roster goes out: automatically or by hand, how often, on which day, at what time. */
+export async function savePublishing(_state: PublishingState, formData: FormData): Promise<PublishingState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  const cadence = String(formData.get("cadence") ?? "weekly") as "daily" | "weekly" | "monthly";
+  const { error } = await api.PATCH("/tenants/current", {
+    params: scope,
+    body: {
+      shifts_publish_auto: formData.get("auto") === "on",
+      shifts_publish_cadence: cadence,
+      shifts_publish_weekday: Number(formData.get("weekday") ?? 6),
+      shifts_publish_day: Number(formData.get("day") ?? 1),
+      shifts_publish_time: String(formData.get("time") ?? "08:00"),
+    },
+  });
+  if (error) return { error: true };
+  revalidatePath("/team/shifts");
+  return { saved: true };
+}

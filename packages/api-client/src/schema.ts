@@ -1804,6 +1804,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shifts/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Shifts
+         * @description Makes the draft shifts that start in the stretch visible to the team.
+         */
+        post: operations["publish_shifts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/shift-templates": {
         parameters: {
             query?: never;
@@ -7794,6 +7814,33 @@ export interface components {
             /** Client Name */
             client_name: string;
         };
+        /** PublishShifts */
+        PublishShifts: {
+            /**
+             * Start
+             * Format: date
+             * @description First local date of the stretch to publish
+             */
+            start: string;
+            /**
+             * Days
+             * @default 7
+             */
+            days: number;
+            /**
+             * Location Id
+             * @description Only these branches
+             */
+            location_id?: string[] | null;
+        };
+        /** Published */
+        Published: {
+            /**
+             * Published
+             * @description Draft shifts that became visible to the team
+             */
+            published: number;
+        };
         /** Question */
         Question: {
             /** Text */
@@ -9045,6 +9092,11 @@ export interface components {
              * @description Not within the branch's opening hours (if set)
              */
             outside_hours: boolean;
+            /**
+             * Published
+             * @description Visible to the team; a draft shows to managers only
+             */
+            published: boolean;
         };
         /** ShiftCreate */
         ShiftCreate: {
@@ -9461,6 +9513,37 @@ export interface components {
              */
             shifts_default_branches?: string[];
             /**
+             * Shifts Publish Auto
+             * @description Publish the shifts roster on schedule
+             * @default true
+             */
+            shifts_publish_auto: boolean;
+            /**
+             * Shifts Publish Cadence
+             * @default weekly
+             * @enum {string}
+             */
+            shifts_publish_cadence: "daily" | "weekly" | "monthly";
+            /**
+             * Shifts Publish Weekday
+             * @description Weekly: 0 = Monday, 6 = Sunday
+             * @default 6
+             */
+            shifts_publish_weekday: number;
+            /**
+             * Shifts Publish Day
+             * @description Monthly: day of the month, 1-28
+             * @default 1
+             */
+            shifts_publish_day: number;
+            /**
+             * Shifts Publish Time
+             * Format: time
+             * @description Local time the roster goes out
+             * @default 08:00:00
+             */
+            shifts_publish_time: string;
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -9554,6 +9637,16 @@ export interface components {
              * @description Branches the shifts board opens with; empty means all of them
              */
             shifts_default_branches?: string[] | null;
+            /** Shifts Publish Auto */
+            shifts_publish_auto?: boolean | null;
+            /** Shifts Publish Cadence */
+            shifts_publish_cadence?: ("daily" | "weekly" | "monthly") | null;
+            /** Shifts Publish Weekday */
+            shifts_publish_weekday?: number | null;
+            /** Shifts Publish Day */
+            shifts_publish_day?: number | null;
+            /** Shifts Publish Time */
+            shifts_publish_time?: string | null;
             /** Legal Entity Type */
             legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
             /**
@@ -14495,6 +14588,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CopiedShifts"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_shifts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishShifts"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Published"];
                 };
             };
             /** @description Validation Error */

@@ -50,7 +50,7 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, ga
                         {here.map((shift) => {
                           const who = person.get(shift.userId);
                           return (
-                            <li key={shift.id} className="relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-within:ring-2 focus-within:ring-primary" style={{ background: `color-mix(in oklab, ${branch.color} 10%, var(--surface))` }}>
+                            <li key={shift.id} className="relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-within:ring-2 focus-within:ring-primary" style={{ background: `color-mix(in oklab, ${branch.color} ${shift.draft ? 4 : 10}%, var(--surface))`, outline: shift.draft ? "1px dashed var(--border)" : undefined }}>
                               {editHref && <Link href={editHref(shift.id)} scroll={false} aria-label={`${who?.name ?? ""}: ${shift.starts}–${shift.ends}`} className="absolute inset-0 rounded-lg outline-none" />}
                               <span dir="ltr" className="w-[6.5rem] shrink-0 text-sm font-semibold tabular-nums">{shift.starts}–{shift.ends}</span>
                               {who && <Avatar id={who.id} name={who.name} src={who.avatar} size="sm" />}
@@ -68,7 +68,8 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, ga
                                   </span>
                                 )}
                               </span>
-                              {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className="ms-auto size-4 shrink-0 text-warning" />}
+                              {shift.draft && <span className="ms-auto shrink-0 rounded-full bg-warning/15 px-2 text-xs font-medium text-warning">{t("publish.draft")}</span>}
+                              {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className={`${shift.draft ? "" : "ms-auto "}size-4 shrink-0 text-warning`} />}
                             </li>
                           );
                         })}

@@ -160,8 +160,8 @@ def seed_workspace(
         conn.execute(
             text("""
                 INSERT INTO app.shifts (tenant_id, location_id, user_id, starts_at, ends_at,
-                                        position, created_by)
-                VALUES (:t, :l, :u, :s, :e, :position, NULL)
+                                        position, created_by, published_at)
+                VALUES (:t, :l, :u, :s, :e, :position, NULL, now())
             """),
             rows,
         )
