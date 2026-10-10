@@ -42,6 +42,7 @@ overlapping shifts, in any branch) already prevents double-booking someone acros
 - **View**: *by person* (rows are people, as today) and *by branch* (one column per selected
   branch, each lists who is on and when). Day view: any number of branches; week: up to 3;
   month: one.
+- Day and week "by branch" (two or more branches) use the shared calendar `TimeGrid`: one lane per branch, each shift a block placed by its hours; a block opens the shift editor (`?edit=<id>`). The month view and the single-branch case keep the plain roster list.
 - Branch chips choose which branches are shown. Cover shifts are marked.
 - The shared multi-branch calendar grid and the owner's default-view preference belong to the
   calendar thread; the board reuses them when they land.
