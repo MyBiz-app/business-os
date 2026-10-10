@@ -22,8 +22,27 @@ HEX = "'^#[0-9a-f]{6}$'"
 
 
 def upgrade() -> None:
-    # Guarded so it can run on a database that already holds these columns: staging applied this
-    # change under the number 0058 before it was renumbered.
+    # Written to be re-runnable: staging once recorded this palette change under the id 0058
+    # (two branches used the same number), so its database has these columns but not the shift
+    # planning ones that the real 0058 adds. Both are completed here whatever is already there;
+    # on a database that went through 0058 in order, the first block changes nothing.
+    op.execute("""
+        ALTER TABLE app.tenant_members ADD COLUMN IF NOT EXISTS home_location_id uuid;
+        ALTER TABLE app.tenant_members DROP CONSTRAINT IF EXISTS tenant_members_home_location_fkey;
+        ALTER TABLE app.tenant_members
+            ADD CONSTRAINT tenant_members_home_location_fkey
+                FOREIGN KEY (tenant_id, home_location_id)
+                REFERENCES app.locations (tenant_id, id) ON DELETE SET NULL (home_location_id);
+        ALTER TABLE app.locations
+            ADD COLUMN IF NOT EXISTS planning_cadence text NOT NULL DEFAULT 'weekly'
+                CHECK (planning_cadence IN ('daily', 'weekly', 'monthly', 'custom')),
+            ADD COLUMN IF NOT EXISTS planning_days integer
+                CHECK (planning_days BETWEEN 1 AND 42);
+        ALTER TABLE app.locations DROP CONSTRAINT IF EXISTS locations_planning_days_custom;
+        ALTER TABLE app.locations
+            ADD CONSTRAINT locations_planning_days_custom
+                CHECK ((planning_cadence = 'custom') = (planning_days IS NOT NULL))
+    """)
     op.execute("ALTER TABLE app.users DROP CONSTRAINT IF EXISTS users_palette_check")
     op.execute("ALTER TABLE app.users DROP CONSTRAINT IF EXISTS users_custom_palette_colors")
     op.execute(f"""
