@@ -4519,6 +4519,22 @@
         "custom": "Custom"
       }
     },
+    "stations": {
+      "title": "Rooms and stations",
+      "hint": "Where each shift is staffed, defined for every branch",
+      "none": "No rooms yet: shifts are planned for the branch as a whole.",
+      "field": "Room or station",
+      "noStation": "No room set",
+      "unassigned": "No room set",
+      "name": "Name",
+      "namePlaceholder": "For example: Pilates 1",
+      "add": "Add a room",
+      "remove": "Remove {name}",
+      "removeHint": "Its shifts stay, without a room.",
+      "nameTaken": "This branch already has a room with that name.",
+      "addAt": "Add a shift in {station}",
+      "people": "{count, plural, one {One person} other {# people}}"
+    },
     "templates": {
       "apply": "Shift types",
       "save": "Save these times as a shift type",

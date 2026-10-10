@@ -23,6 +23,8 @@ export type BoardShift = {
   locationId: string;
   locationName: string;
   color: string;
+  stationId: string | null;
+  stationName: string | null;
   position: string | null;
   note: string | null;
   isCover: boolean;
@@ -32,10 +34,12 @@ export type BoardShift = {
 /** Days a person is away, keyed `userId:day`; the value is the reason, if given. */
 export type Away = Record<string, string | null>;
 export type BoardTemplate = { id: string; locationId: string; name: string; starts: string; ends: string; position: string | null };
+/** A named room or post of a branch that shifts are planned into. */
+export type BoardStation = { id: string; locationId: string; name: string };
 /** A stretch where a branch has fewer people on shift than its coverage rules ask. */
 export type BoardGap = { locationId: string; locationName: string; day: string; starts: string; ends: string; startMinute: number; endMinute: number; needed: number; have: number };
 type Branch = { id: string; name: string; color: string };
-export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string };
+export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string; stationId?: string };
 
 /** The week's shifts: a row per person, a column per day. Managers add a shift from an empty
  * cell and open one to change or delete it. */
@@ -52,9 +56,10 @@ export function ShiftBoard(props: {
   copyMode?: "week" | "day" | null;
   compact?: boolean;
   templates?: BoardTemplate[];
+  stations?: BoardStation[];
   gaps?: BoardGap[];
 }) {
-  const { days, today, locale, people, shifts, away = {}, branches, canEdit, weekStart, copyMode = null, compact = false, templates = [], gaps = [] } = props;
+  const { days, today, locale, people, shifts, away = {}, branches, canEdit, weekStart, copyMode = null, compact = false, templates = [], stations = [], gaps = [] } = props;
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -74,15 +79,15 @@ export function ShiftBoard(props: {
       onClick={() => setEditing({ shift, userId: person.id, day })}
       className="flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default"
       style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} 12%, var(--surface))` }}
-      aria-label={`${person.name}: ${shift.starts}–${shift.ends} ${shift.locationName}${shift.position ? `, ${shift.position}` : ""}`}
+      aria-label={`${person.name}: ${shift.starts}–${shift.ends} ${shift.locationName}${shift.stationName ? `, ${shift.stationName}` : ""}${shift.position ? `, ${shift.position}` : ""}`}
     >
       <span className="flex w-full items-center gap-1 font-semibold tabular-nums" dir="ltr">
         {shift.starts}–{shift.ends}
         {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className="ms-auto size-3.5 text-warning" />}
       </span>
-      {(shift.position || branches.length > 1) && (
+      {(shift.stationName || shift.position || branches.length > 1) && (
         <span dir="auto" className="w-full truncate text-muted">
-          {shift.position ?? shift.locationName}
+          {shift.stationName ?? shift.position ?? shift.locationName}
         </span>
       )}
       {shift.isCover && (
@@ -273,7 +278,7 @@ export function ShiftBoard(props: {
           );
         })}
       </div>
-      {editing && <ShiftDialog key={`${editing.shift?.id ?? "new"}-${editing.userId}-${editing.day}`} editing={editing} people={people} branches={branches} templates={templates} away={away} onClose={() => setEditing(null)} />}
+      {editing && <ShiftDialog key={`${editing.shift?.id ?? "new"}-${editing.userId}-${editing.day}`} editing={editing} people={people} branches={branches} templates={templates} stations={stations} away={away} onClose={() => setEditing(null)} />}
     </div>
   );
 }
@@ -287,7 +292,7 @@ function AwayChip({ reason, label }: { reason: string | null; label: string }) {
   );
 }
 
-export function ShiftDialog({ editing, people, branches, templates = [], away = {}, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; templates?: BoardTemplate[]; away?: Away; onClose: () => void }) {
+export function ShiftDialog({ editing, people, branches, templates = [], stations = [], away = {}, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; templates?: BoardTemplate[]; stations?: BoardStation[]; away?: Away; onClose: () => void }) {
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);
@@ -297,10 +302,12 @@ export function ShiftDialog({ editing, people, branches, templates = [], away = 
   const [picked, setPicked] = useState({ userId: editing.userId, day: editing.day });
   const pickedAway = `${picked.userId}:${picked.day}` in away;
   const [locationId, setLocationId] = useState(shift?.locationId ?? editing.locationId ?? people.find((p) => p.id === editing.userId)?.homeId ?? branches[0]?.id ?? "");
+  const [stationId, setStationId] = useState(shift?.stationId ?? editing.stationId ?? "");
   const [starts, setStarts] = useState(shift?.starts ?? "09:00");
   const [ends, setEnds] = useState(shift?.ends ?? "17:00");
   const [position, setPosition] = useState(shift?.position ?? "");
   const here = templates.filter((tpl) => tpl.locationId === locationId);
+  const rooms = stations.filter((s) => s.locationId === locationId);
   const apply = (tpl: BoardTemplate) => {
     setStarts(tpl.starts);
     setEnds(tpl.ends);
@@ -345,10 +352,11 @@ export function ShiftDialog({ editing, people, branches, templates = [], away = 
         />
         <SelectField label={t("person")} name="user_id" defaultValue={editing.userId} options={people.map((p) => ({ value: p.id, label: p.name }))} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label={t("branch")} name="location_id" value={locationId} onChange={(e) => setLocationId(e.target.value)} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
+          <SelectField label={t("branch")} name="location_id" value={locationId} onChange={(e) => { setLocationId(e.target.value); setStationId(""); }} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
           <Field label={t("date")} name="day" type="date" defaultValue={editing.day} required dir="ltr" />
         </div>
         {branches.length > 1 && <p className="-mt-2 text-xs text-muted">{t("coverHint")}</p>}
+        {rooms.length > 0 && <SelectField label={t("stations.field")} name="station_id" value={rooms.some((s) => s.id === stationId) ? stationId : ""} onChange={(e) => setStationId(e.target.value)} options={[{ value: "", label: t("stations.noStation") }, ...rooms.map((s) => ({ value: s.id, label: s.name }))]} />}
         <TemplatePicker templates={here} onApply={apply} />
         <div className="grid grid-cols-2 gap-4">
           <Field label={t("starts")} name="starts" type="time" step={900} value={starts} onChange={(e) => setStarts(e.target.value)} required dir="ltr" />
