@@ -34,7 +34,7 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="המשך").click()
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard"); h.ready(owner)
-    expect(owner.get_by_role("navigation").get_by_role("link", name="לקוחות")).to_be_visible()
+    expect(owner.get_by_role("navigation").get_by_role("link", name="לקוחות", exact=True)).to_be_visible()
     owner.goto(f"{h.BASE}/services"); h.ready(owner)
     expect(owner.get_by_text("תספורת גברים")).to_be_visible()
     print("1. beauty business with its default services: ok")
