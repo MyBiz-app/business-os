@@ -4,8 +4,8 @@
 accent) are kept in their own columns, as `#rrggbb`, and stay when the person switches to a
 preset. The API validates the format only: the app derives readable colors from the picks.
 
-Revision ID: 0058
-Revises: 0057
+Revision ID: 0059
+Revises: 0058
 Create Date: 2026-10-10
 """
 
@@ -13,8 +13,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0058"
-down_revision: str | None = "0057"
+revision: str = "0059"
+down_revision: str | None = "0058"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
