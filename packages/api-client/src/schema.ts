@@ -1881,6 +1881,45 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/stations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Stations */
+        get: operations["list_stations"];
+        put?: never;
+        /** Create Station */
+        post: operations["create_station"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stations/{station_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Station
+         * @description Removes the station; its shifts stay, without a station.
+         */
+        delete: operations["delete_station"];
+        options?: never;
+        head?: never;
+        /** Update Station */
+        patch: operations["update_station"];
+        trace?: never;
+    };
     "/sessions/options": {
         parameters: {
             query?: never;
@@ -9023,6 +9062,10 @@ export interface components {
             position: string | null;
             /** Note */
             note: string | null;
+            /** Station Id */
+            station_id: string | null;
+            /** Station Name */
+            station_name: string | null;
             /**
              * Home Location Id
              * @description The person's home branch, if set
@@ -9065,6 +9108,11 @@ export interface components {
              * Format: uuid
              */
             location_id: string;
+            /**
+             * Station Id
+             * @description A station of the same branch
+             */
+            station_id?: string | null;
             /**
              * Starts At
              * Format: date-time
@@ -9146,6 +9194,11 @@ export interface components {
             user_id?: string | null;
             /** Location Id */
             location_id?: string | null;
+            /**
+             * Station Id
+             * @description Null clears the station
+             */
+            station_id?: string | null;
             /** Starts At */
             starts_at?: string | null;
             /** Ends At */
@@ -9281,6 +9334,46 @@ export interface components {
             stage: "new" | "contacted" | "trial" | "offer" | "won" | "lost";
             /** Count */
             count: number;
+        };
+        /** Station */
+        Station: {
+            /**
+             * Name
+             * @description E.g. "Pilates 1"
+             */
+            name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /** StationCreate */
+        StationCreate: {
+            /**
+             * Name
+             * @description E.g. "Pilates 1"
+             */
+            name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+        };
+        /** StationUpdate */
+        StationUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Sort Order */
+            sort_order?: number | null;
         };
         /** SupportAccess */
         SupportAccess: {
@@ -14714,6 +14807,151 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CoverageGap"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_stations: {
+        parameters: {
+            query?: {
+                /** @description Only these branches */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Station"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_station: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Station"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_station: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                station_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_station: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                station_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Station"];
                 };
             };
             /** @description Validation Error */
