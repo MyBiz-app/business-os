@@ -4445,7 +4445,8 @@
         "monthly": "כל חודש",
         "custom": "מותאם"
       }
-    }
+    },
+    "peopleOnShift": "משובצים כעת"
   },
   "openingHours": {
     "title": "שעות פתיחה",

@@ -4445,7 +4445,8 @@
         "monthly": "Every month",
         "custom": "Custom"
       }
-    }
+    },
+    "peopleOnShift": "People on shift"
   },
   "openingHours": {
     "title": "Opening hours",

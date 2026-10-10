@@ -244,7 +244,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           lanes={branchList.filter((b) => shown.includes(b.id)).map((b) => ({ id: b.id, name: b.name, color: b.color }))}
           closed={{}}
           open={null}
-          labels={{ now: t("schedule.now"), closed: t("schedule.closedDay"), shifts: t("shifts.title"), empty: t("shifts.nobody"), more: t.raw("schedule.more") as string, onShift: t("schedule.onShift") }}
+          labels={{ now: t("schedule.now"), closed: t("schedule.closedDay"), shifts: t("shifts.title"), empty: t("shifts.nobody"), more: t.raw("schedule.more") as string, onShift: t("schedule.onShift"), peopleOnShift: t("shifts.peopleOnShift"), coverFrom: t.raw("shifts.coverFrom") as string, close: t("shifts.close") }}
           dayHref={range === "week" ? href({ range: "day", date: "__day__" }) : null}
         />
       ) : view === "branches" ? (
