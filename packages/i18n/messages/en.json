@@ -4519,6 +4519,30 @@
         "custom": "Custom"
       }
     },
+    "templates": {
+      "apply": "Shift types",
+      "save": "Save these times as a shift type",
+      "name": "Name",
+      "namePlaceholder": "For example: Morning",
+      "saveDo": "Save {times}",
+      "cancel": "Cancel",
+      "remove": "Remove the shift type {name}",
+      "nameTaken": "This branch already has a shift type with that name."
+    },
+    "coverage": {
+      "title": "Minimum staffing",
+      "hint": "The least people each branch needs on shift",
+      "none": "No rules yet: nothing is flagged for this branch.",
+      "day": "Day",
+      "min": "At least",
+      "remove": "Remove this rule",
+      "add": "Add a rule",
+      "endHint": "An end of 00:00 means the end of the day. People on time off do not count.",
+      "legend": "Fewer people than needed",
+      "short": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
+      "banner": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
+      "gap": "{have} of {needed} on shift"
+    },
     "peopleOnShift": "People on shift"
   },
   "openingHours": {

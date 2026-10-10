@@ -111,3 +111,41 @@ export async function saveShiftsDefault(
   revalidatePath("/team/shifts");
   return { saved: true };
 }
+
+export type TemplateState = { saved?: boolean; error?: "name_taken" | "invalid" | "generic" };
+
+/** Saves a branch's named shift type (the times are the business's local times). */
+export async function saveTemplate(locationId: string, name: string, starts: string, ends: string, position: string): Promise<TemplateState> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  const { response, error } = await api.POST("/shift-templates", {
+    params: scope,
+    body: { location_id: locationId, name, starts, ends, position: position || null },
+  });
+  if (!response.ok) {
+    const detail = (error as { detail?: unknown } | undefined)?.detail;
+    return { error: detail === "template_name_taken" ? "name_taken" : response.status === 422 ? "invalid" : "generic" };
+  }
+  revalidatePath("/team/shifts");
+  return { saved: true };
+}
+
+export async function deleteTemplate(templateId: string): Promise<void> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  await api.DELETE("/shift-templates/{template_id}", { params: { ...scope, path: { template_id: templateId } } });
+  revalidatePath("/team/shifts");
+}
+
+export type CoverageRuleInput = { weekday: number; starts_minute: number; ends_minute: number; min_staff: number };
+export type CoverageState = { saved?: boolean; error?: boolean };
+
+/** Replaces a branch's coverage rules: the least people needed on shift per weekday and stretch. */
+export async function saveCoverageRules(locationId: string, rules: CoverageRuleInput[]): Promise<CoverageState> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  const { response } = await api.PUT("/locations/{location_id}/coverage-rules", {
+    params: { ...scope, path: { location_id: locationId } },
+    body: { rules },
+  });
+  if (!response.ok) return { error: true };
+  revalidatePath("/team/shifts");
+  return { saved: true };
+}
