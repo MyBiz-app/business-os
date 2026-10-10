@@ -9845,6 +9845,84 @@
         }
       }
     },
+    "/shifts/publish": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Publish Shifts",
+        "description": "Makes the draft shifts that start in the stretch visible to the team.",
+        "operationId": "publish_shifts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishShifts"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Published"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shift-templates": {
       "get": {
         "tags": [
@@ -30341,6 +30419,58 @@
         "title": "PublicQuote",
         "description": "What the client sees by the private link."
       },
+      "PublishShifts": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start",
+            "description": "First local date of the stretch to publish"
+          },
+          "days": {
+            "type": "integer",
+            "maximum": 62.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "default": 7
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "Only these branches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start"
+        ],
+        "title": "PublishShifts"
+      },
+      "Published": {
+        "properties": {
+          "published": {
+            "type": "integer",
+            "title": "Published",
+            "description": "Draft shifts that became visible to the team"
+          }
+        },
+        "type": "object",
+        "required": [
+          "published"
+        ],
+        "title": "Published"
+      },
       "Question": {
         "properties": {
           "text": {
@@ -33744,6 +33874,11 @@
             "type": "boolean",
             "title": "Outside Hours",
             "description": "Not within the branch's opening hours (if set)"
+          },
+          "published": {
+            "type": "boolean",
+            "title": "Published",
+            "description": "Visible to the team; a draft shows to managers only"
           }
         },
         "type": "object",
@@ -33763,7 +33898,8 @@
           "home_location_name",
           "is_cover",
           "on_time_off",
-          "outside_hours"
+          "outside_hours",
+          "published"
         ],
         "title": "Shift"
       },
@@ -34808,6 +34944,41 @@
             "title": "Shifts Default Branches",
             "description": "Branches the shifts board opens with; empty: all of them"
           },
+          "shifts_publish_auto": {
+            "type": "boolean",
+            "title": "Shifts Publish Auto",
+            "description": "Publish the shifts roster on schedule",
+            "default": true
+          },
+          "shifts_publish_cadence": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "title": "Shifts Publish Cadence",
+            "default": "weekly"
+          },
+          "shifts_publish_weekday": {
+            "type": "integer",
+            "title": "Shifts Publish Weekday",
+            "description": "Weekly: 0 = Monday, 6 = Sunday",
+            "default": 6
+          },
+          "shifts_publish_day": {
+            "type": "integer",
+            "title": "Shifts Publish Day",
+            "description": "Monthly: day of the month, 1-28",
+            "default": 1
+          },
+          "shifts_publish_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Shifts Publish Time",
+            "description": "Local time the roster goes out",
+            "default": "08:00:00"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -35194,6 +35365,71 @@
             ],
             "title": "Shifts Default Branches",
             "description": "Branches the shifts board opens with; empty means all of them"
+          },
+          "shifts_publish_auto": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Auto"
+          },
+          "shifts_publish_cadence": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Cadence"
+          },
+          "shifts_publish_weekday": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 6.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Weekday"
+          },
+          "shifts_publish_day": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 28.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Day"
+          },
+          "shifts_publish_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Time"
           },
           "legal_entity_type": {
             "anyOf": [

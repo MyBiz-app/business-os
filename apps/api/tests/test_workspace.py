@@ -263,8 +263,12 @@ def test_shifts_refuse_double_booking_and_flag_time_off(
         == "Opens"
     )
 
-    # The team reads shifts; only managers plan them.
+    # The team reads shifts once published; only managers plan them.
     coach_headers = auth(studio["coach"], studio["tenant_id"])
+    published = client.post(
+        "/shifts/publish", json={"start": local_today().isoformat(), "days": 7}, headers=headers
+    )
+    assert published.json() == {"published": 2}
     assert (
         len(
             client.get(
@@ -587,3 +591,55 @@ def test_coverage_rules_flag_understaffed_stretches(
         ).status_code
         == 403
     )
+
+
+def test_a_roster_is_a_draft_until_published(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    coach_headers = auth(studio["coach"], studio["tenant_id"])
+    shift = {"user_id": coach, "location_id": branch, "starts_at": at(1, 9), "ends_at": at(1, 15)}
+    created = client.post("/shifts", json=shift, headers=headers).json()
+    assert created["published"] is False
+    params = {"start": local_today().isoformat()}
+
+    # Managers see the draft; the team does not, nor the coverage it would give.
+    assert len(client.get("/shifts", params=params, headers=headers).json()) == 1
+    assert client.get("/shifts", params=params, headers=coach_headers).json() == []
+
+    # Publishing another stretch leaves it alone; the right one makes it visible, once.
+    elsewhere = {"start": (local_today() + timedelta(days=10)).isoformat(), "days": 7}
+    assert client.post("/shifts/publish", json=elsewhere, headers=headers).json() == {
+        "published": 0
+    }
+    body = {"start": local_today().isoformat(), "days": 7}
+    assert client.post("/shifts/publish", json=body, headers=coach_headers).status_code == 403
+    assert client.post("/shifts/publish", json=body, headers=headers).json() == {"published": 1}
+    assert client.post("/shifts/publish", json=body, headers=headers).json() == {"published": 0}
+    assert len(client.get("/shifts", params=params, headers=coach_headers).json()) == 1
+
+    # Shifts planned afterwards (or copied) are drafts again.
+    later = {**shift, "starts_at": at(2, 9), "ends_at": at(2, 15)}
+    assert client.post("/shifts", json=later, headers=headers).json()["published"] is False
+    assert len(client.get("/shifts", params=params, headers=coach_headers).json()) == 1
+
+
+def test_the_business_chooses_when_the_roster_goes_out(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    tenant = client.get("/tenants/current", headers=headers).json()
+    assert (tenant["shifts_publish_auto"], tenant["shifts_publish_cadence"]) == (True, "weekly")
+    assert (tenant["shifts_publish_weekday"], tenant["shifts_publish_time"]) == (6, "08:00:00")
+    changed = client.patch(
+        "/tenants/current",
+        json={
+            "shifts_publish_cadence": "monthly",
+            "shifts_publish_day": 3,
+            "shifts_publish_time": "07:30",
+            "shifts_publish_auto": False,
+        },
+        headers=headers,
+    ).json()
+    assert (changed["shifts_publish_cadence"], changed["shifts_publish_day"]) == ("monthly", 3)
+    assert (changed["shifts_publish_time"], changed["shifts_publish_auto"]) == ("07:30:00", False)
+    bad = client.patch("/tenants/current", json={"shifts_publish_day": 31}, headers=headers)
+    assert bad.status_code == 422

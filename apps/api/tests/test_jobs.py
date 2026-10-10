@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.jobs import HORIZON_DAYS, extend_series
+from app.jobs import HORIZON_DAYS, _publish_moment, extend_series, publish_shifts
 from tests.conftest import local_today
 from tests.test_bookings import book, new_client
 
@@ -491,3 +491,54 @@ def test_expired_data_is_deleted_by_its_retention_period(
         leads = connection.execute(text("SELECT id::text FROM app.leads")).scalars().all()
     assert deleted["leads"] == 1 and deleted["contact_requests"] == 1
     assert old["id"] not in leads and fresh["id"] in leads
+
+
+def test_the_roster_goes_out_on_schedule(client: TestClient, studio: dict, engine: Engine) -> None:
+    zone = ZoneInfo("Asia/Jerusalem")
+    # Sunday 2026-10-11 at 08:00 is the default weekly moment; the week after is covered.
+    row = {
+        "time_zone": "Asia/Jerusalem",
+        "shifts_publish_cadence": "weekly",
+        "shifts_publish_weekday": 6,
+        "shifts_publish_day": 1,
+        "shifts_publish_time": datetime(2000, 1, 1, 8).time(),
+    }
+    before = datetime(2026, 10, 11, 7, 59, tzinfo=zone)
+    after = datetime(2026, 10, 11, 8, 1, tzinfo=zone)
+    assert _publish_moment(row, before)[0] == datetime(2026, 10, 4, 8, tzinfo=zone)
+    due, end = _publish_moment(row, after)
+    assert due == datetime(2026, 10, 11, 8, tzinfo=zone)
+    assert end == datetime(2026, 10, 18, tzinfo=zone)
+    monthly = {**row, "shifts_publish_cadence": "monthly", "shifts_publish_day": 5}
+    assert _publish_moment(monthly, datetime(2026, 10, 3, 12, tzinfo=zone))[0] == datetime(
+        2026, 9, 5, 8, tzinfo=zone
+    )
+    assert _publish_moment(monthly, datetime(2026, 10, 6, 12, tzinfo=zone)) == (
+        datetime(2026, 10, 5, 8, tzinfo=zone),
+        datetime(2026, 11, 5, tzinfo=zone),
+    )
+    daily = {**row, "shifts_publish_cadence": "daily"}
+    assert _publish_moment(daily, datetime(2026, 10, 11, 6, tzinfo=zone)) == (
+        datetime(2026, 10, 10, 8, tzinfo=zone),
+        datetime(2026, 10, 12, tzinfo=zone),
+    )
+
+    # Only drafts that start before the end of the stretch go out, and only once per moment.
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+
+    def plan(day: datetime) -> None:
+        body = {
+            "user_id": coach,
+            "location_id": branch,
+            "starts_at": day.replace(hour=9).isoformat(),
+            "ends_at": day.replace(hour=15).isoformat(),
+        }
+        assert client.post("/shifts", json=body, headers=headers).status_code == 201
+
+    plan(datetime(2026, 10, 12, tzinfo=zone))  # inside the week
+    plan(datetime(2026, 10, 24, tzinfo=zone))  # the week after
+    with engine.begin() as connection:
+        assert publish_shifts(connection, after) == 1
+    with engine.begin() as connection:
+        assert publish_shifts(connection, after) == 0
+        assert publish_shifts(connection, after + timedelta(days=7, minutes=1)) == 1

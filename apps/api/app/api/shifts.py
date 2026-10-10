@@ -183,6 +183,7 @@ class Shift(BaseModel):
     is_cover: bool = Field(description="At a branch other than the person's home branch")
     on_time_off: bool = Field(description="Falls on a day the person is away")
     outside_hours: bool = Field(description="Not within the branch's opening hours (if set)")
+    published: bool = Field(description="Visible to the team; a draft shows to managers only")
 
 
 class ShiftFields(BaseModel):
@@ -262,7 +263,8 @@ SHIFT_SELECT = """
                  AND h.closes >= (sh.ends_at AT TIME ZONE t.time_zone)::time
                  AND (sh.ends_at AT TIME ZONE t.time_zone)::date
                      = (sh.starts_at AT TIME ZONE t.time_zone)::date
-           ) AS outside_hours
+           ) AS outside_hours,
+           sh.published_at IS NOT NULL AS published
     FROM app.shifts sh
     JOIN app.tenants t ON t.id = sh.tenant_id
     JOIN app.locations l ON l.id = sh.location_id
@@ -272,6 +274,13 @@ SHIFT_SELECT = """
     LEFT JOIN app.locations hl ON hl.id = m.home_location_id
     WHERE app.in_branch(sh.location_id)
 """
+
+
+def drafts_hidden(context: TenantContext) -> str:
+    """SQL filter on `SHIFT_SELECT`: the team sees published shifts only; managers see drafts."""
+    return (
+        "" if Permission.STAFF_MANAGE in context.permissions else " AND sh.published_at IS NOT NULL"
+    )
 
 
 def _time_zone(session: Session) -> str:
@@ -299,7 +308,7 @@ def list_shifts(
     user_id: Annotated[UUID | None, Query(description="Only this person's shifts")] = None,
 ) -> list[Shift]:
     time_zone = _time_zone(context.session)
-    filters = ""
+    filters = drafts_hidden(context)
     params: dict[str, object] = {
         "from": local_to_utc(start, time.min, time_zone),
         "to": local_to_utc(start + timedelta(days=days), time.min, time_zone),
@@ -536,3 +545,34 @@ def copy_shifts_day(body: CopyShiftsDay, user: UserDep, context: ManageDep) -> C
         done, left_out = _copy_range(context, user, body.from_day, 1, target)
         created, skipped = created + done, skipped + left_out
     return CopiedShifts(created=created, skipped=skipped)
+
+
+class PublishShifts(BaseModel):
+    start: dt.date = Field(description="First local date of the stretch to publish")
+    days: int = Field(default=7, ge=1, le=62)
+    location_id: list[UUID] | None = Field(default=None, description="Only these branches")
+
+
+class Published(BaseModel):
+    published: int = Field(description="Draft shifts that became visible to the team")
+
+
+@router.post("/shifts/publish")
+def publish_shifts(body: PublishShifts, context: ManageDep) -> Published:
+    """Makes the draft shifts that start in the stretch visible to the team."""
+    time_zone = _time_zone(context.session)
+    count = context.session.execute(
+        text("""
+            UPDATE app.shifts SET published_at = now()
+            WHERE published_at IS NULL AND app.in_branch(location_id)
+              AND starts_at >= :from AND starts_at < :to
+              AND (CAST(:locations AS uuid[]) IS NULL
+                   OR location_id = ANY(CAST(:locations AS uuid[])))
+        """),
+        {
+            "from": local_to_utc(body.start, time.min, time_zone),
+            "to": local_to_utc(body.start + timedelta(days=body.days), time.min, time_zone),
+            "locations": [str(i) for i in body.location_id] if body.location_id else None,
+        },
+    ).rowcount
+    return Published(published=count)

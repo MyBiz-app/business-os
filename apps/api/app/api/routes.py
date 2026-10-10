@@ -50,6 +50,8 @@ def load_current_tenant(session: Session) -> Tenant:
                        coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
                        t.shifts_default_view, t.shifts_default_range,
                        coalesce(t.shifts_default_branches, '{}') AS shifts_default_branches,
+                       t.shifts_publish_auto, t.shifts_publish_cadence, t.shifts_publish_weekday,
+                       t.shifts_publish_day, t.shifts_publish_time,
                        t.join_code,
                        coalesce(m.role,
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'

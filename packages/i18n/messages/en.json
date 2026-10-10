@@ -4559,7 +4559,37 @@
       "banner": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
       "gap": "{have} of {needed} on shift"
     },
-    "peopleOnShift": "People on shift"
+    "peopleOnShift": "People on shift",
+    "publish": {
+      "title": "Publishing the roster",
+      "hint": "When the team gets to see the shifts you plan",
+      "draft": "Draft",
+      "drafts": "{count, plural, one {# shift is still a draft} other {# shifts are still drafts}} and visible to managers only",
+      "allPublished": "Everything in this view is published",
+      "done": "{count, plural, one {# shift published} other {# shifts published}}",
+      "now": "Publish now",
+      "error": "Could not publish. Try again.",
+      "auto": "Publish automatically",
+      "cadence": "Publish",
+      "weekday": "On",
+      "dayOfMonth": "On day of the month",
+      "time": "At",
+      "cadences": {
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month"
+      },
+      "save": "Save",
+      "saved": "Saved",
+      "saveError": "Could not save",
+      "explain": "The team sees a shift only after it is published. Each publication sends out the coming days: tomorrow for daily, the next seven days for weekly, until the same day next month for monthly. Shifts you add later stay drafts until the next publication or \"Publish now\".",
+      "summary": {
+        "manual": "Published by hand only",
+        "daily": "Goes out every day at {time}",
+        "weekly": "Goes out every {day} at {time}",
+        "monthly": "Goes out on day {day} of every month at {time}"
+      }
+    }
   },
   "openingHours": {
     "title": "Opening hours",

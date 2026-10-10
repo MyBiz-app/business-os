@@ -23,6 +23,8 @@ import { CoverageBanner } from "./coverage-banner";
 import { CoverageSettings } from "./coverage-settings";
 import { EditFromUrl } from "./edit-from-url";
 import { PlanningSettings } from "./planning-settings";
+import { PublishBar } from "./publish-bar";
+import { PublishSettings } from "./publish-settings";
 import { SaveShiftsDefault } from "./save-default";
 import { StationSettings } from "./station-settings";
 import { Segmented } from "./segmented";
@@ -161,7 +163,17 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     isCover: s.is_cover,
     homeName: s.home_location_name ?? null,
     warning: s.on_time_off ? "timeOff" : s.outside_hours ? "outsideHours" : null,
+    draft: !s.published,
   }));
+  const drafts = boardShifts.filter((s) => s.draft).length;
+  const publishTime = tenant.shifts_publish_time.slice(0, 5);
+  const publishSummary = !tenant.shifts_publish_auto
+    ? t("shifts.publish.summary.manual")
+    : tenant.shifts_publish_cadence === "weekly"
+      ? t("shifts.publish.summary.weekly", { day: weekdays[tenant.shifts_publish_weekday], time: publishTime })
+      : tenant.shifts_publish_cadence === "monthly"
+        ? t("shifts.publish.summary.monthly", { day: tenant.shifts_publish_day, time: publishTime })
+        : t("shifts.publish.summary.daily", { time: publishTime });
   // Day and week "by branch": the shared time grid, one lane per branch, each shift a block.
   const gridView = view === "branches" && (range === "day" || range === "week") && shown.length > 1;
   const gridEvents: GridEvent[] = gridView
@@ -177,7 +189,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           end: sameDay ? minutesIn(raw.ends_at, tenant.time_zone) : 1440,
           time: `${s.starts}–${s.ends}`,
           title: people.find((p) => p.id === s.userId)?.name ?? "",
-          detail: s.isCover ? t("shifts.coverFrom", { branch: s.homeName ?? "" }) : (s.stationName ?? s.position),
+          detail: s.draft ? t("shifts.publish.draft") : s.isCover ? t("shifts.coverFrom", { branch: s.homeName ?? "" }) : (s.stationName ?? s.position),
           color: s.color,
           laneId: s.locationId,
           branch: null,
@@ -271,6 +283,8 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         </div>
       )}
 
+      {canEdit && <PublishBar key={`${win.start}-${win.days}-${drafts}`} drafts={drafts} start={win.start} days={win.days} branches={allShown ? [] : shown} summary={publishSummary} />}
+
       <CoverageBanner gaps={gaps} locale={locale} showBranch={branches.length > 1} />
 
       {showSave && <SaveShiftsDefault view={view} range={range} branches={currentSet} />}
@@ -313,6 +327,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
       {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} templates={templates} stations={stations} closeHref={href({ edit: undefined, add: undefined })} away={away} />}
       {canEdit && <StationSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, stations: stations.filter((x) => x.locationId === b.id) }))} />}
       {canEdit && <CoverageSettings weekdays={weekdays} branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, rules: ruleSets.find((r) => r.id === b.id)?.rules ?? [] }))} />}
+      {canManageSettings(tenant) && <PublishSettings auto={tenant.shifts_publish_auto} cadence={tenant.shifts_publish_cadence} weekday={tenant.shifts_publish_weekday} day={tenant.shifts_publish_day} time={publishTime} weekdays={weekdays} />}
       {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
     </main>
   );

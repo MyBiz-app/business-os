@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
-from app.api.shifts import SHIFT_SELECT, Shift, _branch_visible, _time_zone
+from app.api.shifts import SHIFT_SELECT, Shift, _branch_visible, _time_zone, drafts_hidden
 from app.core.permissions import Permission
 from app.schedule.scheduling import local_to_utc
 
@@ -233,7 +233,7 @@ def shift_coverage(
         names[loc] = name
     rows = session.execute(
         text(
-            f"{SHIFT_SELECT} AND sh.starts_at < :to AND sh.ends_at > :from"
+            f"{SHIFT_SELECT} AND sh.starts_at < :to AND sh.ends_at > :from{drafts_hidden(context)}"
             " AND sh.location_id = ANY(CAST(:locations AS uuid[]))"
         ),
         {
