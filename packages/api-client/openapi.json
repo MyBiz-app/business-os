@@ -7012,6 +7012,82 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "services"
+        ],
+        "summary": "Delete Service",
+        "description": "Removes a service nobody has used; one with sessions or sales is archived (hidden).",
+        "operationId": "delete_service",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/locations": {
@@ -13014,6 +13090,82 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Plan"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "plans"
+        ],
+        "summary": "Delete Plan",
+        "description": "Removes a membership or punch card nobody bought; a sold one is archived (hidden).",
+        "operationId": "delete_plan",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "plan_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Plan Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveResult"
                 }
               }
             }
@@ -27000,6 +27152,14 @@
             ],
             "title": "Avatar Url",
             "description": "Path of their picture on this API, if any"
+          },
+          "permissions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Permissions",
+            "description": "What they can actually do (their role's switches)"
           }
         },
         "type": "object",
@@ -27016,7 +27176,8 @@
           "job_title",
           "reports_to",
           "phone",
-          "avatar_url"
+          "avatar_url",
+          "permissions"
         ],
         "title": "Member"
       },
@@ -29897,6 +30058,24 @@
         ],
         "title": "Recommendation"
       },
+      "RemoveResult": {
+        "properties": {
+          "result": {
+            "type": "string",
+            "enum": [
+              "deleted",
+              "archived"
+            ],
+            "title": "Result",
+            "description": "`archived` when sold or scheduled items still refer to it: it is only hidden"
+          }
+        },
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "title": "RemoveResult"
+      },
       "Repeat": {
         "properties": {
           "weekdays": {
@@ -30499,6 +30678,7 @@
                 "clients.privacy",
                 "catalog.read",
                 "catalog.write",
+                "catalog.delete",
                 "schedule.read",
                 "schedule.write",
                 "bookings.manage",
@@ -30511,7 +30691,7 @@
               ]
             },
             "type": "array",
-            "maxItems": 14,
+            "maxItems": 15,
             "title": "Permissions"
           }
         },
@@ -30548,6 +30728,7 @@
                     "clients.privacy",
                     "catalog.read",
                     "catalog.write",
+                    "catalog.delete",
                     "schedule.read",
                     "schedule.write",
                     "bookings.manage",

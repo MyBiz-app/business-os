@@ -70,6 +70,8 @@ export default async function TeamPage() {
               homeBranch={member.home_location_id ?? null}
               avatar={avatarSrc(member.user_id, member.avatar_url)}
               title={member.job_title ?? null}
+              allPermissions={roles.permissions}
+              permissions={member.permissions}
             />
           ))}
         </ul>

@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
+import { PermissionList } from "@/components/permission-list";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
@@ -70,6 +71,8 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
 
 type MemberRowProps = {
   userId: string;
+  allPermissions: string[];
+  permissions: string[];
   email: string;
   name: string | null;
   role: (typeof ROLES)[number];
@@ -85,7 +88,7 @@ type MemberRowProps = {
   title?: string | null;
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -118,6 +121,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
           )}
         </span>
         {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} home={homeBranch} />}
+        <MemberPermissions email={email} all={allPermissions} allowed={permissions} />
         <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
         </Link>
@@ -194,6 +198,26 @@ function MemberBranches({ userId, email, branches, selected, home }: MemberBranc
           {t("saveBranches")}
         </button>
       </form>
+    </details>
+  );
+}
+
+/** What a member can actually do, so an owner can check before (or after) changing their role. */
+function MemberPermissions({ email, all, allowed }: { email: string; all: string[]; allowed: string[] }) {
+  const t = useTranslations("team");
+  return (
+    <details className="group relative">
+      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">{t("viewPermissions")}</summary>
+      <div className="absolute end-0 top-full z-20 mt-1 flex w-72 max-w-[85vw] flex-col gap-3 rounded-2xl bg-surface p-4 shadow-xl ring-1 ring-border">
+        <p className="text-sm font-medium" dir="auto">
+          {t("permissionsOf", { email })}
+        </p>
+        <PermissionList all={all} allowed={allowed} />
+        <p className="text-xs text-muted">{t("permissionsHint")}</p>
+        <Link href="/team/roles" className="text-sm text-primary underline-offset-4 hover:underline">
+          {t("manageRoles")}
+        </Link>
+      </div>
     </details>
   );
 }

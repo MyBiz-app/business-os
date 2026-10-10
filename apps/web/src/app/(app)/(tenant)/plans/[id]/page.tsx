@@ -2,10 +2,11 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { canWriteCatalog } from "@/lib/permissions";
+import { ConfirmDelete } from "@/components/form/confirm-delete";
+import { canDeleteCatalog, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
-import { updatePlan } from "../actions";
+import { deletePlan, updatePlan } from "../actions";
 import { PlanForm } from "../plan-form";
 
 export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
@@ -28,6 +29,9 @@ export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
         submitLabel={t("common.save")}
         readOnly={!canWriteCatalog(tenant)}
       />
+      {canDeleteCatalog(tenant) && (
+        <ConfirmDelete action={deletePlan.bind(null, plan.id)} label={t("plans.delete")} confirm={t("plans.deleteConfirm", { name: plan.name })} />
+      )}
     </main>
   );
 }

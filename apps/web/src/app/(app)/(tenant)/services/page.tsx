@@ -3,13 +3,15 @@ import Link from "next/link";
 
 import { CalendarDays, Gauge } from "lucide-react";
 
+import { FormNotice } from "@/components/form/form-message";
 import { unwrap } from "@/lib/api";
 import { addDays, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canReadReports, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
-export default async function ServicesPage() {
+export default async function ServicesPage({ searchParams }: PageProps<"/services">) {
+  const { removed } = await searchParams;
   const t = await getTranslations();
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("catalog.read");
@@ -32,6 +34,7 @@ export default async function ServicesPage() {
 
   return (
     <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+      {(removed === "deleted" || removed === "archived") && <FormNotice message={t(`services.removed.${removed}`)} />}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("services.title")}</h1>
