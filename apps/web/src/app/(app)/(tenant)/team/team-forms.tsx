@@ -83,11 +83,12 @@ type MemberRowProps = {
   /** The business's active branches (a picker appears when there are several). */
   branches: { id: string; name: string }[];
   memberBranches: string[];
+  homeBranch?: string | null;
   avatar?: string | null;
   title?: string | null;
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, avatar = null, title = null, allPermissions, permissions }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -119,7 +120,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
             </span>
           )}
         </span>
-        {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} />}
+        {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} home={homeBranch} />}
         <MemberPermissions email={email} all={allPermissions} allowed={permissions} />
         <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
@@ -158,10 +159,10 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
   );
 }
 
-type MemberBranchesProps = { userId: string; email: string; branches: { id: string; name: string }[]; selected: string[] };
+type MemberBranchesProps = { userId: string; email: string; branches: { id: string; name: string }[]; selected: string[]; home: string | null };
 
 /** Where a member works: some branches, or (none checked) all of them. */
-function MemberBranches({ userId, email, branches, selected }: MemberBranchesProps) {
+function MemberBranches({ userId, email, branches, selected, home }: MemberBranchesProps) {
   const t = useTranslations("team");
   const [state, action] = useActionState<TeamState, FormData>(setBranches.bind(null, userId), {});
   const names = branches.filter((b) => selected.includes(b.id)).map((b) => b.name);
@@ -182,6 +183,17 @@ function MemberBranches({ userId, email, branches, selected }: MemberBranchesPro
             </label>
           ))}
         </fieldset>
+        <label className="flex flex-col gap-1 text-xs text-muted">
+          {t("homeBranch")}
+          <select name="home_location_id" defaultValue={home ?? ""} className="control px-2 py-1.5 text-sm text-foreground">
+            <option value="">{t("noHomeBranch")}</option>
+            {branches.map((branch) => (
+              <option key={branch.id} value={branch.id}>
+                {branch.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <button type="submit" className="btn-primary px-3 py-1.5 text-sm">
           {t("saveBranches")}
         </button>

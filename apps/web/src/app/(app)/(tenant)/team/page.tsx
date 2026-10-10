@@ -67,6 +67,7 @@ export default async function TeamPage() {
               allowOwner={isOwner}
               branches={branches}
               memberBranches={member.location_ids}
+              homeBranch={member.home_location_id ?? null}
               avatar={avatarSrc(member.user_id, member.avatar_url)}
               title={member.job_title ?? null}
               allPermissions={roles.permissions}
