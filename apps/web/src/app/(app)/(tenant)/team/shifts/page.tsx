@@ -1,4 +1,4 @@
-import { CalendarCog, ChevronLeft, ChevronRight, Clock, MapPin } from "lucide-react";
+import { CalendarCog, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Clock, MapPin } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -10,11 +10,15 @@ import { LiveRefresh } from "@/components/live-refresh";
 import { OpeningHoursList } from "@/components/opening-hours";
 import { unwrap } from "@/lib/api";
 import { branchColor } from "@/lib/calendar";
-import { addDays, dayOf, formatDay, formatTime, isDay, todayIn, weekStart } from "@/lib/dates";
+import { addDays, dayOf, formatDay, formatTime, isDay, todayIn } from "@/lib/dates";
+import { branchLimit, isRange, RANGES, type Range, rangeOfCadence, stepWindow, windowOf } from "@/lib/shift-window";
 import { weekStartFor } from "@/lib/hours";
 import { canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
+import { BranchRoster } from "./branch-roster";
+import { PlanningSettings } from "./planning-settings";
+import { Segmented } from "./segmented";
 import { type BoardPerson, type BoardShift, ShiftBoard } from "./shift-board";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -30,12 +34,10 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   const { me, tenant, api, scope } = await getTenantFor("staff.read");
   const query = await searchParams;
   const today = todayIn(tenant.time_zone);
-  const start = weekStart(isDay(query.week) ? query.week : today);
-  const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
-  const [team, shifts, branches] = await Promise.all([
+  const [team, branches, planning] = await Promise.all([
     api.GET("/staff", { params: scope }).then(unwrap),
-    api.GET("/shifts", { params: { ...scope, query: { start, days: 7 } } }).then(unwrap),
     getBranches(),
+    api.GET("/shifts/planning", { params: scope }).then(unwrap),
   ]);
 
   if (team.members.length <= 1) {
@@ -84,11 +86,34 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   }
 
   const colorOf = new Map(branches.map((b, i) => [b.id, branchColor(i)]));
+  const rhythm = new Map(planning.map((p) => [p.location_id, p]));
+  const view: "people" | "branches" = query.view === "branches" ? "branches" : "people";
+  const requested = String(query.b ?? "").split(",").filter((id) => colorOf.has(id));
+  // The board opens on the rhythm of the first branch shown.
+  const first = rhythm.get(requested[0] ?? branches[0]?.id);
+  const range: Range = isRange(query.range) ? query.range : rangeOfCadence(first?.cadence);
+  const customDays = first?.cadence === "custom" ? (first.days ?? 14) : 14;
+  const anchor = isDay(query.date) ? query.date : today;
+  const win = windowOf(range, anchor, customDays);
+  const days = Array.from({ length: win.days }, (_, i) => addDays(win.start, i));
+  const limit = view === "branches" ? branchLimit(range) : branches.length;
+  const shown = (requested.length ? requested : branches.map((b) => b.id)).slice(0, limit);
+  const allShown = shown.length === branches.length;
+  const shifts = await api
+    .GET("/shifts", { params: { ...scope, query: { start: win.start, days: win.days, ...(allShown ? {} : { location_id: shown }) } } })
+    .then(unwrap);
+
+  const href = (changes: Record<string, string | undefined>) => {
+    const next: Record<string, string | undefined> = { view: view === "branches" ? "branches" : undefined, range, date: anchor, b: allShown ? undefined : shown.join(","), ...changes };
+    const params = new URLSearchParams(Object.entries(next).filter((e): e is [string, string] => Boolean(e[1])));
+    return `/team/shifts?${params}`;
+  };
   const people: BoardPerson[] = team.members.map((m) => ({
     id: m.user_id,
     name: m.full_name || m.email,
     title: m.job_title ?? m.custom_role_name ?? t(`roles.${m.role}`),
     avatar: avatarSrc(m.user_id, m.avatar_url),
+    homeId: m.home_location_id ?? null,
   }));
   const boardShifts: BoardShift[] = shifts.map((s) => ({
     id: s.id,
@@ -102,42 +127,105 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     color: colorOf.get(s.location_id) ?? "var(--primary)",
     position: s.position ?? null,
     note: s.note ?? null,
+    isCover: s.is_cover,
+    homeName: s.home_location_name ?? null,
     warning: s.on_time_off ? "timeOff" : s.outside_hours ? "outsideHours" : null,
   }));
-  const range = `${formatDay(days[0], locale, { day: "numeric", month: "short" })} – ${formatDay(days[6], locale, { day: "numeric", month: "short", year: "numeric" })}`;
+  const last = days[days.length - 1];
+  const rangeLabel =
+    range === "day"
+      ? formatDay(win.start, locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+      : range === "month"
+        ? formatDay(win.start, locale, { month: "long", year: "numeric" })
+        : `${formatDay(win.start, locale, { day: "numeric", month: "short" })} – ${formatDay(last, locale, { day: "numeric", month: "short", year: "numeric" })}`;
+  const showToday = !days.includes(today);
+  const canEdit = canManageTeam(tenant);
+  const branchList = branches.map((b) => ({ ...b, color: colorOf.get(b.id) ?? "" }));
 
   return (
-    <main className="enter flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <main className="enter flex w-full flex-1 flex-col gap-5 px-4 py-8 sm:px-6 sm:py-10">
       <LiveRefresh />
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-2">
-          <BackLink href="/team" label={t("team.title")} />
-          <h1 className="text-3xl font-bold">{t("shifts.title")}</h1>
-          <p className="text-sm text-muted">{range}</p>
-        </div>
-        <nav aria-label={t("shifts.title")} className="flex items-center gap-1.5">
-          <Link href={`/team/shifts?week=${addDays(start, -7)}`} aria-label={t("schedule.previousWeek")} className="btn-secondary size-9">
-            <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
-          </Link>
-          <Link href="/team/shifts" className="btn-secondary px-3 py-2 text-sm">
-            {t("schedule.thisWeek")}
-          </Link>
-          <Link href={`/team/shifts?week=${addDays(start, 7)}`} aria-label={t("schedule.nextWeek")} className="btn-secondary size-9">
-            <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
-          </Link>
-        </nav>
+      <div className="flex flex-col gap-2">
+        <BackLink href="/team" label={t("team.title")} />
+        <h1 className="text-3xl font-bold">{t("shifts.title")}</h1>
       </div>
-      <ShiftBoard
-        key={start}
-        days={days}
-        today={today}
-        locale={locale}
-        people={people}
-        shifts={boardShifts}
-        branches={branches.map((b) => ({ ...b, color: colorOf.get(b.id) ?? "" }))}
-        canEdit={canManageTeam(tenant)}
-        weekStart={start}
-      />
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <nav aria-label={t("shifts.navigate")} className="flex items-center gap-1.5">
+          <Link href={href({ date: stepWindow(range, win, -1) })} aria-label={t(`shifts.previous.${range}`)} className="btn-secondary size-9">
+            <ChevronsLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
+          </Link>
+          {(range === "week" || range === "custom") && (
+            <Link href={href({ date: addDays(anchor, -1) })} aria-label={t("shifts.previous.day")} className="btn-secondary size-9">
+              <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
+            </Link>
+          )}
+          <Link href={href({ date: today })} aria-current={showToday ? undefined : "date"} className={`${showToday ? "btn-secondary" : "btn-primary"} px-3 py-2 text-sm`}>
+            {t("shifts.today")}
+          </Link>
+          {(range === "week" || range === "custom") && (
+            <Link href={href({ date: addDays(anchor, 1) })} aria-label={t("shifts.next.day")} className="btn-secondary size-9">
+              <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+            </Link>
+          )}
+          <Link href={href({ date: stepWindow(range, win, 1) })} aria-label={t(`shifts.next.${range}`)} className="btn-secondary size-9">
+            <ChevronsRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+          </Link>
+          <span className="ms-2 text-lg font-semibold">{rangeLabel}</span>
+        </nav>
+        <div className="flex flex-wrap items-center gap-2">
+          <Segmented
+            label={t("shifts.rangeLabel")}
+            items={RANGES.map((r) => ({ key: r, label: t(`shifts.ranges.${r}`), href: href({ range: r }), active: r === range }))}
+          />
+          <Segmented
+            label={t("shifts.viewLabel")}
+            items={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v === "branches" ? "branches" : undefined }), active: v === view }))}
+          />
+        </div>
+      </div>
+
+      {branches.length > 1 && (
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t("shifts.branchesShown")}>
+          {branchList.map((b) => {
+            const on = shown.includes(b.id);
+            const next = on ? shown.filter((id) => id !== b.id) : [...shown, b.id];
+            const nextIds = view === "branches" ? next.slice(-limit) : next;
+            return (
+              <Link
+                key={b.id}
+                href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? undefined : nextIds.join(",") })}
+                aria-pressed={on}
+                className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${on ? "border-transparent font-medium text-foreground" : "border-border text-muted hover:text-foreground"}`}
+                style={on ? { background: `color-mix(in oklab, ${b.color} 16%, var(--surface))`, boxShadow: `inset 0 0 0 1.5px ${b.color}` } : undefined}
+              >
+                <span aria-hidden="true" className="size-2.5 rounded-full" style={{ background: b.color }} />
+                <span dir="auto">{b.name}</span>
+              </Link>
+            );
+          })}
+          {view === "branches" && <span className="text-xs text-muted">{t("shifts.limitHint", { count: limit })}</span>}
+        </div>
+      )}
+
+      {view === "branches" ? (
+        <BranchRoster days={days} today={today} locale={locale} branches={branchList.filter((b) => shown.includes(b.id))} shifts={boardShifts} people={people} />
+      ) : (
+        <ShiftBoard
+          key={`${win.start}-${win.days}`}
+          days={days}
+          today={today}
+          locale={locale}
+          people={people}
+          shifts={boardShifts}
+          branches={branchList}
+          canEdit={canEdit}
+          canCopy={range === "week"}
+          weekStart={win.start}
+          compact={win.days > 7}
+        />
+      )}
+      {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
     </main>
   );
 }

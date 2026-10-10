@@ -672,7 +672,9 @@
     "someBranches": "{count} סניפים",
     "branchesHint": "הם רואים רק את הסניפים המסומנים כאן (בעלים ומנהלים תמיד רואים הכל). בלי סימון: כל הסניפים.",
     "saveBranches": "שמירה",
-    "count": "{count, plural, one {איש צוות אחד} other {# אנשי צוות}}"
+    "count": "{count, plural, one {איש צוות אחד} other {# אנשי צוות}}",
+    "homeBranch": "סניף בית",
+    "noHomeBranch": "ללא"
   },
   "invite": {
     "title": "הוזמנת להצטרף",
@@ -4359,7 +4361,52 @@
     "position": "תפקיד",
     "positionPlaceholder": "לדוגמה: קבלה",
     "note": "הערה",
-    "delete": "מחיקת המשמרת"
+    "delete": "מחיקת המשמרת",
+    "navigate": "מעבר בין תאריכים",
+    "today": "היום",
+    "rangeLabel": "טווח זמן",
+    "viewLabel": "תצוגה",
+    "branchesShown": "סניפים מוצגים",
+    "limitHint": "עד {count} זה לצד זה בטווח הזה",
+    "ranges": {
+      "day": "יום",
+      "week": "שבוע",
+      "month": "חודש",
+      "custom": "מותאם"
+    },
+    "views": {
+      "people": "לפי עובד",
+      "branches": "לפי סניף"
+    },
+    "previous": {
+      "day": "היום הקודם",
+      "week": "השבוע הקודם",
+      "month": "החודש הקודם",
+      "custom": "התקופה הקודמת"
+    },
+    "next": {
+      "day": "היום הבא",
+      "week": "השבוע הבא",
+      "month": "החודש הבא",
+      "custom": "התקופה הבאה"
+    },
+    "nobody": "אין משובצים",
+    "coverFrom": "מחליף/ה מסניף {branch}",
+    "coverHint": "משמרת בסניף שאינו סניף הבית של העובד מסומנת כהחלפה.",
+    "planning": {
+      "title": "קצב סידור העבודה",
+      "hint": "באיזו תדירות כל סניף מסדר משמרות",
+      "cadence": "סידור",
+      "days": "ימים",
+      "save": "שמירה",
+      "saved": "נשמר",
+      "cadences": {
+        "daily": "כל יום",
+        "weekly": "כל שבוע",
+        "monthly": "כל חודש",
+        "custom": "מותאם"
+      }
+    }
   },
   "openingHours": {
     "title": "שעות פתיחה",
