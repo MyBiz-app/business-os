@@ -562,3 +562,30 @@ body {
   height: 1.5rem;
   border-inline-start: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
 }
+
+/* Reading choices from the person's settings (components/accessibility.tsx), set on <html>.
+ * Text size scales everything, since sizes are in rem. High contrast uses `!important` so it
+ * also wins over the inline colors of "my own colors". */
+html[data-text="large"] {
+  font-size: 112.5%;
+}
+html[data-text="larger"] {
+  font-size: 125%;
+}
+html[data-contrast="high"] {
+  --muted: #27272a !important;
+  --border: #71717a !important;
+}
+html[data-contrast="high"].dark {
+  --muted: #e4e4e7 !important;
+  --border: #a1a1aa !important;
+}
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: 1ms !important;
+  animation-delay: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+  scroll-behavior: auto !important;
+}

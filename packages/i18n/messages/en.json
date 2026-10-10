@@ -3126,9 +3126,9 @@
     "unknown": "This module isn't available."
   },
   "account": {
-    "link": "My profile",
-    "title": "My profile",
-    "subtitle": "How you appear to your team, your clients and in reports.",
+    "link": "Settings",
+    "title": "Settings",
+    "subtitle": "Your personal profile and how the app works for you. Only you see these choices.",
     "name": "Full name",
     "nameHint": "Shown on the schedule, in the client app and in reports.",
     "email": "Email",
@@ -3146,7 +3146,15 @@
     "pictureErrors": {
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
-    }
+    },
+    "profileTitle": "Profile",
+    "detailsTitle": "Personal details",
+    "birthDate": "Date of birth",
+    "birthDateHint": "Only you see this.",
+    "addressLine": "Street and number",
+    "city": "City",
+    "postalCode": "Postal code",
+    "addressHint": "Your home address. Only you see it."
   },
   "sales": {
     "title": "Sales",
@@ -4348,8 +4356,7 @@
   },
   "userMenu": {
     "open": "Open your menu",
-    "label": "Your account",
-    "appearance": "Appearance"
+    "label": "Your account"
   },
   "imageCrop": {
     "title": "Position your picture",
@@ -4488,5 +4495,25 @@
     "title": "Opening hours",
     "subtitle": "When this branch is open. Add a second interval on a day for a break.",
     "closed": "Closed"
+  },
+  "accessibility": {
+    "title": "Accessibility and appearance",
+    "subtitle": "Make the app comfortable for you. Saved on this device.",
+    "language": "Language",
+    "languageHint": "The language of the app.",
+    "theme": "Theme",
+    "themeHint": "Light, dark, or follow your device.",
+    "contrast": "Contrast",
+    "contrastHint": "Stronger text and borders, easier to read.",
+    "contrastNormal": "Standard",
+    "contrastHigh": "High",
+    "textSize": "Text size",
+    "textSizeHint": "Makes all text in the app larger.",
+    "textNormal": "Standard",
+    "textLarge": "Large",
+    "textLarger": "Larger",
+    "motion": "Reduce motion",
+    "motionHint": "Fewer animations and transitions.",
+    "motionReduced": "Reduced"
   }
 }

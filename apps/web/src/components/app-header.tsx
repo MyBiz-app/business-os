@@ -15,8 +15,13 @@ export async function AppHeader({ children }: { children?: React.ReactNode }) {
       </Link>
       <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
         {children}
-        <LocaleSwitcher />
-        <ThemeSwitcher />
+        {/* Signed in, language and theme live in the person's settings; public pages keep them here. */}
+        {!children && (
+          <>
+            <LocaleSwitcher />
+            <ThemeSwitcher />
+          </>
+        )}
       </div>
     </header>
   );

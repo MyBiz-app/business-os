@@ -59,7 +59,7 @@ export interface paths {
         /**
          * Update Me
          * @description The signed-in person's own profile: the name the team, clients and reports see, a phone
-         *     number for the team, and their color palette. Fields left out stay as they are.
+         *     number for the team, personal details (date of birth, home address) and their color palette. Fields left out stay as they are.
          */
         patch: operations["update_me"];
         trace?: never;
@@ -6737,6 +6737,14 @@ export interface components {
             platform_admin: boolean;
             /** Phone */
             phone?: string | null;
+            /** Birth Date */
+            birth_date?: string | null;
+            /** Address Line */
+            address_line?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
             /**
              * Palette
              * @description The person's color palette (none: the MyBiz default)
@@ -9543,6 +9551,14 @@ export interface components {
             full_name?: string | null;
             /** Phone */
             phone?: string | null;
+            /** Birth Date */
+            birth_date?: string | null;
+            /** Address Line */
+            address_line?: string | null;
+            /** City */
+            city?: string | null;
+            /** Postal Code */
+            postal_code?: string | null;
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;

@@ -88,7 +88,7 @@
           "account"
         ],
         "summary": "Update Me",
-        "description": "The signed-in person's own profile: the name the team, clients and reports see, a phone\nnumber for the team, and their color palette. Fields left out stay as they are.",
+        "description": "The signed-in person's own profile: the name the team, clients and reports see, a phone\nnumber for the team, personal details (date of birth, home address) and their color palette. Fields left out stay as they are.",
         "operationId": "update_me",
         "requestBody": {
           "content": {
@@ -26955,6 +26955,51 @@
             ],
             "title": "Phone"
           },
+          "birth_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Date"
+          },
+          "address_line": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "postal_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postal Code"
+          },
           "palette": {
             "anyOf": [
               {
@@ -34303,6 +34348,54 @@
               }
             ],
             "title": "Phone"
+          },
+          "birth_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birth Date"
+          },
+          "address_line": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line"
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "postal_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postal Code"
           },
           "palette": {
             "anyOf": [

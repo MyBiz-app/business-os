@@ -14,7 +14,17 @@ import type { FormState } from "@/lib/form-state";
 
 import { type PictureState, removeAvatar, saveProfile, uploadAvatar } from "./actions";
 
-export function ProfileForm({ name, email, phone }: { name: string | null; email: string; phone: string | null }) {
+type Details = {
+  name: string | null;
+  email: string;
+  phone: string | null;
+  birthDate: string | null;
+  addressLine: string | null;
+  city: string | null;
+  postalCode: string | null;
+};
+
+export function ProfileForm({ name, email, phone, birthDate, addressLine, city, postalCode }: Details) {
   const t = useTranslations();
   const [state, action] = useActionState<FormState, FormData>(saveProfile, {});
   return (
@@ -25,6 +35,18 @@ export function ProfileForm({ name, email, phone }: { name: string | null; email
         <Field label={t("account.phone")} hint={t("account.phoneHint")} name="phone" type="tel" defaultValue={phone ?? ""} maxLength={30} autoComplete="tel" dir="ltr" pattern="[0-9+()\- ]*" />
       </div>
       <Field label={t("account.email")} hint={t("account.emailHint")} value={email} readOnly dir="ltr" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label={t("account.birthDate")} hint={t("account.birthDateHint")} name="birth_date" type="date" defaultValue={birthDate ?? ""} max={new Date().toISOString().slice(0, 10)} autoComplete="bday" dir="ltr" />
+      </div>
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-1 text-sm font-medium">{t("account.detailsTitle")}</legend>
+        <p className="-mt-2 text-xs text-muted">{t("account.addressHint")}</p>
+        <Field label={t("account.addressLine")} name="address_line" defaultValue={addressLine ?? ""} maxLength={200} autoComplete="street-address" dir="auto" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={t("account.city")} name="city" defaultValue={city ?? ""} maxLength={100} autoComplete="address-level2" dir="auto" />
+          <Field label={t("account.postalCode")} name="postal_code" defaultValue={postalCode ?? ""} maxLength={20} autoComplete="postal-code" dir="ltr" />
+        </div>
+      </fieldset>
       <div>
         <SubmitButton>{t("common.save")}</SubmitButton>
       </div>
