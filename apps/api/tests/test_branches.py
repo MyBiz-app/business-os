@@ -253,3 +253,48 @@ def test_a_member_kept_to_branches_sees_only_theirs(
     # Kept to a single branch, they always work in it.
     client.put(f"/staff/{coach}/branches", json={"location_ids": [east]}, headers=headers)
     assert seen(mine) == [east]
+
+
+def test_adding_a_branch_states_the_charge_and_sets_it_up(
+    client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict
+) -> None:
+    headers = studio["headers"]
+    main = studio["location"]["id"]
+    client.put(
+        f"/locations/{main}/hours",
+        json={"intervals": [{"weekday": 0, "opens": "09:00", "closes": "17:00"}]},
+        headers=headers,
+    )
+    colleague = uuid4()
+    add_member(engine, studio["tenant_id"], colleague, "staff")
+    client.put(f"/staff/{colleague}/branches", json={"location_ids": [main]}, headers=headers)
+
+    preview = client.get("/locations/new-branch", headers=headers).json()
+    assert preview["chargeable"] and preview["monthly_extra_now"] == 0
+    assert preview["monthly_extra_after"] == preview["extra_branch_price"] > 0
+
+    body = {"name": "Ashdod", "copy_hours_from": main, "staff_user_ids": [str(colleague)]}
+    refused = client.post("/locations/new-branch", json=body, headers=headers)
+    assert refused.status_code == 409 and refused.json()["detail"] == "charge_not_accepted"
+    assert len(client.get("/locations", headers=headers).json()) == 1
+
+    created = client.post(
+        "/locations/new-branch", json={**body, "accept_extra_charge": True}, headers=headers
+    )
+    assert created.status_code == 201
+    new_id = created.json()["id"]
+    assert modules(client, headers)["extra_location"] == 1
+    hours = client.get(f"/locations/{new_id}/hours", headers=headers).json()["intervals"]
+    assert [(h["weekday"], h["opens"][:5]) for h in hours] == [(0, "09:00")]
+    member = next(
+        m
+        for m in client.get("/staff", headers=headers).json()["members"]
+        if m["user_id"] == str(colleague)
+    )
+    assert set(member["location_ids"]) == {main, new_id}
+
+    # Staff without the settings permission cannot add one.
+    desk = uuid4()
+    add_member(engine, studio["tenant_id"], desk, "staff")
+    desk_headers = auth(desk, studio["tenant_id"])
+    assert client.get("/locations/new-branch", headers=desk_headers).status_code == 403
