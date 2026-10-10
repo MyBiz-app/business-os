@@ -106,6 +106,12 @@ class TenantUpdate(BaseModel):
     requires_health_declaration: bool | None = None
     online_sales: bool | None = None
     resource_payment: Literal["app", "venue"] | None = None
+    schedule_default_view: Literal["day", "week", "month"] | None = None
+    schedule_default_branches: list[UUID] | None = Field(
+        default=None,
+        max_length=3,
+        description="Branches the schedule opens with; empty means the menu's branch",
+    )
     legal_entity_type: LegalEntityType | None = None
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
@@ -162,6 +168,13 @@ class Tenant(BaseModel):
     resource_payment: Literal["app", "venue"] = Field(
         default="app",
         description="Reservations of courts and rooms: paid in the app or at the venue",
+    )
+    schedule_default_view: Literal["day", "week", "month"] = Field(
+        default="week", description="The range the schedule opens with"
+    )
+    schedule_default_branches: list[UUID] = Field(
+        default_factory=list,
+        description="Branches the schedule opens with side by side; empty: the menu's branch",
     )
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
