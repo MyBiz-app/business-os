@@ -37,6 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **Shifts: understaffed stretches are marked everywhere.** Phone day cards list each stretch where a branch has fewer people on shift than its coverage rules ask, and the branch time grid shades those stretches in the branch column.
 - **Client app: load errors no longer look like empty accounts.** Home, bookings, receipts, quotes, documents, addresses and family members show a "couldn't load" card with a Try again button when the request fails (shared `LoadError` in app-kit).
 - **Creative & events: richer starter services (beta).** Photographers, DJs, event suppliers and small venues now start with two or three ready services each (event coverage, a private-event set, site visit and quote, private venue hire, tasting and menu planning) instead of one.
 - **Food & restaurants: more sub-categories (beta).** Restaurants, bakeries and catering join pizzerias and cafés, each with its own starter services (chef's table, baking workshop, tasting meeting, private events), and cafés now start with a barista workshop and a private event instead of an empty list.

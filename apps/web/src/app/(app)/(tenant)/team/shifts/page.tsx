@@ -119,7 +119,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
       : Promise.resolve([]),
   ]);
   const templates: BoardTemplate[] = rawTemplates.map((x) => ({ id: x.id, locationId: x.location_id, name: x.name, starts: x.starts.slice(0, 5), ends: x.ends.slice(0, 5), position: x.position ?? null }));
-  const gaps: BoardGap[] = rawGaps.map((g) => ({ locationId: g.location_id, locationName: g.location_name, day: g.day, starts: minuteToTime(g.starts_minute), ends: minuteToTime(g.ends_minute), needed: g.needed, have: g.have }));
+  const gaps: BoardGap[] = rawGaps.map((g) => ({ locationId: g.location_id, locationName: g.location_name, day: g.day, starts: minuteToTime(g.starts_minute), ends: minuteToTime(g.ends_minute), startMinute: g.starts_minute, endMinute: g.ends_minute, needed: g.needed, have: g.have }));
   // Monday first, as the coverage rules count weekdays.
   const weekdays = Array.from({ length: 7 }, (_, i) => formatDay(addDays("2024-01-01", i), locale, { weekday: "long" }));
 
@@ -277,6 +277,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           locale={locale}
           events={gridEvents}
           shifts={[]}
+          gaps={gaps.map((g) => ({ laneId: g.locationId, day: g.day, start: g.startMinute, end: g.endMinute, label: `${g.locationName} ${g.starts}–${g.ends}: ${t("shifts.coverage.gap", { have: g.have, needed: g.needed })}` }))}
           lanes={branchList.filter((b) => shown.includes(b.id)).map((b) => ({ id: b.id, name: b.name, color: b.color }))}
           closed={{}}
           open={null}
