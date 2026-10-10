@@ -559,6 +559,8 @@
     "pageOf": "Page {page} of {pages}"
   },
   "common": {
+    "loadFailed": "Couldn't load this right now.",
+    "retry": "Try again",
     "save": "Save",
     "create": "Create",
     "cancel": "Cancel",
