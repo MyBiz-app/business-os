@@ -26,7 +26,8 @@ _עודכן לאחרונה: 10.10.2026_ · מתעדכן עם כל מיזוג (Pu
 
 1. ✅ **תבניות המייל ב-Supabase**: מוגדרות (נבדק ב-10.10, זהות ל-`supabase/templates/`).
 2. ✅ **כתובות החזרה ב-Supabase**: מוגדרות (Site URL ו-`https://business-os-alpha-drab.vercel.app/**`).
-3. **התחברות עם Google** (כ-10 דקות):
+3. **לראות את האפליקציות בטלפון (Expo, בחינם)**: ב-GitHub → Actions → "Deploy the Expo apps to the web (Vercel)" → Run workflow → app: all. אחרי כמה דקות כל אפליקציה זמינה ככתובת Vercel (מופיעה בסיכום הריצה), נפתחת בדפדפן של הטלפון ואפשר להוסיף אותה למסך הבית. שלח לי את הכתובות ואני מוסיף אותן ל-CORS של ה-API. לחלופין, במחשב: `pnpm --filter client-app start` וסריקת ה-QR באפליקציית Expo Go.
+4. **התחברות עם Google** (כ-10 דקות):
    1. ב-[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) יוצרים OAuth client מסוג Web application.
    2. ב-Authorized redirect URIs מדביקים את ה-Callback URL שמופיע ב-[Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers). הכתובת נראית כך: `https://<project>.supabase.co/auth/v1/callback`.
    3. מעתיקים את ה-Client ID וה-Client Secret ל-Supabase ומפעילים את Google. הכפתור יופיע באתר לבד, תוך 5 דקות לכל היותר.
