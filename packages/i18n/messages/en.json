@@ -3804,6 +3804,18 @@
     "cafe": {
       "name": "Cafés",
       "tagline": "Shifts, events and regulars."
+    },
+    "restaurant": {
+      "name": "Restaurants",
+      "tagline": "Shifts, chef's tables and group bookings."
+    },
+    "bakery": {
+      "name": "Bakeries",
+      "tagline": "Shifts, baking workshops and custom orders."
+    },
+    "catering": {
+      "name": "Catering",
+      "tagline": "Shifts, tasting meetings and private events."
     }
   },
   "clientFields": {
