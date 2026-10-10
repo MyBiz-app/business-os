@@ -272,6 +272,15 @@
     },
     "cafe": {
       "name": "בתי קפה"
+    },
+    "restaurant": {
+      "name": "מסעדות"
+    },
+    "bakery": {
+      "name": "מאפיות"
+    },
+    "catering": {
+      "name": "קייטרינג"
     }
   }
 }

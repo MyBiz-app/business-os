@@ -37,6 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **Food & restaurants: more sub-categories (beta).** Restaurants, bakeries and catering join pizzerias and cafés, each with its own starter services (chef's table, baking workshop, tasting meeting, private events), and cafés now start with a barista workshop and a private event instead of an empty list.
 - **Personal settings.** "Settings" in the profile-picture menu opens the person's own page (outside the business area): picture, name, phone, date of birth and home address (migration 0063), and an accessibility section with language and theme (moved out of the toolbar on signed-in pages) plus contrast, text size and reduced motion, saved on the device.
 - **Roles, permissions and removing items ([spec](proposals/roles-permissions-2026-10.md), X31).** The roles page shows the built-in roles with what each can do before you create your own; every team row has a "Permissions" popover with what that person can actually do; owners and managers (not front desk or staff) can delete services, memberships and punch cards, with a confirmation, and an item that has sessions or sales is hidden instead of deleted so history stays. The API enforces it (`catalog.delete`); people without a permission don't see the button.
 - **Pictures cropped before saving (X27).** Choosing a profile picture or the business logo opens a dialog: drag and zoom the picture inside a circle (mouse, wheel, slider or keyboard), then save the square that shows. Own colors for the whole app come next.
