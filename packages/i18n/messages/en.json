@@ -36,6 +36,7 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "themeSystem": "System",
+    "themeFollowsColors": "Set by your colors",
     "title": "Settings",
     "subtitle": "Your business details and how it looks to clients.",
     "details": "Business details",
@@ -4316,12 +4317,24 @@
     "palettes": {
       "mybiz": "MyBiz",
       "ocean": "Ocean",
-      "forest": "Forest"
+      "forest": "Forest",
+      "custom": "My own colors"
     },
     "paletteHints": {
       "mybiz": "Black, white and deep purple",
       "ocean": "Cool slate and teal",
-      "forest": "Soft sage and green"
+      "forest": "Soft sage and green",
+      "custom": "Pick three colors yourself"
+    },
+    "customHint": "Pick three colors and the whole app follows them. Everything else is worked out from them, and anything that would be hard to read is adjusted for you, so no mix can break the screen.",
+    "adjusted": "To keep everything readable, we adjusted: {picks}.",
+    "modeFollowsBackground": "A dark background gives the dark look and a light one the light look, so the light and dark switch is off while your colors are on.",
+    "saveColors": "Save my colors",
+    "resetColors": "Back to the starting colors",
+    "picks": {
+      "background": "Background",
+      "text": "Text",
+      "accent": "Accent"
     }
   },
   "organization": {
