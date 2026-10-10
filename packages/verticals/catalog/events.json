@@ -76,6 +76,30 @@
             "ILS": 60000
           },
           "color": "#7c3aed"
+        },
+        {
+          "names": {
+            "he": "צילומי אירוע",
+            "en": "Event coverage"
+          },
+          "duration_minutes": 240,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 180000
+          },
+          "color": "#a21caf"
+        },
+        {
+          "names": {
+            "he": "צילומי משפחה בחוץ",
+            "en": "Outdoor family shoot"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 90000
+          },
+          "color": "#c026d3"
         }
       ]
     },
@@ -94,6 +118,30 @@
             "ILS": 10000
           },
           "color": "#db2777"
+        },
+        {
+          "names": {
+            "he": "הופעה באירוע פרטי",
+            "en": "Private event set"
+          },
+          "duration_minutes": 300,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 250000
+          },
+          "color": "#be185d"
+        },
+        {
+          "names": {
+            "he": "בדיקת סאונד במקום",
+            "en": "On-site sound check"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 15000
+          },
+          "color": "#f472b6"
         }
       ]
     },
@@ -112,6 +160,30 @@
             "ILS": 10000
           },
           "color": "#9333ea"
+        },
+        {
+          "names": {
+            "he": "סיור הצעת מחיר באתר האירוע",
+            "en": "Site visit and quote"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#7e22ce"
+        },
+        {
+          "names": {
+            "he": "הקמה ופירוק לאירוע",
+            "en": "Event set-up and take-down"
+          },
+          "duration_minutes": 240,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 150000
+          },
+          "color": "#a855f7"
         }
       ]
     },
@@ -130,6 +202,30 @@
             "ILS": 5000
           },
           "color": "#6d28d9"
+        },
+        {
+          "names": {
+            "he": "הזמנת המקום לאירוע פרטי",
+            "en": "Private venue hire"
+          },
+          "duration_minutes": 240,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 300000
+          },
+          "color": "#5b21b6"
+        },
+        {
+          "names": {
+            "he": "טעימות ותכנון תפריט",
+            "en": "Tasting and menu planning"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#8b5cf6"
         }
       ]
     }
