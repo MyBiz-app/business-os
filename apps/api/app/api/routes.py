@@ -324,7 +324,8 @@ class ProfileUpdate(BaseModel):
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     """The signed-in person's own profile: the name the team, clients and reports see, a phone
-    number for the team, personal details (date of birth, home address) and their color palette. Fields left out stay as they are."""
+    number for the team, personal details (date of birth, home address) and their color
+    palette. Fields left out stay as they are."""
     ensure_profile(session, user.id, user.email)
     changes = body.model_dump(exclude_unset=True)
     colors = changes.pop("palette_colors", None)

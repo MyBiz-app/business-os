@@ -88,7 +88,7 @@
           "account"
         ],
         "summary": "Update Me",
-        "description": "The signed-in person's own profile: the name the team, clients and reports see, a phone\nnumber for the team, personal details (date of birth, home address) and their color palette. Fields left out stay as they are.",
+        "description": "The signed-in person's own profile: the name the team, clients and reports see, a phone\nnumber for the team, personal details (date of birth, home address) and their color\npalette. Fields left out stay as they are.",
         "operationId": "update_me",
         "requestBody": {
           "content": {

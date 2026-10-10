@@ -59,7 +59,8 @@ export interface paths {
         /**
          * Update Me
          * @description The signed-in person's own profile: the name the team, clients and reports see, a phone
-         *     number for the team, personal details (date of birth, home address) and their color palette. Fields left out stay as they are.
+         *     number for the team, personal details (date of birth, home address) and their color
+         *     palette. Fields left out stay as they are.
          */
         patch: operations["update_me"];
         trace?: never;
