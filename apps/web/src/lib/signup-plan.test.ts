@@ -41,7 +41,7 @@ test("a plan survives the round trip through the URL, Hebrew included", () => {
 test("anything that is not a valid plan is rejected", () => {
   assert.equal(decodePlan(undefined), null);
   assert.equal(decodePlan("not base64 json"), null);
-  assert.equal(decodePlan(encodePlan({ ...plan, vertical: "bakery" as "beauty" })), null);
+  assert.equal(decodePlan(encodePlan({ ...plan, vertical: "no_such_industry" as "beauty" })), null);
   assert.equal(decodePlan(encodePlan({ ...plan, name: "  " })), null);
   assert.equal(decodePlan(encodePlan({ ...plan, modules: { rocket: 1 } as never })), null);
   assert.equal(decodePlan(encodePlan({ ...plan, modules: { crm: 0 } })), null);
