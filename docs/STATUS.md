@@ -24,8 +24,8 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## What the owner needs to do (actions, when convenient)
 
-1. **Supabase email templates** (5 min). This prevents the "email link opened in another browser" bug. In [Supabase → Authentication → Emails → Templates](https://supabase.com/dashboard/project/_/auth/templates), paste each file from [`supabase/templates/`](../supabase/templates/) into Confirm signup, Magic link and Reset password: `confirmation.html`, `magic_link.html`, `recovery.html`.
-2. **Supabase redirect URLs** (2 min). In [Authentication → URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration), set Site URL to `https://business-os-alpha-drab.vercel.app` and include `https://business-os-alpha-drab.vercel.app/auth/confirm` in Redirect URLs.
+1. ✅ **Supabase email templates**: in place (checked 2026-10-10, identical to `supabase/templates/`).
+2. ✅ **Supabase redirect URLs**: in place (Site URL and `https://business-os-alpha-drab.vercel.app/**`).
 3. **Google sign-in** (about 10 min):
    1. In [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials), create an OAuth client of type Web application.
    2. Add the Callback URL shown in [Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers) as an authorized redirect URI.

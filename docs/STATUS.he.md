@@ -24,8 +24,8 @@ _עודכן לאחרונה: 09.10.2026_ · מתעדכן עם כל מיזוג (Pu
 
 ## מה אני צריך ממך (פעולות, מתי שנוח)
 
-1. **תבניות המייל ב-Supabase** (5 דקות). זה מה שמונע את הבאג של "הקישור במייל נפתח בדפדפן אחר". נכנסים ל-[Supabase → Authentication → Emails → Templates](https://supabase.com/dashboard/project/_/auth/templates), ובכל אחת משלוש התבניות (Confirm signup, Magic link, Reset password) מדביקים את התוכן של הקובץ המתאים מ-[`supabase/templates/`](../supabase/templates/): `confirmation.html`, `magic_link.html`, `recovery.html`.
-2. **כתובות החזרה ב-Supabase** (2 דקות). ב-[Authentication → URL Configuration](https://supabase.com/dashboard/project/_/auth/url-configuration) צריך ש-Site URL יהיה `https://business-os-alpha-drab.vercel.app`, וש-Redirect URLs יכלול את `https://business-os-alpha-drab.vercel.app/auth/confirm`.
+1. ✅ **תבניות המייל ב-Supabase**: מוגדרות (נבדק ב-10.10, זהות ל-`supabase/templates/`).
+2. ✅ **כתובות החזרה ב-Supabase**: מוגדרות (Site URL ו-`https://business-os-alpha-drab.vercel.app/**`).
 3. **התחברות עם Google** (כ-10 דקות):
    1. ב-[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) יוצרים OAuth client מסוג Web application.
    2. ב-Authorized redirect URIs מדביקים את ה-Callback URL שמופיע ב-[Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers). הכתובת נראית כך: `https://<project>.supabase.co/auth/v1/callback`.
