@@ -60,6 +60,11 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
   for security, tenant isolation or data integrity to save effort.
 - Don't rerun a failing command unchanged; change the diagnosis first. Trim long output
   (`| tail -n 40`, `-q`, `--tb=short`).
+- Keep threads short: cache reads grow with every turn of a long conversation. One thread per slice
+  (a merged PR is a natural end); for a long task, split it into slices and start a fresh thread per slice,
+  carrying state in `docs/STATUS.md` or the PR, instead of one overnight mega-thread.
+- Model: Sonnet by default; Opus only for the cases in `docs/claude-code.md`. Don't re-run the full
+  e2e/test suite after every small edit; run it once before merge.
 - Do small or sequential work directly. Use a subagent only for genuinely parallel or isolated
   work, with a narrow scope and a defined deliverable.
 
