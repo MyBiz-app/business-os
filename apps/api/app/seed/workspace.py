@@ -43,6 +43,12 @@ TITLES = {
     "fitness": ("בעלים", "מנהל/ת סניף", ("מאמן/ת", "מדריך/ת סטודיו", "קבלה")),
     "beauty": ("בעלים", "מנהל/ת סניף", ("סטייליסט/ית", "צבעי/ת", "קבלה")),
 }
+# The rooms or posts of a branch that shifts are planned into (the owner defines their own).
+STATIONS = {
+    "fitness": ("פילאטיס 1", "פילאטיס 2", "יוגה 1", "יוגה 2"),
+    "food": ("מטבח", "קופה", "משלוחים"),
+    "beauty": ("עמדה 1", "עמדה 2", "שטיפה"),
+}
 DEFAULT_TITLES = ("בעלים", "מנהל/ת צוות", ("איש/אשת צוות",))
 MAX_SHIFT = timedelta(hours=9)
 
@@ -95,7 +101,18 @@ def seed_workspace(
     rows = []
     free: dict[UUID, set[date]] = {}  # who has no shift on which open day (cover candidates)
     first = today - timedelta(days=14)
+    station_names = STATIONS.get(category, ())
     for branch, team in staff.items():
+        stations = [
+            conn.execute(
+                text("""
+                    INSERT INTO app.stations (tenant_id, location_id, name, sort_order)
+                    VALUES (:t, :l, :name, :order) RETURNING id
+                """),
+                {"t": tenant_id, "l": branch, "name": name, "order": order},
+            ).scalar_one()
+            for order, name in enumerate(station_names)
+        ]
         for person in team:
             conn.execute(
                 text("""
@@ -119,11 +136,15 @@ def seed_workspace(
                     continue
                 starts = local_to_utc(day, opens, TIME_ZONE)
                 ends = local_to_utc(day, closes, TIME_ZONE)
+                evening = 0
                 if ends - starts > MAX_SHIFT:
                     if (index + offset) % 2:
                         starts = ends - MAX_SHIFT
+                        evening = 1
                     else:
                         ends = starts + MAX_SHIFT
+                # Mornings and evenings are staffed differently, so rooms fill up unevenly.
+                station = stations[(index + evening) % len(stations)] if stations else None
                 rows.append(
                     {
                         "t": tenant_id,
@@ -132,6 +153,7 @@ def seed_workspace(
                         "s": starts,
                         "e": ends,
                         "position": positions[index],
+                        "station": station,
                     }
                 )
     # Networks borrow staff: tomorrow, someone from one branch covers a gap in the next one.
@@ -153,15 +175,16 @@ def seed_workspace(
                     "s": starts,
                     "e": ends,
                     "position": None,
+                    "station": None,
                 }
             )
             break
     if rows:
         conn.execute(
             text("""
-                INSERT INTO app.shifts (tenant_id, location_id, user_id, starts_at, ends_at,
-                                        position, created_by, published_at)
-                VALUES (:t, :l, :u, :s, :e, :position, NULL, now())
+                INSERT INTO app.shifts (tenant_id, location_id, station_id, user_id, starts_at,
+                                        ends_at, position, created_by, published_at)
+                VALUES (:t, :l, :station, :u, :s, :e, :position, NULL, now())
             """),
             rows,
         )

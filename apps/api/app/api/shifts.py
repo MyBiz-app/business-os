@@ -33,7 +33,15 @@ CatalogReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_REA
 CatalogWriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 
 MAX_SHIFT = timedelta(hours=24)
-SHIFT_COLUMNS = ("user_id", "location_id", "starts_at", "ends_at", "position", "note")
+SHIFT_COLUMNS = (
+    "user_id",
+    "location_id",
+    "station_id",
+    "starts_at",
+    "ends_at",
+    "position",
+    "note",
+)
 
 
 class OpeningInterval(BaseModel):
@@ -168,6 +176,8 @@ class Shift(BaseModel):
     ends_at: datetime
     position: str | None
     note: str | None
+    station_id: UUID | None
+    station_name: str | None
     home_location_id: UUID | None = Field(description="The person's home branch, if set")
     home_location_name: str | None
     is_cover: bool = Field(description="At a branch other than the person's home branch")
@@ -189,6 +199,7 @@ class ShiftFields(BaseModel):
 class ShiftCreate(ShiftFields):
     user_id: UUID
     location_id: UUID
+    station_id: UUID | None = Field(default=None, description="A station of the same branch")
     starts_at: datetime
     ends_at: datetime
 
@@ -202,6 +213,7 @@ class ShiftCreate(ShiftFields):
 class ShiftUpdate(ShiftFields):
     user_id: UUID | None = None
     location_id: UUID | None = None
+    station_id: UUID | None = Field(default=None, description="Null clears the station")
     starts_at: datetime | None = None
     ends_at: datetime | None = None
 
@@ -233,7 +245,8 @@ class CopiedShifts(BaseModel):
 SHIFT_SELECT = """
     SELECT sh.id, sh.location_id, l.name AS location_name, sh.user_id,
            coalesce(u.full_name, u.email) AS user_name, sh.starts_at, sh.ends_at,
-           sh.position, sh.note, m.home_location_id, hl.name AS home_location_name,
+           sh.position, sh.note, sh.station_id, st.name AS station_name,
+           m.home_location_id, hl.name AS home_location_name,
            coalesce(m.home_location_id <> sh.location_id, false) AS is_cover,
            EXISTS (
                SELECT 1 FROM app.staff_time_off o
@@ -256,6 +269,7 @@ SHIFT_SELECT = """
     JOIN app.tenants t ON t.id = sh.tenant_id
     JOIN app.locations l ON l.id = sh.location_id
     JOIN app.users u ON u.id = sh.user_id
+    LEFT JOIN app.stations st ON st.id = sh.station_id
     LEFT JOIN app.tenant_members m ON m.tenant_id = sh.tenant_id AND m.user_id = sh.user_id
     LEFT JOIN app.locations hl ON hl.id = m.home_location_id
     WHERE app.in_branch(sh.location_id)
@@ -349,8 +363,10 @@ def _check_and_lock(
     starts_at: datetime,
     ends_at: datetime,
     ignore: UUID | None = None,
+    station_id: UUID | None = None,
 ) -> None:
-    """The person works here and is free then; holds a lock on them until the commit."""
+    """The person works here and is free then, at a station of this branch if one is named;
+    holds a lock on them until the commit."""
     member = session.execute(
         text("""
             SELECT 1 FROM app.tenant_members
@@ -359,6 +375,14 @@ def _check_and_lock(
         {"id": user_id},
     ).first()
     if member is None or not _branch_visible(session, location_id):
+        raise HTTPException(status_code=422, detail="invalid_reference")
+    if station_id is not None and (
+        session.execute(
+            text("SELECT 1 FROM app.stations WHERE id = :s AND location_id = :l"),
+            {"s": station_id, "l": location_id},
+        ).first()
+        is None
+    ):
         raise HTTPException(status_code=422, detail="invalid_reference")
     session.execute(
         text("SELECT pg_advisory_xact_lock(hashtextextended('shift:' || :id, 0))"),
@@ -378,13 +402,20 @@ def _check_and_lock(
 
 @router.post("/shifts", status_code=status.HTTP_201_CREATED)
 def create_shift(body: ShiftCreate, user: UserDep, context: ManageDep) -> Shift:
-    _check_and_lock(context.session, body.user_id, body.location_id, body.starts_at, body.ends_at)
+    _check_and_lock(
+        context.session,
+        body.user_id,
+        body.location_id,
+        body.starts_at,
+        body.ends_at,
+        station_id=body.station_id,
+    )
     shift_id = context.session.execute(
         text("""
-            INSERT INTO app.shifts (tenant_id, location_id, user_id, starts_at, ends_at,
-                                    position, note, created_by)
-            VALUES (app.current_tenant_id(), :location_id, :user_id, :starts_at, :ends_at,
-                    :position, :note, :created_by)
+            INSERT INTO app.shifts (tenant_id, location_id, station_id, user_id, starts_at,
+                                    ends_at, position, note, created_by)
+            VALUES (app.current_tenant_id(), :location_id, :station_id, :user_id, :starts_at,
+                    :ends_at, :position, :note, :created_by)
             RETURNING id
         """),
         {**body.model_dump(), "created_by": user.id},
@@ -397,9 +428,11 @@ def update_shift(shift_id: UUID, body: ShiftUpdate, context: ManageDep) -> Shift
     current = _load_shift(context.session, shift_id)
     changes = body.model_dump(exclude_unset=True)
     merged = {**current.model_dump(), **{k: v for k, v in changes.items() if v is not None}}
-    for key in ("position", "note"):
+    for key in ("position", "note", "station_id"):
         if key in changes:
             merged[key] = changes[key]
+    if "station_id" not in changes and merged["location_id"] != current.location_id:
+        merged["station_id"] = None  # a station belongs to its branch
     if not merged["starts_at"] < merged["ends_at"] <= merged["starts_at"] + MAX_SHIFT:
         raise HTTPException(status_code=422, detail="invalid_period")
     _check_and_lock(
@@ -409,12 +442,13 @@ def update_shift(shift_id: UUID, body: ShiftUpdate, context: ManageDep) -> Shift
         merged["starts_at"],
         merged["ends_at"],
         ignore=shift_id,
+        station_id=merged["station_id"],
     )
     context.session.execute(
         text("""
             UPDATE app.shifts
-            SET user_id = :user_id, location_id = :location_id, starts_at = :starts_at,
-                ends_at = :ends_at, position = :position, note = :note
+            SET user_id = :user_id, location_id = :location_id, station_id = :station_id,
+                starts_at = :starts_at, ends_at = :ends_at, position = :position, note = :note
             WHERE id = :id
         """),
         {key: merged[key] for key in SHIFT_COLUMNS} | {"id": shift_id},
@@ -455,16 +489,24 @@ def _copy_range(
         ends = starts + (shift.ends_at - shift.starts_at)
         try:
             with context.session.begin_nested():
-                _check_and_lock(context.session, shift.user_id, shift.location_id, starts, ends)
+                _check_and_lock(
+                    context.session,
+                    shift.user_id,
+                    shift.location_id,
+                    starts,
+                    ends,
+                    station_id=shift.station_id,
+                )
                 context.session.execute(
                     text("""
-                        INSERT INTO app.shifts (tenant_id, location_id, user_id, starts_at,
-                                                ends_at, position, note, created_by)
-                        VALUES (app.current_tenant_id(), :location, :user, :starts, :ends,
-                                :position, :note, :created_by)
+                        INSERT INTO app.shifts (tenant_id, location_id, station_id, user_id,
+                                                starts_at, ends_at, position, note, created_by)
+                        VALUES (app.current_tenant_id(), :location, :station, :user, :starts,
+                                :ends, :position, :note, :created_by)
                     """),
                     {
                         "location": shift.location_id,
+                        "station": shift.station_id,
                         "user": shift.user_id,
                         "starts": starts,
                         "ends": ends,

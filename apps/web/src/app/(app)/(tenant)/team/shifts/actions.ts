@@ -18,6 +18,7 @@ function fields(formData: FormData, timeZone: string) {
   return {
     user_id: value("user_id"),
     location_id: value("location_id"),
+    station_id: value("station_id") || null,
     starts_at: starts,
     ends_at: ends,
     position: value("position"),
@@ -133,6 +134,37 @@ export async function deleteTemplate(templateId: string): Promise<void> {
   const { api, scope } = await getTenantFor("staff.manage");
   await api.DELETE("/shift-templates/{template_id}", { params: { ...scope, path: { template_id: templateId } } });
   revalidatePath("/team/shifts");
+}
+
+export type StationState = { saved?: boolean; error?: "name_taken" | "invalid" | "generic" };
+
+/** Adds a room or station to a branch. */
+export async function saveStation(locationId: string, name: string): Promise<StationState> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  const { response, error } = await api.POST("/stations", { params: scope, body: { location_id: locationId, name } });
+  return stationResult(response, error);
+}
+
+export async function renameStation(stationId: string, name: string): Promise<StationState> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  const { response, error } = await api.PATCH("/stations/{station_id}", { params: { ...scope, path: { station_id: stationId } }, body: { name } });
+  return stationResult(response, error);
+}
+
+/** Removes a station; its shifts stay, without one. */
+export async function deleteStation(stationId: string): Promise<void> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  await api.DELETE("/stations/{station_id}", { params: { ...scope, path: { station_id: stationId } } });
+  revalidatePath("/team/shifts");
+}
+
+function stationResult(response: Response, error: unknown): StationState {
+  if (!response.ok) {
+    const detail = (error as { detail?: unknown } | undefined)?.detail;
+    return { error: detail === "station_name_taken" ? "name_taken" : response.status === 422 ? "invalid" : "generic" };
+  }
+  revalidatePath("/team/shifts");
+  return { saved: true };
 }
 
 export type CoverageRuleInput = { weekday: number; starts_minute: number; ends_minute: number; min_staff: number };
