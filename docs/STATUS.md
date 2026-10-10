@@ -85,6 +85,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 ## Next
 
 - Polishing the beta categories; go-live work (#34) when the owner chooses providers
+- Go-live readiness: work through [the 2026-10 readiness review](reviews/go-live-readiness-2026-10.md) one numbered item per thread (blockers B1-B6 first)
 
 ## Planned
 
