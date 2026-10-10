@@ -3,6 +3,14 @@
     "name": "MyBiz",
     "tagline": "Run your business in one place, with AI that works for you."
   },
+  "errorPages": {
+    "title": "Something went wrong",
+    "text": "We couldn't show this page. Please try again; if it keeps happening, contact support and mention the reference below.",
+    "reference": "Reference: {code}",
+    "home": "Back to the home page",
+    "notFoundTitle": "Page not found",
+    "notFoundText": "The page you're looking for doesn't exist or was moved."
+  },
   "home": {
     "status": "System status",
     "apiOnline": "API is online",
