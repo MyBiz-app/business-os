@@ -25,7 +25,6 @@ from app.seed.activity import (
     _seed_reservations,
 )
 from app.seed.common import (
-    CLASS_HOURS,
     CLIENTS,
     FIRST_NAMES,
     GENERIC_NOTES,
@@ -45,6 +44,7 @@ from app.seed.common import (
     profile_id,
 )
 from app.seed.industries import _seed_dependents, _seed_jobs, _seed_practice, _seed_quotes
+from app.seed.workspace import seed_workspace
 
 
 def seed(
@@ -283,7 +283,7 @@ def seed(
         for branch in branches:
             for weekday in (6, 0, 1, 2, 3, 4, 5):  # Sunday first, as the week runs in Israel
                 count = 1 if weekday == 5 else 2 if weekday == 4 else rng.randint(3, 4)
-                for at in sorted(rng.sample(CLASS_HOURS, k=count)):
+                for at in sorted(rng.sample(spec.class_hours, k=min(count, len(spec.class_hours)))):
                     service = rng.choice(classes)
                     room = rooms[branch][0 if service["capacity"] > 8 else -1]
                     weekly(service, branch, room, rng.choice(staff[branch]), weekday, at)
@@ -699,12 +699,13 @@ def seed(
             conn, tenant_id, [c.id for c in clients], start, today, horizon, rng
         )
     _seed_messages(conn, tenant_id, owner, today, rng)
+    shifts = seed_workspace(conn, tenant_id, owner, category, spec.color, staff, today, rng)
 
     print(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "
         f"{len(clients)} clients, {lead_count} leads, {len(sessions)} sessions, "
         f"{len(entitlement_rows)} plans sold, {len(booking_rows)} bookings, "
         f"{reservations} reservations, {dependents} pets / children, {jobs} on-site jobs, "
-        f"{quotes} quotes, {hours} hours logged."
+        f"{quotes} quotes, {hours} hours logged, {shifts} shifts."
     )
     return tenant_id

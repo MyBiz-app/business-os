@@ -60,7 +60,7 @@ export async function apiUpload(path: string, file: File, tenantId: string): Pro
   body.set("file", file);
   return fetch(`${API_URL}${path}`, {
     method: "PUT",
-    headers: { ...(await authHeaders()), "X-Tenant-Id": tenantId },
+    headers: { ...(await authHeaders()), ...(tenantId ? { "X-Tenant-Id": tenantId } : {}) },
     body,
     cache: "no-store",
   });
@@ -70,7 +70,7 @@ export async function apiUpload(path: string, file: File, tenantId: string): Pro
 export async function apiFetch(path: string, init: RequestInit, tenantId: string): Promise<Response> {
   return fetch(`${API_URL}${path}`, {
     ...init,
-    headers: { ...(await authHeaders()), "X-Tenant-Id": tenantId },
+    headers: { ...(await authHeaders()), ...(tenantId ? { "X-Tenant-Id": tenantId } : {}) },
     cache: "no-store",
   });
 }

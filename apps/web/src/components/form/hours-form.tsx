@@ -15,10 +15,13 @@ export function HoursForm({
   save,
   initial,
   weekStartsOn,
+  emptyLabel,
 }: {
   save: (blocks: Block[]) => Promise<HoursState>;
   initial: Block[];
   weekStartsOn: number;
+  /** What a day without hours means here (defaults to "not working"). */
+  emptyLabel?: string;
 }) {
   const t = useTranslations("hours");
   const names = t.raw("weekdays") as string[];
@@ -47,7 +50,7 @@ export function HoursForm({
             <li key={day} className="flex flex-wrap items-start gap-3 py-3">
               <span className="w-20 pt-2 font-semibold">{names[day]}</span>
               <div className="flex flex-1 flex-col gap-2">
-                {mine.length === 0 && <span className="pt-2 text-sm text-muted">{t("none")}</span>}
+                {mine.length === 0 && <span className="pt-2 text-sm text-muted">{emptyLabel ?? t("none")}</span>}
                 {mine.map(({ block, index }) => (
                   <div key={index} className="flex flex-wrap items-center gap-2">
                     <label className="flex items-center gap-2 text-sm">

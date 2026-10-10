@@ -1,6 +1,6 @@
 """Demo data: businesses with branches and months of realistic history, for any industry.
 
-    uv run python -m app.seed --owner-email you@example.com [--demo studio|owner]
+    uv run python -m app.seed --owner-email you@example.com [--demo studio|owner|networks]
         [--owner-name "..."] [--replace] [--months 3] [--seed 7]
 
 The owner must have signed up once (so their profile exists). The script creates businesses
@@ -68,6 +68,8 @@ def main() -> None:
         "events: a photography studio with quotes, deposits and events; "
         "office: an accounting firm with retainers, time, bills and documents; "
         "owner: a pilates chain with five branches and a barbershop with three; "
+        "networks: Urban Slice (pizza, four branches), Pulse Fitness (gym, two) and "
+        "Studio Bloom (hair salon, three) for one owner; "
         "platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",
     )

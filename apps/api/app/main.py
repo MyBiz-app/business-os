@@ -28,6 +28,7 @@ from app.api import (
     modules,
     notifications,
     onsite_jobs,
+    people,
     plans,
     platform,
     privacy,
@@ -40,6 +41,7 @@ from app.api import (
     samples,
     schedule,
     services,
+    shifts,
     staff,
     support,
     time_billing,
@@ -137,6 +139,8 @@ def create_app() -> FastAPI:
     app.include_router(services.router)
     app.include_router(locations.router)
     app.include_router(staff.router)
+    app.include_router(people.router)
+    app.include_router(shifts.router)
     app.include_router(schedule.router)
     app.include_router(bookings.router)
     app.include_router(appointments.router)

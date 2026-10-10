@@ -9,12 +9,14 @@ import { termsOf } from "@business-os/verticals";
 
 import { ColumnChart } from "@/components/charts/column-chart";
 import { GettingStartedCard } from "@/components/getting-started";
+import { LiveRefresh } from "@/components/live-refresh";
 import { CountUp } from "@/components/motion/count-up";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canManageSettings, canReadReports } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
+import { coverSrc } from "@/lib/workspace";
 
 import { isolate } from "@/lib/bidi";
 
@@ -51,22 +53,20 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const reports = canReadReports(tenant);
 
   const canSeeSchedule = tenant.permissions.includes("schedule.read");
-  const todays = canSeeSchedule
-    ? unwrap(await api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }))
-    : [];
-  const [metrics, revenue, attendance] = reports
-    ? await Promise.all([
-        api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES] } } }).then(unwrap),
-        api.GET("/metrics/{key}/series", { params: { ...scope, path: { key: "revenue" }, query: { start: addDays(end, -83), end, grain: "week" } } }).then(unwrap),
-        api.GET("/metrics/{key}/series", { params: { ...scope, path: { key: "attendance" }, query: { start: addDays(end, -83), end, grain: "week" } } }).then(unwrap),
-      ])
-    : [[], [], []];
-
-  // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
-  // invoice is unpaid.
-  const billing = canManageSettings(tenant) ? (await api.GET("/billing", { params: scope })).data : undefined;
-  // The first-steps checklist, for whoever sets the business up, until it's all done.
-  const setup = canManageSettings(tenant) ? (await api.GET("/tenants/current/getting-started", { params: scope })).data : undefined;
+  const series = (key: "revenue" | "attendance") =>
+    api.GET("/metrics/{key}/series", { params: { ...scope, path: { key }, query: { start: addDays(end, -83), end, grain: "week" } } }).then(unwrap);
+  // Everything at once: each request waits on the API, none waits on another.
+  const [todays, [metrics, revenue, attendance], billing, setup] = await Promise.all([
+    canSeeSchedule ? api.GET("/sessions", { params: { ...scope, query: { start: today, days: 1 } } }).then(unwrap) : [],
+    reports
+      ? Promise.all([api.GET("/metrics", { params: { ...scope, query: { start, end, keys: [...TILES] } } }).then(unwrap), series("revenue"), series("attendance")])
+      : ([[], [], []] as const),
+    // The MyBiz subscription: remind whoever manages settings before the trial ends or when an
+    // invoice is unpaid.
+    canManageSettings(tenant) ? api.GET("/billing", { params: scope }).then((r) => r.data) : undefined,
+    // The first-steps checklist, for whoever sets the business up, until it's all done.
+    canManageSettings(tenant) ? api.GET("/tenants/current/getting-started", { params: scope }).then((r) => r.data) : undefined,
+  ]);
   const welcome = query.welcome === "1";
   const billingNotice = !billing
     ? null
@@ -143,6 +143,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
 
   return (
     <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
+      <LiveRefresh />
       {billingNotice && (
         <Link
           href="/settings/billing"
@@ -165,11 +166,18 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         </Link>
       ))}
       {setup && (welcome || setup.done < setup.total) && <GettingStartedCard setup={setup} welcome={welcome} business={tenant.name} />}
-      <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-6 sm:p-8">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-primary/20 blur-3xl"
-        />
+      <div className="card-accent relative flex flex-wrap items-end justify-between gap-6 overflow-hidden p-0">
+        {tenant.cover_url ? (
+          // The business's own cover image, under a fade that keeps the text readable.
+          // eslint-disable-next-line @next/next/no-img-element -- private image route
+          <img src={coverSrc(tenant.cover_url)} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover" />
+        ) : (
+          <div aria-hidden="true" className="pointer-events-none absolute -end-16 -top-20 size-64 rounded-full bg-primary/20 blur-3xl" />
+        )}
+        {tenant.cover_url && (
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-surface via-surface/85 to-surface/20 sm:bg-gradient-to-r sm:from-surface sm:via-surface/80 sm:to-transparent rtl:sm:bg-gradient-to-l" />
+        )}
+        <div className={`relative flex w-full flex-wrap items-end justify-between gap-6 p-6 sm:p-8 ${tenant.cover_url ? "min-h-56 sm:min-h-64" : ""}`}>
         <div className="relative flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">
             {t(`dashboard.greeting.${partOfDay(tenant.time_zone)}`)} ·{" "}
@@ -191,6 +199,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               </Link>
             </p>
           )}
+        </div>
         </div>
       </div>
 

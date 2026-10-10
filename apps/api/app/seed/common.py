@@ -130,6 +130,10 @@ def _insert(conn: Connection, sql: str, rows: list[dict]) -> None:
         conn.execute(text(sql), rows)
 
 
+# When generated classes start, unless a business says otherwise.
+CLASS_HOURS = ("07:00", "08:30", "09:30", "12:00", "17:30", "18:30", "19:30", "20:30")
+
+
 @dataclass(frozen=True)
 class BranchSpec:
     name: str
@@ -151,6 +155,8 @@ class BusinessSpec:
     # The classic studio keeps its hand-made services and timetable (tests rely on it).
     custom_services: tuple[tuple[str, str, int, int, str, float], ...] | None = None
     timetable: tuple[tuple[int, str, int, int, int], ...] | None = None
+    # When generated classes may start (a pizza workshop is an evening thing).
+    class_hours: tuple[str, ...] = CLASS_HOURS
 
 
 STUDIO = BusinessSpec(
@@ -238,6 +244,48 @@ ACCOUNTING_FIRM = BusinessSpec(
     clients=60,
     staff_per_branch=3,
 )
+# One owner, three networks (the owner's upgrade list, 2026-10): a pizza chain with four
+# branches, a gym with two and a hair salon with three. All names and addresses are made up.
+URBAN_SLICE = BusinessSpec(
+    name="Urban Slice",
+    vertical="pizzeria",
+    color="#dc2626",
+    billing_name="אורבן סלייס בע״מ",
+    branches=(
+        BranchSpec("תל אביב - פלורנטין", "וולפסון 18, תל אביב"),
+        BranchSpec("רמת גן - מרום נווה", "הרא״ה 210, רמת גן"),
+        BranchSpec("חולון - קריית שרת", "גולדה מאיר 5, חולון"),
+        BranchSpec("כפר סבא - הירוקה", "ויצמן 140, כפר סבא"),
+    ),
+    clients=380,
+    staff_per_branch=4,
+    class_hours=("17:00", "19:00"),
+)
+PULSE_FITNESS = BusinessSpec(
+    name="Pulse Fitness",
+    vertical="gym",
+    color="#2563eb",
+    billing_name="פולס פיטנס בע״מ",
+    branches=(
+        BranchSpec("ראשון לציון - מערב", "משה בקר 22, ראשון לציון"),
+        BranchSpec("נס ציונה", "ויצמן 30, נס ציונה"),
+    ),
+    clients=360,
+    staff_per_branch=4,
+)
+STUDIO_BLOOM = BusinessSpec(
+    name="Studio Bloom",
+    vertical="hair_salon",
+    color="#db2777",
+    billing_name="סטודיו בלום בע״מ",
+    branches=(
+        BranchSpec("תל אביב - בזל", "בזל 12, תל אביב"),
+        BranchSpec("הרצליה - מרכז", "סוקולוב 60, הרצליה"),
+        BranchSpec("מודיעין", "עמק דותן 4, מודיעין"),
+    ),
+    clients=300,
+    staff_per_branch=3,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
@@ -246,6 +294,7 @@ DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "events": (PHOTO_STUDIO,),
     "office": (ACCOUNTING_FIRM,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
+    "networks": (URBAN_SLICE, PULSE_FITNESS, STUDIO_BLOOM),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
 
@@ -326,7 +375,6 @@ PLATFORM_REQUESTS = (
 
 # Staff hours for appointments: weekday (0 = Monday) -> (opens, closes); Friday until 14:00.
 WORK_HOURS = {6: (9, 19), 0: (9, 19), 1: (9, 19), 2: (9, 19), 3: (9, 19), 4: (9, 14)}
-CLASS_HOURS = ("07:00", "08:30", "09:30", "12:00", "17:30", "18:30", "19:30", "20:30")
 GENERIC_NOTES = (
     "מרוצה מאוד מהתוצאה",
     "ביקש/ה תור קבוע כל חודש",

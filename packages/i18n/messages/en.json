@@ -75,7 +75,32 @@
     },
     "resourcePaymentHint": "In the app, a reservation is confirmed only once it's paid.",
     "integrationsLink": "Integrations",
-    "integrationsHint": "Payments, invoices and messages: which provider you use."
+    "integrationsHint": "Payments, invoices and messages: which provider you use.",
+    "identity": {
+      "title": "Business identity",
+      "subtitle": "Your legal entity and registration number, for invoices and official documents. Only people who manage settings see it.",
+      "entityType": "Legal entity",
+      "notSet": "Not set",
+      "types": {
+        "company": "Company (Ltd.)",
+        "licensed_dealer": "Licensed dealer",
+        "exempt_dealer": "Exempt dealer",
+        "nonprofit": "Nonprofit",
+        "partnership": "Partnership",
+        "other": "Other"
+      },
+      "number": "Registration number",
+      "companyNumber": "Company number",
+      "dealerNumber": "Dealer number (ID)",
+      "numberHint": "Israeli numbers have 9 digits and are checked as you save.",
+      "invalidNumber": "This number doesn't pass the check digit. Check the digits and try again."
+    },
+    "cover": "Cover image",
+    "coverHint": "A wide picture of your place (PNG, JPEG or WebP, up to 1.5 MB). Your team sees it at the top of the dashboard.",
+    "uploadCover": "Upload cover",
+    "removeCover": "Remove cover",
+    "noCover": "No cover yet: the dashboard uses your brand color.",
+    "coverTooLarge": "The image is larger than 1.5 MB. Choose a smaller one."
   },
   "locales": {
     "he": "עברית",
@@ -431,6 +456,25 @@
       "profile": "Client details",
       "visitNotes": "Meeting notes",
       "nextBooking": "Your next meeting"
+    },
+    "food": {
+      "client": "Guest",
+      "clients": "Guests",
+      "addClient": "Add guest",
+      "newClient": "New guest",
+      "searchClients": "Search guests",
+      "noClients": "No guests yet",
+      "noResults": "No guests match your search",
+      "schedule": "Events",
+      "newSession": "New event",
+      "noSessions": "No events",
+      "sessionsToday": "{count, plural, =0 {No events today} one {One event today} other {# events today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The restaurant",
+      "profile": "Guest details",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next booking"
     }
   },
   "clients": {
@@ -527,7 +571,8 @@
     },
     "loading": "Loading…",
     "chooseFile": "Choose a file",
-    "noFile": "No file chosen"
+    "noFile": "No file chosen",
+    "edit": "Edit"
   },
   "services": {
     "title": "Services",
@@ -608,7 +653,8 @@
       "cannot_change_own_role": "You can't change your own role.",
       "exceeds_own_permissions": "You can't grant permissions you don't have yourself.",
       "name_taken": "A role with that name already exists.",
-      "role_in_use": "This role is still assigned to team members. Change their role first."
+      "role_in_use": "This role is still assigned to team members. Change their role first.",
+      "reporting_cycle": "That would make a loop: this person already manages them."
     },
     "manageRoles": "Manage roles and permissions",
     "rolesTitle": "Roles and permissions",
@@ -712,7 +758,18 @@
       "invalid": "Please choose a date.",
       "generic": "Something went wrong. Try again."
     },
-    "jumpToDay": "Go to day"
+    "jumpToDay": "Go to day",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "today": "Today",
+    "view": "View",
+    "dayView": "Day",
+    "weekView": "Week",
+    "branches": "Branches",
+    "now": "Now",
+    "shiftsLegend": "Striped blocks on the side are team shifts.",
+    "more": "+{count} more",
+    "onShift": "on shift"
   },
   "bookings": {
     "title": "Bookings",
@@ -1630,7 +1687,13 @@
     "reservations": "Reservations",
     "reservedHours": "Hours reserved",
     "hoursOf": "{reserved} of {open}",
-    "courtRevenue": "Paid"
+    "courtRevenue": "Paid",
+    "compare": {
+      "title": "Branches side by side",
+      "subtitle": "Same period and definitions as above, per branch.",
+      "total": "Total",
+      "average": "Average"
+    }
   },
   "email": {
     "greeting": "Hi {name},",
@@ -3017,7 +3080,18 @@
     "emailHint": "You sign in with this email.",
     "password": "Password",
     "changePassword": "Change password",
-    "businesses": "Your businesses"
+    "businesses": "Your businesses",
+    "phone": "Phone",
+    "phoneHint": "For your team to reach you. Clients don't see it.",
+    "addPicture": "Add a picture",
+    "replacePicture": "Replace picture",
+    "savePicture": "Save picture",
+    "removePicture": "Remove picture",
+    "pictureHint": "A square PNG, JPEG or WebP up to 512 KB. Your team sees it next to your name.",
+    "pictureErrors": {
+      "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
+      "unsupported_image": "Choose a PNG, JPEG or WebP picture."
+    }
   },
   "sales": {
     "title": "Sales",
@@ -3646,6 +3720,27 @@
     "agencies": {
       "name": "Agencies",
       "tagline": "Retainers, hours and deliverables per client."
+    },
+    "food": {
+      "name": "Food & restaurants",
+      "tagline": "Restaurants, pizzerias and cafés.",
+      "points": [
+        "Staff shifts across every branch",
+        "Events, workshops and parties booked online",
+        "Regulars, allergies and preferences in one place"
+      ],
+      "heroTitle": "Busy kitchens, calm managers.",
+      "heroText": "Shifts, private events, workshops and regular guests for restaurants, pizzerias and cafés, branch by branch.",
+      "yours": "The restaurant",
+      "example": "Urban Slice"
+    },
+    "pizzeria": {
+      "name": "Pizzerias",
+      "tagline": "Shifts, parties and pizza workshops."
+    },
+    "cafe": {
+      "name": "Cafés",
+      "tagline": "Shifts, events and regulars."
     }
   },
   "clientFields": {
@@ -3764,7 +3859,11 @@
     "allBusinesses": "All my businesses",
     "newBusiness": "Add a business",
     "branch": "Branch",
-    "allBranches": "All branches"
+    "allBranches": "All branches",
+    "search": "Find a business or branch",
+    "branchesOf": "Branches of {name}",
+    "otherBusinesses": "Other businesses",
+    "noMatches": "Nothing matches that name."
   },
   "businesses": {
     "title": "My businesses",
@@ -4191,5 +4290,79 @@
     "done": "{count, plural, =0 {Nobody was billed} one {One bill created; the client pays it by its link} other {# bills created; each client pays by their link}}",
     "skipped": "{count, plural, one {One client was skipped (already billed or nothing to bill).} other {# clients were skipped (already billed or nothing to bill).}}",
     "billFor": "Bill #{number} · {name}"
+  },
+  "userMenu": {
+    "open": "Open your menu",
+    "label": "Your account",
+    "appearance": "Appearance"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "subtitle": "Light or dark, and the colors you work in. Only you see your choice.",
+    "palette": "Colors",
+    "palettes": {
+      "mybiz": "MyBiz",
+      "ocean": "Ocean",
+      "forest": "Forest"
+    },
+    "paletteHints": {
+      "mybiz": "Black, white and deep purple",
+      "ocean": "Cool slate and teal",
+      "forest": "Soft sage and green"
+    }
+  },
+  "organization": {
+    "title": "Organization chart",
+    "subtitle": "Who reports to whom across the business. Select a person for their details. Reporting lines don't change what anyone can see or do; roles do.",
+    "fold": "Fold the people under {name}",
+    "unfold": "Show the people under {name}",
+    "close": "Close",
+    "allBranches": "All branches",
+    "alone": "Invite your team to see your business's structure here.",
+    "nobody": "Nobody (top of the chart)",
+    "jobTitle": "Job title",
+    "jobTitlePlaceholder": "e.g. Branch manager",
+    "reportsTo": "Reports to",
+    "accessNote": "This only draws the chart. What they can see and do comes from their role.",
+    "cycle": "That would make a loop: this person already manages them."
+  },
+  "shifts": {
+    "title": "Shifts",
+    "soloTitle": "Hours and availability",
+    "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",
+    "soloAvailability": "My availability",
+    "soloAvailabilityHint": "The hours clients can book with you",
+    "soloClosedHint": "Holidays and days off for the whole business",
+    "warningLegend": "Falls on time off or outside opening hours",
+    "copyWeek": "Copy last week",
+    "copied": "{created, plural, =0 {Nothing copied} one {Copied one shift} other {Copied # shifts}}{skipped, plural, =0 {} one {, one skipped because it clashed} other {, # skipped because they clashed}}",
+    "person": "Team member",
+    "onShift": "{count, plural, =0 {No one} one {One person} other {# people}}",
+    "hoursTotal": "{hours} h",
+    "warnings": {
+      "timeOff": "On time off",
+      "outsideHours": "Outside opening hours"
+    },
+    "addFor": "Add a shift for {name} on {day}",
+    "editTitle": "Edit shift",
+    "newTitle": "New shift",
+    "close": "Close",
+    "errors": {
+      "overlap": "This person already has a shift at that time.",
+      "invalid": "Check the branch, date and times."
+    },
+    "branch": "Branch",
+    "date": "Date",
+    "starts": "Starts",
+    "ends": "Ends",
+    "position": "Position",
+    "positionPlaceholder": "For example: front desk",
+    "note": "Note",
+    "delete": "Delete shift"
+  },
+  "openingHours": {
+    "title": "Opening hours",
+    "subtitle": "When this branch is open. Add a second interval on a day for a break.",
+    "closed": "Closed"
   }
 }

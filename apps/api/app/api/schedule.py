@@ -260,11 +260,20 @@ def list_sessions(
     start: Annotated[dt.date, Query(description="First local date (business time zone)")],
     days: Annotated[int, Query(ge=1, le=42)] = 7,
     mine: Annotated[bool, Query(description="Only sessions the user teaches")] = False,
+    location_id: Annotated[
+        list[UUID] | None,
+        Query(
+            description="Only these branches, for a multi-branch calendar (within the "
+            "person's own branches)"
+        ),
+    ] = None,
 ) -> list[ScheduledSession]:
     time_zone = _time_zone(context.session)
     window_start = local_to_utc(start, time.min, time_zone)
     window_end = local_to_utc(start + timedelta(days=days), time.min, time_zone)
     teaching = "AND s.instructor_user_id = app.current_user_id()" if mine else ""
+    if location_id:
+        teaching += " AND s.location_id = ANY(CAST(:locations AS uuid[]))"
     # An appointment whose booking was cancelled frees the time; it is not shown.
     in_window = (
         f"WHERE s.starts_at >= :from AND s.starts_at < :to {teaching}"
@@ -275,7 +284,11 @@ def list_sessions(
     )
     rows = context.session.execute(
         text(f"{SESSION_SELECT} {in_window}"),
-        {"from": window_start, "to": window_end},
+        {
+            "from": window_start,
+            "to": window_end,
+            "locations": [str(i) for i in location_id or []],
+        },
     ).mappings()
     return [_to_model(row) for row in rows]
 

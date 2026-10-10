@@ -123,3 +123,19 @@ export async function saveRoomHours(roomId: string, locationId: string, blocks: 
   revalidatePath(`/locations/${locationId}/rooms/${roomId}`);
   return { saved: true };
 }
+
+/** A branch's opening hours (one or more intervals per day; a gap is a break). */
+export async function saveOpeningHours(locationId: string, blocks: Block[]): Promise<HoursState> {
+  if (blocks.some((block) => !block.starts || !block.ends || block.ends <= block.starts)) {
+    return { error: "invalid" };
+  }
+  const { api, scope } = await getTenantFor("catalog.write");
+  const { response } = await api.PUT("/locations/{location_id}/hours", {
+    params: { ...scope, path: { location_id: locationId } },
+    body: { intervals: blocks.map((b) => ({ weekday: b.weekday, opens: b.starts, closes: b.ends })) },
+  });
+  if (!response.ok) return { error: response.status === 422 ? "overlapping_hours" : "generic" };
+  revalidatePath(`/locations/${locationId}`);
+  revalidatePath("/schedule");
+  return { saved: true };
+}
