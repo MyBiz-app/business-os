@@ -5,7 +5,7 @@ import { Linking, Text } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -27,7 +27,7 @@ export default function Quotes() {
     if (!business) return [] as ClientQuote[];
     return unwrap(await api.GET("/client/quotes", { params: scope }));
   }, [api, scope, business]);
-  const { data, loading, reload } = useLoad(load);
+  const { data, error, loading, reload } = useLoad(load);
   if (!business) return null;
 
   return (
@@ -36,6 +36,7 @@ export default function Quotes() {
       <Heading palette={palette}>
         {data?.some((q) => q.kind === "bill") ? tProfile("quotesAndBills") : t("title")}
       </Heading>
+      {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {data && data.length === 0 && (
         <Card palette={palette}>
           <Text style={[styles.muted, { color: palette.muted }]}>{t("none")}</Text>

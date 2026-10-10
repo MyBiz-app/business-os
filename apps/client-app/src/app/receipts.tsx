@@ -5,7 +5,7 @@ import { Text } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, ListRow } from "@business-os/app-kit/components/rows";
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -24,7 +24,7 @@ export default function Receipts() {
     if (!business) return [] as Receipt[];
     return unwrap(await api.GET("/client/receipts", { params: scope }));
   }, [api, scope, business]);
-  const { data, loading, reload } = useLoad(load);
+  const { data, error, loading, reload } = useLoad(load);
   if (!business) return null;
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: business.time_zone });
 
@@ -32,6 +32,7 @@ export default function Receipts() {
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <BackBar label={tProfile("title")} palette={palette} onPress={() => router.back()} />
       <Heading palette={palette}>{tProfile("receipts")}</Heading>
+      {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {data && data.length === 0 && (
         <Card palette={palette}>
           <Text style={[styles.muted, { color: palette.muted }]}>{tProfile("noReceipts")}</Text>
