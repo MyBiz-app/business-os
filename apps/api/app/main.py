@@ -55,6 +55,7 @@ from app.api import settings as business_settings
 from app.api.routes import router
 from app.core.config import get_settings
 from app.core.db import get_engine
+from app.core.logging import configure_logging, request_logging
 from app.core.rate_limit import MemoryStore, limiter
 
 
@@ -70,6 +71,7 @@ class ReadyResponse(BaseModel):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    configure_logging()
     app = FastAPI(
         title="Business OS API",
         version="0.1.0",
@@ -96,13 +98,16 @@ def create_app() -> FastAPI:
             )
         )
 
+    # Registered after the limiter (so 429s are logged) and before CORS (so a logged crash
+    # still gets CORS headers); later registrations wrap earlier ones.
+    app.middleware("http")(request_logging)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
-        expose_headers=["Cache-Control"],
-        allow_headers=["Authorization", "Content-Type", "X-Tenant-Id"],
+        expose_headers=["Cache-Control", "X-Request-ID"],
+        allow_headers=["Authorization", "Content-Type", "X-Tenant-Id", "X-Request-ID"],
     )
 
     @app.get("/health", tags=["system"])
