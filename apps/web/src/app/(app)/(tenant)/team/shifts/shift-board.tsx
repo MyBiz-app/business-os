@@ -30,7 +30,7 @@ export type BoardShift = {
   warning: "timeOff" | "outsideHours" | null;
 };
 type Branch = { id: string; name: string; color: string };
-type Editing = { shift: BoardShift | null; userId: string; day: string };
+export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string };
 
 /** The week's shifts: a row per person, a column per day. Managers add a shift from an empty
  * cell and open one to change or delete it. */
@@ -222,7 +222,7 @@ export function ShiftDialog({ editing, people, branches, onClose }: { editing: E
         />
         <SelectField label={t("person")} name="user_id" defaultValue={editing.userId} options={people.map((p) => ({ value: p.id, label: p.name }))} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label={t("branch")} name="location_id" defaultValue={shift?.locationId ?? people.find((p) => p.id === editing.userId)?.homeId ?? branches[0]?.id} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
+          <SelectField label={t("branch")} name="location_id" defaultValue={shift?.locationId ?? editing.locationId ?? people.find((p) => p.id === editing.userId)?.homeId ?? branches[0]?.id} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
           <Field label={t("date")} name="day" type="date" defaultValue={editing.day} required dir="ltr" />
         </div>
         {branches.length > 1 && <p className="-mt-2 text-xs text-muted">{t("coverHint")}</p>}

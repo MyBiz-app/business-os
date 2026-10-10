@@ -4464,6 +4464,7 @@
     "viewLabel": "View",
     "branchesShown": "Branches shown",
     "limitHint": "Up to {count} side by side in this range",
+    "addAt": "Add a shift at {branch}, {day}",
     "saveDefault": "Save as default view",
     "saveDefaultHint": "The shifts board will open with this view, range and these branches for everyone in the business.",
     "defaultSaved": "Saved.",

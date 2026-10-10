@@ -4464,6 +4464,7 @@
     "viewLabel": "תצוגה",
     "branchesShown": "סניפים מוצגים",
     "limitHint": "עד {count} זה לצד זה בטווח הזה",
+    "addAt": "הוספת משמרת ב{branch}, {day}",
     "saveDefault": "שמירה כתצוגת ברירת מחדל",
     "saveDefaultHint": "לוח המשמרות ייפתח בתצוגה, בטווח ובסניפים האלה אצל כל מי שבעסק.",
     "defaultSaved": "נשמר.",
