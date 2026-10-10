@@ -2965,7 +2965,126 @@ export const CATALOG: Entry[] = [
       },
       {
         "key": "cafe",
-        "status": "beta"
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "סדנת בריסטה",
+              "en": "Barista workshop"
+            },
+            "duration_minutes": 90,
+            "booking_mode": "class",
+            "capacity": 10,
+            "prices": {
+              "ILS": 14000
+            },
+            "color": "#92400e"
+          },
+          {
+            "names": {
+              "he": "אירוע פרטי בקפה",
+              "en": "Private café event"
+            },
+            "duration_minutes": 120,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 150000
+            },
+            "color": "#b45309"
+          }
+        ]
+      },
+      {
+        "key": "restaurant",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "שולחן שף",
+              "en": "Chef's table"
+            },
+            "duration_minutes": 150,
+            "booking_mode": "class",
+            "capacity": 10,
+            "prices": {
+              "ILS": 32000
+            },
+            "color": "#b91c1c"
+          },
+          {
+            "names": {
+              "he": "הזמנת קבוצה",
+              "en": "Group booking"
+            },
+            "duration_minutes": 120,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 80000
+            },
+            "color": "#dc2626"
+          }
+        ]
+      },
+      {
+        "key": "bakery",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "סדנת אפייה",
+              "en": "Baking workshop"
+            },
+            "duration_minutes": 120,
+            "booking_mode": "class",
+            "capacity": 12,
+            "prices": {
+              "ILS": 15000
+            },
+            "color": "#d97706"
+          },
+          {
+            "names": {
+              "he": "טעימות והזמנה מיוחדת",
+              "en": "Tasting for a custom order"
+            },
+            "duration_minutes": 30,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 3000
+            },
+            "color": "#f59e0b"
+          }
+        ]
+      },
+      {
+        "key": "catering",
+        "status": "beta",
+        "default_services": [
+          {
+            "names": {
+              "he": "פגישת טעימות לקייטרינג",
+              "en": "Catering tasting meeting"
+            },
+            "duration_minutes": 60,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 10000
+            },
+            "color": "#be123c"
+          },
+          {
+            "names": {
+              "he": "אירוע פרטי בקייטרינג",
+              "en": "Catered private event"
+            },
+            "duration_minutes": 240,
+            "booking_mode": "appointment",
+            "prices": {
+              "ILS": 600000
+            },
+            "color": "#9f1239"
+          }
+        ]
       }
     ]
   }
