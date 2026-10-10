@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useActionState, useRef, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
+import { ImageCropDialog } from "@/components/image-crop-dialog";
 import { Field } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { FormError, FormNotice } from "@/components/form/form-message";
@@ -37,6 +38,8 @@ export function PictureForm({ id, name, src }: { id: string; name: string; src: 
   const tCommon = useTranslations("common");
   const [state, action] = useActionState<PictureState, FormData>(uploadAvatar, {});
   const [preview, setPreview] = useState<string | null>(null);
+  const [cropping, setCropping] = useState<File | null>(null);
+  const [cropped, setCropped] = useState<File | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const error = state.error === "generic" ? tCommon("errors.generic") : state.error && t(`pictureErrors.${state.error}`);
 
@@ -48,8 +51,10 @@ export function PictureForm({ id, name, src }: { id: string; name: string; src: 
         <FormNotice message={state.saved && !preview ? tCommon("saved") : undefined} />
         <form
           action={async (data) => {
+            if (cropped) data.set("avatar", cropped);
             await action(data);
             setPreview(null);
+            setCropped(null);
           }}
           className="flex flex-wrap items-center gap-2"
         >
@@ -63,8 +68,8 @@ export function PictureForm({ id, name, src }: { id: string; name: string; src: 
               accept="image/png,image/jpeg,image/webp"
               className="sr-only"
               onChange={(event) => {
-                const file = event.target.files?.[0];
-                setPreview(file ? URL.createObjectURL(file) : null);
+                // The picture is cropped to a square in a dialog first; what is saved is the crop.
+                setCropping(event.target.files?.[0] ?? null);
               }}
             />
           </label>
@@ -80,6 +85,20 @@ export function PictureForm({ id, name, src }: { id: string; name: string; src: 
         )}
         <p className="text-xs text-muted">{t("pictureHint")}</p>
       </div>
+      {cropping && (
+        <ImageCropDialog
+          file={cropping}
+          onCancel={() => {
+            setCropping(null);
+            if (input.current) input.current.value = "";
+          }}
+          onDone={(file) => {
+            setCropping(null);
+            setCropped(file);
+            setPreview(URL.createObjectURL(file));
+          }}
+        />
+      )}
     </div>
   );
 }

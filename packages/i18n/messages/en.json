@@ -45,6 +45,7 @@
     "useDefault": "Use the default color",
     "logo": "Logo",
     "logoHint": "PNG, JPG or WebP, up to 512 KB. A square image works best.",
+    "logoPreview": "Preview of the logo",
     "uploadLogo": "Upload logo",
     "removeLogo": "Remove logo",
     "noLogo": "No logo yet",
@@ -4298,6 +4299,17 @@
     "open": "Open your menu",
     "label": "Your account",
     "appearance": "Appearance"
+  },
+  "imageCrop": {
+    "title": "Position your picture",
+    "hint": "Drag the picture and zoom until the circle shows what you want. The corners outside the circle are not shown.",
+    "area": "Picture position. Use the arrow keys to move it and plus and minus to zoom.",
+    "zoom": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "use": "Use this picture",
+    "cancel": "Cancel",
+    "failed": "This picture could not be prepared. Try a different one."
   },
   "appearance": {
     "title": "Appearance",
