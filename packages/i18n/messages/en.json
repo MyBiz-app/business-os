@@ -674,7 +674,9 @@
     "someBranches": "{count} branches",
     "branchesHint": "They see only the branches checked here (owners and managers always see all). None checked means all branches.",
     "saveBranches": "Save",
-    "count": "{count, plural, one {One person} other {# people}}"
+    "count": "{count, plural, one {One person} other {# people}}",
+    "homeBranch": "Home branch",
+    "noHomeBranch": "None"
   },
   "invite": {
     "title": "You're invited",
@@ -4384,7 +4386,52 @@
     "position": "Position",
     "positionPlaceholder": "For example: front desk",
     "note": "Note",
-    "delete": "Delete shift"
+    "delete": "Delete shift",
+    "navigate": "Change dates",
+    "today": "Today",
+    "rangeLabel": "Time range",
+    "viewLabel": "View",
+    "branchesShown": "Branches shown",
+    "limitHint": "Up to {count} side by side in this range",
+    "ranges": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "custom": "Custom"
+    },
+    "views": {
+      "people": "By person",
+      "branches": "By branch"
+    },
+    "previous": {
+      "day": "Previous day",
+      "week": "Previous week",
+      "month": "Previous month",
+      "custom": "Previous period"
+    },
+    "next": {
+      "day": "Next day",
+      "week": "Next week",
+      "month": "Next month",
+      "custom": "Next period"
+    },
+    "nobody": "No one is scheduled",
+    "coverFrom": "Cover from {branch}",
+    "coverHint": "A shift at a branch other than the person's home branch is shown as cover.",
+    "planning": {
+      "title": "Planning rhythm",
+      "hint": "How often each branch plans its shifts",
+      "cadence": "Plan",
+      "days": "Days",
+      "save": "Save",
+      "saved": "Saved",
+      "cadences": {
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month",
+        "custom": "Custom"
+      }
+    }
   },
   "openingHours": {
     "title": "Opening hours",

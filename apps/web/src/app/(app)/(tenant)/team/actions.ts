@@ -74,6 +74,14 @@ export async function setBranches(userId: string, _state: TeamState, formData: F
         body: { location_ids: formData.getAll("location_ids").map(String) },
       }),
     );
+    if (formData.has("home_location_id")) {
+      unwrap(
+        await api.PUT("/staff/{user_id}/home-branch", {
+          params: { ...scope, path: { user_id: userId } },
+          body: { location_id: String(formData.get("home_location_id")) || null },
+        }),
+      );
+    }
   } catch (error) {
     return { error: toError(error) };
   }
