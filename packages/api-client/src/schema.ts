@@ -6613,7 +6613,9 @@ export interface components {
              * Palette
              * @description The person's color palette (none: the MyBiz default)
              */
-            palette?: ("mybiz" | "ocean" | "forest") | null;
+            palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
+            /** @description The colors picked for the `custom` palette, kept when a preset is chosen */
+            palette_colors?: components["schemas"]["PaletteColors"] | null;
             /**
              * Avatar Url
              * @description Path of the person's own picture on this API, if any
@@ -6945,6 +6947,19 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /**
+         * PaletteColors
+         * @description The three colors a person picks for "my own colors" (`#rrggbb`). The app derives every
+         *     other color from them, so any combination is safe to store.
+         */
+        PaletteColors: {
+            /** Background */
+            background: string;
+            /** Text */
+            text: string;
+            /** Accent */
+            accent: string;
         };
         /** PaymentMethod */
         PaymentMethod: {
@@ -9318,7 +9333,8 @@ export interface components {
             /** Phone */
             phone?: string | null;
             /** Palette */
-            palette?: ("mybiz" | "ocean" | "forest") | null;
+            palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
+            palette_colors?: components["schemas"]["PaletteColors"] | null;
         };
     };
     responses: never;

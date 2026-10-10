@@ -47,7 +47,7 @@ export default async function AccountPage() {
           </div>
           <ThemeSwitcher />
         </div>
-        <PalettePicker current={me.palette ?? null} save={savePalette} />
+        <PalettePicker current={me.palette ?? null} currentColors={me.palette_colors ?? null} save={savePalette} />
       </section>
       <section aria-labelledby="password-heading" className="card flex flex-wrap items-center justify-between gap-3 p-6">
         <h2 id="password-heading" className="flex items-center gap-2 font-semibold">

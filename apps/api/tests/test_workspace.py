@@ -35,6 +35,21 @@ def test_a_person_manages_their_own_profile_and_picture(
     assert client.get("/me", headers=owner).json()["palette"] == "ocean"
     assert client.patch("/me", json={"palette": "pink"}, headers=owner).status_code == 422
 
+    # Own colors: three picks, kept when a preset is chosen again.
+    own = {"background": "#101820", "text": "#f0f0f0", "accent": "#22d3ee"}
+    assert client.patch("/me", json={"palette": "custom"}, headers=owner).status_code == 422
+    bad_color = {**own, "accent": "cyan"}
+    assert (
+        client.patch(
+            "/me", json={"palette": "custom", "palette_colors": bad_color}, headers=owner
+        ).status_code
+        == 422
+    )
+    saved = client.patch("/me", json={"palette": "custom", "palette_colors": own}, headers=owner)
+    assert (saved.json()["palette"], saved.json()["palette_colors"]) == ("custom", own)
+    back = client.patch("/me", json={"palette": "forest"}, headers=owner).json()
+    assert (back["palette"], back["palette_colors"]) == ("forest", own)
+
     bad = client.put(
         "/me/avatar", files={"file": ("a.png", b"GIF89a....", "image/png")}, headers=owner
     )

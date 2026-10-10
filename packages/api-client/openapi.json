@@ -26456,7 +26456,8 @@
                 "enum": [
                   "mybiz",
                   "ocean",
-                  "forest"
+                  "forest",
+                  "custom"
                 ]
               },
               {
@@ -26465,6 +26466,17 @@
             ],
             "title": "Palette",
             "description": "The person's color palette (none: the MyBiz default)"
+          },
+          "palette_colors": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaletteColors"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The colors picked for the `custom` palette, kept when a preset is chosen"
           },
           "avatar_url": {
             "anyOf": [
@@ -27334,6 +27346,33 @@
           "name"
         ],
         "title": "OptionItem"
+      },
+      "PaletteColors": {
+        "properties": {
+          "background": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$",
+            "title": "Background"
+          },
+          "text": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$",
+            "title": "Text"
+          },
+          "accent": {
+            "type": "string",
+            "pattern": "^#[0-9a-f]{6}$",
+            "title": "Accent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "background",
+          "text",
+          "accent"
+        ],
+        "title": "PaletteColors",
+        "description": "The three colors a person picks for \"my own colors\" (`#rrggbb`). The app derives every\nother color from them, so any combination is safe to store."
       },
       "PaymentMethod": {
         "properties": {
@@ -33592,7 +33631,8 @@
                 "enum": [
                   "mybiz",
                   "ocean",
-                  "forest"
+                  "forest",
+                  "custom"
                 ]
               },
               {
@@ -33600,6 +33640,16 @@
               }
             ],
             "title": "Palette"
+          },
+          "palette_colors": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PaletteColors"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",

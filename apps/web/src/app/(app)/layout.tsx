@@ -10,7 +10,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <div className="flex flex-1 flex-col">
-      <PaletteSync palette={me.palette ?? null} />
+      <PaletteSync palette={me.palette ?? null} colors={me.palette_colors ?? null} />
       <AppHeader>
         <UserMenu
           id={me.id}

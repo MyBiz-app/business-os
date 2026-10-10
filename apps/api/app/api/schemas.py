@@ -27,6 +27,18 @@ class SupportAccess(BaseModel):
     expires_at: datetime
 
 
+Palette = Literal["mybiz", "ocean", "forest", "custom"]
+
+
+class PaletteColors(BaseModel):
+    """The three colors a person picks for "my own colors" (`#rrggbb`). The app derives every
+    other color from them, so any combination is safe to store."""
+
+    background: str = Field(pattern=r"^#[0-9a-f]{6}$")
+    text: str = Field(pattern=r"^#[0-9a-f]{6}$")
+    accent: str = Field(pattern=r"^#[0-9a-f]{6}$")
+
+
 class Me(BaseModel):
     id: UUID
     email: str
@@ -34,8 +46,12 @@ class Me(BaseModel):
     locale: Locale | None
     platform_admin: bool = Field(description="On the MyBiz team (sees the console)")
     phone: str | None = None
-    palette: Literal["mybiz", "ocean", "forest"] | None = Field(
+    palette: Palette | None = Field(
         default=None, description="The person's color palette (none: the MyBiz default)"
+    )
+    palette_colors: PaletteColors | None = Field(
+        default=None,
+        description="The colors picked for the `custom` palette, kept when a preset is chosen",
     )
     avatar_url: str | None = Field(
         default=None, description="Path of the person's own picture on this API, if any"
