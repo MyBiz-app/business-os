@@ -39,6 +39,8 @@ export type GridShift = {
   avatar: string | null;
   label: string;
   warn: boolean;
+  /** What the details card shows (hover and click on the person's circle). */
+  details?: { time: string; role: string | null; position: string | null; place: string | null; cover: string | null; warning: string | null };
 };
 
 type Props = {
@@ -59,6 +61,10 @@ type Props = {
     empty: string;
     more: string;
     onShift: string;
+    /** Heading of the details card when several people share a stretch of time. */
+    peopleOnShift: string;
+    coverFrom: string;
+    close: string;
   };
   /** The day view's address with `__day__` for the day: where "+N more" leads from the week. */
   dayHref: string | null;
@@ -117,6 +123,23 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], c
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days, events, lanes, max]);
   const hasShifts = shifts.length > 0;
+  const [peek, setPeek] = useState<{ x: number; y: number; shifts: GridShift[] } | null>(null);
+  useEffect(() => {
+    if (!peek) return;
+    const close = (event: Event) => {
+      if (event instanceof KeyboardEvent ? event.key === "Escape" : !(event.target as Element).closest?.("[data-peek]")) setPeek(null);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [peek]);
+  const openPeek = (element: HTMLElement, list: GridShift[]) => {
+    const box = element.getBoundingClientRect();
+    setPeek({ x: Math.min(Math.max(box.left + box.width / 2, 150), window.innerWidth - 150), y: Math.min(box.top + box.height / 2, window.innerHeight - 40), shifts: list });
+  };
   const hourLabel = (hour: number) =>
     new Intl.DateTimeFormat(locale, {
       hour: "2-digit",
@@ -282,10 +305,13 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], c
                         ? coverage(dayShifts).map((segment) => {
                             const block = y(segment.end) - y(segment.start);
                             return (
-                              <div
+                              <button
+                                type="button"
+                                data-peek
                                 key={segment.start}
+                                onClick={(event) => openPeek(event.currentTarget, dayShifts.filter((x) => x.start < segment.end && x.end > segment.start))}
                                 title={`${segment.count} · ${labels.onShift}`}
-                                className="absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums"
+                                className="absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
                                 style={{
                                   top: y(segment.start) + 1,
                                   height: Math.max(block - 2, 14),
@@ -295,14 +321,17 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], c
                                 {block > 30 && <Users aria-hidden="true" className="size-3 opacity-70" />}
                                 <span aria-hidden="true">{segment.count}</span>
                                 <span className="sr-only">{`${segment.count} ${labels.onShift}, ${clock(segment.start)}–${clock(segment.end)}`}</span>
-                              </div>
+                              </button>
                             );
                           })
                         : layOut(dayShifts).map((shift) => (
-                            <div
+                            <button
+                              type="button"
+                              data-peek
                               key={shift.id}
-                              title={`${shift.name} · ${shift.label}`}
-                              className={`absolute flex justify-center rounded-md pt-0.5 ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
+                              onClick={(event) => openPeek(event.currentTarget, [shift])}
+                              aria-label={`${shift.name} ${shift.label}`}
+                              className={`group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
                               style={{
                                 top: y(shift.start) + 1,
                                 height: Math.max(y(shift.end) - y(shift.start) - 2, 16),
@@ -311,8 +340,14 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], c
                               }}
                             >
                               <Avatar id={shift.userId} name={shift.name} src={shift.avatar} size="xs" />
-                              <span className="sr-only">{`${shift.name} ${shift.label}`}</span>
-                            </div>
+                              <span
+                                aria-hidden="true"
+                                dir="auto"
+                                className="pointer-events-none absolute end-full top-0 z-40 me-1 hidden whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background shadow-lg group-hover/chip:block group-focus-visible/chip:block"
+                              >
+                                {shift.name}
+                              </span>
+                            </button>
                           ))}
                     </div>
                   )}
@@ -328,6 +363,54 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], c
           )}
         </div>
       </div>
+      {peek && (
+        <div
+          data-peek
+          role="dialog"
+          aria-label={labels.peopleOnShift}
+          className="fixed z-50 w-72 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-surface p-3 shadow-2xl ring-1 ring-border"
+          style={{ left: peek.x, top: peek.y }}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold text-muted">{peek.shifts.length > 1 ? `${labels.peopleOnShift} (${peek.shifts.length})` : labels.shifts}</p>
+            <button type="button" onClick={() => setPeek(null)} aria-label={labels.close} className="btn-ghost size-6 text-muted">
+              ×
+            </button>
+          </div>
+          <ul className="flex max-h-72 flex-col gap-2 overflow-auto">
+            {peek.shifts.map((shift) => (
+              <li key={shift.id} className="flex items-start gap-2.5">
+                <Avatar id={shift.userId} name={shift.name} src={shift.avatar} size="md" />
+                <div className="flex min-w-0 flex-col text-sm">
+                  <span dir="auto" className="truncate font-semibold">
+                    {shift.name}
+                  </span>
+                  {shift.details?.role && (
+                    <span dir="auto" className="truncate text-muted">
+                      {shift.details.role}
+                    </span>
+                  )}
+                  <span dir="ltr" className="w-fit font-medium tabular-nums">
+                    {shift.details?.time ?? shift.label}
+                  </span>
+                  {shift.details?.position && (
+                    <span dir="auto" className="truncate text-muted">
+                      {shift.details.position}
+                    </span>
+                  )}
+                  {shift.details?.place && (
+                    <span dir="auto" className="truncate text-muted">
+                      {shift.details.place}
+                      {shift.details.cover ? ` · ${labels.coverFrom.replace("{branch}", shift.details.cover)}` : ""}
+                    </span>
+                  )}
+                  {shift.details?.warning && <span className="mt-0.5 w-fit rounded-full bg-warning/15 px-2 py-0.5 text-xs">{shift.details.warning}</span>}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

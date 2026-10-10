@@ -7237,6 +7237,149 @@
         }
       }
     },
+    "/locations/new-branch": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "New Branch Preview",
+        "operationId": "new_branch_preview",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewBranchPreview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Add Branch",
+        "description": "Adds a branch to a running business: its details, opening hours copied from another\nbranch, and the team members who work there. When it adds a monthly charge the owner must\nhave accepted it; nothing is billed here (the extra-branch module follows the branches).",
+        "operationId": "add_branch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchSetup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/locations/{location_id}": {
       "get": {
         "tags": [
@@ -20832,6 +20975,62 @@
         ],
         "title": "BranchPlanning"
       },
+      "BranchSetup": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "copy_hours_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Copy Hours From",
+            "description": "Start with another branch's opening hours"
+          },
+          "staff_user_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Staff User Ids",
+            "description": "Team members who work here too"
+          },
+          "accept_extra_charge": {
+            "type": "boolean",
+            "title": "Accept Extra Charge",
+            "description": "Required when the new branch adds a monthly charge",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "BranchSetup"
+      },
       "BreakdownItem": {
         "properties": {
           "key": {
@@ -27519,6 +27718,49 @@
           "created_at"
         ],
         "title": "MyReview"
+      },
+      "NewBranchPreview": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "active_branches": {
+            "type": "integer",
+            "title": "Active Branches"
+          },
+          "extra_branch_price": {
+            "type": "integer",
+            "title": "Extra Branch Price",
+            "description": "Monthly, minor units, per branch beyond the first"
+          },
+          "monthly_extra_now": {
+            "type": "integer",
+            "title": "Monthly Extra Now",
+            "description": "Monthly cost of the extra branches today"
+          },
+          "monthly_extra_after": {
+            "type": "integer",
+            "title": "Monthly Extra After",
+            "description": "Monthly cost of the extra branches with the new one"
+          },
+          "chargeable": {
+            "type": "boolean",
+            "title": "Chargeable",
+            "description": "The new branch adds a monthly charge"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "active_branches",
+          "extra_branch_price",
+          "monthly_extra_now",
+          "monthly_extra_after",
+          "chargeable"
+        ],
+        "title": "NewBranchPreview",
+        "description": "What adding one more branch costs, shown before the form is filled in."
       },
       "NoteCreate": {
         "properties": {

@@ -1339,6 +1339,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/locations/new-branch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** New Branch Preview */
+        get: operations["new_branch_preview"];
+        put?: never;
+        /**
+         * Add Branch
+         * @description Adds a branch to a running business: its details, opening hours copied from another
+         *     branch, and the team members who work there. When it adds a monthly charge the owner must
+         *     have accepted it; nothing is billed here (the extra-branch module follows the branches).
+         */
+        post: operations["add_branch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/locations/{location_id}": {
         parameters: {
             query?: never;
@@ -4491,6 +4514,29 @@ export interface components {
              */
             location_id: string;
         };
+        /** BranchSetup */
+        BranchSetup: {
+            /** Name */
+            name: string;
+            /** Address */
+            address?: string | null;
+            /**
+             * Copy Hours From
+             * @description Start with another branch's opening hours
+             */
+            copy_hours_from?: string | null;
+            /**
+             * Staff User Ids
+             * @description Team members who work here too
+             */
+            staff_user_ids?: string[];
+            /**
+             * Accept Extra Charge
+             * @description Required when the new branch adds a monthly charge
+             * @default false
+             */
+            accept_extra_charge: boolean;
+        };
         /** BreakdownItem */
         BreakdownItem: {
             /**
@@ -6963,6 +7009,36 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /**
+         * NewBranchPreview
+         * @description What adding one more branch costs, shown before the form is filled in.
+         */
+        NewBranchPreview: {
+            /** Currency */
+            currency: string;
+            /** Active Branches */
+            active_branches: number;
+            /**
+             * Extra Branch Price
+             * @description Monthly, minor units, per branch beyond the first
+             */
+            extra_branch_price: number;
+            /**
+             * Monthly Extra Now
+             * @description Monthly cost of the extra branches today
+             */
+            monthly_extra_now: number;
+            /**
+             * Monthly Extra After
+             * @description Monthly cost of the extra branches with the new one
+             */
+            monthly_extra_after: number;
+            /**
+             * Chargeable
+             * @description The new branch adds a monthly charge
+             */
+            chargeable: boolean;
         };
         /** NoteCreate */
         NoteCreate: {
@@ -12858,6 +12934,76 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LocationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    new_branch_preview: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewBranchPreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_branch: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchSetup"];
             };
         };
         responses: {

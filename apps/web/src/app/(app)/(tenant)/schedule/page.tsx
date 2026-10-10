@@ -5,6 +5,7 @@ import { termsOf } from "@business-os/verticals";
 
 import { DateJump } from "@/components/calendar-board/date-jump";
 import { MonthGrid } from "@/components/calendar-board/month-grid";
+import { avatarSrc } from "@/components/avatar";
 import { TimeGrid, type GridEvent, type GridLane, type GridShift } from "@/components/calendar-board/time-grid";
 import { LiveRefresh } from "@/components/live-refresh";
 import { unwrap } from "@/lib/api";
@@ -56,14 +57,17 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const hoursOf = multi ? laneIds : branch ? [branch] : branches.length === 1 ? [branches[0].id] : [];
   const showHours = view !== "month" && tenant.permissions.includes("catalog.read");
 
-  const [sessions, closedDays, shifts, hours] = await Promise.all([
+  const [sessions, closedDays, shifts, hours, team] = await Promise.all([
     api.GET("/sessions", { params: { ...params, query: { start, days: days.length, ...filter } } }).then(unwrap),
     api.GET("/closed-days", { params: { ...params, query: { start } } }).then(unwrap),
     view === "month" ? [] : api.GET("/shifts", { params: { ...params, query: { start, days: days.length, ...filter } } }).then((r) => r.data ?? []),
     showHours
       ? Promise.all(hoursOf.map((id) => api.GET("/locations/{location_id}/hours", { params: { ...params, path: { location_id: id } } }).then((r) => [id, r.data ?? null] as const)))
       : [],
+    tenant.permissions.includes("staff.read") ? api.GET("/staff", { params }).then((r) => r.data?.members ?? []) : [],
   ]);
+  const roleOf = new Map(team.map((m) => [m.user_id, m.job_title ?? m.custom_role_name ?? tAll(`roles.${m.role}`)]));
+  const avatarOf = new Map(team.map((m) => [m.user_id, avatarSrc(m.user_id, m.avatar_url)]));
 
   const mergedBranches = !multi && shown.length > 1;
   const events: GridEvent[] = sessions.map((session) => {
@@ -99,9 +103,17 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     end: dayOf(shift.ends_at, tenant.time_zone) === dayOf(shift.starts_at, tenant.time_zone) ? minutesIn(shift.ends_at, tenant.time_zone) : 24 * 60,
     userId: shift.user_id,
     name: shift.user_name,
-    avatar: null,
+    avatar: avatarOf.get(shift.user_id) ?? null,
     label: `${formatTime(shift.starts_at, locale, tenant.time_zone)}–${formatTime(shift.ends_at, locale, tenant.time_zone)}${shift.position ? ` · ${shift.position}` : ""}`,
     warn: shift.on_time_off || shift.outside_hours,
+    details: {
+      time: `${formatTime(shift.starts_at, "en-GB", tenant.time_zone)}–${formatTime(shift.ends_at, "en-GB", tenant.time_zone)}`,
+      role: roleOf.get(shift.user_id) ?? null,
+      position: shift.position ?? null,
+      place: shift.location_name,
+      cover: shift.is_cover ? (shift.home_location_name ?? null) : null,
+      warning: shift.on_time_off ? tAll("shifts.warnings.timeOff") : shift.outside_hours ? tAll("shifts.warnings.outsideHours") : null,
+    },
   }));
   // Opening hours per branch lane (`""`: the single column).
   const open = hours.length
@@ -314,7 +326,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           lanes={lanes}
           closed={closed}
           open={open}
-          labels={{ now: t("now"), closed: t("closedDay"), shifts: tAll("shifts.title"), empty: term("noSessions"), more: t.raw("more") as string, onShift: t("onShift") }}
+          labels={{ now: t("now"), closed: t("closedDay"), shifts: tAll("shifts.title"), empty: term("noSessions"), more: t.raw("more") as string, onShift: t("onShift"), peopleOnShift: tAll("shifts.peopleOnShift"), coverFrom: tAll.raw("shifts.coverFrom") as string, close: tAll("shifts.close") }}
           dayHref={view === "week" ? link({ view: "day", date: "__day__" }) : null}
         />
       )}
