@@ -1,15 +1,22 @@
-from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, status
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.api.common import set_clause
 from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.modules import check_selection, set_modules
-from app.api.schemas import Me, Membership, SupportAccess, Tenant, TenantCreate
+from app.api.schemas import (
+    Me,
+    Membership,
+    Palette,
+    PaletteColors,
+    SupportAccess,
+    Tenant,
+    TenantCreate,
+)
 from app.catalog.verticals import VERTICAL_PACKS
 from app.commerce.modules import PRESETS
 from app.core.db import set_tenant
@@ -200,6 +207,11 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
             text("""
                 SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
                        phone, palette,
+                       CASE WHEN palette_background IS NULL THEN NULL
+                            ELSE jsonb_build_object('background', palette_background,
+                                                    'text', palette_text,
+                                                    'accent', palette_accent)
+                       END AS palette_colors,
                        CASE WHEN avatar_updated_at IS NULL THEN NULL
                             ELSE '/me/avatar?v=' || extract(epoch FROM avatar_updated_at)::bigint
                        END AS avatar_url
@@ -280,7 +292,14 @@ def get_current_tenant(context: TenantDep) -> Tenant:
 class ProfileUpdate(BaseModel):
     full_name: str | None = Field(default=None, max_length=120)
     phone: str | None = Field(default=None, max_length=30, pattern=r"^[0-9+()\- ]*$")
-    palette: Literal["mybiz", "ocean", "forest"] | None = None
+    palette: Palette | None = None
+    palette_colors: PaletteColors | None = None
+
+    @model_validator(mode="after")
+    def custom_needs_colors(self) -> "ProfileUpdate":
+        if self.palette == "custom" and self.palette_colors is None:
+            raise ValueError("the custom palette needs its three colors")
+        return self
 
     @field_validator("full_name", "phone", mode="before")
     @classmethod
@@ -294,6 +313,9 @@ def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     number for the team, and their color palette. Fields left out stay as they are."""
     ensure_profile(session, user.id, user.email)
     changes = body.model_dump(exclude_unset=True)
+    colors = changes.pop("palette_colors", None)
+    if colors:
+        changes |= {f"palette_{name}": value for name, value in colors.items()}
     if changes:
         session.execute(
             text(f"UPDATE app.users SET {set_clause(changes)} WHERE id = :id"),
