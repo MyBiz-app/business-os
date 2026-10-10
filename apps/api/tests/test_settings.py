@@ -67,7 +67,9 @@ def test_schedule_default_view_is_kept_per_business(
         json={"schedule_default_view": "day", "schedule_default_branches": [branch]},
         headers=headers,
     )
-    cleared = client.patch("/tenants/current", json={"schedule_default_branches": []}, headers=headers)
+    cleared = client.patch(
+        "/tenants/current", json={"schedule_default_branches": []}, headers=headers
+    )
     rejected = [
         {"schedule_default_view": "year"},
         {"schedule_default_branches": [foreign_branch]},

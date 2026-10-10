@@ -9018,7 +9018,7 @@ export interface components {
             schedule_default_view?: ("day" | "week" | "month") | null;
             /**
              * Schedule Default Branches
-             * @description Branches the schedule opens with; an empty list means the branch picked in the menu
+             * @description Branches the schedule opens with; empty means the menu's branch
              */
             schedule_default_branches?: string[] | null;
             /** Legal Entity Type */

@@ -94,7 +94,7 @@ class TenantUpdate(BaseModel):
     schedule_default_branches: list[UUID] | None = Field(
         default=None,
         max_length=3,
-        description="Branches the schedule opens with; an empty list means the branch picked in the menu",
+        description="Branches the schedule opens with; empty means the menu's branch",
     )
     legal_entity_type: LegalEntityType | None = None
     business_number: str | None = Field(
