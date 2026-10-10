@@ -93,8 +93,17 @@ def seed_workspace(
     # Shifts from two weeks back to three weeks ahead. Everyone works five of the open days
     # (two fixed days off each); a long day splits into a morning and an evening shift.
     rows = []
+    free: dict[UUID, set[date]] = {}  # who has no shift on which open day (cover candidates)
     first = today - timedelta(days=14)
     for branch, team in staff.items():
+        for person in team:
+            conn.execute(
+                text("""
+                    UPDATE app.tenant_members SET home_location_id = :l
+                    WHERE tenant_id = :t AND user_id = :u
+                """),
+                {"t": tenant_id, "l": branch, "u": person},
+            )
         days_off = {person: set(rng.sample(range(7), 2)) for person in team}
         positions = [None, *(team_titles[i % len(team_titles)] for i in range(len(team) - 1))]
         for offset in range(35):
@@ -106,6 +115,7 @@ def seed_workspace(
             closes = time.fromisoformat(intervals[-1][1])
             for index, person in enumerate(team):
                 if day.weekday() in days_off[person]:
+                    free.setdefault(person, set()).add(day)
                     continue
                 starts = local_to_utc(day, opens, TIME_ZONE)
                 ends = local_to_utc(day, closes, TIME_ZONE)
@@ -124,6 +134,28 @@ def seed_workspace(
                         "position": positions[index],
                     }
                 )
+    # Networks borrow staff: tomorrow, someone from one branch covers a gap in the next one.
+    tomorrow = today + timedelta(days=1)
+    branches = list(staff)
+    for here, there in zip(branches, branches[1:] + branches[:1], strict=True):
+        intervals = hours.get(tomorrow.weekday())
+        borrowed = next((p for p in reversed(staff[here]) if tomorrow in free.get(p, ())), None)
+        if len(branches) > 1 and intervals and borrowed:
+            opens = time.fromisoformat(intervals[0][0])
+            closes = time.fromisoformat(intervals[-1][1])
+            starts = local_to_utc(tomorrow, opens, TIME_ZONE)
+            ends = min(local_to_utc(tomorrow, closes, TIME_ZONE), starts + MAX_SHIFT)
+            rows.append(
+                {
+                    "t": tenant_id,
+                    "l": there,
+                    "u": borrowed,
+                    "s": starts,
+                    "e": ends,
+                    "position": None,
+                }
+            )
+            break
     if rows:
         conn.execute(
             text("""

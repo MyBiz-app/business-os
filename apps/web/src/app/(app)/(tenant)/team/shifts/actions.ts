@@ -64,3 +64,19 @@ export async function copyShiftsWeek(from: string, to: string): Promise<CopyStat
   revalidatePath("/team/shifts");
   return { copied: data };
 }
+
+export type PlanningState = { saved?: boolean; error?: boolean };
+
+/** How often a branch plans its shifts (sets the window its board opens on). */
+export async function savePlanning(locationId: string, _state: PlanningState, formData: FormData): Promise<PlanningState> {
+  const { api, scope } = await getTenantFor("catalog.write");
+  const cadence = String(formData.get("cadence") ?? "weekly") as "daily" | "weekly" | "monthly" | "custom";
+  const days = Number(formData.get("days"));
+  const { response } = await api.PUT("/locations/{location_id}/planning", {
+    params: { ...scope, path: { location_id: locationId } },
+    body: cadence === "custom" ? { cadence, days } : { cadence },
+  });
+  if (!response.ok) return { error: true };
+  revalidatePath("/team/shifts");
+  return { saved: true };
+}

@@ -48,6 +48,9 @@ class Member(BaseModel):
     custom_role_id: UUID | None
     custom_role_name: str | None
     location_ids: list[UUID] = Field(description="Branches they work at; empty means all")
+    home_location_id: UUID | None = Field(
+        description="The branch they normally work at (informational: shifts elsewhere are cover)"
+    )
     joined_at: datetime
     job_title: str | None
     reports_to: UUID | None = Field(description="Who they report to (never grants access)")
@@ -152,7 +155,7 @@ class Accepted(BaseModel):
 MEMBER_SELECT = """
     SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
            r.name AS custom_role_name, m.location_ids, m.created_at AS joined_at,
-           m.job_title, m.reports_to, u.phone,
+           m.job_title, m.reports_to, m.home_location_id, u.phone,
            CASE WHEN u.avatar_updated_at IS NULL THEN NULL
                 ELSE '/staff/' || u.id || '/avatar?v='
                      || extract(epoch FROM u.avatar_updated_at)::bigint END AS avatar_url
@@ -326,6 +329,32 @@ def set_member_branches(user_id: UUID, body: MemberBranches, context: ManageDep)
             WHERE tenant_id = app.current_tenant_id() AND user_id = :user_id
         """),
         {"ids": [str(i) for i in ids], "user_id": user_id},
+    )
+    return _load_member(context.session, user_id)
+
+
+class HomeBranch(BaseModel):
+    location_id: UUID | None = Field(description="None clears it")
+
+
+@router.put("/staff/{user_id}/home-branch")
+def set_home_branch(user_id: UUID, body: HomeBranch, context: ManageDep) -> Member:
+    """Where a member normally works. It never limits where a shift can be placed: a shift at
+    another branch is simply shown as cover."""
+    if _member_role(context.session, user_id) is None:
+        raise not_found()
+    if body.location_id is not None:
+        known = context.session.execute(
+            text("SELECT 1 FROM app.locations WHERE id = :id"), {"id": body.location_id}
+        ).first()
+        if known is None:
+            raise HTTPException(status_code=422, detail="unknown_branch")
+    context.session.execute(
+        text("""
+            UPDATE app.tenant_members SET home_location_id = :location
+            WHERE tenant_id = app.current_tenant_id() AND user_id = :user_id
+        """),
+        {"location": body.location_id, "user_id": user_id},
     )
     return _load_member(context.session, user_id)
 

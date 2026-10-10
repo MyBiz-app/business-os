@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Copy, Plus, Trash2, X } from "lucide-react";
+import { AlertTriangle, ArrowRightLeft, Copy, Plus, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 
@@ -12,7 +12,7 @@ import { addDays, formatDay } from "@/lib/dates";
 
 import { copyShiftsWeek, type CopyState, deleteShift, saveShift, type ShiftState } from "./actions";
 
-export type BoardPerson = { id: string; name: string; title: string; avatar: string | null };
+export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null };
 export type BoardShift = {
   id: string;
   userId: string;
@@ -25,6 +25,8 @@ export type BoardShift = {
   color: string;
   position: string | null;
   note: string | null;
+  isCover: boolean;
+  homeName: string | null;
   warning: "timeOff" | "outsideHours" | null;
 };
 type Branch = { id: string; name: string; color: string };
@@ -41,8 +43,10 @@ export function ShiftBoard(props: {
   branches: Branch[];
   canEdit: boolean;
   weekStart: string;
+  canCopy?: boolean;
+  compact?: boolean;
 }) {
-  const { days, today, locale, people, shifts, branches, canEdit, weekStart } = props;
+  const { days, today, locale, people, shifts, branches, canEdit, weekStart, canCopy = true, compact = false } = props;
   const t = useTranslations("shifts");
   const [editing, setEditing] = useState<Editing | null>(null);
   const [copy, setCopy] = useState<CopyState>({});
@@ -67,7 +71,7 @@ export function ShiftBoard(props: {
             {t("warningLegend")}
           </li>
         </ul>
-        {canEdit && (
+        {canEdit && canCopy && (
           <div className="flex flex-col items-end gap-1">
             <button
               type="button"
@@ -89,7 +93,7 @@ export function ShiftBoard(props: {
       </div>
 
       <div className="card overflow-x-auto p-0">
-        <table className="w-full min-w-[56rem] border-collapse text-sm">
+        <table className="w-full border-collapse text-sm" style={{ minWidth: `${13 + days.length * (compact ? 6 : 7)}rem` }}>
           <caption className="sr-only">{t("title")}</caption>
           <thead>
             <tr className="border-b border-border">
@@ -145,6 +149,12 @@ export function ShiftBoard(props: {
                             {(shift.position || branches.length > 1) && (
                               <span dir="auto" className="w-full truncate text-muted">
                                 {shift.position ?? shift.locationName}
+                              </span>
+                            )}
+                            {shift.isCover && (
+                              <span className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 px-1.5 text-[0.6875rem] font-medium text-primary">
+                                <ArrowRightLeft aria-hidden="true" className="size-3 shrink-0" />
+                                <span dir="auto" className="truncate">{shift.locationName}</span>
                               </span>
                             )}
                           </button>
@@ -212,9 +222,10 @@ function ShiftDialog({ editing, people, branches, onClose }: { editing: Editing;
         />
         <SelectField label={t("person")} name="user_id" defaultValue={editing.userId} options={people.map((p) => ({ value: p.id, label: p.name }))} />
         <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label={t("branch")} name="location_id" defaultValue={shift?.locationId ?? branches[0]?.id} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
+          <SelectField label={t("branch")} name="location_id" defaultValue={shift?.locationId ?? people.find((p) => p.id === editing.userId)?.homeId ?? branches[0]?.id} options={branches.map((b) => ({ value: b.id, label: b.name }))} />
           <Field label={t("date")} name="day" type="date" defaultValue={editing.day} required dir="ltr" />
         </div>
+        {branches.length > 1 && <p className="-mt-2 text-xs text-muted">{t("coverHint")}</p>}
         <div className="grid grid-cols-2 gap-4">
           <Field label={t("starts")} name="starts" type="time" step={900} defaultValue={shift?.starts ?? "09:00"} required dir="ltr" />
           <Field label={t("ends")} name="ends" type="time" step={900} defaultValue={shift?.ends ?? "17:00"} required dir="ltr" />
