@@ -338,3 +338,62 @@ def test_branch_comparison_and_calendars_stay_within_the_persons_branches(
         "/sessions", params={**week, "location_id": [north, south]}, headers=headers
     ).json()
     assert len(both) == 2
+
+
+def test_home_branch_marks_a_shift_elsewhere_as_cover(client: TestClient, studio: dict) -> None:
+    headers, home, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    other = client.post("/locations", json={"name": "Hod HaSharon"}, headers=headers).json()["id"]
+
+    member = client.put(f"/staff/{coach}/home-branch", json={"location_id": home}, headers=headers)
+    assert member.status_code == 200 and member.json()["home_location_id"] == home
+    unknown = client.put(
+        f"/staff/{coach}/home-branch", json={"location_id": str(uuid4())}, headers=headers
+    )
+    assert unknown.status_code == 422
+
+    shift = {"user_id": coach, "location_id": home, "starts_at": at(1, 9), "ends_at": at(1, 13)}
+    at_home = client.post("/shifts", json=shift, headers=headers).json()
+    assert (at_home["is_cover"], at_home["home_location_name"]) == (False, "Main")
+    cover = client.post(
+        "/shifts",
+        json={**shift, "location_id": other, "starts_at": at(1, 14), "ends_at": at(1, 18)},
+        headers=headers,
+    ).json()
+    assert cover["is_cover"] is True and cover["location_name"] == "Hod HaSharon"
+    # Covering at a second branch cannot overlap the person's other shift.
+    clash = client.post("/shifts", json={**shift, "location_id": other}, headers=headers)
+    assert clash.status_code == 409
+
+    # Without a home branch nothing is cover.
+    client.put(f"/staff/{coach}/home-branch", json={"location_id": None}, headers=headers)
+    listed = client.get(
+        "/shifts", params={"start": local_today().isoformat(), "days": 3}, headers=headers
+    )
+    assert {s["is_cover"] for s in listed.json()} == {False}
+
+
+def test_each_branch_has_a_planning_rhythm(client: TestClient, studio: dict) -> None:
+    headers, branch = studio["headers"], studio["location"]["id"]
+    rhythms = client.get("/shifts/planning", headers=headers).json()
+    assert rhythms == [{"location_id": branch, "cadence": "weekly", "days": None}]
+
+    monthly = client.put(
+        f"/locations/{branch}/planning", json={"cadence": "monthly"}, headers=headers
+    )
+    assert monthly.status_code == 200 and monthly.json()["cadence"] == "monthly"
+    custom = client.put(
+        f"/locations/{branch}/planning", json={"cadence": "custom", "days": 10}, headers=headers
+    )
+    assert custom.json()["days"] == 10
+    for bad in ({"cadence": "custom"}, {"cadence": "daily", "days": 3}, {"cadence": "yearly"}):
+        assert (
+            client.put(f"/locations/{branch}/planning", json=bad, headers=headers).status_code
+            == 422
+        )
+    assert (
+        client.put(
+            f"/locations/{uuid4()}/planning", json={"cadence": "daily"}, headers=headers
+        ).status_code
+        == 404
+    )
+    assert client.get("/shifts/planning", headers=headers).json()[0]["days"] == 10

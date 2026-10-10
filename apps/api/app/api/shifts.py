@@ -11,7 +11,7 @@ branches sees and plans only those. One person never has two overlapping shifts.
 import datetime as dt
 from datetime import datetime, time, timedelta
 from itertools import pairwise
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
@@ -113,6 +113,51 @@ def set_opening_hours(
     return _load_hours(context.session, location_id)
 
 
+Cadence = Literal["daily", "weekly", "monthly", "custom"]
+
+
+class Planning(BaseModel):
+    """How often a branch plans its shifts; sets the window its board opens on."""
+
+    cadence: Cadence = "weekly"
+    days: int | None = Field(default=None, ge=1, le=42, description="Only for `custom`")
+
+    @model_validator(mode="after")
+    def days_only_for_custom(self) -> "Planning":
+        if (self.cadence == "custom") != (self.days is not None):
+            raise ValueError("days are given for a custom cadence, and only then")
+        return self
+
+
+class BranchPlanning(Planning):
+    location_id: UUID
+
+
+@router.get("/shifts/planning")
+def list_planning(context: CatalogReadDep) -> list[BranchPlanning]:
+    rows = context.session.execute(
+        text("""
+            SELECT id AS location_id, planning_cadence AS cadence, planning_days AS days
+            FROM app.locations WHERE active AND app.in_branch(id) ORDER BY created_at, name
+        """)
+    ).mappings()
+    return [BranchPlanning.model_validate(dict(row)) for row in rows]
+
+
+@router.put("/locations/{location_id}/planning")
+def set_planning(location_id: UUID, body: Planning, context: CatalogWriteDep) -> BranchPlanning:
+    if not _branch_visible(context.session, location_id):
+        raise not_found()
+    context.session.execute(
+        text("""
+            UPDATE app.locations SET planning_cadence = :cadence, planning_days = :days
+            WHERE id = :id
+        """),
+        {**body.model_dump(), "id": location_id},
+    )
+    return BranchPlanning(location_id=location_id, **body.model_dump())
+
+
 class Shift(BaseModel):
     id: UUID
     location_id: UUID
@@ -123,6 +168,9 @@ class Shift(BaseModel):
     ends_at: datetime
     position: str | None
     note: str | None
+    home_location_id: UUID | None = Field(description="The person's home branch, if set")
+    home_location_name: str | None
+    is_cover: bool = Field(description="At a branch other than the person's home branch")
     on_time_off: bool = Field(description="Falls on a day the person is away")
     outside_hours: bool = Field(description="Not within the branch's opening hours (if set)")
 
@@ -170,7 +218,8 @@ class CopiedShifts(BaseModel):
 SHIFT_SELECT = """
     SELECT sh.id, sh.location_id, l.name AS location_name, sh.user_id,
            coalesce(u.full_name, u.email) AS user_name, sh.starts_at, sh.ends_at,
-           sh.position, sh.note,
+           sh.position, sh.note, m.home_location_id, hl.name AS home_location_name,
+           coalesce(m.home_location_id <> sh.location_id, false) AS is_cover,
            EXISTS (
                SELECT 1 FROM app.staff_time_off o
                WHERE o.tenant_id = sh.tenant_id AND o.user_id = sh.user_id
@@ -191,6 +240,8 @@ SHIFT_SELECT = """
     JOIN app.tenants t ON t.id = sh.tenant_id
     JOIN app.locations l ON l.id = sh.location_id
     JOIN app.users u ON u.id = sh.user_id
+    LEFT JOIN app.tenant_members m ON m.tenant_id = sh.tenant_id AND m.user_id = sh.user_id
+    LEFT JOIN app.locations hl ON hl.id = m.home_location_id
     WHERE app.in_branch(sh.location_id)
 """
 
