@@ -45,3 +45,27 @@ export function formatTime(instant: string, locale: string, timeZone: string): s
 export function formatDay(day: string, locale: string, options: Intl.DateTimeFormatOptions): string {
   return new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
 }
+
+/** The first day of the month of `day`. */
+export function monthStart(day: string): string {
+  return `${day.slice(0, 7)}-01`;
+}
+
+/** The same day-of-month in another month, or that month's last day when it is shorter. */
+export function addMonths(day: string, months: number): string {
+  const [year, month, date] = day.split("-").map(Number);
+  const target = new Date(Date.UTC(year, month - 1 + months, 1));
+  const last = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0)).getUTCDate();
+  target.setUTCDate(Math.min(date, last));
+  return target.toISOString().slice(0, 10);
+}
+
+/** The weeks that show the month of `day`: the Sunday before its first day and the number of days
+ * (a whole number of weeks, at most 42). */
+export function monthGrid(day: string): { start: string; days: number } {
+  const first = monthStart(day);
+  const [year, month] = first.split("-").map(Number);
+  const length = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const offset = weekdayOf(first);
+  return { start: weekStart(first), days: Math.ceil((offset + length) / 7) * 7 };
+}

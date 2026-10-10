@@ -33094,6 +33094,26 @@
             "description": "Reservations of courts and rooms: paid in the app or at the venue",
             "default": "app"
           },
+          "schedule_default_view": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month"
+            ],
+            "title": "Schedule Default View",
+            "description": "The range the schedule opens with",
+            "default": "week"
+          },
+          "schedule_default_branches": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Schedule Default Branches",
+            "description": "Branches the schedule opens with side by side; empty: the menu's branch"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -33398,6 +33418,39 @@
               }
             ],
             "title": "Resource Payment"
+          },
+          "schedule_default_view": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Default View"
+          },
+          "schedule_default_branches": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array",
+                "maxItems": 3
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Default Branches",
+            "description": "Branches the schedule opens with; empty means the menu's branch"
           },
           "legal_entity_type": {
             "anyOf": [

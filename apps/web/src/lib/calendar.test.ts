@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { branchColor, capLanes, coverage, layOut, minutesIn, visibleHours } from "./calendar.ts";
+import { branchColor, capLanes, coverage, isBoardRange, layOut, limitLanes, minutesIn, visibleHours } from "./calendar.ts";
 
 test("minutes since local midnight follow the time zone", () => {
   assert.equal(minutesIn("2026-10-10T06:30:00Z", "Asia/Jerusalem"), 9 * 60 + 30);
@@ -66,4 +66,12 @@ test("coverage counts who is on at each stretch", () => {
     { start: 780, end: 840, count: 1 },
     { start: 840, end: 1020, count: 2 },
   ]);
+});
+
+test("each range keeps at most its number of lanes, in the order picked", () => {
+  const ids = ["a", "b", "c", "d", "e", "f", "g", "a"];
+  assert.deepEqual(limitLanes(ids, "day"), ["a", "b", "c", "d", "e", "f"]);
+  assert.deepEqual(limitLanes(ids, "week"), ["a", "b", "c"]);
+  assert.deepEqual(limitLanes(ids, "month"), ["a"]);
+  assert.ok(isBoardRange("month") && !isBoardRange("year"));
 });
