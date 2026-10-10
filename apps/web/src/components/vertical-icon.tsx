@@ -1,5 +1,5 @@
 import type { Icon } from "@business-os/verticals";
-import { Briefcase, Camera, Car, Dumbbell, GraduationCap, PawPrint, Scissors, Stethoscope, Trophy, Wrench } from "lucide-react";
+import { Briefcase, Camera, Car, Dumbbell, GraduationCap, PawPrint, Scissors, Stethoscope, Trophy, UtensilsCrossed, Wrench } from "lucide-react";
 
 const ICONS: Record<Icon, typeof Dumbbell> = {
   dumbbell: Dumbbell,
@@ -12,6 +12,7 @@ const ICONS: Record<Icon, typeof Dumbbell> = {
   "paw-print": PawPrint,
   camera: Camera,
   briefcase: Briefcase,
+  utensils: UtensilsCrossed,
 };
 
 /** An industry's icon from the catalog (decorative: the industry's name is always next to it). */

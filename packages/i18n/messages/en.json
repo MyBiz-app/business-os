@@ -456,6 +456,25 @@
       "profile": "Client details",
       "visitNotes": "Meeting notes",
       "nextBooking": "Your next meeting"
+    },
+    "food": {
+      "client": "Guest",
+      "clients": "Guests",
+      "addClient": "Add guest",
+      "newClient": "New guest",
+      "searchClients": "Search guests",
+      "noClients": "No guests yet",
+      "noResults": "No guests match your search",
+      "schedule": "Events",
+      "newSession": "New event",
+      "noSessions": "No events",
+      "sessionsToday": "{count, plural, =0 {No events today} one {One event today} other {# events today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The restaurant",
+      "profile": "Guest details",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next booking"
     }
   },
   "clients": {
@@ -3699,6 +3718,27 @@
     "agencies": {
       "name": "Agencies",
       "tagline": "Retainers, hours and deliverables per client."
+    },
+    "food": {
+      "name": "Food & restaurants",
+      "tagline": "Restaurants, pizzerias and cafés.",
+      "points": [
+        "Staff shifts across every branch",
+        "Events, workshops and parties booked online",
+        "Regulars, allergies and preferences in one place"
+      ],
+      "heroTitle": "Busy kitchens, calm managers.",
+      "heroText": "Shifts, private events, workshops and regular guests for restaurants, pizzerias and cafés, branch by branch.",
+      "yours": "The restaurant",
+      "example": "Urban Slice"
+    },
+    "pizzeria": {
+      "name": "Pizzerias",
+      "tagline": "Shifts, parties and pizza workshops."
+    },
+    "cafe": {
+      "name": "Cafés",
+      "tagline": "Shifts, events and regulars."
     }
   },
   "clientFields": {

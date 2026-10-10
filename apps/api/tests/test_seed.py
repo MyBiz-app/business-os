@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from sqlalchemy import Engine, text
 
+from app.api.settings import israeli_number_valid
 from app.seed import (
     AC_COMPANY,
     ACCOUNTING_FIRM,
@@ -287,3 +288,60 @@ def test_demo_accounting_firm_bills_by_time(engine: Engine) -> None:
         ).one()
     assert retainers == ACCOUNTING_FIRM.clients and entries > 200 and bills > 60
     assert unbilled_past == 0 and documents > 30 and signed > 10
+
+
+def test_networks_demo_has_three_networks_with_their_workspace(engine: Engine) -> None:
+    owner = uuid4()
+    email = f"networks-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        seed_demo(connection, email, "networks", 1, random.Random(4))
+    # Seeding again with --replace keeps one copy of each network.
+    with engine.begin() as connection:
+        tenants = seed_demo(connection, email, "networks", 1, random.Random(5), replace=True)
+
+    with engine.connect() as connection:
+        rows = (
+            connection.execute(
+                text("""
+                SELECT t.id, t.name, t.vertical, t.business_number, t.cover IS NOT NULL AS cover,
+                       (SELECT count(*) FROM app.locations l WHERE l.tenant_id = t.id) AS branches,
+                       (SELECT count(DISTINCT h.location_id) FROM app.location_hours h
+                        WHERE h.tenant_id = t.id) AS branches_with_hours,
+                       (SELECT count(DISTINCT s.location_id) FROM app.shifts s
+                        WHERE s.tenant_id = t.id) AS branches_with_shifts,
+                       (SELECT count(*) FROM app.tenant_members m
+                        WHERE m.tenant_id = t.id AND m.role <> 'owner'
+                          AND (m.reports_to IS NULL OR m.job_title IS NULL)) AS unplaced,
+                       (SELECT count(*) FROM app.shifts a JOIN app.shifts b
+                            ON a.tenant_id = b.tenant_id AND a.user_id = b.user_id
+                           AND a.id < b.id AND a.starts_at < b.ends_at AND b.starts_at < a.ends_at
+                        WHERE a.tenant_id = t.id) AS overlaps
+                FROM app.tenants t JOIN app.tenant_members m ON m.tenant_id = t.id
+                WHERE m.user_id = :owner AND m.role = 'owner'
+            """),
+                {"owner": owner},
+            )
+            .mappings()
+            .all()
+        )
+
+    assert {row["id"] for row in rows} == set(tenants)
+    by_name = {row["name"]: row for row in rows}
+    assert {name: row["vertical"] for name, row in by_name.items()} == {
+        "Urban Slice": "pizzeria",
+        "Pulse Fitness": "gym",
+        "Studio Bloom": "hair_salon",
+    }
+    assert [by_name[n]["branches"] for n in ("Urban Slice", "Pulse Fitness", "Studio Bloom")] == [
+        4,
+        2,
+        3,
+    ]
+    for row in rows:
+        assert israeli_number_valid(row["business_number"]) and row["cover"]
+        assert row["branches_with_hours"] == row["branches_with_shifts"] == row["branches"]
+        assert row["unplaced"] == 0 and row["overlaps"] == 0

@@ -15,7 +15,7 @@ import { CATALOG } from "./catalog.generated";
 export const STATUSES = ["live", "beta", "planned"] as const;
 export const ICONS = [
   "dumbbell", "scissors", "stethoscope", "graduation-cap", "car",
-  "trophy", "wrench", "paw-print", "camera", "briefcase",
+  "trophy", "wrench", "paw-print", "camera", "briefcase", "utensils",
 ] as const;
 export const FIELD_KINDS = ["text", "long_text", "number", "date", "select"] as const;
 export const BOOKING_MODES = ["class", "appointment", "resource"] as const;

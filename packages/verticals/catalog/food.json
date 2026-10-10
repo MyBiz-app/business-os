@@ -1,0 +1,79 @@
+{
+  "key": "food",
+  "order": 11,
+  "status": "beta",
+  "icon": "utensils",
+  "color": "from-red-500 to-orange-600",
+  "terms": "food",
+  "client_term": "guest",
+  "booking_modes": ["appointment", "class"],
+  "cancellation_window_minutes": 1440,
+  "booking_requires_plan": false,
+  "default_preset": "growing",
+  "recommended_modules": ["client_app", "whatsapp", "crm"],
+  "client_fields": [
+    { "key": "dietary_restrictions", "kind": "text", "max_length": 200 },
+    { "key": "allergies", "kind": "text", "max_length": 200 },
+    { "key": "preferences", "kind": "text" }
+  ],
+  "default_services": [
+    {
+      "names": { "he": "אירוע פרטי", "en": "Private event" },
+      "duration_minutes": 180,
+      "booking_mode": "appointment",
+      "prices": { "ILS": 250000 },
+      "color": "#dc2626"
+    },
+    {
+      "names": { "he": "סדנת בישול", "en": "Cooking workshop" },
+      "duration_minutes": 120,
+      "booking_mode": "class",
+      "capacity": 12,
+      "prices": { "ILS": 18000 },
+      "color": "#ea580c"
+    }
+  ],
+  "children": [
+    {
+      "key": "pizzeria",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": { "he": "סדנת פיצה", "en": "Pizza workshop" },
+          "duration_minutes": 120,
+          "booking_mode": "class",
+          "capacity": 12,
+          "prices": { "ILS": 16000 },
+          "color": "#dc2626"
+        },
+        {
+          "names": { "he": "מסיבת יום הולדת", "en": "Birthday party" },
+          "duration_minutes": 150,
+          "booking_mode": "appointment",
+          "prices": { "ILS": 120000 },
+          "color": "#f59e0b"
+        },
+        {
+          "names": { "he": "אירוע פרטי", "en": "Private event" },
+          "duration_minutes": 180,
+          "booking_mode": "appointment",
+          "prices": { "ILS": 250000 },
+          "color": "#b91c1c"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": { "he": "כרטיסיית סדנאות (4)", "en": "Workshop card (4)" },
+          "kind": "punch_card",
+          "credits": 4,
+          "validity_days": 180,
+          "prices": { "ILS": 56000 }
+        }
+      ]
+    },
+    {
+      "key": "cafe",
+      "status": "beta"
+    }
+  ]
+}
