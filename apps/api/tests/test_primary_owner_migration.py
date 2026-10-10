@@ -26,7 +26,16 @@ def test_primary_owner_businesses_move_to_the_demo_account(engine: Engine, studi
             text("INSERT INTO app.users (id, email) VALUES (:id, :e)"),
             {"id": demo, "e": migration.DEMO_ACCOUNT},
         )
+        # References to the membership must follow it: a reporting line and a shift.
+        connection.execute(
+            text("UPDATE app.tenant_members SET reports_to = :o WHERE user_id = :c"),
+            {"o": studio["owner"], "c": studio["coach"]},
+        )
         connection.execute(text(migration.MOVE_MEMBERSHIPS))
+        reports_to = connection.execute(
+            text("SELECT reports_to FROM app.tenant_members WHERE user_id = :c"),
+            {"c": studio["coach"]},
+        ).scalar_one()
         members = {
             row.user_id: row.role
             for row in connection.execute(
@@ -34,6 +43,7 @@ def test_primary_owner_businesses_move_to_the_demo_account(engine: Engine, studi
                 {"t": studio["tenant_id"]},
             )
         }
+    assert reports_to == demo
     assert members[demo] == "owner"
     assert studio["owner"] not in members
     assert members[studio["coach"]] == "staff"  # the rest of the team stays
