@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from app.api.common import blank_to_none, not_found, set_clause
+from app.api.common import RemoveResult, blank_to_none, delete_or_archive, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.core.permissions import Permission
 
@@ -15,6 +15,7 @@ router = APIRouter(prefix="/services", tags=["services"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
+DeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))]
 
 COLUMNS = (
     "id, name, description, duration_minutes, capacity, booking_mode, price_amount, "
@@ -215,3 +216,9 @@ def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> 
     if row is None:
         raise not_found()
     return Service.model_validate(dict(row))
+
+
+@router.delete("/{service_id}")
+def delete_service(service_id: UUID, context: DeleteDep) -> RemoveResult:
+    """Removes a service nobody has used; one with sessions or sales is archived (hidden)."""
+    return delete_or_archive(context.session, "services", service_id)

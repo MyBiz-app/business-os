@@ -1,7 +1,7 @@
 import hashlib
 import secrets
 from datetime import UTC, datetime, timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
-from app.core.permissions import ROLE_PERMISSIONS, Permission
+from app.core.permissions import ROLE_PERMISSIONS, Permission, effective_permissions
 
 router = APIRouter(tags=["staff"])
 
@@ -53,6 +53,18 @@ class Member(BaseModel):
     reports_to: UUID | None = Field(description="Who they report to (never grants access)")
     phone: str | None
     avatar_url: str | None = Field(description="Path of their picture on this API, if any")
+    permissions: list[str] = Field(description="What they can actually do (their role's switches)")
+
+    @model_validator(mode="before")
+    @classmethod
+    def with_permissions(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "permissions" not in data:
+            data = {**data}
+            custom = data.pop("custom_permissions", None)
+            order = [p.value for p in Permission]
+            effective = effective_permissions(data["role"], custom)
+            data["permissions"] = [p for p in order if p in effective]
+        return data
 
 
 class Invitation(BaseModel):
@@ -151,7 +163,8 @@ class Accepted(BaseModel):
 
 MEMBER_SELECT = """
     SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
-           r.name AS custom_role_name, m.location_ids, m.created_at AS joined_at,
+           r.name AS custom_role_name, r.permissions AS custom_permissions,
+           m.location_ids, m.created_at AS joined_at,
            m.job_title, m.reports_to, u.phone,
            CASE WHEN u.avatar_updated_at IS NULL THEN NULL
                 ELSE '/staff/' || u.id || '/avatar?v='

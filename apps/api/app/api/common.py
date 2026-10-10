@@ -1,10 +1,12 @@
 """Small helpers shared by the tenant-scoped CRUD endpoints."""
 
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
 from fastapi import HTTPException, status
+from pydantic import BaseModel, Field
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 
@@ -39,3 +41,29 @@ def ensure_not_erased(db: Session, client_id: UUID) -> None:
     ).scalar()
     if erased:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="client_erased")
+
+
+class RemoveResult(BaseModel):
+    result: Literal["deleted", "archived"] = Field(
+        description="`archived` when sold or scheduled items still refer to it: it is only hidden"
+    )
+
+
+def delete_or_archive(session: Session, table: str, row_id: UUID) -> RemoveResult:
+    """Delete a catalog row nothing refers to; otherwise just deactivate it, so history stays.
+    `table` is a literal chosen by the caller, never user input."""
+    try:
+        with session.begin_nested():
+            deleted = session.execute(
+                text(f"DELETE FROM app.{table} WHERE id = :id"), {"id": row_id}
+            ).rowcount
+    except IntegrityError:
+        archived = session.execute(
+            text(f"UPDATE app.{table} SET active = false WHERE id = :id"), {"id": row_id}
+        ).rowcount
+        if not archived:
+            raise not_found() from None
+        return RemoveResult(result="archived")
+    if not deleted:
+        raise not_found()
+    return RemoveResult(result="deleted")

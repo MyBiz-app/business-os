@@ -2,10 +2,11 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { canWriteCatalog } from "@/lib/permissions";
+import { ConfirmDelete } from "@/components/form/confirm-delete";
+import { canDeleteCatalog, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
-import { saveServiceRooms, updateService } from "../actions";
+import { deleteService, saveServiceRooms, updateService } from "../actions";
 import { ServiceForm } from "../service-form";
 import { ServiceRooms } from "../service-rooms";
 
@@ -44,6 +45,9 @@ export default async function ServicePage({ params }: PageProps<"/services/[id]"
         submitLabel={t("common.save")}
         readOnly={readOnly}
       />
+      {canDeleteCatalog(tenant) && (
+        <ConfirmDelete action={deleteService.bind(null, service.id)} label={t("services.delete")} confirm={t("services.deleteConfirm", { name: service.name })} />
+      )}
       {service.booking_mode === "resource" && (
         <section aria-labelledby="rooms-heading" className="card flex flex-col gap-4 p-6">
           <div className="flex flex-col gap-1">

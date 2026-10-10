@@ -1307,7 +1307,11 @@ export interface paths {
         get: operations["get_service"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Service
+         * @description Removes a service nobody has used; one with sessions or sales is archived (hidden).
+         */
+        delete: operations["delete_service"];
         options?: never;
         head?: never;
         /** Update Service */
@@ -2324,7 +2328,11 @@ export interface paths {
         get: operations["get_plan"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete Plan
+         * @description Removes a membership or punch card nobody bought; a sold one is archived (hidden).
+         */
+        delete: operations["delete_plan"];
         options?: never;
         head?: never;
         /**
@@ -6663,6 +6671,11 @@ export interface components {
              * @description Path of their picture on this API, if any
              */
             avatar_url: string | null;
+            /**
+             * Permissions
+             * @description What they can actually do (their role's switches)
+             */
+            permissions: string[];
         };
         /** MemberAtRisk */
         MemberAtRisk: {
@@ -7715,6 +7728,15 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** RemoveResult */
+        RemoveResult: {
+            /**
+             * Result
+             * @description `archived` when sold or scheduled items still refer to it: it is only hidden
+             * @enum {string}
+             */
+            result: "deleted" | "archived";
+        };
         /** Repeat */
         Repeat: {
             /**
@@ -7978,14 +8000,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
         };
         /** Roles */
         Roles: {
@@ -12564,6 +12586,41 @@ export interface operations {
             };
         };
     };
+    delete_service: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RemoveResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_service: {
         parameters: {
             query?: never;
@@ -15123,6 +15180,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Plan"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_plan: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RemoveResult"];
                 };
             };
             /** @description Validation Error */

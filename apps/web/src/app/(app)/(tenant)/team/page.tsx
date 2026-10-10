@@ -69,6 +69,8 @@ export default async function TeamPage() {
               memberBranches={member.location_ids}
               avatar={avatarSrc(member.user_id, member.avatar_url)}
               title={member.job_title ?? null}
+              allPermissions={roles.permissions}
+              permissions={member.permissions}
             />
           ))}
         </ul>

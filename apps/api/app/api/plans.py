@@ -10,7 +10,14 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
+from app.api.common import (
+    RemoveResult,
+    blank_to_none,
+    delete_or_archive,
+    ensure_not_erased,
+    not_found,
+    set_clause,
+)
 from app.api.deps import TenantContext, require
 from app.core.permissions import Permission
 
@@ -18,6 +25,7 @@ router = APIRouter(tags=["plans"])
 
 CatalogReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 CatalogWriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
+CatalogDeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))]
 ClientsReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 SalesDep = Annotated[TenantContext, Depends(require(Permission.SALES_MANAGE))]
 
@@ -360,6 +368,12 @@ def update_plan(plan_id: UUID, body: PlanUpdate, context: CatalogWriteDep) -> Pl
     if row is None:
         raise not_found()
     return Plan.model_validate(dict(row))
+
+
+@router.delete("/plans/{plan_id}")
+def delete_plan(plan_id: UUID, context: CatalogDeleteDep) -> RemoveResult:
+    """Removes a membership or punch card nobody bought; a sold one is archived (hidden)."""
+    return delete_or_archive(context.session, "plans", plan_id)
 
 
 # --- Entitlements -----------------------------------------------------------------------------

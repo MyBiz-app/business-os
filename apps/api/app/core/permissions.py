@@ -12,6 +12,7 @@ class Permission(StrEnum):
     CLIENTS_PRIVACY = "clients.privacy"  # export or erase a client's personal data (owners)
     CATALOG_READ = "catalog.read"
     CATALOG_WRITE = "catalog.write"
+    CATALOG_DELETE = "catalog.delete"  # remove services, memberships and punch cards
     SCHEDULE_READ = "schedule.read"
     SCHEDULE_WRITE = "schedule.write"
     BOOKINGS_MANAGE = "bookings.manage"  # book clients into sessions, check in, cancel
@@ -31,6 +32,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.CLIENTS_WRITE,
             Permission.CATALOG_READ,
             Permission.CATALOG_WRITE,
+            Permission.CATALOG_DELETE,
             Permission.SCHEDULE_READ,
             Permission.SCHEDULE_WRITE,
             Permission.BOOKINGS_MANAGE,

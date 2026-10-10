@@ -94,3 +94,10 @@ export async function saveServiceRooms(serviceId: string, _state: FormState, for
   revalidatePath(`/services/${serviceId}`);
   return { saved: true };
 }
+
+export async function deleteService(serviceId: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  const { result } = unwrap(await api.DELETE("/services/{service_id}", { params: { ...scope, path: { service_id: serviceId } } }));
+  revalidatePath("/services");
+  redirect(`/services?removed=${result}`);
+}

@@ -3,7 +3,7 @@ from app.core.permissions import ROLE_PERMISSIONS, Permission
 # The full matrix, written out so that any change to who-can-do-what is a visible diff.
 EXPECTED = {
     "owner": set(Permission),
-    "manager": set(Permission) - {"clients.privacy"},
+    "manager": set(Permission) - {"clients.privacy"},  # includes catalog.delete
     "front_desk": {
         "clients.read",
         "clients.write",
