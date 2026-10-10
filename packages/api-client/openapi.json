@@ -9599,7 +9599,7 @@
           "shifts"
         ],
         "summary": "Copy Shifts Week",
-        "description": "Repeats a week's shifts (in the visible branches) in another week, at the same local\ntimes; a shift that would clash with one already there is skipped.",
+        "description": "Repeats a week's shifts (in the visible branches) in `repeat` following weeks from\n`to_week`, at the same local times; a shift that would clash with one already there is\nskipped.",
         "operationId": "copy_shifts_week",
         "security": [
           {
@@ -9643,6 +9643,84 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CopyShiftsWeek"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopiedShifts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shifts/copy-day": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Copy Shifts Day",
+        "description": "Repeats one day's shifts (in the visible branches) on other days.",
+        "operationId": "copy_shifts_day",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyShiftsDay"
               }
             }
           }
@@ -23645,6 +23723,33 @@
         ],
         "title": "CopiedShifts"
       },
+      "CopyShiftsDay": {
+        "properties": {
+          "from_day": {
+            "type": "string",
+            "format": "date",
+            "title": "From Day",
+            "description": "The day whose shifts are copied"
+          },
+          "to_days": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "maxItems": 31,
+            "minItems": 1,
+            "title": "To Days",
+            "description": "Days to fill"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_day",
+          "to_days"
+        ],
+        "title": "CopyShiftsDay"
+      },
       "CopyShiftsWeek": {
         "properties": {
           "from_week": {
@@ -23658,6 +23763,14 @@
             "format": "date",
             "title": "To Week",
             "description": "First day of the week to fill"
+          },
+          "repeat": {
+            "type": "integer",
+            "maximum": 8.0,
+            "minimum": 1.0,
+            "title": "Repeat",
+            "description": "Fill this many following weeks, seven days apart",
+            "default": 1
           }
         },
         "type": "object",

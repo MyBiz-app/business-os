@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { addDays } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
 import { zonedToIso } from "@/lib/zoned";
 
@@ -57,9 +58,19 @@ export async function deleteShift(shiftId: string): Promise<void> {
 
 export type CopyState = { copied?: { created: number; skipped: number }; error?: boolean };
 
-export async function copyShiftsWeek(from: string, to: string): Promise<CopyState> {
+/** Repeats the week starting `from` over the `weeks` weeks that follow it. */
+export async function copyShiftsWeek(from: string, weeks: number): Promise<CopyState> {
   const { api, scope } = await getTenantFor("staff.manage");
-  const { data } = await api.POST("/shifts/copy-week", { params: scope, body: { from_week: from, to_week: to } });
+  const { data } = await api.POST("/shifts/copy-week", { params: scope, body: { from_week: from, to_week: addDays(from, 7), repeat: weeks } });
+  if (!data) return { error: true };
+  revalidatePath("/team/shifts");
+  return { copied: data };
+}
+
+/** Repeats a day's shifts on the `days` days that follow it. */
+export async function copyShiftsDay(from: string, days: number): Promise<CopyState> {
+  const { api, scope } = await getTenantFor("staff.manage");
+  const { data } = await api.POST("/shifts/copy-day", { params: scope, body: { from_day: from, to_days: Array.from({ length: days }, (_, i) => addDays(from, i + 1)) } });
   if (!data) return { error: true };
   revalidatePath("/team/shifts");
   return { copied: data };
