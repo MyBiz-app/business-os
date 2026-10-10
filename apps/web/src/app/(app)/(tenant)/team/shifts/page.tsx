@@ -22,7 +22,7 @@ import { EditFromUrl } from "./edit-from-url";
 import { PlanningSettings } from "./planning-settings";
 import { SaveShiftsDefault } from "./save-default";
 import { Segmented } from "./segmented";
-import { type BoardPerson, type BoardShift, ShiftBoard } from "./shift-board";
+import { type BoardPerson, type BoardShift, type Editing, ShiftBoard } from "./shift-board";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("shifts");
@@ -160,7 +160,11 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         };
       })
     : [];
-  const editing = typeof query.edit === "string" ? boardShifts.find((s) => s.id === query.edit) : undefined;
+  const existing = typeof query.edit === "string" ? boardShifts.find((s) => s.id === query.edit) : undefined;
+  // `?add=<day>:<branch>`: a new shift at that branch, for someone who works there if possible.
+  const [addDay, addBranch] = typeof query.add === "string" ? query.add.split(":") : [];
+  const adding = isDay(addDay) && colorOf.has(addBranch) ? { shift: null, userId: (people.find((p) => p.homeId === addBranch) ?? people[0]).id, day: addDay, locationId: addBranch } : undefined;
+  const editing: Editing | undefined = existing ? { shift: existing, userId: existing.userId, day: existing.day } : adding;
   const last = days[days.length - 1];
   const rangeLabel =
     range === "day"
@@ -259,7 +263,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           dayHref={range === "week" ? href({ range: "day", date: "__day__" }) : null}
         />
       ) : view === "branches" ? (
-        <BranchRoster days={days} today={today} locale={locale} branches={branchList.filter((b) => shown.includes(b.id))} shifts={boardShifts} people={people} />
+        <BranchRoster days={days} today={today} locale={locale} branches={branchList.filter((b) => shown.includes(b.id))} shifts={boardShifts} people={people} editHref={canEdit ? (id) => href({ edit: id }) : undefined} addHref={canEdit ? (day, branchId) => href({ add: `${day}:${branchId}` }) : undefined} />
       ) : (
         <ShiftBoard
           key={`${win.start}-${win.days}`}
@@ -275,7 +279,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           compact={win.days > 7}
         />
       )}
-      {editing && canEdit && <EditFromUrl shift={editing} people={people} branches={branchList} closeHref={href({ edit: undefined })} />}
+      {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} closeHref={href({ edit: undefined, add: undefined })} />}
       {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
     </main>
   );
