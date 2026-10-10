@@ -5,7 +5,7 @@ import { Text } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { BackBar, Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, ErrorText, Field, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -31,7 +31,7 @@ export default function Addresses() {
     if (!business) return [] as Address[];
     return unwrap(await api.GET("/client/addresses", { params: scope }));
   }, [api, scope, business]);
-  const { data, reload } = useLoad(load);
+  const { data, error: loadError, reload } = useLoad(load);
   if (!business) return null;
 
   const add = async () => {
@@ -71,6 +71,7 @@ export default function Addresses() {
     <Screen palette={palette}>
       <BackBar label={tProfile("title")} palette={palette} onPress={() => router.back()} />
       <Heading palette={palette}>{t("myAddresses")}</Heading>
+      {loadError !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       <Text style={[styles.muted, { color: palette.muted }]}>{t("myAddressesHint")}</Text>
       {data?.map((address) => (
         <ListRow
