@@ -622,7 +622,20 @@
     "mainBranch": "Main branch",
     "branchNumber": "Branch {number}",
     "bookable": "For rent by the hour",
-    "openingHours": "Opening hours: {name}"
+    "openingHours": "Opening hours: {name}",
+    "addBranch": {
+      "title": "Add a branch",
+      "details": "Branch details",
+      "chargeTitle": "This adds a monthly charge",
+      "chargeBody": "Each branch beyond the first costs {price} a month. Your extra branches go from {before} to {after} a month.",
+      "chargeNote": "Nothing is charged now; the change shows on your next invoice.",
+      "copyHours": "Opening hours",
+      "setHoursLater": "I'll set them after creating the branch",
+      "staff": "Who works here too?",
+      "staffHint": "Team members kept to specific branches. Everyone else already works at all branches.",
+      "accept": "I understand the monthly charge for the new branch",
+      "submit": "Add branch"
+    }
   },
   "team": {
     "title": "Team",

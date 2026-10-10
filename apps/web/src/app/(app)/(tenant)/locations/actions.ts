@@ -139,3 +139,29 @@ export async function saveOpeningHours(locationId: string, blocks: Block[]): Pro
   revalidatePath("/schedule");
   return { saved: true };
 }
+
+/** Adds a branch to a running business; the owner must have accepted the extra monthly charge. */
+export async function addBranch(_state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  const copyFrom = value(formData, "copy_hours_from");
+  let id: string;
+  try {
+    id = unwrap(
+      await api.POST("/locations/new-branch", {
+        params: scope,
+        body: {
+          name: value(formData, "name"),
+          address: value(formData, "address"),
+          copy_hours_from: copyFrom === "" ? null : copyFrom,
+          staff_user_ids: formData.getAll("staff_user_ids").map(String),
+          accept_extra_charge: formData.get("accept_extra_charge") === "on",
+        },
+      }),
+    ).id;
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/locations");
+  revalidatePath("/team");
+  redirect(`/locations/${id}`);
+}

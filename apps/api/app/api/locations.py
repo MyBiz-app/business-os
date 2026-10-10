@@ -9,12 +9,14 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, require
+from app.commerce.modules import MODULES
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["locations"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
+SettingsDep = Annotated[TenantContext, Depends(require(Permission.BUSINESS_SETTINGS))]
 
 LOCATION_COLUMNS = "id, name, address, active, created_at, updated_at"
 ROOM_COLUMNS = "id, location_id, name, capacity, active, bookable"
@@ -139,6 +141,112 @@ def create_location(body: LocationCreate, context: WriteDep) -> Location:
         {**body.model_dump(), "tenant_id": context.tenant_id},
     ).scalar_one()
     return _one_location(context.session, location_id)
+
+
+class NewBranchPreview(BaseModel):
+    """What adding one more branch costs, shown before the form is filled in."""
+
+    currency: str
+    active_branches: int
+    extra_branch_price: int = Field(description="Monthly, minor units, per branch beyond the first")
+    monthly_extra_now: int = Field(description="Monthly cost of the extra branches today")
+    monthly_extra_after: int = Field(
+        description="Monthly cost of the extra branches with the new one"
+    )
+    chargeable: bool = Field(description="The new branch adds a monthly charge")
+
+
+class BranchSetup(LocationCreate):
+    copy_hours_from: UUID | None = Field(
+        default=None, description="Start with another branch's opening hours"
+    )
+    staff_user_ids: list[UUID] = Field(
+        default_factory=list, max_length=200, description="Team members who work here too"
+    )
+    accept_extra_charge: bool = Field(
+        default=False, description="Required when the new branch adds a monthly charge"
+    )
+
+
+def _new_branch_preview(session: Session) -> NewBranchPreview:
+    currency, active = session.execute(
+        text("""
+            SELECT t.currency, (SELECT count(*) FROM app.locations WHERE active)
+            FROM app.tenants t WHERE t.id = app.current_tenant_id()
+        """)
+    ).one()
+    prices = MODULES["extra_location"].prices
+    price = prices.get(currency, prices["USD"])
+    now = max(active - 1, 0)
+    # The first branch is included; any branch added to a business that has one is extra.
+    return NewBranchPreview(
+        currency=currency,
+        active_branches=active,
+        extra_branch_price=price,
+        monthly_extra_now=now * price,
+        monthly_extra_after=(now + 1) * price if active >= 1 else 0,
+        chargeable=active >= 1,
+    )
+
+
+@router.get("/locations/new-branch")
+def new_branch_preview(context: SettingsDep) -> NewBranchPreview:
+    return _new_branch_preview(context.session)
+
+
+@router.post("/locations/new-branch", status_code=status.HTTP_201_CREATED)
+def add_branch(body: BranchSetup, context: SettingsDep) -> Location:
+    """Adds a branch to a running business: its details, opening hours copied from another
+    branch, and the team members who work there. When it adds a monthly charge the owner must
+    have accepted it; nothing is billed here (the extra-branch module follows the branches)."""
+    session = context.session
+    if _new_branch_preview(session).chargeable and not body.accept_extra_charge:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="charge_not_accepted")
+    if (
+        body.copy_hours_from is not None
+        and not session.execute(
+            text("SELECT EXISTS (SELECT 1 FROM app.locations WHERE id = :id)"),
+            {"id": body.copy_hours_from},
+        ).scalar_one()
+    ):
+        raise HTTPException(status_code=422, detail="unknown_branch")
+    staff = sorted(set(body.staff_user_ids))
+    known = session.execute(
+        text("""
+            SELECT count(*) FROM app.tenant_members
+            WHERE tenant_id = app.current_tenant_id() AND user_id = ANY(CAST(:ids AS uuid[]))
+        """),
+        {"ids": [str(i) for i in staff]},
+    ).scalar_one()
+    if known != len(staff):
+        raise HTTPException(status_code=422, detail="unknown_member")
+    location_id = session.execute(
+        text("""
+            INSERT INTO app.locations (tenant_id, name, address)
+            VALUES (:tenant_id, :name, :address) RETURNING id
+        """),
+        {"tenant_id": context.tenant_id, "name": body.name, "address": body.address},
+    ).scalar_one()
+    if body.copy_hours_from is not None:
+        session.execute(
+            text("""
+                INSERT INTO app.location_hours (tenant_id, location_id, weekday, opens, closes)
+                SELECT tenant_id, :new, weekday, opens, closes
+                FROM app.location_hours WHERE location_id = :source
+            """),
+            {"new": location_id, "source": body.copy_hours_from},
+        )
+    if staff:
+        # A member with no branches works everywhere already, so only narrowed ones change.
+        session.execute(
+            text("""
+                UPDATE app.tenant_members SET location_ids = location_ids || :new
+                WHERE tenant_id = app.current_tenant_id() AND user_id = ANY(CAST(:ids AS uuid[]))
+                  AND cardinality(location_ids) > 0
+            """),
+            {"new": [location_id], "ids": [str(i) for i in staff]},
+        )
+    return _one_location(session, location_id)
 
 
 @router.get("/locations/{location_id}")
