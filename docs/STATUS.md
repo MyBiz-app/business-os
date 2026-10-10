@@ -1,6 +1,6 @@
 # Project status
 
-_Last updated: 2026-10-09_ · Updated with every merged pull request. Open work lives in
+_Last updated: 2026-10-10_ · Updated with every merged pull request. Open work lives in
 [GitHub issues](https://github.com/MyBiz-app/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
@@ -37,6 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- **Workspace upgrade (owner's 16-point list, [plan](proposals/crm-upgrade-2026-10.md), X23–X26).** Personal profiles with a picture, phone and an avatar menu; three color palettes (MyBiz black/white/deep purple by default, Ocean, Forest) in light and dark; the business's legal entity and registration number (Israeli check digit) and a workspace cover; an org chart with job titles and reporting lines (never permissions); branch opening hours with breaks; a weekly shift board (overlap protection, warnings, copy last week) and a simple hours page for one-person businesses; a day/week calendar with a live "now" line, multi-branch colors and the shifts lane; branches side by side in reports; one popover to switch business and branch; shared screens refresh on focus and every minute. Demo: every demo has titles, hierarchy, hours and shifts, and the new `networks` demo seeds Urban Slice (pizza, 4 branches), Pulse Fitness (2) and Studio Bloom (3) for one owner, with a new Food & restaurants category (beta).
 - **The product's name in one place (X21).** "MyBiz" is a working name: it now comes from `packages/i18n/brand.json`, which feeds every translation, page title, the invoice and the share picture, and the API's texts. Renaming is one file (plus the store names in each app's `app.json`), see [design-system.md](design-system.md).
 - **Data is kept only as long as decided (X20).** A daily job (`purge-expired`, scheduled on staging) deletes leads that never became clients and nobody touched for 12 months, website requests and AI assistant conversations after 12 months, and the message log after 24 months.
 - **Team members work in their branches (#64, X19).** A member assigned to branches sees only those: the branch picker lists only theirs, "all branches" means all of theirs, and lists and numbers follow it. Owners and managers see every branch.
