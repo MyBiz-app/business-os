@@ -55,7 +55,8 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
     changes = {
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()
-        if value is not None or key in ("primary_color", "legal_entity_type", "business_number")
+        if value is not None
+        or key in ("primary_color", "legal_entity_type", "business_number", "shifts_default_range")
     }
     if changes.get("business_number"):
         currency = (
@@ -70,8 +71,10 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             raise HTTPException(status_code=422, detail="invalid_business_number")
         if currency == "ILS":
             changes["business_number"] = number.replace("-", "")
-    branches = changes.get("schedule_default_branches")
-    if branches:
+    for key in ("schedule_default_branches", "shifts_default_branches"):
+        branches = changes.get(key)
+        if not branches:
+            continue
         known = context.session.execute(
             text("SELECT count(*) FROM app.locations WHERE id = ANY(:ids)"), {"ids": branches}
         ).scalar_one()

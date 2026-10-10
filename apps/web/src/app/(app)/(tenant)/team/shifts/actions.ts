@@ -80,3 +80,23 @@ export async function savePlanning(locationId: string, _state: PlanningState, fo
   revalidatePath("/team/shifts");
   return { saved: true };
 }
+
+export type DefaultViewState = { saved?: boolean; error?: boolean };
+
+/** The owner's choice of how the shifts board opens: people or branches, the range, the branches. */
+export async function saveShiftsDefault(
+  view: "people" | "branches",
+  range: "day" | "week" | "month" | "custom",
+  branches: string[],
+  _state: DefaultViewState,
+  _formData: FormData,
+): Promise<DefaultViewState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  const { error } = await api.PATCH("/tenants/current", {
+    params: scope,
+    body: { shifts_default_view: view, shifts_default_range: range, shifts_default_branches: branches },
+  });
+  if (error) return { error: true };
+  revalidatePath("/team/shifts");
+  return { saved: true };
+}

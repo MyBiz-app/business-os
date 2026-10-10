@@ -14,12 +14,13 @@ import { branchColor, minutesIn } from "@/lib/calendar";
 import { addDays, dayOf, formatDay, formatTime, isDay, todayIn } from "@/lib/dates";
 import { branchLimit, isRange, RANGES, type Range, rangeOfCadence, stepWindow, windowOf } from "@/lib/shift-window";
 import { weekStartFor } from "@/lib/hours";
-import { canManageTeam } from "@/lib/permissions";
+import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { BranchRoster } from "./branch-roster";
 import { EditFromUrl } from "./edit-from-url";
 import { PlanningSettings } from "./planning-settings";
+import { SaveShiftsDefault } from "./save-default";
 import { Segmented } from "./segmented";
 import { type BoardPerson, type BoardShift, ShiftBoard } from "./shift-board";
 
@@ -89,11 +90,13 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
 
   const colorOf = new Map(branches.map((b, i) => [b.id, branchColor(i)]));
   const rhythm = new Map(planning.map((p) => [p.location_id, p]));
-  const view: "people" | "branches" = query.view === "branches" ? "branches" : "people";
-  const requested = String(query.b ?? "").split(",").filter((id) => colorOf.has(id));
-  // The board opens on the rhythm of the first branch shown.
+  // What the owner saved as the way the board opens; the address overrides it.
+  const savedBranches = (tenant.shifts_default_branches ?? []).filter((id) => colorOf.has(id));
+  const view: "people" | "branches" = query.view === "branches" || query.view === "people" ? query.view : (tenant.shifts_default_view ?? "people");
+  const requested = ("b" in query ? String(query.b ?? "").split(",") : savedBranches).filter((id) => colorOf.has(id));
+  // Without a saved range, the board opens on the rhythm of the first branch shown.
   const first = rhythm.get(requested[0] ?? branches[0]?.id);
-  const range: Range = isRange(query.range) ? query.range : rangeOfCadence(first?.cadence);
+  const range: Range = isRange(query.range) ? query.range : (tenant.shifts_default_range ?? rangeOfCadence(first?.cadence));
   const customDays = first?.cadence === "custom" ? (first.days ?? 14) : 14;
   const anchor = isDay(query.date) ? query.date : today;
   const win = windowOf(range, anchor, customDays);
@@ -106,7 +109,8 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     .then(unwrap);
 
   const href = (changes: Record<string, string | undefined>) => {
-    const next: Record<string, string | undefined> = { view: view === "branches" ? "branches" : undefined, range, date: anchor, b: allShown ? undefined : shown.join(","), ...changes };
+    // "all" keeps every branch when the saved default is a narrower set.
+    const next: Record<string, string | undefined> = { view, range, date: anchor, b: allShown ? (savedBranches.length ? "all" : undefined) : shown.join(","), ...changes };
     const params = new URLSearchParams(Object.entries(next).filter((e): e is [string, string] => Boolean(e[1])));
     return `/team/shifts?${params}`;
   };
@@ -166,6 +170,11 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         : `${formatDay(win.start, locale, { day: "numeric", month: "short" })} – ${formatDay(last, locale, { day: "numeric", month: "short", year: "numeric" })}`;
   const showToday = !days.includes(today);
   const canEdit = canManageTeam(tenant);
+  const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((id) => b.includes(id));
+  const savedView = tenant.shifts_default_view ?? "people";
+  const savedRange = tenant.shifts_default_range ?? rangeOfCadence(rhythm.get(savedBranches[0] ?? branches[0]?.id)?.cadence);
+  const currentSet = allShown ? [] : shown;
+  const showSave = canManageSettings(tenant) && (view !== savedView || range !== savedRange || !sameSet(currentSet, savedBranches));
   const branchList = branches.map((b) => ({ ...b, color: colorOf.get(b.id) ?? "" }));
 
   return (
@@ -206,7 +215,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           />
           <Segmented
             label={t("shifts.viewLabel")}
-            items={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v === "branches" ? "branches" : undefined }), active: v === view }))}
+            items={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v }), active: v === view }))}
           />
         </div>
       </div>
@@ -220,7 +229,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
             return (
               <Link
                 key={b.id}
-                href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? undefined : nextIds.join(",") })}
+                href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? (savedBranches.length ? "all" : undefined) : nextIds.join(",") })}
                 aria-pressed={on}
                 className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${on ? "border-transparent font-medium text-foreground" : "border-border text-muted hover:text-foreground"}`}
                 style={on ? { background: `color-mix(in oklab, ${b.color} 16%, var(--surface))`, boxShadow: `inset 0 0 0 1.5px ${b.color}` } : undefined}
@@ -233,6 +242,8 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           {view === "branches" && <span className="text-xs text-muted">{t("shifts.limitHint", { count: limit })}</span>}
         </div>
       )}
+
+      {showSave && <SaveShiftsDefault view={view} range={range} branches={currentSet} />}
 
       {gridView ? (
         <TimeGrid
