@@ -51,6 +51,9 @@ class Me(BaseModel):
     address_line: str | None = None
     city: str | None = None
     postal_code: str | None = None
+    email_roster: bool = Field(
+        default=True, description="Email the person when their roster is published"
+    )
     palette: Palette | None = Field(
         default=None, description="The person's color palette (none: the MyBiz default)"
     )

@@ -542,3 +542,92 @@ def test_the_roster_goes_out_on_schedule(client: TestClient, studio: dict, engin
     with engine.begin() as connection:
         assert publish_shifts(connection, after) == 0
         assert publish_shifts(connection, after + timedelta(days=7, minutes=1)) == 1
+
+
+def test_staff_are_emailed_once_when_their_shifts_are_published(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import notify_roster
+
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    zone = ZoneInfo("Asia/Jerusalem")
+    soon = datetime.now(zone).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=3)
+    for day in (0, 1):
+        day_start = soon + timedelta(days=day)
+        body = {
+            "user_id": coach,
+            "location_id": branch,
+            "starts_at": day_start.replace(hour=9).isoformat(),
+            "ends_at": day_start.replace(hour=15).isoformat(),
+            "position": "Coach",
+        }
+        assert client.post("/shifts", json=body, headers=headers).status_code == 201
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "UPDATE app.users SET email = 'coach@example.com', full_name = 'Dana Levi' "
+                "WHERE id = :id"
+            ),
+            {"id": coach},
+        )
+    sender = LogSender()
+
+    # Drafts are not announced.
+    with engine.begin() as connection:
+        assert notify_roster(connection, sender) == {"sent": 0, "failed": 0, "skipped": 0}
+
+    published = client.post(
+        "/shifts/publish", json={"start": soon.date().isoformat(), "days": 7}, headers=headers
+    )
+    assert published.json() == {"published": 2}
+    with engine.begin() as connection:
+        assert notify_roster(connection, sender) == {"sent": 1, "failed": 0, "skipped": 0}
+        assert notify_roster(connection, sender)["sent"] == 0  # once only
+    [email] = sender.sent
+    assert email.to == "coach@example.com"
+    assert email.subject == "המשמרות החדשות שלך ב" + "Studio Flow"
+    assert email.text.startswith("שלום Dana,")
+    assert email.text.count("09:00–15:00 · Main · Coach") == 2
+    with engine.connect() as connection:
+        usage = (
+            connection.execute(
+                text("SELECT quantity FROM app.usage_events WHERE source_ref = 'roster_emails'")
+            )
+            .scalars()
+            .all()
+        )
+    assert [int(quantity) for quantity in usage] == [1]
+
+
+def test_switching_roster_emails_off_sends_nothing(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import notify_roster
+
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    zone = ZoneInfo("Asia/Jerusalem")
+    day = datetime.now(zone).replace(hour=9, minute=0, second=0, microsecond=0) + timedelta(days=2)
+    body = {
+        "user_id": coach,
+        "location_id": branch,
+        "starts_at": day.isoformat(),
+        "ends_at": (day + timedelta(hours=6)).isoformat(),
+    }
+    assert client.post("/shifts", json=body, headers=headers).status_code == 201
+    client.post("/shifts/publish", json={"start": day.date().isoformat()}, headers=headers)
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "UPDATE app.users SET email = 'c@example.com', email_roster = false WHERE id = :id"
+            ),
+            {"id": coach},
+        )
+    sender = LogSender()
+    with engine.begin() as connection:
+        assert notify_roster(connection, sender) == {"sent": 0, "failed": 0, "skipped": 1}
+        unnotified = connection.execute(
+            text("SELECT count(*) FROM app.shifts WHERE notified_at IS NULL")
+        ).scalar_one()
+    assert sender.sent == [] and unnotified == 0

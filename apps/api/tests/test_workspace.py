@@ -42,6 +42,24 @@ def test_a_person_keeps_their_personal_details(
     assert future.status_code == 422
 
 
+def test_roster_emails_are_on_by_default_and_can_be_switched_off(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    owner = auth(studio["owner"])
+    assert client.get("/me", headers=owner).json()["email_roster"] is True
+    off = client.patch("/me", json={"email_roster": False}, headers=owner).json()
+    assert off["email_roster"] is False
+    # Other changes and an empty value leave the choice alone.
+    assert (
+        client.patch("/me", json={"city": "Holon"}, headers=owner).json()["email_roster"] is False
+    )
+    assert (
+        client.patch("/me", json={"email_roster": None}, headers=owner).json()["email_roster"]
+        is False
+    )
+    assert client.patch("/me", json={"email_roster": True}, headers=owner).json()["email_roster"]
+
+
 def test_a_person_manages_their_own_profile_and_picture(
     client: TestClient, auth: AuthHeaders, studio: dict
 ) -> None:

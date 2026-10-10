@@ -10,7 +10,7 @@ import { AccessibilitySettings } from "@/components/accessibility";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
-import { PictureForm, ProfileForm } from "./profile-form";
+import { NotificationsForm, PictureForm, ProfileForm } from "./profile-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
@@ -44,6 +44,12 @@ export default async function AccountPage() {
           city={me.city ?? null}
           postalCode={me.postal_code ?? null}
         />
+      </section>
+      <section id="notifications" aria-labelledby="notifications-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
+        <h2 id="notifications-heading" className="font-semibold">
+          {t("account.notificationsTitle")}
+        </h2>
+        <NotificationsForm emailRoster={me.email_roster ?? true} />
       </section>
       <section id="accessibility" aria-labelledby="accessibility-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
         <div className="flex flex-col gap-1">

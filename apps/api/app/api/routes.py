@@ -213,7 +213,7 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
         session.execute(
             text("""
                 SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
-                       phone, birth_date, address_line, city, postal_code, palette,
+                       phone, birth_date, address_line, city, postal_code, email_roster, palette,
                        CASE WHEN palette_background IS NULL THEN NULL
                             ELSE jsonb_build_object('background', palette_background,
                                                     'text', palette_text,
@@ -303,6 +303,7 @@ class ProfileUpdate(BaseModel):
     address_line: str | None = Field(default=None, max_length=200)
     city: str | None = Field(default=None, max_length=100)
     postal_code: str | None = Field(default=None, max_length=20)
+    email_roster: bool | None = None
     palette: Palette | None = None
     palette_colors: PaletteColors | None = None
 
@@ -328,11 +329,14 @@ class ProfileUpdate(BaseModel):
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     """The signed-in person's own profile: the name the team, clients and reports see, a phone
-    number for the team, personal details (date of birth, home address) and their color
-    palette. Fields left out stay as they are."""
+    number for the team, personal details (date of birth, home address), whether to email
+    them when their roster is published, and their color palette. Fields left out stay as
+    they are."""
     ensure_profile(session, user.id, user.email)
     changes = body.model_dump(exclude_unset=True)
     colors = changes.pop("palette_colors", None)
+    if changes.get("email_roster", True) is None:
+        del changes["email_roster"]
     if colors:
         changes |= {f"palette_{name}": value for name, value in colors.items()}
     if changes:
