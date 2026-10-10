@@ -1,7 +1,9 @@
+import { CalendarClock, Network } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { avatarSrc } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
 import { canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenant } from "@/lib/tenant";
@@ -29,9 +31,19 @@ export default async function TeamPage() {
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("team.title")}</h1>
         <p className="text-sm text-muted">{t("team.subtitle")}</p>
-        <Link href="/team/roles" className="mt-1 text-sm text-primary underline-offset-4 hover:underline">
-          {t("team.manageRoles")}
-        </Link>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <Link href="/team/organization" className="btn-secondary px-3 py-2 text-sm">
+            <Network aria-hidden="true" className="size-4" />
+            {t("organization.title")}
+          </Link>
+          <Link href="/team/shifts" className="btn-secondary px-3 py-2 text-sm">
+            <CalendarClock aria-hidden="true" className="size-4" />
+            {t("shifts.title")}
+          </Link>
+          <Link href="/team/roles" className="btn-ghost px-3 py-2 text-sm">
+            {t("team.manageRoles")}
+          </Link>
+        </div>
       </div>
 
       <section aria-labelledby="members-heading" className="flex flex-col gap-3">
@@ -55,6 +67,8 @@ export default async function TeamPage() {
               allowOwner={isOwner}
               branches={branches}
               memberBranches={member.location_ids}
+              avatar={avatarSrc(member.user_id, member.avatar_url)}
+              title={member.job_title ?? null}
             />
           ))}
         </ul>

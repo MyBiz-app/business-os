@@ -64,3 +64,42 @@ export async function removeLogo(): Promise<void> {
   await api.DELETE("/tenants/current/logo", { params: scope });
   revalidatePath("/", "layout");
 }
+
+export type IdentityState = { error?: "invalid_business_number" | "generic"; saved?: boolean };
+
+/** The business's legal entity and registration number (ח.פ., עוסק מורשה...). */
+export async function updateIdentity(_state: IdentityState, formData: FormData): Promise<IdentityState> {
+  const { api, scope } = await getTenant();
+  const type = String(formData.get("legal_entity_type") ?? "");
+  const response = await api.PATCH("/tenants/current", {
+    params: scope,
+    body: {
+      legal_entity_type: (type || null) as "company" | null,
+      business_number: String(formData.get("business_number") ?? ""),
+    },
+  });
+  if (response.error) {
+    const detail = (response.error as { detail?: unknown }).detail;
+    return { error: detail === "invalid_business_number" ? "invalid_business_number" : "generic" };
+  }
+  revalidatePath("/settings");
+  return { saved: true };
+}
+
+export async function uploadCover(_state: LogoState, formData: FormData): Promise<LogoState> {
+  const file = formData.get("cover");
+  if (!(file instanceof File) || file.size === 0) return { error: "unsupported_image" };
+  const { tenant } = await getTenant();
+  const response = await apiUpload("/tenants/current/cover", file, tenant.id);
+  if (response.status === 413) return { error: "logo_too_large" };
+  if (response.status === 415) return { error: "unsupported_image" };
+  if (!response.ok) return { error: "generic" };
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+export async function removeCover(): Promise<void> {
+  const { api, scope } = await getTenant();
+  await api.DELETE("/tenants/current/cover", { params: scope });
+  revalidatePath("/", "layout");
+}

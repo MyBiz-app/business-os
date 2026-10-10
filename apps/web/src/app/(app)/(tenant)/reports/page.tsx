@@ -10,6 +10,7 @@ import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 import { ScrollRegion } from "@/components/scroll-region";
 
+import { BranchComparison } from "./branch-comparison";
 import { BusyHours } from "./busy-hours";
 
 type Row = components["schemas"]["BreakdownItem"];
@@ -18,6 +19,7 @@ const PERIODS = { "30": 30, "90": 90 } as const;
 type Period = keyof typeof PERIODS;
 const AT_RISK_DAYS = 14;
 const SHOWN = 10; // members listed before "show all"
+const COMPARED = ["revenue", "new_clients", "active_clients", "plans_sold", "attendance", "occupancy"] as const;
 
 export default async function ReportsPage({ searchParams }: PageProps<"/reports">) {
   const t = await getTranslations("reports");
@@ -29,7 +31,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const start = addDays(end, -(PERIODS[period] - 1));
   const range = { start, end };
 
-  const [byService, byInstructor, bySlot, byBranch, atRisk, reviews, courts] = await Promise.all([
+  const [byService, byInstructor, bySlot, byBranch, atRisk, reviews, courts, compared] = await Promise.all([
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "service" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "instructor" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "time_slot" }, query: range } }).then(unwrap),
@@ -37,6 +39,12 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
     api.GET("/metrics/members-at-risk", { params: { ...scope, query: { days: AT_RISK_DAYS } } }).then(unwrap),
     api.GET("/reviews", { params: { ...scope, query: { days: PERIODS[period] } } }).then(unwrap),
     api.GET("/reports/resources", { params: { ...scope, query: range } }).then(unwrap),
+    // Branch by branch, across the person's branches (not just the one picked in the menu).
+    api
+      .GET("/metrics/branches", {
+        params: { header: { "X-Tenant-Id": scope.header["X-Tenant-Id"] }, query: { ...range, keys: [...COMPARED] } },
+      })
+      .then((r) => r.data ?? []),
   ]);
   const tReviews = await getTranslations("reviews");
 
@@ -131,6 +139,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         timeZone={tenant.time_zone}
         title={tReviews("title", { count: PERIODS[period] })}
       />
+      {compared.length > 1 && <BranchComparison rows={compared} currency={tenant.currency} locale={locale} />}
       {/* Comparing branches matters once there is more than one (and none is selected). */}
       {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"))}
       {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}

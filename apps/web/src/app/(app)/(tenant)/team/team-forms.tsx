@@ -80,9 +80,11 @@ type MemberRowProps = {
   /** The business's active branches (a picker appears when there are several). */
   branches: { id: string; name: string }[];
   memberBranches: string[];
+  avatar?: string | null;
+  title?: string | null;
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, avatar = null, title = null }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -97,12 +99,17 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
     <li className="flex flex-col gap-2 border-t border-border px-5 py-4 transition-colors first:border-t-0 hover:bg-primary/4">
       <TeamError state={roleState.error ? roleState : removeState} />
       <div className="flex flex-wrap items-center gap-3">
-        <Avatar id={userId} name={name ?? email} />
+        <Avatar id={userId} name={name ?? email} src={avatar} />
         {/* The name keeps its own line on phones; the actions wrap below it. */}
         <span className="flex min-w-48 flex-1 flex-col">
           <span className="truncate font-medium" dir="auto">
             {name ?? email} {isSelf && <span className="font-normal text-muted">{t("team.you")}</span>}
           </span>
+          {title && (
+            <span className="truncate text-sm" dir="auto">
+              {title}
+            </span>
+          )}
           {name && (
             <span className="truncate text-sm text-muted" dir="ltr">
               {email}

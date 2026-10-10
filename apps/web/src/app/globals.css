@@ -11,17 +11,19 @@
  * Surfaces: `background` is the page canvas, `surface` the raised cards on it. Accents are
  * mixed from `primary`, so a business's brand color carries through the whole UI. */
 :root {
-  --background: #f6f6f9;
-  --foreground: #18181b;
+  --background: #f7f7f8;
+  --foreground: #0a0a0a;
   --surface: #ffffff;
-  --border: #e4e4ea;
+  --border: #e5e4ea;
   --muted: #52525b;
-  --primary: #4f46e5;
-  --on-primary: #ffffff;
+  --palette-primary: #6d28d9;
+  --palette-on-primary: #ffffff;
+  --primary: var(--palette-primary);
+  --on-primary: var(--palette-on-primary);
   --success: #15803d;
   --danger: #b91c1c;
   --warning: #b45309;
-  --shadow-color: 240 10% 20%;
+  --shadow-color: 260 12% 18%;
   --elevation:
     0 1px 2px hsl(var(--shadow-color) / 0.06),
     0 2px 6px hsl(var(--shadow-color) / 0.04);
@@ -39,30 +41,66 @@
 }
 
 .dark {
-  --background: #0a0a0f;
+  --background: #000000;
   --foreground: #fafafa;
-  --surface: #15151c;
-  --border: #2a2a33;
+  --surface: #121214;
+  --border: #2a2a30;
   --muted: #a1a1aa;
-  --primary: #818cf8;
-  --on-primary: #09090b;
+  --palette-primary: #a78bfa;
+  --palette-on-primary: #0a0a0a;
   --success: #22c55e;
   --danger: #f87171;
   --warning: #fbbf24;
-  --shadow-color: 240 30% 2%;
+  --shadow-color: 260 30% 2%;
   --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
   --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);
 }
 
-/* A business's brand color (lib/brand.ts brandStyle), in its light or dark variant. */
+/* The person's palette (decision X25): MyBiz (above) is the default; set on <html> as
+ * data-palette before the first paint (components/palette.tsx). */
+[data-palette="ocean"] {
+  --background: #f4f7f9;
+  --border: #dde5ea;
+  --muted: #4b5563;
+  --palette-primary: #0e7490;
+  --shadow-color: 200 30% 18%;
+}
+[data-palette="ocean"].dark {
+  --background: #050b10;
+  --surface: #0d171e;
+  --border: #1f2e38;
+  --muted: #9ca8b3;
+  --palette-primary: #22d3ee;
+  --palette-on-primary: #04141a;
+  --shadow-color: 200 40% 2%;
+}
+[data-palette="forest"] {
+  --background: #f5f7f4;
+  --border: #dfe5dc;
+  --muted: #4b524a;
+  --palette-primary: #166534;
+  --shadow-color: 120 15% 16%;
+}
+[data-palette="forest"].dark {
+  --background: #060a07;
+  --surface: #0f1611;
+  --border: #233026;
+  --muted: #a3ada3;
+  --palette-primary: #4ade80;
+  --palette-on-primary: #052e14;
+  --shadow-color: 120 30% 2%;
+}
+
+/* A business's brand color (lib/brand.ts brandStyle), in its light or dark variant; without
+ * one, the person's palette. */
 .brand {
-  --primary: var(--brand, #4f46e5);
-  --on-primary: var(--on-brand, #ffffff);
+  --primary: var(--brand, var(--palette-primary));
+  --on-primary: var(--on-brand, var(--palette-on-primary));
 }
 
 .dark .brand {
-  --primary: var(--brand-dark, #818cf8);
-  --on-primary: var(--on-brand-dark, #09090b);
+  --primary: var(--brand-dark, var(--palette-primary));
+  --on-primary: var(--on-brand-dark, var(--palette-on-primary));
 }
 
 @theme inline {
@@ -169,31 +207,36 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.75rem;
+  border-radius: 0.625rem;
   font-weight: 600;
+  line-height: 1.25rem;
   color: var(--on-primary);
   background:
-    linear-gradient(180deg, color-mix(in oklab, white 14%, transparent), transparent),
+    linear-gradient(180deg, color-mix(in oklab, white 10%, transparent), transparent),
     var(--primary);
   box-shadow:
-    0 1px 2px hsl(var(--shadow-color) / 0.2),
-    0 4px 12px -2px color-mix(in oklab, var(--primary) 45%, transparent);
+    0 1px 0 color-mix(in oklab, white 18%, transparent) inset,
+    0 1px 2px hsl(var(--shadow-color) / 0.18),
+    0 2px 8px -2px color-mix(in oklab, var(--primary) 40%, transparent);
   transition:
-    transform 150ms var(--ease-out),
-    box-shadow 150ms var(--ease-out),
-    filter 150ms var(--ease-out);
+    transform 120ms var(--ease-out),
+    box-shadow 160ms var(--ease-out),
+    filter 160ms var(--ease-out);
   &:hover:not(:disabled) {
-    transform: translateY(-1px);
-    filter: brightness(1.06);
+    filter: brightness(1.08);
     box-shadow:
-      0 2px 4px hsl(var(--shadow-color) / 0.2),
-      0 8px 20px -4px color-mix(in oklab, var(--primary) 55%, transparent);
+      0 1px 0 color-mix(in oklab, white 18%, transparent) inset,
+      0 1px 2px hsl(var(--shadow-color) / 0.18),
+      0 6px 16px -4px color-mix(in oklab, var(--primary) 50%, transparent);
   }
   &:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
+    transform: scale(0.97);
   }
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  &[aria-busy="true"] {
     cursor: progress;
   }
 }
@@ -203,23 +246,97 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 0.75rem;
+  border-radius: 0.625rem;
   border: 1px solid var(--border);
   background: var(--surface);
   font-weight: 600;
+  line-height: 1.25rem;
+  box-shadow: 0 1px 2px hsl(var(--shadow-color) / 0.05);
   transition:
-    transform 150ms var(--ease-out),
-    border-color 150ms var(--ease-out),
-    background-color 150ms var(--ease-out);
+    transform 120ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out);
   &:hover:not(:disabled) {
-    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+    border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
     background: color-mix(in oklab, var(--primary) 5%, var(--surface));
   }
   &:active:not(:disabled) {
-    transform: scale(0.98);
+    transform: scale(0.97);
   }
   &:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+/* A quiet action (cancel, back, secondary links in a toolbar). */
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: 0.625rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  color: var(--muted);
+  transition:
+    color 160ms var(--ease-out),
+    background-color 160ms var(--ease-out);
+  &:hover:not(:disabled) {
+    color: var(--foreground);
+    background: color-mix(in oklab, var(--foreground) 6%, transparent);
+  }
+  &:disabled {
+    opacity: 0.55;
+  }
+}
+
+/* A destructive action (delete, remove): quiet until hovered. */
+@utility btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  border-radius: 0.625rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  color: var(--danger);
+  border: 1px solid color-mix(in oklab, var(--danger) 30%, var(--border));
+  transition: background-color 160ms var(--ease-out);
+  &:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--danger) 8%, transparent);
+  }
+  &:disabled {
+    opacity: 0.55;
+  }
+}
+
+/* A menu or popover under its button: fades and scales in from it. */
+@utility popover {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow:
+    0 1px 2px hsl(var(--shadow-color) / 0.08),
+    0 16px 40px -12px hsl(var(--shadow-color) / 0.35);
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 160ms var(--ease-out),
+    visibility 0s linear 160ms;
+  &[data-open="false"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+    pointer-events: none;
+  }
+  &[data-open="true"] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition-delay: 0s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
 }
 
@@ -370,4 +487,67 @@ body {
     opacity: 0;
     transform: translateY(260px) rotate(540deg);
   }
+}
+
+/* ---- Org chart (team/organization): cards joined by lines, top down ----------------------- */
+.org-tree,
+.org-tree ul {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.org-tree ul {
+  padding-top: 1.5rem;
+}
+.org-tree li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 0.5rem 0;
+}
+.org-tree > li {
+  padding-top: 0;
+}
+.org-tree li::before,
+.org-tree li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  inset-inline-end: 50%;
+  width: 50%;
+  height: 1.5rem;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+}
+.org-tree li::after {
+  inset-inline-end: auto;
+  inset-inline-start: 50%;
+  border-inline-start: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+}
+.org-tree > li::before,
+.org-tree > li::after,
+.org-tree li:only-child::before {
+  display: none;
+}
+.org-tree li:only-child::after {
+  border-top: 0;
+}
+.org-tree li:first-child::before,
+.org-tree li:last-child::after {
+  border: 0 none;
+}
+.org-tree li:last-child:not(:only-child)::before {
+  border-inline-end: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  border-start-end-radius: 0.75rem;
+}
+.org-tree li:first-child:not(:only-child)::after {
+  border-start-start-radius: 0.75rem;
+}
+.org-tree ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  inset-inline-start: 50%;
+  height: 1.5rem;
+  border-inline-start: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
 }

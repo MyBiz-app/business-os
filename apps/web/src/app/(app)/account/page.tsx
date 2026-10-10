@@ -4,9 +4,13 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
+import { avatarSrc } from "@/components/avatar";
+import { PalettePicker } from "@/components/palette";
+import { ThemeSwitcher } from "@/components/theme-switcher";
 import { getActiveMembership } from "@/lib/tenant";
 
-import { ProfileForm } from "./profile-form";
+import { savePalette } from "./actions";
+import { PictureForm, ProfileForm } from "./profile-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
@@ -17,15 +21,33 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AccountPage() {
   const t = await getTranslations();
   const { me } = await getActiveMembership();
+  const name = me.full_name || me.email;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-10">
+    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">{t("account.title")}</h1>
         <p className="text-muted">{t("account.subtitle")}</p>
       </div>
-      <section className="card p-6">
-        <ProfileForm name={me.full_name} email={me.email} />
+      <section aria-labelledby="profile-heading" className="card flex flex-col gap-6 p-6">
+        <h2 id="profile-heading" className="sr-only">
+          {t("account.title")}
+        </h2>
+        <PictureForm id={me.id} name={name} src={avatarSrc(me.id, me.avatar_url)} />
+        <div className="border-t border-border" />
+        <ProfileForm name={me.full_name} email={me.email} phone={me.phone ?? null} />
+      </section>
+      <section id="appearance" aria-labelledby="appearance-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-col gap-1">
+            <h2 id="appearance-heading" className="font-semibold">
+              {t("appearance.title")}
+            </h2>
+            <p className="text-sm text-muted">{t("appearance.subtitle")}</p>
+          </div>
+          <ThemeSwitcher />
+        </div>
+        <PalettePicker current={me.palette ?? null} save={savePalette} />
       </section>
       <section aria-labelledby="password-heading" className="card flex flex-wrap items-center justify-between gap-3 p-6">
         <h2 id="password-heading" className="flex items-center gap-2 font-semibold">

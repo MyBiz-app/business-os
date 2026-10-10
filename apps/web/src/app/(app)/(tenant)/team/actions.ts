@@ -17,7 +17,7 @@ const TEAM_ERRORS = [
   "name_taken",
   "role_in_use",
 ] as const;
-export type TeamError = (typeof TEAM_ERRORS)[number] | "invalid" | "generic";
+export type TeamError = (typeof TEAM_ERRORS)[number] | "invalid" | "generic" | "reporting_cycle";
 export type TeamState = { error?: TeamError; link?: string; email?: string; created?: boolean };
 
 function toError(error: unknown): TeamError {
@@ -130,4 +130,25 @@ export async function deleteRole(roleId: string, _state: TeamState): Promise<Tea
   if (!response.ok) return { error: toError(new ApiError(response.status, error)) };
   revalidatePath("/team", "layout");
   return {};
+}
+
+/** A member's job title and who they report to (the org chart; never changes access). */
+export async function saveOrganization(userId: string, _state: TeamState, formData: FormData): Promise<TeamState> {
+  const { api, scope } = await getTenant();
+  const reportsTo = String(formData.get("reports_to") ?? "");
+  try {
+    unwrap(
+      await api.PATCH("/staff/{user_id}/organization", {
+        params: { ...scope, path: { user_id: userId } },
+        body: { job_title: String(formData.get("job_title") ?? ""), reports_to: reportsTo || null },
+      }),
+    );
+  } catch (error) {
+    if (error instanceof ApiError && (error.body as { detail?: unknown } | null)?.detail === "reporting_cycle") {
+      return { error: "reporting_cycle" };
+    }
+    return { error: toError(error) };
+  }
+  revalidatePath("/team", "layout");
+  return { created: true };
 }
