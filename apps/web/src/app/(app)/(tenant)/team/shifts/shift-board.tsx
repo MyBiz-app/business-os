@@ -33,7 +33,7 @@ export type BoardShift = {
 export type Away = Record<string, string | null>;
 export type BoardTemplate = { id: string; locationId: string; name: string; starts: string; ends: string; position: string | null };
 /** A stretch where a branch has fewer people on shift than its coverage rules ask. */
-export type BoardGap = { locationId: string; locationName: string; day: string; starts: string; ends: string; needed: number; have: number };
+export type BoardGap = { locationId: string; locationName: string; day: string; starts: string; ends: string; startMinute: number; endMinute: number; needed: number; have: number };
 type Branch = { id: string; name: string; color: string };
 export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string };
 
@@ -238,6 +238,14 @@ export function ShiftBoard(props: {
                 {label}
                 <span className="text-xs font-normal text-muted">{t("onShift", { count: covered(day) })}</span>
               </h3>
+              {gaps.filter((g) => g.day === day).map((g) => (
+                <p key={`${g.locationId}-${g.starts}`} className="flex flex-wrap items-center gap-x-2 border-b border-border bg-warning/10 px-4 py-2 text-xs font-medium text-warning">
+                  <ShieldAlert aria-hidden="true" className="size-3.5 shrink-0" />
+                  {branches.length > 1 && <span dir="auto">{g.locationName}</span>}
+                  <span dir="ltr" className="tabular-nums">{g.starts}–{g.ends}</span>
+                  <span>{t("coverage.gap", { have: g.have, needed: g.needed })}</span>
+                </p>
+              ))}
               <ul className="flex flex-col divide-y divide-border">
                 {working.length === 0 && <li className="px-4 py-3 text-sm text-muted">{t("noShiftsDay")}</li>}
                 {working.map((person) => (
