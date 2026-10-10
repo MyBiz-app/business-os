@@ -37,7 +37,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
-- **Client app: load errors no longer look like empty accounts.** Home, bookings, receipts, quotes, documents, addresses and family members show a "couldn't load" card with a Try again button when the request fails (shared `LoadError` in app-kit).
+- **Client app: load errors no longer look like empty accounts.** Home, bookings, receipts, quotes, documents, addresses and family members show a "couldn't load" card with a Try again button when the request fails (shared `LoadError` in app-kit). Empty lists on Home, Bookings and Updates now use one shared card (`EmptyState`) with a spinner while loading.
 - **Creative & events: richer starter services (beta).** Photographers, DJs, event suppliers and small venues now start with two or three ready services each (event coverage, a private-event set, site visit and quote, private venue hire, tasting and menu planning) instead of one.
 - **Food & restaurants: more sub-categories (beta).** Restaurants, bakeries and catering join pizzerias and cafés, each with its own starter services (chef's table, baking workshop, tasting meeting, private events), and cafés now start with a barista workshop and a private event instead of an empty list.
 - **Personal settings.** "Settings" in the profile-picture menu opens the person's own page (outside the business area): picture, name, phone, date of birth and home address (migration 0063), and an accessibility section with language and theme (moved out of the toolbar on signed-in pages) plus contrast, text size and reduced motion, saved on the device.
