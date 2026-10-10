@@ -22,14 +22,17 @@ HEX = "'^#[0-9a-f]{6}$'"
 
 
 def upgrade() -> None:
-    op.execute("ALTER TABLE app.users DROP CONSTRAINT users_palette_check")
+    # Guarded so it can run on a database that already holds these columns: staging applied this
+    # change under the number 0058 before it was renumbered.
+    op.execute("ALTER TABLE app.users DROP CONSTRAINT IF EXISTS users_palette_check")
+    op.execute("ALTER TABLE app.users DROP CONSTRAINT IF EXISTS users_custom_palette_colors")
     op.execute(f"""
         ALTER TABLE app.users
             ADD CONSTRAINT users_palette_check
                 CHECK (palette IN ('mybiz', 'ocean', 'forest', 'custom')),
-            ADD COLUMN palette_background text CHECK (palette_background ~ {HEX}),
-            ADD COLUMN palette_text text CHECK (palette_text ~ {HEX}),
-            ADD COLUMN palette_accent text CHECK (palette_accent ~ {HEX}),
+            ADD COLUMN IF NOT EXISTS palette_background text CHECK (palette_background ~ {HEX}),
+            ADD COLUMN IF NOT EXISTS palette_text text CHECK (palette_text ~ {HEX}),
+            ADD COLUMN IF NOT EXISTS palette_accent text CHECK (palette_accent ~ {HEX}),
             ADD CONSTRAINT users_custom_palette_colors CHECK (
                 palette IS DISTINCT FROM 'custom'
                 OR (palette_background IS NOT NULL AND palette_text IS NOT NULL
