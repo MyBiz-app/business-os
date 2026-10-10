@@ -310,6 +310,66 @@ def test_a_week_of_shifts_is_copied_without_clashes(client: TestClient, studio: 
     assert len(next_week) == 1  # the one planned by hand, not a clashing copy
 
 
+def test_shifts_are_copied_to_other_days_and_repeated_over_weeks(
+    client: TestClient, studio: dict
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    client.post(
+        "/shifts",
+        json={
+            "user_id": coach,
+            "location_id": branch,
+            "starts_at": at(0, 8),
+            "ends_at": at(0, 12),
+        },
+        headers=headers,
+    )
+    today = local_today()
+
+    def on(day: int) -> list:
+        return client.get(
+            "/shifts",
+            params={"start": (today + timedelta(days=day)).isoformat(), "days": 1},
+            headers=headers,
+        ).json()
+
+    days = client.post(
+        "/shifts/copy-day",
+        json={
+            "from_day": today.isoformat(),
+            "to_days": [(today + timedelta(days=d)).isoformat() for d in (1, 2)],
+        },
+        headers=headers,
+    )
+    again = client.post(
+        "/shifts/copy-day",
+        json={"from_day": today.isoformat(), "to_days": [(today + timedelta(days=1)).isoformat()]},
+        headers=headers,
+    )
+    weeks = client.post(
+        "/shifts/copy-week",
+        json={
+            "from_week": today.isoformat(),
+            "to_week": (today + timedelta(days=7)).isoformat(),
+            "repeat": 2,
+        },
+        headers=headers,
+    )
+    invalid = [
+        {"from_day": today.isoformat(), "to_days": [today.isoformat()]},
+        {"from_day": today.isoformat(), "to_days": []},
+    ]
+
+    assert days.json() == {"created": 2, "skipped": 0}
+    assert again.json() == {"created": 0, "skipped": 1}  # already there
+    assert len(on(1)) == 1 and len(on(2)) == 1
+    # Three shifts this week (today, +1, +2) copied into two following weeks.
+    assert weeks.json() == {"created": 6, "skipped": 0}
+    assert len(on(8)) == 1 and len(on(15)) == 1
+    for body in invalid:
+        assert client.post("/shifts/copy-day", json=body, headers=headers).status_code == 422
+
+
 def test_branch_comparison_and_calendars_stay_within_the_persons_branches(
     client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict
 ) -> None:

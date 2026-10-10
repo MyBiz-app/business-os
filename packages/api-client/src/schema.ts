@@ -1753,10 +1753,31 @@ export interface paths {
         put?: never;
         /**
          * Copy Shifts Week
-         * @description Repeats a week's shifts (in the visible branches) in another week, at the same local
-         *     times; a shift that would clash with one already there is skipped.
+         * @description Repeats a week's shifts (in the visible branches) in `repeat` following weeks from
+         *     `to_week`, at the same local times; a shift that would clash with one already there is
+         *     skipped.
          */
         post: operations["copy_shifts_week"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/copy-day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Shifts Day
+         * @description Repeats one day's shifts (in the visible branches) on other days.
+         */
+        post: operations["copy_shifts_day"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5525,6 +5546,20 @@ export interface components {
              */
             skipped: number;
         };
+        /** CopyShiftsDay */
+        CopyShiftsDay: {
+            /**
+             * From Day
+             * Format: date
+             * @description The day whose shifts are copied
+             */
+            from_day: string;
+            /**
+             * To Days
+             * @description Days to fill
+             */
+            to_days: string[];
+        };
         /** CopyShiftsWeek */
         CopyShiftsWeek: {
             /**
@@ -5539,6 +5574,12 @@ export interface components {
              * @description First day of the week to fill
              */
             to_week: string;
+            /**
+             * Repeat
+             * @description Fill this many following weeks, seven days apart
+             * @default 1
+             */
+            repeat: number;
         };
         /** CoreTier */
         CoreTier: {
@@ -14142,6 +14183,43 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CopyShiftsWeek"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopiedShifts"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_shifts_day: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyShiftsDay"];
             };
         };
         responses: {

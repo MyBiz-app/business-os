@@ -274,7 +274,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           shifts={boardShifts}
           branches={branchList}
           canEdit={canEdit}
-          canCopy={range === "week"}
+          copyMode={range === "week" ? "week" : range === "day" ? "day" : null}
           weekStart={win.start}
           compact={win.days > 7}
         />

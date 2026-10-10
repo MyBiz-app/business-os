@@ -8,9 +8,9 @@ import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
-import { addDays, formatDay } from "@/lib/dates";
+import { formatDay } from "@/lib/dates";
 
-import { copyShiftsWeek, type CopyState, deleteShift, saveShift, type ShiftState } from "./actions";
+import { copyShiftsDay, copyShiftsWeek, type CopyState, deleteShift, saveShift, type ShiftState } from "./actions";
 
 export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null };
 export type BoardShift = {
@@ -43,14 +43,17 @@ export function ShiftBoard(props: {
   branches: Branch[];
   canEdit: boolean;
   weekStart: string;
-  canCopy?: boolean;
+  copyMode?: "week" | "day" | null;
   compact?: boolean;
 }) {
-  const { days, today, locale, people, shifts, branches, canEdit, weekStart, canCopy = true, compact = false } = props;
+  const { days, today, locale, people, shifts, branches, canEdit, weekStart, copyMode = null, compact = false } = props;
   const t = useTranslations("shifts");
+  const tCommon = useTranslations("common");
   const [editing, setEditing] = useState<Editing | null>(null);
   const [copy, setCopy] = useState<CopyState>({});
   const [copying, startCopy] = useTransition();
+  const [copyCount, setCopyCount] = useState(1);
+  const copyCounts = copyMode === "week" ? [1, 2, 4] : [1, 3, 6];
   const hours = (minutes: number) => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(minutes / 60);
   const total = (userId: string) => shifts.filter((s) => s.userId === userId).reduce((sum, s) => sum + s.minutes, 0);
   const covered = (day: string) => new Set(shifts.filter((s) => s.day === day).map((s) => s.userId)).size;
@@ -71,21 +74,38 @@ export function ShiftBoard(props: {
             {t("warningLegend")}
           </li>
         </ul>
-        {canEdit && canCopy && (
+        {canEdit && copyMode && (
           <div className="flex flex-col items-end gap-1">
-            <button
-              type="button"
-              disabled={copying || shifts.length === 0}
-              aria-busy={copying}
-              onClick={() => startCopy(async () => setCopy(await copyShiftsWeek(weekStart, addDays(weekStart, 7))))}
-              className="btn-secondary px-3 py-2 text-sm"
-            >
-              <Copy aria-hidden="true" className="size-4" />
-              {t("copyWeek")}
-            </button>
+            <div className="flex items-center gap-2">
+              <label htmlFor="copy-count" className="text-sm text-muted">
+                {t("copyTo")}
+              </label>
+              <select id="copy-count" value={copyCount} onChange={(event) => setCopyCount(Number(event.target.value))} className="input w-auto py-1.5 text-sm">
+                {copyCounts.map((n) => (
+                  <option key={n} value={n}>
+                    {copyMode === "week" ? (n === 1 ? t("copyNextWeek") : t("copyNextWeeks", { count: n })) : n === 1 ? t("copyNextDay") : t("copyNextDays", { count: n })}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                disabled={copying || shifts.length === 0}
+                aria-busy={copying}
+                onClick={() => startCopy(async () => setCopy(await (copyMode === "week" ? copyShiftsWeek(weekStart, copyCount) : copyShiftsDay(weekStart, copyCount))))}
+                className="btn-secondary px-3 py-2 text-sm"
+              >
+                <Copy aria-hidden="true" className="size-4" />
+                {t("copyDo")}
+              </button>
+            </div>
             {copy.copied && (
               <p role="status" className="text-xs text-muted">
                 {t("copied", { created: copy.copied.created, skipped: copy.copied.skipped })}
+              </p>
+            )}
+            {copy.error && (
+              <p role="alert" className="text-xs text-danger">
+                {tCommon("errors.generic")}
               </p>
             )}
           </div>

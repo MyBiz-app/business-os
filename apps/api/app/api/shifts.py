@@ -208,6 +208,20 @@ class ShiftUpdate(ShiftFields):
 class CopyShiftsWeek(BaseModel):
     from_week: dt.date = Field(description="First day of the week to copy (seven days from it)")
     to_week: dt.date = Field(description="First day of the week to fill")
+    repeat: int = Field(
+        default=1, ge=1, le=8, description="Fill this many following weeks, seven days apart"
+    )
+
+
+class CopyShiftsDay(BaseModel):
+    from_day: dt.date = Field(description="The day whose shifts are copied")
+    to_days: list[dt.date] = Field(min_length=1, max_length=31, description="Days to fill")
+
+    @model_validator(mode="after")
+    def other_days(self) -> "CopyShiftsDay":
+        if self.from_day in self.to_days or len(set(self.to_days)) != len(self.to_days):
+            raise ValueError("copy to other days, each once")
+        return self
 
 
 class CopiedShifts(BaseModel):
@@ -378,13 +392,12 @@ def delete_shift(shift_id: UUID, context: ManageDep) -> None:
     context.session.execute(text("DELETE FROM app.shifts WHERE id = :id"), {"id": shift_id})
 
 
-@router.post("/shifts/copy-week")
-def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) -> CopiedShifts:
-    """Repeats a week's shifts (in the visible branches) in another week, at the same local
-    times; a shift that would clash with one already there is skipped."""
-    source, target = body.from_week, body.to_week
-    if abs((target - source).days) < 7:
-        raise HTTPException(status_code=422, detail="weeks_overlap")
+def _copy_range(
+    context: TenantContext, user: UserDep, source: dt.date, days: int, target: dt.date
+) -> tuple[int, int]:
+    """Repeats the shifts that start in `days` local days from `source` (in the visible branches)
+    from `target` on, at the same local times. A shift that would clash with one already there
+    is skipped. Returns (created, skipped)."""
     time_zone = _time_zone(context.session)
     rows = context.session.execute(
         text(f"""
@@ -393,7 +406,7 @@ def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) ->
         """),
         {
             "from": local_to_utc(source, time.min, time_zone),
-            "to": local_to_utc(source + timedelta(days=7), time.min, time_zone),
+            "to": local_to_utc(source + timedelta(days=days), time.min, time_zone),
         },
     ).mappings()
     shifts = [Shift.model_validate(dict(row)) for row in rows]
@@ -427,4 +440,30 @@ def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) ->
             created += 1
         except HTTPException:
             skipped += 1
+    return created, skipped
+
+
+@router.post("/shifts/copy-week")
+def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) -> CopiedShifts:
+    """Repeats a week's shifts (in the visible branches) in `repeat` following weeks from
+    `to_week`, at the same local times; a shift that would clash with one already there is
+    skipped."""
+    source = body.from_week
+    targets = [body.to_week + timedelta(days=7 * i) for i in range(body.repeat)]
+    if any(abs((target - source).days) < 7 for target in targets):
+        raise HTTPException(status_code=422, detail="weeks_overlap")
+    created = skipped = 0
+    for target in targets:
+        done, left_out = _copy_range(context, user, source, 7, target)
+        created, skipped = created + done, skipped + left_out
+    return CopiedShifts(created=created, skipped=skipped)
+
+
+@router.post("/shifts/copy-day")
+def copy_shifts_day(body: CopyShiftsDay, user: UserDep, context: ManageDep) -> CopiedShifts:
+    """Repeats one day's shifts (in the visible branches) on other days."""
+    created = skipped = 0
+    for target in body.to_days:
+        done, left_out = _copy_range(context, user, body.from_day, 1, target)
+        created, skipped = created + done, skipped + left_out
     return CopiedShifts(created=created, skipped=skipped)
