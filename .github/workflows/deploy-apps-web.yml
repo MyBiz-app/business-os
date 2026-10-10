@@ -13,7 +13,8 @@ on:
         options: [all, client-app, business-app, staff-app]
 
 env:
-  VERCEL_ORG_ID: team_KwKjSLwpf7CxSCUP92Fbx6qK
+  # Not a secret: names the Vercel team. Passed as --scope (VERCEL_ORG_ID alone is rejected by the CLI).
+  VERCEL_SCOPE: team_KwKjSLwpf7CxSCUP92Fbx6qK
   VERCEL_CLI: vercel@59.26.0
   # Public values only (the same ones the website ships to every browser).
   EXPO_PUBLIC_API_URL: https://business-os-api-staging.onrender.com
@@ -65,6 +66,7 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
+          set -o pipefail
           test -n "$VERCEL_TOKEN" || { echo "::error::VERCEL_TOKEN is not set"; exit 1; }
-          npx --yes "$VERCEL_CLI" deploy --prod --yes --name "mybiz-${{ matrix.app }}" --token="$VERCEL_TOKEN" | tee url.txt
+          npx --yes "$VERCEL_CLI" deploy --prod --yes --name "mybiz-${{ matrix.app }}" --scope "$VERCEL_SCOPE" --token="$VERCEL_TOKEN" | tee url.txt
           echo "### ${{ matrix.app }}: $(tail -n1 url.txt)" >> "$GITHUB_STEP_SUMMARY"
