@@ -7,6 +7,7 @@ Counts live in a store behind a small interface: the built-in in-memory store co
 process, which is enough for one instance; with several instances a shared store (Redis) plugs in
 here without touching the rules."""
 
+import hmac
 import math
 import threading
 import time
@@ -65,13 +66,29 @@ class MemoryStore:
         return count, start + window
 
 
-def client_address(request: Request, trust_forwarded: bool) -> str:
-    """The caller's address; behind the hosting proxy, the first address it forwarded."""
+VISITOR_HEADER = "x-visitor-address"
+INTERNAL_TOKEN_HEADER = "x-internal-token"
+
+
+def client_address(
+    request: Request, trust_forwarded: bool, internal_token: str | None = None
+) -> str:
+    """The caller's address, never a value the caller can choose freely.
+
+    The web server (which sees the real visitor) may name the visitor in `X-Visitor-Address`, but
+    only together with the shared `X-Internal-Token`. Otherwise, behind the hosting proxy, the
+    address is the right-most `X-Forwarded-For` entry: the one the proxy itself appended, after
+    anything the caller sent. Without a trusted proxy, the connection's own address."""
+    if internal_token:
+        supplied = request.headers.get(INTERNAL_TOKEN_HEADER, "")
+        visitor = request.headers.get(VISITOR_HEADER, "").strip()
+        if visitor and hmac.compare_digest(supplied.encode(), internal_token.encode()):
+            return visitor
     if trust_forwarded:
         forwarded = request.headers.get("x-forwarded-for", "")
-        first = forwarded.split(",")[0].strip()
-        if first:
-            return first
+        last = forwarded.split(",")[-1].strip()
+        if last:
+            return last
     return request.client.host if request.client else "unknown"
 
 
@@ -79,6 +96,7 @@ def limiter(
     store: LimiterStore,
     *,
     trust_forwarded: bool,
+    internal_token: str | None = None,
     rules: tuple[Rule, ...] = RULES,
     clock: Callable[[], float] = time.time,
 ):
@@ -89,7 +107,7 @@ def limiter(
         path = request.url.path
         if request.method == "OPTIONS" or path in EXEMPT:
             return await call_next(request)
-        address = client_address(request, trust_forwarded)
+        address = client_address(request, trust_forwarded, internal_token)
         now = clock()
         for rule in rules:
             if not path.startswith(rule.prefix):

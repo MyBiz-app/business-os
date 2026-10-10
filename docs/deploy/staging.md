@@ -64,7 +64,11 @@ only) and not the transaction pooler (port 6543).
   webhook calls, and a ceiling of 1,200 calls a minute for everything; over a limit the API
   answers 429 with `Retry-After`. On in every environment except local development
   (`API_RATE_LIMITS=false` turns them off). Behind Render's proxy `API_TRUST_FORWARDED_FOR=true`
-  counts the visitor's address; the web forwards its visitors' addresses to the API.
+  counts the right-most `X-Forwarded-For` address (the one Render appended, which a caller cannot
+  forge). The web app names its visitors in `X-Visitor-Address`, believed only together with
+  `X-Internal-Token` equal to `API_INTERNAL_TOKEN` (set the same value on Render and Vercel).
+- The API refuses to start when `API_ENVIRONMENT` is not one of local/test/staging/production, or
+  is local/test (the default) while the database is not on localhost.
 - Counts are kept per API process. With more than one instance, a shared store (Redis) plugs
   in behind `LimiterStore` in the same file.
 

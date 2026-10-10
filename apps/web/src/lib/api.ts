@@ -36,11 +36,12 @@ export class ApiError extends Error {
 }
 
 /** The visitor's address, passed on so the API's rate limits count each visitor rather than
- * this server (the API trusts it only behind the hosting proxy). */
+ * this server. The API believes it only together with the shared secret (API_INTERNAL_TOKEN). */
 async function forwardedFor(): Promise<Record<string, string>> {
   const incoming = await headers();
   const address = incoming.get("x-forwarded-for")?.split(",")[0]?.trim() || incoming.get("x-real-ip");
-  return address ? { "X-Forwarded-For": address } : {};
+  const token = process.env.API_INTERNAL_TOKEN;
+  return address && token ? { "X-Visitor-Address": address, "X-Internal-Token": token } : {};
 }
 
 async function authHeaders(): Promise<Record<string, string>> {

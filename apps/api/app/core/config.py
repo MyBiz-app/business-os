@@ -1,7 +1,11 @@
 from functools import lru_cache
+from urllib.parse import urlparse
 
-from pydantic import AliasChoices, Field, SecretStr, field_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+ENVIRONMENTS = ("local", "test", "staging", "production")
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal", None}
 
 
 class Settings(BaseSettings):
@@ -54,8 +58,10 @@ class Settings(BaseSettings):
     # Rate limits per caller (app/core/rate_limit.py). Off by default in local development and
     # tests (everything comes from one address there); on everywhere else unless set.
     rate_limits: bool | None = None
-    # Behind the hosting proxy, count the first X-Forwarded-For address (the visitor).
+    # Behind the hosting proxy, count the right-most X-Forwarded-For address (added by the proxy).
     trust_forwarded_for: bool = False
+    # Shared with the web server, which then names the real visitor in X-Visitor-Address.
+    internal_token: SecretStr | None = None
 
     @property
     def rate_limits_on(self) -> bool:
@@ -69,6 +75,21 @@ class Settings(BaseSettings):
     client_app_url: str = "http://localhost:8081"
     business_app_url: str = "http://localhost:8082"
     staff_app_url: str = "http://localhost:8083"
+
+    @model_validator(mode="after")
+    def refuse_unsafe_environment(self) -> "Settings":
+        # Fail closed: a missing or mistyped API_ENVIRONMENT must not leave a deployment on the
+        # public development key with rate limits off. Local/test only run against a local database.
+        if self.environment not in ENVIRONMENTS:
+            raise ValueError(f"environment must be one of {', '.join(ENVIRONMENTS)}")
+        if self.environment in ("local", "test") and (
+            urlparse(self.database_url).hostname not in LOCAL_HOSTS
+        ):
+            raise ValueError(
+                "API_ENVIRONMENT is local/test (or unset) but the database is not local; "
+                "set API_ENVIRONMENT to staging or production"
+            )
+        return self
 
     @field_validator("database_url")
     @classmethod

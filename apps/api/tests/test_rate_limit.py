@@ -13,10 +13,18 @@ RULES = (
 )
 
 
-def make_app(now: list[float], *, trust_forwarded: bool = False) -> TestClient:
+def make_app(
+    now: list[float], *, trust_forwarded: bool = False, internal_token: str | None = None
+) -> TestClient:
     app = FastAPI()
     app.middleware("http")(
-        limiter(MemoryStore(), trust_forwarded=trust_forwarded, rules=RULES, clock=lambda: now[0])
+        limiter(
+            MemoryStore(),
+            trust_forwarded=trust_forwarded,
+            internal_token=internal_token,
+            rules=RULES,
+            clock=lambda: now[0],
+        )
     )
 
     @app.get("/public/page")
@@ -63,13 +71,43 @@ def test_visitors_are_counted_apart_behind_the_proxy() -> None:
     now = [0.0]
     trusted = make_app(now, trust_forwarded=True)
     for visitor in ("203.0.113.1", "203.0.113.2"):
-        headers = {"X-Forwarded-For": f"{visitor}, 10.0.0.1"}
+        headers = {"X-Forwarded-For": f"10.9.9.9, {visitor}"}
         codes = [trusted.get("/public/page", headers=headers).status_code for _ in range(3)]
         assert codes == [200, 200, 200]
     # Not behind a trusted proxy, the header is ignored: one caller.
     direct = make_app(now)
     codes = [
         direct.get("/public/page", headers={"X-Forwarded-For": f"203.0.113.{i}"}).status_code
+        for i in range(4)
+    ]
+    assert codes[-1] == 429
+
+
+def test_a_spoofed_forwarded_for_does_not_reset_the_count() -> None:
+    now = [0.0]
+    trusted = make_app(now, trust_forwarded=True)
+    # The caller invents a new leading address each time; the proxy appended the real one last.
+    codes = [
+        trusted.get(
+            "/public/page", headers={"X-Forwarded-For": f"198.51.100.{i}, 203.0.113.7"}
+        ).status_code
+        for i in range(4)
+    ]
+    assert codes[-1] == 429
+
+
+def test_web_server_names_the_visitor_only_with_the_shared_token() -> None:
+    now = [0.0]
+    app = make_app(now, trust_forwarded=True, internal_token="s3cret")
+    for visitor in ("203.0.113.1", "203.0.113.2"):
+        headers = {"X-Internal-Token": "s3cret", "X-Visitor-Address": visitor}
+        assert [app.get("/public/page", headers=headers).status_code for _ in range(3)] == [200] * 3
+    # Without (or with a wrong) token the claimed visitor is ignored: one caller.
+    codes = [
+        app.get(
+            "/public/page",
+            headers={"X-Internal-Token": "nope", "X-Visitor-Address": f"192.0.2.{i}"},
+        ).status_code
         for i in range(4)
     ]
     assert codes[-1] == 429

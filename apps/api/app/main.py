@@ -87,7 +87,14 @@ def create_app() -> FastAPI:
         return response
 
     if settings.rate_limits_on:
-        app.middleware("http")(limiter(MemoryStore(), trust_forwarded=settings.trust_forwarded_for))
+        token = settings.internal_token.get_secret_value() if settings.internal_token else None
+        app.middleware("http")(
+            limiter(
+                MemoryStore(),
+                trust_forwarded=settings.trust_forwarded_for,
+                internal_token=token,
+            )
+        )
 
     app.add_middleware(
         CORSMiddleware,
