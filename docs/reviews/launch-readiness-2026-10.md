@@ -288,6 +288,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** L · **Model:** Sonnet. **Owner decision:** bundle ids and store accounts.
 
 ### P1-11 · Dependency and secret hygiene automation
+- **Progress:** ✅ Dependabot (weekly, grouped; PR 3). CodeQL and secret scanning with push protection are paid on a private repository (GitHub Advanced Security) — left for the owner's decision.
 - **Where:** `.github/` has no `dependabot.yml`, no CodeQL, no secret-scanning config.
 - **Fix:** Dependabot (or Renovate) weekly for npm, uv, GitHub Actions and Docker with grouped
   updates; CodeQL for Python and TypeScript; enable GitHub secret scanning and push protection.
