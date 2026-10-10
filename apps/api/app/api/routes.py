@@ -1,3 +1,4 @@
+from typing import Literal
 from uuid import UUID
 
 from fastapi import APIRouter, status
@@ -5,13 +6,14 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
+from app.api.common import set_clause
 from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.modules import check_selection, set_modules
 from app.api.schemas import Me, Membership, SupportAccess, Tenant, TenantCreate
 from app.catalog.verticals import VERTICAL_PACKS
 from app.commerce.modules import PRESETS
 from app.core.db import set_tenant
-from app.core.permissions import effective_permissions
+from app.core.permissions import Permission, effective_permissions
 from app.messaging.email import load_all_messages
 
 router = APIRouter()
@@ -47,7 +49,11 @@ def load_current_tenant(session: Session) -> Tenant:
                            AS modules,
                        CASE WHEN t.logo IS NULL THEN NULL
                             ELSE '/public/tenants/' || t.id || '/logo?v='
-                                 || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url
+                                 || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url,
+                       CASE WHEN t.cover IS NULL THEN NULL
+                            ELSE '/tenants/current/cover?v='
+                                 || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
+                       t.legal_entity_type, t.business_number
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m
                     ON m.tenant_id = t.id AND m.user_id = app.current_user_id()
@@ -62,6 +68,9 @@ def load_current_tenant(session: Session) -> Tenant:
     data["permissions"] = sorted(
         effective_permissions(data["role"], data.pop("custom_permissions"))
     )
+    # The registration number is for the people who manage the business, not the whole team.
+    if Permission.BUSINESS_SETTINGS.value not in data["permissions"]:
+        data["legal_entity_type"] = data["business_number"] = None
     return Tenant.model_validate(data)
 
 
@@ -189,7 +198,11 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
     profile = (
         session.execute(
             text("""
-                SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin
+                SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
+                       phone, palette,
+                       CASE WHEN avatar_updated_at IS NULL THEN NULL
+                            ELSE '/me/avatar?v=' || extract(epoch FROM avatar_updated_at)::bigint
+                       END AS avatar_url
                 FROM app.users WHERE id = :id
             """),
             {"id": user.id},
@@ -266,8 +279,10 @@ def get_current_tenant(context: TenantDep) -> Tenant:
 
 class ProfileUpdate(BaseModel):
     full_name: str | None = Field(default=None, max_length=120)
+    phone: str | None = Field(default=None, max_length=30, pattern=r"^[0-9+()\- ]*$")
+    palette: Literal["mybiz", "ocean", "forest"] | None = None
 
-    @field_validator("full_name", mode="before")
+    @field_validator("full_name", "phone", mode="before")
     @classmethod
     def blank(cls, value: object) -> object:
         return value.strip() or None if isinstance(value, str) else value
@@ -275,10 +290,13 @@ class ProfileUpdate(BaseModel):
 
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
-    """The signed-in person's own profile: the name the team, clients and reports see."""
+    """The signed-in person's own profile: the name the team, clients and reports see, a phone
+    number for the team, and their color palette. Fields left out stay as they are."""
     ensure_profile(session, user.id, user.email)
-    session.execute(
-        text("UPDATE app.users SET full_name = :name WHERE id = :id"),
-        {"name": body.full_name, "id": user.id},
-    )
+    changes = body.model_dump(exclude_unset=True)
+    if changes:
+        session.execute(
+            text(f"UPDATE app.users SET {set_clause(changes)} WHERE id = :id"),
+            {**changes, "id": user.id},
+        )
     return get_me(user, session)

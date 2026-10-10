@@ -5,6 +5,7 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
+from sqlalchemy import text
 
 from app.api.deps import TenantContext, require
 from app.core.permissions import Permission
@@ -134,3 +135,65 @@ def get_members_at_risk(
         MemberAtRisk.model_validate(member.__dict__)
         for member in members_at_risk(context.session, days)
     ]
+
+
+class BranchMetric(BaseModel):
+    key: MetricKey
+    unit: Unit
+    value: float | None
+    higher_is_better: bool
+
+
+class BranchMetrics(BaseModel):
+    location_id: str
+    name: str
+    metrics: list[BranchMetric]
+
+
+@router.get("/branches")
+def compare_branches(
+    context: ReportsDep,
+    start: Annotated[dt.date, Query(description="First local date")],
+    end: Annotated[dt.date, Query(description="Last local date (inclusive)")],
+    keys: Annotated[list[MetricKey] | None, Query()] = None,
+    location_id: Annotated[
+        list[str] | None, Query(description="Only these branches (within the person's own)")
+    ] = None,
+) -> list[BranchMetrics]:
+    """The same metrics, branch by branch, for comparing them side by side. Each value uses
+    the metric's single definition with that one branch selected, so the numbers add up to
+    the business's own. Only branches the person may see are compared."""
+    _check_period(start, end)
+    db = context.session
+    branches = db.execute(
+        text("""
+            SELECT id::text AS id, name FROM app.locations
+            WHERE active AND app.in_branch(id) ORDER BY created_at, name
+        """)
+    ).all()
+    if location_id:
+        wanted = set(location_id)
+        branches = [b for b in branches if b.id in wanted]
+    previous = db.execute(text("SELECT current_setting('app.location_id', true)")).scalar()
+    result = []
+    try:
+        for branch in branches:
+            db.execute(text("SELECT set_config('app.location_id', :id, true)"), {"id": branch.id})
+            result.append(
+                BranchMetrics(
+                    location_id=branch.id,
+                    name=branch.name,
+                    metrics=[
+                        BranchMetric(
+                            key=key,
+                            unit=METRICS[key].unit,
+                            value=compute(db, key, start, end),
+                            higher_is_better=METRICS[key].higher_is_better,
+                        )
+                        for key in keys or list(METRICS)
+                    ],
+                )
+            )
+    finally:
+        db.execute(text("SELECT set_config('app.location_id', :id, true)"), {"id": previous or ""})
+    return result

@@ -7,6 +7,10 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.catalog.verticals import VERTICAL_PACKS
 
+LegalEntityType = Literal[
+    "company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"
+]
+
 Locale = Literal["he", "en"]
 Role = Literal["owner", "manager", "staff", "front_desk"]
 
@@ -29,6 +33,13 @@ class Me(BaseModel):
     full_name: str | None
     locale: Locale | None
     platform_admin: bool = Field(description="On the MyBiz team (sees the console)")
+    phone: str | None = None
+    palette: Literal["mybiz", "ocean", "forest"] | None = Field(
+        default=None, description="The person's color palette (none: the MyBiz default)"
+    )
+    avatar_url: str | None = Field(
+        default=None, description="Path of the person's own picture on this API, if any"
+    )
     memberships: list[Membership]
     support_access: list[SupportAccess] = Field(
         description="Businesses that let MyBiz support in (the MyBiz team only)"
@@ -79,6 +90,19 @@ class TenantUpdate(BaseModel):
     requires_health_declaration: bool | None = None
     online_sales: bool | None = None
     resource_payment: Literal["app", "venue"] | None = None
+    legal_entity_type: LegalEntityType | None = None
+    business_number: str | None = Field(
+        default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
+    )
+
+    @field_validator("business_number", mode="before")
+    @classmethod
+    def normalize_number(cls, value: object) -> object:
+        # People type it with spaces or dashes; an empty field clears it.
+        if isinstance(value, str):
+            value = value.replace(" ", "").strip()
+            return value or None
+        return value
 
     @field_validator("name")
     @classmethod
@@ -104,6 +128,15 @@ class Tenant(BaseModel):
     currency: str
     primary_color: str | None
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
+    cover_url: str | None = Field(
+        default=None, description="Path of the workspace cover image on this API (members only)"
+    )
+    legal_entity_type: LegalEntityType | None = Field(
+        default=None, description="Shown only to people who manage the business's settings"
+    )
+    business_number: str | None = Field(
+        default=None, description="Shown only to people who manage the business's settings"
+    )
     cancellation_window_minutes: int
     booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
     requires_health_declaration: bool = Field(

@@ -58,7 +58,8 @@ export interface paths {
         head?: never;
         /**
          * Update Me
-         * @description The signed-in person's own profile: the name the team, clients and reports see.
+         * @description The signed-in person's own profile: the name the team, clients and reports see, a phone
+         *     number for the team, and their color palette. Fields left out stay as they are.
          */
         patch: operations["update_me"];
         trace?: never;
@@ -1475,6 +1476,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{user_id}/organization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set Member Organization */
+        patch: operations["set_member_organization"];
+        trace?: never;
+    };
     "/roles": {
         parameters: {
             query?: never;
@@ -1539,6 +1557,123 @@ export interface paths {
         put?: never;
         /** Accept Invitation */
         post: operations["accept_invitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Own Avatar */
+        get: operations["get_own_avatar"];
+        /** Upload Avatar */
+        put: operations["upload_avatar"];
+        post?: never;
+        /** Delete Avatar */
+        delete: operations["delete_avatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Member Avatar
+         * @description A team member's picture, for the business's own team.
+         */
+        get: operations["get_member_avatar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/hours": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Opening Hours */
+        get: operations["get_opening_hours"];
+        /**
+         * Set Opening Hours
+         * @description Replaces the branch's whole week.
+         */
+        put: operations["set_opening_hours"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Shifts */
+        get: operations["list_shifts"];
+        put?: never;
+        /** Create Shift */
+        post: operations["create_shift"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/{shift_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Shift */
+        delete: operations["delete_shift"];
+        options?: never;
+        head?: never;
+        /** Update Shift */
+        patch: operations["update_shift"];
+        trace?: never;
+    };
+    "/shifts/copy-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Shifts Week
+         * @description Repeats a week's shifts (in the visible branches) in another week, at the same local
+         *     times; a shift that would clash with one already there is skipped.
+         */
+        post: operations["copy_shifts_week"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2369,6 +2504,28 @@ export interface paths {
          *     with no renewal.
          */
         get: operations["get_members_at_risk"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/metrics/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Compare Branches
+         * @description The same metrics, branch by branch, for comparing them side by side. Each value uses
+         *     the metric's single definition with that one branch selected, so the numbers add up to
+         *     the business's own. Only branches the person may see are compared.
+         */
+        get: operations["compare_branches"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3652,6 +3809,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/cover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Cover */
+        get: operations["get_cover"];
+        /**
+         * Upload Cover
+         * @description The workspace's cover image (the dashboard header), seen by the business's team.
+         */
+        put: operations["upload_cover"];
+        post?: never;
+        /** Delete Cover */
+        delete: operations["delete_cover"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/tenants/{tenant_id}/logo": {
         parameters: {
             query?: never;
@@ -4082,6 +4261,16 @@ export interface components {
             /** Source */
             source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
         };
+        /** Body_upload_avatar */
+        Body_upload_avatar: {
+            /** File */
+            file: string;
+        };
+        /** Body_upload_cover */
+        Body_upload_cover: {
+            /** File */
+            file: string;
+        };
         /** Body_upload_document */
         Body_upload_document: {
             /** File */
@@ -4193,6 +4382,32 @@ export interface components {
              * @enum {string}
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
+        /** BranchMetric */
+        BranchMetric: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held";
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "money" | "count" | "percent";
+            /** Value */
+            value: number | null;
+            /** Higher Is Better */
+            higher_is_better: boolean;
+        };
+        /** BranchMetrics */
+        BranchMetrics: {
+            /** Location Id */
+            location_id: string;
+            /** Name */
+            name: string;
+            /** Metrics */
+            metrics: components["schemas"]["BranchMetric"][];
         };
         /** BreakdownItem */
         BreakdownItem: {
@@ -5170,6 +5385,31 @@ export interface components {
              * Format: date-time
              */
             updated_at: string;
+        };
+        /** CopiedShifts */
+        CopiedShifts: {
+            /** Created */
+            created: number;
+            /**
+             * Skipped
+             * @description Shifts left out because the person was already working
+             */
+            skipped: number;
+        };
+        /** CopyShiftsWeek */
+        CopyShiftsWeek: {
+            /**
+             * From Week
+             * Format: date
+             * @description Any day of the week to copy
+             */
+            from_week: string;
+            /**
+             * To Week
+             * Format: date
+             * @description Any day of the week to fill
+             */
+            to_week: string;
         };
         /** CoreTier */
         CoreTier: {
@@ -6359,6 +6599,18 @@ export interface components {
              * @description On the MyBiz team (sees the console)
              */
             platform_admin: boolean;
+            /** Phone */
+            phone?: string | null;
+            /**
+             * Palette
+             * @description The person's color palette (none: the MyBiz default)
+             */
+            palette?: ("mybiz" | "ocean" | "forest") | null;
+            /**
+             * Avatar Url
+             * @description Path of the person's own picture on this API, if any
+             */
+            avatar_url?: string | null;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
             /**
@@ -6397,6 +6649,20 @@ export interface components {
              * Format: date-time
              */
             joined_at: string;
+            /** Job Title */
+            job_title: string | null;
+            /**
+             * Reports To
+             * @description Who they report to (never grants access)
+             */
+            reports_to: string | null;
+            /** Phone */
+            phone: string | null;
+            /**
+             * Avatar Url
+             * @description Path of their picture on this API, if any
+             */
+            avatar_url: string | null;
         };
         /** MemberAtRisk */
         MemberAtRisk: {
@@ -6421,6 +6687,17 @@ export interface components {
              * @description Empty means all branches
              */
             location_ids: string[];
+        };
+        /**
+         * MemberOrganization
+         * @description A member's place in the business: their title and who they report to. Reporting is for
+         *     the org chart only and never changes what anyone may see or do.
+         */
+        MemberOrganization: {
+            /** Job Title */
+            job_title?: string | null;
+            /** Reports To */
+            reports_to?: string | null;
         };
         /**
          * MemberUpdate
@@ -6618,6 +6895,33 @@ export interface components {
             created_at: string;
             /** Read At */
             read_at: string | null;
+        };
+        /**
+         * OpeningHours
+         * @description A branch's week: one or more intervals per open day (a break is the gap between two);
+         *     a day with no interval is closed.
+         */
+        OpeningHours: {
+            /** Intervals */
+            intervals: components["schemas"]["OpeningInterval"][];
+        };
+        /** OpeningInterval */
+        OpeningInterval: {
+            /**
+             * Weekday
+             * @description 0 = Monday
+             */
+            weekday: number;
+            /**
+             * Opens
+             * Format: time
+             */
+            opens: string;
+            /**
+             * Closes
+             * Format: time
+             */
+            closes: string;
         };
         /** OptionItem */
         OptionItem: {
@@ -8246,6 +8550,100 @@ export interface components {
             /** Done */
             done: boolean;
         };
+        /** Shift */
+        Shift: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Position */
+            position: string | null;
+            /** Note */
+            note: string | null;
+            /**
+             * On Time Off
+             * @description Falls on a day the person is away
+             */
+            on_time_off: boolean;
+            /**
+             * Outside Hours
+             * @description Not within the branch's opening hours (if set)
+             */
+            outside_hours: boolean;
+        };
+        /** ShiftCreate */
+        ShiftCreate: {
+            /**
+             * Position
+             * @description E.g. reception
+             */
+            position?: string | null;
+            /** Note */
+            note?: string | null;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+        };
+        /** ShiftUpdate */
+        ShiftUpdate: {
+            /**
+             * Position
+             * @description E.g. reception
+             */
+            position?: string | null;
+            /** Note */
+            note?: string | null;
+            /** User Id */
+            user_id?: string | null;
+            /** Location Id */
+            location_id?: string | null;
+            /** Starts At */
+            starts_at?: string | null;
+            /** Ends At */
+            ends_at?: string | null;
+        };
         /** Signature */
         Signature: {
             /** Name */
@@ -8487,6 +8885,21 @@ export interface components {
              * @description Public path of the logo on this API, if any
              */
             logo_url: string | null;
+            /**
+             * Cover Url
+             * @description Path of the workspace cover image on this API (members only)
+             */
+            cover_url?: string | null;
+            /**
+             * Legal Entity Type
+             * @description Shown only to people who manage the business's settings
+             */
+            legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
+            /**
+             * Business Number
+             * @description Shown only to people who manage the business's settings
+             */
+            business_number?: string | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
@@ -8589,6 +9002,13 @@ export interface components {
             online_sales?: boolean | null;
             /** Resource Payment */
             resource_payment?: ("app" | "venue") | null;
+            /** Legal Entity Type */
+            legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
+            /**
+             * Business Number
+             * @description Registration number (ח.פ., עוסק מורשה...)
+             */
+            business_number?: string | null;
         };
         /** TestCardRequest */
         TestCardRequest: {
@@ -8873,6 +9293,10 @@ export interface components {
         app__api__routes__ProfileUpdate: {
             /** Full Name */
             full_name?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Palette */
+            palette?: ("mybiz" | "ocean" | "forest") | null;
         };
     };
     responses: never;
@@ -12615,6 +13039,45 @@ export interface operations {
             };
         };
     };
+    set_member_organization: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberOrganization"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Member"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_roles: {
         parameters: {
             query?: never;
@@ -12821,6 +13284,379 @@ export interface operations {
             };
         };
     };
+    get_own_avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+        };
+    };
+    upload_avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_avatar"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_avatar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Me"];
+                };
+            };
+        };
+    };
+    get_member_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_opening_hours: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_opening_hours: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OpeningHours"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OpeningHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_shifts: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+                /** @description Only these branches (within the person's own) */
+                location_id?: string[] | null;
+                /** @description Only this person's shifts */
+                user_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Shift"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_shift: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShiftCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Shift"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_shift: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                shift_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_shift: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                shift_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShiftUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Shift"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_shifts_week: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyShiftsWeek"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopiedShifts"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     schedule_options: {
         parameters: {
             query?: never;
@@ -12862,6 +13698,8 @@ export interface operations {
                 days?: number;
                 /** @description Only sessions the user teaches */
                 mine?: boolean;
+                /** @description Only these branches, for a multi-branch calendar (within the person's own branches) */
+                location_id?: string[] | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -14765,6 +15603,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MemberAtRisk"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compare_branches: {
+        parameters: {
+            query: {
+                /** @description First local date */
+                start: string;
+                /** @description Last local date (inclusive) */
+                end: string;
+                keys?: ("revenue" | "active_clients" | "new_clients" | "plans_sold" | "attendance" | "occupancy" | "no_show_rate" | "late_cancel_rate" | "sessions_held")[] | null;
+                /** @description Only these branches (within the person's own) */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchMetrics"][];
                 };
             };
             /** @description Validation Error */
@@ -17284,6 +18163,111 @@ export interface operations {
         };
     };
     delete_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_cover: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_cover: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_cover"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_cover: {
         parameters: {
             query?: never;
             header: {
