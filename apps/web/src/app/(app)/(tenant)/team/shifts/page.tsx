@@ -104,9 +104,10 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   const limit = view === "branches" ? branchLimit(range) : branches.length;
   const shown = (requested.length ? requested : branches.map((b) => b.id)).slice(0, limit);
   const allShown = shown.length === branches.length;
-  const shifts = await api
-    .GET("/shifts", { params: { ...scope, query: { start: win.start, days: win.days, ...(allShown ? {} : { location_id: shown }) } } })
-    .then(unwrap);
+  const [shifts, awayRanges] = await Promise.all([
+    api.GET("/shifts", { params: { ...scope, query: { start: win.start, days: win.days, ...(allShown ? {} : { location_id: shown }) } } }).then(unwrap),
+    api.GET("/shifts/time-off", { params: { ...scope, query: { start: win.start, days: win.days } } }).then(unwrap),
+  ]);
 
   const href = (changes: Record<string, string | undefined>) => {
     // "all" keeps every branch when the saved default is a narrower set.
@@ -121,6 +122,11 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     avatar: avatarSrc(m.user_id, m.avatar_url),
     homeId: m.home_location_id ?? null,
   }));
+  // Each away day in the window as `userId:day` (a range is spread over the days it covers).
+  const away: Record<string, string | null> = {};
+  for (const r of awayRanges) {
+    for (const day of days) if (day >= r.starts_on && day <= r.ends_on) away[`${r.user_id}:${day}`] = r.reason ?? null;
+  }
   const boardShifts: BoardShift[] = shifts.map((s) => ({
     id: s.id,
     userId: s.user_id,
@@ -272,6 +278,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           locale={locale}
           people={people}
           shifts={boardShifts}
+          away={away}
           branches={branchList}
           canEdit={canEdit}
           copyMode={range === "week" ? "week" : range === "day" ? "day" : null}
@@ -279,7 +286,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           compact={win.days > 7}
         />
       )}
-      {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} closeHref={href({ edit: undefined, add: undefined })} />}
+      {editing && canEdit && <EditFromUrl key={`${editing.shift?.id ?? "new"}-${editing.day}-${editing.locationId ?? ""}`} editing={editing} people={people} branches={branchList} closeHref={href({ edit: undefined, add: undefined })} away={away} />}
       {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
     </main>
   );

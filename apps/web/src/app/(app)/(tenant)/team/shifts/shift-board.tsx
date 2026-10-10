@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ArrowRightLeft, Copy, Plus, Trash2, X } from "lucide-react";
+import { AlertTriangle, ArrowRightLeft, Copy, Plane, Plus, Trash2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 
@@ -29,6 +29,8 @@ export type BoardShift = {
   homeName: string | null;
   warning: "timeOff" | "outsideHours" | null;
 };
+/** Days a person is away, keyed `userId:day`; the value is the reason, if given. */
+export type Away = Record<string, string | null>;
 type Branch = { id: string; name: string; color: string };
 export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string };
 
@@ -40,13 +42,14 @@ export function ShiftBoard(props: {
   locale: string;
   people: BoardPerson[];
   shifts: BoardShift[];
+  away?: Away;
   branches: Branch[];
   canEdit: boolean;
   weekStart: string;
   copyMode?: "week" | "day" | null;
   compact?: boolean;
 }) {
-  const { days, today, locale, people, shifts, branches, canEdit, weekStart, copyMode = null, compact = false } = props;
+  const { days, today, locale, people, shifts, away = {}, branches, canEdit, weekStart, copyMode = null, compact = false } = props;
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -57,6 +60,34 @@ export function ShiftBoard(props: {
   const hours = (minutes: number) => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(minutes / 60);
   const total = (userId: string) => shifts.filter((s) => s.userId === userId).reduce((sum, s) => sum + s.minutes, 0);
   const covered = (day: string) => new Set(shifts.filter((s) => s.day === day).map((s) => s.userId)).size;
+
+  const shiftButton = (shift: BoardShift, person: BoardPerson, day: string) => (
+    <button
+      key={shift.id}
+      type="button"
+      disabled={!canEdit}
+      onClick={() => setEditing({ shift, userId: person.id, day })}
+      className="flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default"
+      style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} 12%, var(--surface))` }}
+      aria-label={`${person.name}: ${shift.starts}–${shift.ends} ${shift.locationName}${shift.position ? `, ${shift.position}` : ""}`}
+    >
+      <span className="flex w-full items-center gap-1 font-semibold tabular-nums" dir="ltr">
+        {shift.starts}–{shift.ends}
+        {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className="ms-auto size-3.5 text-warning" />}
+      </span>
+      {(shift.position || branches.length > 1) && (
+        <span dir="auto" className="w-full truncate text-muted">
+          {shift.position ?? shift.locationName}
+        </span>
+      )}
+      {shift.isCover && (
+        <span className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 px-1.5 text-[0.6875rem] font-medium text-primary">
+          <ArrowRightLeft aria-hidden="true" className="size-3 shrink-0" />
+          <span dir="auto" className="truncate">{shift.locationName}</span>
+        </span>
+      )}
+    </button>
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -73,6 +104,12 @@ export function ShiftBoard(props: {
             <AlertTriangle aria-hidden="true" className="size-3.5 text-warning" />
             {t("warningLegend")}
           </li>
+          {Object.keys(away).length > 0 && (
+            <li className="flex items-center gap-1.5">
+              <Plane aria-hidden="true" className="size-3.5 text-muted" />
+              {t("awayLegend")}
+            </li>
+          )}
         </ul>
         {canEdit && copyMode && (
           <div className="flex flex-col items-end gap-1">
@@ -112,7 +149,7 @@ export function ShiftBoard(props: {
         )}
       </div>
 
-      <div className="card overflow-x-auto p-0">
+      <div className="card overflow-x-auto p-0 max-md:hidden">
         <table className="w-full border-collapse text-sm" style={{ minWidth: `${13 + days.length * (compact ? 6 : 7)}rem` }}>
           <caption className="sr-only">{t("title")}</caption>
           <thead>
@@ -149,36 +186,12 @@ export function ShiftBoard(props: {
                 </th>
                 {days.map((day) => {
                   const mine = shifts.filter((s) => s.userId === person.id && s.day === day);
+                  const isAway = `${person.id}:${day}` in away;
                   return (
                     <td key={day} className={`group h-16 border-s border-border p-1 align-top ${day === today ? "bg-primary/[0.03]" : ""}`}>
                       <div className="flex h-full flex-col gap-1">
-                        {mine.map((shift) => (
-                          <button
-                            key={shift.id}
-                            type="button"
-                            disabled={!canEdit}
-                            onClick={() => setEditing({ shift, userId: person.id, day })}
-                            className="flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs transition-shadow hover:shadow-sm disabled:cursor-default"
-                            style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} 12%, var(--surface))` }}
-                            aria-label={`${person.name}: ${shift.starts}–${shift.ends} ${shift.locationName}${shift.position ? `, ${shift.position}` : ""}`}
-                          >
-                            <span className="flex w-full items-center gap-1 font-semibold tabular-nums" dir="ltr">
-                              {shift.starts}–{shift.ends}
-                              {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className="ms-auto size-3.5 text-warning" />}
-                            </span>
-                            {(shift.position || branches.length > 1) && (
-                              <span dir="auto" className="w-full truncate text-muted">
-                                {shift.position ?? shift.locationName}
-                              </span>
-                            )}
-                            {shift.isCover && (
-                              <span className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 px-1.5 text-[0.6875rem] font-medium text-primary">
-                                <ArrowRightLeft aria-hidden="true" className="size-3 shrink-0" />
-                                <span dir="auto" className="truncate">{shift.locationName}</span>
-                              </span>
-                            )}
-                          </button>
-                        ))}
+                        {isAway && <AwayChip reason={away[`${person.id}:${day}`]} label={t("away")} />}
+                        {mine.map((shift) => shiftButton(shift, person, day))}
                         {canEdit && (
                           <button
                             type="button"
@@ -198,18 +211,66 @@ export function ShiftBoard(props: {
           </tbody>
         </table>
       </div>
-      {editing && <ShiftDialog key={`${editing.shift?.id ?? "new"}-${editing.userId}-${editing.day}`} editing={editing} people={people} branches={branches} onClose={() => setEditing(null)} />}
+      <div className="flex flex-col gap-3 md:hidden">
+        {days.map((day) => {
+          const working = people.filter((p) => shifts.some((s) => s.userId === p.id && s.day === day) || `${p.id}:${day}` in away);
+          const label = formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" });
+          return (
+            <section key={day} aria-label={label} className="card overflow-hidden p-0">
+              <h3 className={`flex items-center justify-between gap-2 border-b border-border px-4 py-2.5 text-sm font-semibold ${day === today ? "bg-primary/10 text-primary" : "bg-surface-2"}`}>
+                {label}
+                <span className="text-xs font-normal text-muted">{t("onShift", { count: covered(day) })}</span>
+              </h3>
+              <ul className="flex flex-col divide-y divide-border">
+                {working.length === 0 && <li className="px-4 py-3 text-sm text-muted">{t("noShiftsDay")}</li>}
+                {working.map((person) => (
+                  <li key={person.id} className="flex flex-col gap-1.5 px-4 py-2.5">
+                    <span className="flex items-center gap-2.5">
+                      <Avatar id={person.id} name={person.name} src={person.avatar} size="sm" />
+                      <span dir="auto" className="min-w-0 truncate text-sm font-medium">{person.name}</span>
+                      {`${person.id}:${day}` in away && <AwayChip reason={away[`${person.id}:${day}`]} label={t("away")} />}
+                    </span>
+                    {shifts.filter((s) => s.userId === person.id && s.day === day).map((shift) => shiftButton(shift, person, day))}
+                  </li>
+                ))}
+              </ul>
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={() => setEditing({ shift: null, userId: people[0].id, day })}
+                  aria-label={t("dayCardAdd", { day: formatDay(day, locale, { weekday: "long", day: "numeric" }) })}
+                  className="flex min-h-11 w-full items-center justify-center border-t border-dashed border-border text-muted transition-colors hover:text-foreground"
+                >
+                  <Plus aria-hidden="true" className="size-4" />
+                </button>
+              )}
+            </section>
+          );
+        })}
+      </div>
+      {editing && <ShiftDialog key={`${editing.shift?.id ?? "new"}-${editing.userId}-${editing.day}`} editing={editing} people={people} branches={branches} away={away} onClose={() => setEditing(null)} />}
     </div>
   );
 }
 
-export function ShiftDialog({ editing, people, branches, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; onClose: () => void }) {
+function AwayChip({ reason, label }: { reason: string | null; label: string }) {
+  return (
+    <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 text-[0.6875rem] font-medium text-muted" title={reason ?? undefined}>
+      <Plane aria-hidden="true" className="size-3 shrink-0" />
+      <span dir="auto" className="truncate">{reason ? `${label} · ${reason}` : label}</span>
+    </span>
+  );
+}
+
+export function ShiftDialog({ editing, people, branches, away = {}, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; away?: Away; onClose: () => void }) {
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);
   const { shift } = editing;
   const [state, action] = useActionState<ShiftState, FormData>(saveShift.bind(null, shift?.id ?? null), {});
   const [deleting, startDelete] = useTransition();
+  const [picked, setPicked] = useState({ userId: editing.userId, day: editing.day });
+  const pickedAway = `${picked.userId}:${picked.day}` in away;
 
   useEffect(() => {
     dialog.current?.showModal();
@@ -228,7 +289,14 @@ export function ShiftDialog({ editing, people, branches, onClose }: { editing: E
       aria-labelledby="shift-dialog-title"
       className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-2xl border border-border bg-surface p-0 text-foreground shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm"
     >
-      <form action={action} className="flex flex-col gap-4 p-6">
+      <form
+        action={action}
+        onChange={(event) => {
+          const form = event.currentTarget;
+          setPicked({ userId: String(new FormData(form).get("user_id")), day: String(new FormData(form).get("day")) });
+        }}
+        className="flex flex-col gap-4 p-6"
+      >
         <div className="flex items-start justify-between gap-3">
           <h2 id="shift-dialog-title" className="text-lg font-semibold">
             {shift ? t("editTitle") : t("newTitle")}
@@ -252,7 +320,13 @@ export function ShiftDialog({ editing, people, branches, onClose }: { editing: E
         </div>
         <Field label={t("position")} name="position" defaultValue={shift?.position ?? ""} maxLength={60} placeholder={t("positionPlaceholder")} dir="auto" />
         <Field label={t("note")} name="note" defaultValue={shift?.note ?? ""} maxLength={200} dir="auto" />
-        {shift?.warning && (
+        {pickedAway && (
+          <p role="status" className="flex items-center gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm">
+            <AlertTriangle aria-hidden="true" className="size-4 shrink-0 text-warning" />
+            {t("awayWarning", { name: people.find((p) => p.id === picked.userId)?.name ?? "" })}
+          </p>
+        )}
+        {shift?.warning && !(pickedAway && shift.warning === "timeOff") && (
           <p className="flex items-center gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm">
             <AlertTriangle aria-hidden="true" className="size-4 shrink-0 text-warning" />
             {t(`warnings.${shift.warning}`)}
