@@ -1724,6 +1724,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shifts/time-off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Away
+         * @description Who is away (vacation, sick days) in the window, so the board can show it.
+         */
+        get: operations["list_away"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/shifts/{shift_id}": {
         parameters: {
             query?: never;
@@ -4226,6 +4246,26 @@ export interface components {
             details: {
                 [key: string]: unknown;
             };
+        };
+        /** AwayDays */
+        AwayDays: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** Reason */
+            reason: string | null;
         };
         /** BillPreview */
         BillPreview: {
@@ -14084,6 +14124,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Shift"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_away: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AwayDays"][];
                 };
             };
             /** @description Validation Error */

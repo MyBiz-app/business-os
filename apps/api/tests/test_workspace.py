@@ -246,6 +246,13 @@ def test_shifts_refuse_double_booking_and_flag_time_off(
     assert [s["on_time_off"] for s in listed] == [True, True]
     assert [s["outside_hours"] for s in listed] == [True, True]
 
+    away = client.get(
+        "/shifts/time-off", params={"start": local_today().isoformat()}, headers=headers
+    ).json()
+    assert [(a["user_id"], a["starts_on"]) for a in away] == [(coach, day)]
+    far = (local_today() + timedelta(days=30)).isoformat()
+    assert client.get("/shifts/time-off", params={"start": far}, headers=headers).json() == []
+
     # Moving a shift onto another of the same person is refused; deleting works.
     moved = client.patch(f"/shifts/{body['id']}", json={"ends_at": at(1, 16)}, headers=headers)
     assert moved.status_code == 409

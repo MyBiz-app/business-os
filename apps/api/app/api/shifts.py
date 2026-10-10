@@ -306,6 +306,33 @@ def list_shifts(
     return [Shift.model_validate(dict(row)) for row in rows]
 
 
+class AwayDays(BaseModel):
+    user_id: UUID
+    starts_on: dt.date
+    ends_on: dt.date
+    reason: str | None
+
+
+@router.get("/shifts/time-off")
+def list_away(
+    context: ReadDep,
+    start: Annotated[dt.date, Query(description="First local date (business time zone)")],
+    days: Annotated[int, Query(ge=1, le=42)] = 7,
+) -> list[AwayDays]:
+    """Who is away (vacation, sick days) in the window, so the board can show it."""
+    rows = context.session.execute(
+        text("""
+            SELECT o.user_id, o.starts_on, o.ends_on, o.reason FROM app.staff_time_off o
+            WHERE o.tenant_id = app.current_tenant_id()
+              AND o.starts_on < CAST(:start AS date) + CAST(:days AS int)
+              AND o.ends_on >= CAST(:start AS date)
+            ORDER BY o.starts_on, o.user_id
+        """),
+        {"start": start, "days": days},
+    ).mappings()
+    return [AwayDays.model_validate(dict(r)) for r in rows]
+
+
 def _check_and_lock(
     session: Session,
     user_id: UUID,
