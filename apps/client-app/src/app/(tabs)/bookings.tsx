@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -51,7 +51,7 @@ export default function Bookings() {
       plans,
     };
   }, [api, scope, business]);
-  const { data, loading, reload } = useLoad(load);
+  const { data, error, loading, reload } = useLoad(load);
   const [buying, setBuying] = useState<string | null>(null);
   const [allHistory, setAllHistory] = useState(false);
   const [purchase, setPurchase] = useState<{ ok: boolean; message: string } | null>(null);
@@ -113,6 +113,7 @@ export default function Bookings() {
   return (
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <Heading palette={palette}>{t("title")}</Heading>
+      {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
 
       <Heading palette={palette} level={2}>
         {t("myPlans")}
@@ -205,7 +206,7 @@ export default function Bookings() {
       </Heading>
       {data?.upcoming.length ? (
         <Card palette={palette}>{data.upcoming.map(row)}</Card>
-      ) : (
+      ) : error !== undefined && !data ? null : (
         <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
       )}
       {data?.past.length ? (

@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
 import { Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Button, Card, elevation, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, elevation, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -50,7 +50,7 @@ export default function Home() {
       toReview: pending.data ?? [],
     };
   }, [api, scope, business]);
-  const { data, loading, reload } = useLoad(load);
+  const { data, error, loading, reload } = useLoad(load);
   const sessions = data?.sessions;
   // Coming back (e.g. after rating a visit) shows fresh data.
   useFocusEffect(
@@ -158,13 +158,17 @@ export default function Home() {
         </Card>
       )}
 
+      {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
+
       <Heading palette={palette} level={2}>
         {tTerms(`${termsFor(business)}.nextBooking`)}
       </Heading>
       {next ? (
         <SessionCard session={next} onChange={update} showDay dependents={dependents} />
       ) : (
-        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
+        error !== undefined && !data ? null : (
+          <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
+        )
       )}
 
       {todays.length > 0 && (

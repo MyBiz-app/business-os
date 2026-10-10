@@ -559,6 +559,8 @@
     "pageOf": "עמוד {page} מתוך {pages}"
   },
   "common": {
+    "loadFailed": "לא הצלחנו לטעון כרגע.",
+    "retry": "נסו שוב",
     "save": "שמירה",
     "create": "יצירה",
     "cancel": "ביטול",
