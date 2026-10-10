@@ -8097,6 +8097,94 @@
         }
       }
     },
+    "/staff/{user_id}/home-branch": {
+      "put": {
+        "tags": [
+          "staff"
+        ],
+        "summary": "Set Home Branch",
+        "description": "Where a member normally works. It never limits where a shift can be placed: a shift at\nanother branch is simply shown as cover.",
+        "operationId": "set_home_branch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HomeBranch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff/{user_id}/organization": {
       "patch": {
         "tags": [
@@ -8888,6 +8976,164 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/OpeningHours"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shifts/planning": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Planning",
+        "operationId": "list_planning",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BranchPlanning"
+                  },
+                  "title": "Response List Planning"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locations/{location_id}/planning": {
+      "put": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Set Planning",
+        "operationId": "set_planning",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Planning"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BranchPlanning"
                 }
               }
             }
@@ -20538,6 +20784,45 @@
         ],
         "title": "BranchMetrics"
       },
+      "BranchPlanning": {
+        "properties": {
+          "cadence": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "custom"
+            ],
+            "title": "Cadence",
+            "default": "weekly"
+          },
+          "days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 42.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days",
+            "description": "Only for `custom`"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id"
+        ],
+        "title": "BranchPlanning"
+      },
       "BranchSetup": {
         "properties": {
           "name": {
@@ -24611,6 +24896,28 @@
         ],
         "title": "HealthResponse"
       },
+      "HomeBranch": {
+        "properties": {
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "None clears it"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id"
+        ],
+        "title": "HomeBranch"
+      },
       "HoursBlock": {
         "properties": {
           "weekday": {
@@ -26629,6 +26936,19 @@
             "title": "Location Ids",
             "description": "Branches they work at; empty means all"
           },
+          "home_location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Location Id",
+            "description": "The branch they normally work at (informational: shifts elsewhere are cover)"
+          },
           "joined_at": {
             "type": "string",
             "format": "date-time",
@@ -26691,6 +27011,7 @@
           "custom_role_id",
           "custom_role_name",
           "location_ids",
+          "home_location_id",
           "joined_at",
           "job_title",
           "reports_to",
@@ -27899,6 +28220,38 @@
         "type": "object",
         "title": "PlanUpdate",
         "description": "The kind and credits are fixed once a plan exists; create a new plan instead."
+      },
+      "Planning": {
+        "properties": {
+          "cadence": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly",
+              "custom"
+            ],
+            "title": "Cadence",
+            "default": "weekly"
+          },
+          "days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 42.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days",
+            "description": "Only for `custom`"
+          }
+        },
+        "type": "object",
+        "title": "Planning",
+        "description": "How often a branch plans its shifts; sets the window its board opens on."
       },
       "PlatformBusiness": {
         "properties": {
@@ -31911,6 +32264,35 @@
             ],
             "title": "Note"
           },
+          "home_location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Location Id",
+            "description": "The person's home branch, if set"
+          },
+          "home_location_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Home Location Name"
+          },
+          "is_cover": {
+            "type": "boolean",
+            "title": "Is Cover",
+            "description": "At a branch other than the person's home branch"
+          },
           "on_time_off": {
             "type": "boolean",
             "title": "On Time Off",
@@ -31933,6 +32315,9 @@
           "ends_at",
           "position",
           "note",
+          "home_location_id",
+          "home_location_name",
+          "is_cover",
           "on_time_off",
           "outside_hours"
         ],

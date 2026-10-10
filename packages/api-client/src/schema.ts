@@ -1499,6 +1499,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{user_id}/home-branch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Home Branch
+         * @description Where a member normally works. It never limits where a shift can be placed: a shift at
+         *     another branch is simply shown as cover.
+         */
+        put: operations["set_home_branch"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff/{user_id}/organization": {
         parameters: {
             query?: never;
@@ -1639,6 +1660,40 @@ export interface paths {
          * @description Replaces the branch's whole week.
          */
         put: operations["set_opening_hours"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/planning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Planning */
+        get: operations["list_planning"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/planning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set Planning */
+        put: operations["set_planning"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4432,6 +4487,25 @@ export interface components {
             /** Metrics */
             metrics: components["schemas"]["BranchMetric"][];
         };
+        /** BranchPlanning */
+        BranchPlanning: {
+            /**
+             * Cadence
+             * @default weekly
+             * @enum {string}
+             */
+            cadence: "daily" | "weekly" | "monthly" | "custom";
+            /**
+             * Days
+             * @description Only for `custom`
+             */
+            days?: number | null;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+        };
         /** BranchSetup */
         BranchSetup: {
             /** Name */
@@ -5993,6 +6067,14 @@ export interface components {
             /** Environment */
             environment: string;
         };
+        /** HomeBranch */
+        HomeBranch: {
+            /**
+             * Location Id
+             * @description None clears it
+             */
+            location_id: string | null;
+        };
         /** HoursBlock */
         HoursBlock: {
             /**
@@ -6693,6 +6775,11 @@ export interface components {
              */
             location_ids: string[];
             /**
+             * Home Location Id
+             * @description The branch they normally work at (informational: shifts elsewhere are cover)
+             */
+            home_location_id: string | null;
+            /**
              * Joined At
              * Format: date-time
              */
@@ -7217,6 +7304,23 @@ export interface components {
             validity_days?: number | null;
             /** Active */
             active?: boolean | null;
+        };
+        /**
+         * Planning
+         * @description How often a branch plans its shifts; sets the window its board opens on.
+         */
+        Planning: {
+            /**
+             * Cadence
+             * @default weekly
+             * @enum {string}
+             */
+            cadence: "daily" | "weekly" | "monthly" | "custom";
+            /**
+             * Days
+             * @description Only for `custom`
+             */
+            days?: number | null;
         };
         /** PlatformBusiness */
         PlatformBusiness: {
@@ -8676,6 +8780,18 @@ export interface components {
             position: string | null;
             /** Note */
             note: string | null;
+            /**
+             * Home Location Id
+             * @description The person's home branch, if set
+             */
+            home_location_id: string | null;
+            /** Home Location Name */
+            home_location_name: string | null;
+            /**
+             * Is Cover
+             * @description At a branch other than the person's home branch
+             */
+            is_cover: boolean;
             /**
              * On Time Off
              * @description Falls on a day the person is away
@@ -13201,6 +13317,45 @@ export interface operations {
             };
         };
     };
+    set_home_branch: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HomeBranch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Member"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     set_member_organization: {
         parameters: {
             query?: never;
@@ -13619,6 +13774,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OpeningHours"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_planning: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchPlanning"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_planning: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Planning"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BranchPlanning"];
                 };
             };
             /** @description Validation Error */
