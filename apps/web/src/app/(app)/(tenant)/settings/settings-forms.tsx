@@ -9,6 +9,7 @@ import { FormFeedback } from "@/components/form/form-feedback";
 import { FileField } from "@/components/form/file-field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ImageCropDialog } from "@/components/image-crop-dialog";
 import { brandStyle } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
 import { locales } from "@/i18n/config";
@@ -156,19 +157,52 @@ export function LogoForm() {
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
   const [state, action] = useActionState<LogoState, FormData>(uploadLogo, {});
+  // The logo is cropped to a square in a dialog first; what is uploaded is the crop.
+  const [cropping, setCropping] = useState<File | null>(null);
+  const [cropped, setCropped] = useState<{ file: File; url: string } | null>(null);
   const error =
     state.error === "logo_too_large" || state.error === "unsupported_image"
       ? t(`errors.${state.error}`)
       : state.error && tCommon("errors.generic");
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form
+      action={async (data) => {
+        if (cropped) data.set("logo", cropped.file);
+        await action(data);
+      }}
+      className="flex flex-col gap-3"
+    >
       <FormError message={error} />
       <FormNotice message={state.saved ? tCommon("saved") : undefined} />
-      <FileField label={t("logo")} hint={t("logoHint")} name="logo" accept="image/png,image/jpeg,image/webp" required />
+      <FileField
+        label={t("logo")}
+        hint={t("logoHint")}
+        name="logo"
+        accept="image/png,image/jpeg,image/webp"
+        required
+        onChange={(event) => {
+          setCropped(null);
+          setCropping(event.target.files?.[0] ?? null);
+        }}
+      />
+      {cropped && (
+        // eslint-disable-next-line @next/next/no-img-element -- a local preview of the cropped logo
+        <img src={cropped.url} alt={t("logoPreview")} className="size-20 rounded-full object-cover ring-1 ring-border" />
+      )}
       <div>
         <SubmitButton>{t("uploadLogo")}</SubmitButton>
       </div>
+      {cropping && (
+        <ImageCropDialog
+          file={cropping}
+          onCancel={() => setCropping(null)}
+          onDone={(file) => {
+            setCropping(null);
+            setCropped({ file, url: URL.createObjectURL(file) });
+          }}
+        />
+      )}
     </form>
   );
 }
