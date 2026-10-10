@@ -5,7 +5,7 @@ import { Linking, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge } from "@business-os/app-kit/components/rows";
-import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, ErrorText, Field, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -26,7 +26,7 @@ export default function Documents() {
     if (!business) return [] as Document[];
     return unwrap(await api.GET("/client/documents", { params: scope }));
   }, [api, scope, business]);
-  const { data, loading, reload } = useLoad(load);
+  const { data, error: loadError, loading, reload } = useLoad(load);
   if (!business) return null;
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: business.time_zone });
 
@@ -63,6 +63,7 @@ export default function Documents() {
     <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
       <BackBar label={tProfile("title")} palette={palette} onPress={() => router.back()} />
       <Heading palette={palette}>{t("mine")}</Heading>
+      {loadError !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       <Text style={[styles.muted, { color: palette.muted }]}>{t("mineHint")}</Text>
       <ErrorText message={error} palette={palette} />
       {data && data.length === 0 && (

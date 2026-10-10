@@ -6,7 +6,7 @@ import { useTranslations } from "use-intl";
 
 import { DependentForm, type DependentBody } from "@business-os/app-kit/components/dependent-form";
 import { BackBar, Badge, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useBusiness } from "@/providers/business-provider";
@@ -29,7 +29,7 @@ export default function Dependents() {
     ]);
     return { settings, dependents };
   }, [api, scope, business]);
-  const { data, reload } = useLoad(load);
+  const { data, error, reload } = useLoad(load);
   if (!business || !kind) return null;
 
   const add = async (body: DependentBody) => {
@@ -55,6 +55,7 @@ export default function Dependents() {
     <Screen palette={palette}>
       <BackBar label={tProfile("title")} palette={palette} onPress={() => router.back()} />
       <Heading palette={palette}>{t(`mine.${kind}`)}</Heading>
+      {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
       {data && data.dependents.length === 0 && (
         <Text style={[styles.muted, { color: palette.muted }]}>{t(`mineHint.${kind}`)}</Text>
       )}
