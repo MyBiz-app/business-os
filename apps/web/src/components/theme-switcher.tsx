@@ -1,9 +1,11 @@
 "use client";
 
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Lock, Monitor, Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
+
+import { useCustomPalette } from "@/components/palette";
 
 const themes = [
   { value: "light", label: "themeLight", Icon: Sun },
@@ -25,6 +27,17 @@ export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
   const mounted = useMounted();
   const current = mounted ? theme : "system";
+  const custom = useCustomPalette();
+
+  // "My own colors" decide light or dark themselves (by the background); see components/palette.tsx.
+  if (custom) {
+    return (
+      <span className="flex items-center gap-1.5 rounded-xl border border-border bg-surface px-2.5 py-1.5 text-xs text-muted">
+        <Lock aria-hidden="true" className="size-3.5" />
+        {t("themeFollowsColors")}
+      </span>
+    );
+  }
 
   return (
     <div role="group" aria-label={t("theme")} className="flex items-center gap-0.5 rounded-xl border border-border bg-surface p-0.5">

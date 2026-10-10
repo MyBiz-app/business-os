@@ -36,6 +36,7 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "themeSystem": "System",
+    "themeFollowsColors": "Set by your colors",
     "title": "Settings",
     "subtitle": "Your business details and how it looks to clients.",
     "details": "Business details",
@@ -45,6 +46,7 @@
     "useDefault": "Use the default color",
     "logo": "Logo",
     "logoHint": "PNG, JPG or WebP, up to 512 KB. A square image works best.",
+    "logoPreview": "Preview of the logo",
     "uploadLogo": "Upload logo",
     "removeLogo": "Remove logo",
     "noLogo": "No logo yet",
@@ -4311,6 +4313,17 @@
     "label": "Your account",
     "appearance": "Appearance"
   },
+  "imageCrop": {
+    "title": "Position your picture",
+    "hint": "Drag the picture and zoom until the circle shows what you want. The corners outside the circle are not shown.",
+    "area": "Picture position. Use the arrow keys to move it and plus and minus to zoom.",
+    "zoom": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "use": "Use this picture",
+    "cancel": "Cancel",
+    "failed": "This picture could not be prepared. Try a different one."
+  },
   "appearance": {
     "title": "Appearance",
     "subtitle": "Light or dark, and the colors you work in. Only you see your choice.",
@@ -4318,12 +4331,24 @@
     "palettes": {
       "mybiz": "MyBiz",
       "ocean": "Ocean",
-      "forest": "Forest"
+      "forest": "Forest",
+      "custom": "My own colors"
     },
     "paletteHints": {
       "mybiz": "Black, white and deep purple",
       "ocean": "Cool slate and teal",
-      "forest": "Soft sage and green"
+      "forest": "Soft sage and green",
+      "custom": "Pick three colors yourself"
+    },
+    "customHint": "Pick three colors and the whole app follows them. Everything else is worked out from them, and anything that would be hard to read is adjusted for you, so no mix can break the screen.",
+    "adjusted": "To keep everything readable, we adjusted: {picks}.",
+    "modeFollowsBackground": "A dark background gives the dark look and a light one the light look, so the light and dark switch is off while your colors are on.",
+    "saveColors": "Save my colors",
+    "resetColors": "Back to the starting colors",
+    "picks": {
+      "background": "Background",
+      "text": "Text",
+      "accent": "Accent"
     }
   },
   "organization": {

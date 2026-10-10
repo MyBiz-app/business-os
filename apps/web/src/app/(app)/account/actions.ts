@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import type { Palette } from "@/components/palette";
+import type { PaletteColors } from "@/lib/palette-colors";
 import { apiFetch, apiUpload, getApi, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
 
@@ -39,6 +40,6 @@ export async function removeAvatar(): Promise<void> {
   revalidatePath("/", "layout");
 }
 
-export async function savePalette(palette: Palette): Promise<void> {
-  await (await getApi()).PATCH("/me", { body: { palette } });
+export async function savePalette(palette: Palette, colors?: PaletteColors): Promise<void> {
+  await (await getApi()).PATCH("/me", { body: colors ? { palette, palette_colors: colors } : { palette } });
 }
