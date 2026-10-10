@@ -30,7 +30,12 @@ _עודכן לאחרונה: 10.10.2026_ · מתעדכן עם כל מיזוג (Pu
    1. ב-[Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials) יוצרים OAuth client מסוג Web application.
    2. ב-Authorized redirect URIs מדביקים את ה-Callback URL שמופיע ב-[Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers). הכתובת נראית כך: `https://<project>.supabase.co/auth/v1/callback`.
    3. מעתיקים את ה-Client ID וה-Client Secret ל-Supabase ומפעילים את Google. הכפתור יופיע באתר לבד, תוך 5 דקות לכל היותר.
-4. **התחברות עם Apple** (אופציונלי, אפשר בהמשך). צריך חשבון [Apple Developer](https://developer.apple.com/programs/) בתשלום שנתי. אחרי שיש חשבון, אדריך אותך.
+4. **התחברות עם Apple** (אופציונלי, אפשר בהמשך). הכפתור כבר באתר, מושבת עם תווית "בקרוב", ויופעל רק אחרי השלבים האלה. צריך חשבון [Apple Developer](https://developer.apple.com/programs/) בתשלום שנתי:
+   1. ב-Apple Developer → Identifiers יוצרים App ID (עם Sign in with Apple) ו-Services ID (זה ה-Client ID).
+   2. ב-Services ID מגדירים את הדומיין ואת ה-Return URL: ה-Callback של [Supabase → Authentication → Sign In / Providers → Apple](https://supabase.com/dashboard/project/_/auth/providers).
+   3. יוצרים Key עם Sign in with Apple ומורידים את קובץ ה-`.p8` (אפשר להוריד פעם אחת בלבד).
+   4. ב-Supabase מדביקים את ה-Services ID וה-Secret Key (JWT שנוצר מה-`.p8`, [המדריך של Supabase](https://supabase.com/docs/guides/auth/social-login/auth-apple); הוא פג כל 6 חודשים, צריך לחדש) ומפעילים את Apple.
+   5. ב-Vercel מגדירים משתנה סביבה `AUTH_APPLE_ENABLED=true` ועושים deploy. הכפתור יהפוך לפעיל. את ה-`.p8` לא שולחים לי.
 5. **להחליף את הסיסמאות הזמניות** של חשבונות הדמו. **לא לשלוח לי** את הסיסמה החדשה.
 6. **החלטות פתוחות:** [#46](https://github.com/MyBiz-app/business-os/issues/46) ספק סליקה (ממנו יגיעו גם Apple Pay ו-Google Pay), [#47](https://github.com/MyBiz-app/business-os/issues/47) ספק חשבוניות, [#36](https://github.com/MyBiz-app/business-os/issues/36) שם המותג. הספקים יחוברו כשהעסק יתחיל לפעול (X21), והשם הוא MyBiz בינתיים.
 7. **דוח התיקונים והשיפורים** שלך, לפני העלייה לאוויר.

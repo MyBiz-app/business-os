@@ -4,7 +4,7 @@ import type { AuthError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { OAUTH_PROVIDERS, type OAuthProvider } from "@/lib/auth-providers";
+import { appleEnabled, OAUTH_PROVIDERS, type OAuthProvider } from "@/lib/auth-providers";
 import { AUTH_NEXT_COOKIE, safeNext } from "@/lib/navigation";
 import { siteOrigin } from "@/lib/origin";
 import { resumeMetadata } from "@/lib/resume";
@@ -48,6 +48,7 @@ export async function login(_state: FormState, formData: FormData): Promise<Form
 export async function oauthSignIn(formData: FormData): Promise<void> {
   const provider = String(formData.get("provider") ?? "") as OAuthProvider;
   if (!OAUTH_PROVIDERS.includes(provider)) redirect("/login");
+  if (provider === "apple" && !appleEnabled()) redirect("/login");
   const next = safeNext(formData.get("next"));
   // The return trip is in this same browser, so the destination can wait in a cookie (the
   // redirect address stays fixed, as Supabase's allow list wants).

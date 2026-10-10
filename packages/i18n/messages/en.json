@@ -156,7 +156,8 @@
     "oauth": {
       "google": "Continue with Google",
       "apple": "Continue with Apple",
-      "or": "or with email"
+      "or": "or with email",
+      "soon": "Coming soon"
     }
   },
   "onboarding": {
