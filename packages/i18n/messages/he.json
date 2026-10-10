@@ -767,7 +767,9 @@
     "weekView": "שבוע",
     "branches": "סניפים",
     "now": "עכשיו",
-    "shiftsLegend": "הפסים בצד הם משמרות הצוות."
+    "shiftsLegend": "הפסים בצד הם משמרות הצוות.",
+    "more": "עוד {count}",
+    "onShift": "במשמרת"
   },
   "bookings": {
     "title": "הרשמות",
@@ -3857,7 +3859,11 @@
     "allBusinesses": "כל העסקים שלי",
     "newBusiness": "הוספת עסק",
     "branch": "סניף",
-    "allBranches": "כל הסניפים"
+    "allBranches": "כל הסניפים",
+    "search": "חיפוש עסק או סניף",
+    "branchesOf": "הסניפים של {name}",
+    "otherBusinesses": "עסקים נוספים",
+    "noMatches": "אין עסק או סניף בשם הזה."
   },
   "businesses": {
     "title": "העסקים שלי",

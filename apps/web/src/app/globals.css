@@ -543,6 +543,17 @@ body {
 .org-tree li:first-child:not(:only-child)::after {
   border-start-start-radius: 0.75rem;
 }
+.org-tree ul.org-stack {
+  flex-direction: column;
+  align-items: center;
+}
+.org-tree li.org-leaf {
+  padding: 0;
+}
+.org-tree li.org-leaf::before,
+.org-tree li.org-leaf::after {
+  display: none;
+}
 .org-tree ul::before {
   content: "";
   position: absolute;

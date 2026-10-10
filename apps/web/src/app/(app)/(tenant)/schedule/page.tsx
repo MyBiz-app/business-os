@@ -217,7 +217,8 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         shifts={gridShifts}
         closed={closed}
         open={open}
-        labels={{ now: t("now"), closed: t("closedDay"), shifts: tAll("shifts.title"), empty: term("noSessions") }}
+        labels={{ now: t("now"), closed: t("closedDay"), shifts: tAll("shifts.title"), empty: term("noSessions"), more: t.raw("more") as string, onShift: t("onShift") }}
+        dayHref={view === "week" ? link({ view: "day", date: "__day__" }) : null}
       />
       {gridShifts.length > 0 && <p className="text-xs text-muted">{t("shiftsLegend")}</p>}
     </main>

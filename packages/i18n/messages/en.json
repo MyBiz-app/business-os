@@ -767,7 +767,9 @@
     "weekView": "Week",
     "branches": "Branches",
     "now": "Now",
-    "shiftsLegend": "Striped blocks on the side are team shifts."
+    "shiftsLegend": "Striped blocks on the side are team shifts.",
+    "more": "+{count} more",
+    "onShift": "on shift"
   },
   "bookings": {
     "title": "Bookings",
@@ -3857,7 +3859,11 @@
     "allBusinesses": "All my businesses",
     "newBusiness": "Add a business",
     "branch": "Branch",
-    "allBranches": "All branches"
+    "allBranches": "All branches",
+    "search": "Find a business or branch",
+    "branchesOf": "Branches of {name}",
+    "otherBusinesses": "Other businesses",
+    "noMatches": "Nothing matches that name."
   },
   "businesses": {
     "title": "My businesses",

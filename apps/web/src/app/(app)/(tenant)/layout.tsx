@@ -10,8 +10,7 @@ import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
 import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
-import { BranchPicker } from "./_menu/branch-picker";
-import { BusinessMenu } from "./_menu/business-menu";
+import { WorkspaceSwitcher } from "./_menu/workspace-switcher";
 
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const { tenant, me, branch } = await getTenant();
@@ -58,14 +57,14 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     // The business's brand color replaces the product color inside its own area.
     <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
       <aside className="border-b border-border bg-surface/60 print:hidden backdrop-blur md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-e">
-        <BusinessMenu
+        <WorkspaceSwitcher
           name={tenant.name}
           logo={logo}
           current={tenant.id}
           memberships={me.memberships}
-          branchName={branches.length > 1 ? (currentBranch?.name ?? t("businessMenu.allBranches")) : null}
+          branches={branches.map(({ id, name }) => ({ id, name }))}
+          branch={currentBranch?.id ?? null}
         />
-        {branches.length > 1 && <BranchPicker current={currentBranch?.id ?? null} branches={branches} />}
         <SideNav items={items} />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">

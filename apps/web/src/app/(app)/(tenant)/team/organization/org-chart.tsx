@@ -2,7 +2,7 @@
 
 import { ChevronDown, Mail, MapPin, Phone, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
@@ -52,9 +52,43 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
       return next;
     });
 
+  // A wide tree opens centered on its top.
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const element = scroller.current;
+    if (element) element.scrollLeft = ((element.scrollWidth - element.clientWidth) / 2) * (getComputedStyle(element).direction === "rtl" ? -1 : 1);
+  }, []);
+
+  // People with no one under them, side by side under one manager, stack in a column instead:
+  // the chart stays as wide as its managers, not as its whole team.
+  const renderLeaf = (node: OrgPerson, index: number) => (
+    <li key={node.id} className="org-leaf">
+      {index > 0 && <span aria-hidden="true" className="block h-2 w-px bg-foreground/20" />}
+      <button
+        type="button"
+        onClick={() => setSelected(node.id === selected ? null : node.id)}
+        aria-pressed={node.id === selected}
+        className={`flex w-48 items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
+          node.id === selected ? "border-primary ring-2 ring-primary/25" : "border-border"
+        }`}
+      >
+        <Avatar id={node.id} name={node.name} src={node.avatar} size="sm" />
+        <span className="flex min-w-0 flex-col">
+          <span dir="auto" className="truncate text-sm font-semibold">
+            {node.name}
+          </span>
+          <span dir="auto" className="truncate text-xs text-muted">
+            {node.title ?? node.role}
+          </span>
+        </span>
+      </button>
+    </li>
+  );
+
   const renderNode = (node: OrgPerson) => {
     const reports = children.get(node.id) ?? [];
     const open = !folded.has(node.id);
+    const stack = reports.length > 1 && reports.every((r) => !children.has(r.id));
     return (
       <li key={node.id}>
         <div className="flex flex-col items-center">
@@ -91,18 +125,21 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
               className="relative z-10 -mt-3 flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted shadow-sm hover:text-foreground"
             >
               {reports.length}
-              <ChevronDown aria-hidden="true" className={`size-3 transition-transform motion-reduce:transition-none ${open ? "" : "-rotate-90 rtl:rotate-90"}`} />
+              <ChevronDown
+                aria-hidden="true"
+                className={`size-3 transition-transform motion-reduce:transition-none ${open ? "" : "-rotate-90 rtl:rotate-90"}`}
+              />
             </button>
           )}
         </div>
-        {reports.length > 0 && open && <ul>{reports.map(renderNode)}</ul>}
+        {reports.length > 0 && open && (stack ? <ul className="org-stack">{reports.map(renderLeaf)}</ul> : <ul>{reports.map(renderNode)}</ul>)}
       </li>
     );
   };
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-      <div className="card min-w-0 flex-1 overflow-x-auto p-6">
+      <div ref={scroller} className="card min-w-0 flex-1 overflow-x-auto p-6">
         <ul className="org-tree mx-auto w-max">{roots.map(renderNode)}</ul>
         {people.length === 1 && <p className="mt-6 text-center text-sm text-muted">{t("alone")}</p>}
       </div>
@@ -171,13 +208,25 @@ function OrganizationForm({ person, people }: { person: OrgPerson; people: OrgPe
   const excluded = below(people, person.id);
   const options = [
     { value: "", label: t("organization.nobody") },
-    ...people.filter((p) => p.id !== person.id && !excluded.has(p.id)).map((p) => ({ value: p.id, label: p.title ? `${p.name} · ${p.title}` : p.name })),
+    ...people
+      .filter((p) => p.id !== person.id && !excluded.has(p.id))
+      .map((p) => ({
+        value: p.id,
+        label: p.title ? `${p.name} · ${p.title}` : p.name,
+      })),
   ];
   return (
     <form action={action} className="flex flex-col gap-3 border-t border-border pt-4">
       <FormError message={state.error && (state.error === "reporting_cycle" ? t("organization.cycle") : t("common.errors.generic"))} />
       <FormNotice message={state.created ? t("common.saved") : undefined} />
-      <Field label={t("organization.jobTitle")} name="job_title" defaultValue={person.title ?? ""} maxLength={80} dir="auto" placeholder={t("organization.jobTitlePlaceholder")} />
+      <Field
+        label={t("organization.jobTitle")}
+        name="job_title"
+        defaultValue={person.title ?? ""}
+        maxLength={80}
+        dir="auto"
+        placeholder={t("organization.jobTitlePlaceholder")}
+      />
       <SelectField label={t("organization.reportsTo")} name="reports_to" defaultValue={person.reportsTo ?? ""} options={options} />
       <p className="text-xs text-muted">{t("organization.accessNote")}</p>
       <div>
