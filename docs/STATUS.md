@@ -104,3 +104,4 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - CI (lint, typecheck, tests, build) runs on every pull request; `main` is green.
 - About 340 API tests and 34 end-to-end browser flows, including accessibility (WCAG AA) and dark mode; the business app flow covers 7 steps on a phone.
 - Paid services run in simulated mode until go-live (spec section 10).
+- Launch-readiness review (2026-10-10, [findings](reviews/launch-readiness-2026-10.md)): ready for a beta with friendly businesses, not yet for paying customers. Nine blockers (production stack, reliable job scheduling, logging and alerts, fail-closed config, forwarded-address rate limits, AI cost ceiling, object storage, auth settings from the repository, legal basics) and an ordered plan of slices.
