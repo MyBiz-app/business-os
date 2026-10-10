@@ -158,8 +158,8 @@ class ShiftUpdate(ShiftFields):
 
 
 class CopyShiftsWeek(BaseModel):
-    from_week: dt.date = Field(description="Any day of the week to copy")
-    to_week: dt.date = Field(description="Any day of the week to fill")
+    from_week: dt.date = Field(description="First day of the week to copy (seven days from it)")
+    to_week: dt.date = Field(description="First day of the week to fill")
 
 
 class CopiedShifts(BaseModel):
@@ -327,17 +327,13 @@ def delete_shift(shift_id: UUID, context: ManageDep) -> None:
     context.session.execute(text("DELETE FROM app.shifts WHERE id = :id"), {"id": shift_id})
 
 
-def _monday(day: dt.date) -> dt.date:
-    return day - timedelta(days=day.weekday())
-
-
 @router.post("/shifts/copy-week")
 def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) -> CopiedShifts:
     """Repeats a week's shifts (in the visible branches) in another week, at the same local
     times; a shift that would clash with one already there is skipped."""
-    source, target = _monday(body.from_week), _monday(body.to_week)
-    if source == target:
-        raise HTTPException(status_code=422, detail="same_week")
+    source, target = body.from_week, body.to_week
+    if abs((target - source).days) < 7:
+        raise HTTPException(status_code=422, detail="weeks_overlap")
     time_zone = _time_zone(context.session)
     rows = context.session.execute(
         text(f"""

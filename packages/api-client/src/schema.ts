@@ -5401,13 +5401,13 @@ export interface components {
             /**
              * From Week
              * Format: date
-             * @description Any day of the week to copy
+             * @description First day of the week to copy (seven days from it)
              */
             from_week: string;
             /**
              * To Week
              * Format: date
-             * @description Any day of the week to fill
+             * @description First day of the week to fill
              */
             to_week: string;
         };

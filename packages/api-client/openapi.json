@@ -23015,13 +23015,13 @@
             "type": "string",
             "format": "date",
             "title": "From Week",
-            "description": "Any day of the week to copy"
+            "description": "First day of the week to copy (seven days from it)"
           },
           "to_week": {
             "type": "string",
             "format": "date",
             "title": "To Week",
-            "description": "Any day of the week to fill"
+            "description": "First day of the week to fill"
           }
         },
         "type": "object",
