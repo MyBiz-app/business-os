@@ -20,18 +20,22 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
+    # Guarded so it can run again on a database stamped back to 0057 (staging, where this number
+    # once belonged to the palette migration).
     op.execute("""
         ALTER TABLE app.tenant_members
-            ADD COLUMN home_location_id uuid,
+            ADD COLUMN IF NOT EXISTS home_location_id uuid,
+            DROP CONSTRAINT IF EXISTS tenant_members_home_location_fkey,
             ADD CONSTRAINT tenant_members_home_location_fkey
                 FOREIGN KEY (tenant_id, home_location_id)
                 REFERENCES app.locations (tenant_id, id) ON DELETE SET NULL (home_location_id)
     """)
     op.execute("""
         ALTER TABLE app.locations
-            ADD COLUMN planning_cadence text NOT NULL DEFAULT 'weekly'
+            ADD COLUMN IF NOT EXISTS planning_cadence text NOT NULL DEFAULT 'weekly'
                 CHECK (planning_cadence IN ('daily', 'weekly', 'monthly', 'custom')),
-            ADD COLUMN planning_days integer CHECK (planning_days BETWEEN 1 AND 42),
+            ADD COLUMN IF NOT EXISTS planning_days integer CHECK (planning_days BETWEEN 1 AND 42),
+            DROP CONSTRAINT IF EXISTS locations_planning_days_custom,
             ADD CONSTRAINT locations_planning_days_custom
                 CHECK ((planning_cadence = 'custom') = (planning_days IS NOT NULL))
     """)
