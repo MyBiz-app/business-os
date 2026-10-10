@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   send:
-    name: Send pending emails
+    name: Send pending emails and roster notices
     if: ${{ vars.EMAIL_PROVIDER != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -29,7 +29,7 @@ jobs:
         working-directory: apps/api
         run: uv sync --locked --no-dev
 
-      - name: Run
+      - name: Send client notifications
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
@@ -37,3 +37,12 @@ jobs:
           API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
           API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
         run: uv run python -m app.jobs send-emails
+
+      - name: Email staff their newly published shifts
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+          API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+        run: uv run python -m app.jobs notify-shifts

@@ -1809,6 +1809,22 @@
     "leadFollowUp": {
       "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
       "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "roster": {
+      "subject": "Your new shifts at {business}",
+      "intro": "Your roster at {business} was published. Your shifts:",
+      "line": "{day} {from}–{to} · {branch}{position}",
+      "more": "…and {count} more. See them all in the app.",
+      "weekdays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "footer": "You can turn these emails off under Personal settings."
     }
   },
   "support": {
@@ -3156,7 +3172,10 @@
     "addressLine": "Street and number",
     "city": "City",
     "postalCode": "Postal code",
-    "addressHint": "Your home address. Only you see it."
+    "addressHint": "Your home address. Only you see it.",
+    "notificationsTitle": "Email notifications",
+    "rosterEmails": "Email me when my roster is published",
+    "rosterEmailsHint": "One email with your new shifts, sent after the business publishes the roster."
   },
   "sales": {
     "title": "Sales",
