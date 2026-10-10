@@ -7,7 +7,7 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
-import { enabledProviders } from "@/lib/auth-providers";
+import { providerButtons } from "@/lib/auth-providers";
 import { createClient } from "@/lib/supabase/server";
 import { CURRENCIES, type Currency, trialEndsOn, withLocations } from "@/lib/signup-plan";
 
@@ -80,7 +80,7 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
           modules: withLocations(Object.fromEntries(presetModules.map((key) => [key, 1])), 1),
         }}
         trialEndsOn={trialEndsOn()}
-        providers={signedIn ? [] : await enabledProviders()}
+        providers={signedIn ? [] : await providerButtons()}
         signedIn={signedIn}
         returnTo={search ? `/start?${search}` : "/start"}
         illustrations={{

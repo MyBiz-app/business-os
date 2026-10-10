@@ -13,7 +13,7 @@ import { PROVIDER_MARKS } from "@/components/auth/provider-marks";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { OfferPicture } from "@/components/modules/offer-picture";
 import { VerticalIcon } from "@/components/vertical-icon";
-import type { OAuthProvider } from "@/lib/auth-providers";
+import type { ProviderButton } from "@/lib/auth-providers";
 import { formatMoney } from "@/lib/money";
 import {
   chooseTier,
@@ -71,7 +71,7 @@ type Props = {
   /** The last day of the free trial if the business is created today (YYYY-MM-DD). */
   trialEndsOn: string;
   /** Signed out with Google or Apple sign-in available: the journey opens with them. */
-  providers: OAuthProvider[];
+  providers: ProviderButton[];
   signedIn: boolean;
   /** Where Google or Apple sign-in comes back to (this page, with its preselections). */
   returnTo: string;
@@ -87,7 +87,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const { text } = industryTexts(useTranslations());
   const locale = useLocale();
   const router = useRouter();
-  const steps: Step[] = [...(providers.length > 0 && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS, "summary"];
+  const steps: Step[] = [...(providers.some((button) => button.live) && !signedIn ? (["account"] as const) : []), "industry", "business", "base", ...OFFERS, "summary"];
   const [stepIndex, setStepIndex] = useState(steps[0] === "account" ? 0 : initial.vertical ? 1 : 0);
   // The category whose kinds of business are shown in the industry step (null: all categories).
   const [category, setCategory] = useState<string | null>(findVertical(initial.vertical)?.category ?? null);
@@ -208,16 +208,25 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
       <>
         <StepHeading eyebrow={t("account.eyebrow")} title={<h1 {...headingProps}>{t("account.title")}</h1>} subtitle={t("account.subtitle")} />
         <div className="card flex max-w-md flex-col gap-3 p-6">
-          {providers.map((provider) => (
-            <form key={provider} action={oauthSignIn}>
-              <input type="hidden" name="provider" value={provider} />
-              <input type="hidden" name="next" value={returnTo} />
-              <button type="submit" className="btn-secondary flex w-full items-center justify-center gap-3 px-4 py-3 text-base">
+          {providers.map(({ provider, live }) => {
+            const label = (
+              <>
                 {PROVIDER_MARKS[provider]()}
                 {tAuth(provider)}
-              </button>
-            </form>
-          ))}
+                {!live && <span className="rounded-full border border-border px-2 py-0.5 text-xs font-medium text-muted">{tAuth("soon")}</span>}
+              </>
+            );
+            const classes = "btn-secondary flex w-full items-center justify-center gap-3 px-4 py-3 text-base";
+            return live ? (
+              <form key={provider} action={oauthSignIn}>
+                <input type="hidden" name="provider" value={provider} />
+                <input type="hidden" name="next" value={returnTo} />
+                <button type="submit" className={classes}>{label}</button>
+              </form>
+            ) : (
+              <button key={provider} type="button" disabled aria-disabled="true" className={`${classes} opacity-60`}>{label}</button>
+            );
+          })}
           <p className="flex items-center gap-3 text-xs text-muted before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
             {tAuth("or")}
           </p>
