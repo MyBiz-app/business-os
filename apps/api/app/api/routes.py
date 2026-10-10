@@ -38,6 +38,8 @@ def load_current_tenant(session: Session) -> Tenant:
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.resource_payment,
+                       t.schedule_default_view,
+                       coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
                        t.join_code,
                        coalesce(m.role,
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'

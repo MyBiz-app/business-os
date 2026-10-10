@@ -115,3 +115,18 @@ const BRANCH_COLORS = ["#7c3aed", "#0891b2", "#d97706", "#db2777", "#16a34a", "#
 export function branchColor(index: number): string {
   return BRANCH_COLORS[((index % BRANCH_COLORS.length) + BRANCH_COLORS.length) % BRANCH_COLORS.length];
 }
+
+/** The ranges of the schedule board and how many branches (or other parallel lanes) each shows
+ * side by side: a day has the room for the most, a month shows one. */
+export type BoardRange = "day" | "week" | "month";
+
+export const LANE_LIMIT: Record<BoardRange, number> = { day: 6, week: 3, month: 1 };
+
+export function isBoardRange(value: unknown): value is BoardRange {
+  return value === "day" || value === "week" || value === "month";
+}
+
+/** The first picks that fit the range, without repeats. */
+export function limitLanes(ids: string[], range: BoardRange): string[] {
+  return [...new Set(ids)].slice(0, LANE_LIMIT[range]);
+}
