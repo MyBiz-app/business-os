@@ -4462,6 +4462,10 @@
     "viewLabel": "View",
     "branchesShown": "Branches shown",
     "limitHint": "Up to {count} side by side in this range",
+    "saveDefault": "Save as default view",
+    "saveDefaultHint": "The shifts board will open with this view, range and these branches for everyone in the business.",
+    "defaultSaved": "Saved.",
+    "defaultError": "Could not save. Try again.",
     "ranges": {
       "day": "Day",
       "week": "Week",

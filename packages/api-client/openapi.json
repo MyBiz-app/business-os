@@ -33340,6 +33340,43 @@
             "title": "Schedule Default Branches",
             "description": "Branches the schedule opens with side by side; empty: the menu's branch"
           },
+          "shifts_default_view": {
+            "type": "string",
+            "enum": [
+              "people",
+              "branches"
+            ],
+            "title": "Shifts Default View",
+            "description": "How the shifts board opens: a row per person or per branch",
+            "default": "people"
+          },
+          "shifts_default_range": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Default Range",
+            "description": "The range the shifts board opens with; none: the planning rhythm"
+          },
+          "shifts_default_branches": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Shifts Default Branches",
+            "description": "Branches the shifts board opens with; empty: all of them"
+          },
           "join_code": {
             "type": "string",
             "title": "Join Code",
@@ -33677,6 +33714,55 @@
             ],
             "title": "Schedule Default Branches",
             "description": "Branches the schedule opens with; empty means the menu's branch"
+          },
+          "shifts_default_view": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "people",
+                  "branches"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Default View"
+          },
+          "shifts_default_range": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "day",
+                  "week",
+                  "month",
+                  "custom"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Default Range"
+          },
+          "shifts_default_branches": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array",
+                "maxItems": 3
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Default Branches",
+            "description": "Branches the shifts board opens with; empty means all of them"
           },
           "legal_entity_type": {
             "anyOf": [

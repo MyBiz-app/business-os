@@ -9175,6 +9175,23 @@ export interface components {
              */
             schedule_default_branches?: string[];
             /**
+             * Shifts Default View
+             * @description How the shifts board opens: a row per person or per branch
+             * @default people
+             * @enum {string}
+             */
+            shifts_default_view: "people" | "branches";
+            /**
+             * Shifts Default Range
+             * @description The range the shifts board opens with; none: the planning rhythm
+             */
+            shifts_default_range?: ("day" | "week" | "month" | "custom") | null;
+            /**
+             * Shifts Default Branches
+             * @description Branches the shifts board opens with; empty: all of them
+             */
+            shifts_default_branches?: string[];
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -9259,6 +9276,15 @@ export interface components {
              * @description Branches the schedule opens with; empty means the menu's branch
              */
             schedule_default_branches?: string[] | null;
+            /** Shifts Default View */
+            shifts_default_view?: ("people" | "branches") | null;
+            /** Shifts Default Range */
+            shifts_default_range?: ("day" | "week" | "month" | "custom") | null;
+            /**
+             * Shifts Default Branches
+             * @description Branches the shifts board opens with; empty means all of them
+             */
+            shifts_default_branches?: string[] | null;
             /** Legal Entity Type */
             legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
             /**

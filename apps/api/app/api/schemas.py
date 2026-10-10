@@ -116,6 +116,13 @@ class TenantUpdate(BaseModel):
         max_length=3,
         description="Branches the schedule opens with; empty means the menu's branch",
     )
+    shifts_default_view: Literal["people", "branches"] | None = None
+    shifts_default_range: Literal["day", "week", "month", "custom"] | None = None
+    shifts_default_branches: list[UUID] | None = Field(
+        default=None,
+        max_length=3,
+        description="Branches the shifts board opens with; empty means all of them",
+    )
     legal_entity_type: LegalEntityType | None = None
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
@@ -179,6 +186,16 @@ class Tenant(BaseModel):
     schedule_default_branches: list[UUID] = Field(
         default_factory=list,
         description="Branches the schedule opens with side by side; empty: the menu's branch",
+    )
+    shifts_default_view: Literal["people", "branches"] = Field(
+        default="people", description="How the shifts board opens: a row per person or per branch"
+    )
+    shifts_default_range: Literal["day", "week", "month", "custom"] | None = Field(
+        default=None, description="The range the shifts board opens with; none: the planning rhythm"
+    )
+    shifts_default_branches: list[UUID] = Field(
+        default_factory=list,
+        description="Branches the shifts board opens with; empty: all of them",
     )
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
