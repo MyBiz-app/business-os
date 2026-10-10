@@ -15,9 +15,12 @@ services:
     envVars:
       - key: API_ENVIRONMENT
         value: staging
-      # Render's proxy puts the visitor's address first in X-Forwarded-For (rate limits).
+      # Render's proxy appends the caller's address last in X-Forwarded-For (rate limits).
       - key: API_TRUST_FORWARDED_FOR
         value: "true"
+      # Shared with the web app (same name there) so it can name the real visitor.
+      - key: API_INTERNAL_TOKEN
+        sync: false
       - key: API_DATABASE_URL
         sync: false
       - key: API_JWKS_URL
