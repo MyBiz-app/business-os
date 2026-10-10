@@ -9078,6 +9078,18 @@ export interface components {
              */
             resource_payment: "app" | "venue";
             /**
+             * Schedule Default View
+             * @description The range the schedule opens with
+             * @default week
+             * @enum {string}
+             */
+            schedule_default_view: "day" | "week" | "month";
+            /**
+             * Schedule Default Branches
+             * @description Branches the schedule opens with side by side; empty: the menu's branch
+             */
+            schedule_default_branches?: string[];
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -9155,6 +9167,13 @@ export interface components {
             online_sales?: boolean | null;
             /** Resource Payment */
             resource_payment?: ("app" | "venue") | null;
+            /** Schedule Default View */
+            schedule_default_view?: ("day" | "week" | "month") | null;
+            /**
+             * Schedule Default Branches
+             * @description Branches the schedule opens with; empty means the menu's branch
+             */
+            schedule_default_branches?: string[] | null;
             /** Legal Entity Type */
             legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
             /**

@@ -4,8 +4,8 @@ The API only deletes a row nothing refers to; otherwise it deactivates the row (
 keys from sessions and entitlements refuse the delete), so history is never lost. The new
 `catalog.delete` permission is checked by the API; this only lets the API role issue DELETE.
 
-Revision ID: 0059
-Revises: 0058
+Revision ID: 0061
+Revises: 0060
 Create Date: 2026-10-10
 """
 
@@ -13,8 +13,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0059"
-down_revision: str | None = "0058"
+revision: str = "0061"
+down_revision: str | None = "0060"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

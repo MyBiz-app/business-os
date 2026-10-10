@@ -70,6 +70,13 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             raise HTTPException(status_code=422, detail="invalid_business_number")
         if currency == "ILS":
             changes["business_number"] = number.replace("-", "")
+    branches = changes.get("schedule_default_branches")
+    if branches:
+        known = context.session.execute(
+            text("SELECT count(*) FROM app.locations WHERE id = ANY(:ids)"), {"ids": branches}
+        ).scalar_one()
+        if known != len(set(branches)):
+            raise HTTPException(status_code=422, detail="unknown_branch")
     context.session.execute(
         text(f"UPDATE app.tenants SET {set_clause(changes)} WHERE id = app.current_tenant_id()"),
         changes,

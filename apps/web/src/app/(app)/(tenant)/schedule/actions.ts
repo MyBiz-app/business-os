@@ -233,3 +233,22 @@ export async function setJobStatus(
   );
   refreshSession(sessionId);
 }
+
+export type DefaultViewState = { saved?: boolean; error?: boolean };
+
+/** The owner's choice of how the schedule opens: the range and the branches side by side. */
+export async function saveScheduleDefault(
+  view: "day" | "week" | "month",
+  branches: string[],
+  _state: DefaultViewState,
+  _formData: FormData,
+): Promise<DefaultViewState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(await api.PATCH("/tenants/current", { params: scope, body: { schedule_default_view: view, schedule_default_branches: branches } }));
+  } catch {
+    return { error: true };
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
