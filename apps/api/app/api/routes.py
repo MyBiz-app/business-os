@@ -1,3 +1,4 @@
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, status
@@ -208,7 +209,7 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
         session.execute(
             text("""
                 SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
-                       phone, palette,
+                       phone, birth_date, address_line, city, postal_code, palette,
                        CASE WHEN palette_background IS NULL THEN NULL
                             ELSE jsonb_build_object('background', palette_background,
                                                     'text', palette_text,
@@ -294,6 +295,10 @@ def get_current_tenant(context: TenantDep) -> Tenant:
 class ProfileUpdate(BaseModel):
     full_name: str | None = Field(default=None, max_length=120)
     phone: str | None = Field(default=None, max_length=30, pattern=r"^[0-9+()\- ]*$")
+    birth_date: date | None = None
+    address_line: str | None = Field(default=None, max_length=200)
+    city: str | None = Field(default=None, max_length=100)
+    postal_code: str | None = Field(default=None, max_length=20)
     palette: Palette | None = None
     palette_colors: PaletteColors | None = None
 
@@ -303,7 +308,14 @@ class ProfileUpdate(BaseModel):
             raise ValueError("the custom palette needs its three colors")
         return self
 
-    @field_validator("full_name", "phone", mode="before")
+    @field_validator("birth_date")
+    @classmethod
+    def not_in_future(cls, value: date | None) -> date | None:
+        if value is not None and value > date.today():
+            raise ValueError("the date of birth cannot be in the future")
+        return value
+
+    @field_validator("full_name", "phone", "address_line", "city", "postal_code", mode="before")
     @classmethod
     def blank(cls, value: object) -> object:
         return value.strip() or None if isinstance(value, str) else value
@@ -312,7 +324,8 @@ class ProfileUpdate(BaseModel):
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     """The signed-in person's own profile: the name the team, clients and reports see, a phone
-    number for the team, and their color palette. Fields left out stay as they are."""
+    number for the team, personal details (date of birth, home address) and their color
+    palette. Fields left out stay as they are."""
     ensure_profile(session, user.id, user.email)
     changes = body.model_dump(exclude_unset=True)
     colors = changes.pop("palette_colors", None)

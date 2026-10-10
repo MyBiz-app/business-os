@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 from zoneinfo import available_timezones
@@ -46,6 +46,10 @@ class Me(BaseModel):
     locale: Locale | None
     platform_admin: bool = Field(description="On the MyBiz team (sees the console)")
     phone: str | None = None
+    birth_date: date | None = None
+    address_line: str | None = None
+    city: str | None = None
+    postal_code: str | None = None
     palette: Palette | None = Field(
         default=None, description="The person's color palette (none: the MyBiz default)"
     )

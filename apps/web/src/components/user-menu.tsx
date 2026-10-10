@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Settings2, ShieldCheck, UserRound } from "lucide-react";
+import { LogOut, Settings, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useCallback, useId, useRef, useState } from "react";
@@ -17,7 +17,7 @@ type Props = {
   signOut: () => Promise<void>;
 };
 
-/** The signed-in person: their picture opens their profile, the MyBiz console (for the team)
+/** The signed-in person: their picture opens their settings, the MyBiz console (for the team)
  * and signing out. */
 export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) {
   const t = useTranslations();
@@ -77,12 +77,8 @@ export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) 
         </div>
         <div className="flex flex-col gap-0.5 p-1.5">
           <Link role="menuitem" href="/account" className={item}>
-            <UserRound aria-hidden="true" className="size-4 text-muted" />
+            <Settings aria-hidden="true" className="size-4 text-muted" />
             {t("account.link")}
-          </Link>
-          <Link role="menuitem" href="/account#appearance" className={item}>
-            <Settings2 aria-hidden="true" className="size-4 text-muted" />
-            {t("userMenu.appearance")}
           </Link>
           {platform && (
             <Link role="menuitem" href="/platform" className={item}>

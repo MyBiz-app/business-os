@@ -19,6 +19,29 @@ def at(day_offset: int, hour: int, minute: int = 0) -> str:
     return local.isoformat()
 
 
+def test_a_person_keeps_their_personal_details(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    owner = auth(studio["owner"])
+    details = {
+        "birth_date": "1990-05-17",
+        "address_line": " 12 Herzl St ",
+        "city": "Holon",
+        "postal_code": "5800000",
+    }
+    me = client.patch("/me", json=details, headers=owner).json()
+    assert (me["birth_date"], me["address_line"], me["city"], me["postal_code"]) == (
+        "1990-05-17",
+        "12 Herzl St",
+        "Holon",
+        "5800000",
+    )
+    # A blank value clears the field; a date in the future is refused.
+    assert client.patch("/me", json={"city": " "}, headers=owner).json()["city"] is None
+    future = client.patch("/me", json={"birth_date": "2999-01-01"}, headers=owner)
+    assert future.status_code == 422
+
+
 def test_a_person_manages_their_own_profile_and_picture(
     client: TestClient, auth: AuthHeaders, studio: dict
 ) -> None:

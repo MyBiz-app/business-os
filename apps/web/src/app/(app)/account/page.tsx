@@ -6,7 +6,7 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { avatarSrc } from "@/components/avatar";
 import { PalettePicker } from "@/components/palette";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { AccessibilitySettings } from "@/components/accessibility";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
@@ -35,17 +35,31 @@ export default async function AccountPage() {
         </h2>
         <PictureForm id={me.id} name={name} src={avatarSrc(me.id, me.avatar_url)} />
         <div className="border-t border-border" />
-        <ProfileForm name={me.full_name} email={me.email} phone={me.phone ?? null} />
+        <ProfileForm
+          name={me.full_name}
+          email={me.email}
+          phone={me.phone ?? null}
+          birthDate={me.birth_date ?? null}
+          addressLine={me.address_line ?? null}
+          city={me.city ?? null}
+          postalCode={me.postal_code ?? null}
+        />
+      </section>
+      <section id="accessibility" aria-labelledby="accessibility-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
+        <div className="flex flex-col gap-1">
+          <h2 id="accessibility-heading" className="font-semibold">
+            {t("accessibility.title")}
+          </h2>
+          <p className="text-sm text-muted">{t("accessibility.subtitle")}</p>
+        </div>
+        <AccessibilitySettings />
       </section>
       <section id="appearance" aria-labelledby="appearance-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <h2 id="appearance-heading" className="font-semibold">
-              {t("appearance.title")}
-            </h2>
-            <p className="text-sm text-muted">{t("appearance.subtitle")}</p>
-          </div>
-          <ThemeSwitcher />
+        <div className="flex flex-col gap-1">
+          <h2 id="appearance-heading" className="font-semibold">
+            {t("appearance.title")}
+          </h2>
+          <p className="text-sm text-muted">{t("appearance.subtitle")}</p>
         </div>
         <PalettePicker current={me.palette ?? null} currentColors={me.palette_colors ?? null} save={savePalette} />
       </section>

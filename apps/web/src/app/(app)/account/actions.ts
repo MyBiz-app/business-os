@@ -11,7 +11,15 @@ export async function saveProfile(_state: FormState, formData: FormData): Promis
   try {
     unwrap(
       await (await getApi()).PATCH("/me", {
-        body: { full_name: String(formData.get("full_name") ?? ""), phone: String(formData.get("phone") ?? "") },
+        body: {
+          full_name: String(formData.get("full_name") ?? ""),
+          phone: String(formData.get("phone") ?? ""),
+          // An empty date field clears the date of birth.
+          birth_date: String(formData.get("birth_date") ?? "") || null,
+          address_line: String(formData.get("address_line") ?? ""),
+          city: String(formData.get("city") ?? ""),
+          postal_code: String(formData.get("postal_code") ?? ""),
+        },
       }),
     );
   } catch (error) {
