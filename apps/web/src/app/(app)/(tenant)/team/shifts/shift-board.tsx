@@ -183,7 +183,7 @@ export function ShiftBoard(props: {
   );
 }
 
-function ShiftDialog({ editing, people, branches, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; onClose: () => void }) {
+export function ShiftDialog({ editing, people, branches, onClose }: { editing: Editing; people: BoardPerson[]; branches: Branch[]; onClose: () => void }) {
   const t = useTranslations("shifts");
   const tCommon = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);

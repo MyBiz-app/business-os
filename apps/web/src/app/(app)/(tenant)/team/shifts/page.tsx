@@ -9,7 +9,8 @@ import { BackLink } from "@/components/back-link";
 import { LiveRefresh } from "@/components/live-refresh";
 import { OpeningHoursList } from "@/components/opening-hours";
 import { unwrap } from "@/lib/api";
-import { branchColor } from "@/lib/calendar";
+import { TimeGrid, type GridEvent } from "@/components/calendar-board/time-grid";
+import { branchColor, minutesIn } from "@/lib/calendar";
 import { addDays, dayOf, formatDay, formatTime, isDay, todayIn } from "@/lib/dates";
 import { branchLimit, isRange, RANGES, type Range, rangeOfCadence, stepWindow, windowOf } from "@/lib/shift-window";
 import { weekStartFor } from "@/lib/hours";
@@ -17,6 +18,7 @@ import { canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { BranchRoster } from "./branch-roster";
+import { EditFromUrl } from "./edit-from-url";
 import { PlanningSettings } from "./planning-settings";
 import { Segmented } from "./segmented";
 import { type BoardPerson, type BoardShift, ShiftBoard } from "./shift-board";
@@ -131,6 +133,30 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     homeName: s.home_location_name ?? null,
     warning: s.on_time_off ? "timeOff" : s.outside_hours ? "outsideHours" : null,
   }));
+  // Day and week "by branch": the shared time grid, one lane per branch, each shift a block.
+  const gridView = view === "branches" && (range === "day" || range === "week") && shown.length > 1;
+  const gridEvents: GridEvent[] = gridView
+    ? boardShifts.map((s, i) => {
+        const raw = shifts[i];
+        const start = minutesIn(raw.starts_at, tenant.time_zone);
+        const sameDay = dayOf(raw.ends_at, tenant.time_zone) === s.day;
+        return {
+          id: s.id,
+          href: href({ edit: s.id }),
+          day: s.day,
+          start,
+          end: sameDay ? minutesIn(raw.ends_at, tenant.time_zone) : 1440,
+          time: `${s.starts}–${s.ends}`,
+          title: people.find((p) => p.id === s.userId)?.name ?? "",
+          detail: s.isCover ? t("shifts.coverFrom", { branch: s.homeName ?? "" }) : s.position,
+          color: s.color,
+          laneId: s.locationId,
+          branch: null,
+          cancelled: false,
+        };
+      })
+    : [];
+  const editing = typeof query.edit === "string" ? boardShifts.find((s) => s.id === query.edit) : undefined;
   const last = days[days.length - 1];
   const rangeLabel =
     range === "day"
@@ -208,7 +234,20 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         </div>
       )}
 
-      {view === "branches" ? (
+      {gridView ? (
+        <TimeGrid
+          days={days}
+          timeZone={tenant.time_zone}
+          locale={locale}
+          events={gridEvents}
+          shifts={[]}
+          lanes={branchList.filter((b) => shown.includes(b.id)).map((b) => ({ id: b.id, name: b.name, color: b.color }))}
+          closed={{}}
+          open={null}
+          labels={{ now: t("schedule.now"), closed: t("schedule.closedDay"), shifts: t("shifts.title"), empty: t("shifts.nobody"), more: t.raw("schedule.more") as string, onShift: t("schedule.onShift") }}
+          dayHref={range === "week" ? href({ range: "day", date: "__day__" }) : null}
+        />
+      ) : view === "branches" ? (
         <BranchRoster days={days} today={today} locale={locale} branches={branchList.filter((b) => shown.includes(b.id))} shifts={boardShifts} people={people} />
       ) : (
         <ShiftBoard
@@ -225,6 +264,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           compact={win.days > 7}
         />
       )}
+      {editing && canEdit && <EditFromUrl shift={editing} people={people} branches={branchList} closeHref={href({ edit: undefined })} />}
       {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
     </main>
   );
