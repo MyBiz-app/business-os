@@ -1,4 +1,4 @@
-# Adding a branch (X27)
+# Adding a branch (X28)
 
 **Goal.** A network owner can add a branch at any time, through one form that captures what a
 branch needs at the start and states clearly when it costs extra.
