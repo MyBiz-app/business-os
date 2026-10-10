@@ -78,6 +78,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** S–M · **Model:** Sonnet.
 
 ### P0-3 · No logging, error tracking or alerting anywhere
+- **Progress:** ✅ (1) API structured JSON logs, request ids, stable 500 body, slow-query log (this PR). Still open: (2) error tracker and (3) uptime monitor (need an account), (4) web error pages.
 - **Where:** no file under `apps/api/app` imports `logging`; no Sentry/OpenTelemetry in the API,
   the web app or the Expo apps; `apps/web/src/app` has no `error.tsx`, `global-error.tsx` or
   `not-found.tsx`.
