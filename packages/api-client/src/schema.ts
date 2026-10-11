@@ -59,8 +59,9 @@ export interface paths {
         /**
          * Update Me
          * @description The signed-in person's own profile: the name the team, clients and reports see, a phone
-         *     number for the team, personal details (date of birth, home address) and their color
-         *     palette. Fields left out stay as they are.
+         *     number for the team, personal details (date of birth, home address), whether to email
+         *     them when their roster is published, and their color palette. Fields left out stay as
+         *     they are.
          */
         patch: operations["update_me"];
         trace?: never;
@@ -1724,6 +1725,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shifts/time-off": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Away
+         * @description Who is away (vacation, sick days) in the window, so the board can show it.
+         */
+        get: operations["list_away"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/shifts/{shift_id}": {
         parameters: {
             query?: never;
@@ -1753,14 +1774,171 @@ export interface paths {
         put?: never;
         /**
          * Copy Shifts Week
-         * @description Repeats a week's shifts (in the visible branches) in another week, at the same local
-         *     times; a shift that would clash with one already there is skipped.
+         * @description Repeats a week's shifts (in the visible branches) in `repeat` following weeks from
+         *     `to_week`, at the same local times; a shift that would clash with one already there is
+         *     skipped.
          */
         post: operations["copy_shifts_week"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/shifts/copy-day": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Shifts Day
+         * @description Repeats one day's shifts (in the visible branches) on other days.
+         */
+        post: operations["copy_shifts_day"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Shifts
+         * @description Makes the draft shifts that start in the stretch visible to the team.
+         */
+        post: operations["publish_shifts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shift-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Shift Templates */
+        get: operations["list_shift_templates"];
+        put?: never;
+        /** Create Shift Template */
+        post: operations["create_shift_template"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shift-templates/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Shift Template */
+        delete: operations["delete_shift_template"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/coverage-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Coverage Rules */
+        get: operations["get_coverage_rules"];
+        /**
+         * Set Coverage Rules
+         * @description Replaces the branch's whole set of rules.
+         */
+        put: operations["set_coverage_rules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/coverage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Shift Coverage
+         * @description Where a branch has fewer people on shift than its coverage rules ask, day by day. People
+         *     away on time off do not count. Branches without rules are never listed.
+         */
+        get: operations["shift_coverage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Stations */
+        get: operations["list_stations"];
+        put?: never;
+        /** Create Station */
+        post: operations["create_station"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stations/{station_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Station
+         * @description Removes the station; its shifts stay, without a station.
+         */
+        delete: operations["delete_station"];
+        options?: never;
+        head?: never;
+        /** Update Station */
+        patch: operations["update_station"];
         trace?: never;
     };
     "/sessions/options": {
@@ -4206,6 +4384,26 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** AwayDays */
+        AwayDays: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Starts On
+             * Format: date
+             */
+            starts_on: string;
+            /**
+             * Ends On
+             * Format: date
+             */
+            ends_on: string;
+            /** Reason */
+            reason: string | null;
+        };
         /** BillPreview */
         BillPreview: {
             /**
@@ -5525,6 +5723,20 @@ export interface components {
              */
             skipped: number;
         };
+        /** CopyShiftsDay */
+        CopyShiftsDay: {
+            /**
+             * From Day
+             * Format: date
+             * @description The day whose shifts are copied
+             */
+            from_day: string;
+            /**
+             * To Days
+             * @description Days to fill
+             */
+            to_days: string[];
+        };
         /** CopyShiftsWeek */
         CopyShiftsWeek: {
             /**
@@ -5539,6 +5751,12 @@ export interface components {
              * @description First day of the week to fill
              */
             to_week: string;
+            /**
+             * Repeat
+             * @description Fill this many following weeks, seven days apart
+             * @default 1
+             */
+            repeat: number;
         };
         /** CoreTier */
         CoreTier: {
@@ -5546,6 +5764,60 @@ export interface components {
             up_to_clients: number | null;
             /** Price */
             price: number;
+        };
+        /** CoverageGap */
+        CoverageGap: {
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Starts Minute */
+            starts_minute: number;
+            /** Ends Minute */
+            ends_minute: number;
+            /** Needed */
+            needed: number;
+            /**
+             * Have
+             * @description People on shift through the stretch
+             */
+            have: number;
+        };
+        /** CoverageRule */
+        CoverageRule: {
+            /**
+             * Weekday
+             * @description 0 = Monday
+             */
+            weekday: number;
+            /**
+             * Starts Minute
+             * @description Minutes from midnight
+             */
+            starts_minute: number;
+            /**
+             * Ends Minute
+             * @description Minutes from midnight; 1440 = end of day
+             */
+            ends_minute: number;
+            /**
+             * Min Staff
+             * @description People needed on shift at the same time
+             */
+            min_staff: number;
+        };
+        /** CoverageRules */
+        CoverageRules: {
+            /** Rules */
+            rules: components["schemas"]["CoverageRule"][];
         };
         /** CreatedInvitation */
         CreatedInvitation: {
@@ -6747,6 +7019,12 @@ export interface components {
             /** Postal Code */
             postal_code?: string | null;
             /**
+             * Email Roster
+             * @description Email the person when their roster is published
+             * @default true
+             */
+            email_roster: boolean;
+            /**
              * Palette
              * @description The person's color palette (none: the MyBiz default)
              */
@@ -7581,6 +7859,33 @@ export interface components {
             time_zone: string;
             /** Client Name */
             client_name: string;
+        };
+        /** PublishShifts */
+        PublishShifts: {
+            /**
+             * Start
+             * Format: date
+             * @description First local date of the stretch to publish
+             */
+            start: string;
+            /**
+             * Days
+             * @default 7
+             */
+            days: number;
+            /**
+             * Location Id
+             * @description Only these branches
+             */
+            location_id?: string[] | null;
+        };
+        /** Published */
+        Published: {
+            /**
+             * Published
+             * @description Draft shifts that became visible to the team
+             */
+            published: number;
         };
         /** Question */
         Question: {
@@ -8811,6 +9116,10 @@ export interface components {
             position: string | null;
             /** Note */
             note: string | null;
+            /** Station Id */
+            station_id: string | null;
+            /** Station Name */
+            station_name: string | null;
             /**
              * Home Location Id
              * @description The person's home branch, if set
@@ -8833,6 +9142,11 @@ export interface components {
              * @description Not within the branch's opening hours (if set)
              */
             outside_hours: boolean;
+            /**
+             * Published
+             * @description Visible to the team; a draft shows to managers only
+             */
+            published: boolean;
         };
         /** ShiftCreate */
         ShiftCreate: {
@@ -8854,6 +9168,11 @@ export interface components {
              */
             location_id: string;
             /**
+             * Station Id
+             * @description A station of the same branch
+             */
+            station_id?: string | null;
+            /**
              * Starts At
              * Format: date-time
              */
@@ -8863,6 +9182,63 @@ export interface components {
              * Format: date-time
              */
             ends_at: string;
+        };
+        /** ShiftTemplate */
+        ShiftTemplate: {
+            /**
+             * Name
+             * @description E.g. "Morning"
+             */
+            name: string;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             * @description Earlier than `starts`: the shift runs past midnight
+             */
+            ends: string;
+            /** Position */
+            position?: string | null;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+        };
+        /** ShiftTemplateCreate */
+        ShiftTemplateCreate: {
+            /**
+             * Name
+             * @description E.g. "Morning"
+             */
+            name: string;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             * @description Earlier than `starts`: the shift runs past midnight
+             */
+            ends: string;
+            /** Position */
+            position?: string | null;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
         };
         /** ShiftUpdate */
         ShiftUpdate: {
@@ -8877,6 +9253,11 @@ export interface components {
             user_id?: string | null;
             /** Location Id */
             location_id?: string | null;
+            /**
+             * Station Id
+             * @description Null clears the station
+             */
+            station_id?: string | null;
             /** Starts At */
             starts_at?: string | null;
             /** Ends At */
@@ -9012,6 +9393,46 @@ export interface components {
             stage: "new" | "contacted" | "trial" | "offer" | "won" | "lost";
             /** Count */
             count: number;
+        };
+        /** Station */
+        Station: {
+            /**
+             * Name
+             * @description E.g. "Pilates 1"
+             */
+            name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /** StationCreate */
+        StationCreate: {
+            /**
+             * Name
+             * @description E.g. "Pilates 1"
+             */
+            name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+        };
+        /** StationUpdate */
+        StationUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Sort Order */
+            sort_order?: number | null;
         };
         /** SupportAccess */
         SupportAccess: {
@@ -9192,6 +9613,37 @@ export interface components {
              */
             shifts_default_branches?: string[];
             /**
+             * Shifts Publish Auto
+             * @description Publish the shifts roster on schedule
+             * @default true
+             */
+            shifts_publish_auto: boolean;
+            /**
+             * Shifts Publish Cadence
+             * @default weekly
+             * @enum {string}
+             */
+            shifts_publish_cadence: "daily" | "weekly" | "monthly";
+            /**
+             * Shifts Publish Weekday
+             * @description Weekly: 0 = Monday, 6 = Sunday
+             * @default 6
+             */
+            shifts_publish_weekday: number;
+            /**
+             * Shifts Publish Day
+             * @description Monthly: day of the month, 1-28
+             * @default 1
+             */
+            shifts_publish_day: number;
+            /**
+             * Shifts Publish Time
+             * Format: time
+             * @description Local time the roster goes out
+             * @default 08:00:00
+             */
+            shifts_publish_time: string;
+            /**
              * Join Code
              * @description Code clients enter or scan to join this business
              */
@@ -9285,6 +9737,16 @@ export interface components {
              * @description Branches the shifts board opens with; empty means all of them
              */
             shifts_default_branches?: string[] | null;
+            /** Shifts Publish Auto */
+            shifts_publish_auto?: boolean | null;
+            /** Shifts Publish Cadence */
+            shifts_publish_cadence?: ("daily" | "weekly" | "monthly") | null;
+            /** Shifts Publish Weekday */
+            shifts_publish_weekday?: number | null;
+            /** Shifts Publish Day */
+            shifts_publish_day?: number | null;
+            /** Shifts Publish Time */
+            shifts_publish_time?: string | null;
             /** Legal Entity Type */
             legal_entity_type?: ("company" | "licensed_dealer" | "exempt_dealer" | "nonprofit" | "partnership" | "other") | null;
             /**
@@ -9586,6 +10048,8 @@ export interface components {
             city?: string | null;
             /** Postal Code */
             postal_code?: string | null;
+            /** Email Roster */
+            email_roster?: boolean | null;
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
@@ -14056,6 +14520,43 @@ export interface operations {
             };
         };
     };
+    list_away: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AwayDays"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     delete_shift: {
         parameters: {
             query?: never;
@@ -14152,6 +14653,444 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CopiedShifts"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    copy_shifts_day: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CopyShiftsDay"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CopiedShifts"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_shifts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishShifts"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Published"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_shift_templates: {
+        parameters: {
+            query?: {
+                /** @description Only these branches */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShiftTemplate"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_shift_template: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShiftTemplateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShiftTemplate"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_shift_template: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_coverage_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_coverage_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CoverageRules"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageRules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shift_coverage: {
+        parameters: {
+            query: {
+                /** @description First local date (business time zone) */
+                start: string;
+                days?: number;
+                /** @description Only these branches */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoverageGap"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_stations: {
+        parameters: {
+            query?: {
+                /** @description Only these branches */
+                location_id?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Station"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_station: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Station"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_station: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                station_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_station: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                station_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StationUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Station"];
                 };
             };
             /** @description Validation Error */

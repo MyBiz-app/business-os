@@ -6,13 +6,13 @@ import { useActionState, useRef, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
 import { ImageCropDialog } from "@/components/image-crop-dialog";
-import { Field } from "@/components/form/field";
+import { CheckboxField, Field } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
 
-import { type PictureState, removeAvatar, saveProfile, uploadAvatar } from "./actions";
+import { type PictureState, removeAvatar, saveNotifications, saveProfile, uploadAvatar } from "./actions";
 
 type Details = {
   name: string | null;
@@ -47,6 +47,24 @@ export function ProfileForm({ name, email, phone, birthDate, addressLine, city, 
           <Field label={t("account.postalCode")} name="postal_code" defaultValue={postalCode ?? ""} maxLength={20} autoComplete="postal-code" dir="ltr" />
         </div>
       </fieldset>
+      <div>
+        <SubmitButton>{t("common.save")}</SubmitButton>
+      </div>
+    </form>
+  );
+}
+
+/** What the person is emailed about. */
+export function NotificationsForm({ emailRoster }: { emailRoster: boolean }) {
+  const t = useTranslations();
+  const [state, action] = useActionState<FormState, FormData>(saveNotifications, {});
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <FormFeedback state={state} />
+      <div className="flex flex-col gap-1">
+        <CheckboxField label={t("account.rosterEmails")} name="email_roster" defaultChecked={emailRoster} />
+        <p className="text-xs text-muted">{t("account.rosterEmailsHint")}</p>
+      </div>
       <div>
         <SubmitButton>{t("common.save")}</SubmitButton>
       </div>

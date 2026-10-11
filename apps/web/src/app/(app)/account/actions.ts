@@ -29,6 +29,16 @@ export async function saveProfile(_state: FormState, formData: FormData): Promis
   return { saved: true };
 }
 
+export async function saveNotifications(_state: FormState, formData: FormData): Promise<FormState> {
+  try {
+    unwrap(await (await getApi()).PATCH("/me", { body: { email_roster: formData.get("email_roster") === "on" } }));
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
 export type PictureState = { error?: "image_too_large" | "unsupported_image" | "generic"; saved?: boolean };
 
 export async function uploadAvatar(_state: PictureState, formData: FormData): Promise<PictureState> {

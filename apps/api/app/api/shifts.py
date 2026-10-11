@@ -33,7 +33,15 @@ CatalogReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_REA
 CatalogWriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 
 MAX_SHIFT = timedelta(hours=24)
-SHIFT_COLUMNS = ("user_id", "location_id", "starts_at", "ends_at", "position", "note")
+SHIFT_COLUMNS = (
+    "user_id",
+    "location_id",
+    "station_id",
+    "starts_at",
+    "ends_at",
+    "position",
+    "note",
+)
 
 
 class OpeningInterval(BaseModel):
@@ -168,11 +176,14 @@ class Shift(BaseModel):
     ends_at: datetime
     position: str | None
     note: str | None
+    station_id: UUID | None
+    station_name: str | None
     home_location_id: UUID | None = Field(description="The person's home branch, if set")
     home_location_name: str | None
     is_cover: bool = Field(description="At a branch other than the person's home branch")
     on_time_off: bool = Field(description="Falls on a day the person is away")
     outside_hours: bool = Field(description="Not within the branch's opening hours (if set)")
+    published: bool = Field(description="Visible to the team; a draft shows to managers only")
 
 
 class ShiftFields(BaseModel):
@@ -188,6 +199,7 @@ class ShiftFields(BaseModel):
 class ShiftCreate(ShiftFields):
     user_id: UUID
     location_id: UUID
+    station_id: UUID | None = Field(default=None, description="A station of the same branch")
     starts_at: datetime
     ends_at: datetime
 
@@ -201,6 +213,7 @@ class ShiftCreate(ShiftFields):
 class ShiftUpdate(ShiftFields):
     user_id: UUID | None = None
     location_id: UUID | None = None
+    station_id: UUID | None = Field(default=None, description="Null clears the station")
     starts_at: datetime | None = None
     ends_at: datetime | None = None
 
@@ -208,6 +221,20 @@ class ShiftUpdate(ShiftFields):
 class CopyShiftsWeek(BaseModel):
     from_week: dt.date = Field(description="First day of the week to copy (seven days from it)")
     to_week: dt.date = Field(description="First day of the week to fill")
+    repeat: int = Field(
+        default=1, ge=1, le=8, description="Fill this many following weeks, seven days apart"
+    )
+
+
+class CopyShiftsDay(BaseModel):
+    from_day: dt.date = Field(description="The day whose shifts are copied")
+    to_days: list[dt.date] = Field(min_length=1, max_length=31, description="Days to fill")
+
+    @model_validator(mode="after")
+    def other_days(self) -> "CopyShiftsDay":
+        if self.from_day in self.to_days or len(set(self.to_days)) != len(self.to_days):
+            raise ValueError("copy to other days, each once")
+        return self
 
 
 class CopiedShifts(BaseModel):
@@ -218,7 +245,8 @@ class CopiedShifts(BaseModel):
 SHIFT_SELECT = """
     SELECT sh.id, sh.location_id, l.name AS location_name, sh.user_id,
            coalesce(u.full_name, u.email) AS user_name, sh.starts_at, sh.ends_at,
-           sh.position, sh.note, m.home_location_id, hl.name AS home_location_name,
+           sh.position, sh.note, sh.station_id, st.name AS station_name,
+           m.home_location_id, hl.name AS home_location_name,
            coalesce(m.home_location_id <> sh.location_id, false) AS is_cover,
            EXISTS (
                SELECT 1 FROM app.staff_time_off o
@@ -235,15 +263,24 @@ SHIFT_SELECT = """
                  AND h.closes >= (sh.ends_at AT TIME ZONE t.time_zone)::time
                  AND (sh.ends_at AT TIME ZONE t.time_zone)::date
                      = (sh.starts_at AT TIME ZONE t.time_zone)::date
-           ) AS outside_hours
+           ) AS outside_hours,
+           sh.published_at IS NOT NULL AS published
     FROM app.shifts sh
     JOIN app.tenants t ON t.id = sh.tenant_id
     JOIN app.locations l ON l.id = sh.location_id
     JOIN app.users u ON u.id = sh.user_id
+    LEFT JOIN app.stations st ON st.id = sh.station_id
     LEFT JOIN app.tenant_members m ON m.tenant_id = sh.tenant_id AND m.user_id = sh.user_id
     LEFT JOIN app.locations hl ON hl.id = m.home_location_id
     WHERE app.in_branch(sh.location_id)
 """
+
+
+def drafts_hidden(context: TenantContext) -> str:
+    """SQL filter on `SHIFT_SELECT`: the team sees published shifts only; managers see drafts."""
+    return (
+        "" if Permission.STAFF_MANAGE in context.permissions else " AND sh.published_at IS NOT NULL"
+    )
 
 
 def _time_zone(session: Session) -> str:
@@ -271,7 +308,7 @@ def list_shifts(
     user_id: Annotated[UUID | None, Query(description="Only this person's shifts")] = None,
 ) -> list[Shift]:
     time_zone = _time_zone(context.session)
-    filters = ""
+    filters = drafts_hidden(context)
     params: dict[str, object] = {
         "from": local_to_utc(start, time.min, time_zone),
         "to": local_to_utc(start + timedelta(days=days), time.min, time_zone),
@@ -292,6 +329,33 @@ def list_shifts(
     return [Shift.model_validate(dict(row)) for row in rows]
 
 
+class AwayDays(BaseModel):
+    user_id: UUID
+    starts_on: dt.date
+    ends_on: dt.date
+    reason: str | None
+
+
+@router.get("/shifts/time-off")
+def list_away(
+    context: ReadDep,
+    start: Annotated[dt.date, Query(description="First local date (business time zone)")],
+    days: Annotated[int, Query(ge=1, le=42)] = 7,
+) -> list[AwayDays]:
+    """Who is away (vacation, sick days) in the window, so the board can show it."""
+    rows = context.session.execute(
+        text("""
+            SELECT o.user_id, o.starts_on, o.ends_on, o.reason FROM app.staff_time_off o
+            WHERE o.tenant_id = app.current_tenant_id()
+              AND o.starts_on < CAST(:start AS date) + CAST(:days AS int)
+              AND o.ends_on >= CAST(:start AS date)
+            ORDER BY o.starts_on, o.user_id
+        """),
+        {"start": start, "days": days},
+    ).mappings()
+    return [AwayDays.model_validate(dict(r)) for r in rows]
+
+
 def _check_and_lock(
     session: Session,
     user_id: UUID,
@@ -299,8 +363,10 @@ def _check_and_lock(
     starts_at: datetime,
     ends_at: datetime,
     ignore: UUID | None = None,
+    station_id: UUID | None = None,
 ) -> None:
-    """The person works here and is free then; holds a lock on them until the commit."""
+    """The person works here and is free then, at a station of this branch if one is named;
+    holds a lock on them until the commit."""
     member = session.execute(
         text("""
             SELECT 1 FROM app.tenant_members
@@ -309,6 +375,14 @@ def _check_and_lock(
         {"id": user_id},
     ).first()
     if member is None or not _branch_visible(session, location_id):
+        raise HTTPException(status_code=422, detail="invalid_reference")
+    if station_id is not None and (
+        session.execute(
+            text("SELECT 1 FROM app.stations WHERE id = :s AND location_id = :l"),
+            {"s": station_id, "l": location_id},
+        ).first()
+        is None
+    ):
         raise HTTPException(status_code=422, detail="invalid_reference")
     session.execute(
         text("SELECT pg_advisory_xact_lock(hashtextextended('shift:' || :id, 0))"),
@@ -328,13 +402,20 @@ def _check_and_lock(
 
 @router.post("/shifts", status_code=status.HTTP_201_CREATED)
 def create_shift(body: ShiftCreate, user: UserDep, context: ManageDep) -> Shift:
-    _check_and_lock(context.session, body.user_id, body.location_id, body.starts_at, body.ends_at)
+    _check_and_lock(
+        context.session,
+        body.user_id,
+        body.location_id,
+        body.starts_at,
+        body.ends_at,
+        station_id=body.station_id,
+    )
     shift_id = context.session.execute(
         text("""
-            INSERT INTO app.shifts (tenant_id, location_id, user_id, starts_at, ends_at,
-                                    position, note, created_by)
-            VALUES (app.current_tenant_id(), :location_id, :user_id, :starts_at, :ends_at,
-                    :position, :note, :created_by)
+            INSERT INTO app.shifts (tenant_id, location_id, station_id, user_id, starts_at,
+                                    ends_at, position, note, created_by)
+            VALUES (app.current_tenant_id(), :location_id, :station_id, :user_id, :starts_at,
+                    :ends_at, :position, :note, :created_by)
             RETURNING id
         """),
         {**body.model_dump(), "created_by": user.id},
@@ -347,9 +428,11 @@ def update_shift(shift_id: UUID, body: ShiftUpdate, context: ManageDep) -> Shift
     current = _load_shift(context.session, shift_id)
     changes = body.model_dump(exclude_unset=True)
     merged = {**current.model_dump(), **{k: v for k, v in changes.items() if v is not None}}
-    for key in ("position", "note"):
+    for key in ("position", "note", "station_id"):
         if key in changes:
             merged[key] = changes[key]
+    if "station_id" not in changes and merged["location_id"] != current.location_id:
+        merged["station_id"] = None  # a station belongs to its branch
     if not merged["starts_at"] < merged["ends_at"] <= merged["starts_at"] + MAX_SHIFT:
         raise HTTPException(status_code=422, detail="invalid_period")
     _check_and_lock(
@@ -359,12 +442,13 @@ def update_shift(shift_id: UUID, body: ShiftUpdate, context: ManageDep) -> Shift
         merged["starts_at"],
         merged["ends_at"],
         ignore=shift_id,
+        station_id=merged["station_id"],
     )
     context.session.execute(
         text("""
             UPDATE app.shifts
-            SET user_id = :user_id, location_id = :location_id, starts_at = :starts_at,
-                ends_at = :ends_at, position = :position, note = :note
+            SET user_id = :user_id, location_id = :location_id, station_id = :station_id,
+                starts_at = :starts_at, ends_at = :ends_at, position = :position, note = :note
             WHERE id = :id
         """),
         {key: merged[key] for key in SHIFT_COLUMNS} | {"id": shift_id},
@@ -378,13 +462,12 @@ def delete_shift(shift_id: UUID, context: ManageDep) -> None:
     context.session.execute(text("DELETE FROM app.shifts WHERE id = :id"), {"id": shift_id})
 
 
-@router.post("/shifts/copy-week")
-def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) -> CopiedShifts:
-    """Repeats a week's shifts (in the visible branches) in another week, at the same local
-    times; a shift that would clash with one already there is skipped."""
-    source, target = body.from_week, body.to_week
-    if abs((target - source).days) < 7:
-        raise HTTPException(status_code=422, detail="weeks_overlap")
+def _copy_range(
+    context: TenantContext, user: UserDep, source: dt.date, days: int, target: dt.date
+) -> tuple[int, int]:
+    """Repeats the shifts that start in `days` local days from `source` (in the visible branches)
+    from `target` on, at the same local times. A shift that would clash with one already there
+    is skipped. Returns (created, skipped)."""
     time_zone = _time_zone(context.session)
     rows = context.session.execute(
         text(f"""
@@ -393,7 +476,7 @@ def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) ->
         """),
         {
             "from": local_to_utc(source, time.min, time_zone),
-            "to": local_to_utc(source + timedelta(days=7), time.min, time_zone),
+            "to": local_to_utc(source + timedelta(days=days), time.min, time_zone),
         },
     ).mappings()
     shifts = [Shift.model_validate(dict(row)) for row in rows]
@@ -406,16 +489,24 @@ def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) ->
         ends = starts + (shift.ends_at - shift.starts_at)
         try:
             with context.session.begin_nested():
-                _check_and_lock(context.session, shift.user_id, shift.location_id, starts, ends)
+                _check_and_lock(
+                    context.session,
+                    shift.user_id,
+                    shift.location_id,
+                    starts,
+                    ends,
+                    station_id=shift.station_id,
+                )
                 context.session.execute(
                     text("""
-                        INSERT INTO app.shifts (tenant_id, location_id, user_id, starts_at,
-                                                ends_at, position, note, created_by)
-                        VALUES (app.current_tenant_id(), :location, :user, :starts, :ends,
-                                :position, :note, :created_by)
+                        INSERT INTO app.shifts (tenant_id, location_id, station_id, user_id,
+                                                starts_at, ends_at, position, note, created_by)
+                        VALUES (app.current_tenant_id(), :location, :station, :user, :starts,
+                                :ends, :position, :note, :created_by)
                     """),
                     {
                         "location": shift.location_id,
+                        "station": shift.station_id,
                         "user": shift.user_id,
                         "starts": starts,
                         "ends": ends,
@@ -427,4 +518,61 @@ def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) ->
             created += 1
         except HTTPException:
             skipped += 1
+    return created, skipped
+
+
+@router.post("/shifts/copy-week")
+def copy_shifts_week(body: CopyShiftsWeek, user: UserDep, context: ManageDep) -> CopiedShifts:
+    """Repeats a week's shifts (in the visible branches) in `repeat` following weeks from
+    `to_week`, at the same local times; a shift that would clash with one already there is
+    skipped."""
+    source = body.from_week
+    targets = [body.to_week + timedelta(days=7 * i) for i in range(body.repeat)]
+    if any(abs((target - source).days) < 7 for target in targets):
+        raise HTTPException(status_code=422, detail="weeks_overlap")
+    created = skipped = 0
+    for target in targets:
+        done, left_out = _copy_range(context, user, source, 7, target)
+        created, skipped = created + done, skipped + left_out
     return CopiedShifts(created=created, skipped=skipped)
+
+
+@router.post("/shifts/copy-day")
+def copy_shifts_day(body: CopyShiftsDay, user: UserDep, context: ManageDep) -> CopiedShifts:
+    """Repeats one day's shifts (in the visible branches) on other days."""
+    created = skipped = 0
+    for target in body.to_days:
+        done, left_out = _copy_range(context, user, body.from_day, 1, target)
+        created, skipped = created + done, skipped + left_out
+    return CopiedShifts(created=created, skipped=skipped)
+
+
+class PublishShifts(BaseModel):
+    start: dt.date = Field(description="First local date of the stretch to publish")
+    days: int = Field(default=7, ge=1, le=62)
+    location_id: list[UUID] | None = Field(default=None, description="Only these branches")
+
+
+class Published(BaseModel):
+    published: int = Field(description="Draft shifts that became visible to the team")
+
+
+@router.post("/shifts/publish")
+def publish_shifts(body: PublishShifts, context: ManageDep) -> Published:
+    """Makes the draft shifts that start in the stretch visible to the team."""
+    time_zone = _time_zone(context.session)
+    count = context.session.execute(
+        text("""
+            UPDATE app.shifts SET published_at = now()
+            WHERE published_at IS NULL AND app.in_branch(location_id)
+              AND starts_at >= :from AND starts_at < :to
+              AND (CAST(:locations AS uuid[]) IS NULL
+                   OR location_id = ANY(CAST(:locations AS uuid[])))
+        """),
+        {
+            "from": local_to_utc(body.start, time.min, time_zone),
+            "to": local_to_utc(body.start + timedelta(days=body.days), time.min, time_zone),
+            "locations": [str(i) for i in body.location_id] if body.location_id else None,
+        },
+    ).rowcount
+    return Published(published=count)

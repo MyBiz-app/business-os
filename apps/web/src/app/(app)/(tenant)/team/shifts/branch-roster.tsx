@@ -1,19 +1,51 @@
-import { AlertTriangle, ArrowRightLeft, Plus } from "lucide-react";
+import { AlertTriangle, ArrowRightLeft, Plus, ShieldAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 import { Avatar } from "@/components/avatar";
 import { formatDay } from "@/lib/dates";
 
-import type { BoardPerson, BoardShift } from "./shift-board";
+import type { BoardGap, BoardPerson, BoardShift, BoardStation } from "./shift-board";
 
 type Branch = { id: string; name: string; color: string };
 
 /** Who is on and when, a day at a time with one column per branch, so branches compare side
  * by side. The branch name and color head every column. */
-export function BranchRoster({ days, today, locale, branches, shifts, people, editHref, addHref }: { days: string[]; today: string; locale: string; branches: Branch[]; shifts: BoardShift[]; people: BoardPerson[]; editHref?: (shiftId: string) => string; addHref?: (day: string, branchId: string) => string }) {
+export function BranchRoster({ days, today, locale, branches, shifts, people, stations = [], gaps = [], editHref, addHref }: { days: string[]; today: string; locale: string; branches: Branch[]; shifts: BoardShift[]; people: BoardPerson[]; stations?: BoardStation[]; gaps?: BoardGap[]; editHref?: (shiftId: string) => string; addHref?: (day: string, branchId: string, stationId?: string) => string }) {
   const t = useTranslations("shifts");
   const person = new Map(people.map((p) => [p.id, p]));
+  const branchById = new Map(branches.map((b) => [b.id, b]));
+  const renderShifts = (list: BoardShift[]) => (
+    <ul className="flex flex-col gap-1.5">
+      {list.map((shift) => {
+        const who = person.get(shift.userId);
+        const branch = branchById.get(shift.locationId);
+        return (
+          <li key={shift.id} className="relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-within:ring-2 focus-within:ring-primary" style={{ background: `color-mix(in oklab, ${branch?.color ?? "var(--primary)"} ${shift.draft ? 4 : 10}%, var(--surface))`, outline: shift.draft ? "1px dashed var(--border)" : undefined }}>
+            {editHref && <Link href={editHref(shift.id)} scroll={false} aria-label={`${who?.name ?? ""}: ${shift.starts}–${shift.ends}`} className="absolute inset-0 rounded-lg outline-none" />}
+            <span dir="ltr" className="w-[6.5rem] shrink-0 text-sm font-semibold tabular-nums">{shift.starts}–{shift.ends}</span>
+            {who && <Avatar id={who.id} name={who.name} src={who.avatar} size="sm" />}
+            <span className="flex min-w-0 flex-col">
+              <span dir="auto" className="truncate text-sm font-medium">{who?.name}</span>
+              {(shift.position || shift.isCover) && (
+                <span className="flex items-center gap-1 truncate text-xs text-muted">
+                  {shift.isCover && (
+                    <span className="inline-flex items-center gap-1 text-primary">
+                      <ArrowRightLeft aria-hidden="true" className="size-3" />
+                      {t("coverFrom", { branch: shift.homeName ?? "" })}
+                    </span>
+                  )}
+                  {shift.position && <span dir="auto">{shift.position}</span>}
+                </span>
+              )}
+            </span>
+            {shift.draft && <span className="ms-auto shrink-0 rounded-full bg-warning/15 px-2 text-xs font-medium text-warning">{t("publish.draft")}</span>}
+            {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className={`${shift.draft ? "" : "ms-auto "}size-4 shrink-0 text-warning`} />}
+          </li>
+        );
+      })}
+    </ul>
+  );
   return (
     <div className="flex flex-col gap-4">
       {days.map((day) => {
@@ -27,6 +59,8 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, ed
             <div className="grid divide-border max-sm:divide-y sm:divide-x sm:[grid-template-columns:repeat(var(--n),minmax(0,1fr))]" style={{ "--n": branches.length } as React.CSSProperties}>
               {branches.map((branch) => {
                 const here = shifts.filter((s) => s.day === day && s.locationId === branch.id);
+                const rooms = stations.filter((r) => r.locationId === branch.id);
+                const unplaced = here.filter((s) => !s.stationId || !rooms.some((r) => r.id === s.stationId));
                 return (
                   <div key={branch.id} className="flex min-w-0 flex-col gap-2 p-3">
                     <div className="flex items-center gap-2 border-b-2 pb-1.5 text-sm font-semibold" style={{ borderColor: branch.color }}>
@@ -34,36 +68,45 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, ed
                       <span dir="auto" className="truncate">{branch.name}</span>
                       <span className="ms-auto text-xs font-normal text-muted">{t("onShift", { count: new Set(here.map((s) => s.userId)).size })}</span>
                     </div>
-                    {here.length === 0 ? (
+                    {gaps
+                      .filter((g) => g.day === day && g.locationId === branch.id)
+                      .map((g) => (
+                        <p key={`${g.starts}-${g.ends}`} className="flex items-center gap-1.5 rounded-lg bg-warning/10 px-2 py-1 text-xs">
+                          <ShieldAlert aria-hidden="true" className="size-3.5 shrink-0 text-warning" />
+                          <span dir="ltr" className="tabular-nums">{g.starts}–{g.ends}</span>
+                          <span>{t("coverage.gap", { have: g.have, needed: g.needed })}</span>
+                        </p>
+                      ))}
+                    {here.length === 0 && rooms.length === 0 ? (
                       <p className="py-2 text-sm text-muted">{t("nobody")}</p>
+                    ) : rooms.length === 0 ? (
+                      renderShifts(here)
                     ) : (
-                      <ul className="flex flex-col gap-1.5">
-                        {here.map((shift) => {
-                          const who = person.get(shift.userId);
+                      <div className="flex flex-col gap-3">
+                        {rooms.map((room) => {
+                          const inRoom = here.filter((s) => s.stationId === room.id);
                           return (
-                            <li key={shift.id} className="relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-within:ring-2 focus-within:ring-primary" style={{ background: `color-mix(in oklab, ${branch.color} 10%, var(--surface))` }}>
-                              {editHref && <Link href={editHref(shift.id)} scroll={false} aria-label={`${who?.name ?? ""}: ${shift.starts}–${shift.ends}`} className="absolute inset-0 rounded-lg outline-none" />}
-                              <span dir="ltr" className="w-[6.5rem] shrink-0 text-sm font-semibold tabular-nums">{shift.starts}–{shift.ends}</span>
-                              {who && <Avatar id={who.id} name={who.name} src={who.avatar} size="sm" />}
-                              <span className="flex min-w-0 flex-col">
-                                <span dir="auto" className="truncate text-sm font-medium">{who?.name}</span>
-                                {(shift.position || shift.isCover) && (
-                                  <span className="flex items-center gap-1 truncate text-xs text-muted">
-                                    {shift.isCover && (
-                                      <span className="inline-flex items-center gap-1 text-primary">
-                                        <ArrowRightLeft aria-hidden="true" className="size-3" />
-                                        {t("coverFrom", { branch: shift.homeName ?? "" })}
-                                      </span>
-                                    )}
-                                    {shift.position && <span dir="auto">{shift.position}</span>}
-                                  </span>
+                            <div key={room.id} role="group" aria-label={room.name} className="flex flex-col gap-1.5">
+                              <div className="flex items-center gap-2 text-xs font-semibold text-muted">
+                                <span dir="auto" className="truncate">{room.name}</span>
+                                <span className="font-normal">{t("stations.people", { count: new Set(inRoom.map((s) => s.userId)).size })}</span>
+                                {addHref && (
+                                  <Link href={addHref(day, branch.id, room.id)} scroll={false} aria-label={t("stations.addAt", { station: room.name })} className="ms-auto rounded p-0.5 transition-colors hover:text-foreground">
+                                    <Plus aria-hidden="true" className="size-3.5" />
+                                  </Link>
                                 )}
-                              </span>
-                              {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className="ms-auto size-4 shrink-0 text-warning" />}
-                            </li>
+                              </div>
+                              {inRoom.length > 0 ? renderShifts(inRoom) : <p className="rounded-lg border border-dashed border-border px-2 py-1 text-xs text-muted">{t("nobody")}</p>}
+                            </div>
                           );
                         })}
-                      </ul>
+                        {unplaced.length > 0 && (
+                          <div role="group" aria-label={t("stations.unassigned")} className="flex flex-col gap-1.5">
+                            <div className="text-xs font-semibold text-muted">{t("stations.unassigned")}</div>
+                            {renderShifts(unplaced)}
+                          </div>
+                        )}
+                      </div>
                     )}
                     {addHref && (
                       <Link href={addHref(day, branch.id)} scroll={false} aria-label={t("addAt", { branch: branch.name, day: formatDay(day, locale, { weekday: "long", day: "numeric" }) })} className="flex items-center justify-center rounded-lg border border-dashed border-border py-1 text-muted transition-colors hover:text-foreground">

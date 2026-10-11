@@ -88,7 +88,7 @@
           "account"
         ],
         "summary": "Update Me",
-        "description": "The signed-in person's own profile: the name the team, clients and reports see, a phone\nnumber for the team, personal details (date of birth, home address) and their color\npalette. Fields left out stay as they are.",
+        "description": "The signed-in person's own profile: the name the team, clients and reports see, a phone\nnumber for the team, personal details (date of birth, home address), whether to email\nthem when their roster is published, and their color palette. Fields left out stay as\nthey are.",
         "operationId": "update_me",
         "requestBody": {
           "content": {
@@ -9438,6 +9438,102 @@
         }
       }
     },
+    "/shifts/time-off": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Away",
+        "description": "Who is away (vacation, sick days) in the window, so the board can show it.",
+        "operationId": "list_away",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date (business time zone)",
+              "title": "Start"
+            },
+            "description": "First local date (business time zone)"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 42,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AwayDays"
+                  },
+                  "title": "Response List Away"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shifts/{shift_id}": {
       "patch": {
         "tags": [
@@ -9599,7 +9695,7 @@
           "shifts"
         ],
         "summary": "Copy Shifts Week",
-        "description": "Repeats a week's shifts (in the visible branches) in another week, at the same local\ntimes; a shift that would clash with one already there is skipped.",
+        "description": "Repeats a week's shifts (in the visible branches) in `repeat` following weeks from\n`to_week`, at the same local times; a shift that would clash with one already there is\nskipped.",
         "operationId": "copy_shifts_week",
         "security": [
           {
@@ -9657,6 +9753,1005 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shifts/copy-day": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Copy Shifts Day",
+        "description": "Repeats one day's shifts (in the visible branches) on other days.",
+        "operationId": "copy_shifts_day",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopyShiftsDay"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopiedShifts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shifts/publish": {
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Publish Shifts",
+        "description": "Makes the draft shifts that start in the stretch visible to the team.",
+        "operationId": "publish_shifts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishShifts"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Published"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shift-templates": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Shift Templates",
+        "operationId": "list_shift_templates",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these branches",
+              "title": "Location Id"
+            },
+            "description": "Only these branches"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ShiftTemplate"
+                  },
+                  "title": "Response List Shift Templates"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Create Shift Template",
+        "operationId": "create_shift_template",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShiftTemplateCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShiftTemplate"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shift-templates/{template_id}": {
+      "delete": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Delete Shift Template",
+        "operationId": "delete_shift_template",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Template Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/locations/{location_id}/coverage-rules": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Get Coverage Rules",
+        "operationId": "get_coverage_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoverageRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Set Coverage Rules",
+        "description": "Replaces the branch's whole set of rules.",
+        "operationId": "set_coverage_rules",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoverageRules"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoverageRules"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shifts/coverage": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Shift Coverage",
+        "description": "Where a branch has fewer people on shift than its coverage rules ask, day by day. People\naway on time off do not count. Branches without rules are never listed.",
+        "operationId": "shift_coverage",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "First local date (business time zone)",
+              "title": "Start"
+            },
+            "description": "First local date (business time zone)"
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 42,
+              "minimum": 1,
+              "default": 7,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these branches",
+              "title": "Location Id"
+            },
+            "description": "Only these branches"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CoverageGap"
+                  },
+                  "title": "Response Shift Coverage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stations": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Stations",
+        "operationId": "list_stations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these branches",
+              "title": "Location Id"
+            },
+            "description": "Only these branches"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Station"
+                  },
+                  "title": "Response List Stations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Create Station",
+        "operationId": "create_station",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Station"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stations/{station_id}": {
+      "patch": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Update Station",
+        "operationId": "update_station",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Station Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StationUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Station"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Delete Station",
+        "description": "Removes the station; its shifts stay, without a station.",
+        "operationId": "delete_station",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Station Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -20225,6 +21320,44 @@
         ],
         "title": "AuditEntry"
       },
+      "AwayDays": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "starts_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Starts On"
+          },
+          "ends_on": {
+            "type": "string",
+            "format": "date",
+            "title": "Ends On"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "starts_on",
+          "ends_on",
+          "reason"
+        ],
+        "title": "AwayDays"
+      },
       "BillPreview": {
         "properties": {
           "client_id": {
@@ -23645,6 +24778,33 @@
         ],
         "title": "CopiedShifts"
       },
+      "CopyShiftsDay": {
+        "properties": {
+          "from_day": {
+            "type": "string",
+            "format": "date",
+            "title": "From Day",
+            "description": "The day whose shifts are copied"
+          },
+          "to_days": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "type": "array",
+            "maxItems": 31,
+            "minItems": 1,
+            "title": "To Days",
+            "description": "Days to fill"
+          }
+        },
+        "type": "object",
+        "required": [
+          "from_day",
+          "to_days"
+        ],
+        "title": "CopyShiftsDay"
+      },
       "CopyShiftsWeek": {
         "properties": {
           "from_week": {
@@ -23658,6 +24818,14 @@
             "format": "date",
             "title": "To Week",
             "description": "First day of the week to fill"
+          },
+          "repeat": {
+            "type": "integer",
+            "maximum": 8.0,
+            "minimum": 1.0,
+            "title": "Repeat",
+            "description": "Fill this many following weeks, seven days apart",
+            "default": 1
           }
         },
         "type": "object",
@@ -23691,6 +24859,109 @@
           "price"
         ],
         "title": "CoreTier"
+      },
+      "CoverageGap": {
+        "properties": {
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          },
+          "location_name": {
+            "type": "string",
+            "title": "Location Name"
+          },
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "starts_minute": {
+            "type": "integer",
+            "title": "Starts Minute"
+          },
+          "ends_minute": {
+            "type": "integer",
+            "title": "Ends Minute"
+          },
+          "needed": {
+            "type": "integer",
+            "title": "Needed"
+          },
+          "have": {
+            "type": "integer",
+            "title": "Have",
+            "description": "People on shift through the stretch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id",
+          "location_name",
+          "day",
+          "starts_minute",
+          "ends_minute",
+          "needed",
+          "have"
+        ],
+        "title": "CoverageGap"
+      },
+      "CoverageRule": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Weekday",
+            "description": "0 = Monday"
+          },
+          "starts_minute": {
+            "type": "integer",
+            "exclusiveMaximum": 1440.0,
+            "minimum": 0.0,
+            "title": "Starts Minute",
+            "description": "Minutes from midnight"
+          },
+          "ends_minute": {
+            "type": "integer",
+            "maximum": 1440.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Ends Minute",
+            "description": "Minutes from midnight; 1440 = end of day"
+          },
+          "min_staff": {
+            "type": "integer",
+            "maximum": 50.0,
+            "minimum": 1.0,
+            "title": "Min Staff",
+            "description": "People needed on shift at the same time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "starts_minute",
+          "ends_minute",
+          "min_staff"
+        ],
+        "title": "CoverageRule"
+      },
+      "CoverageRules": {
+        "properties": {
+          "rules": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageRule"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Rules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rules"
+        ],
+        "title": "CoverageRules"
       },
       "CreatedInvitation": {
         "properties": {
@@ -27000,6 +28271,12 @@
             ],
             "title": "Postal Code"
           },
+          "email_roster": {
+            "type": "boolean",
+            "title": "Email Roster",
+            "description": "Email the person when their roster is published",
+            "default": true
+          },
           "palette": {
             "anyOf": [
               {
@@ -29147,6 +30424,58 @@
         ],
         "title": "PublicQuote",
         "description": "What the client sees by the private link."
+      },
+      "PublishShifts": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start",
+            "description": "First local date of the stretch to publish"
+          },
+          "days": {
+            "type": "integer",
+            "maximum": 62.0,
+            "minimum": 1.0,
+            "title": "Days",
+            "default": 7
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "Only these branches"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start"
+        ],
+        "title": "PublishShifts"
+      },
+      "Published": {
+        "properties": {
+          "published": {
+            "type": "integer",
+            "title": "Published",
+            "description": "Draft shifts that became visible to the team"
+          }
+        },
+        "type": "object",
+        "required": [
+          "published"
+        ],
+        "title": "Published"
       },
       "Question": {
         "properties": {
@@ -32490,6 +33819,29 @@
             ],
             "title": "Note"
           },
+          "station_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Station Id"
+          },
+          "station_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Station Name"
+          },
           "home_location_id": {
             "anyOf": [
               {
@@ -32528,6 +33880,11 @@
             "type": "boolean",
             "title": "Outside Hours",
             "description": "Not within the branch's opening hours (if set)"
+          },
+          "published": {
+            "type": "boolean",
+            "title": "Published",
+            "description": "Visible to the team; a draft shows to managers only"
           }
         },
         "type": "object",
@@ -32541,11 +33898,14 @@
           "ends_at",
           "position",
           "note",
+          "station_id",
+          "station_name",
           "home_location_id",
           "home_location_name",
           "is_cover",
           "on_time_off",
-          "outside_hours"
+          "outside_hours",
+          "published"
         ],
         "title": "Shift"
       },
@@ -32586,6 +33946,19 @@
             "format": "uuid",
             "title": "Location Id"
           },
+          "station_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Station Id",
+            "description": "A station of the same branch"
+          },
           "starts_at": {
             "type": "string",
             "format": "date-time",
@@ -32605,6 +33978,106 @@
           "ends_at"
         ],
         "title": "ShiftCreate"
+      },
+      "ShiftTemplate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "description": "E.g. \"Morning\""
+          },
+          "starts": {
+            "type": "string",
+            "format": "time",
+            "title": "Starts"
+          },
+          "ends": {
+            "type": "string",
+            "format": "time",
+            "title": "Ends",
+            "description": "Earlier than `starts`: the shift runs past midnight"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "starts",
+          "ends",
+          "location_id",
+          "id"
+        ],
+        "title": "ShiftTemplate"
+      },
+      "ShiftTemplateCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "description": "E.g. \"Morning\""
+          },
+          "starts": {
+            "type": "string",
+            "format": "time",
+            "title": "Starts"
+          },
+          "ends": {
+            "type": "string",
+            "format": "time",
+            "title": "Ends",
+            "description": "Earlier than `starts`: the shift runs past midnight"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "starts",
+          "ends",
+          "location_id"
+        ],
+        "title": "ShiftTemplateCreate"
       },
       "ShiftUpdate": {
         "properties": {
@@ -32656,6 +34129,19 @@
               }
             ],
             "title": "Location Id"
+          },
+          "station_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Station Id",
+            "description": "Null clears the station"
           },
           "starts_at": {
             "anyOf": [
@@ -32992,6 +34478,93 @@
           "count"
         ],
         "title": "StageCount"
+      },
+      "Station": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "description": "E.g. \"Pilates 1\""
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "sort_order": {
+            "type": "integer",
+            "title": "Sort Order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "location_id",
+          "id",
+          "sort_order"
+        ],
+        "title": "Station"
+      },
+      "StationCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 1,
+            "title": "Name",
+            "description": "E.g. \"Pilates 1\""
+          },
+          "location_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Location Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "location_id"
+        ],
+        "title": "StationCreate"
+      },
+      "StationUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "sort_order": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 999.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort Order"
+          }
+        },
+        "type": "object",
+        "title": "StationUpdate"
       },
       "SupportAccess": {
         "properties": {
@@ -33376,6 +34949,41 @@
             "type": "array",
             "title": "Shifts Default Branches",
             "description": "Branches the shifts board opens with; empty: all of them"
+          },
+          "shifts_publish_auto": {
+            "type": "boolean",
+            "title": "Shifts Publish Auto",
+            "description": "Publish the shifts roster on schedule",
+            "default": true
+          },
+          "shifts_publish_cadence": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "title": "Shifts Publish Cadence",
+            "default": "weekly"
+          },
+          "shifts_publish_weekday": {
+            "type": "integer",
+            "title": "Shifts Publish Weekday",
+            "description": "Weekly: 0 = Monday, 6 = Sunday",
+            "default": 6
+          },
+          "shifts_publish_day": {
+            "type": "integer",
+            "title": "Shifts Publish Day",
+            "description": "Monthly: day of the month, 1-28",
+            "default": 1
+          },
+          "shifts_publish_time": {
+            "type": "string",
+            "format": "time",
+            "title": "Shifts Publish Time",
+            "description": "Local time the roster goes out",
+            "default": "08:00:00"
           },
           "join_code": {
             "type": "string",
@@ -33763,6 +35371,71 @@
             ],
             "title": "Shifts Default Branches",
             "description": "Branches the shifts board opens with; empty means all of them"
+          },
+          "shifts_publish_auto": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Auto"
+          },
+          "shifts_publish_cadence": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "daily",
+                  "weekly",
+                  "monthly"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Cadence"
+          },
+          "shifts_publish_weekday": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 6.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Weekday"
+          },
+          "shifts_publish_day": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 28.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Day"
+          },
+          "shifts_publish_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shifts Publish Time"
           },
           "legal_entity_type": {
             "anyOf": [
@@ -34482,6 +36155,17 @@
               }
             ],
             "title": "Postal Code"
+          },
+          "email_roster": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Roster"
           },
           "palette": {
             "anyOf": [

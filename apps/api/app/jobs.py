@@ -6,6 +6,8 @@
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
+    uv run python -m app.jobs notify-shifts    (emails staff their newly published shifts)
+    uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
 
@@ -14,7 +16,7 @@ system work that needs no user's permission."""
 
 import argparse
 import json
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -30,6 +32,7 @@ from app.messaging.email import (
     send_emails,
     sender_from_settings,
 )
+from app.messaging.roster import notify_roster
 from app.providers.choice import choose
 from app.schedule.scheduling import weekly_occurrences
 
@@ -365,12 +368,83 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
     }
 
 
+def _publish_moment(row: dict, now: datetime) -> tuple[datetime, datetime]:
+    """The latest moment at or before `now` the business's roster is due out, and the end of the
+    stretch it covers: daily through tomorrow, weekly seven days, monthly until the same day of
+    the next month. Both are UTC."""
+    zone = ZoneInfo(row["time_zone"])
+    local = now.astimezone(zone)
+    at = row["shifts_publish_time"]
+    cadence = row["shifts_publish_cadence"]
+    day = local.date()
+    if cadence == "weekly":
+        day -= timedelta(days=(day.weekday() - row["shifts_publish_weekday"]) % 7)
+    elif cadence == "monthly":
+        if day.day < row["shifts_publish_day"]:
+            day = (day.replace(day=1) - timedelta(days=1)).replace(day=1)
+        day = day.replace(day=row["shifts_publish_day"])
+    if datetime.combine(day, at, zone) > local:
+        day -= {
+            "daily": timedelta(days=1),
+            "weekly": timedelta(days=7),
+            "monthly": timedelta(days=28),
+        }[cadence]
+        if cadence == "monthly":
+            day = day.replace(day=row["shifts_publish_day"])
+    if cadence == "daily":
+        end = day + timedelta(days=2)
+    elif cadence == "weekly":
+        end = day + timedelta(days=7)
+    else:
+        end = (day.replace(day=1) + timedelta(days=32)).replace(day=row["shifts_publish_day"])
+    due = datetime.combine(day, at, zone).astimezone(UTC)
+    return due, datetime.combine(end, time.min, zone).astimezone(UTC)
+
+
+def publish_shifts(conn: Connection, now: datetime | None = None) -> int:
+    """Publishes the draft shifts of every business whose roster is due (once per due moment).
+    Run hourly. Returns how many shifts became visible."""
+    now = now or datetime.now(UTC)
+    published = 0
+    rows = conn.execute(
+        text("""
+            SELECT id, time_zone, shifts_publish_cadence, shifts_publish_weekday,
+                   shifts_publish_day, shifts_publish_time, shifts_last_auto_published_at
+            FROM app.tenants WHERE shifts_publish_auto
+        """)
+    ).mappings()
+    for row in list(rows):
+        due, end = _publish_moment(dict(row), now)
+        last = row["shifts_last_auto_published_at"]
+        if last is not None and last >= due:
+            continue
+        published += conn.execute(
+            text("""
+                UPDATE app.shifts SET published_at = :now
+                WHERE tenant_id = :tenant AND published_at IS NULL AND starts_at < :end
+            """),
+            {"now": now, "tenant": row["id"], "end": end},
+        ).rowcount
+        conn.execute(
+            text("UPDATE app.tenants SET shifts_last_auto_published_at = :now WHERE id = :id"),
+            {"now": now, "id": row["id"]},
+        )
+    return published
+
+
 def send_messages(conn: Connection) -> dict[str, int]:
     return outbox.send_messages(conn)
 
 
 def issue_documents(conn: Connection) -> dict[str, int]:
     return outbox.issue_documents(conn)
+
+
+def notify_shifts(conn: Connection) -> dict[str, int] | str:
+    sender = sender_from_settings()
+    if sender is None:
+        return "email provider not configured; nothing sent"
+    return notify_roster(conn, sender)
 
 
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
@@ -385,10 +459,12 @@ JOBS = {
     "remind-sessions": remind_sessions,
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
+    "notify-shifts": notify_shifts,
     "message-reminders": message_reminders,
     "follow-up-leads": follow_up_leads,
     "purge-expired": purge_expired,
     "bill-businesses": bill_businesses,
+    "publish-shifts": publish_shifts,
     "send-messages": send_messages,
     "issue-documents": issue_documents,
 }

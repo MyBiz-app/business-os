@@ -29,6 +29,13 @@ The staging Supabase project's "Magic link" and "Confirm signup" email templates
 
 ## Publish as a web app (staging)
 
+Quickest way: GitHub → Actions → *Deploy the Expo apps to the web (Vercel)* → *Run workflow*.
+It builds the web export on the runner and uploads it to Vercel (one project per app,
+`mybiz-client-app`, `mybiz-business-app`, `mybiz-staff-app`; uses the `VERCEL_TOKEN` secret).
+Afterwards add each printed address to the API's `API_CORS_ORIGINS` (see below).
+
+Manual alternative (a Vercel project with a Git connection):
+
 The same app runs in a phone's browser, so people can try it without installing anything.
 It is a static site (`expo export -p web`), deployed by a second Vercel project:
 

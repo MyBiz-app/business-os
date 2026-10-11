@@ -313,6 +313,12 @@ def test_networks_demo_has_three_networks_with_their_workspace(engine: Engine) -
                         WHERE h.tenant_id = t.id) AS branches_with_hours,
                        (SELECT count(DISTINCT s.location_id) FROM app.shifts s
                         WHERE s.tenant_id = t.id) AS branches_with_shifts,
+                       (SELECT count(DISTINCT s.station_id) FROM app.shifts s
+                        WHERE s.tenant_id = t.id) AS stations_used,
+                       (SELECT count(*) FROM app.shifts a JOIN app.shifts b
+                            ON a.station_id = b.station_id AND a.id < b.id
+                           AND a.starts_at < b.ends_at AND b.starts_at < a.ends_at
+                        WHERE a.tenant_id = t.id) AS shared_stations,
                        (SELECT count(*) FROM app.tenant_members m
                         WHERE m.tenant_id = t.id AND m.role <> 'owner'
                           AND (m.reports_to IS NULL OR m.job_title IS NULL)) AS unplaced,
@@ -345,3 +351,5 @@ def test_networks_demo_has_three_networks_with_their_workspace(engine: Engine) -
         assert israeli_number_valid(row["business_number"]) and row["cover"]
         assert row["branches_with_hours"] == row["branches_with_shifts"] == row["branches"]
         assert row["unplaced"] == 0 and row["overlaps"] == 0
+        # Shifts are planned into rooms, and on busy stretches two people share one.
+        assert row["stations_used"] >= 2 and row["shared_stations"] > 0

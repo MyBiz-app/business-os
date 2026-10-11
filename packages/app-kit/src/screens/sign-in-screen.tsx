@@ -7,9 +7,12 @@ import { Button, ErrorText, Field, Heading, Screen, styles } from "../components
 import { supabase } from "../lib/supabase";
 import { useTheme } from "../providers/theme-provider";
 
+// The email OTP length is a Supabase project setting (6 locally, 8 on hosted projects).
+const MIN_CODE_LENGTH = 6;
+const MAX_CODE_LENGTH = 10;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Passwordless sign-in, shared by the three apps: the user gets a 6-digit code by email (new
+/** Passwordless sign-in, shared by the three apps: the user gets a numeric code by email (Supabase decides the length, so the input accepts 6 to 10 digits) (new
  * users are signed up). Each app's `sign-in` route re-exports it. */
 export function SignInScreen() {
   const t = useTranslations("client.signIn");
@@ -54,7 +57,7 @@ export function SignInScreen() {
             label={t("code")}
             palette={palette}
             value={code}
-            onChangeText={(value) => setCode(value.replace(/\D/g, "").slice(0, 6))}
+            onChangeText={(value) => setCode(value.replace(/\D/g, "").slice(0, MAX_CODE_LENGTH))}
             keyboardType="number-pad"
             autoComplete="one-time-code"
             textContentType="oneTimeCode"
@@ -62,7 +65,7 @@ export function SignInScreen() {
             onSubmitEditing={() => void verify()}
           />
           <ErrorText message={error} palette={palette} />
-          <Button label={t("verify")} palette={palette} busy={busy} disabled={code.length < 6} onPress={() => void verify()} />
+          <Button label={t("verify")} palette={palette} busy={busy} disabled={code.length < MIN_CODE_LENGTH} onPress={() => void verify()} />
           <Button label={t("changeEmail")} variant="secondary" palette={palette} onPress={() => setSentTo(null)} />
         </>
       ) : (

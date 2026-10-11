@@ -43,12 +43,16 @@ export type GridShift = {
   details?: { time: string; role: string | null; position: string | null; place: string | null; cover: string | null; warning: string | null };
 };
 
+/** A stretch where a lane has fewer people on shift than its coverage rules ask. */
+export type GridGap = { laneId: string; day: string; start: number; end: number; label: string };
+
 type Props = {
   days: string[];
   timeZone: string;
   locale: string;
   events: GridEvent[];
   shifts: GridShift[];
+  gaps?: GridGap[];
   /** Two or more lanes put each day's columns side by side, each under its own named header. */
   lanes?: GridLane[];
   closed: Record<string, string | null>;
@@ -74,7 +78,7 @@ const HOUR = 64; // pixels per hour
 
 /** The day or week as a time grid: events where they happen, overlapping ones side by side,
  * shifts in a narrow lane, closed hours shaded and a live line at the current time. */
-export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], closed, open, labels, dayHref }: Props) {
+export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], lanes = [], closed, open, labels, dayHref }: Props) {
   const laned = lanes.length > 1;
   const columns: (GridLane | null)[] = laned ? lanes : [null];
   const range = useMemo(() => visibleHours([...events, ...shifts, ...Object.values(open ?? {}).flatMap((byDay) => Object.values(byDay).flat())].filter((e) => e.end > e.start)), [events, shifts, open]);
@@ -236,6 +240,19 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, lanes = [], c
                     !isClosed &&
                     closedSpans(openings, range).map((span) => (
                       <div key={span.start} aria-hidden="true" className="absolute inset-x-0 bg-foreground/[0.035]" style={{ top: y(span.start), height: y(span.end) - y(span.start) }} />
+                    ))}
+                  {/* Understaffed stretches: a warning band across the column. */}
+                  {gaps
+                    .filter((g) => g.day === day && (!laned || g.laneId === id))
+                    .map((g) => (
+                      <div
+                        key={`${g.laneId}|${g.start}`}
+                        title={g.label}
+                        className="absolute inset-x-0 z-0 border-y border-dashed border-warning/60 bg-warning/10"
+                        style={{ top: y(Math.max(g.start, range.from)), height: Math.max(y(Math.min(g.end, range.to)) - y(Math.max(g.start, range.from)), 0) }}
+                      >
+                        <span className="sr-only">{g.label}</span>
+                      </div>
                     ))}
                   {placed.length === 0 && dayShifts.length === 0 && days.length === 1 && (
                     <p className="absolute inset-x-0 top-8 px-2 text-center text-sm text-muted">{labels.empty}</p>

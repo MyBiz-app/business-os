@@ -42,6 +42,24 @@ def test_a_person_keeps_their_personal_details(
     assert future.status_code == 422
 
 
+def test_roster_emails_are_on_by_default_and_can_be_switched_off(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    owner = auth(studio["owner"])
+    assert client.get("/me", headers=owner).json()["email_roster"] is True
+    off = client.patch("/me", json={"email_roster": False}, headers=owner).json()
+    assert off["email_roster"] is False
+    # Other changes and an empty value leave the choice alone.
+    assert (
+        client.patch("/me", json={"city": "Holon"}, headers=owner).json()["email_roster"] is False
+    )
+    assert (
+        client.patch("/me", json={"email_roster": None}, headers=owner).json()["email_roster"]
+        is False
+    )
+    assert client.patch("/me", json={"email_roster": True}, headers=owner).json()["email_roster"]
+
+
 def test_a_person_manages_their_own_profile_and_picture(
     client: TestClient, auth: AuthHeaders, studio: dict
 ) -> None:
@@ -246,6 +264,13 @@ def test_shifts_refuse_double_booking_and_flag_time_off(
     assert [s["on_time_off"] for s in listed] == [True, True]
     assert [s["outside_hours"] for s in listed] == [True, True]
 
+    away = client.get(
+        "/shifts/time-off", params={"start": local_today().isoformat()}, headers=headers
+    ).json()
+    assert [(a["user_id"], a["starts_on"]) for a in away] == [(coach, day)]
+    far = (local_today() + timedelta(days=30)).isoformat()
+    assert client.get("/shifts/time-off", params={"start": far}, headers=headers).json() == []
+
     # Moving a shift onto another of the same person is refused; deleting works.
     moved = client.patch(f"/shifts/{body['id']}", json={"ends_at": at(1, 16)}, headers=headers)
     assert moved.status_code == 409
@@ -256,8 +281,12 @@ def test_shifts_refuse_double_booking_and_flag_time_off(
         == "Opens"
     )
 
-    # The team reads shifts; only managers plan them.
+    # The team reads shifts once published; only managers plan them.
     coach_headers = auth(studio["coach"], studio["tenant_id"])
+    published = client.post(
+        "/shifts/publish", json={"start": local_today().isoformat(), "days": 7}, headers=headers
+    )
+    assert published.json() == {"published": 2}
     assert (
         len(
             client.get(
@@ -308,6 +337,66 @@ def test_a_week_of_shifts_is_copied_without_clashes(client: TestClient, studio: 
         headers=headers,
     ).json()
     assert len(next_week) == 1  # the one planned by hand, not a clashing copy
+
+
+def test_shifts_are_copied_to_other_days_and_repeated_over_weeks(
+    client: TestClient, studio: dict
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    client.post(
+        "/shifts",
+        json={
+            "user_id": coach,
+            "location_id": branch,
+            "starts_at": at(0, 8),
+            "ends_at": at(0, 12),
+        },
+        headers=headers,
+    )
+    today = local_today()
+
+    def on(day: int) -> list:
+        return client.get(
+            "/shifts",
+            params={"start": (today + timedelta(days=day)).isoformat(), "days": 1},
+            headers=headers,
+        ).json()
+
+    days = client.post(
+        "/shifts/copy-day",
+        json={
+            "from_day": today.isoformat(),
+            "to_days": [(today + timedelta(days=d)).isoformat() for d in (1, 2)],
+        },
+        headers=headers,
+    )
+    again = client.post(
+        "/shifts/copy-day",
+        json={"from_day": today.isoformat(), "to_days": [(today + timedelta(days=1)).isoformat()]},
+        headers=headers,
+    )
+    weeks = client.post(
+        "/shifts/copy-week",
+        json={
+            "from_week": today.isoformat(),
+            "to_week": (today + timedelta(days=7)).isoformat(),
+            "repeat": 2,
+        },
+        headers=headers,
+    )
+    invalid = [
+        {"from_day": today.isoformat(), "to_days": [today.isoformat()]},
+        {"from_day": today.isoformat(), "to_days": []},
+    ]
+
+    assert days.json() == {"created": 2, "skipped": 0}
+    assert again.json() == {"created": 0, "skipped": 1}  # already there
+    assert len(on(1)) == 1 and len(on(2)) == 1
+    # Three shifts this week (today, +1, +2) copied into two following weeks.
+    assert weeks.json() == {"created": 6, "skipped": 0}
+    assert len(on(8)) == 1 and len(on(15)) == 1
+    for body in invalid:
+        assert client.post("/shifts/copy-day", json=body, headers=headers).status_code == 422
 
 
 def test_branch_comparison_and_calendars_stay_within_the_persons_branches(
@@ -435,3 +524,140 @@ def test_each_branch_has_a_planning_rhythm(client: TestClient, studio: dict) -> 
         == 404
     )
     assert client.get("/shifts/planning", headers=headers).json()[0]["days"] == 10
+
+
+def test_shift_templates_are_named_per_branch(client: TestClient, studio: dict) -> None:
+    headers, branch = studio["headers"], studio["location"]["id"]
+    morning = {"location_id": branch, "name": " Morning ", "starts": "07:00", "ends": "15:00"}
+    created = client.post("/shift-templates", json=morning, headers=headers)
+    assert created.status_code == 201 and created.json()["name"] == "Morning"
+    night = {"location_id": branch, "name": "Night", "starts": "22:00", "ends": "06:00"}
+    assert client.post("/shift-templates", json=night, headers=headers).status_code == 201
+    same_name = client.post(
+        "/shift-templates", json={**morning, "name": "morning"}, headers=headers
+    )
+    assert same_name.status_code == 409 and same_name.json()["detail"] == "template_name_taken"
+    zero = {**morning, "name": "Zero", "ends": "07:00"}
+    assert client.post("/shift-templates", json=zero, headers=headers).status_code == 422
+
+    listed = client.get("/shift-templates", headers=headers).json()
+    assert [t["name"] for t in listed] == ["Morning", "Night"]
+    other = client.get("/shift-templates", params={"location_id": str(uuid4())}, headers=headers)
+    assert other.json() == []
+    gone = client.delete(f"/shift-templates/{created.json()['id']}", headers=headers)
+    assert gone.status_code == 204
+    assert (
+        client.delete(f"/shift-templates/{created.json()['id']}", headers=headers).status_code
+        == 404
+    )
+
+
+def test_coverage_rules_flag_understaffed_stretches(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    tomorrow = local_today() + timedelta(days=1)
+    rule = {"weekday": tomorrow.weekday(), "starts_minute": 8 * 60, "ends_minute": 18 * 60}
+    rules = {"rules": [{**rule, "min_staff": 2}]}
+    saved = client.put(f"/locations/{branch}/coverage-rules", json=rules, headers=headers)
+    assert saved.status_code == 200 and saved.json() == rules
+    backwards = {"rules": [{**rule, "ends_minute": 8 * 60, "min_staff": 1}]}
+    assert (
+        client.put(
+            f"/locations/{branch}/coverage-rules", json=backwards, headers=headers
+        ).status_code
+        == 422
+    )
+
+    def gaps() -> list[dict]:
+        return client.get(
+            "/shifts/coverage",
+            params={"start": local_today().isoformat(), "days": 3},
+            headers=headers,
+        ).json()
+
+    # Nobody works: the whole stretch is short by two.
+    assert [(g["starts_minute"], g["ends_minute"], g["needed"], g["have"]) for g in gaps()] == [
+        (480, 1080, 2, 0)
+    ]
+    # One person 9-15: short by one in the morning and afternoon, short by two in between? No:
+    # 9-15 has one of two, 8-9 and 15-18 have none.
+    client.post(
+        "/shifts",
+        json={"user_id": coach, "location_id": branch, "starts_at": at(1, 9), "ends_at": at(1, 15)},
+        headers=headers,
+    )
+    assert [(g["starts_minute"], g["ends_minute"], g["have"]) for g in gaps()] == [
+        (480, 540, 0),
+        (540, 900, 1),
+        (900, 1080, 0),
+    ]
+    # Time off for that person removes them from the count.
+    day = tomorrow.isoformat()
+    client.post(
+        f"/staff/{coach}/time-off", json={"starts_on": day, "ends_on": day}, headers=headers
+    )
+    assert [(g["starts_minute"], g["ends_minute"], g["have"]) for g in gaps()] == [(480, 1080, 0)]
+    # Managers set rules; the team only reads them.
+    coach_headers = auth(studio["coach"], studio["tenant_id"])
+    assert (
+        client.get(f"/locations/{branch}/coverage-rules", headers=coach_headers).status_code == 200
+    )
+    assert (
+        client.put(
+            f"/locations/{branch}/coverage-rules", json=rules, headers=coach_headers
+        ).status_code
+        == 403
+    )
+
+
+def test_a_roster_is_a_draft_until_published(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    coach_headers = auth(studio["coach"], studio["tenant_id"])
+    shift = {"user_id": coach, "location_id": branch, "starts_at": at(1, 9), "ends_at": at(1, 15)}
+    created = client.post("/shifts", json=shift, headers=headers).json()
+    assert created["published"] is False
+    params = {"start": local_today().isoformat()}
+
+    # Managers see the draft; the team does not, nor the coverage it would give.
+    assert len(client.get("/shifts", params=params, headers=headers).json()) == 1
+    assert client.get("/shifts", params=params, headers=coach_headers).json() == []
+
+    # Publishing another stretch leaves it alone; the right one makes it visible, once.
+    elsewhere = {"start": (local_today() + timedelta(days=10)).isoformat(), "days": 7}
+    assert client.post("/shifts/publish", json=elsewhere, headers=headers).json() == {
+        "published": 0
+    }
+    body = {"start": local_today().isoformat(), "days": 7}
+    assert client.post("/shifts/publish", json=body, headers=coach_headers).status_code == 403
+    assert client.post("/shifts/publish", json=body, headers=headers).json() == {"published": 1}
+    assert client.post("/shifts/publish", json=body, headers=headers).json() == {"published": 0}
+    assert len(client.get("/shifts", params=params, headers=coach_headers).json()) == 1
+
+    # Shifts planned afterwards (or copied) are drafts again.
+    later = {**shift, "starts_at": at(2, 9), "ends_at": at(2, 15)}
+    assert client.post("/shifts", json=later, headers=headers).json()["published"] is False
+    assert len(client.get("/shifts", params=params, headers=coach_headers).json()) == 1
+
+
+def test_the_business_chooses_when_the_roster_goes_out(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    tenant = client.get("/tenants/current", headers=headers).json()
+    assert (tenant["shifts_publish_auto"], tenant["shifts_publish_cadence"]) == (True, "weekly")
+    assert (tenant["shifts_publish_weekday"], tenant["shifts_publish_time"]) == (6, "08:00:00")
+    changed = client.patch(
+        "/tenants/current",
+        json={
+            "shifts_publish_cadence": "monthly",
+            "shifts_publish_day": 3,
+            "shifts_publish_time": "07:30",
+            "shifts_publish_auto": False,
+        },
+        headers=headers,
+    ).json()
+    assert (changed["shifts_publish_cadence"], changed["shifts_publish_day"]) == ("monthly", 3)
+    assert (changed["shifts_publish_time"], changed["shifts_publish_auto"]) == ("07:30:00", False)
+    bad = client.patch("/tenants/current", json={"shifts_publish_day": 31}, headers=headers)
+    assert bad.status_code == 422
