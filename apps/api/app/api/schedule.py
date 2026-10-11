@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.bookings import lock_session, promote_waitlist
-from app.api.common import blank_to_none, not_found
+from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.core.permissions import Permission
 from app.messaging.notifications import live_clients, notify, notify_sessions, session_snapshot
@@ -438,7 +438,7 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
         assignments["starts_at"] = new_start
         assignments["ends_at"] = new_start + timedelta(minutes=duration)
 
-    set_sql = ", ".join([*(f"{key} = :{key}" for key in assignments), "updated_at = now()"])
+    set_sql = set_clause(assignments)
     try:
         db.execute(
             text(f"UPDATE app.sessions SET {set_sql} WHERE id = :id"),

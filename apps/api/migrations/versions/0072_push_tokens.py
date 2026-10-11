@@ -4,8 +4,8 @@ One row per (person, device token). A person can sign in on several devices; a d
 changes hands is re-registered under the new person by the endpoint. Not tenant-scoped: the
 token belongs to the person, whichever business they are acting in.
 
-Revision ID: 0070
-Revises: 0069
+Revision ID: 0072
+Revises: 0071
 Create Date: 2026-10-11
 """
 
@@ -13,8 +13,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0070"
-down_revision: str | None = "0069"
+revision: str = "0072"
+down_revision: str | None = "0071"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
