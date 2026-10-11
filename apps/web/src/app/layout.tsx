@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 
 import { PaletteScript } from "@/components/palette-script";
+import { SkipLink } from "@/components/skip-link";
 import { ThemeProvider } from "@/components/theme-provider";
 import { localeDirection } from "@/i18n/config";
 import { mainFont } from "./fonts";
@@ -35,7 +36,10 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider messages={messages}>
+            <SkipLink />
+            {children}
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
