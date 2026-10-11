@@ -88,8 +88,8 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
 
 
 @router.put("/tenants/current/logo")
-async def upload_logo(file: UploadFile, context: SettingsDep) -> Tenant:
-    data = await file.read(MAX_LOGO_BYTES + 1)
+def upload_logo(file: UploadFile, context: SettingsDep) -> Tenant:
+    data = file.file.read(MAX_LOGO_BYTES + 1)
     if len(data) > MAX_LOGO_BYTES:
         raise HTTPException(status_code=status.HTTP_413_CONTENT_TOO_LARGE, detail="logo_too_large")
     content_type = _detect_type(data)
@@ -125,9 +125,9 @@ MAX_COVER_BYTES = 1536 * 1024
 IMAGE_RESPONSES = {200: {"content": {"image/png": {}, "image/jpeg": {}, "image/webp": {}}}}
 
 
-async def read_image(file: UploadFile, limit: int) -> tuple[bytes, str]:
+def read_image(file: UploadFile, limit: int) -> tuple[bytes, str]:
     """An uploaded picture: at most `limit` bytes and a PNG, JPEG or WebP by its content."""
-    data = await file.read(limit + 1)
+    data = file.file.read(limit + 1)
     if len(data) > limit:
         raise HTTPException(status_code=status.HTTP_413_CONTENT_TOO_LARGE, detail="image_too_large")
     content_type = _detect_type(data)
@@ -151,9 +151,9 @@ def image_response(data: bytes, content_type: str) -> Response:
 
 
 @router.put("/tenants/current/cover")
-async def upload_cover(file: UploadFile, context: SettingsDep) -> Tenant:
+def upload_cover(file: UploadFile, context: SettingsDep) -> Tenant:
     """The workspace's cover image (the dashboard header), seen by the business's team."""
-    data, content_type = await read_image(file, MAX_COVER_BYTES)
+    data, content_type = read_image(file, MAX_COVER_BYTES)
     context.session.execute(
         text("""
             UPDATE app.tenants
