@@ -12,6 +12,8 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 from helpers import APP, login, otp
 
+# A session on the schedule grid links to /schedule/<id>; the other /schedule/... links are pages (new, closed, ...).
+SESSION_LINK = 'main a[href^="/schedule/"]:not([href*="?"]):not([href="/schedule/closed"])'
 ADMIN = sys.argv[1]  # a platform admin's email (see README)
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
@@ -134,7 +136,7 @@ with sync_playwright() as p:
 
     # Owner sees the booking.
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
-    owner.locator("main ol li li a").first.click(); h.ready(owner)
+    owner.locator(SESSION_LINK).first.click(); h.ready(owner)
     expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible()
     print("6. owner sees the booking: ok")
 
@@ -149,7 +151,7 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="אישור").click()
     expect(owner.get_by_role("status").filter(has_text="בוצע")).to_be_visible()
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
-    owner.locator("main ol li li a").first.click(); h.ready(owner)
+    owner.locator(SESSION_LINK).first.click(); h.ready(owner)
     expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("דנה כהן")).to_be_visible()
     print("7. AI answered, proposed an action, confirmed, executed: ok")
     check_a11y(owner, "he-light session roster")
