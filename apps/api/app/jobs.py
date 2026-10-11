@@ -11,6 +11,7 @@
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
     uv run python -m app.jobs delete-closed-businesses [--apply] (dry run unless --apply)
+    uv run python -m app.jobs move-files      (documents kept in the database → the object store)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
@@ -36,6 +37,7 @@ from app.messaging.email import (
 )
 from app.messaging.roster import notify_roster, notify_roster_changes
 from app.providers.choice import choose
+from app.providers.storage import tenant_key
 from app.schedule.scheduling import weekly_occurrences
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
@@ -500,6 +502,39 @@ def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     return send_emails(conn, sender)
 
 
+MOVE_BATCH = 100  # documents per run, so one run stays short; run again until it reports 0
+
+
+def move_files(conn: Connection, batch: int = MOVE_BATCH) -> dict[str, int] | str:
+    """Moves documents still kept in the database to the object store (T80), a batch per run.
+    The key is the document's own, so a run that fails half-way is simply run again."""
+    storage = choose(conn, None, "storage").instance
+    if storage.in_database:
+        return "storage provider keeps files in the database; nothing to move"
+    rows = conn.execute(
+        text("""
+            SELECT id, tenant_id, client_id, content_type, content FROM app.client_documents
+            WHERE content IS NOT NULL ORDER BY created_at LIMIT :batch
+        """),
+        {"batch": batch},
+    ).mappings()
+    moved = 0
+    for row in list(rows):
+        key = tenant_key(row["tenant_id"], "documents", row["client_id"], row["id"])
+        storage.put(key, bytes(row["content"]), row["content_type"])
+        conn.execute(
+            text(
+                "UPDATE app.client_documents SET storage_key = :key, content = NULL WHERE id = :id"
+            ),
+            {"key": key, "id": row["id"]},
+        )
+        moved += 1
+    left = conn.execute(
+        text("SELECT count(*) FROM app.client_documents WHERE content IS NOT NULL")
+    ).scalar_one()
+    return {"moved": moved, "left": left}
+
+
 JOBS = {
     "extend-series": extend_series,
     "remind-sessions": remind_sessions,
@@ -514,6 +549,7 @@ JOBS = {
     "publish-shifts": publish_shifts,
     "send-messages": send_messages,
     "issue-documents": issue_documents,
+    "move-files": move_files,
 }
 
 

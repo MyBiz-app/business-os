@@ -253,7 +253,7 @@ def get_client_context(
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_client")
     if session.execute(
-        text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = app.current_tenant_id()")
+        text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = :id"), {"id": tenant_id}
     ).scalar():
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
     if not has_module(session, "client_app"):
