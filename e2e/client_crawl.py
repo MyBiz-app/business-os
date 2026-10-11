@@ -52,7 +52,7 @@ with sync_playwright() as p:
     scan(page, "sign-in")
     page.get_by_label("אימייל").fill(client_email)
     page.get_by_role("button", name="שליחת קוד").click()
-    page.get_by_label("קוד בן 6 ספרות").fill(h.otp(client_email))
+    page.get_by_label("הקוד מהמייל").fill(h.otp(client_email))
     page.get_by_role("button", name="כניסה").click(); page.wait_for_url("**/join")
     scan(page, "join")
     page.get_by_label("קוד הצטרפות").fill(code)
