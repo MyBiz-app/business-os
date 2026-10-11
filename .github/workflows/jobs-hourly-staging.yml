@@ -30,4 +30,5 @@ jobs:
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
         run: uv run python -m app.jobs publish-shifts

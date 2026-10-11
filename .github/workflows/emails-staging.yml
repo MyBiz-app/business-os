@@ -33,6 +33,7 @@ jobs:
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
           API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
           API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
           API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
@@ -42,6 +43,7 @@ jobs:
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
           API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
           API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
           API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}

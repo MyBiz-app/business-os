@@ -51,6 +51,7 @@ jobs:
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
           OWNER_EMAIL: ${{ inputs.owner_email }}
           OWNER_NAME: ${{ inputs.owner_name }}
           DEMO: ${{ inputs.demo }}
