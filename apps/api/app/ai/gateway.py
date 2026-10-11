@@ -39,13 +39,23 @@ class LLMProvider(Protocol):
     model: str
 
     def create(
-        self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
-    ) -> LLMResponse: ...
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        strong: bool = False,
+    ) -> LLMResponse:
+        """One model call. `strong` asks for the stronger (dearer) model where the provider has
+        one; a provider with a single model ignores it."""
+        ...
 
 
 # USD per million tokens: input, output, cache read, cache write (5-minute TTL).
+# Haiku prices are for prompts up to 100K tokens; unknown models are priced as the dearest.
 PRICES: dict[str, tuple[float, float, float, float]] = {
     "claude-opus-5-5": (4.0, 20.0, 0.20, 5.0),
+    "claude-sonnet-5-5": (2.0, 10.0, 0.20, 2.5),
+    "claude-haiku-5-5": (0.10, 0.50, 0.01, 0.125),
 }
 
 
@@ -65,21 +75,36 @@ def credits(model: str, usage: Usage) -> float:
 class AnthropicProvider:
     """Claude through the Anthropic API."""
 
-    def __init__(self, api_key: str, model: str) -> None:
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        strong_model: str | None = None,
+        max_tokens: int = 4096,
+        timeout: float = 60.0,
+    ) -> None:
         # Imported here, not at module level: the SDK loads native extensions that some
         # locked-down Windows machines block, and it is only needed when a key is set.
         import anthropic
 
-        self.client = anthropic.Anthropic(api_key=api_key, max_retries=2, timeout=120)
+        self.client = anthropic.Anthropic(api_key=api_key, max_retries=2, timeout=timeout)
         self.model = model
+        self.strong_model = strong_model or model
+        self.max_tokens = max_tokens
 
     def create(
-        self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        strong: bool = False,
     ) -> LLMResponse:
         import anthropic
 
         try:
-            response = self._call(system, messages, tools)
+            response = self._call(
+                system, messages, tools, self.strong_model if strong else self.model
+            )
         except anthropic.RateLimitError as error:
             raise ProviderBusy from error
         except anthropic.APIError as error:
@@ -99,11 +124,16 @@ class AnthropicProvider:
         )
 
     def _call(
-        self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
+        self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]], model: str
     ) -> Any:
+        extra: dict[str, Any] = {}
+        if not model.startswith("claude-haiku"):
+            # On a safety decline, the API retries on Anthropic's recommended model (Haiku has
+            # no server-side fallback).
+            extra = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
         return self.client.beta.messages.create(
-            model=self.model,
-            max_tokens=16000,
+            model=model,
+            max_tokens=self.max_tokens,
             system=system,
             messages=messages,  # type: ignore[arg-type]
             tools=tools,  # type: ignore[arg-type]
@@ -111,9 +141,7 @@ class AnthropicProvider:
             output_config={"effort": "medium"},
             # Cache the stable prefix (tools + system + history) between turns.
             cache_control={"type": "ephemeral"},
-            # On a safety decline, the API retries on Anthropic's recommended model.
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
+            **extra,
         )
 
 
@@ -127,4 +155,10 @@ def get_provider() -> LLMProvider | None:
 
             return DemoProvider()
         return None
-    return AnthropicProvider(settings.anthropic_api_key.get_secret_value(), settings.ai_model)
+    return AnthropicProvider(
+        settings.anthropic_api_key.get_secret_value(),
+        settings.ai_model,
+        settings.ai_strong_model,
+        settings.ai_max_tokens,
+        settings.ai_timeout_seconds,
+    )
