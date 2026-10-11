@@ -1837,6 +1837,15 @@
         "Sun"
       ],
       "footer": "You can turn these emails off under Personal settings."
+    },
+    "rosterChanges": {
+      "subject": "Your roster at {business} changed",
+      "intro": "Changes to your shifts at {business}:",
+      "removed": "Removed:",
+      "changed": "Changed:",
+      "arrow": "now",
+      "more": "…and {count} more changes. See your roster in the app.",
+      "footer": "You can turn these emails off under Personal settings."
     }
   },
   "support": {
@@ -3190,7 +3199,7 @@
     "addressHint": "Your home address. Only you see it.",
     "notificationsTitle": "Email notifications",
     "rosterEmails": "Email me when my roster is published",
-    "rosterEmailsHint": "One email with your new shifts, sent after the business publishes the roster."
+    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed."
   },
   "sales": {
     "title": "Sales",
@@ -3340,7 +3349,11 @@
       "name": "Your name",
       "save": "Save",
       "branch": "Branch",
-      "allBranches": "All branches"
+      "allBranches": "All branches",
+      "rosterEmails": "Email me about my shifts",
+      "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "on": "On",
+      "off": "Off"
     },
     "back": "Back",
     "error": "Something went wrong. Try again.",
