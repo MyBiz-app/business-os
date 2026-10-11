@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { router } from "expo-router";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
@@ -14,7 +15,8 @@ import { useSession } from "@business-os/app-kit/providers/session-provider";
 export default function Me() {
   const t = useTranslations("business.me");
   const tRoles = useTranslations("roles");
-  const { palette, memberships, tenant, select, api, refresh, branches, branch, selectBranch } = useBusiness();
+  const tSchedule = useTranslations("business.schedule");
+  const { palette, memberships, tenant, select, api, refresh, branches, branch, selectBranch, can } = useBusiness();
   const { session } = useSession();
   const [name, setName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -63,6 +65,15 @@ export default function Me() {
           </Text>
         )}
       </Card>
+
+      {can("schedule.read") && (
+        <Button
+          label={tSchedule("open")}
+          variant="secondary"
+          palette={palette}
+          onPress={() => router.push("/schedule")}
+        />
+      )}
 
       <Card palette={palette}>
         <Field
