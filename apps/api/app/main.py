@@ -44,6 +44,7 @@ from app.api import (
     schedule,
     services,
     shift_planning,
+    shift_swaps,
     shifts,
     staff,
     stations,
@@ -160,6 +161,7 @@ def create_app() -> FastAPI:
     app.include_router(people.router)
     app.include_router(push_tokens.router)
     app.include_router(shifts.router)
+    app.include_router(shift_swaps.router)
     app.include_router(time_off_requests.router)
     app.include_router(shift_planning.router)
     app.include_router(stations.router)
