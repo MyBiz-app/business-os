@@ -58,6 +58,8 @@ INDEXES: list[tuple[str, str, str]] = [
     ("sessions_address", "sessions", "address_id"),
     ("shifts_location_station", "shifts", "tenant_id, location_id, station_id"),
     ("tenant_members_custom_role", "tenant_members", "tenant_id, custom_role_id"),
+    ("time_off_requests_tenant_user", "time_off_requests", "tenant_id, user_id, starts_on"),
+    ("time_off_requests_time_off", "time_off_requests", "time_off_id"),
     ("tenant_members_home_location", "tenant_members", "tenant_id, home_location_id"),
     ("time_entries_bill", "time_entries", "bill_id"),
 ]
