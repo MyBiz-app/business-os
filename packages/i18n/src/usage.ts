@@ -1,9 +1,9 @@
 // Warnings about the business's space and messages (#104), shared by the web and the apps so
 // both say the same thing at the same point: near from 80% of the bundle, over at 100%.
 
-export type UsageWarning = { key: "nearMessages" | "overMessages" | "nearStorage" | "overStorage"; percent: number };
+export type UsageWarning = { key: "nearMessages" | "overMessages" | "nearStorage" | "overStorage" | "nearAi" | "overAi"; percent: number };
 
-type Usage = { messages: number; messages_included: number; storage_bytes: number; storage_included_bytes: number };
+type Usage = { messages: number; messages_included: number; storage_bytes: number; storage_included_bytes: number; ai_credits?: number; ai_credits_included?: number };
 
 const NEAR = 80;
 
@@ -17,5 +17,6 @@ export function usageWarnings(usage: Usage): UsageWarning[] {
   };
   check(usage.messages, usage.messages_included, "nearMessages", "overMessages");
   check(usage.storage_bytes, usage.storage_included_bytes, "nearStorage", "overStorage");
+  check(usage.ai_credits ?? 0, usage.ai_credits_included ?? 0, "nearAi", "overAi");
   return warnings;
 }

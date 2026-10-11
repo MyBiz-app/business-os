@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";
 import { Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Button, Card, elevation, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, elevation, EmptyState, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
@@ -167,7 +167,7 @@ export default function Home() {
         <SessionCard session={next} onChange={update} showDay dependents={dependents} />
       ) : (
         error !== undefined && !data ? null : (
-          <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
+          <EmptyState palette={palette} message={t("noUpcoming")} loading={loading} />
         )
       )}
 

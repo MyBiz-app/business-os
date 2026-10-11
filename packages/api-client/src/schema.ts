@@ -9934,6 +9934,16 @@ export interface components {
             storage_bytes: number;
             /** Storage Included Bytes */
             storage_included_bytes: number;
+            /**
+             * Ai Credits
+             * @description AI credits used this month (1 credit = 1 US cent)
+             */
+            ai_credits: number;
+            /**
+             * Ai Credits Included
+             * @description 0 when the business has no AI module
+             */
+            ai_credits_included: number;
         };
         /** UsagePoint */
         UsagePoint: {

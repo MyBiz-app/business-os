@@ -112,6 +112,14 @@ export default async function BillingPage() {
           included={usage.messages_included}
           text={t("usage.of", { used: number.format(usage.messages), included: number.format(usage.messages_included) })}
         />
+        {usage.ai_credits_included > 0 && (
+          <Meter
+            label={t("usage.ai")}
+            used={usage.ai_credits}
+            included={usage.ai_credits_included}
+            text={t("usage.of", { used: number.format(Math.round(usage.ai_credits)), included: number.format(usage.ai_credits_included) })}
+          />
+        )}
         <Meter
           label={t("usage.storage")}
           used={usage.storage_bytes}

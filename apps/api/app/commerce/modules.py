@@ -112,6 +112,20 @@ ALLOWANCES: dict[str | None, Allowance] = {
 }
 
 
+# Monthly AI allowance per AI module, in AI credits (one credit = one US cent of model cost, see
+# app/ai/gateway.py). The business gets the largest one it has. This is the single place to set
+# the amounts; they are deliberately below each module's price so the AI never costs more than
+# it earns. Soft limit: warnings from 80%, new questions stop at 100% until next month or a
+# bigger module.
+AI_CREDITS_INCLUDED: dict[str, int] = {"ai_basic": 400, "ai_pro": 1200}
+
+
+def ai_credits_allowed(modules: "dict[str, int] | list[str]") -> int:
+    return max(
+        (AI_CREDITS_INCLUDED[key] for key in AI_CREDITS_INCLUDED if key in modules), default=0
+    )
+
+
 def allowance(modules: "dict[str, int] | list[str]") -> tuple[str | None, Allowance]:
     """The business's bundle (None: the included one) and what it allows."""
     pack = next((key for key in ("pack_max", "pack_plus") if key in modules), None)

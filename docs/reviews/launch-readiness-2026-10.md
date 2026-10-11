@@ -135,6 +135,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
   usage events; (2) a per-user rate limit on `/assistant` messages; (3) default to a cheaper model
   for everyday Q&A with an explicit opt-in for the bigger one; lower `max_tokens`; a request
   timeout; (4) a platform-wide daily spend alarm in the console.
+- **Progress:** ✅ (1) monthly allowance per AI module, warnings at 80% and 100%, new questions refused with `ai_limit_reached` (PR #184; amounts provisional, `AI_CREDITS_INCLUDED`, decision X33). Still open: (2) per-user rate limit, (3) cheaper default model, lower `max_tokens`, (4) platform daily spend alarm.
 - **Done when:** a test exhausts a tenant's allowance and the next message is refused with a
   clear code; the console shows AI spend per business.
 - **Size:** M · **Model:** Opus designs the allowance (it touches billing and modules), Sonnet builds.
