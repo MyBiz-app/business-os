@@ -6763,7 +6763,7 @@ export interface components {
             unread: number;
             /**
              * Items
-             * @description The latest 50, newest first
+             * @description Newest first, one page
              */
             items: components["schemas"]["Notification"][];
         };
@@ -7142,6 +7142,11 @@ export interface components {
              * @description Open leads with a follow-up date today or earlier
              */
             follow_ups_due: number;
+            /**
+             * Total
+             * @description Leads on the board matching the filters, across all pages
+             */
+            total: number;
         };
         /** LeadCreate */
         LeadCreate: {
@@ -10835,7 +10840,9 @@ export interface operations {
                 plan?: ("valid" | "none") | null;
                 /** @description No check-in in this many days */
                 absent_days?: number | null;
+                /** @description Rows per page */
                 limit?: number;
+                /** @description Rows to skip */
                 offset?: number;
             };
             header: {
@@ -13147,6 +13154,8 @@ export interface operations {
                 owner_user_id?: string | null;
                 /** @description Won / lost leads closed in this many days */
                 closed_days?: number;
+                limit?: number;
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -16695,7 +16704,12 @@ export interface operations {
     };
     list_client_bookings: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -19426,7 +19440,10 @@ export interface operations {
     audit: {
         parameters: {
             query?: {
+                /** @description Rows per page */
                 limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header?: never;
             path?: never;
@@ -20492,7 +20509,12 @@ export interface operations {
     };
     my_notifications: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
             };

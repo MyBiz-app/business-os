@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
+from app.api.pagination import PageDep
 from app.catalog.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
 from app.core.permissions import Permission
 
@@ -158,6 +159,7 @@ def _like_pattern(search: str) -> str:
 @router.get("")
 def list_clients(
     context: ReadDep,
+    page_of: PageDep,
     search: Annotated[str | None, Query(max_length=100)] = None,
     client_status: Annotated[ClientStatus | None, Query(alias="status")] = None,
     plan: Annotated[
@@ -167,13 +169,11 @@ def list_clients(
     absent_days: Annotated[
         int | None, Query(ge=1, le=365, description="No check-in in this many days")
     ] = None,
-    limit: Annotated[int, Query(ge=1, le=100)] = 25,
-    offset: Annotated[int, Query(ge=0)] = 0,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
     # The current branch's clients, and those without a home branch (they belong to all).
     where = "WHERE (home_location_id IS NULL OR app.in_branch(home_location_id))"
-    params: dict[str, object] = {"limit": limit, "offset": offset}
+    params: dict[str, object] = {"limit": page_of.limit, "offset": page_of.offset}
     if search and search.strip():
         where += """ AND concat_ws(' ', first_name, last_name, email, phone) ILIKE :pattern"""
         params["pattern"] = _like_pattern(search.strip())

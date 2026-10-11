@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from app.api.deps import ClientDep
+from app.api.pagination import DEFAULT_LIMIT, Page, PageDep
 
 router = APIRouter(prefix="/client", tags=["client"])
 
@@ -38,21 +39,22 @@ class Notification(BaseModel):
 
 class Inbox(BaseModel):
     unread: int
-    items: list[Notification] = Field(description="The latest 50, newest first")
+    items: list[Notification] = Field(description="Newest first, one page")
 
 
 class MarkRead(BaseModel):
     ids: list[UUID] | None = Field(default=None, description="Omit to mark all as read")
 
 
-def _inbox(context: ClientDep) -> Inbox:
+def _inbox(context: ClientDep, page: Page) -> Inbox:
     db = context.session
     rows = db.execute(
         text("""
             SELECT id, kind, payload, created_at, read_at FROM app.notifications
             WHERE client_id = app.current_client_id()
-            ORDER BY created_at DESC LIMIT 50
-        """)
+            ORDER BY created_at DESC LIMIT :limit OFFSET :offset
+        """),
+        {"limit": page.limit, "offset": page.offset},
     ).mappings()
     unread = db.execute(
         text("""
@@ -64,8 +66,8 @@ def _inbox(context: ClientDep) -> Inbox:
 
 
 @router.get("/notifications")
-def my_notifications(context: ClientDep) -> Inbox:
-    return _inbox(context)
+def my_notifications(context: ClientDep, page: PageDep) -> Inbox:
+    return _inbox(context, page)
 
 
 @router.post("/notifications/read")
@@ -78,4 +80,4 @@ def mark_read(body: MarkRead, context: ClientDep) -> Inbox:
         """),
         {"ids": [str(i) for i in body.ids] if body.ids is not None else None},
     )
-    return _inbox(context)
+    return _inbox(context, Page(limit=DEFAULT_LIMIT, offset=0))

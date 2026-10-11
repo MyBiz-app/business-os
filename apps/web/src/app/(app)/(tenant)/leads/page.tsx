@@ -104,6 +104,10 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
         <CopyLink link={inquiryLink} label={t("inquiryLink")} copy={t("copy")} copied={t("copied")} />
       </div>
 
+      {board.total > board.items.length && (
+        <p role="status" className="text-sm text-muted">{t("truncated", { shown: board.items.length, total: board.total })}</p>
+      )}
+
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
       <div role="region" aria-label={t("pipeline")} tabIndex={0} className="-mx-6 overflow-x-auto px-6 pb-2">
         <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:min-w-[58rem] lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-6">

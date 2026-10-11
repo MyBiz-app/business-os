@@ -595,11 +595,13 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 100,
+              "maximum": 200,
               "minimum": 1,
-              "default": 25,
+              "description": "Rows per page",
+              "default": 50,
               "title": "Limit"
-            }
+            },
+            "description": "Rows per page"
           },
           {
             "name": "offset",
@@ -607,10 +609,13 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 100000,
               "minimum": 0,
+              "description": "Rows to skip",
               "default": 0,
               "title": "Offset"
-            }
+            },
+            "description": "Rows to skip"
           },
           {
             "name": "X-Tenant-Id",
@@ -5518,6 +5523,30 @@
               "title": "Closed Days"
             },
             "description": "Won / lost leads closed in this many days"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
           },
           {
             "name": "X-Tenant-Id",
@@ -13258,6 +13287,34 @@
             }
           },
           {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -19176,11 +19233,27 @@
             "required": false,
             "schema": {
               "type": "integer",
-              "maximum": 500,
+              "maximum": 200,
               "minimum": 1,
-              "default": 200,
+              "description": "Rows per page",
+              "default": 50,
               "title": "Limit"
-            }
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
           }
         ],
         "responses": {
@@ -21164,6 +21237,34 @@
           }
         ],
         "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
           {
             "name": "X-Tenant-Id",
             "in": "header",
@@ -27981,7 +28082,7 @@
             },
             "type": "array",
             "title": "Items",
-            "description": "The latest 50, newest first"
+            "description": "Newest first, one page"
           }
         },
         "type": "object",
@@ -28974,6 +29075,11 @@
             "type": "integer",
             "title": "Follow Ups Due",
             "description": "Open leads with a follow-up date today or earlier"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Leads on the board matching the filters, across all pages"
           }
         },
         "type": "object",
@@ -28983,7 +29089,8 @@
           "new_last_30_days",
           "won_last_30_days",
           "conversion_rate",
-          "follow_ups_due"
+          "follow_ups_due",
+          "total"
         ],
         "title": "LeadBoard"
       },
