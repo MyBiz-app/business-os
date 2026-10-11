@@ -6,7 +6,7 @@
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
-    uv run python -m app.jobs notify-shifts    (emails staff their newly published shifts)
+    uv run python -m app.jobs notify-shifts    (emails staff new and edited published shifts)
     uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
@@ -32,7 +32,7 @@ from app.messaging.email import (
     send_emails,
     sender_from_settings,
 )
-from app.messaging.roster import notify_roster
+from app.messaging.roster import notify_roster, notify_roster_changes
 from app.providers.choice import choose
 from app.schedule.scheduling import weekly_occurrences
 
@@ -444,7 +444,9 @@ def notify_shifts(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
     if sender is None:
         return "email provider not configured; nothing sent"
-    return notify_roster(conn, sender)
+    published = notify_roster(conn, sender)
+    edits = notify_roster_changes(conn, sender)
+    return published | {f"changes_{key}": value for key, value in edits.items()}
 
 
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:

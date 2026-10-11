@@ -23,9 +23,20 @@ class FakeProvider:
         self.steps = list(steps)
         self.calls: list[dict[str, Any]] = []
 
-    def create(self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]]):
+    def create(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        strong: bool = False,
+    ):
         self.calls.append(
-            {"system": system, "messages": json.loads(json.dumps(messages)), "tools": tools}
+            {
+                "system": system,
+                "messages": json.loads(json.dumps(messages)),
+                "tools": tools,
+                "strong": strong,
+            }
         )
         return self.steps.pop(0)(messages)
 
@@ -442,3 +453,78 @@ def test_demo_mode_answers_who_owes_money(client: TestClient, studio: dict, use_
     # At a studio "hours" is about classes, not logged time: no time tools there.
     hours = ask(client, headers, conversation_id, "כמה שעות נרשמו החודש?").json()["turns"]
     assert "נרשמו" not in [turn["text"] for turn in hours if turn["role"] == "assistant"][-1]
+
+
+def test_monthly_ai_limit_stops_new_questions(
+    client: TestClient, studio: dict, use_provider, engine: Engine
+) -> None:
+    use_provider(FakeProvider([says("Hi.")]))
+    headers = studio["headers"]
+    usage = client.get("/billing/usage", headers=headers).json()
+    included = usage["ai_credits_included"]
+    assert included > 0 and usage["ai_credits"] == 0
+
+    def spend(credits: float) -> None:
+        with engine.begin() as connection:
+            connection.execute(
+                text("""
+                    INSERT INTO app.usage_events (tenant_id, meter, quantity)
+                    SELECT id, 'ai_credits', :q FROM app.tenants
+                """),
+                {"q": credits},
+            )
+
+    spend(included * 0.8)
+    assert client.get("/billing/usage", headers=headers).json()["ai_credits"] == included * 0.8
+    assert ask(client, headers, conversation(client, headers), "hi").status_code == 200
+
+    spend(included)  # now well over 100%
+    response = ask(client, headers, conversation(client, headers), "hi again")
+    assert response.status_code == 409
+    assert response.json()["detail"] == "ai_limit_reached"
+
+
+def test_per_user_rate_limit_stops_a_burst(
+    client: TestClient, studio: dict, use_provider, monkeypatch
+) -> None:
+    from app.core.config import get_settings
+
+    monkeypatch.setenv("API_AI_USER_MESSAGES_PER_MINUTE", "2")
+    get_settings.cache_clear()
+    try:
+        use_provider(FakeProvider([says("a"), says("b"), says("c")]))
+        headers = studio["headers"]
+        chat = conversation(client, headers)
+        assert ask(client, headers, chat, "one").status_code == 200
+        assert ask(client, headers, chat, "two").status_code == 200
+        limited = ask(client, headers, chat, "three")
+        assert limited.status_code == 429
+        assert limited.json()["detail"] == "ai_rate_limited"
+        assert int(limited.headers["retry-after"]) >= 1
+    finally:
+        monkeypatch.undo()
+        get_settings.cache_clear()
+
+
+def test_everyday_questions_use_the_cheap_model_and_long_chains_escalate(
+    client: TestClient, studio: dict, use_provider
+) -> None:
+    headers = studio["headers"]
+    chain = [calls("get_metrics", {}) for _ in range(4)] + [says("Done.")]
+    provider = FakeProvider([says("Hi."), *chain])
+    use_provider(provider)
+    assert ask(client, headers, conversation(client, headers), "hello").status_code == 200
+    assert ask(client, headers, conversation(client, headers), "dig deep").status_code == 200
+    # One call for the quick question; then three on the cheap model before the strong one.
+    assert [call["strong"] for call in provider.calls] == [False, False, False, False, True, True]
+
+
+def test_model_prices_cover_the_configured_models() -> None:
+    from app.ai.gateway import PRICES, Usage, credits
+    from app.core.config import Settings
+
+    settings = Settings()
+    assert settings.ai_model in PRICES and settings.ai_strong_model in PRICES
+    usage = Usage(input_tokens=10_000, output_tokens=1_000)
+    assert credits(settings.ai_model, usage) < credits(settings.ai_strong_model, usage)
+    assert credits(settings.ai_strong_model, usage) < credits("claude-opus-5-5", usage)

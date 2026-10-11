@@ -102,6 +102,16 @@ export function LoadError({ palette, onRetry }: { palette: Palette; onRetry: () 
   );
 }
 
+/** An empty list, or a spinner while the first load runs; keeps every screen's "nothing here" look the same. */
+export function EmptyState({ palette, message, loading }: { palette: Palette; message: string; loading?: boolean }) {
+  if (loading) return <ActivityIndicator accessibilityLabel={message} color={palette.primary} />;
+  return (
+    <Card palette={palette}>
+      <Text style={[styles.muted, { color: palette.muted }]}>{message}</Text>
+    </Card>
+  );
+}
+
 type ScreenProps = {
   palette: Palette;
   children: React.ReactNode;

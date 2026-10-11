@@ -1281,6 +1281,8 @@
     "errors": {
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
+      "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
     },
@@ -1356,6 +1358,8 @@
     "bookings30d": "Bookings (30 days)",
     "aiCredits30d": "AI credits (30 days)",
     "aiCreditsPerDay": "AI credits per day",
+    "aiSpendAlarmTitle": "AI spend alarm",
+    "aiSpendAlarm": "Today's AI spend is {spent} credits, over the {limit} credit alarm.",
     "aiCredits": "AI credits",
     "day": "Day",
     "businessesTitle": "Businesses",
@@ -1832,6 +1836,15 @@
         "Sat",
         "Sun"
       ],
+      "footer": "You can turn these emails off under Personal settings."
+    },
+    "rosterChanges": {
+      "subject": "Your roster at {business} changed",
+      "intro": "Changes to your shifts at {business}:",
+      "removed": "Removed:",
+      "changed": "Changed:",
+      "arrow": "now",
+      "more": "…and {count} more changes. See your roster in the app.",
       "footer": "You can turn these emails off under Personal settings."
     }
   },
@@ -2481,6 +2494,9 @@
       },
       "nearMessages": "You've used {percent}% of this month's messages. They keep going to your clients; a bigger bundle covers more.",
       "overMessages": "You've passed this month's messages ({percent}%). They keep going to your clients; choose a bigger bundle.",
+      "ai": "AI assistant this month",
+      "nearAi": "You've used {percent}% of this month's AI allowance. At 100% the assistant pauses until next month.",
+      "overAi": "You've used this month's AI allowance, so the assistant is paused until next month. Everything else keeps working; a bigger AI module raises the allowance.",
       "nearStorage": "Your files take {percent}% of your space.",
       "overStorage": "Your space for files is full: new files can't be added. Delete some or choose a bigger bundle."
     }
@@ -3183,7 +3199,7 @@
     "addressHint": "Your home address. Only you see it.",
     "notificationsTitle": "Email notifications",
     "rosterEmails": "Email me when my roster is published",
-    "rosterEmailsHint": "One email with your new shifts, sent after the business publishes the roster."
+    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed."
   },
   "sales": {
     "title": "Sales",
@@ -3333,7 +3349,11 @@
       "name": "Your name",
       "save": "Save",
       "branch": "Branch",
-      "allBranches": "All branches"
+      "allBranches": "All branches",
+      "rosterEmails": "Email me about my shifts",
+      "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "on": "On",
+      "off": "Off"
     },
     "back": "Back",
     "error": "Something went wrong. Try again.",

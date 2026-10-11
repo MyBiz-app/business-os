@@ -21,3 +21,10 @@ test("near from 80%, over from 100%", () => {
   ]);
   assert.deepEqual(usageWarnings(usage(250, 0)), [{ key: "overMessages", percent: 125 }]);
 });
+
+test("AI allowance warns like the others, and is skipped without an AI module", () => {
+  const base = { messages: 0, messages_included: 200, storage_bytes: 0, storage_included_bytes: 1000 };
+  assert.deepEqual(usageWarnings({ ...base, ai_credits: 320, ai_credits_included: 400 }), [{ key: "nearAi", percent: 80 }]);
+  assert.deepEqual(usageWarnings({ ...base, ai_credits: 400, ai_credits_included: 400 }), [{ key: "overAi", percent: 100 }]);
+  assert.deepEqual(usageWarnings({ ...base, ai_credits: 0, ai_credits_included: 0 }), []);
+});

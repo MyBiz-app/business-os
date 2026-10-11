@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Card, EmptyState, Heading, Screen } from "@business-os/app-kit/components/ui";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
 
@@ -73,7 +73,7 @@ export default function Updates() {
       }}
     >
       <Heading palette={palette}>{t("title")}</Heading>
-      {inbox && items.length === 0 && <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>}
+      {inbox && items.length === 0 && <EmptyState palette={palette} message={t("empty")} />}
       {items.length > 0 && (
         <Card palette={palette}>
           {items.map((n, index) => {

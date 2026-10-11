@@ -631,3 +631,108 @@ def test_switching_roster_emails_off_sends_nothing(
             text("SELECT count(*) FROM app.shifts WHERE notified_at IS NULL")
         ).scalar_one()
     assert sender.sent == [] and unnotified == 0
+
+
+def _published_shift(client: TestClient, studio: dict, engine: Engine) -> tuple[str, dict]:
+    """A published, already-announced shift of the coach three days from now."""
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    zone = ZoneInfo("Asia/Jerusalem")
+    day = datetime.now(zone).replace(hour=9, minute=0, second=0, microsecond=0) + timedelta(days=3)
+    body = {
+        "user_id": coach,
+        "location_id": branch,
+        "starts_at": day.isoformat(),
+        "ends_at": (day + timedelta(hours=6)).isoformat(),
+        "position": "Coach",
+    }
+    shift = client.post("/shifts", json=body, headers=headers).json()
+    client.post("/shifts/publish", json={"start": day.date().isoformat()}, headers=headers)
+    with engine.begin() as connection:
+        connection.execute(
+            text("UPDATE app.users SET email = 'coach@example.com' WHERE id = :id"), {"id": coach}
+        )
+        connection.execute(text("UPDATE app.shifts SET notified_at = now()"))
+    return shift["id"], body
+
+
+def test_edits_to_a_published_shift_are_emailed_once_after_a_quiet_period(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import QUIET_PERIOD, notify_roster_changes
+
+    headers = studio["headers"]
+    shift_id, body = _published_shift(client, studio, engine)
+    starts = datetime.fromisoformat(body["starts_at"])
+    # Three edits in a row: the email carries where the shift started and where it ended up.
+    for hour in (10, 11, 12):
+        edit = {
+            "starts_at": starts.replace(hour=hour).isoformat(),
+            "ends_at": (starts.replace(hour=hour) + timedelta(hours=6)).isoformat(),
+        }
+        assert client.patch(f"/shifts/{shift_id}", json=edit, headers=headers).status_code == 200
+    sender = LogSender()
+    with engine.begin() as connection:
+        # Still being edited: nothing goes out yet.
+        assert notify_roster_changes(connection, sender) == {"sent": 0, "failed": 0, "skipped": 0}
+    later = datetime.now(UTC) + QUIET_PERIOD + timedelta(minutes=1)
+    with engine.begin() as connection:
+        assert notify_roster_changes(connection, sender, later) == {
+            "sent": 1,
+            "failed": 0,
+            "skipped": 0,
+        }
+        assert notify_roster_changes(connection, sender, later)["sent"] == 0  # once only
+    [email] = sender.sent
+    assert email.to == "coach@example.com"
+    assert email.text.count("09:00–15:00 · Main · Coach") == 1
+    assert email.text.count("12:00–18:00 · Main · Coach") == 1
+    assert email.text.count("10:00") == 0 and email.text.count("11:00") == 0
+
+
+def test_a_removed_shift_is_emailed_and_one_put_back_is_not(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import QUIET_PERIOD, notify_roster_changes
+
+    headers = studio["headers"]
+    shift_id, body = _published_shift(client, studio, engine)
+    starts = datetime.fromisoformat(body["starts_at"])
+    moved = {
+        "starts_at": starts.replace(hour=13).isoformat(),
+        "ends_at": (starts.replace(hour=19)).isoformat(),
+    }
+    assert client.patch(f"/shifts/{shift_id}", json=moved, headers=headers).status_code == 200
+    original = {"starts_at": body["starts_at"], "ends_at": body["ends_at"]}
+    assert client.patch(f"/shifts/{shift_id}", json=original, headers=headers).status_code == 200
+    later = datetime.now(UTC) + QUIET_PERIOD + timedelta(minutes=1)
+    sender = LogSender()
+    with engine.begin() as connection:
+        assert notify_roster_changes(connection, sender, later)["skipped"] == 1
+    assert sender.sent == []
+
+    assert client.delete(f"/shifts/{shift_id}", headers=headers).status_code == 204
+    with engine.begin() as connection:
+        assert notify_roster_changes(connection, sender, later)["sent"] == 1
+    [email] = sender.sent
+    assert email.text.count("09:00–15:00 · Main · Coach") == 1
+
+
+def test_drafts_and_shifts_not_yet_announced_record_no_changes(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    day = datetime.now(ZoneInfo("Asia/Jerusalem")).replace(hour=9, minute=0) + timedelta(days=3)
+    body = {
+        "user_id": coach,
+        "location_id": branch,
+        "starts_at": day.isoformat(),
+        "ends_at": (day + timedelta(hours=6)).isoformat(),
+    }
+    shift_id = client.post("/shifts", json=body, headers=headers).json()["id"]
+    client.patch(f"/shifts/{shift_id}", json={"position": "Lead"}, headers=headers)
+    client.post("/shifts/publish", json={"start": day.date().isoformat()}, headers=headers)
+    client.patch(f"/shifts/{shift_id}", json={"position": "Cover"}, headers=headers)
+    with engine.connect() as connection:
+        assert connection.execute(text("SELECT count(*) FROM app.shift_changes")).scalar_one() == 0
