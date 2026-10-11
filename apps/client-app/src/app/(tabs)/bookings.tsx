@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, SectionTitle } from "@business-os/app-kit/components/rows";
-import { Button, Card, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, EmptyState, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
@@ -207,7 +207,7 @@ export default function Bookings() {
       {data?.upcoming.length ? (
         <Card palette={palette}>{data.upcoming.map(row)}</Card>
       ) : error !== undefined && !data ? null : (
-        <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : t("noUpcoming")}</Text>
+        <EmptyState palette={palette} message={t("noUpcoming")} loading={loading} />
       )}
       {data?.past.length ? (
         <>
