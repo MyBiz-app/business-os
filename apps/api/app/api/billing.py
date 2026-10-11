@@ -18,6 +18,7 @@ from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
 from app.commerce.billing import add_months
 from app.commerce.modules import allowance
+from app.core.config import get_settings
 from app.core.permissions import Permission
 
 router = APIRouter(prefix="/billing", tags=["billing"])
@@ -235,7 +236,10 @@ def set_details(body: BillingDetails, context: SettingsDep) -> BillingDetails:
 
 @router.post("/payment-method")
 def add_test_card(body: TestCardRequest, context: SettingsDep) -> PaymentMethod:
-    """Adds a test card (no card number is ever entered in the prototype)."""
+    """Adds a test card (no card number is ever entered in the prototype). Not available in
+    production: a fake card must never stand in for real billing there."""
+    if get_settings().environment == "production":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="test_cards_disabled")
     exp = add_months(datetime.now(UTC).date(), 36)
     _upsert(
         context.session,
