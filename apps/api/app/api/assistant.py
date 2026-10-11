@@ -4,13 +4,14 @@ import datetime as dt
 import json
 from typing import Annotated, Any, Literal
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.ai import actions, assistant
+from app.ai import actions, assistant, budget
 from app.ai.gateway import LLMProvider, ProviderBusy, ProviderUnavailable, get_provider
 from app.api.common import not_found
 from app.api.deps import TenantContext, UserDep, has_module, require
@@ -172,6 +173,19 @@ def get_conversation(conversation_id: UUID, context: AIDep) -> Conversation:
     return _load(context.session, conversation_id)
 
 
+def _check_budget(db: Session, provider: LLMProvider) -> None:
+    """Soft monthly limit: from 100% of the AI module's allowance, new questions wait for next
+    month or a bigger module (demo answers cost nothing and are never limited)."""
+    if getattr(provider, "model", None) == "demo":
+        return
+    time_zone = db.execute(
+        text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    month_start = dt.datetime.now(ZoneInfo(time_zone)).date().replace(day=1)
+    if budget.credits_used(db, month_start) >= budget.credits_included(db):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_limit_reached")
+
+
 @router.post("/conversations/{conversation_id}/messages")
 def send_message(
     conversation_id: UUID,
@@ -185,6 +199,7 @@ def send_message(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="ai_not_configured"
         )
     _load(context.session, conversation_id)  # 404 unless it is the user's conversation
+    _check_budget(context.session, provider)
     try:
         assistant.ask(provider, context, user.id, conversation_id, body.text)
     except ProviderBusy as error:

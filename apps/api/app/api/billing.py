@@ -12,6 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
+from app.ai import budget as ai_budget
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
@@ -82,6 +83,8 @@ class Usage(BaseModel):
     messages_included: int
     storage_bytes: int = Field(description="Files kept now")
     storage_included_bytes: int
+    ai_credits: float = Field(description="AI credits used this month (1 credit = 1 US cent)")
+    ai_credits_included: int = Field(description="0 when the business has no AI module")
 
 
 class Billing(BaseModel):
@@ -205,6 +208,8 @@ def usage(db: Session, today: date) -> Usage:
         messages_included=allowed.messages,
         storage_bytes=int(row.storage),
         storage_included_bytes=allowed.storage_bytes,
+        ai_credits=round(ai_budget.credits_used(db, month_start), 2),
+        ai_credits_included=ai_budget.credits_included(db),
     )
 
 
