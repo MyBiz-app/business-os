@@ -13,7 +13,7 @@ it is a new provider class, or a different choice in settings.
 | Messaging | `messaging.py`: `MessageProvider` — `send` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
 | Email | `email.py` (senders in `app/messaging/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
 | AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_ANTHROPIC_API_KEY` |
-| Storage | `storage.py`: `StorageProvider` | `database` | the platform: `API_STORAGE_PROVIDER` |
+| Storage | `storage.py`: `StorageProvider` — `put`, `get`, `delete`, `signed_url` | `database` (also `supabase`: Supabase Storage, T80) | the platform: `API_STORAGE_PROVIDER` |
 
 - `registry.py`: `@register(capability, name, label, fields=…)` and `SettingField`.
 - `choice.py`: `choose(db, tenant_id, capability)` — the business's own connection, else the
@@ -26,6 +26,19 @@ it is a new provider class, or a different choice in settings.
   the signature, then the checkout is completed for exactly its amount.
 - `app/api/integrations.py`: settings → Integrations (`/integrations`) and the console
   (`/platform/integrations`).
+
+## File storage (Supabase Storage)
+
+Client documents go to a private Supabase Storage bucket when the platform's storage provider is
+`supabase` (decision T80). To turn it on for a deployment:
+
+1. The bucket: `files`, private, 10 MB per file (created on staging 2026-10-11; locally it comes
+   from `supabase/config.toml`).
+2. On the API host: `API_STORAGE_PROVIDER=supabase` and
+   `API_STORAGE_SETTINGS={"url": "https://<project>.supabase.co", "service_key": "<secret key>"}`
+   (the secret key from Supabase → Project Settings → API Keys; it never goes in the repository).
+3. Move documents already kept in the database: `uv run python -m app.jobs move-files`, again
+   until it reports `left: 0`.
 
 ## Adding a provider (for example invoicing provider "acme")
 
