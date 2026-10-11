@@ -154,6 +154,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** M · **Model:** Opus for the design and data move, Sonnet for the provider.
 
 ### P0-8 · Auth settings on the hosted project are not managed from the repository
+- **Progress:** ✅ checklist in `docs/deploy/auth-settings.md` (PR 4); applying settings from CI is still open.
 - **Where:** `supabase/config.toml` says `otp_length = 6`; the hosted project sent an 8-digit code
   (2026-10-10). Email templates and redirect URLs are also set by hand.
 - **Why:** every new environment (production) will drift the same way, and sign-in is the first
@@ -198,6 +199,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** M · **Model:** Opus.
 
 ### P1-3 · Migrations run on every container start, and in a workflow too
+- **Progress:** ✅ CI test fails on more than one head, duplicate numbers or a file name that differs from its revision (PR 4). The pre-deploy step needs the paid Render plan.
 - **Where:** `Dockerfile` CMD (`alembic upgrade head && uvicorn ...`),
   `.github/workflows/migrate-staging.yml`.
 - **Why:** two mechanisms for one job; with more than one instance or worker each start races to
