@@ -22,6 +22,16 @@ Walk this list for every new hosted project and after any change to the auth sec
 | Leaked password protection | — | on (Pro plan only) |
 | SMTP | — | the project's own sender before real customers (the built-in one is rate limited) |
 
+## Applying from CI
+
+Run the workflow *Apply Supabase auth settings (staging)* (Actions, Run workflow). Without
+"apply" it only prints which settings differ from `supabase/config.toml`; with it, it changes
+them. It covers site URL, redirect URLs, OTP length and expiry, email confirmation, password
+length, anonymous sign-ins, token rotation, JWT expiry and the three email templates. The rest
+of the table (Google provider, leaked-password protection, SMTP) stays manual. One-time setup:
+create a Supabase personal access token and save it as the secret `SUPABASE_ACCESS_TOKEN` in
+the GitHub `staging` environment. The staging URLs live in the workflow file.
+
 After changing anything, run a sign-in with an emailed code on that environment and confirm the
 code length and the template language. Moving to `supabase config push` from CI is the longer
 fix (launch-readiness P0-8) and needs the project's access token as a secret.

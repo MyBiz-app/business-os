@@ -207,3 +207,19 @@ def test_console_lists_one_business_invoices(
     assert [i["id"] for i in invoices] == [i["id"] for i in own]  # this business only, same order
     assert len(invoices) == 2 and invoices[0]["number"] > invoices[1]["number"]
     assert all(i["currency"] == "ILS" and i["total"] > 0 for i in invoices)
+
+
+def test_test_cards_are_refused_in_production(
+    client: TestClient, studio: dict, monkeypatch
+) -> None:
+    from app.core.config import get_settings
+
+    monkeypatch.setenv("API_ENVIRONMENT", "production")
+    get_settings.cache_clear()
+    try:
+        refused = client.post(
+            "/billing/payment-method", json={"brand": "visa"}, headers=studio["headers"]
+        )
+    finally:
+        get_settings.cache_clear()
+    assert refused.status_code == 403 and refused.json()["detail"] == "test_cards_disabled"
