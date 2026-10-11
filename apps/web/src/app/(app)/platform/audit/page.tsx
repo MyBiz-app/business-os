@@ -13,12 +13,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** What the MyBiz team did (owners only). */
-export default async function PlatformAuditPage() {
+const PAGE_SIZE = 50;
+
+export default async function PlatformAuditPage({ searchParams }: PageProps<"/platform/audit">) {
   const t = await getTranslations("platform");
   const locale = await getLocale();
   const { api, isOwner } = await getPlatform();
   if (!isOwner) notFound();
-  const entries = unwrap(await api.GET("/platform/audit"));
+  const page = Math.max(1, Number((await searchParams).page) || 1);
+  const entries = unwrap(
+    await api.GET("/platform/audit", { params: { query: { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE } } }),
+  );
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const actions: Record<string, string> = (await getMessages()).platform.audit.actions;
   const label = (action: string) => actions[action.replace(".", "_")] ?? action;
@@ -71,6 +76,12 @@ export default async function PlatformAuditPage() {
             </tbody>
           </table>
         </ScrollRegion>
+      )}
+      {(page > 1 || entries.length === PAGE_SIZE) && (
+        <nav aria-label={t("audit.title")} className="flex items-center justify-between text-sm">
+          {page > 1 ? <Link href={`/platform/audit?page=${page - 1}`} className="text-primary">{t("audit.previous")}</Link> : <span />}
+          {entries.length === PAGE_SIZE ? <Link href={`/platform/audit?page=${page + 1}`} className="text-primary">{t("audit.next")}</Link> : <span />}
+        </nav>
       )}
     </main>
   );

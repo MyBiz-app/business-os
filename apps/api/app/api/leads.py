@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, has_module, require
+from app.api.pagination import MAX_LIMIT
 from app.permissions import Permission
 
 router = APIRouter(prefix="/leads", tags=["leads"])
@@ -144,6 +145,7 @@ class LeadBoard(BaseModel):
         description="Won ÷ (won + lost) among leads closed in the last 90 days"
     )
     follow_ups_due: int = Field(description="Open leads with a follow-up date today or earlier")
+    total: int = Field(description="Leads on the board matching the filters, across all pages")
 
 
 SELECT = """
@@ -226,6 +228,8 @@ def list_leads(
     closed_days: Annotated[
         int, Query(ge=0, le=365, description="Won / lost leads closed in this many days")
     ] = 30,
+    limit: Annotated[int, Query(ge=1, le=MAX_LIMIT)] = MAX_LIMIT,
+    offset: Annotated[int, Query(ge=0, le=100_000)] = 0,
 ) -> LeadBoard:
     """The pipeline: open leads, plus won and lost ones closed recently."""
     db = context.session
@@ -242,12 +246,19 @@ def list_leads(
     if owner_user_id:
         where += " AND l.owner_user_id = :owner"
         params["owner"] = owner_user_id
+    stage_counts = dict(
+        db.execute(
+            text(f"SELECT l.stage, count(*) FROM app.leads l {where} GROUP BY l.stage"), params
+        ).all()
+    )
+    total = sum(stage_counts.values())
     rows = db.execute(
         text(f"""
             {SELECT} {where}
-            ORDER BY l.follow_up_on NULLS LAST, l.stage_changed_at DESC LIMIT 500
+            ORDER BY l.follow_up_on NULLS LAST, l.stage_changed_at DESC, l.id
+            LIMIT :limit OFFSET :offset
         """),
-        params,
+        {**params, "limit": limit, "offset": offset},
     ).mappings()
     items = [Lead.model_validate(dict(r)) for r in rows]
     stats = db.execute(
@@ -267,9 +278,7 @@ def list_leads(
             FROM app.leads
         """)
     ).one()
-    counts = {stage: 0 for stage in STAGES}
-    for lead in items:
-        counts[lead.stage] += 1
+    counts = {stage: stage_counts.get(stage, 0) for stage in STAGES}
     closed = stats.won_90 + stats.lost_90
     return LeadBoard(
         items=items,
@@ -278,6 +287,7 @@ def list_leads(
         won_last_30_days=stats.won_30,
         conversion_rate=round(stats.won_90 / closed, 3) if closed else None,
         follow_ups_due=stats.due,
+        total=total,
     )
 
 

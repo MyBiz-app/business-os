@@ -1164,6 +1164,8 @@
       "business": "Business",
       "details": "Details",
       "empty": "Nothing yet.",
+      "previous": "Previous",
+      "next": "Next",
       "actions": {
         "staff_added": "Added a team member",
         "staff_changed": "Changed a team member",
@@ -1937,6 +1939,7 @@
     }
   },
   "leads": {
+    "truncated": "Showing the first {shown} of {total} leads. Narrow the search to see the rest.",
     "title": "Leads",
     "subtitle": "People on their way to becoming clients",
     "new": "New lead",

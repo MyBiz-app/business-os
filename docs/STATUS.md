@@ -26,6 +26,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 - Websites complete. Polished in four rounds: the clients list shows each client's plan and last visit, team avatars, a busy-hours heatmap and occupancy bars in the reports, plans and services show how they are used, a shorter client history, a day strip on the phone schedule, a two-row header on phones, search, sort and pages in the MyBiz console, a billing summary, and structured data for search results.
 - Checked end to end: `dod.py` (sign-up through the AI assistant and the console), a crawl of every page in Hebrew and English on computer and phone with no errors, no accessibility violations and nothing spilling off the screen, in light and dark mode.
+- List endpoints share one paging dependency (default 50 rows, at most 200, with `offset`): clients, leads board, a client's bookings, the client-app inbox and the MyBiz audit log. The audit log has Previous / Next in the console; the leads board says when it shows only the first part.
 - [#38](https://github.com/adiredri/business-os/issues/38) Owner review on computer and phone
 
 ## Next

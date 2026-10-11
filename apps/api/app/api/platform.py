@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep
 from app.api.modules import check_selection
+from app.api.pagination import PageDep
 
 router = APIRouter(prefix="/platform", tags=["platform"])
 
@@ -254,14 +255,17 @@ class AuditEntry(BaseModel):
 
 
 @router.get("/audit")
-def audit(db: StaffDep, limit: Annotated[int, Query(ge=1, le=500)] = 200) -> list[AuditEntry]:
+def audit(db: StaffDep, page: PageDep) -> list[AuditEntry]:
     """What the MyBiz team did, newest first (owners only)."""
     try:
         with db.begin_nested():
             rows = (
-                db.execute(text("SELECT * FROM app.platform_audit_list(:limit)"), {"limit": limit})
+                db.execute(
+                    text("SELECT * FROM app.platform_audit_list(:limit)"),
+                    {"limit": page.limit + page.offset},
+                )
                 .mappings()
-                .all()
+                .all()[page.offset :]
             )
     except DBAPIError as error:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="owners_only") from error

@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
+from app.api.pagination import PageDep
 from app.api.plans import usable_entitlement
 from app.notifications import notify_booking
 from app.permissions import Permission
@@ -249,7 +250,9 @@ def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) ->
 
 
 @router.get("/clients/{client_id}/bookings")
-def list_client_bookings(client_id: UUID, context: ClientsReadDep) -> list[ClientBooking]:
+def list_client_bookings(
+    client_id: UUID, context: ClientsReadDep, page: PageDep
+) -> list[ClientBooking]:
     """A client's bookings, newest session first."""
     rows = context.session.execute(
         text("""
@@ -260,9 +263,9 @@ def list_client_bookings(client_id: UUID, context: ClientsReadDep) -> list[Clien
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
             WHERE b.client_id = :id
-            ORDER BY s.starts_at DESC
-            LIMIT 200
+            ORDER BY s.starts_at DESC, b.id
+            LIMIT :limit OFFSET :offset
         """),
-        {"id": client_id},
+        {"id": client_id, "limit": page.limit, "offset": page.offset},
     ).mappings()
     return [ClientBooking.model_validate(dict(row)) for row in rows]
