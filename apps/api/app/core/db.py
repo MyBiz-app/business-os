@@ -24,8 +24,17 @@ TENANT_KEY = "app.tenant_id"
 
 @lru_cache
 def get_engine() -> Engine:
-    engine = create_engine(get_settings().database_url, pool_pre_ping=True)
-    log_slow_queries(engine, get_settings().slow_query_ms)
+    settings = get_settings()
+    engine = create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
+        pool_timeout=settings.db_pool_timeout,
+        pool_recycle=settings.db_pool_recycle,
+        connect_args={} if settings.db_prepared_statements else {"prepare_threshold": None},
+    )
+    log_slow_queries(engine, settings.slow_query_ms)
     return engine
 
 

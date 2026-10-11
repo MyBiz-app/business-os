@@ -3,6 +3,7 @@
 import datetime as dt
 import json
 import math
+import threading
 import time
 from typing import Annotated, Any, Literal
 from uuid import UUID
@@ -190,6 +191,9 @@ def _check_budget(db: Session, provider: LLMProvider) -> None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_limit_reached")
 
 
+# Concurrent model calls in this worker (a call holds a request thread and a connection).
+_model_calls = threading.BoundedSemaphore(get_settings().ai_max_concurrent_calls)
+
 # Counts per API process, like the address limiter (app/core/rate_limit.py).
 _user_messages = MemoryStore()
 
@@ -231,12 +235,16 @@ def send_message(
     _load(context.session, conversation_id)  # 404 unless it is the user's conversation
     _check_budget(context.session, provider)
     _check_user_rate(user.id, provider)
+    if not _model_calls.acquire(blocking=False):
+        raise HTTPException(status_code=429, detail="ai_busy")
     try:
         assistant.ask(provider, context, user.id, conversation_id, body.text)
     except ProviderBusy as error:
         raise HTTPException(status_code=429, detail="ai_busy") from error
     except ProviderUnavailable as error:
         raise HTTPException(status_code=502, detail="ai_unavailable") from error
+    finally:
+        _model_calls.release()
     return _load(context.session, conversation_id)
 
 

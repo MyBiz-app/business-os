@@ -109,11 +109,11 @@ def _unprocessable(detail: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detail)
 
 
-async def _read(file: UploadFile) -> tuple[bytes, str]:
+def _read(file: UploadFile) -> tuple[bytes, str]:
     content_type = (file.content_type or "").split(";")[0].strip()
     if content_type not in TYPES:
         raise _unprocessable("unsupported_type")
-    content = await file.read(MAX_SIZE + 1)
+    content = file.file.read(MAX_SIZE + 1)
     if not content:
         raise _unprocessable("empty_file")
     if len(content) > MAX_SIZE:
@@ -241,7 +241,7 @@ def client_documents(client_id: UUID, context: ReadDep) -> list[Document]:
 
 
 @router.post("/clients/{client_id}/documents", status_code=status.HTTP_201_CREATED)
-async def upload_document(
+def upload_document(
     client_id: UUID,
     context: WriteDep,
     file: Annotated[UploadFile, File()],
@@ -250,7 +250,7 @@ async def upload_document(
     shared: Annotated[bool, Form()] = False,
     sign_requested: Annotated[bool, Form()] = False,
 ) -> Document:
-    content, content_type = await _read(file)
+    content, content_type = _read(file)
     return _store(
         context.session,
         context.tenant_id,
@@ -320,12 +320,12 @@ def my_documents(context: ClientDep) -> list[Document]:
 
 
 @client_router.post("/documents", status_code=status.HTTP_201_CREATED)
-async def upload_my_document(
+def upload_my_document(
     context: ClientDep,
     file: Annotated[UploadFile, File()],
     name: Annotated[str | None, Form(max_length=200)] = None,
 ) -> Document:
-    content, content_type = await _read(file)
+    content, content_type = _read(file)
     return _store(
         context.session,
         context.tenant_id,
