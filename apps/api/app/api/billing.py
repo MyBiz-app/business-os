@@ -236,8 +236,8 @@ def set_details(body: BillingDetails, context: SettingsDep) -> BillingDetails:
 
 @router.post("/payment-method")
 def add_test_card(body: TestCardRequest, context: SettingsDep) -> PaymentMethod:
-    """Adds a test card (no card number is ever entered in the prototype). Not available in
-    production: a fake card must never stand in for real billing there."""
+    """Adds a test card (no card number is ever entered in the prototype)."""
+    # A fake card must never stand in for real billing in production.
     if get_settings().environment == "production":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="test_cards_disabled")
     exp = add_months(datetime.now(UTC).date(), 36)
