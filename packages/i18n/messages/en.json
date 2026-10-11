@@ -2595,6 +2595,21 @@
     "byService": "By service",
     "comments": "Latest comments"
   },
+  "timeOffQueue": {
+    "title": "Time-off requests",
+    "subtitle": "Approving blocks the days for scheduling and bookings. Appointments already booked stay.",
+    "back": "Shifts",
+    "open": "Time-off requests",
+    "pending": "{count, plural, one {# waiting for you} other {# waiting for you}}",
+    "noPending": "No requests are waiting.",
+    "shiftCount": "{count, plural, =0 {No shifts on these days} one {Already has # shift on these days} other {Already has # shifts on these days}}",
+    "note": "Note for the requester (optional)",
+    "noteHint": "Shown to the requester",
+    "approve": "Approve",
+    "decline": "Decline",
+    "decided": "Recently decided",
+    "status": { "approved": "Approved", "declined": "Declined", "cancelled": "Withdrawn" }
+  },
   "timeOff": {
     "title": "Time off",
     "hint": "No appointments are offered with this staff member on these days. Appointments already booked stay — handle them separately.",

@@ -40,6 +40,9 @@ export default async function TeamPage() {
             <CalendarClock aria-hidden="true" className="size-4" />
             {t("shifts.title")}
           </Link>
+          <Link href="/team/time-off" className="btn-secondary px-3 py-2 text-sm">
+            {t("timeOffQueue.open")}
+          </Link>
           <Link href="/team/roles" className="btn-ghost px-3 py-2 text-sm">
             {t("team.manageRoles")}
           </Link>
