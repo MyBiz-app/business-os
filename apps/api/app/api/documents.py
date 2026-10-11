@@ -1,18 +1,21 @@
 """Client documents (#45, decision X14): contracts, reports and the client's own papers.
 
-Files go through the storage provider (X13): the built-in `database` provider keeps the bytes
-in the row; another provider keeps them elsewhere under a key. Staff upload documents and choose
+Files go through the storage provider (X13, T80): the built-in `database` provider keeps the
+bytes in the row; an object store (Supabase Storage) keeps them under a key that starts with the
+business, and the row keeps only the key. Staff upload documents and choose
 what the client sees; clients upload their papers in the app and sign documents that ask for it
 by writing their name."""
 
+from contextlib import suppress
 from datetime import datetime
 from typing import Annotated, Literal
 from urllib.parse import quote
 from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
-from sqlalchemy import text
+from sqlalchemy import event, text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
@@ -23,6 +26,7 @@ from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.core.signed_links import sign, verify
 from app.providers.choice import choose
+from app.providers.storage import StorageError, StorageProvider, tenant_key
 
 router = APIRouter(tags=["documents"])
 public_router = APIRouter(tags=["documents"])
@@ -33,6 +37,7 @@ WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 DocumentKind = Literal["contract", "report", "client_file", "other"]
 MAX_SIZE = 10 * 1024 * 1024
+LINK_SECONDS = 600  # a signed link opens the file for 10 minutes
 TYPES = {
     "application/pdf",
     "image/png",
@@ -81,6 +86,25 @@ COLUMNS = """id, client_id, name, kind, content_type, size, shared, uploaded_by_
     sign_requested, signed_at, signed_name, created_at"""
 
 
+def _storage_unavailable() -> HTTPException:
+    return HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="storage_down")
+
+
+def _forget(storage: StorageProvider, key: str) -> None:
+    """Removes an object whose row is gone; a failure leaves an orphan, never a broken row."""
+    with suppress(StorageError):
+        storage.delete(key)
+
+
+def _content(db: Session, row: dict) -> bytes:
+    if row["content"] is not None:
+        return bytes(row["content"])
+    try:
+        return choose(db, None, "storage").instance.get(row["storage_key"])
+    except (StorageError, LookupError) as error:
+        raise _storage_unavailable() from error
+
+
 def _unprocessable(detail: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detail)
 
@@ -125,22 +149,30 @@ def _store(
     ensure_not_erased(db, client_id)
     _check_space(db, tenant_id, len(content))
     storage = choose(db, None, "storage").instance
+    document_id = uuid4()
     key = None
     if not storage.in_database:
-        key = f"documents/{tenant_id}/{client_id}/{uuid4()}"
-        storage.put(key, content, content_type)
+        key = tenant_key(tenant_id, "documents", client_id, document_id)
+        try:
+            storage.put(key, content, content_type)
+        except StorageError as error:
+            raise _storage_unavailable() from error
+        # The row and the object live or die together: if the row is never saved, the object
+        # goes too.
+        event.listen(db, "after_rollback", lambda _session: _forget(storage, key), once=True)
     try:
         row = (
             db.execute(
                 text(f"""
                     INSERT INTO app.client_documents
-                        (tenant_id, client_id, name, kind, content_type, size, content,
+                        (id, tenant_id, client_id, name, kind, content_type, size, content,
                          storage_key, shared, uploaded_by_client, sign_requested, created_by)
-                    VALUES (:tenant_id, :client_id, :name, :kind, :content_type, :size,
+                    VALUES (:id, :tenant_id, :client_id, :name, :kind, :content_type, :size,
                             :content, :key, :shared, :by_client, :sign, app.current_user_id())
                     RETURNING {COLUMNS}
                 """),
                 {
+                    "id": document_id,
                     "tenant_id": tenant_id,
                     "client_id": client_id,
                     "name": name.strip()[:200] or "document",
@@ -176,11 +208,7 @@ def _file(db: Session, document_id: UUID) -> Response:
     )
     if row is None:
         raise not_found()
-    content = (
-        bytes(row["content"])
-        if row["content"] is not None
-        else choose(db, None, "storage").instance.get(row["storage_key"])
-    )
+    content = _content(db, row)
     filename = row["name"].replace('"', "")
     return Response(
         content=content,
@@ -277,7 +305,9 @@ def delete_document(document_id: UUID, context: WriteDep) -> None:
     if key is None:
         raise not_found()
     if key[0]:
-        choose(db, None, "storage").instance.delete(key[0])
+        # Only once the row is really gone, so a failed request never loses the file.
+        storage = choose(db, None, "storage").instance
+        event.listen(db, "after_commit", lambda _session: _forget(storage, key[0]), once=True)
 
 
 # --- Client app -------------------------------------------------------------------------------
@@ -343,11 +373,17 @@ def signed_file(token: str, session: AnonymousSessionDep) -> Response:
     )
     if row is None:
         raise not_found()
-    content = (
-        bytes(row["content"])
-        if row["content"] is not None
-        else choose(session, None, "storage").instance.get(row["storage_key"])
-    )
+    if row["storage_key"] is not None:
+        # Straight from the object store: the bytes don't pass through the API.
+        try:
+            url = choose(session, None, "storage").instance.signed_url(
+                row["storage_key"], LINK_SECONDS
+            )
+        except StorageError as error:
+            raise _storage_unavailable() from error
+        if url:
+            return RedirectResponse(url, status_code=status.HTTP_302_FOUND)
+    content = _content(session, row)
     return Response(
         content=content,
         media_type=row["content_type"],
