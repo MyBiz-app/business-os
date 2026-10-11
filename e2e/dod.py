@@ -50,7 +50,7 @@ with sync_playwright() as p:
     owner.get_by_label("שימוש בצבע ברירת המחדל").uncheck()
     owner.get_by_label("צבע המותג").fill("#0f766e")
     with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
-        owner.get_by_role("button", name="שמירה").nth(1).click()
+        owner.locator("form").filter(has=owner.get_by_label("צבע המותג")).get_by_role("button", name="שמירה").click()
     h.ready(owner)  # the save refreshes the page; a file chosen before that is lost
     owner.get_by_label("לוגו", exact=True).set_input_files("e2e/logo.png")
     use = owner.get_by_role("button", name="להשתמש בתמונה")  # the crop dialog opens first
