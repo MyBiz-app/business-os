@@ -1,7 +1,7 @@
 import hashlib
 import secrets
 from datetime import UTC, datetime, timedelta
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,10 +10,10 @@ from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
-from app.api.common import not_found, set_clause
+from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
-from app.permissions import ROLE_PERMISSIONS, Permission
+from app.core.permissions import ROLE_PERMISSIONS, Permission, effective_permissions
 
 router = APIRouter(tags=["staff"])
 
@@ -48,7 +48,26 @@ class Member(BaseModel):
     custom_role_id: UUID | None
     custom_role_name: str | None
     location_ids: list[UUID] = Field(description="Branches they work at; empty means all")
+    home_location_id: UUID | None = Field(
+        description="The branch they normally work at (informational: shifts elsewhere are cover)"
+    )
     joined_at: datetime
+    job_title: str | None
+    reports_to: UUID | None = Field(description="Who they report to (never grants access)")
+    phone: str | None
+    avatar_url: str | None = Field(description="Path of their picture on this API, if any")
+    permissions: list[str] = Field(description="What they can actually do (their role's switches)")
+
+    @model_validator(mode="before")
+    @classmethod
+    def with_permissions(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "permissions" not in data:
+            data = {**data}
+            custom = data.pop("custom_permissions", None)
+            order = [p.value for p in Permission]
+            effective = effective_permissions(data["role"], custom)
+            data["permissions"] = [p for p in order if p in effective]
+        return data
 
 
 class Invitation(BaseModel):
@@ -145,6 +164,19 @@ class Accepted(BaseModel):
     tenant_id: UUID
 
 
+MEMBER_SELECT = """
+    SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
+           r.name AS custom_role_name, r.permissions AS custom_permissions,
+           m.location_ids, m.created_at AS joined_at,
+           m.job_title, m.reports_to, m.home_location_id, u.phone,
+           CASE WHEN u.avatar_updated_at IS NULL THEN NULL
+                ELSE '/staff/' || u.id || '/avatar?v='
+                     || extract(epoch FROM u.avatar_updated_at)::bigint END AS avatar_url
+    FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
+    LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
+    WHERE m.tenant_id = app.current_tenant_id()
+"""
+
 INVITATION_SELECT = """
     SELECT id, email, role, expires_at, created_at,
            CASE WHEN accepted_at IS NOT NULL THEN 'accepted'
@@ -174,17 +206,7 @@ def _owner_count(session: Session) -> int:
 
 @router.get("/staff")
 def get_team(context: ReadDep) -> Team:
-    members = context.session.execute(
-        text("""
-            SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
-                   r.name AS custom_role_name, m.location_ids,
-                   m.created_at AS joined_at
-            FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
-            LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
-            WHERE m.tenant_id = app.current_tenant_id()
-            ORDER BY m.created_at
-        """)
-    ).mappings()
+    members = context.session.execute(text(f"{MEMBER_SELECT} ORDER BY m.created_at")).mappings()
     invitations = context.session.execute(
         text(f"{INVITATION_SELECT} WHERE accepted_at IS NULL ORDER BY created_at DESC")
     ).mappings()
@@ -252,14 +274,7 @@ def revoke_invitation(invitation_id: UUID, context: ManageDep) -> None:
 def _load_member(session: Session, user_id: UUID) -> Member:
     row = (
         session.execute(
-            text("""
-                SELECT m.user_id, u.email, u.full_name, m.role, m.custom_role_id,
-                       r.name AS custom_role_name, m.location_ids,
-                   m.created_at AS joined_at
-                FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
-                LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
-                WHERE m.tenant_id = app.current_tenant_id() AND m.user_id = :user_id
-            """),
+            text(f"{MEMBER_SELECT} AND m.user_id = :user_id"),
             {"user_id": user_id},
         )
         .mappings()
@@ -328,6 +343,74 @@ def set_member_branches(user_id: UUID, body: MemberBranches, context: ManageDep)
         """),
         {"ids": [str(i) for i in ids], "user_id": user_id},
     )
+    return _load_member(context.session, user_id)
+
+
+class HomeBranch(BaseModel):
+    location_id: UUID | None = Field(description="None clears it")
+
+
+@router.put("/staff/{user_id}/home-branch")
+def set_home_branch(user_id: UUID, body: HomeBranch, context: ManageDep) -> Member:
+    """Where a member normally works. It never limits where a shift can be placed: a shift at
+    another branch is simply shown as cover."""
+    if _member_role(context.session, user_id) is None:
+        raise not_found()
+    if body.location_id is not None:
+        known = context.session.execute(
+            text("SELECT 1 FROM app.locations WHERE id = :id"), {"id": body.location_id}
+        ).first()
+        if known is None:
+            raise HTTPException(status_code=422, detail="unknown_branch")
+    context.session.execute(
+        text("""
+            UPDATE app.tenant_members SET home_location_id = :location
+            WHERE tenant_id = app.current_tenant_id() AND user_id = :user_id
+        """),
+        {"location": body.location_id, "user_id": user_id},
+    )
+    return _load_member(context.session, user_id)
+
+
+class MemberOrganization(BaseModel):
+    """A member's place in the business: their title and who they report to. Reporting is for
+    the org chart only and never changes what anyone may see or do."""
+
+    job_title: str | None = Field(default=None, max_length=80)
+    reports_to: UUID | None = None
+
+    @field_validator("job_title", mode="before")
+    @classmethod
+    def blank_title(cls, value: object) -> object:
+        return blank_to_none(value)
+
+
+@router.patch("/staff/{user_id}/organization")
+def set_member_organization(user_id: UUID, body: MemberOrganization, context: ManageDep) -> Member:
+    if _member_role(context.session, user_id) is None:
+        raise not_found()
+    changes = body.model_dump(exclude_unset=True)
+    if not changes:
+        return _load_member(context.session, user_id)
+    if changes.get("reports_to") is not None:
+        if changes["reports_to"] == user_id:
+            raise HTTPException(status_code=422, detail="reporting_cycle")
+        if _member_role(context.session, changes["reports_to"]) is None:
+            raise HTTPException(status_code=422, detail="invalid_reference")
+    assignments = ", ".join(f"{column} = :{column}" for column in changes)
+    try:
+        with context.session.begin_nested():
+            context.session.execute(
+                text(f"""
+                    UPDATE app.tenant_members SET {assignments}
+                    WHERE tenant_id = app.current_tenant_id() AND user_id = :user_id
+                """),
+                {**changes, "user_id": user_id},
+            )
+    except DBAPIError as error:
+        if getattr(error.orig, "sqlstate", None) == "23514":
+            raise HTTPException(status_code=422, detail="reporting_cycle") from error
+        raise
     return _load_member(context.session, user_id)
 
 

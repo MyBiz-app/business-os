@@ -1,11 +1,16 @@
-from datetime import datetime
+import datetime as dt
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 from zoneinfo import available_timezones
 
 from pydantic import BaseModel, Field, field_validator
 
-from app.verticals import VERTICAL_PACKS
+from app.catalog.verticals import VERTICAL_PACKS
+
+LegalEntityType = Literal[
+    "company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"
+]
 
 Locale = Literal["he", "en"]
 Role = Literal["owner", "manager", "staff", "front_desk"]
@@ -23,12 +28,42 @@ class SupportAccess(BaseModel):
     expires_at: datetime
 
 
+Palette = Literal["mybiz", "ocean", "forest", "custom"]
+
+
+class PaletteColors(BaseModel):
+    """The three colors a person picks for "my own colors" (`#rrggbb`). The app derives every
+    other color from them, so any combination is safe to store."""
+
+    background: str = Field(pattern=r"^#[0-9a-f]{6}$")
+    text: str = Field(pattern=r"^#[0-9a-f]{6}$")
+    accent: str = Field(pattern=r"^#[0-9a-f]{6}$")
+
+
 class Me(BaseModel):
     id: UUID
     email: str
     full_name: str | None
     locale: Locale | None
     platform_admin: bool = Field(description="On the MyBiz team (sees the console)")
+    phone: str | None = None
+    birth_date: date | None = None
+    address_line: str | None = None
+    city: str | None = None
+    postal_code: str | None = None
+    email_roster: bool = Field(
+        default=True, description="Email the person when their roster is published"
+    )
+    palette: Palette | None = Field(
+        default=None, description="The person's color palette (none: the MyBiz default)"
+    )
+    palette_colors: PaletteColors | None = Field(
+        default=None,
+        description="The colors picked for the `custom` palette, kept when a preset is chosen",
+    )
+    avatar_url: str | None = Field(
+        default=None, description="Path of the person's own picture on this API, if any"
+    )
     memberships: list[Membership]
     support_access: list[SupportAccess] = Field(
         description="Businesses that let MyBiz support in (the MyBiz team only)"
@@ -78,6 +113,38 @@ class TenantUpdate(BaseModel):
     booking_requires_plan: bool | None = None
     requires_health_declaration: bool | None = None
     online_sales: bool | None = None
+    resource_payment: Literal["app", "venue"] | None = None
+    schedule_default_view: Literal["day", "week", "month"] | None = None
+    schedule_default_branches: list[UUID] | None = Field(
+        default=None,
+        max_length=3,
+        description="Branches the schedule opens with; empty means the menu's branch",
+    )
+    shifts_default_view: Literal["people", "branches"] | None = None
+    shifts_default_range: Literal["day", "week", "month", "custom"] | None = None
+    shifts_default_branches: list[UUID] | None = Field(
+        default=None,
+        max_length=3,
+        description="Branches the shifts board opens with; empty means all of them",
+    )
+    shifts_publish_auto: bool | None = None
+    shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
+    shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
+    shifts_publish_day: int | None = Field(default=None, ge=1, le=28)
+    shifts_publish_time: dt.time | None = None
+    legal_entity_type: LegalEntityType | None = None
+    business_number: str | None = Field(
+        default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
+    )
+
+    @field_validator("business_number", mode="before")
+    @classmethod
+    def normalize_number(cls, value: object) -> object:
+        # People type it with spaces or dashes; an empty field clears it.
+        if isinstance(value, str):
+            value = value.replace(" ", "").strip()
+            return value or None
+        return value
 
     @field_validator("name")
     @classmethod
@@ -103,12 +170,51 @@ class Tenant(BaseModel):
     currency: str
     primary_color: str | None
     logo_url: str | None = Field(description="Public path of the logo on this API, if any")
+    cover_url: str | None = Field(
+        default=None, description="Path of the workspace cover image on this API (members only)"
+    )
+    legal_entity_type: LegalEntityType | None = Field(
+        default=None, description="Shown only to people who manage the business's settings"
+    )
+    business_number: str | None = Field(
+        default=None, description="Shown only to people who manage the business's settings"
+    )
     cancellation_window_minutes: int
     booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
     requires_health_declaration: bool = Field(
         description="Clients need a valid health declaration to book in the app"
     )
     online_sales: bool = Field(description="Clients can buy plans in the app")
+    resource_payment: Literal["app", "venue"] = Field(
+        default="app",
+        description="Reservations of courts and rooms: paid in the app or at the venue",
+    )
+    schedule_default_view: Literal["day", "week", "month"] = Field(
+        default="week", description="The range the schedule opens with"
+    )
+    schedule_default_branches: list[UUID] = Field(
+        default_factory=list,
+        description="Branches the schedule opens with side by side; empty: the menu's branch",
+    )
+    shifts_default_view: Literal["people", "branches"] = Field(
+        default="people", description="How the shifts board opens: a row per person or per branch"
+    )
+    shifts_default_range: Literal["day", "week", "month", "custom"] | None = Field(
+        default=None, description="The range the shifts board opens with; none: the planning rhythm"
+    )
+    shifts_default_branches: list[UUID] = Field(
+        default_factory=list,
+        description="Branches the shifts board opens with; empty: all of them",
+    )
+    shifts_publish_auto: bool = Field(
+        default=True, description="Publish the shifts roster on schedule"
+    )
+    shifts_publish_cadence: Literal["daily", "weekly", "monthly"] = "weekly"
+    shifts_publish_weekday: int = Field(default=6, description="Weekly: 0 = Monday, 6 = Sunday")
+    shifts_publish_day: int = Field(default=1, description="Monthly: day of the month, 1-28")
+    shifts_publish_time: dt.time = Field(
+        default=dt.time(8), description="Local time the roster goes out"
+    )
     join_code: str = Field(description="Code clients enter or scan to join this business")
     modules: list[str] = Field(description="Enabled modules (features depend on them)")
     permissions: list[str] = Field(description="The current user's effective permissions")

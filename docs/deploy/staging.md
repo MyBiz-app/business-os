@@ -2,11 +2,12 @@
 
 - Web: https://business-os-alpha-drab.vercel.app
 - API: https://business-os-api-staging.onrender.com (`/health`, `/docs`)
+- Expo apps on the web: https://mybiz-client-app.vercel.app, https://mybiz-business-app.vercel.app, https://mybiz-staff-app.vercel.app (published by hand with [`deploy-apps-web.yml`](../../.github/workflows/deploy-apps-web.yml); all three are in the API's `API_CORS_ORIGINS`)
 
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|
-| Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main` (previews for every PR) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json) |
-| Client app on the web (`apps/mobile`) | Vercel, static site | `main` | [`apps/mobile/vercel.json`](../../apps/mobile/vercel.json), [`apps/mobile/README.md`](../../apps/mobile/README.md) |
+| Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main`, through GitHub Actions (the Hobby plan can't deploy a private organization repository from Git, so there are no PR previews) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json), [`deploy-web.yml`](../../.github/workflows/deploy-web.yml) (needs the `VERCEL_TOKEN` secret in the `staging` environment) |
+| Client app on the web (`apps/client-app`) | Vercel, static site | `main` | [`apps/client-app/vercel.json`](../../apps/client-app/vercel.json), [`apps/client-app/README.md`](../../apps/client-app/README.md) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | — | Supabase dashboard |
 | Migrations | The API container on start (`alembic upgrade head` before uvicorn), and GitHub Actions | Every deploy; `main` (when migrations change) or by hand | [`Dockerfile`](../../apps/api/Dockerfile), [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
@@ -18,7 +19,8 @@ Supabase and Render have no Israel region today; Frankfurt is close to Israel an
 (GDPR; Israel and the EU recognize each other's data protection as adequate).
 
 The free Render plan sleeps after 15 minutes without traffic; the first request then takes
-up to about a minute.
+up to about a minute. During Israeli daytime [`keep-api-awake.yml`](../../.github/workflows/keep-api-awake.yml)
+pings it every 10 minutes so it stays awake.
 
 ## Secrets and settings (never committed)
 
@@ -26,6 +28,7 @@ up to about a minute.
 |---|---|---|
 | GitHub → Settings → Environments → `staging` | `STAGING_DATABASE_URL` | Supabase **Session pooler** connection string (port 5432), with the password filled in |
 | Render → service → Environment | `API_DATABASE_URL` | Same as above |
+| Render → service → Environment | `WEB_CONCURRENCY` (optional) | API worker processes, default 2. Keep workers × (`API_DB_POOL_SIZE` 5 + `API_DB_MAX_OVERFLOW` 10) under the database's connection limit |
 | Render → service → Environment | `API_JWKS_URL` | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` |
 | Vercel → project → Environment Variables | `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
 | Vercel | `NEXT_PUBLIC_SUPABASE_KEY` | Supabase **publishable** key |
@@ -52,6 +55,23 @@ only) and not the transaction pooler (port 6543).
    `API_JWKS_URL`. Check `https://<service>.onrender.com/health`.
 4. **Vercel**: *Add New → Project*, import this repository, Root Directory `apps/web`; add the
    environment variables above; deploy.
+
+## Health and rate limits
+
+- `GET /health`: the process is up (Render's health check). `GET /health/ready`: the database
+  answers too (503 when it doesn't); point uptime monitoring here.
+- Rate limits per visitor (`app/core/rate_limit.py`): 20 public form posts and 120 public reads a
+  minute (`/public/…`: join pages, quote links, inquiries, the contact form, file links), 600
+  webhook calls, and a ceiling of 1,200 calls a minute for everything; over a limit the API
+  answers 429 with `Retry-After`. On in every environment except local development
+  (`API_RATE_LIMITS=false` turns them off). Behind Render's proxy `API_TRUST_FORWARDED_FOR=true`
+  counts the right-most `X-Forwarded-For` address (the one Render appended, which a caller cannot
+  forge). The web app names its visitors in `X-Visitor-Address`, believed only together with
+  `X-Internal-Token` equal to `API_INTERNAL_TOKEN` (set the same value on Render and Vercel).
+- The API refuses to start when `API_ENVIRONMENT` is not one of local/test/staging/production, or
+  is local/test (the default) while the database is not on localhost.
+- Counts are kept per API process. With more than one instance, a shared store (Redis) plugs
+  in behind `LimiterStore` in the same file.
 
 ## Notes
 
@@ -97,7 +117,7 @@ python -m app.jobs send-emails` prints instead of sending.
 Supabase's built-in email only sends to the project's team members (a few per hour), so for
 anyone else a sign-up **fails and no account is created**. Set up real email once:
 
-1. **An SMTP sender.** Until there is a domain ([#48](https://github.com/adiredri/business-os/issues/48)),
+1. **An SMTP sender.** Until there is a domain ([#48](https://github.com/MyBiz-app/business-os/issues/48)),
    a Gmail account with an *App Password* works (Google Account → Security → 2-Step
    Verification on → App passwords). Production: a domain with Resend or Amazon SES.
 2. **Supabase → Authentication → Emails → SMTP Settings:** enable custom SMTP; host

@@ -2,6 +2,7 @@ import { BadgeCheck, Ticket, TicketPercent, TrendingUp, Users } from "lucide-rea
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { FormNotice } from "@/components/form/form-message";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
@@ -11,7 +12,8 @@ import { getTenantFor } from "@/lib/tenant";
 import { deletePromoCode, setPromoActive } from "./promo-actions";
 import { PromoForm } from "./promo-form";
 
-export default async function PlansPage() {
+export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
+  const { removed } = await searchParams;
   const t = await getTranslations();
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("catalog.read");
@@ -28,6 +30,7 @@ export default async function PlansPage() {
 
   return (
     <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+      {(removed === "deleted" || removed === "archived") && <FormNotice message={t(`plans.removed.${removed}`)} />}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("plans.title")}</h1>

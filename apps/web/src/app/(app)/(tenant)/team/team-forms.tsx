@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
+import { PermissionList } from "@/components/permission-list";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
@@ -70,6 +71,8 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
 
 type MemberRowProps = {
   userId: string;
+  allPermissions: string[];
+  permissions: string[];
   email: string;
   name: string | null;
   role: (typeof ROLES)[number];
@@ -80,9 +83,12 @@ type MemberRowProps = {
   /** The business's active branches (a picker appears when there are several). */
   branches: { id: string; name: string }[];
   memberBranches: string[];
+  homeBranch?: string | null;
+  avatar?: string | null;
+  title?: string | null;
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -97,19 +103,25 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
     <li className="flex flex-col gap-2 border-t border-border px-5 py-4 transition-colors first:border-t-0 hover:bg-primary/4">
       <TeamError state={roleState.error ? roleState : removeState} />
       <div className="flex flex-wrap items-center gap-3">
-        <Avatar id={userId} name={name ?? email} />
+        <Avatar id={userId} name={name ?? email} src={avatar} />
         {/* The name keeps its own line on phones; the actions wrap below it. */}
         <span className="flex min-w-48 flex-1 flex-col">
           <span className="truncate font-medium" dir="auto">
             {name ?? email} {isSelf && <span className="font-normal text-muted">{t("team.you")}</span>}
           </span>
+          {title && (
+            <span className="truncate text-sm" dir="auto">
+              {title}
+            </span>
+          )}
           {name && (
             <span className="truncate text-sm text-muted" dir="ltr">
               {email}
             </span>
           )}
         </span>
-        {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} />}
+        {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} home={homeBranch} />}
+        <MemberPermissions email={email} all={allPermissions} allowed={permissions} />
         <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
         </Link>
@@ -147,10 +159,10 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
   );
 }
 
-type MemberBranchesProps = { userId: string; email: string; branches: { id: string; name: string }[]; selected: string[] };
+type MemberBranchesProps = { userId: string; email: string; branches: { id: string; name: string }[]; selected: string[]; home: string | null };
 
 /** Where a member works: some branches, or (none checked) all of them. */
-function MemberBranches({ userId, email, branches, selected }: MemberBranchesProps) {
+function MemberBranches({ userId, email, branches, selected, home }: MemberBranchesProps) {
   const t = useTranslations("team");
   const [state, action] = useActionState<TeamState, FormData>(setBranches.bind(null, userId), {});
   const names = branches.filter((b) => selected.includes(b.id)).map((b) => b.name);
@@ -171,10 +183,41 @@ function MemberBranches({ userId, email, branches, selected }: MemberBranchesPro
             </label>
           ))}
         </fieldset>
+        <label className="flex flex-col gap-1 text-xs text-muted">
+          {t("homeBranch")}
+          <select name="home_location_id" defaultValue={home ?? ""} className="control px-2 py-1.5 text-sm text-foreground">
+            <option value="">{t("noHomeBranch")}</option>
+            {branches.map((branch) => (
+              <option key={branch.id} value={branch.id}>
+                {branch.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <button type="submit" className="btn-primary px-3 py-1.5 text-sm">
           {t("saveBranches")}
         </button>
       </form>
+    </details>
+  );
+}
+
+/** What a member can actually do, so an owner can check before (or after) changing their role. */
+function MemberPermissions({ email, all, allowed }: { email: string; all: string[]; allowed: string[] }) {
+  const t = useTranslations("team");
+  return (
+    <details className="group relative">
+      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">{t("viewPermissions")}</summary>
+      <div className="absolute end-0 top-full z-20 mt-1 flex w-72 max-w-[85vw] flex-col gap-3 rounded-2xl bg-surface p-4 shadow-xl ring-1 ring-border">
+        <p className="text-sm font-medium" dir="auto">
+          {t("permissionsOf", { email })}
+        </p>
+        <PermissionList all={all} allowed={allowed} />
+        <p className="text-xs text-muted">{t("permissionsHint")}</p>
+        <Link href="/team/roles" className="text-sm text-primary underline-offset-4 hover:underline">
+          {t("manageRoles")}
+        </Link>
+      </div>
     </details>
   );
 }

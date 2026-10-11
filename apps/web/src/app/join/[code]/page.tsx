@@ -46,7 +46,7 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
         >
           {t("openApp")}
         </a>
-        {/* The client app also runs in the browser (see apps/mobile/README.md). */}
+        {/* The client app also runs in the browser (see apps/client-app/README.md). */}
         {process.env.NEXT_PUBLIC_CLIENT_APP_URL && (
           <a
             href={`${process.env.NEXT_PUBLIC_CLIENT_APP_URL}/join?code=${encodeURIComponent(joinCode)}`}

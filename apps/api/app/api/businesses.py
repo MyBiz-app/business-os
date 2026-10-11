@@ -14,8 +14,8 @@ from app.api.deps import SessionDep, UserDep
 from app.api.routes import ensure_profile
 from app.api.schemas import Role
 from app.core.db import set_tenant
-from app.metrics import compute
-from app.permissions import effective_permissions
+from app.core.permissions import effective_permissions
+from app.reports.metrics import compute
 
 router = APIRouter(tags=["account"])
 

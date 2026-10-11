@@ -99,13 +99,35 @@ test("settings, starter content and client fields are valid", () => {
       }
       assert.match(service.color, /^#[0-9a-f]{6}$/, `${where}: color`);
       if (service.booking_mode === "class") assert.ok((service.capacity ?? 0) > 1, `${where}: class capacity`);
+      if (service.on_site) assert.equal(service.booking_mode, "appointment", `${where}: on-site is an appointment`);
+      const travel = service.travel_minutes ?? 0;
+      assert.ok(Number.isInteger(travel) && travel >= 0 && travel <= 240, `${where}: travel minutes`);
+      if (service.booking_mode === "resource") {
+        const { duration_minutes: min, max_minutes: max, step_minutes: step } = service;
+        assert.ok(max !== undefined && step !== undefined, `${where}: a resource needs max_minutes and step_minutes`);
+        assert.ok(max >= min && (max - min) % step === 0 && step >= 15, `${where}: resource lengths`);
+      }
+    }
+    for (const room of entry.default_rooms ?? []) {
+      for (const locale of LOCALES) assert.ok(room.names[locale]?.trim(), `${where}: room name ${locale}`);
+      assert.match(room.opens, /^\d\d:\d\d$/, `${where}: room opens`);
+      assert.match(room.closes, /^\d\d:\d\d$/, `${where}: room closes`);
+      assert.ok(room.closes > room.opens, `${where}: room hours`);
     }
     for (const plan of entry.default_plans ?? []) {
       for (const locale of LOCALES) assert.ok(plan.names[locale]?.trim(), `${where}: plan name ${locale}`);
       assert.ok(Number.isInteger(plan.prices.ILS) && plan.prices.ILS! > 0, `${where}: plan ILS price`);
       assert.ok(plan.kind === "membership" || (plan.credits ?? 0) > 0, `${where}: punch card credits`);
     }
-    for (const field of [...(entry.client_fields ?? []), ...(entry.extra_client_fields ?? [])]) {
+    if (entry.dependents !== undefined) {
+      assert.ok(entry.dependents === null || entry.dependents === "pet" || entry.dependents === "child", `${where}: dependents`);
+    }
+    if (entry.dependent_required) assert.ok(vertical(entry.key)!.dependents, `${where}: dependent_required without dependents`);
+    for (const field of [
+      ...(entry.client_fields ?? []),
+      ...(entry.extra_client_fields ?? []),
+      ...(entry.dependent_fields ?? []),
+    ]) {
       assert.match(field.key, /^[a-z][a-z0-9_]*$/, `${where}: field ${field.key}`);
       assert.ok(FIELD_KINDS.includes(field.kind), `${where}: ${field.key} kind`);
       assert.equal(field.kind === "select", (field.options?.length ?? 0) > 0, `${where}: ${field.key} options`);
@@ -125,7 +147,13 @@ test("a sub-category inherits from its parent and overrides only what it sets", 
   assert.equal(termsOf("no-such-industry"), "fitness");
   assert.deepEqual(categories().map((c) => c.key).slice(0, 5), ["fitness", "beauty", "clinic", "classes", "automotive"]);
   assert.ok(childrenOf("beauty").some((c) => c.key === "barbershop"));
-  assert.ok(isOpen("garage") && !isOpen("pets") && !isOpen("nope"));
+  assert.ok(isOpen("garage") && isOpen("pets") && !isOpen("nope"));
+  const grooming = vertical("pet_grooming")!;
+  assert.equal(grooming.dependents, "pet");
+  assert.equal(grooming.dependentRequired, true);
+  assert.ok(grooming.dependentFields.some((f) => f.key === "species"));
+  assert.equal(vertical("kids_activities")!.dependents, "child");
+  assert.equal(vertical("pilates")!.dependents, null);
 });
 
 test("every entry has its texts in every language, with categories complete", () => {
@@ -142,7 +170,7 @@ test("every entry has its texts in every language, with categories complete", ()
       }
       if (v.status !== "planned") {
         assert.ok(lookup(locale, `terms.${v.terms}.clients`), `${locale}: terms.${v.terms}`);
-        for (const field of v.clientFields) {
+        for (const field of [...v.clientFields, ...v.dependentFields]) {
           assert.ok(lookup(locale, `clientFields.${field.key}`), `${locale}: clientFields.${field.key}`);
           for (const option of field.options ?? []) {
             assert.ok(lookup(locale, `clientFields.${field.key}_options.${option}`), `${locale}: ${field.key} option ${option}`);
@@ -167,4 +195,12 @@ test("a sub-category's text falls back to its category", () => {
   const he = has("he");
   assert.equal(textKey("pilates", "heroTitle", he), "verticals.fitness.heroTitle");
   assert.equal(textKey("pilates", "name", he), "verticals.pilates.name");
+});
+
+test("an industry by the hour starts with courts its services are booked in", () => {
+  for (const v of ALL_VERTICALS.filter((entry) => entry.status !== "planned")) {
+    const resources = v.defaultServices.filter((service) => service.booking_mode === "resource");
+    if (resources.length > 0) assert.ok(v.defaultRooms.length > 0, `${v.key}: resource services need default_rooms`);
+    if (resources.length > 0) assert.ok(v.bookingModes.includes("resource"), `${v.key}: booking_modes`);
+  }
 });

@@ -4,6 +4,8 @@ Every transaction runs as the `app_api` role, with the current user and tenant s
 transaction-local settings that row-level security reads. The context is re-applied at the
 start of each transaction, so a commit can never leave a session running unrestricted."""
 
+import logging
+import time
 from collections.abc import Iterator
 from functools import lru_cache
 from typing import Annotated
@@ -14,6 +16,7 @@ from sqlalchemy import Connection, Engine, create_engine, event, text
 from sqlalchemy.orm import Session, SessionTransaction
 
 from app.core.config import get_settings
+from app.core.logging import log
 
 USER_KEY = "app.user_id"
 TENANT_KEY = "app.tenant_id"
@@ -21,7 +24,42 @@ TENANT_KEY = "app.tenant_id"
 
 @lru_cache
 def get_engine() -> Engine:
-    return create_engine(get_settings().database_url, pool_pre_ping=True)
+    settings = get_settings()
+    engine = create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
+        pool_timeout=settings.db_pool_timeout,
+        pool_recycle=settings.db_pool_recycle,
+        connect_args={} if settings.db_prepared_statements else {"prepare_threshold": None},
+    )
+    log_slow_queries(engine, settings.slow_query_ms)
+    return engine
+
+
+def log_slow_queries(engine: Engine, threshold_ms: int) -> None:
+    """Log statements slower than the threshold: the statement text only, never its parameters
+    (they hold personal data)."""
+    if threshold_ms <= 0:
+        return
+
+    @event.listens_for(engine, "before_cursor_execute")
+    def _start(conn, _cursor, _statement, _parameters, _context, _executemany) -> None:
+        conn.info["query_started"] = time.perf_counter()
+
+    @event.listens_for(engine, "after_cursor_execute")
+    def _finish(conn, _cursor, statement, _parameters, _context, _executemany) -> None:
+        elapsed_ms = (
+            time.perf_counter() - conn.info.pop("query_started", time.perf_counter())
+        ) * 1000
+        if elapsed_ms >= threshold_ms:
+            log(
+                logging.WARNING,
+                "slow query",
+                duration_ms=round(elapsed_ms, 1),
+                statement=" ".join(statement.split())[:300],
+            )
 
 
 def _apply_context(connection: Connection, user_id: str, tenant_id: str) -> None:

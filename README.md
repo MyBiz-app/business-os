@@ -15,6 +15,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 
 ## Status and documents
 
+- **Start here:** [`docs/README.md`](docs/README.md) ([עברית](docs/README.he.md)) — where every document is, how the system is built, and the outside services today and at go-live.
 - **Product spec (v3):** [English](docs/spec/v3/spec.en.md) · [עברית](docs/spec/v3/spec.he.md) ·
   Word: [`docs/spec/MyBiz-Spec-en.docx`](docs/spec/MyBiz-Spec-en.docx),
   [`docs/spec/MyBiz-Spec-he.docx`](docs/spec/MyBiz-Spec-he.docx)
@@ -22,9 +23,9 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 - **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) — every product and technical decision.
 - **Status:** [`docs/STATUS.md`](docs/STATUS.md) ([Hebrew](docs/STATUS.he.md)) — what is done, in progress and next; open work in GitHub issues.
 - **Detailed v2 chapters:** [`docs/spec/v2/`](docs/spec/v2/README.md) (architecture, data model, AI).
-- **Where we are:** the foundation is built (see the spec's roadmap). Now, one phase at a time:
-  1 marketing website and sign-up journey → 2 business web app → 3 MyBiz console → 4 apps →
-  go-live (real payments, invoicing, email, WhatsApp, AI key).
+- **Where we are:** phases 1–3 and 5–7 are done and every category in the catalog is open; the
+  apps (phase 4) are in their last round; go-live (real payments, invoicing, email, WhatsApp,
+  AI key) comes when the owner picks providers. See the status board.
 - Paid services run in clearly labeled demo / simulated modes until go-live.
 
 ## Repository layout
@@ -33,7 +34,7 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 |---|---|
 | `apps/web` | Business web app: Next.js, Tailwind, next-intl (he / en), light / dark |
 | `apps/api` | Backend API: Python 3.13, FastAPI, managed with uv |
-| `apps/mobile` | Client app: Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
+| `apps/client-app` | Client app: Expo (SDK 57) + Expo Router, shared translations, light / dark, RTL |
 | `apps/business-app` | Business app for owners and staff on the go (Expo) |
 | `apps/staff-app` | MyBiz team app (Expo) |
 | `packages/i18n` | Shared translations (he / en) and locale helpers for the web and the apps |
@@ -62,7 +63,7 @@ pnpm dev                            # starts API (port 8000) and web (port 3000)
 | http://127.0.0.1:54323 | Supabase Studio (browse the database) |
 | http://127.0.0.1:54324 | Test mailbox (sign-up and password-reset emails) |
 
-The apps run separately: `pnpm --filter mobile exec expo start --web` (clients, port 8081),
+The apps run separately: `pnpm --filter client-app exec expo start --web` (clients, port 8081),
 `pnpm --filter business-app exec expo start --web --port 8082` (the business),
 `pnpm --filter staff-app exec expo start --web --port 8083` (the MyBiz team).
 
@@ -91,7 +92,7 @@ pnpm dev:app
 Mobile (in a second terminal), with the phone on the same Wi-Fi as the computer:
 
 ```bash
-pnpm dev:mobile                     # scan the QR code with the iPhone camera → opens in Expo Go
+pnpm dev:client-app                  # scan the QR code with the iPhone camera → opens in Expo Go
 ```
 
 ## Troubleshooting

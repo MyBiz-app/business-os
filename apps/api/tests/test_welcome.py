@@ -2,7 +2,7 @@ from datetime import date
 
 from fastapi.testclient import TestClient
 
-from app.welcome import WelcomeDetails, build_welcome
+from app.catalog.welcome import WelcomeDetails, build_welcome
 
 
 def details(**overrides: object) -> WelcomeDetails:

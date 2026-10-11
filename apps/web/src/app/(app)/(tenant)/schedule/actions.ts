@@ -138,13 +138,13 @@ function refreshSession(sessionId: string) {
   revalidatePath(`/schedule/${sessionId}`);
 }
 
-export async function bookClient(sessionId: string, clientId: string): Promise<void> {
+export async function bookClient(sessionId: string, clientId: string, dependentId: string | undefined): Promise<void> {
   const { api, scope } = await getTenant();
   try {
     unwrap(
       await api.POST("/sessions/{session_id}/bookings", {
         params: { ...scope, path: { session_id: sessionId } },
-        body: { client_id: clientId },
+        body: { client_id: clientId, dependent_id: dependentId ?? null },
       }),
     );
   } catch (error) {
@@ -204,4 +204,51 @@ export async function copyWeek(weekStart: string, _state: CopyWeekState, _formDa
   } catch {
     return { error: "generic" };
   }
+}
+
+/** Records that a reservation was paid at the venue (cash, card at the desk…); issues a receipt. */
+export async function recordVenuePayment(sessionId: string, bookingId: string, formData: FormData): Promise<void> {
+  const { api, scope } = await getTenant();
+  const method = String(formData.get("method") ?? "cash");
+  unwrap(
+    await api.POST("/resources/reservations/{booking_id}/payment", {
+      params: { ...scope, path: { booking_id: bookingId } },
+      body: { method: (["card", "cash", "transfer", "other"].includes(method) ? method : "cash") as "card" | "cash" | "transfer" | "other" },
+    }),
+  );
+  revalidatePath(`/schedule/${sessionId}`);
+}
+
+/** Moves an on-site job one step (#42): on the way, in progress, done. */
+export async function setJobStatus(
+  sessionId: string,
+  status: "scheduled" | "on_the_way" | "in_progress" | "done",
+): Promise<void> {
+  const { api, scope } = await getTenant();
+  unwrap(
+    await api.POST("/jobs/{session_id}/status", {
+      params: { ...scope, path: { session_id: sessionId } },
+      body: { status },
+    }),
+  );
+  refreshSession(sessionId);
+}
+
+export type DefaultViewState = { saved?: boolean; error?: boolean };
+
+/** The owner's choice of how the schedule opens: the range and the branches side by side. */
+export async function saveScheduleDefault(
+  view: "day" | "week" | "month",
+  branches: string[],
+  _state: DefaultViewState,
+  _formData: FormData,
+): Promise<DefaultViewState> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(await api.PATCH("/tenants/current", { params: scope, body: { schedule_default_view: view, schedule_default_branches: branches } }));
+  } catch {
+    return { error: true };
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
 }

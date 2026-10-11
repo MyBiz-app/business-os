@@ -52,6 +52,35 @@
       "clientApp": "אפליקציית הלקוחות",
       "help": "יש שאלה? פשוט עונים למייל הזה או כותבים לנו בעמוד צור קשר: {contact}",
       "signature": "בהצלחה,\nצוות MyBiz"
+    },
+    "leadFollowUp": {
+      "withInterest": "היי {name}, כאן {business}. התעניינת אצלנו ב{interest}: רוצה לקבוע זמן? אפשר פשוט להשיב להודעה הזו ונחזור אליך.",
+      "plain": "היי {name}, כאן {business}. נשמח לעזור: רוצה לקבוע זמן? אפשר פשוט להשיב להודעה הזו ונחזור אליך."
+    },
+    "roster": {
+      "subject": "המשמרות החדשות שלך ב{business}",
+      "intro": "סידור העבודה שלך ב{business} פורסם. המשמרות שלך:",
+      "line": "{day} {from}–{to} · {branch}{position}",
+      "more": "…ועוד {count}. את כולן אפשר לראות באפליקציה.",
+      "weekdays": [
+        "ב׳",
+        "ג׳",
+        "ד׳",
+        "ה׳",
+        "ו׳",
+        "ש׳",
+        "א׳"
+      ],
+      "footer": "אפשר לכבות את המיילים האלה בהגדרות האישיות."
+    },
+    "rosterChanges": {
+      "subject": "סידור העבודה שלך ב{business} השתנה",
+      "intro": "שינויים במשמרות שלך ב{business}:",
+      "removed": "הוסרה:",
+      "changed": "השתנתה:",
+      "arrow": "עכשיו",
+      "more": "…ועוד {count} שינויים. את הסידור אפשר לראות באפליקציה.",
+      "footer": "אפשר לכבות את המיילים האלה בהגדרות האישיות."
     }
   },
   "modules": {
@@ -65,7 +94,18 @@
       "agent_finance": "סוכן כספים",
       "agent_marketing": "סוכן שיווק",
       "whatsapp": "וואטסאפ",
-      "extra_location": "סניפים נוספים"
+      "extra_location": "סניפים נוספים",
+      "client_app_branded": "אפליקציה ממותגת בחנויות",
+      "crm_automation": "לידים על טייס אוטומטי",
+      "whatsapp_ai": "עוזר AI בוואטסאפ",
+      "pack_plus": "חבילת Plus (מקום והודעות)",
+      "pack_max": "חבילת Max (מקום והודעות)",
+      "support_priority": "תמיכה בעדיפות",
+      "support_vip": "תמיכת VIP",
+      "setup_guided": "הקמה מלווה",
+      "setup_full": "הקמה מלאה בשבילך",
+      "noSupport": "תמיכה רגילה",
+      "noPack": "הכמות הכלולה"
     }
   },
   "locations": {
@@ -76,6 +116,12 @@
     "businessName": "{industry} לדוגמה",
     "branch": "סניף ראשי",
     "address": "רחוב הדוגמה 1, תל אביב"
+  },
+  "bills": {
+    "title": "חשבון {month}",
+    "retainer": "ריטיינר {month}",
+    "hours": "שעות עבודה {month}",
+    "hoursBeyond": "שעות עבודה {month} מעבר לריטיינר"
   },
   "verticals": {
     "fitness": {
@@ -182,6 +228,84 @@
     },
     "tires": {
       "name": "פנצ'ריה וצמיגים"
+    },
+    "padel_tennis": {
+      "name": "מועדון פאדל וטניס"
+    },
+    "football_pitches": {
+      "name": "מגרשי כדורגל"
+    },
+    "rehearsal_studios": {
+      "name": "חדרי חזרות"
+    },
+    "meeting_rooms": {
+      "name": "חדרי ישיבות וחללי עבודה"
+    },
+    "pet_grooming": {
+      "name": "מספרת כלבים וחתולים"
+    },
+    "dog_training": {
+      "name": "אילוף כלבים"
+    },
+    "pet_daycare": {
+      "name": "גן כלבים"
+    },
+    "cleaning": {
+      "name": "שירותי ניקיון"
+    },
+    "ac_technicians": {
+      "name": "מיזוג אוויר"
+    },
+    "electricians": {
+      "name": "חשמלאים"
+    },
+    "plumbers": {
+      "name": "אינסטלטורים"
+    },
+    "pest_control": {
+      "name": "הדברה"
+    },
+    "photographers": {
+      "name": "צלמים וסטודיו"
+    },
+    "djs": {
+      "name": "תקליטנים ונגנים"
+    },
+    "event_suppliers": {
+      "name": "ספקי אירועים"
+    },
+    "small_venues": {
+      "name": "מקומות אירוח קטנים"
+    },
+    "consultants": {
+      "name": "יועצים"
+    },
+    "accountants": {
+      "name": "רואי חשבון ומנהלי חשבונות"
+    },
+    "lawyers": {
+      "name": "עורכי דין"
+    },
+    "agencies": {
+      "name": "סוכנויות"
+    },
+    "food": {
+      "name": "מסעדות ואוכל"
+    },
+    "pizzeria": {
+      "name": "פיצריות"
+    },
+    "cafe": {
+      "name": "בתי קפה"
+    },
+    "restaurant": {
+      "name": "מסעדות"
+    },
+    "bakery": {
+      "name": "מאפיות"
+    },
+    "catering": {
+      "name": "קייטרינג"
     }
   }
 }

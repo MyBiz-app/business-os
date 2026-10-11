@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser, get_current_user
 from app.core.db import EngineDep, open_session, session_scope, set_tenant
-from app.permissions import Permission, effective_permissions
+from app.core.permissions import Permission, effective_permissions
 
 UserDep = Annotated[CurrentUser, Depends(get_current_user)]
 
@@ -38,6 +38,32 @@ class TenantContext:
     role: str
     # Effective permissions: the custom role's switches, or the system role's bundle.
     permissions: frozenset[str] = frozenset()
+    # The branches this person may work in; None means every branch (#64).
+    branches: frozenset[UUID] | None = None
+
+
+def ensure_branch_visible(context: TenantContext, location_id: UUID | None) -> None:
+    """Reading or changing something by id: a member kept to some branches gets "not found" for
+    anything filed under another one. A row with no branch belongs to everyone."""
+    if (
+        context.branches is not None
+        and location_id is not None
+        and location_id not in context.branches
+    ):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+
+
+def ensure_branch_allowed(context: TenantContext, location_id: UUID | None) -> None:
+    """A branch named in a request body: a member kept to some branches can't file anything
+    under another one."""
+    if (
+        context.branches is not None
+        and location_id is not None
+        and location_id not in context.branches
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_branch"
+        )
 
 
 def _audit_platform_visit(session: Session, tenant_id: UUID, action: str, request: Request) -> None:
@@ -95,9 +121,26 @@ def _platform_context(session: Session, tenant_id: UUID, request: Request) -> Te
     )
 
 
-def set_branch(session: Session, location_id: UUID | None) -> None:
+# Roles that always work across every branch; others with branches assigned are kept to them.
+ALL_BRANCH_ROLES = frozenset({"owner", "manager"})
+
+
+def set_branch(
+    session: Session, location_id: UUID | None, allowed: frozenset[UUID] | None = None
+) -> None:
     """The branch this request works in: lists and numbers follow it (app.in_branch) and new
-    sessions, sales and clients are filed under it. It must be one of the business's branches."""
+    sessions, sales and clients are filed under it. It must be one of the business's branches.
+    A member kept to some branches (`allowed`) works only in those: no branch, or one outside
+    them, means all of their branches."""
+    if allowed is not None and location_id not in allowed:
+        if len(allowed) == 1:
+            location_id = next(iter(allowed))
+        else:
+            session.execute(
+                text("SELECT set_config('app.location_ids', :ids, true)"),
+                {"ids": "{" + ",".join(sorted(str(b) for b in allowed)) + "}"},
+            )
+            return
     if location_id is None:
         return
     known = session.execute(
@@ -126,7 +169,7 @@ def get_tenant_context(
     set_tenant(session, tenant_id)
     member = session.execute(
         text("""
-            SELECT m.role, r.permissions AS custom_permissions
+            SELECT m.role, r.permissions AS custom_permissions, m.location_ids
             FROM app.tenant_members m
             LEFT JOIN app.tenant_roles r ON r.id = m.custom_role_id
             WHERE m.tenant_id = app.current_tenant_id() AND m.user_id = app.current_user_id()
@@ -142,12 +185,18 @@ def get_tenant_context(
             set_branch(session, branch_id)
             return context
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
-    set_branch(session, branch_id)
+    allowed = (
+        frozenset(member.location_ids)
+        if member.location_ids and member.role not in ALL_BRANCH_ROLES
+        else None
+    )
+    set_branch(session, branch_id, allowed)
     return TenantContext(
         session=session,
         tenant_id=tenant_id,
         role=member.role,
         permissions=effective_permissions(member.role, member.custom_permissions),
+        branches=allowed,
     )
 
 

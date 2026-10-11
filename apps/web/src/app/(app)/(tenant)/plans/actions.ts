@@ -53,3 +53,10 @@ export async function updatePlan(planId: string, _state: FormState, formData: Fo
   revalidatePath("/plans");
   return { saved: true };
 }
+
+export async function deletePlan(planId: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  const { result } = unwrap(await api.DELETE("/plans/{plan_id}", { params: { ...scope, path: { plan_id: planId } } }));
+  revalidatePath("/plans");
+  redirect(`/plans?removed=${result}`);
+}

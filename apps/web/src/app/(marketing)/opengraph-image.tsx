@@ -1,4 +1,6 @@
-import messages from "@business-os/i18n/messages/he.json";
+import { markSvg } from "@business-os/brand";
+import { messages as all } from "@business-os/i18n";
+import { BRAND } from "@business-os/i18n/brand";
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -8,14 +10,16 @@ import { visualRtl } from "@/lib/visual-rtl";
 // Israel first: the shared picture speaks Hebrew, with the site's own font (Heebo, OFL, in
 // ./fonts with its license) and the same words as the home page. The renderer draws left to
 // right only, so each Hebrew line is passed in visual order.
+const messages = all.he;
 const hero = messages.marketing.hero;
+const mark = `data:image/svg+xml;base64,${Buffer.from(markSvg()).toString("base64")}`;
 const FONTS = join(process.cwd(), "src/app/(marketing)/fonts");
 const [medium, extraBold] = await Promise.all([
   readFile(join(FONTS, "Heebo-Medium.ttf")),
   readFile(join(FONTS, "Heebo-ExtraBold.ttf")),
 ]);
 
-export const alt = `MyBiz – ${messages.app.tagline}`;
+export const alt = `${BRAND.name} – ${messages.app.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -38,10 +42,8 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 44, fontWeight: 800 }}>
-          MyBiz
-          <div style={{ width: 72, height: 72, borderRadius: 20, background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            M
-          </div>
+          {BRAND.name}
+          <img src={mark} width={72} height={72} alt="" />
         </div>
         <div style={{ marginTop: 48, fontSize: 80, fontWeight: 800, lineHeight: 1.1 }}>{visualRtl(hero.title)}</div>
         <div style={{ fontSize: 80, fontWeight: 800, lineHeight: 1.1, opacity: 0.85 }}>{visualRtl(hero.titleAccent)}</div>

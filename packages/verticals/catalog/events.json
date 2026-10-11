@@ -1,7 +1,233 @@
 {
   "key": "events",
   "order": 9,
-  "status": "planned",
+  "status": "beta",
   "icon": "camera",
-  "color": "from-fuchsia-500 to-purple-600"
+  "color": "from-fuchsia-500 to-purple-600",
+  "terms": "events",
+  "client_term": "client",
+  "booking_modes": [
+    "appointment"
+  ],
+  "cancellation_window_minutes": 2880,
+  "booking_requires_plan": false,
+  "default_preset": "growing",
+  "recommended_modules": [
+    "client_app",
+    "whatsapp",
+    "crm"
+  ],
+  "client_fields": [
+    {
+      "key": "event_type",
+      "kind": "select",
+      "options": [
+        "wedding",
+        "bar_mitzvah",
+        "birthday",
+        "corporate",
+        "other"
+      ]
+    },
+    {
+      "key": "preferences",
+      "kind": "text"
+    }
+  ],
+  "default_services": [
+    {
+      "names": {
+        "he": "פגישת תכנון",
+        "en": "Planning meeting"
+      },
+      "duration_minutes": 60,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 10000
+      },
+      "color": "#a21caf"
+    }
+  ],
+  "children": [
+    {
+      "key": "photographers",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת היכרות",
+            "en": "Intro meeting"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 5000
+          },
+          "color": "#c026d3"
+        },
+        {
+          "names": {
+            "he": "צילומי סטודיו",
+            "en": "Studio session"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 60000
+          },
+          "color": "#7c3aed"
+        },
+        {
+          "names": {
+            "he": "צילומי אירוע",
+            "en": "Event coverage"
+          },
+          "duration_minutes": 240,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 180000
+          },
+          "color": "#a21caf"
+        },
+        {
+          "names": {
+            "he": "צילומי משפחה בחוץ",
+            "en": "Outdoor family shoot"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 90000
+          },
+          "color": "#c026d3"
+        }
+      ]
+    },
+    {
+      "key": "djs",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת תכנון מוזיקה",
+            "en": "Music planning meeting"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#db2777"
+        },
+        {
+          "names": {
+            "he": "הופעה באירוע פרטי",
+            "en": "Private event set"
+          },
+          "duration_minutes": 300,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 250000
+          },
+          "color": "#be185d"
+        },
+        {
+          "names": {
+            "he": "בדיקת סאונד במקום",
+            "en": "On-site sound check"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 15000
+          },
+          "color": "#f472b6"
+        }
+      ]
+    },
+    {
+      "key": "event_suppliers",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת תכנון",
+            "en": "Planning meeting"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#9333ea"
+        },
+        {
+          "names": {
+            "he": "סיור הצעת מחיר באתר האירוע",
+            "en": "Site visit and quote"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 10000
+          },
+          "color": "#7e22ce"
+        },
+        {
+          "names": {
+            "he": "הקמה ופירוק לאירוע",
+            "en": "Event set-up and take-down"
+          },
+          "duration_minutes": 240,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 150000
+          },
+          "color": "#a855f7"
+        }
+      ]
+    },
+    {
+      "key": "small_venues",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "סיור במקום",
+            "en": "Venue tour"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 5000
+          },
+          "color": "#6d28d9"
+        },
+        {
+          "names": {
+            "he": "הזמנת המקום לאירוע פרטי",
+            "en": "Private venue hire"
+          },
+          "duration_minutes": 240,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 300000
+          },
+          "color": "#5b21b6"
+        },
+        {
+          "names": {
+            "he": "טעימות ותכנון תפריט",
+            "en": "Tasting and menu planning"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#8b5cf6"
+        }
+      ]
+    }
+  ]
 }

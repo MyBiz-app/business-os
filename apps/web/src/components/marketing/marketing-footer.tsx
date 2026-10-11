@@ -1,8 +1,8 @@
 import { categories } from "@business-os/verticals";
-import { Sparkles } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { BrandMark } from "@/components/brand-mark";
 import { industryTexts } from "@/lib/verticals";
 
 export async function MarketingFooter() {
@@ -47,12 +47,10 @@ export async function MarketingFooter() {
   ];
   return (
     <footer className="border-t border-border bg-surface/60">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-12 md:grid-cols-[1.5fr_repeat(4,1fr)]">
-        <div className="flex flex-col gap-3">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-6 py-12 md:grid-cols-[1.5fr_repeat(4,1fr)] md:gap-10">
+        <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <span className="flex items-center gap-2 text-lg font-bold">
-            <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-brand-from to-brand-to text-white">
-              <Sparkles className="size-4" />
-            </span>
+            <BrandMark className="size-8" />
             {tApp("name")}
           </span>
           <p className="max-w-xs text-sm text-muted">{t("footer.tagline")}</p>

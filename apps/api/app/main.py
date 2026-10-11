@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Request
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from sqlalchemy import Engine, text
 
 from app.api import (
     appointments,
@@ -14,30 +18,47 @@ from app.api import (
     client_import,
     client_notes,
     clients,
+    dependents,
+    documents,
+    integrations,
     leads,
     locations,
     marketing,
     messaging,
     modules,
     notifications,
+    onsite_jobs,
+    people,
     plans,
     platform,
     privacy,
     promo_codes,
+    push_tokens,
+    quotes,
     receipts,
     reports,
+    resources,
     reviews,
     samples,
     schedule,
     services,
+    shift_planning,
+    shifts,
     staff,
+    stations,
     support,
+    time_billing,
+    time_off_requests,
+    webhooks,
     welcome,
 )
 from app.api import health as health_declarations
 from app.api import settings as business_settings
 from app.api.routes import router
 from app.core.config import get_settings
+from app.core.db import get_engine
+from app.core.logging import configure_logging, request_logging
+from app.core.rate_limit import MemoryStore, limiter
 
 
 class HealthResponse(BaseModel):
@@ -45,8 +66,14 @@ class HealthResponse(BaseModel):
     environment: str
 
 
+class ReadyResponse(BaseModel):
+    status: str
+    database: str
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
+    configure_logging()
     app = FastAPI(
         title="Business OS API",
         version="0.1.0",
@@ -63,23 +90,63 @@ def create_app() -> FastAPI:
         response.headers.setdefault("Referrer-Policy", "no-referrer")
         return response
 
+    if settings.rate_limits_on:
+        token = settings.internal_token.get_secret_value() if settings.internal_token else None
+        app.middleware("http")(
+            limiter(
+                MemoryStore(),
+                trust_forwarded=settings.trust_forwarded_for,
+                internal_token=token,
+            )
+        )
+
+    # Registered after the limiter (so 429s are logged) and before CORS (so a logged crash
+    # still gets CORS headers); later registrations wrap earlier ones.
+    app.middleware("http")(request_logging)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
-        expose_headers=["Cache-Control"],
-        allow_headers=["Authorization", "Content-Type", "X-Tenant-Id"],
+        expose_headers=["Cache-Control", "X-Request-ID"],
+        allow_headers=["Authorization", "Content-Type", "X-Tenant-Id", "X-Request-ID"],
     )
 
     @app.get("/health", tags=["system"])
     def health() -> HealthResponse:
         return HealthResponse(status="ok", environment=settings.environment)
 
+    @app.get("/health/ready", tags=["system"], responses={503: {"model": ReadyResponse}})
+    def ready(engine: Annotated[Engine, Depends(get_engine)]) -> ReadyResponse:
+        """Ready to serve: the database answers. Monitoring polls this; /health only says the
+        process is up."""
+        try:
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+        except Exception:
+            return JSONResponse(  # type: ignore[return-value]
+                ReadyResponse(status="unavailable", database="unreachable").model_dump(),
+                status_code=503,
+            )
+        return ReadyResponse(status="ok", database="ok")
+
     app.include_router(router)
     app.include_router(businesses.router)
     app.include_router(client_import.router)
     app.include_router(clients.router)
+    app.include_router(dependents.router)
+    app.include_router(dependents.client_router)
+    app.include_router(onsite_jobs.router)
+    app.include_router(onsite_jobs.client_router)
+    app.include_router(webhooks.router)
+    app.include_router(quotes.router)
+    app.include_router(quotes.public_router)
+    app.include_router(quotes.client_router)
+    app.include_router(documents.router)
+    app.include_router(documents.client_router)
+    app.include_router(documents.public_router)
+    app.include_router(time_billing.router)
+    app.include_router(integrations.router)
     app.include_router(client_notes.router)
     app.include_router(privacy.router)
     app.include_router(leads.router)
@@ -88,10 +155,18 @@ def create_app() -> FastAPI:
     app.include_router(services.router)
     app.include_router(locations.router)
     app.include_router(staff.router)
+    app.include_router(people.router)
+    app.include_router(push_tokens.router)
+    app.include_router(shifts.router)
+    app.include_router(time_off_requests.router)
+    app.include_router(shift_planning.router)
+    app.include_router(stations.router)
     app.include_router(schedule.router)
     app.include_router(bookings.router)
     app.include_router(appointments.router)
     app.include_router(appointments.client_router)
+    app.include_router(resources.router)
+    app.include_router(resources.client_router)
     app.include_router(plans.router)
     app.include_router(promo_codes.router)
     app.include_router(reports.router)

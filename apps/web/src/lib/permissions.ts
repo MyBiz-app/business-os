@@ -8,6 +8,8 @@ const has = (tenant: Access, permission: string) => tenant.permissions.includes(
 
 export const canWriteClients = (tenant: Access) => has(tenant, "clients.write");
 export const canWriteCatalog = (tenant: Access) => has(tenant, "catalog.write");
+/** Removing services, memberships and punch cards (owners and managers). */
+export const canDeleteCatalog = (tenant: Access) => has(tenant, "catalog.delete");
 export const canWriteSchedule = (tenant: Access) => has(tenant, "schedule.write");
 export const canManageBookings = (tenant: Access) => has(tenant, "bookings.manage");
 export const canSell = (tenant: Access) => has(tenant, "sales.manage");

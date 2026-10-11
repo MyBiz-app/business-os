@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
@@ -9,7 +10,7 @@ import { getPlatform } from "@/lib/platform";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.audit");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** What the MyBiz team did (owners only). */

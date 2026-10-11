@@ -81,6 +81,7 @@ Chosen because the current core already serves them fully (schedule, appointment
 | Clinics & Health | physiotherapy and rehabilitation, dental clinic, nutrition, aesthetic clinic, therapy and coaching | patients | appointments, treatment series | ID number, health fund, referred by, allergies |
 | Classes & Lessons | dance, martial arts, music lessons, private tutoring, kids' activities | students | weekly classes and private lessons; term and monthly plans | level, parent's contact (for children) |
 | Automotive | garage, detailing and car wash, tires | customers | appointments | plate, make, model, year, mileage, next inspection |
+| Sports & facilities (beta) | padel and tennis clubs, football pitches, rehearsal studios, meeting rooms and coworking | players | courts and rooms by the hour (paid in the app or at the venue) | level, preferences; instrument (studios); company (meeting rooms) |
 
 Several industries in the original list live inside these as sub-categories: wellness and spa (Beauty & Spa); rehabilitation, nutrition, therapy and coaching (Clinics & Health); education, dance, music and kids' activities (Classes & Lessons).
 
@@ -106,12 +107,11 @@ These need one new capability in the core first. Each capability is built once f
 
 | Category | Examples | New capability it needs |
 |---|---|---|
-| Sports & facility booking | football, tennis and padel academies; courts, rehearsal and studio rooms, meeting rooms by the hour | Resources: booking a court, room or space by the hour, alongside or without a staff member |
-| Home & field services | cleaning, air conditioning, electricians, plumbers, pest control | On-site jobs: the client's address, travel time, assigning a technician, quotes |
-| Pet services | dog grooming, training, boarding, dog day care | Dependents: several profiles under one client (pets; also children for Kids & Youth) |
+| Home & field services | cleaning, air conditioning, electricians, plumbers, pest control | On-site jobs: the client's address, travel time, assigning a technician, quotes. **Built (#42): Home & field services is open as beta**; quotes built in #44 |
+| Pet services | dog grooming, training, boarding, dog day care | Dependents: several profiles under one client (pets; also children for Kids & Youth). **Built (#43): Pet services is open as beta** (grooming, training, day care); Kids & Youth keeps a profile per child |
 | Kids & Youth (full) | enrichment centers, camps, toddler gyms | Dependents and parent accounts |
-| Creative & events | photographers and studios, DJs, event suppliers, small venues | Quotes, deposits and event projects |
-| Professional services | consultants, accountants, lawyers, agencies | Documents and retainers, time-based billing |
+| Creative & events | photographers and studios, DJs, event suppliers, small venues | Quotes, deposits and event projects. **Built (#44): Creative & events is open as beta** |
+| Professional services | consultants, accountants, lawyers, agencies | Documents and retainers, time-based billing. **Built (#45): Professional services is open as beta** |
 
 Until a category opens, interested businesses can leave their details through the contact form, which records the industry.
 
@@ -189,8 +189,8 @@ Built in phase 3:
 ## 9. Apps
 
 - Client app (built, Expo; also runs in the browser): join, home, schedule and appointments, bookings and plans, buying with promo codes, receipts, ratings, updates, profile, health declaration.
-- Business app (built in phase 4): the owner's and staff's day on the go. Today — the day's sessions with check-in of every booked client; Clients — search and a client card with plan, visits and contact; Numbers — the key figures of the last 30 days; Me — profile, language, theme and switching between businesses. Each person sees only what their permissions allow.
-- MyBiz staff app (built in phase 4): Home — what needs attention (open requests, new businesses); Businesses — search and a business card; Inbox — handle requests (take, status, notes); Me. Each staff member sees only what their level and permissions allow.
+- Business app (built in phase 4, extended to run the whole day from the phone): Today — a day strip for the week ahead, each day's classes and appointments, and what needs attention (plans ending, clients drifting away, leads to call back, health declarations); a session — check-in and no-show, booking a client in (or onto the waiting list), cancelling a booking and a visit note; Clients — search, filters (with or without a plan, not seen in 14 days), adding a client, and a client card with contact, plans and selling one (simulated payment), what's coming up, recent visits, notes and a WhatsApp message; Leads — by stage, a lead card with call, moving the stage, logging a call, turning them into a client, and a new lead; Messages — what was sent to clients and leads; Numbers — the key figures of the last 30 days; Me — profile, language, theme, branch and switching between businesses. Each person sees only what their permissions and the business's modules allow.
+- MyBiz staff app (built in phase 4, extended in its second round): Home — the platform's numbers (open requests, new businesses this week, businesses, active clients), this month's billing, and the open requests and new businesses themselves; Businesses — search, sort and a business card (owner, numbers, modules, invoices, and more trial days for billing staff); Inbox — open and handled requests, and a request card (call, WhatsApp, email, status, taking it, internal notes, opening its business); Me. Each staff member sees only what their level and permissions allow.
 - All three apps share one kit (sign-in, theme, language, right-to-left, accessible components), so a fix in one place reaches all of them.
 - Still to do: final polish of the client app and builds for the app stores (at go-live).
 
@@ -224,10 +224,10 @@ Swapping a simulated service for a real one changes only its adapter; screens an
 | 1 — Marketing website | Complete site and the sign-up journey with cart, summary, payment, welcome email, guide | Done |
 | 2 — Business web app | Locked modules with previews and upsell; full review and polish; sales; profiles | Done |
 | 3 — MyBiz console | Team levels and permissions, full visibility and actions, support inbox | Done |
-| 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | Mostly done |
+| 4 — Apps | Business app and MyBiz staff app built, shared app kit; remaining: client app polish and store builds | In progress: second round on the business app done; client app polish and store builds remain |
 | 5 — Industries | The category template (category → sub-category) in one shared catalog; the five main categories with their sub-categories | Done |
-| 6 — Businesses and branches | One owner with several businesses, each with several branches: my businesses, a current branch, data and numbers per branch, a full demo | In progress |
-| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories | Planned |
+| 6 — Businesses and branches | One owner with several businesses, each with several branches: my businesses, a current branch, data and numbers per branch, a full demo | Done |
+| 7 — More categories | Core capabilities for the future categories (resources, on-site jobs, dependents, quotes and deposits), each opening its categories. All built: resources (#41), dependents (#43), on-site jobs (#42), quotes and deposits (#44), documents, retainers and time billing (#45); every category in the catalog is open | Done |
 | Go-live | Real payment, invoicing, email, WhatsApp, AI key, domain, production hardening | When the owner decides |
 
 The live status of the work — done, in progress and next — is kept in `docs/STATUS.md` and in the repository's GitHub issues, updated with every merged change.

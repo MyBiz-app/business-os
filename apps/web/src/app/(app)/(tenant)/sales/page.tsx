@@ -2,6 +2,7 @@ import { ChevronLeft, ChevronRight, Download, Receipt } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
@@ -12,7 +13,7 @@ import { monthRange } from "./month";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("sales");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** A month of sales: the total, the split by payment method and every receipt. */

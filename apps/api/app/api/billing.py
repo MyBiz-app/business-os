@@ -1,5 +1,5 @@
-"""The business's MyBiz subscription (simulated, see app/billing.py): trial, plan, test card,
-billing details and invoices. Owners and anyone with `business.settings`."""
+"""The business's MyBiz subscription (simulated, see app/commerce/billing.py): trial, plan,
+test card, billing details and invoices. Owners and anyone with `business.settings`."""
 
 from datetime import UTC, date, datetime, timedelta
 from typing import Annotated, Literal
@@ -12,11 +12,13 @@ from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
+from app.ai import budget as ai_budget
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
-from app.api.modules import QuoteOut, _tenant_modules
-from app.billing import add_months
-from app.permissions import Permission
+from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
+from app.commerce.billing import add_months
+from app.commerce.modules import allowance
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/billing", tags=["billing"])
 
@@ -72,6 +74,19 @@ class Invoice(InvoiceSummary):
     simulated: bool
 
 
+class Usage(BaseModel):
+    """This calendar month's use against the business's bundle (space and messages)."""
+
+    pack: Literal["pack_plus", "pack_max"] | None = Field(description="None: the included one")
+    month_start: date
+    messages: int = Field(description="Messages sent this month (all channels)")
+    messages_included: int
+    storage_bytes: int = Field(description="Files kept now")
+    storage_included_bytes: int
+    ai_credits: float = Field(description="AI credits used this month (1 credit = 1 US cent)")
+    ai_credits_included: int = Field(description="0 when the business has no AI module")
+
+
 class Billing(BaseModel):
     trial_ends_at: datetime
     in_trial: bool
@@ -82,6 +97,7 @@ class Billing(BaseModel):
     details: BillingDetails
     invoices: list[InvoiceSummary]
     balance_due: int = Field(description="Sum of open invoices, minor units")
+    usage: Usage
 
 
 class TestCardRequest(BaseModel):
@@ -154,6 +170,46 @@ def get_billing(context: SettingsDep) -> Billing:
         details=_details(account),
         invoices=invoices,
         balance_due=sum(i.total for i in invoices if i.status == "open"),
+        usage=usage(db, today),
+    )
+
+
+@router.get("/usage")
+def get_usage(context: SettingsDep) -> Usage:
+    """This month's space and messages, for the warnings on the dashboard and in the app."""
+    db = context.session
+    time_zone = db.execute(
+        text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    return usage(db, datetime.now(ZoneInfo(time_zone)).date())
+
+
+def usage(db: Session, today: date) -> Usage:
+    """Messages counted from usage events since the 1st of the business's month, and the
+    files the business keeps now."""
+    pack, allowed = allowance(enabled_modules(db))
+    month_start = today.replace(day=1)
+    row = db.execute(
+        text("""
+            SELECT
+                (SELECT coalesce(sum(u.quantity), 0) FROM app.usage_events u
+                 WHERE u.meter = 'messages'
+                   AND u.occurred_at >= (CAST(:start AS date)::timestamp AT TIME ZONE t.time_zone))
+                    AS messages,
+                app.storage_used() AS storage
+            FROM app.tenants t WHERE t.id = app.current_tenant_id()
+        """),
+        {"start": month_start},
+    ).one()
+    return Usage(
+        pack=pack,  # type: ignore[arg-type]
+        month_start=month_start,
+        messages=int(row.messages),
+        messages_included=allowed.messages,
+        storage_bytes=int(row.storage),
+        storage_included_bytes=allowed.storage_bytes,
+        ai_credits=round(ai_budget.credits_used(db, month_start), 2),
+        ai_credits_included=ai_budget.credits_included(db),
     )
 
 

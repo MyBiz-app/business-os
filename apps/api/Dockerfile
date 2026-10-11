@@ -25,8 +25,10 @@ USER api
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
-# Hosting platforms pass the port in $PORT. The database is brought up to date before the API
+# Hosting platforms pass the port in $PORT. WEB_CONCURRENCY sets the worker processes (uvicorn
+# reads it; default 2). Limits that count per process (rate limits) apply per worker.
+# The port comes from $PORT (hosting platforms). The database is brought up to date before the API
 # starts, so new code never runs against an old schema (the host keeps the previous version
 # serving until this one is healthy). Migrations are additive, so the previous version keeps
 # working while it drains.
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --no-proxy-headers --workers ${WEB_CONCURRENCY:-2}"]

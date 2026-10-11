@@ -1,7 +1,11 @@
 from functools import lru_cache
+from urllib.parse import urlparse
 
-from pydantic import AliasChoices, Field, SecretStr, field_validator
+from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+ENVIRONMENTS = ("local", "test", "staging", "production")
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal", None}
 
 
 class Settings(BaseSettings):
@@ -28,7 +32,21 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
     )
-    ai_model: str = "claude-opus-5-5"
+    # Everyday questions run on the cheap model; a turn that needs many tool calls escalates to
+    # the stronger one (P0-6). Prices live in app/ai/gateway.py.
+    ai_model: str = "claude-haiku-5-5"
+    ai_strong_model: str = "claude-sonnet-5-5"
+    ai_escalate_after_steps: int = (
+        3  # model calls in one message before switching to the strong model
+    )
+    ai_max_tokens: int = 4096  # per model call
+    ai_timeout_seconds: float = 60.0
+    # Per user, so one account (or a stolen session) cannot hammer the model: fixed windows.
+    ai_user_messages_per_minute: int = 6
+    ai_user_messages_per_hour: int = 60
+    # Platform-wide spend alarm shown in the console: AI credits (a credit is one US cent) per
+    # UTC day.
+    ai_daily_alert_credits: int = 2000
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp
@@ -37,11 +55,72 @@ class Settings(BaseSettings):
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from
+    # Outside services (decision X13, docs/integrations.md): the platform's default provider
+    # per capability and its settings as a JSON object; a business can connect its own
+    # (settings → Integrations) for payments, invoicing and messaging.
+    payments_provider: str = "simulated"
+    payments_settings: SecretStr | None = None
+    invoicing_provider: str = "internal"
+    invoicing_settings: SecretStr | None = None
+    messaging_provider: str = "simulated"
+    messaging_settings: SecretStr | None = None
+    storage_provider: str = "database"
+    storage_settings: SecretStr | None = None
+    # Encrypts the businesses' provider secrets in the database (a Fernet key).
+    secrets_key: SecretStr | None = None
+
+    # Connection pool, per API worker process. Keep workers * (pool_size + max_overflow) under the
+    # database's (or pooler's) client limit. Prepared statements are off by default so the URL can
+    # point at a transaction-mode pooler (Supavisor, port 6543); every transaction here is
+    # self-contained (`SET LOCAL`), so both pooler modes work.
+    db_pool_size: int = 5
+    db_max_overflow: int = 10
+    db_pool_timeout: float = 15.0  # seconds to wait for a free connection before failing
+    db_pool_recycle: int = 1800  # seconds; replaces connections the pooler may have closed
+    db_prepared_statements: bool = False
+
+    # Model calls hold a request thread for seconds: at most this many run at once per worker,
+    # the rest get "busy" (429) instead of using up the threads other requests need.
+    ai_max_concurrent_calls: int = 8
+
+    # Statements slower than this (milliseconds) are logged; 0 turns it off.
+    slow_query_ms: int = 500
+
+    # Rate limits per caller (app/core/rate_limit.py). Off by default in local development and
+    # tests (everything comes from one address there); on everywhere else unless set.
+    rate_limits: bool | None = None
+    # Behind the hosting proxy, count the right-most X-Forwarded-For address (added by the proxy).
+    trust_forwarded_for: bool = False
+    # Shared with the web server, which then names the real visitor in X-Visitor-Address.
+    internal_token: SecretStr | None = None
+
+    @property
+    def rate_limits_on(self) -> bool:
+        if self.rate_limits is not None:
+            return self.rate_limits
+        return self.environment not in ("local", "test")
+
     # Public addresses used in emails (links to the web app and the client app).
     web_url: str = "http://localhost:3000"
+    api_url: str = "http://localhost:8000"  # this API's public address (signed file links)
     client_app_url: str = "http://localhost:8081"
     business_app_url: str = "http://localhost:8082"
     staff_app_url: str = "http://localhost:8083"
+
+    @model_validator(mode="after")
+    def refuse_unsafe_environment(self) -> "Settings":
+        # Fail closed: a missing or mistyped API_ENVIRONMENT must not leave a deployment on the
+        # public development key with rate limits off. Local/test only run against a local database.
+        if self.environment not in ENVIRONMENTS:
+            raise ValueError(f"environment must be one of {', '.join(ENVIRONMENTS)}")
+        if self.environment in ("local", "test") and (
+            urlparse(self.database_url).hostname not in LOCAL_HOSTS
+        ):
+            raise ValueError(
+                "API_ENVIRONMENT is local/test (or unset) but the database is not local; "
+                "set API_ENVIRONMENT to staging or production"
+            )
+        return self
 
     @field_validator("database_url")
     @classmethod

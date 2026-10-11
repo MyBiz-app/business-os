@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslations } from "use-intl";
 
 import { FadeIn, PressableScale } from "./motion";
 import { tint } from "../lib/brand";
@@ -85,6 +86,29 @@ export function ErrorText({ message, palette }: { message?: string | null; palet
     <Text accessibilityRole="alert" style={[styles.error, { color: palette.danger }]}>
       {message}
     </Text>
+  );
+}
+
+/** Shown when a screen's data failed to load, so a network error isn't mistaken for "nothing here". */
+export function LoadError({ palette, onRetry }: { palette: Palette; onRetry: () => void }) {
+  const t = useTranslations("common");
+  return (
+    <Card palette={palette}>
+      <Text accessibilityRole="alert" style={[styles.muted, { color: palette.foreground }]}>
+        {t("loadFailed")}
+      </Text>
+      <Button label={t("retry")} palette={palette} variant="secondary" onPress={onRetry} />
+    </Card>
+  );
+}
+
+/** An empty list, or a spinner while the first load runs; keeps every screen's "nothing here" look the same. */
+export function EmptyState({ palette, message, loading }: { palette: Palette; message: string; loading?: boolean }) {
+  if (loading) return <ActivityIndicator accessibilityLabel={message} color={palette.primary} />;
+  return (
+    <Card palette={palette}>
+      <Text style={[styles.muted, { color: palette.muted }]}>{message}</Text>
+    </Card>
   );
 }
 

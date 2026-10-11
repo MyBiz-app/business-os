@@ -2,10 +2,11 @@ import Constants from "expo-constants";
 
 // On a phone, "localhost" is the phone itself. In development we reach the API and the local
 // Supabase on the computer that runs the Expo dev server (same Wi-Fi), using the host Expo
-// reports. Other environments set EXPO_PUBLIC_* variables (see apps/mobile/README.md).
+// reports. Other environments set EXPO_PUBLIC_* variables (see apps/client-app/README.md).
 const devHost = Constants.expoConfig?.hostUri?.split(":")[0] ?? "localhost";
 
 export const API_URL = process.env.EXPO_PUBLIC_API_URL || `http://${devHost}:8000`;
+export const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL || `http://${devHost}:3000`;
 
 export const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || `http://${devHost}:54321`;
 

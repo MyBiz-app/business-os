@@ -38,7 +38,7 @@ ignore = ["RUF001"]
 
 [tool.ruff.lint.per-file-ignores]
 # Inline-styled email HTML reads better unwrapped.
-"app/welcome.py" = ["E501"]
+"app/catalog/welcome.py" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

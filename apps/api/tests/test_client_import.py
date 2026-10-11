@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from openpyxl import Workbook
 from sqlalchemy import Engine, text
 
-from app.importing import parse_rows, read_table, suggest_mapping
+from app.catalog.importing import parse_rows, read_table, suggest_mapping
 from tests.conftest import AuthHeaders
 
 HEBREW_CSV = (

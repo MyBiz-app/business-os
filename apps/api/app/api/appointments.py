@@ -21,10 +21,10 @@ from app.api.client_app import ClientSession, _load_session
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
 from app.api.health import ensure_may_book
-from app.appointments import Hours, free_starts
-from app.notifications import notify_booking
-from app.permissions import Permission
-from app.scheduling import local_to_utc
+from app.core.permissions import Permission
+from app.messaging.notifications import notify_booking
+from app.schedule.appointments import Hours, free_starts
+from app.schedule.scheduling import local_to_utc
 
 router = APIRouter(tags=["appointments"])
 client_router = APIRouter(prefix="/client", tags=["client"])
@@ -68,12 +68,22 @@ class AppointmentCreate(BaseModel):
     staff_user_id: UUID
     starts_at: datetime
     client_id: UUID
+    dependent_id: UUID | None = None
+    address_id: UUID | None = Field(
+        default=None, description="On-site services: one of the client's addresses (#42)"
+    )
 
 
 class ClientAppointmentCreate(BaseModel):
     service_id: UUID
     staff_user_id: UUID
     starts_at: datetime
+    dependent_id: UUID | None = Field(
+        default=None, description="Which of the client's pets / children comes (#43)"
+    )
+    address_id: UUID | None = Field(
+        default=None, description="On-site services: one of the client's addresses (#42)"
+    )
 
 
 # --- Working hours ----------------------------------------------------------------------------
@@ -222,7 +232,7 @@ def appointment_slots(
     service = (
         db.execute(
             text("""
-                SELECT duration_minutes FROM app.services
+                SELECT duration_minutes, travel_minutes FROM app.services
                 WHERE id = :id AND active AND booking_mode = 'appointment'
             """),
             {"id": service_id},
@@ -259,14 +269,22 @@ def appointment_slots(
         {"from": day_start, "to": day_start + timedelta(days=1, hours=1)},
     ).all()
     length = timedelta(minutes=service["duration_minutes"])
+    # An on-site job takes the technician from its travel time before it (busy times already
+    # start at other jobs' travel): the free blocks are travel + job, the job starts after.
+    travel = timedelta(minutes=service["travel_minutes"])
     slots = [
-        Slot(starts_at=start, ends_at=start + length, staff_user_id=s.user_id, staff_name=s.name)
+        Slot(
+            starts_at=start + travel,
+            ends_at=start + travel + length,
+            staff_user_id=s.user_id,
+            staff_name=s.name,
+        )
         for s in staff
         for start in free_starts(
             day,
             [Hours(h.starts, h.ends) for h in hours if h.user_id == s.user_id],
             [(b.starts_at, b.ends_at) for b in busy if b.user_id == s.user_id],
-            service["duration_minutes"],
+            service["duration_minutes"] + service["travel_minutes"],
             business["time_zone"],
             now=datetime.now(UTC),
         )
@@ -275,26 +293,56 @@ def appointment_slots(
 
 
 def create_appointment_session(
-    db: Session, service_id: UUID, staff_user_id: UUID, starts_at: datetime
+    db: Session,
+    service_id: UUID,
+    staff_user_id: UUID,
+    starts_at: datetime,
+    address_id: UUID | None = None,
 ) -> UUID:
     if starts_at <= datetime.now(UTC):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="session_started")
     try:
         with db.begin_nested():
             return db.execute(
-                text("SELECT app.create_appointment_session(:service, :staff, :starts)"),
-                {"service": service_id, "staff": staff_user_id, "starts": starts_at},
+                text("SELECT app.create_appointment_session(:service, :staff, :starts, :address)"),
+                {
+                    "service": service_id,
+                    "staff": staff_user_id,
+                    "starts": starts_at,
+                    "address": address_id,
+                },
             ).scalar_one()
     except DBAPIError as error:
         code = getattr(error.orig, "sqlstate", None)
-        detail = {"23P01": "slot_taken", "22023": "outside_hours", "P0002": "not_found"}.get(
-            code or ""
-        )
+        detail = {
+            "23P01": "slot_taken",
+            "22023": "outside_hours",
+            "P0002": "not_found",
+            "22004": "address_required",
+        }.get(code or "")
         if detail is None:
             raise
         if detail == "not_found":
             raise not_found() from error
+        if detail == "address_required":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detail
+            ) from error
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=detail) from error
+
+
+def _ensure_address_of(db: Session, address_id: UUID | None, client_id: UUID) -> None:
+    """Staff book a job at an address of the client the job is for."""
+    if address_id is None:
+        return
+    found = db.execute(
+        text("SELECT 1 FROM app.client_addresses WHERE id = :id AND client_id = :client"),
+        {"id": address_id, "client": client_id},
+    ).first()
+    if found is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="address_required"
+        )
 
 
 @router.get("/appointments/staff")
@@ -316,9 +364,17 @@ def slots(
 def book_appointment(body: AppointmentCreate, context: ManageDep) -> Booking:
     """Books a client into a free time with a staff member (staff may book without a plan)."""
     db = context.session
-    session_id = create_appointment_session(db, body.service_id, body.staff_user_id, body.starts_at)
+    _ensure_address_of(db, body.address_id, body.client_id)
+    session_id = create_appointment_session(
+        db, body.service_id, body.staff_user_id, body.starts_at, body.address_id
+    )
     booking_id = place_booking(
-        db, context.tenant_id, session_id, body.client_id, requires_plan=False
+        db,
+        context.tenant_id,
+        session_id,
+        body.client_id,
+        requires_plan=False,
+        dependent_id=body.dependent_id,
     )
     notify_booking(db, booking_id, "booked_by_studio")
     return _load(db, booking_id)
@@ -348,8 +404,17 @@ def book_my_appointment(body: ClientAppointmentCreate, context: ClientDep) -> Cl
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),
         {"id": context.tenant_id},
     ).scalar_one()
-    session_id = create_appointment_session(db, body.service_id, body.staff_user_id, body.starts_at)
-    place_booking(db, context.tenant_id, session_id, context.client_id, requires_plan=requires_plan)
+    session_id = create_appointment_session(
+        db, body.service_id, body.staff_user_id, body.starts_at, body.address_id
+    )
+    place_booking(
+        db,
+        context.tenant_id,
+        session_id,
+        context.client_id,
+        requires_plan=requires_plan,
+        dependent_id=body.dependent_id,
+    )
     return _load_session(db, session_id)
 
 
@@ -361,6 +426,7 @@ class AppointmentService(BaseModel):
     price_amount: int
     price_currency: str
     color: str | None
+    on_site: bool = Field(default=False, description="At the client's address: needs one (#42)")
 
 
 @client_router.get("/appointments/services")
@@ -368,7 +434,8 @@ def my_appointment_services(context: ClientDep) -> list[AppointmentService]:
     """What the client can book as a personal appointment."""
     rows = context.session.execute(
         text("""
-            SELECT id, name, description, duration_minutes, price_amount, price_currency, color
+            SELECT id, name, description, duration_minutes, price_amount, price_currency, color,
+                   on_site
             FROM app.services WHERE active AND booking_mode = 'appointment' ORDER BY name
         """)
     ).mappings()

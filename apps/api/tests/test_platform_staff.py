@@ -203,6 +203,39 @@ def test_the_inbox_moves_requests_along(
     assert client.get("/platform/contact-requests", headers=auth(other)).status_code == 403
 
 
+def test_support_tiers_order_the_inbox_and_setup_opens_a_task(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
+) -> None:
+    staff, _ = staff_member(engine, "owner", ("inbox.manage", "billing.manage"))
+    headers = auth(staff)
+    tenant_id = str(studio["tenant_id"])
+    client.post(
+        "/public/contact",
+        json={"name": "Dana", "email": "dana@example.com", "message": "Hi", "locale": "he"},
+    )
+    client.post(
+        "/support-requests", json={"message": "Help with the schedule"}, headers=studio["headers"]
+    )
+    inbox = client.get("/platform/contact-requests", headers=headers).json()
+    assert [r["tier"] for r in inbox] == ["standard", "standard"]
+
+    # VIP support and setup done for them: the business's request moves up, and a task opens.
+    modules = {"support_vip": 1, "setup_full": 1}
+    for _ in range(2):  # saving the modules again doesn't open a second task
+        client.put(
+            f"/platform/businesses/{tenant_id}/modules", json={"modules": modules}, headers=headers
+        )
+    inbox = client.get("/platform/contact-requests", headers=headers).json()
+    assert {(r["kind"], r["tier"]) for r in inbox[:2]} == {
+        ("setup_full", "vip"),
+        ("request", "vip"),
+    }
+    assert inbox[2]["tier"] == "standard" and not inbox[2]["from_business"]
+    task = next(r for r in inbox if r["kind"] == "setup_full")
+    assert task["tenant_id"] == tenant_id and task["business"] == "Studio Flow"
+    assert sum(r["kind"] == "setup_full" for r in inbox) == 1
+
+
 def test_staff_act_on_a_business_from_the_console(
     client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders
 ) -> None:

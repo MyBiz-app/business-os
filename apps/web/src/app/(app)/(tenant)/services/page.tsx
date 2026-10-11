@@ -3,13 +3,15 @@ import Link from "next/link";
 
 import { CalendarDays, Gauge } from "lucide-react";
 
+import { FormNotice } from "@/components/form/form-message";
 import { unwrap } from "@/lib/api";
 import { addDays, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canReadReports, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
-export default async function ServicesPage() {
+export default async function ServicesPage({ searchParams }: PageProps<"/services">) {
+  const { removed } = await searchParams;
   const t = await getTranslations();
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("catalog.read");
@@ -32,6 +34,7 @@ export default async function ServicesPage() {
 
   return (
     <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+      {(removed === "deleted" || removed === "archived") && <FormNotice message={t(`services.removed.${removed}`)} />}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-3xl font-bold">{t("services.title")}</h1>
@@ -61,7 +64,11 @@ export default async function ServicesPage() {
                     <span className="font-semibold">{service.name}</span>
                     <span className="text-sm text-muted">
                       {t("services.minutes", { count: service.duration_minutes })} ·{" "}
-                      {service.booking_mode === "appointment" ? t("services.appointmentLabel") : t("services.participants", { count: service.capacity })}
+                      {service.booking_mode === "appointment"
+                        ? t("services.appointmentLabel")
+                        : service.booking_mode === "resource"
+                          ? t("resources.label")
+                          : t("services.participants", { count: service.capacity })}
                       {!service.active && ` · ${t("common.inactive")}`}
                     </span>
                   </span>
@@ -75,7 +82,7 @@ export default async function ServicesPage() {
                       <CalendarDays aria-hidden="true" className="size-4" />
                       {t("services.stats.sessions", { count: usageOf.get(service.id)?.sessions ?? 0 })}
                     </span>
-                    {usageOf.get(service.id)?.occupancy != null && service.booking_mode !== "appointment" && (
+                    {usageOf.get(service.id)?.occupancy != null && service.booking_mode === "class" && (
                       <span className="inline-flex items-center gap-1.5">
                         <Gauge aria-hidden="true" className="size-4" />
                         {t("services.stats.occupancy", { value: percent.format((usageOf.get(service.id)?.occupancy ?? 0) / 100) })}

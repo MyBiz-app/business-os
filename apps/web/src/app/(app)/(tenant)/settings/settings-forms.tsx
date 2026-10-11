@@ -9,16 +9,17 @@ import { FormFeedback } from "@/components/form/form-feedback";
 import { FileField } from "@/components/form/file-field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ImageCropDialog } from "@/components/image-crop-dialog";
 import { brandStyle } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
 import { locales } from "@/i18n/config";
 
-import { type LogoState, updateBrandColor, updateDetails, uploadLogo } from "./actions";
+import { type IdentityState, type LogoState, updateBrandColor, updateDetails, updateIdentity, uploadCover, uploadLogo } from "./actions";
 
 type Tenant = components["schemas"]["Tenant"];
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
-const DEFAULT_COLOR = "#4f46e5";
+const DEFAULT_COLOR = "#6d28d9";
 const CANCELLATION_WINDOWS = [0, 60, 120, 180, 360, 720, 1440, 2880];
 
 export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: string[] }) {
@@ -27,7 +28,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}`} className="grid gap-4 sm:grid-cols-2">
+      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.resource_payment}`} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
         </div>
@@ -94,6 +95,15 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
           <CheckboxField label={t("settings.onlineSales")} name="online_sales" defaultChecked={tenant.online_sales} />
           <p className="mt-1.5 text-xs text-muted">{t("settings.onlineSalesHint")}</p>
         </div>
+        <div className="sm:col-span-2">
+          <SelectField
+            label={t("settings.resourcePayment")}
+            name="resource_payment"
+            defaultValue={tenant.resource_payment}
+            options={(["app", "venue"] as const).map((value) => ({ value, label: t(`settings.resourcePayments.${value}`) }))}
+          />
+          <p className="mt-1.5 text-xs text-muted">{t("settings.resourcePaymentHint")}</p>
+        </div>
       </div>
       <div>
         <SubmitButton>{t("common.save")}</SubmitButton>
@@ -147,18 +157,104 @@ export function LogoForm() {
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
   const [state, action] = useActionState<LogoState, FormData>(uploadLogo, {});
+  // The logo is cropped to a square in a dialog first; what is uploaded is the crop.
+  const [cropping, setCropping] = useState<File | null>(null);
+  const [cropped, setCropped] = useState<{ file: File; url: string } | null>(null);
   const error =
     state.error === "logo_too_large" || state.error === "unsupported_image"
       ? t(`errors.${state.error}`)
       : state.error && tCommon("errors.generic");
 
   return (
+    <form
+      action={async (data) => {
+        if (cropped) data.set("logo", cropped.file);
+        await action(data);
+      }}
+      className="flex flex-col gap-3"
+    >
+      <FormError message={error} />
+      <FormNotice message={state.saved ? tCommon("saved") : undefined} />
+      <FileField
+        label={t("logo")}
+        hint={t("logoHint")}
+        name="logo"
+        accept="image/png,image/jpeg,image/webp"
+        required
+        onChange={(event) => {
+          setCropped(null);
+          setCropping(event.target.files?.[0] ?? null);
+        }}
+      />
+      {cropped && (
+        // eslint-disable-next-line @next/next/no-img-element -- a local preview of the cropped logo
+        <img src={cropped.url} alt={t("logoPreview")} className="size-20 rounded-full object-cover ring-1 ring-border" />
+      )}
+      <div>
+        <SubmitButton>{t("uploadLogo")}</SubmitButton>
+      </div>
+      {cropping && (
+        <ImageCropDialog
+          file={cropping}
+          onCancel={() => setCropping(null)}
+          onDone={(file) => {
+            setCropping(null);
+            setCropped({ file, url: URL.createObjectURL(file) });
+          }}
+        />
+      )}
+    </form>
+  );
+}
+
+const ENTITY_TYPES = ["company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"] as const;
+
+/** Who the business is legally. Only people who manage settings see this. */
+export function IdentityForm({ type, number }: { type: string | null; number: string | null }) {
+  const t = useTranslations("settings.identity");
+  const tCommon = useTranslations("common");
+  const [state, action] = useActionState<IdentityState, FormData>(updateIdentity, {});
+  const [entity, setEntity] = useState(type ?? "");
+  const numberLabel =
+    entity === "company" || entity === "partnership" || entity === "nonprofit"
+      ? t("companyNumber")
+      : entity === "licensed_dealer" || entity === "exempt_dealer"
+        ? t("dealerNumber")
+        : t("number");
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <FormError message={state.error && (state.error === "invalid_business_number" ? t("invalidNumber") : tCommon("errors.generic"))} />
+      <FormNotice message={state.saved ? tCommon("saved") : undefined} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <SelectField
+          label={t("entityType")}
+          name="legal_entity_type"
+          value={entity}
+          onChange={(event) => setEntity(event.target.value)}
+          options={[{ value: "", label: t("notSet") }, ...ENTITY_TYPES.map((value) => ({ value, label: t(`types.${value}`) }))]}
+        />
+        <Field label={numberLabel} hint={t("numberHint")} name="business_number" defaultValue={number ?? ""} inputMode="numeric" maxLength={24} dir="ltr" autoComplete="off" />
+      </div>
+      <div>
+        <SubmitButton>{tCommon("save")}</SubmitButton>
+      </div>
+    </form>
+  );
+}
+
+export function CoverForm() {
+  const t = useTranslations("settings");
+  const tCommon = useTranslations("common");
+  const [state, action] = useActionState<LogoState, FormData>(uploadCover, {});
+  const error =
+    state.error === "logo_too_large" ? t("coverTooLarge") : state.error === "unsupported_image" ? t("errors.unsupported_image") : state.error && tCommon("errors.generic");
+  return (
     <form action={action} className="flex flex-col gap-3">
       <FormError message={error} />
       <FormNotice message={state.saved ? tCommon("saved") : undefined} />
-      <FileField label={t("logo")} hint={t("logoHint")} name="logo" accept="image/png,image/jpeg,image/webp" required />
+      <FileField label={t("cover")} hint={t("coverHint")} name="cover" accept="image/png,image/jpeg,image/webp" required />
       <div>
-        <SubmitButton>{t("uploadLogo")}</SubmitButton>
+        <SubmitButton>{t("uploadCover")}</SubmitButton>
       </div>
     </form>
   );

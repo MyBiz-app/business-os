@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { ApiError, getApi, type Tenant, unwrap } from "@/lib/api";
+import { clearResumePath } from "@/lib/resume";
 import { decodePlan } from "@/lib/signup-plan";
 import { setActiveTenant } from "@/lib/tenant";
 
@@ -42,6 +43,7 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
     return { error: error instanceof ApiError && error.status === 422 ? "invalid" : "generic" };
   }
   await setActiveTenant(tenant.id);
+  await clearResumePath().catch(() => null);
 
   // The business exists from here on; a hiccup in the steps below must not block the owner.
   const scope = { header: { "X-Tenant-Id": tenant.id } };

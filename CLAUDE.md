@@ -23,12 +23,50 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 
 | Path | What |
 |---|---|
+| `apps/api` | Python API (FastAPI, Alembic migrations, tests). In `app/`: `api/` the endpoints, domain logic in `schedule/`, `commerce/`, `messaging/`, `catalog/`, `reports/`, plus `core/`, `providers/`, `ai/`, `seed/` and `jobs.py` |
+| `apps/web` | Next.js: marketing site, business web app, MyBiz console |
+| `apps/client-app`, `apps/business-app`, `apps/staff-app` | Expo apps: the clients' app, the business app, the MyBiz team app |
+| `packages/app-kit` | Shared screens, components and providers for the Expo apps |
+| `packages/i18n` | Translations (`he`, `en`) and locale-aware formatting (money) |
+| `packages/brand` | The MyBiz logo: one source for the web mark, favicon and app icons (the name comes from `packages/i18n/brand.json`) |
+| `packages/verticals` | The industry catalog (categories, sub-categories, packs) |
+| `packages/api-client` | Typed API client generated from the API's OpenAPI schema |
+| `supabase/` | Local Supabase config and auth email templates |
+| `e2e/` | End-to-end checks (Playwright, Python) |
 | `docs/spec/v1/` | Original owner spec (Hebrew + English .docx) |
-| `docs/spec/v2/` | Current working spec (source of truth) |
+| `docs/spec/v2/` | Detailed v2 chapters (architecture, data model, AI) |
+| `docs/spec/v3/` | Current product spec (source of truth), English and Hebrew |
+| `docs/proposals/`, `docs/reviews/` | Design proposals per feature; architecture reviews |
 | `docs/DECISIONS.md` | Decision log |
 | `docs/STATUS.md`, `docs/STATUS.he.md` | Project status board (done, in progress, next), English and Hebrew |
 | `docs/verticals.md` | Industries: the category catalog and how to add a category |
 | `docs/design-system.md` | Design tokens and where to change what (font, colors, buttons, texts, prices) |
+| `docs/integrations.md` | Outside services behind swappable providers: how to add or switch one |
+| `docs/claude-code.md` | How to run Claude Code on this repo cheaply: model choice, `/compact`, `/clear`, measuring usage |
+
+## Working efficiently (Claude Code)
+
+- The map above is the project structure; don't rediscover it. Search (`rg`, Grep/Glob) before
+  opening files, and read only the files and line ranges the task needs. Don't re-read an unchanged file.
+- Never open whole generated or bulky files: `packages/api-client/openapi.json` and
+  `packages/api-client/src/schema.ts` (generated, ~1.3 MB together; grep with a pattern instead),
+  lockfiles, `node_modules/`, `.next/`, `.turbo/`, `dist/`, `docs/spec/v1/` (.docx).
+- `docs/DECISIONS.md`, `docs/STATUS.md` and `docs/STATUS.he.md` are long: find the section
+  (`rg -n '^## ' <file>`), read only that range, and make a small edit there.
+- Scope to the task: a UI change doesn't need the backend read, and vice versa.
+- Test the affected area first (`uv run pytest tests/test_<area>.py` in `apps/api`,
+  `pnpm --filter <package> test|typecheck|lint`); run the full suite when the change is risky
+  (auth, tenant isolation, migrations, shared packages) or before merging. Never skip validation
+  for security, tenant isolation or data integrity to save effort.
+- Don't rerun a failing command unchanged; change the diagnosis first. Trim long output
+  (`| tail -n 40`, `-q`, `--tb=short`).
+- Keep threads short: cache reads grow with every turn of a long conversation. One thread per slice
+  (a merged PR is a natural end); for a long task, split it into slices and start a fresh thread per slice,
+  carrying state in `docs/STATUS.md` or the PR, instead of one overnight mega-thread.
+- Model: Sonnet by default; Opus only for the cases in `docs/claude-code.md`. Don't re-run the full
+  e2e/test suite after every small edit; run it once before merge.
+- Do small or sequential work directly. Use a subagent only for genuinely parallel or isolated
+  work, with a narrow scope and a defined deliverable.
 
 ## Non-negotiable principles
 

@@ -29,28 +29,63 @@ jobs:
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
         run: uv run python -m app.jobs extend-series
 
       - name: Remind today's booked clients
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
         run: uv run python -m app.jobs remind-sessions
 
       - name: Remind clients whose plan ends soon
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
         run: uv run python -m app.jobs remind-plans
 
       - name: Invoice businesses for MyBiz (simulated charges)
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
         run: uv run python -m app.jobs bill-businesses
 
       - name: Copy today's reminders to WhatsApp (simulated, messaging module)
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
         run: uv run python -m app.jobs message-reminders
+
+      - name: Follow up leads nobody has touched (leads on autopilot)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs follow-up-leads
+
+      - name: Delete data past its retention period (decision X20)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs purge-expired
+
+      - name: Send queued messages through each business's provider
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+          API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
+        run: uv run python -m app.jobs send-messages
+
+      - name: Issue receipts' documents with each business's invoicing provider
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+          API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
+        run: uv run python -m app.jobs issue-documents

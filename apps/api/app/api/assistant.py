@@ -2,19 +2,25 @@
 
 import datetime as dt
 import json
+import math
+import threading
+import time
 from typing import Annotated, Any, Literal
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.ai import actions, assistant
+from app.ai import actions, assistant, budget
 from app.ai.gateway import LLMProvider, ProviderBusy, ProviderUnavailable, get_provider
 from app.api.common import not_found
 from app.api.deps import TenantContext, UserDep, has_module, require
-from app.permissions import Permission
+from app.core.config import get_settings
+from app.core.permissions import Permission
+from app.core.rate_limit import MemoryStore
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -172,6 +178,48 @@ def get_conversation(conversation_id: UUID, context: AIDep) -> Conversation:
     return _load(context.session, conversation_id)
 
 
+def _check_budget(db: Session, provider: LLMProvider) -> None:
+    """Soft monthly limit: from 100% of the AI module's allowance, new questions wait for next
+    month or a bigger module (demo answers cost nothing and are never limited)."""
+    if getattr(provider, "model", None) == "demo":
+        return
+    time_zone = db.execute(
+        text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    month_start = dt.datetime.now(ZoneInfo(time_zone)).date().replace(day=1)
+    if budget.credits_used(db, month_start) >= budget.credits_included(db):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_limit_reached")
+
+
+# Concurrent model calls in this worker (a call holds a request thread and a connection).
+_model_calls = threading.BoundedSemaphore(get_settings().ai_max_concurrent_calls)
+
+# Counts per API process, like the address limiter (app/core/rate_limit.py).
+_user_messages = MemoryStore()
+
+
+def _check_user_rate(user_id: UUID, provider: LLMProvider) -> None:
+    """A per-user ceiling on questions, so one account cannot run up the model bill (P0-6).
+    Demo answers cost nothing and are never limited."""
+    if getattr(provider, "model", None) == "demo":
+        return
+    settings = get_settings()
+    now = time.time()
+    for name, limit, window in (
+        ("minute", settings.ai_user_messages_per_minute, 60),
+        ("hour", settings.ai_user_messages_per_hour, 3600),
+    ):
+        if limit <= 0:
+            continue
+        count, ends = _user_messages.hit(f"ai:{name}:{user_id}", window, now)
+        if count > limit:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="ai_rate_limited",
+                headers={"Retry-After": str(max(1, math.ceil(ends - now)))},
+            )
+
+
 @router.post("/conversations/{conversation_id}/messages")
 def send_message(
     conversation_id: UUID,
@@ -185,12 +233,18 @@ def send_message(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="ai_not_configured"
         )
     _load(context.session, conversation_id)  # 404 unless it is the user's conversation
+    _check_budget(context.session, provider)
+    _check_user_rate(user.id, provider)
+    if not _model_calls.acquire(blocking=False):
+        raise HTTPException(status_code=429, detail="ai_busy")
     try:
         assistant.ask(provider, context, user.id, conversation_id, body.text)
     except ProviderBusy as error:
         raise HTTPException(status_code=429, detail="ai_busy") from error
     except ProviderUnavailable as error:
         raise HTTPException(status_code=502, detail="ai_unavailable") from error
+    finally:
+        _model_calls.release()
     return _load(context.session, conversation_id)
 
 

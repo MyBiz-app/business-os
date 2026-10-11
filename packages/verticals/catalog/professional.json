@@ -1,7 +1,158 @@
 {
   "key": "professional",
   "order": 10,
-  "status": "planned",
+  "status": "beta",
   "icon": "briefcase",
-  "color": "from-cyan-600 to-sky-700"
+  "color": "from-cyan-600 to-sky-700",
+  "terms": "professional",
+  "client_term": "client",
+  "booking_modes": [
+    "appointment"
+  ],
+  "cancellation_window_minutes": 1440,
+  "booking_requires_plan": false,
+  "default_preset": "growing",
+  "recommended_modules": [
+    "client_app",
+    "crm",
+    "ai"
+  ],
+  "time_billing": true,
+  "client_fields": [
+    {
+      "key": "company",
+      "kind": "text"
+    },
+    {
+      "key": "id_number",
+      "kind": "text",
+      "max_length": 20
+    },
+    {
+      "key": "preferences",
+      "kind": "text"
+    }
+  ],
+  "default_services": [
+    {
+      "names": {
+        "he": "פגישת ייעוץ",
+        "en": "Consultation"
+      },
+      "duration_minutes": 60,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 45000
+      },
+      "color": "#0e7490"
+    },
+    {
+      "names": {
+        "he": "פגישת היכרות",
+        "en": "Intro call"
+      },
+      "duration_minutes": 30,
+      "booking_mode": "appointment",
+      "prices": {
+        "ILS": 5000
+      },
+      "color": "#0284c7"
+    }
+  ],
+  "children": [
+    {
+      "key": "consultants",
+      "status": "beta"
+    },
+    {
+      "key": "accountants",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת הנהלת חשבונות",
+            "en": "Bookkeeping meeting"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 35000
+          },
+          "color": "#0f766e"
+        },
+        {
+          "names": {
+            "he": "הכנת דוח שנתי",
+            "en": "Annual report meeting"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 60000
+          },
+          "color": "#155e75"
+        }
+      ]
+    },
+    {
+      "key": "lawyers",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת ייעוץ משפטי",
+            "en": "Legal consultation"
+          },
+          "duration_minutes": 60,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 80000
+          },
+          "color": "#1e3a8a"
+        },
+        {
+          "names": {
+            "he": "שיחת היכרות",
+            "en": "Intro call"
+          },
+          "duration_minutes": 20,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 5000
+          },
+          "color": "#1d4ed8"
+        }
+      ]
+    },
+    {
+      "key": "agencies",
+      "status": "beta",
+      "default_services": [
+        {
+          "names": {
+            "he": "פגישת אסטרטגיה",
+            "en": "Strategy meeting"
+          },
+          "duration_minutes": 90,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 90000
+          },
+          "color": "#7c3aed"
+        },
+        {
+          "names": {
+            "he": "פגישת סטטוס",
+            "en": "Status meeting"
+          },
+          "duration_minutes": 30,
+          "booking_mode": "appointment",
+          "prices": {
+            "ILS": 20000
+          },
+          "color": "#6d28d9"
+        }
+      ]
+    }
+  ]
 }

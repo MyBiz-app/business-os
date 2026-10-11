@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 
 import { unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
-import { getTenant } from "@/lib/tenant";
+import type { Block, HoursState } from "@/lib/hours";
+import { getTenant, getTenantFor } from "@/lib/tenant";
 
 const value = (formData: FormData, name: string) => String(formData.get(name) ?? "");
 const optionalNumber = (formData: FormData, name: string) => {
@@ -65,7 +66,11 @@ export async function addRoom(
     unwrap(
       await api.POST("/locations/{location_id}/rooms", {
         params: { ...scope, path: { location_id: locationId } },
-        body: { name: value(formData, "name"), capacity: optionalNumber(formData, "capacity") },
+        body: {
+          name: value(formData, "name"),
+          capacity: optionalNumber(formData, "capacity"),
+          bookable: formData.get("bookable") === "on",
+        },
       }),
     );
   } catch (error) {
@@ -90,6 +95,7 @@ export async function updateRoom(
           name: value(formData, "name"),
           capacity: optionalNumber(formData, "capacity"),
           active: formData.get("active") === "on",
+          bookable: formData.get("bookable") === "on",
         },
       }),
     );
@@ -98,4 +104,64 @@ export async function updateRoom(
   }
   revalidatePath(`/locations/${locationId}`);
   return { saved: true };
+}
+
+/** A bookable room's weekly opening hours (when it can be reserved). */
+export async function saveRoomHours(roomId: string, locationId: string, blocks: Block[]): Promise<HoursState> {
+  if (blocks.some((block) => !block.starts || !block.ends || block.ends <= block.starts)) {
+    return { error: "invalid" };
+  }
+  const { api, scope } = await getTenantFor("catalog.write");
+  const { response, error } = await api.PUT("/rooms/{room_id}/hours", {
+    params: { ...scope, path: { room_id: roomId } },
+    body: blocks,
+  });
+  if (!response.ok) {
+    const detail = (error as { detail?: unknown } | undefined)?.detail;
+    return { error: detail === "overlapping_hours" ? "overlapping_hours" : response.status === 422 ? "invalid" : "generic" };
+  }
+  revalidatePath(`/locations/${locationId}/rooms/${roomId}`);
+  return { saved: true };
+}
+
+/** A branch's opening hours (one or more intervals per day; a gap is a break). */
+export async function saveOpeningHours(locationId: string, blocks: Block[]): Promise<HoursState> {
+  if (blocks.some((block) => !block.starts || !block.ends || block.ends <= block.starts)) {
+    return { error: "invalid" };
+  }
+  const { api, scope } = await getTenantFor("catalog.write");
+  const { response } = await api.PUT("/locations/{location_id}/hours", {
+    params: { ...scope, path: { location_id: locationId } },
+    body: { intervals: blocks.map((b) => ({ weekday: b.weekday, opens: b.starts, closes: b.ends })) },
+  });
+  if (!response.ok) return { error: response.status === 422 ? "overlapping_hours" : "generic" };
+  revalidatePath(`/locations/${locationId}`);
+  revalidatePath("/schedule");
+  return { saved: true };
+}
+
+/** Adds a branch to a running business; the owner must have accepted the extra monthly charge. */
+export async function addBranch(_state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  const copyFrom = value(formData, "copy_hours_from");
+  let id: string;
+  try {
+    id = unwrap(
+      await api.POST("/locations/new-branch", {
+        params: scope,
+        body: {
+          name: value(formData, "name"),
+          address: value(formData, "address"),
+          copy_hours_from: copyFrom === "" ? null : copyFrom,
+          staff_user_ids: formData.getAll("staff_user_ids").map(String),
+          accept_extra_charge: formData.get("accept_extra_charge") === "on",
+        },
+      }),
+    ).id;
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/locations");
+  revalidatePath("/team");
+  redirect(`/locations/${id}`);
 }

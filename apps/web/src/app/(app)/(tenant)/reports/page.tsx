@@ -6,9 +6,11 @@ import { Pill } from "@/components/pill";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, todayIn } from "@/lib/dates";
+import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 import { ScrollRegion } from "@/components/scroll-region";
 
+import { BranchComparison } from "./branch-comparison";
 import { BusyHours } from "./busy-hours";
 
 type Row = components["schemas"]["BreakdownItem"];
@@ -17,6 +19,7 @@ const PERIODS = { "30": 30, "90": 90 } as const;
 type Period = keyof typeof PERIODS;
 const AT_RISK_DAYS = 14;
 const SHOWN = 10; // members listed before "show all"
+const COMPARED = ["revenue", "new_clients", "active_clients", "plans_sold", "attendance", "occupancy"] as const;
 
 export default async function ReportsPage({ searchParams }: PageProps<"/reports">) {
   const t = await getTranslations("reports");
@@ -28,13 +31,20 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const start = addDays(end, -(PERIODS[period] - 1));
   const range = { start, end };
 
-  const [byService, byInstructor, bySlot, byBranch, atRisk, reviews] = await Promise.all([
+  const [byService, byInstructor, bySlot, byBranch, atRisk, reviews, courts, compared] = await Promise.all([
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "service" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "instructor" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "time_slot" }, query: range } }).then(unwrap),
     api.GET("/metrics/breakdown/{dimension}", { params: { ...scope, path: { dimension: "branch" }, query: range } }).then(unwrap),
     api.GET("/metrics/members-at-risk", { params: { ...scope, query: { days: AT_RISK_DAYS } } }).then(unwrap),
     api.GET("/reviews", { params: { ...scope, query: { days: PERIODS[period] } } }).then(unwrap),
+    api.GET("/reports/resources", { params: { ...scope, query: range } }).then(unwrap),
+    // Branch by branch, across the person's branches (not just the one picked in the menu).
+    api
+      .GET("/metrics/branches", {
+        params: { header: { "X-Tenant-Id": scope.header["X-Tenant-Id"] }, query: { ...range, keys: [...COMPARED] } },
+      })
+      .then((r) => r.data ?? []),
   ]);
   const tReviews = await getTranslations("reviews");
 
@@ -129,11 +139,60 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         timeZone={tenant.time_zone}
         title={tReviews("title", { count: PERIODS[period] })}
       />
+      {compared.length > 1 && <BranchComparison rows={compared} currency={tenant.currency} locale={locale} />}
       {/* Comparing branches matters once there is more than one (and none is selected). */}
       {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"))}
       {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
       {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
       {bySlot.length > 0 && <BusyHours rows={bySlot} locale={locale} />}
+      {/* Courts and rooms rented by the hour: how much of their open time was reserved. */}
+      {courts.length > 0 && (
+        <section aria-labelledby="by-court" className="flex flex-col gap-3 card p-6">
+          <h2 id="by-court" className="text-lg font-semibold">
+            {t("byCourt")}
+          </h2>
+          <ScrollRegion labelledBy="by-court">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-start text-muted">
+                  <th scope="col" className="py-2 pe-4 text-start font-medium">{t("court")}</th>
+                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("reservations")}</th>
+                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("reservedHours")}</th>
+                  <th scope="col" className="py-2 pe-4 text-end font-medium">{t("occupancy")}</th>
+                  <th scope="col" className="py-2 text-end font-medium">{t("courtRevenue")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {courts.map((row) => (
+                  <tr key={row.room_id} className="border-b border-border last:border-0">
+                    <th scope="row" className="py-2 pe-4 text-start font-medium">
+                      <bdi>{row.room_name}</bdi>
+                      <span className="block text-xs font-normal text-muted">
+                        <bdi>{row.location_name}</bdi>
+                      </span>
+                    </th>
+                    <td className="py-2 pe-4 text-end tabular-nums">{number.format(row.reservations)}</td>
+                    <td className="py-2 pe-4 text-end tabular-nums">
+                      {t("hoursOf", { reserved: number.format(row.reserved_hours), open: number.format(row.open_hours) })}
+                    </td>
+                    <td className="py-2 pe-4">
+                      <span className="flex items-center justify-end gap-2 tabular-nums">
+                        {row.occupancy_percent !== null && (
+                          <span aria-hidden="true" className="hidden h-1.5 w-20 overflow-hidden rounded-full bg-foreground/8 sm:block">
+                            <span className="block h-full rounded-full bg-primary" style={{ inlineSize: `${Math.min(100, row.occupancy_percent)}%` }} />
+                          </span>
+                        )}
+                        {percent(row.occupancy_percent)}
+                      </span>
+                    </td>
+                    <td className="py-2 text-end tabular-nums">{formatMoney(row.revenue, row.currency, locale)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </ScrollRegion>
+        </section>
+      )}
       <section aria-labelledby="at-risk-heading" className="flex flex-col gap-3 card p-6">
         <div className="flex flex-col gap-1">
           <h2 id="at-risk-heading" className="text-lg font-semibold">

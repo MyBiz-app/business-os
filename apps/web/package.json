@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@business-os/api-client": "workspace:*",
+    "@business-os/brand": "workspace:*",
     "@business-os/i18n": "workspace:*",
     "@business-os/verticals": "workspace:*",
     "@supabase/ssr": "0.12.7",

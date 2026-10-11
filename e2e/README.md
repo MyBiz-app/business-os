@@ -13,13 +13,15 @@ proposes a booking → confirmed and executed → a platform admin sees the busi
 
 1. `supabase start`, then `cd apps/api && uv run alembic upgrade head`
 2. API with the scripted AI model: `cd apps/api && PYTHONPATH=../../e2e:. uv run uvicorn fake_ai_api:app --port 8000`
-3. Web: `pnpm --filter web dev`; client app: `pnpm --filter mobile exec expo start --web --port 8081`
+3. Web: `pnpm --filter web dev`; client app: `pnpm --filter client-app exec expo start --web --port 8081`
 4. Make an existing local user a platform admin:
    `docker exec supabase_db_business-os psql -U postgres -c "insert into app.platform_staff (email, level) values ('you@example.com', 'owner')"`
 5. From the repository root:
    `uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" python e2e/dod.py you@example.com`
 
 Screenshots are written to `e2e/screenshots/` (git-ignored).
+
+CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by hand from the Actions tab).
 
 `roles.py` checks custom roles through the UI (create a role, assign it, access changes, in-use role is protected). Run it the same way, without arguments, against the normal API.
 
@@ -57,6 +59,28 @@ Screenshots are written to `e2e/screenshots/` (git-ignored).
 
 `client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.
 
-`business_app.py <owner email with data>` (needs `pnpm --filter business-app exec expo start --web --port 8082`): the business app — today, a session's roster and check-in, a client, the numbers.
+`business_app.py <owner email with data>` (needs `pnpm --filter business-app exec expo start --web --port 8082`): the business app on a phone — today with its attention lists and the week, a session (check-in, booking someone in, a visit note), clients (filters, a new client, selling a plan, a note, a message), leads (a stage, a call, turning one into a client, a new lead), messages, numbers and settings; then the main screens in English with dark mode. If your local database listens on another port, set `E2E_DATABASE_URL`.
 
-`staff_app.py <team email>` (needs `pnpm --filter staff-app exec expo start --web --port 8083`): the MyBiz team app — what needs attention, businesses, and handling a request.
+`staff_app.py <team email of a MyBiz owner>` (needs `pnpm --filter staff-app exec expo start --web --port 8083`, and a fresh `app.seed --demo platform`: it marks one new request done): the MyBiz team app on a phone — the numbers and what needs attention, sorting and opening a business (numbers, modules, invoices, more trial days), handling a request (take it, notes, done); then the main screens in English with dark mode.
+
+`resources.py <owner email with data>`: courts and rooms by the hour (#41) — a room becomes a court for rent with opening hours, a service by the hour gets its court, and the front desk reserves it from the day grid; then the grid in English/dark on a phone.
+
+`court_app.py <owner email>` (needs `pnpm dev:app`; run `resources.py` first): a new client books a court in the app — length, day, time — pays (simulated) and opens the receipt.
+
+`pets.py <owner email>` (on the pet grooming demo, `--demo pets`): pets under their owners (#43) — the owner's card lists their pets and a new one is added with its details; an appointment is booked for the pet and the roster shows "pet · owner"; then the card in English/dark on a phone.
+
+`pets_app.py <owner email>` (needs `pnpm dev:app`, the pet grooming demo): a new owner adds their dog under "My pets" in the client app and books a grooming appointment for it.
+
+`onsite_jobs.py <owner email>` (on the air-conditioning demo, `--demo jobs`): on-site jobs (#42) — a client's addresses and a new one; a job booked at that address; the job's page with the address, navigation links and on the way → in progress → done (checks the client in); then the job in English/dark on a phone.
+
+`onsite_app.py <owner email>` (needs `pnpm dev:app`, the demo): a new client adds their home under "My addresses" and books an AC service there.
+
+`jobs_app.py <owner email>` (needs `pnpm dev:business`, the demo): the owner opens the team's jobs of the day in the business app and moves one on its way.
+
+`integrations.py <owner email> <MyBiz team owner email>`: settings → Integrations lists the payments, invoicing and messaging providers; connecting one and going back to the default; the console lists every service with its default (English/dark on a phone).
+
+`quotes.py <owner email>` (on the photography demo, `--demo events`): quotes (#44) — a new quote with lines and an event saved as a draft and sent; the client opens the private link with no sign-in (English/dark phone), accepts with their name and pays the deposit; the business sees it paid and the event listed.
+
+`practice.py <owner email>` (on the accounting demo, `--demo office`): documents, time and bills (#45) — log time, set the retainer, upload a contract shared and asking to sign, bill the month and open the bill's link to pay (English/dark phone), and My time.
+
+`client_account.py <owner email>` (on the accounting demo, `--demo office`): the client app's account round (#98) — a new client sees a bill to pay, a quote to answer and a contract to sign on the home screen and in "In my account", signs the contract, and home stops asking (Hebrew/light, profile in dark).

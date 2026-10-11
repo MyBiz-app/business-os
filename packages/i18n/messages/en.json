@@ -3,6 +3,14 @@
     "name": "MyBiz",
     "tagline": "Run your business in one place, with AI that works for you."
   },
+  "errorPages": {
+    "title": "Something went wrong",
+    "text": "We couldn't show this page. Please try again; if it keeps happening, contact support and mention the reference below.",
+    "reference": "Reference: {code}",
+    "home": "Back to the home page",
+    "notFoundTitle": "Page not found",
+    "notFoundText": "The page you're looking for doesn't exist or was moved."
+  },
   "home": {
     "status": "System status",
     "apiOnline": "API is online",
@@ -36,6 +44,7 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "themeSystem": "System",
+    "themeFollowsColors": "Set by your colors",
     "title": "Settings",
     "subtitle": "Your business details and how it looks to clients.",
     "details": "Business details",
@@ -45,6 +54,7 @@
     "useDefault": "Use the default color",
     "logo": "Logo",
     "logoHint": "PNG, JPG or WebP, up to 512 KB. A square image works best.",
+    "logoPreview": "Preview of the logo",
     "uploadLogo": "Upload logo",
     "removeLogo": "Remove logo",
     "noLogo": "No logo yet",
@@ -67,7 +77,40 @@
     "onlineSales": "Clients can buy plans in the app",
     "onlineSalesHint": "Until a payment provider is connected, purchases are test payments and no money is charged.",
     "billingLink": "MyBiz billing",
-    "billingHint": "Trial, payment method and invoices."
+    "billingHint": "Trial, payment method and invoices.",
+    "resourcePayment": "Courts and rooms by the hour are paid",
+    "resourcePayments": {
+      "app": "In the app, when booking",
+      "venue": "At the venue"
+    },
+    "resourcePaymentHint": "In the app, a reservation is confirmed only once it's paid.",
+    "integrationsLink": "Integrations",
+    "integrationsHint": "Payments, invoices and messages: which provider you use.",
+    "identity": {
+      "title": "Business identity",
+      "subtitle": "Your legal entity and registration number, for invoices and official documents. Only people who manage settings see it.",
+      "entityType": "Legal entity",
+      "notSet": "Not set",
+      "types": {
+        "company": "Company (Ltd.)",
+        "licensed_dealer": "Licensed dealer",
+        "exempt_dealer": "Exempt dealer",
+        "nonprofit": "Nonprofit",
+        "partnership": "Partnership",
+        "other": "Other"
+      },
+      "number": "Registration number",
+      "companyNumber": "Company number",
+      "dealerNumber": "Dealer number (ID)",
+      "numberHint": "Israeli numbers have 9 digits and are checked as you save.",
+      "invalidNumber": "This number doesn't pass the check digit. Check the digits and try again."
+    },
+    "cover": "Cover image",
+    "coverHint": "A wide picture of your place (PNG, JPEG or WebP, up to 1.5 MB). Your team sees it at the top of the dashboard.",
+    "uploadCover": "Upload cover",
+    "removeCover": "Remove cover",
+    "noCover": "No cover yet: the dashboard uses your brand color.",
+    "coverTooLarge": "The image is larger than 1.5 MB. Choose a smaller one."
   },
   "locales": {
     "he": "עברית",
@@ -119,6 +162,12 @@
       "link_invalid": "This link is invalid or has expired. Please try again.",
       "generic": "Something went wrong. Please try again.",
       "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us."
+    },
+    "oauth": {
+      "google": "Continue with Google",
+      "apple": "Continue with Apple",
+      "or": "or with email",
+      "soon": "Coming soon"
     }
   },
   "onboarding": {
@@ -222,7 +271,11 @@
     "clientApp": "Client app",
     "locked": "Not in your plan",
     "lockedItem": "{name} — not in your plan",
-    "sales": "Sales"
+    "sales": "Sales",
+    "resources": "Courts & rooms",
+    "quotes": "Quotes",
+    "time": "My time",
+    "billingRun": "Billing"
   },
   "terms": {
     "fitness": {
@@ -319,6 +372,120 @@
       "profile": "Student details",
       "visitNotes": "Progress notes",
       "nextBooking": "Your next lesson"
+    },
+    "sports": {
+      "client": "Player",
+      "clients": "Players",
+      "addClient": "Add player",
+      "newClient": "New player",
+      "searchClients": "Search players",
+      "noClients": "No players yet",
+      "noResults": "No players match your search",
+      "schedule": "Schedule",
+      "newSession": "New session",
+      "noSessions": "Nothing booked",
+      "sessionsToday": "{count, plural, =0 {Nothing booked today} one {One booking today} other {# bookings today}}",
+      "appTab": "Schedule",
+      "appEmpty": "Nothing on this day.",
+      "place": "The club",
+      "profile": "Player profile",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next booking"
+    },
+    "pets": {
+      "client": "Owner",
+      "clients": "Owners",
+      "addClient": "Add owner",
+      "newClient": "New owner",
+      "searchClients": "Search owners",
+      "noClients": "No owners yet",
+      "noResults": "No owners match your search",
+      "schedule": "Appointments",
+      "newSession": "New appointment",
+      "noSessions": "No appointments",
+      "sessionsToday": "{count, plural, =0 {No appointments today} one {One appointment today} other {# appointments today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The salon",
+      "profile": "Owner details",
+      "visitNotes": "Grooming notes",
+      "nextBooking": "Your next appointment"
+    },
+    "home_services": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Jobs",
+      "newSession": "New job",
+      "noSessions": "No jobs",
+      "sessionsToday": "{count, plural, =0 {No jobs today} one {One job today} other {# jobs today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "Your place",
+      "profile": "Client details",
+      "visitNotes": "Job notes",
+      "nextBooking": "Your next visit"
+    },
+    "events": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Calendar",
+      "newSession": "New meeting",
+      "noSessions": "No meetings",
+      "sessionsToday": "{count, plural, =0 {No meetings today} one {One meeting today} other {# meetings today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The studio",
+      "profile": "Event details",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next meeting"
+    },
+    "professional": {
+      "client": "Client",
+      "clients": "Clients",
+      "addClient": "Add client",
+      "newClient": "New client",
+      "searchClients": "Search clients",
+      "noClients": "No clients yet",
+      "noResults": "No clients match your search",
+      "schedule": "Meetings",
+      "newSession": "New meeting",
+      "noSessions": "No meetings",
+      "sessionsToday": "{count, plural, =0 {No meetings today} one {One meeting today} other {# meetings today}}",
+      "appTab": "Meetings",
+      "appEmpty": "Nothing on this day.",
+      "place": "The office",
+      "profile": "Client details",
+      "visitNotes": "Meeting notes",
+      "nextBooking": "Your next meeting"
+    },
+    "food": {
+      "client": "Guest",
+      "clients": "Guests",
+      "addClient": "Add guest",
+      "newClient": "New guest",
+      "searchClients": "Search guests",
+      "noClients": "No guests yet",
+      "noResults": "No guests match your search",
+      "schedule": "Events",
+      "newSession": "New event",
+      "noSessions": "No events",
+      "sessionsToday": "{count, plural, =0 {No events today} one {One event today} other {# events today}}",
+      "appTab": "Book",
+      "appEmpty": "Nothing on this day.",
+      "place": "The restaurant",
+      "profile": "Guest details",
+      "visitNotes": "Notes",
+      "nextBooking": "Your next booking"
     }
   },
   "clients": {
@@ -400,6 +567,8 @@
     "pageOf": "Page {page} of {pages}"
   },
   "common": {
+    "loadFailed": "Couldn't load this right now.",
+    "retry": "Try again",
     "save": "Save",
     "create": "Create",
     "cancel": "Cancel",
@@ -410,11 +579,13 @@
     "add": "Add",
     "errors": {
       "invalid": "Please check the details and try again.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "storage_full": "Your space for files is full. Delete some files or choose a bigger bundle in Billing."
     },
     "loading": "Loading…",
     "chooseFile": "Choose a file",
-    "noFile": "No file chosen"
+    "noFile": "No file chosen",
+    "edit": "Edit"
   },
   "services": {
     "title": "Services",
@@ -422,6 +593,12 @@
     "add": "Add service",
     "new": "New service",
     "empty": "No services yet. Add your first one.",
+    "delete": "Delete service",
+    "deleteConfirm": "Delete the service \"{name}\"? If it has sessions or sales it is hidden instead, and its history stays.",
+    "removed": {
+      "deleted": "The service was deleted.",
+      "archived": "The service is used by past sessions or sales, so it was hidden from your catalog instead. Its history is kept."
+    },
     "name": "Name",
     "description": "Description",
     "duration": "Duration (minutes)",
@@ -436,7 +613,8 @@
     "bookingMode": "How it is booked",
     "modes": {
       "class": "Group session – at set times on the schedule",
-      "appointment": "Personal appointment – the client picks a free time"
+      "appointment": "Personal appointment – the client picks a free time",
+      "resource": "A court or room by the hour"
     },
     "appointmentLabel": "Appointment",
     "stats": {
@@ -460,7 +638,22 @@
     "addRoom": "Add room",
     "noRooms": "No rooms yet.",
     "mainBranch": "Main branch",
-    "branchNumber": "Branch {number}"
+    "branchNumber": "Branch {number}",
+    "bookable": "For rent by the hour",
+    "openingHours": "Opening hours: {name}",
+    "addBranch": {
+      "title": "Add a branch",
+      "details": "Branch details",
+      "chargeTitle": "This adds a monthly charge",
+      "chargeBody": "Each branch beyond the first costs {price} a month. Your extra branches go from {before} to {after} a month.",
+      "chargeNote": "Nothing is charged now; the change shows on your next invoice.",
+      "copyHours": "Opening hours",
+      "setHoursLater": "I'll set them after creating the branch",
+      "staff": "Who works here too?",
+      "staffHint": "Team members kept to specific branches. Everyone else already works at all branches.",
+      "accept": "I understand the monthly charge for the new branch",
+      "submit": "Add branch"
+    }
   },
   "team": {
     "title": "Team",
@@ -492,12 +685,22 @@
       "cannot_change_own_role": "You can't change your own role.",
       "exceeds_own_permissions": "You can't grant permissions you don't have yourself.",
       "name_taken": "A role with that name already exists.",
-      "role_in_use": "This role is still assigned to team members. Change their role first."
+      "role_in_use": "This role is still assigned to team members. Change their role first.",
+      "reporting_cycle": "That would make a loop: this person already manages them."
     },
     "manageRoles": "Manage roles and permissions",
     "rolesTitle": "Roles and permissions",
     "rolesSubtitle": "Create a role by switching permissions on or off, then give it to team members. You can only grant permissions you have yourself.",
     "newRole": "New role",
+    "systemRolesTitle": "Built-in roles",
+    "systemRolesHint": "What each built-in role can do. These can't be edited; create your own role below to fine-tune.",
+    "customRolesTitle": "Your roles",
+    "noCustomRoles": "You haven't created any roles yet.",
+    "viewPermissions": "Permissions",
+    "permissionsOf": "What {email} can do",
+    "permissionsHint": "To change this, pick another role for them, or create a role with exactly the permissions you want.",
+    "allowed": "Allowed",
+    "notAllowed": "Not allowed",
     "roleName": "Role name",
     "rolePermissions": "What this role can do",
     "roleCreated": "Role created.",
@@ -507,9 +710,11 @@
     "branchesOf": "Branches of {email}",
     "allBranches": "All branches",
     "someBranches": "{count} branches",
-    "branchesHint": "Where they work. None checked means all branches.",
+    "branchesHint": "They see only the branches checked here (owners and managers always see all). None checked means all branches.",
     "saveBranches": "Save",
-    "count": "{count, plural, one {One person} other {# people}}"
+    "count": "{count, plural, one {One person} other {# people}}",
+    "homeBranch": "Home branch",
+    "noHomeBranch": "None"
   },
   "invite": {
     "title": "You're invited",
@@ -596,7 +801,32 @@
       "invalid": "Please choose a date.",
       "generic": "Something went wrong. Try again."
     },
-    "jumpToDay": "Go to day"
+    "jumpToDay": "Go to day",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "today": "Today",
+    "view": "View",
+    "dayView": "Day",
+    "weekView": "Week",
+    "branches": "Branches",
+    "now": "Now",
+    "shiftsLegend": "The strip at the edge of each column shows who is on shift: faces, or the number of people when it gets crowded.",
+    "more": "+{count} more",
+    "onShift": "on shift",
+    "monthView": "Month",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "stepDay": "Day",
+    "stepWeek": "Week",
+    "stepMonth": "Month",
+    "goToDate": "Go to date",
+    "branchLimit": "Up to {count} branches in this view",
+    "monthOneBranch": "The month view shows one branch at a time.",
+    "saveDefault": "Save as default view",
+    "saveDefaultHint": "The schedule will open with this range and these branches for everyone in the business.",
+    "defaultSaved": "Saved.",
+    "defaultError": "Could not save. Try again.",
+    "resetView": "Back to the default view"
   },
   "bookings": {
     "title": "Bookings",
@@ -636,7 +866,9 @@
       "invalid_transition": "That change isn't possible for this booking.",
       "invalid_reference": "That client is not available. Refresh and try again.",
       "not_found": "The booking was not found. Refresh and try again.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "dependent_required": "Choose who comes.",
+      "unknown_dependent": "That one isn't on this client's card any more."
     },
     "noPlan": "No plan",
     "showAll": "Show the whole history ({count})"
@@ -652,11 +884,11 @@
     },
     "signIn": {
       "title": "Sign in",
-      "subtitle": "Enter your email and we'll send you a 6-digit code. No password needed.",
+      "subtitle": "Enter your email and we'll send you a one-time code. No password needed.",
       "email": "Email",
       "sendCode": "Send code",
       "codeSent": "We sent a code to {email}. It's valid for one hour.",
-      "code": "6-digit code",
+      "code": "Code from the email",
       "verify": "Sign in",
       "changeEmail": "Use a different email",
       "invalidEmail": "Enter a valid email address.",
@@ -685,7 +917,13 @@
       "nextBooking": "Your next booking",
       "noUpcoming": "No upcoming bookings yet.",
       "today": "Today",
-      "bookClass": "Book a class"
+      "bookClass": "Book a class",
+      "waiting": "Waiting for you",
+      "payBill": "Pay bill {number}",
+      "payDeposit": "Pay the deposit for quote {number}",
+      "answerQuote": "Answer quote {number}",
+      "signDocument": "Sign “{name}”",
+      "signHint": "Sign by writing your name"
     },
     "schedule": {
       "title": "Schedule",
@@ -714,7 +952,8 @@
       "bought": "Done! {plan} is now in your plans.",
       "buyFailed": "The purchase didn't go through. Try again.",
       "receipts": "Receipts",
-      "noReceipts": "No receipts yet."
+      "noReceipts": "No receipts yet.",
+      "showAll": "Show all ({count})"
     },
     "profile": {
       "title": "Profile",
@@ -729,7 +968,15 @@
       "save": "Save details",
       "saved": "Saved.",
       "saveFailed": "Couldn't save. Try again.",
-      "firstNameRequired": "Please enter your first name."
+      "firstNameRequired": "Please enter your first name.",
+      "account": "In my account",
+      "toSign": "{count, plural, one {# to sign} other {# to sign}}",
+      "toPay": "To pay",
+      "toAnswer": "Needs an answer",
+      "quotesAndBills": "Quotes and bills",
+      "receipts": "My receipts",
+      "receiptsHint": "Every payment, with its receipt",
+      "noReceipts": "No payments yet."
     },
     "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
     "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",
@@ -753,7 +1000,9 @@
       "generic": "Something went wrong. Try again.",
       "no_valid_plan": "You need a valid membership or punch card to book. Ask the business.",
       "health_declaration_required": "Please fill in the health declaration before booking.",
-      "health_declaration_review": "The business needs to approve your health declaration before you can book."
+      "health_declaration_review": "The business needs to approve your health declaration before you can book.",
+      "dependent_required": "Choose who's coming.",
+      "unknown_dependent": "That profile isn't active any more."
     },
     "health": {
       "title": "Health declaration",
@@ -840,7 +1089,10 @@
         "no_valid_plan": "You need a valid plan to book.",
         "health_declaration_required": "Please fill in the health declaration before booking.",
         "health_declaration_review": "Your health declaration is waiting for review.",
-        "generic": "Something went wrong. Please try again."
+        "generic": "Something went wrong. Please try again.",
+        "dependent_required": "Choose who's coming.",
+        "unknown_dependent": "That profile isn't active any more.",
+        "address_required": "Choose where the job is."
       }
     },
     "review": {
@@ -869,6 +1121,35 @@
       "listPrice": "Price",
       "discount": "Discount",
       "invalid": "This code isn't valid for this purchase."
+    },
+    "court": {
+      "cta": "Book a court",
+      "ctaText": "Pick a day, a time and how long",
+      "title": "Book a court",
+      "none": "Nothing to book here yet.",
+      "what": "What",
+      "perHour": "{price} an hour",
+      "length": "How long",
+      "where": "Which court",
+      "anyCourt": "Any",
+      "noSlots": "No free time on this day for this length.",
+      "simulated": "Test payment: no money is charged.",
+      "venueHint": "You pay at the venue.",
+      "payAndReserve": "Pay {price} and book",
+      "reserve": "Book for {time}",
+      "booked": "Booked!",
+      "bookedBody": "{service}, {room}, {date}, {from}–{to}.",
+      "paid": "Paid {price}.",
+      "payAtVenue": "{price}, paid at the venue.",
+      "receipt": "The receipt",
+      "errors": {
+        "slot_taken": "Someone just booked this time. Pick another.",
+        "outside_hours": "That's outside the opening hours.",
+        "length_not_offered": "This length isn't offered.",
+        "health_declaration_required": "Fill in the health declaration first.",
+        "health_declaration_review": "Your health declaration is waiting for the business.",
+        "generic": "Something went wrong. Try again."
+      }
     }
   },
   "join": {
@@ -877,7 +1158,7 @@
     "qrLabel": "QR code that opens the join page",
     "codeLabel": "Join code",
     "step1": "Install the MyBiz app.",
-    "step2": "Sign in with your email (you'll get a 6-digit code).",
+    "step2": "Sign in with your email (you'll get a one-time code).",
     "step3": "Enter the join code above.",
     "title": "Join {name}",
     "body": "Book appointments and sessions, join waitlists and manage your bookings in the app.",
@@ -890,6 +1171,12 @@
     "add": "Add plan",
     "new": "New plan",
     "empty": "No plans yet.",
+    "delete": "Delete plan",
+    "deleteConfirm": "Delete \"{name}\"? If clients already bought it, it is hidden instead and their purchases stay valid.",
+    "removed": {
+      "deleted": "The plan was deleted.",
+      "archived": "Clients already bought this plan, so it was hidden from sale instead. Existing purchases stay valid."
+    },
     "name": "Name",
     "kind": "Type",
     "kinds": {
@@ -994,10 +1281,14 @@
     "errors": {
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
+      "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
     },
-    "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything."
+    "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything.",
+    "logTimePreview": "Log {hours} h for {client}: {description}",
+    "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all"
   },
   "modules": {
     "title": "Modules and plan",
@@ -1019,7 +1310,18 @@
       "agent_finance": "Finance agent",
       "agent_marketing": "Marketing agent",
       "whatsapp": "WhatsApp",
-      "extra_location": "Extra locations"
+      "extra_location": "Extra locations",
+      "client_app_branded": "Branded app in the stores",
+      "crm_automation": "Leads on autopilot",
+      "whatsapp_ai": "AI on WhatsApp",
+      "pack_plus": "Plus bundle (space and messages)",
+      "pack_max": "Max bundle (space and messages)",
+      "support_priority": "Priority support",
+      "support_vip": "VIP support",
+      "setup_guided": "Guided setup",
+      "setup_full": "Done-for-you setup",
+      "noSupport": "Standard support",
+      "noPack": "Included amount"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -1031,9 +1333,22 @@
       "whatsapp": "Messages to clients and leads: broadcasts to a segment, templates and a send log.",
       "analytics_pro": "Deeper reports: cohorts, retention, revenue per client and per branch, with exports.",
       "agent_finance": "An AI agent that follows payments, debts and renewals, and prepares reminders for your approval.",
-      "agent_marketing": "An AI agent that finds clients to win back and drafts campaigns for your approval."
+      "agent_marketing": "An AI agent that finds clients to win back and drafts campaigns for your approval.",
+      "client_app_branded": "Your business's own app on the App Store and Google Play, published and updated by our team.",
+      "crm_automation": "Facebook and Instagram ad leads land on the board, and a follow-up goes out automatically.",
+      "whatsapp_ai": "Answers clients on WhatsApp 24/7 and offers free slots for you to confirm. Needs AI.",
+      "pack_plus": "20 GB for files and 1,000 messages a month.",
+      "pack_max": "100 GB for files and 5,000 messages a month.",
+      "support_priority": "Chat and phone, an answer within 4 business hours.",
+      "support_vip": "A personal account manager, a monthly call and an answer within an hour.",
+      "setup_guided": "A setup session with the MyBiz team: services, prices and staff set up together.",
+      "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
+      "noSupport": "Email and help center, an answer by the next business day.",
+      "noPack": "2 GB for files and 200 messages a month."
     },
-    "followsBranches": "Follows your active branches"
+    "followsBranches": "Follows your active branches",
+    "supportTier": "Support",
+    "packTier": "Space and messages"
   },
   "platform": {
     "title": "MyBiz console",
@@ -1043,6 +1358,8 @@
     "bookings30d": "Bookings (30 days)",
     "aiCredits30d": "AI credits (30 days)",
     "aiCreditsPerDay": "AI credits per day",
+    "aiSpendAlarmTitle": "AI spend alarm",
+    "aiSpendAlarm": "Today's AI spend is {spent} credits, over the {limit} credit alarm.",
     "aiCredits": "AI credits",
     "day": "Day",
     "businessesTitle": "Businesses",
@@ -1084,7 +1401,8 @@
       "inbox": "Inbox",
       "billing": "Billing",
       "team": "MyBiz team",
-      "audit": "Audit log"
+      "audit": "Audit log",
+      "integrations": "Integrations"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -1179,7 +1497,7 @@
     },
     "inbox": {
       "title": "Inbox",
-      "subtitle": "Requests from the website and messages from businesses. Open ones first.",
+      "subtitle": "Requests from the website, messages from businesses and setup tasks. Open ones first, VIP and priority support on top.",
       "statuses": {
         "new": "New",
         "in_progress": "In progress",
@@ -1198,7 +1516,16 @@
       "saveNotes": "Save notes",
       "openBusiness": "Open the business",
       "empty": "Nothing here.",
-      "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}"
+      "count": "{count, plural, =0 {No requests} one {# request} other {# requests}}",
+      "setupTask": "Setup task",
+      "tiers": {
+        "priority": "Priority support",
+        "vip": "VIP support"
+      },
+      "setup": {
+        "setup_guided": "Bought guided setup: book a setup session with them.",
+        "setup_full": "Bought setup done for them: reach out to collect their details and set the business up."
+      }
     },
     "actions": {
       "title": "Actions for the owner",
@@ -1245,6 +1572,21 @@
       "paidTotal": "Paid in total",
       "openTotal": "Open to collect",
       "paidShare": "{value} paid"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "subtitle": "Which provider each service uses by default, and the providers available to businesses.",
+      "default": "Default",
+      "available": "Providers available",
+      "simulated": "Simulated",
+      "live": "Live",
+      "businesses": "{count, plural, one {# business} other {# businesses}}",
+      "howTo": "A new provider is one class registered in the API (see docs/integrations.md); the default changes with API_<SERVICE>_PROVIDER.",
+      "capabilities": {
+        "email": "Email",
+        "ai": "AI assistant",
+        "storage": "File storage"
+      }
     }
   },
   "permissions": {
@@ -1256,6 +1598,8 @@
     "catalog_read_hint": "Services, locations and plans",
     "catalog_write": "Edit services and plans",
     "catalog_write_hint": "Add and change them",
+    "catalog_delete": "Remove services and plans",
+    "catalog_delete_hint": "Remove a service, membership or punch card from the catalog",
     "schedule_read": "View the schedule",
     "schedule_read_hint": "Sessions and rosters",
     "schedule_write": "Edit the schedule",
@@ -1408,6 +1752,18 @@
       "less": "Less",
       "more": "More",
       "busiest": "Busiest: {slot}"
+    },
+    "byCourt": "Courts and rooms by the hour",
+    "court": "Court",
+    "reservations": "Reservations",
+    "reservedHours": "Hours reserved",
+    "hoursOf": "{reserved} of {open}",
+    "courtRevenue": "Paid",
+    "compare": {
+      "title": "Branches side by side",
+      "subtitle": "Same period and definitions as above, per branch.",
+      "total": "Total",
+      "average": "Average"
     }
   },
   "email": {
@@ -1463,6 +1819,35 @@
       "clientApp": "The client app",
       "help": "Questions? Just reply to this email or write to us on the contact page: {contact}",
       "signature": "Good luck,\nThe MyBiz team"
+    },
+    "leadFollowUp": {
+      "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
+      "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "roster": {
+      "subject": "Your new shifts at {business}",
+      "intro": "Your roster at {business} was published. Your shifts:",
+      "line": "{day} {from}–{to} · {branch}{position}",
+      "more": "…and {count} more. See them all in the app.",
+      "weekdays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "footer": "You can turn these emails off under Personal settings."
+    },
+    "rosterChanges": {
+      "subject": "Your roster at {business} changed",
+      "intro": "Changes to your shifts at {business}:",
+      "removed": "Removed:",
+      "changed": "Changed:",
+      "arrow": "now",
+      "more": "…and {count} more changes. See your roster in the app.",
+      "footer": "You can turn these emails off under Personal settings."
     }
   },
   "support": {
@@ -1513,7 +1898,9 @@
     "print": "Print",
     "back": "Back to the client",
     "thanks": "Thank you!",
-    "email": "Email"
+    "email": "Email",
+    "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
+    "openDocument": "Open the document"
   },
   "marketing": {
     "nav": {
@@ -1707,7 +2094,8 @@
       "seeAll": "See all prices",
       "note": "Launch prices, subject to change.",
       "currency": "Currency",
-      "modulesText": "Add only what your business needs. Turn any add-on on or off whenever you like."
+      "modulesText": "Add only what your business needs. Turn any add-on on or off whenever you like.",
+      "oneTime": "one-time"
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -1908,7 +2296,8 @@
       "slot_taken": "That time was just taken. Choose another.",
       "outside_hours": "That time is outside working hours.",
       "generic": "Something went wrong. Please try again.",
-      "invalid": "Choose a client and a time."
+      "invalid": "Choose a client and a time.",
+      "address_required": "Choose one of the client's addresses."
     }
   },
   "hours": {
@@ -2093,7 +2482,27 @@
     "activeClients": "{count} active clients at the end of the period",
     "paidWith": "Paid with the card ending {last4} on {date}",
     "dashboardTrial": "{days, plural, one {1 day} other {# days}} left in your trial. Add a payment method to keep going without a break.",
-    "dashboardDue": "You have an open MyBiz invoice of {amount}."
+    "dashboardDue": "You have an open MyBiz invoice of {amount}.",
+    "usage": {
+      "title": "Space and messages · {pack}",
+      "since": "Since {date}",
+      "messages": "Messages this month",
+      "storage": "Files",
+      "of": "{used} of {included}",
+      "more": "Need more? Choose a bigger bundle",
+      "packs": {
+        "included": "Basic",
+        "pack_plus": "Plus",
+        "pack_max": "Max"
+      },
+      "nearMessages": "You've used {percent}% of this month's messages. They keep going to your clients; a bigger bundle covers more.",
+      "overMessages": "You've passed this month's messages ({percent}%). They keep going to your clients; choose a bigger bundle.",
+      "ai": "AI assistant this month",
+      "nearAi": "You've used {percent}% of this month's AI allowance. At 100% the assistant pauses until next month.",
+      "overAi": "You've used this month's AI allowance, so the assistant is paused until next month. Everything else keeps working; a bigger AI module raises the allowance.",
+      "nearStorage": "Your files take {percent}% of your space.",
+      "overStorage": "Your space for files is full: new files can't be added. Delete some or choose a bigger bundle."
+    }
   },
   "visitNotes": {
     "body": "What was done / worth remembering?",
@@ -2244,10 +2653,13 @@
       "plan": "Plan",
       "extras": "Extras",
       "summary": "Summary",
-      "step": "Step {step} of {total}"
+      "step": "Step {step} of {total}",
+      "services": "Services",
+      "flight": "{percent}% of the way"
     },
     "back": "Back",
     "next": "Continue",
+    "skip": "Skip",
     "industry": {
       "title": "What kind of business do you run?",
       "subtitle": "We'll set MyBiz up with your industry's words, services and forms.",
@@ -2256,7 +2668,7 @@
       "otherKind": "Another {name} business",
       "allIndustries": "All industries",
       "missing": "Don't see your industry?",
-      "seeAll": "See every industry, including those coming soon"
+      "seeAll": "See every industry and its kinds of business"
     },
     "business": {
       "title": "Tell us about {yours}",
@@ -2300,7 +2712,11 @@
         "Ratings from your clients",
         "Hebrew and English, phone and computer"
       ],
-      "locations": "+ {count, plural, one {# extra location} other {# extra locations}} for your branches"
+      "locations": "+ {count, plural, one {# extra location} other {# extra locations}} for your branches",
+      "pick": "Pick the size that fits you today. You move up only when the business grows.",
+      "custom": "Custom price",
+      "current": "Your size",
+      "clients": "active clients"
     },
     "perMonth": "/ month",
     "daily": "That's about {price} a day",
@@ -2320,7 +2736,27 @@
           "Booking and waitlists without a phone call",
           "Buying memberships and punch cards in the app",
           "Ratings after every visit"
-        ]
+        ],
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "The MyBiz client app, with your name and colors",
+            "points": [
+              "Booking and waitlists without a call",
+              "Buying memberships and class packs",
+              "A rating after every visit"
+            ]
+          },
+          "pro": {
+            "name": "Pro · your own app",
+            "tagline": "An app under your name in the stores, with your icon",
+            "points": [
+              "Everything in Basic",
+              "Your business's app on the App Store and Google Play",
+              "Our team publishes and updates it for you"
+            ]
+          }
+        }
       },
       "ai": {
         "eyebrow": "AI assistant",
@@ -2339,7 +2775,27 @@
           }
         },
         "choose": "Choose this",
-        "chosen": "Chosen"
+        "chosen": "Chosen",
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "Answers about your schedule, clients and numbers",
+            "points": [
+              "Ask in plain words",
+              "Answers from your real data",
+              "Available any time"
+            ]
+          },
+          "pro": {
+            "name": "Pro",
+            "tagline": "Everything in Basic, and it prepares the work",
+            "points": [
+              "Prepares bookings and cancellations for you to confirm",
+              "Knows who owes money and what awaits an answer",
+              "Every action waits for your OK"
+            ]
+          }
+        }
       },
       "crm": {
         "eyebrow": "CRM & leads",
@@ -2360,7 +2816,27 @@
           "Dana · Instagram",
           "Yossi · Website",
           "Maya · Referral"
-        ]
+        ],
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "A tidy lead board, from inquiry to client",
+            "points": [
+              "An inquiry form for your site and socials",
+              "A board from new inquiry to paying client",
+              "Follow-up reminders and a call log"
+            ]
+          },
+          "pro": {
+            "name": "Pro · leads on autopilot",
+            "tagline": "Ad leads arrive by themselves, and follow-ups run by themselves",
+            "points": [
+              "Everything in Basic",
+              "Facebook and Instagram ad leads straight to the board",
+              "An automatic follow-up to a lead who didn't reply"
+            ]
+          }
+        }
       },
       "whatsapp": {
         "eyebrow": "WhatsApp & SMS",
@@ -2372,7 +2848,123 @@
           "Ready-made message templates"
         ],
         "message": "Hi Dana! A reminder: tomorrow at 18:00 you have a session with us. See you 💪",
-        "reply": "Thanks, I'll be there!"
+        "reply": "Thanks, I'll be there!",
+        "plans": {
+          "basic": {
+            "name": "Basic",
+            "tagline": "Automatic reminders and updates",
+            "points": [
+              "Automatic reminders the day before",
+              "Broadcasts to a group of clients",
+              "Ready message templates"
+            ]
+          },
+          "pro": {
+            "name": "Pro · AI on WhatsApp",
+            "tagline": "Answers your clients on WhatsApp, even at night",
+            "points": [
+              "Everything in Basic",
+              "Answers common questions 24/7",
+              "Offers a free slot and passes it to you to confirm"
+            ]
+          }
+        }
+      },
+      "pack": {
+        "eyebrow": "Space and messages",
+        "title": "How much space and messaging do you need?",
+        "text": "Like luggage on a flight: the basics are included, and if you know you'll need more, a bigger bundle up front saves you money.",
+        "plans": {
+          "included": {
+            "name": "Basic",
+            "tagline": "Enough for most businesses at the start",
+            "points": [
+              "2 GB for files and documents",
+              "200 messages a month"
+            ]
+          },
+          "plus": {
+            "name": "Plus",
+            "tagline": "For a business that talks to its clients a lot",
+            "points": [
+              "20 GB for files and documents",
+              "1,000 messages a month"
+            ]
+          },
+          "max": {
+            "name": "Max",
+            "tagline": "For a big business or several branches",
+            "points": [
+              "100 GB for files and documents",
+              "5,000 messages a month"
+            ]
+          }
+        }
+      },
+      "support": {
+        "eyebrow": "Support",
+        "title": "How close would you like us to be?",
+        "text": "Like picking a seat: everyone gets there, but some like the window.",
+        "plans": {
+          "standard": {
+            "name": "Standard",
+            "tagline": "We're here when you need us",
+            "points": [
+              "Email and help center",
+              "An answer by the next business day"
+            ]
+          },
+          "priority": {
+            "name": "Priority",
+            "tagline": "Fast answers, by chat and phone",
+            "points": [
+              "Chat and phone",
+              "An answer within 4 business hours",
+              "Front of the queue"
+            ]
+          },
+          "vip": {
+            "name": "VIP",
+            "tagline": "A personal account manager, just for you",
+            "points": [
+              "A personal account manager",
+              "A monthly call about your numbers",
+              "An answer within an hour"
+            ]
+          }
+        }
+      },
+      "setup": {
+        "eyebrow": "Setup",
+        "title": "Who sets the business up?",
+        "text": "A one-time fee, only if you want it: charged with the first invoice after the trial.",
+        "plans": {
+          "self": {
+            "name": "Myself",
+            "tagline": "A step-by-step guide",
+            "points": [
+              "A first-steps checklist",
+              "Short guides on every screen"
+            ]
+          },
+          "guided": {
+            "name": "Guided setup",
+            "tagline": "We set it up together, on a video call",
+            "points": [
+              "45 minutes with one of our experts",
+              "Services, plans and team ready by the end of the call"
+            ]
+          },
+          "full": {
+            "name": "Done for you",
+            "tagline": "You arrive, everything is ready",
+            "points": [
+              "Clients, memberships and schedule imported from your old system",
+              "The whole business set up",
+              "A training call for your team"
+            ]
+          }
+        }
       }
     },
     "cart": {
@@ -2386,7 +2978,8 @@
       "items": "{count, plural, one {# item} other {# items}}",
       "addedNotice": "{name} added. Monthly total: {total}",
       "removedNotice": "{name} removed. Monthly total: {total}",
-      "emptyHint": "Add-ons you choose show up here. You can change them any time."
+      "emptyHint": "Add-ons you choose show up here. You can change them any time.",
+      "once": "One-time, with the first invoice"
     },
     "summary": {
       "title": "Your plan is ready",
@@ -2402,10 +2995,16 @@
       "haveAccount": "Already have a MyBiz account?",
       "login": "Sign in and continue",
       "guarantee": [
-        "No setup fees",
+        "No mandatory setup fee",
         "Cancel any time",
         "Your data stays yours"
-      ]
+      ],
+      "pass": "Your boarding pass",
+      "from": "Today",
+      "to": "Your business, live",
+      "trial": "14 days free",
+      "once": "One-time (with the first invoice)",
+      "celebrate": "What a plan! One more step and you're off"
     },
     "finish": {
       "title": "Last step: payment details",
@@ -2422,12 +3021,33 @@
       "errors": {
         "invalid": "Some details are missing or incorrect. Please check and try again.",
         "generic": "Something went wrong. Please try again in a moment."
-      }
+      },
+      "later": "Not now – explore a sample business first"
     },
     "presets": {
       "starter": "Starter",
       "growing": "Growing",
       "ai_powered": "AI-powered"
+    },
+    "account": {
+      "eyebrow": "Before take-off",
+      "title": "Let's save your plan",
+      "subtitle": "Sign up in one tap and nothing you choose gets lost. Or carry on and create your account at the end.",
+      "email": "Continue – I'll sign up with email at the end",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "tier": {
+      "choose": "Choose",
+      "chosen": "Chosen",
+      "included": "Included",
+      "free": "Free",
+      "once": "one-time",
+      "onceNote": "One-time, with the first invoice after the trial",
+      "recommended": "Recommended for you",
+      "bestValue": "Best value",
+      "noThanks": "No thanks, skip {name}",
+      "needsAi": "Includes AI Basic (+{price} a month), since you haven't chosen AI yet"
     }
   },
   "gettingStarted": {
@@ -2551,16 +3171,38 @@
     "unknown": "This module isn't available."
   },
   "account": {
-    "link": "My profile",
-    "title": "My profile",
-    "subtitle": "How you appear to your team, your clients and in reports.",
+    "link": "Settings",
+    "title": "Settings",
+    "subtitle": "Your personal profile and how the app works for you. Only you see these choices.",
     "name": "Full name",
     "nameHint": "Shown on the schedule, in the client app and in reports.",
     "email": "Email",
     "emailHint": "You sign in with this email.",
     "password": "Password",
     "changePassword": "Change password",
-    "businesses": "Your businesses"
+    "businesses": "Your businesses",
+    "phone": "Phone",
+    "phoneHint": "For your team to reach you. Clients don't see it.",
+    "addPicture": "Add a picture",
+    "replacePicture": "Replace picture",
+    "savePicture": "Save picture",
+    "removePicture": "Remove picture",
+    "pictureHint": "A square PNG, JPEG or WebP up to 512 KB. Your team sees it next to your name.",
+    "pictureErrors": {
+      "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
+      "unsupported_image": "Choose a PNG, JPEG or WebP picture."
+    },
+    "profileTitle": "Profile",
+    "detailsTitle": "Personal details",
+    "birthDate": "Date of birth",
+    "birthDateHint": "Only you see this.",
+    "addressLine": "Street and number",
+    "city": "City",
+    "postalCode": "Postal code",
+    "addressHint": "Your home address. Only you see it.",
+    "notificationsTitle": "Email notifications",
+    "rosterEmails": "Email me when my roster is published",
+    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed."
   },
   "sales": {
     "title": "Sales",
@@ -2596,7 +3238,9 @@
     "tabs": {
       "today": "Today",
       "numbers": "Numbers",
-      "me": "Me"
+      "me": "Me",
+      "leads": "Leads",
+      "messages": "Messages"
     },
     "noBusiness": {
       "title": "This app is for business owners and staff",
@@ -2626,7 +3270,14 @@
         "cancelled": "Cancelled",
         "waitlisted": "Waiting"
       },
-      "saved": "Saved."
+      "saved": "Saved.",
+      "days": "Days of the week",
+      "noneOnDay": "Nothing on this day.",
+      "backToDay": "Back to the day",
+      "sessions": "{count, plural, =0 {Nothing booked} one {# session} other {# sessions}}",
+      "booked": "{count, plural, =0 {No bookings} one {# booking} other {# bookings}}",
+      "attention": "Needs your attention",
+      "full": "Full"
     },
     "clients": {
       "search": "Search",
@@ -2639,12 +3290,51 @@
       "email": "Email",
       "plan": "Plan",
       "noPlan": "No active plan",
-      "notes": "Notes"
+      "notes": "Notes",
+      "add": "Add",
+      "total": "{count, plural, =0 {None} one {# in all} other {# in all}}",
+      "created": "Saved. Here is the new card.",
+      "nameRequired": "A first name is needed.",
+      "visitsTitle": "Recent visits",
+      "upcomingTitle": "Coming up",
+      "noVisits": "No visits yet.",
+      "sell": "Sell a plan",
+      "sold": "Sold: {plan}. The receipt is on its way.",
+      "noPlans": "There are no plans to sell yet. Add them on the web.",
+      "message": "Message",
+      "planUntil": "{plan} · until {date}",
+      "credits": "{left} of {total} left",
+      "searchHint": "Name, phone or email",
+      "more": "Show more",
+      "refine": "There are more: search to find someone.",
+      "noteSaved": "Note saved.",
+      "selected": "Selected"
     },
     "numbers": {
       "title": "Key numbers",
-      "period": "Last {count} days",
-      "empty": "No numbers yet."
+      "period": "Last {count} days, compared with the {count} days before",
+      "periodBranch": "{branch} · last {count} days, compared with the {count} days before",
+      "days": "{count} days",
+      "empty": "No numbers yet.",
+      "vsBefore": "{change} vs. before",
+      "trend": "Trend",
+      "noTrend": "Nothing to show for this period yet.",
+      "weekOf": "Week of {date}",
+      "best": "Best: {when}, {value}",
+      "breakdownLine": "{sessions, plural, one {# session} other {# sessions}} · {attended, plural, one {# check-in} other {# check-ins}} · {occupancy} full"
+    },
+    "quotes": {
+      "saved": "Saved.",
+      "sent": "Sent. The client can open it by its link.",
+      "sendAgain": "Send to the client again",
+      "whatsapp": "Send on WhatsApp",
+      "share": "Share the link",
+      "paymentRecorded": "Payment recorded.",
+      "depositDue": "Deposit left to pay: {amount}",
+      "noEnd": "No end date",
+      "validFor": "{count} days",
+      "forClient": "For {name}",
+      "invalid": "Add a title, and give every item a description, a quantity and a price."
     },
     "me": {
       "title": "Me",
@@ -2662,7 +3352,56 @@
       "name": "Your name",
       "save": "Save",
       "branch": "Branch",
-      "allBranches": "All branches"
+      "allBranches": "All branches",
+      "rosterEmails": "Email me about my shifts",
+      "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "on": "On",
+      "off": "Off"
+    },
+    "back": "Back",
+    "error": "Something went wrong. Try again.",
+    "session": {
+      "book": "Book someone in",
+      "close": "Close",
+      "booked": "{name} is booked.",
+      "waitlisted": "The session is full: {name} is on the waiting list.",
+      "cancel": "Cancel booking",
+      "cancelConfirm": "Cancel {name}'s booking?",
+      "yes": "Yes, cancel",
+      "no": "Keep it",
+      "note": "Note",
+      "noteFor": "A note about {name}'s visit",
+      "noteSaved": "Note saved on {name}'s card."
+    },
+    "leads": {
+      "open": "Open",
+      "due": "{count, plural, =0 {Nobody to call back today} one {# to call back today} other {# to call back today}}",
+      "none": "No leads here.",
+      "stage": "Move to",
+      "moved": "Moved to {stage}.",
+      "logged": "Added to the activity.",
+      "converted": "{name} is now a client.",
+      "convertConfirm": "Create a client card for {name} and mark the lead as won?",
+      "yes": "Yes",
+      "no": "Not now",
+      "followUp": "Call back {date}",
+      "added": "The lead is saved.",
+      "log": "Log a call or note"
+    },
+    "messages": {
+      "title": "Messages",
+      "sent": "Sent messages",
+      "to": "To {name}",
+      "send": "Send",
+      "noPhone": "There is no phone number to send to."
+    },
+    "reserve": {
+      "cta": "New reservation",
+      "none": "No court or room is for rent yet. Set them up on the web.",
+      "minutes": "{count} min",
+      "day": "Day",
+      "time": "Court and time",
+      "reserveFor": "Reserve for {name}"
     }
   },
   "staffApp": {
@@ -2682,7 +3421,14 @@
       "open": "Open requests",
       "newBusinesses": "New businesses this week",
       "nothing": "Nothing waiting. Enjoy the quiet.",
-      "youAre": "You're signed in as {level}"
+      "youAre": "You're signed in as {level}",
+      "businesses": "Businesses",
+      "activeClients": "Active clients",
+      "bookings": "Bookings, 30 days",
+      "latest": "Open requests",
+      "newest": "New this week",
+      "billing": "Billing, {month}",
+      "paidOpen": "{paid} paid · {open} open"
     },
     "businesses": {
       "search": "Search a business",
@@ -2690,7 +3436,10 @@
       "owner": "Owner",
       "clients": "{count} clients",
       "trialEnds": "Trial ends {date}",
-      "modules": "Modules"
+      "modules": "Modules",
+      "count": "{count, plural, =0 {No businesses} one {# business} other {# businesses}}",
+      "back": "Businesses",
+      "row": "{clients} clients · {modules} modules"
     },
     "inbox": {
       "title": "Inbox",
@@ -2706,6 +3455,29 @@
       "title": "Me",
       "level": "Your level: {level}",
       "permissions": "What you may do"
+    },
+    "business": {
+      "since": "On MyBiz since {date}",
+      "numbers": "The numbers",
+      "emailOwner": "Email the owner",
+      "noModules": "Core only",
+      "extend": "Add {days} days",
+      "statuses": {
+        "open": "Open",
+        "paid": "Paid",
+        "void": "Credited"
+      },
+      "period": "{from} – {to}"
+    },
+    "request": {
+      "back": "Requests",
+      "status": "Status",
+      "notesSaved": "Notes saved.",
+      "updated": "Updated.",
+      "call": "Call",
+      "email": "Email",
+      "error": "Something went wrong. Try again.",
+      "you": "you"
     }
   },
   "verticals": {
@@ -2783,7 +3555,9 @@
         "Pay when booking"
       ],
       "heroTitle": "Every court and room, booked.",
-      "heroText": "Padel, tennis and football courts, rehearsal and studio rooms, meeting rooms: booked by the hour, paid in advance."
+      "heroText": "Padel, tennis and football courts, rehearsal and studio rooms, meeting rooms: booked by the hour, paid in advance.",
+      "yours": "The club",
+      "example": "Padel Point"
     },
     "home_services": {
       "name": "Home & field services",
@@ -2791,10 +3565,12 @@
       "points": [
         "The client's address on every job",
         "Assign a technician",
-        "Quotes and approvals"
+        "Travel time between jobs"
       ],
       "heroTitle": "Every job on the road, in control.",
-      "heroText": "Cleaning, air conditioning, electricians, plumbers and pest control: jobs at the client's address, technicians, travel time and quotes."
+      "heroText": "Cleaning, air conditioning, electricians, plumbers and pest control: jobs at the client's address, a technician for each, travel time between jobs and the day's route on the phone.",
+      "yours": "Your business",
+      "example": "Cool Air"
     },
     "pets": {
       "name": "Pet services",
@@ -2805,7 +3581,9 @@
         "Boarding and day care"
       ],
       "heroTitle": "Happy pets, happy owners.",
-      "heroText": "Dog grooming, training, boarding and day care, with a profile for every pet under its owner."
+      "heroText": "Dog grooming, training, boarding and day care, with a profile for every pet under its owner.",
+      "yours": "The salon",
+      "example": "Happy Paws"
     },
     "events": {
       "name": "Creative & events",
@@ -2816,7 +3594,9 @@
         "Every event in one place"
       ],
       "heroTitle": "From the first call to the big day.",
-      "heroText": "Photographers and studios, DJs, event suppliers and small venues: quotes, deposits and every event day in one place."
+      "heroText": "Photographers and studios, DJs, event suppliers and small venues: quotes, deposits and every event day in one place.",
+      "yours": "Your studio",
+      "example": "Golden Hour Studio"
     },
     "professional": {
       "name": "Professional services",
@@ -2827,7 +3607,9 @@
         "Retainers and billable hours"
       ],
       "heroTitle": "Your practice, organized.",
-      "heroText": "Consultants, accountants, lawyers and agencies: client meetings, documents, retainers and billable hours."
+      "heroText": "Consultants, accountants, lawyers and agencies: client meetings, documents, retainers and billable hours.",
+      "yours": "Your practice",
+      "example": "Levi & Partners"
     },
     "gym": {
       "name": "Gym",
@@ -2967,6 +3749,125 @@
       "tagline": "Punctures, tires and alignment.",
       "yours": "your shop",
       "example": "Wheel Pro"
+    },
+    "padel_tennis": {
+      "name": "Padel & tennis club",
+      "tagline": "Courts by the hour, paid when booked.",
+      "example": "Padel Point"
+    },
+    "football_pitches": {
+      "name": "Football pitches",
+      "tagline": "Five-a-side and full pitches by the hour.",
+      "example": "Goal Arena"
+    },
+    "rehearsal_studios": {
+      "name": "Rehearsal studios",
+      "tagline": "Rooms for bands and musicians, by the hour.",
+      "yours": "The studio",
+      "example": "Loud Rooms"
+    },
+    "meeting_rooms": {
+      "name": "Meeting rooms & coworking",
+      "tagline": "Rooms for meetings and workshops, by the hour.",
+      "yours": "The space",
+      "example": "Work Hub"
+    },
+    "pet_grooming": {
+      "name": "Pet grooming",
+      "tagline": "Baths, grooming and nails, with a profile per pet."
+    },
+    "dog_training": {
+      "name": "Dog training",
+      "tagline": "Private lessons and puppy classes."
+    },
+    "pet_daycare": {
+      "name": "Doggy day care",
+      "tagline": "Day care by the day or with a pass."
+    },
+    "cleaning": {
+      "name": "Cleaning services",
+      "tagline": "Home and office cleaning at the client's place."
+    },
+    "ac_technicians": {
+      "name": "Air conditioning",
+      "tagline": "Service, installation and repairs at home."
+    },
+    "electricians": {
+      "name": "Electricians",
+      "tagline": "Visits and installations, a technician for each job."
+    },
+    "plumbers": {
+      "name": "Plumbers",
+      "tagline": "Visits, unblocking and repairs."
+    },
+    "pest_control": {
+      "name": "Pest control",
+      "tagline": "Treatments for apartments, houses and offices."
+    },
+    "photographers": {
+      "name": "Photographers & studios",
+      "tagline": "Shoots, events and albums, from quote to delivery."
+    },
+    "djs": {
+      "name": "DJs & musicians",
+      "tagline": "Event dates held with a deposit."
+    },
+    "event_suppliers": {
+      "name": "Event suppliers",
+      "tagline": "Design, catering and rentals with quotes."
+    },
+    "small_venues": {
+      "name": "Small venues",
+      "tagline": "Tours, quotes and event days."
+    },
+    "consultants": {
+      "name": "Consultants",
+      "tagline": "Meetings, retainers and billable hours."
+    },
+    "accountants": {
+      "name": "Accountants & bookkeepers",
+      "tagline": "Clients' papers, monthly retainers and reports."
+    },
+    "lawyers": {
+      "name": "Lawyers",
+      "tagline": "Consultations, documents to sign and hours."
+    },
+    "agencies": {
+      "name": "Agencies",
+      "tagline": "Retainers, hours and deliverables per client."
+    },
+    "food": {
+      "name": "Food & restaurants",
+      "tagline": "Restaurants, pizzerias and cafés.",
+      "points": [
+        "Staff shifts across every branch",
+        "Events, workshops and parties booked online",
+        "Regulars, allergies and preferences in one place"
+      ],
+      "heroTitle": "Busy kitchens, calm managers.",
+      "heroText": "Shifts, private events, workshops and regular guests for restaurants, pizzerias and cafés, branch by branch.",
+      "yours": "The restaurant",
+      "example": "Urban Slice"
+    },
+    "pizzeria": {
+      "name": "Pizzerias",
+      "tagline": "Shifts, parties and pizza workshops."
+    },
+    "cafe": {
+      "name": "Cafés",
+      "tagline": "Shifts, events and regulars."
+    },
+    "restaurant": {
+      "name": "Restaurants",
+      "tagline": "Shifts, chef's tables and group bookings."
+    },
+    "bakery": {
+      "name": "Bakeries",
+      "tagline": "Shifts, baking workshops and custom orders."
+    },
+    "catering": {
+      "name": "Catering",
+      "tagline": "Shifts, tasting meetings and private events."
     }
   },
   "clientFields": {
@@ -3039,7 +3940,45 @@
     "instrument": "Instrument",
     "school_grade": "School grade",
     "subjects": "Subjects",
-    "tire_size": "Tire size"
+    "tire_size": "Tire size",
+    "company": "Company",
+    "species": "Species",
+    "species_options": {
+      "dog": "Dog",
+      "cat": "Cat",
+      "other": "Other"
+    },
+    "breed": "Breed",
+    "size": "Size",
+    "size_options": {
+      "small": "Small",
+      "medium": "Medium",
+      "large": "Large",
+      "giant": "Giant"
+    },
+    "weight_kg": "Weight (kg)",
+    "temperament": "Temperament",
+    "temperament_options": {
+      "calm": "Calm",
+      "nervous": "Nervous",
+      "reactive": "Reactive (needs care)"
+    },
+    "vaccinated_until": "Vaccinations valid until",
+    "property_type": "Property",
+    "property_type_options": {
+      "apartment": "Apartment",
+      "house": "House",
+      "office": "Office",
+      "other": "Other"
+    },
+    "event_type": "Event type",
+    "event_type_options": {
+      "wedding": "Wedding",
+      "bar_mitzvah": "Bar / bat mitzvah",
+      "birthday": "Birthday",
+      "corporate": "Corporate",
+      "other": "Other"
+    }
   },
   "businessMenu": {
     "switch": "Switch business",
@@ -3047,7 +3986,11 @@
     "allBusinesses": "All my businesses",
     "newBusiness": "Add a business",
     "branch": "Branch",
-    "allBranches": "All branches"
+    "allBranches": "All branches",
+    "search": "Find a business or branch",
+    "branchesOf": "Branches of {name}",
+    "otherBusinesses": "Other businesses",
+    "noMatches": "Nothing matches that name."
   },
   "businesses": {
     "title": "My businesses",
@@ -3082,5 +4025,645 @@
       "button": "Create a sample business",
       "error": "We couldn't create a sample business. Please try again."
     }
+  },
+  "resources": {
+    "title": "Courts & rooms",
+    "subtitle": "The day's reservations, court by court, and a new one.",
+    "label": "By the hour",
+    "dayNav": "Choose a day",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "today": "Today",
+    "emptyDay": "No reservations on this day yet.",
+    "noBookableRooms": "No court or room is for rent yet. Mark one as \"for rent by the hour\" in a branch.",
+    "toLocations": "To the branches",
+    "new": "New reservation",
+    "noServices": "Add a service of the kind \"a court or room by the hour\" first.",
+    "addService": "New service",
+    "service": "What",
+    "perHour": "{price} an hour",
+    "length": "How long",
+    "noRoomsForService": "Choose which courts serve this service, on the service's page.",
+    "noSlots": "No free time for this length on this day.",
+    "pastDay": "This day has passed.",
+    "noClients": "No client matches the search.",
+    "client": "For whom",
+    "reserve": "Reserve",
+    "price": "Price: {price}",
+    "errors": {
+      "slot_taken": "Someone just took this time. Choose another.",
+      "outside_hours": "That's outside the opening hours.",
+      "length_not_offered": "This length isn't offered.",
+      "invalid": "Choose a time and a client.",
+      "generic": "Something went wrong. Try again."
+    },
+    "hoursHint": "When it can be reserved, in {branch}. Outside these hours it isn't offered.",
+    "notBookable": "This room isn't for rent yet: mark it \"for rent by the hour\" in the branch.",
+    "serviceHint": "Clients choose how long, between the shortest and the longest, in steps; the price follows the hour.",
+    "minLength": "Shortest",
+    "maxLength": "Longest",
+    "step": "In steps of",
+    "pricePerHour": "Price per hour",
+    "rooms": "Courts and rooms",
+    "roomsHint": "Where this service can be reserved.",
+    "saveRooms": "Save",
+    "paid": "Paid",
+    "notPaid": "Not paid yet",
+    "method": "Paid by",
+    "methods": {
+      "cash": "Cash",
+      "card": "Card",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    },
+    "recordPayment": "Record the payment"
+  },
+  "dependents": {
+    "title": {
+      "pet": "Pets",
+      "child": "Children"
+    },
+    "add": {
+      "pet": "Add a pet",
+      "child": "Add a child"
+    },
+    "none": {
+      "pet": "No pets yet.",
+      "child": "No children yet."
+    },
+    "name": "Name",
+    "birthDate": "Date of birth",
+    "notes": "Notes",
+    "active": "Active",
+    "inactive": "No longer comes",
+    "edit": "Edit {name}",
+    "save": "Save",
+    "retire": "Mark as no longer coming",
+    "restore": "Mark as coming again",
+    "age": "{years, plural, =0 {under a year} one {# year} other {# years}}",
+    "for": "For {name}",
+    "bookFor": "Book {dependent} ({owner})",
+    "withoutDependent": "Without",
+    "owner": {
+      "pet": "Owner",
+      "child": "Parent"
+    },
+    "nameRequired": "Enter a name.",
+    "dateFormat": "Write the date as year-month-day, for example 2020-05-31.",
+    "dateHint": "Year-month-day",
+    "saveFailed": "Couldn't save. Try again.",
+    "who": "Who's coming?",
+    "me": "Me",
+    "mine": {
+      "pet": "My pets",
+      "child": "My children"
+    },
+    "mineHint": {
+      "pet": "Add your pets to book for them.",
+      "child": "Add your children to book for them."
+    },
+    "addFirst": {
+      "pet": "Add a pet first, then book for it.",
+      "child": "Add a child first, then book for them."
+    },
+    "count": "{count, plural, =0 {None yet} one {One} other {#}}",
+    "booked": "Booked: {names}"
+  },
+  "jobs": {
+    "title": "On-site job",
+    "onSite": "At the client's address (on-site)",
+    "onSiteHint": "The technician goes to the client. Booking asks for the client's address.",
+    "travel": "Time to get there",
+    "travelBefore": "{minutes} min on the road before the job",
+    "noAddress": "No address.",
+    "progress": "Job progress",
+    "undo": "Back one step",
+    "noAddresses": "No clients with an address match. Add an address on the client's card first.",
+    "bookHint": "An on-site job: choose the client and the address.",
+    "statuses": {
+      "scheduled": "Scheduled",
+      "on_the_way": "On the way",
+      "in_progress": "In progress",
+      "done": "Done"
+    },
+    "actions": {
+      "on_the_way": "On my way",
+      "in_progress": "Start the job",
+      "done": "Job done"
+    },
+    "address": {
+      "title": "Addresses",
+      "none": "No addresses yet.",
+      "add": "Add an address",
+      "save": "Save",
+      "edit": "Edit address",
+      "street": "Street and number",
+      "city": "City",
+      "details": "Floor, apartment",
+      "label": "Name",
+      "labelHint": "Home, office…",
+      "notes": "How to get in",
+      "notesHint": "Gate code, parking, intercom",
+      "inactive": "Not in use",
+      "retire": "Stop using",
+      "restore": "Use again",
+      "required": "Enter the street and the city.",
+      "saveFailed": "Couldn't save. Try again."
+    },
+    "myDay": "My jobs",
+    "teamDay": "The team's jobs",
+    "whose": "Whose jobs",
+    "mine": "Mine",
+    "team": "Everyone",
+    "none": "No on-site jobs on this day.",
+    "leaveBy": "Leave by {time}",
+    "call": "Call",
+    "open": "Job details",
+    "statusFailed": "Couldn't update the job. Try again.",
+    "cta": "My jobs today",
+    "where": "Where?",
+    "addAddress": "Add an address",
+    "myAddresses": "My addresses",
+    "myAddressesHint": "Where on-site jobs happen.",
+    "clientStatus": {
+      "scheduled": "Scheduled",
+      "on_the_way": "The technician is on the way",
+      "in_progress": "Work in progress",
+      "done": "Done"
+    }
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Choose the provider for each service. Switching provider is choosing another one here; your clients, prices and history stay as they are.",
+    "provider": "Provider",
+    "builtin": "built in",
+    "save": "Save connection",
+    "change": "Change provider or settings",
+    "disconnect": "Disconnect (back to the default)",
+    "platformDefault": "Using MyBiz's default.",
+    "connectedOn": "Your own connection, since {date}.",
+    "secretSet": "Saved (hidden)",
+    "secretKeep": "Leave empty to keep the saved value.",
+    "secretHint": "Kept encrypted; never shown again.",
+    "capabilities": {
+      "payments": {
+        "title": "Payments",
+        "hint": "Takes your clients' card payments in the app."
+      },
+      "invoicing": {
+        "title": "Invoices and receipts",
+        "hint": "Issues the legal document for every payment."
+      },
+      "messaging": {
+        "title": "WhatsApp and SMS",
+        "hint": "Sends your messages and reminders to clients."
+      }
+    }
+  },
+  "quotes": {
+    "title": "Quotes",
+    "subtitle": "Send a quote, the client accepts it with one tap and pays the deposit.",
+    "new": "New quote",
+    "back": "All quotes",
+    "none": "No quotes here yet.",
+    "noneForClient": "No quotes for this client yet.",
+    "filter": "Filter by status",
+    "filters": {
+      "all": "All",
+      "draft": "Drafts",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "expired": "Expired"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "sent": "Sent",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "expired": "Expired"
+    },
+    "client": "Client",
+    "chooseClient": "Choose a client",
+    "titleField": "Title",
+    "titleHint": "For example: Wedding photography, AC installation",
+    "lines": "What's included",
+    "lineDescription": "Item {number}",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "amount": "Amount",
+    "addLine": "Add an item",
+    "removeLine": "Remove item {number}",
+    "total": "Total",
+    "deposit": "Deposit (%)",
+    "depositHint": "Paid on acceptance; 0 for none.",
+    "validUntilField": "Valid until",
+    "eventDate": "Event date",
+    "eventHint": "If the quote is for an event.",
+    "eventTime": "Start time",
+    "eventPlace": "Place",
+    "notes": "Terms and notes",
+    "notesHint": "What's included, cancellation terms…",
+    "saveDraft": "Save draft",
+    "edit": "Edit",
+    "send": "Send to the client",
+    "draftHint": "A draft can be edited. Once sent, the client can open it by its private link.",
+    "share": "Send and share",
+    "copyLink": "Copy the link",
+    "copied": "Copied",
+    "preview": "As the client sees it",
+    "copyAsNew": "Copy as a new version",
+    "whatsappText": "Hi {name}, here is your quote for {title}: {link}",
+    "acceptedBy": "Accepted by {name} on {date}",
+    "paid": "Paid",
+    "due": "Left to pay",
+    "method": "Payment method",
+    "recordPayment": "Record a payment",
+    "event": "The event",
+    "eventOn": "event {date}",
+    "eventsLink": "Events",
+    "eventsTitle": "Upcoming events",
+    "eventsSubtitle": "Accepted quotes with an event date, soonest first.",
+    "noEvents": "No upcoming events.",
+    "leftToPay": "{amount} left to pay",
+    "fullyPaid": "Fully paid",
+    "depositOf": "Deposit: {percent}% ({amount})",
+    "paidSoFar": "Paid: {amount}",
+    "balance": "left: {amount}",
+    "validUntil": "Valid until {date}",
+    "public": {
+      "title": "Quote {number}",
+      "for": "for {name}",
+      "missing": "Quote not found",
+      "answer": "Your answer",
+      "name": "Your full name",
+      "nameHint": "Writing your name confirms you accept the quote and its terms.",
+      "accept": "Accept the quote",
+      "decline": "Decline",
+      "acceptedBy": "Accepted by {name}. Thank you!",
+      "payDeposit": "Pay the deposit · {amount}",
+      "depositPaid": "The deposit is paid. See you soon!",
+      "processing": "Your payment is being confirmed; refresh in a moment.",
+      "declined": "You declined this quote.",
+      "expired": "This quote has expired. Ask the business for a new one.",
+      "errors": {
+        "name_required": "Write your name to accept.",
+        "expired": "This quote has expired.",
+        "already_answered": "This quote was already answered.",
+        "generic": "Something went wrong. Try again."
+      },
+      "billTitle": "Bill {number}",
+      "billDue": "To pay",
+      "billPaid": "Paid",
+      "payTitle": "Payment",
+      "payBill": "Pay · {amount}",
+      "billThanks": "Paid in full. Thank you!"
+    }
+  },
+  "bills": {
+    "title": "Bill {month}",
+    "retainer": "Retainer {month}",
+    "hours": "Hours {month}",
+    "hoursBeyond": "Hours {month} beyond the retainer"
+  },
+  "documents": {
+    "title": "Documents",
+    "none": "No documents yet.",
+    "add": "Upload a document",
+    "file": "File",
+    "fileHint": "PDF, image, Word or Excel, up to 10 MB.",
+    "name": "Name (optional)",
+    "kind": "Type",
+    "kinds": {
+      "contract": "Contract",
+      "report": "Report",
+      "client_file": "From the client",
+      "other": "Other"
+    },
+    "shareWithClient": "The client sees it in the app",
+    "askToSign": "Ask the client to sign",
+    "upload": "Upload",
+    "fromClient": "From the client",
+    "shared": "Shared",
+    "share": "Share",
+    "unshare": "Stop sharing",
+    "signedBy": "Signed by {name} · {date}",
+    "waitingSignature": "Waiting for signature",
+    "delete": "Delete {name}",
+    "mine": "My documents",
+    "mineHint": "Documents the business shared with you.",
+    "open": "Open",
+    "sign": "Sign",
+    "signName": "Your full name",
+    "signHint": "Writing your name signs the document.",
+    "signFailed": "Couldn't sign. Try again."
+  },
+  "time": {
+    "title": "Time and billing",
+    "unbilled": "{hours} h not billed",
+    "none": "No time logged yet.",
+    "day": "Day",
+    "hours": "Hours",
+    "what": "What was done",
+    "billable": "Billable",
+    "log": "Log time",
+    "hoursShort": "{hours} h",
+    "billed": "Bill #{number}",
+    "notBillable": "Not billable",
+    "month": "Month",
+    "bill": "Bill the month",
+    "nothingToBill": "Nothing to bill for that month.",
+    "billFailed": "Couldn't create the bill. Try again.",
+    "myTitle": "My time",
+    "mySubtitle": "What you logged in the last 30 days.",
+    "myNone": "No time logged in the last 30 days. Log time on a client's card.",
+    "today": "Today",
+    "last7": "Last 7 days",
+    "last30": "Last 30 days",
+    "retainer": {
+      "edit": "Retainer and hourly rate",
+      "monthly": "Monthly fee",
+      "monthlyHint": "0 for hourly billing only.",
+      "included": "Hours included",
+      "rate": "Hourly rate",
+      "save": "Save",
+      "summary": "Retainer {amount} a month with {hours} h included; {rate} an hour beyond.",
+      "hourly": "Billed by the hour: {rate}."
+    },
+    "logged": "Time logged."
+  },
+  "billingRun": {
+    "title": "Billing the month",
+    "subtitle": "Every client with a retainer or unbilled time, and what each would be billed. Choose who to bill and bill them all at once.",
+    "chooseMonth": "Choose the month",
+    "show": "Show",
+    "clientsToBill": "Clients to bill",
+    "totalToBill": "Total to bill",
+    "alreadyBilled": "Already billed",
+    "none": "No client has a retainer or unbilled time in this month.",
+    "tableCaption": "What each client would be billed",
+    "choose": "Bill",
+    "chooseClient": "Bill {name}",
+    "client": "Client",
+    "fee": "Monthly fee",
+    "hours": "Hours worked",
+    "extra": "Beyond the retainer",
+    "total": "Total",
+    "billed": "Billed",
+    "run": "{count, plural, =0 {Choose clients to bill} one {Bill one client} other {Bill # clients}}",
+    "failed": "Couldn't bill. Try again.",
+    "doneTitle": "Billing done",
+    "done": "{count, plural, =0 {Nobody was billed} one {One bill created; the client pays it by its link} other {# bills created; each client pays by their link}}",
+    "skipped": "{count, plural, one {One client was skipped (already billed or nothing to bill).} other {# clients were skipped (already billed or nothing to bill).}}",
+    "billFor": "Bill #{number} · {name}"
+  },
+  "userMenu": {
+    "open": "Open your menu",
+    "label": "Your account"
+  },
+  "imageCrop": {
+    "title": "Position your picture",
+    "hint": "Drag the picture and zoom until the circle shows what you want. The corners outside the circle are not shown.",
+    "area": "Picture position. Use the arrow keys to move it and plus and minus to zoom.",
+    "zoom": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "use": "Use this picture",
+    "cancel": "Cancel",
+    "failed": "This picture could not be prepared. Try a different one."
+  },
+  "appearance": {
+    "title": "Appearance",
+    "subtitle": "Light or dark, and the colors you work in. Only you see your choice.",
+    "palette": "Colors",
+    "palettes": {
+      "mybiz": "MyBiz",
+      "ocean": "Ocean",
+      "forest": "Forest",
+      "custom": "My own colors"
+    },
+    "paletteHints": {
+      "mybiz": "Black, white and deep purple",
+      "ocean": "Cool slate and teal",
+      "forest": "Soft sage and green",
+      "custom": "Pick three colors yourself"
+    },
+    "customHint": "Pick three colors and the whole app follows them. Everything else is worked out from them, and anything that would be hard to read is adjusted for you, so no mix can break the screen.",
+    "adjusted": "To keep everything readable, we adjusted: {picks}.",
+    "modeFollowsBackground": "A dark background gives the dark look and a light one the light look, so the light and dark switch is off while your colors are on.",
+    "saveColors": "Save my colors",
+    "resetColors": "Back to the starting colors",
+    "picks": {
+      "background": "Background",
+      "text": "Text",
+      "accent": "Accent"
+    }
+  },
+  "organization": {
+    "title": "Organization chart",
+    "subtitle": "Who reports to whom across the business. Select a person for their details. Reporting lines don't change what anyone can see or do; roles do.",
+    "fold": "Fold the people under {name}",
+    "unfold": "Show the people under {name}",
+    "close": "Close",
+    "allBranches": "All branches",
+    "alone": "Invite your team to see your business's structure here.",
+    "nobody": "Nobody (top of the chart)",
+    "jobTitle": "Job title",
+    "jobTitlePlaceholder": "e.g. Branch manager",
+    "reportsTo": "Reports to",
+    "accessNote": "This only draws the chart. What they can see and do comes from their role.",
+    "cycle": "That would make a loop: this person already manages them."
+  },
+  "shifts": {
+    "title": "Shifts",
+    "soloTitle": "Hours and availability",
+    "soloSubtitle": "You run the business on your own, so there is no shift board. Keep your opening hours and availability up to date.",
+    "soloAvailability": "My availability",
+    "soloAvailabilityHint": "The hours clients can book with you",
+    "soloClosedHint": "Holidays and days off for the whole business",
+    "warningLegend": "Falls on time off or outside opening hours",
+    "awayLegend": "Away (time off)",
+    "away": "Away",
+    "awayWarning": "{name} is on time off on this day. You can still save the shift.",
+    "dayCardAdd": "Add a shift on {day}",
+    "noShiftsDay": "No shifts",
+    "copyWeek": "Copy last week",
+    "copied": "{created, plural, =0 {Nothing copied} one {Copied one shift} other {Copied # shifts}}{skipped, plural, =0 {} one {, one skipped because it clashed} other {, # skipped because they clashed}}",
+    "copyTo": "Copy shifts to",
+    "copyNextWeek": "Next week",
+    "copyNextWeeks": "The next {count} weeks",
+    "copyNextDay": "Tomorrow",
+    "copyNextDays": "The next {count} days",
+    "copyDo": "Copy",
+    "person": "Team member",
+    "onShift": "{count, plural, =0 {No one} one {One person} other {# people}}",
+    "hoursTotal": "{hours} h",
+    "warnings": {
+      "timeOff": "On time off",
+      "outsideHours": "Outside opening hours"
+    },
+    "addFor": "Add a shift for {name} on {day}",
+    "editTitle": "Edit shift",
+    "newTitle": "New shift",
+    "close": "Close",
+    "errors": {
+      "overlap": "This person already has a shift at that time.",
+      "invalid": "Check the branch, date and times."
+    },
+    "branch": "Branch",
+    "date": "Date",
+    "starts": "Starts",
+    "ends": "Ends",
+    "position": "Position",
+    "positionPlaceholder": "For example: front desk",
+    "note": "Note",
+    "delete": "Delete shift",
+    "navigate": "Change dates",
+    "today": "Today",
+    "rangeLabel": "Time range",
+    "viewLabel": "View",
+    "branchesShown": "Branches shown",
+    "limitHint": "Up to {count} side by side in this range",
+    "addAt": "Add a shift at {branch}, {day}",
+    "saveDefault": "Save as default view",
+    "saveDefaultHint": "The shifts board will open with this view, range and these branches for everyone in the business.",
+    "defaultSaved": "Saved.",
+    "defaultError": "Could not save. Try again.",
+    "ranges": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "custom": "Custom"
+    },
+    "views": {
+      "people": "By person",
+      "branches": "By branch"
+    },
+    "previous": {
+      "day": "Previous day",
+      "week": "Previous week",
+      "month": "Previous month",
+      "custom": "Previous period"
+    },
+    "next": {
+      "day": "Next day",
+      "week": "Next week",
+      "month": "Next month",
+      "custom": "Next period"
+    },
+    "nobody": "No one is scheduled",
+    "coverFrom": "Cover from {branch}",
+    "coverHint": "A shift at a branch other than the person's home branch is shown as cover.",
+    "planning": {
+      "title": "Planning rhythm",
+      "hint": "How often each branch plans its shifts",
+      "cadence": "Plan",
+      "days": "Days",
+      "save": "Save",
+      "saved": "Saved",
+      "cadences": {
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month",
+        "custom": "Custom"
+      }
+    },
+    "stations": {
+      "title": "Rooms and stations",
+      "hint": "Where each shift is staffed, defined for every branch",
+      "none": "No rooms yet: shifts are planned for the branch as a whole.",
+      "field": "Room or station",
+      "noStation": "No room set",
+      "unassigned": "No room set",
+      "name": "Name",
+      "namePlaceholder": "For example: Pilates 1",
+      "add": "Add a room",
+      "remove": "Remove {name}",
+      "removeHint": "Its shifts stay, without a room.",
+      "nameTaken": "This branch already has a room with that name.",
+      "addAt": "Add a shift in {station}",
+      "people": "{count, plural, one {One person} other {# people}}"
+    },
+    "templates": {
+      "apply": "Shift types",
+      "save": "Save these times as a shift type",
+      "name": "Name",
+      "namePlaceholder": "For example: Morning",
+      "saveDo": "Save {times}",
+      "cancel": "Cancel",
+      "remove": "Remove the shift type {name}",
+      "nameTaken": "This branch already has a shift type with that name."
+    },
+    "coverage": {
+      "title": "Minimum staffing",
+      "hint": "The least people each branch needs on shift",
+      "none": "No rules yet: nothing is flagged for this branch.",
+      "day": "Day",
+      "min": "At least",
+      "remove": "Remove this rule",
+      "add": "Add a rule",
+      "endHint": "An end of 00:00 means the end of the day. People on time off do not count.",
+      "legend": "Fewer people than needed",
+      "short": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
+      "banner": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
+      "gap": "{have} of {needed} on shift"
+    },
+    "peopleOnShift": "People on shift",
+    "publish": {
+      "title": "Publishing the roster",
+      "hint": "When the team gets to see the shifts you plan",
+      "draft": "Draft",
+      "drafts": "{count, plural, one {# shift is still a draft} other {# shifts are still drafts}} and visible to managers only",
+      "allPublished": "Everything in this view is published",
+      "done": "{count, plural, one {# shift published} other {# shifts published}}",
+      "now": "Publish now",
+      "error": "Could not publish. Try again.",
+      "auto": "Publish automatically",
+      "cadence": "Publish",
+      "weekday": "On",
+      "dayOfMonth": "On day of the month",
+      "time": "At",
+      "cadences": {
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month"
+      },
+      "save": "Save",
+      "saved": "Saved",
+      "saveError": "Could not save",
+      "explain": "The team sees a shift only after it is published. Each publication sends out the coming days: tomorrow for daily, the next seven days for weekly, until the same day next month for monthly. Shifts you add later stay drafts until the next publication or \"Publish now\".",
+      "summary": {
+        "manual": "Published by hand only",
+        "daily": "Goes out every day at {time}",
+        "weekly": "Goes out every {day} at {time}",
+        "monthly": "Goes out on day {day} of every month at {time}"
+      }
+    }
+  },
+  "openingHours": {
+    "title": "Opening hours",
+    "subtitle": "When this branch is open. Add a second interval on a day for a break.",
+    "closed": "Closed"
+  },
+  "accessibility": {
+    "title": "Accessibility and appearance",
+    "subtitle": "Make the app comfortable for you. Saved on this device.",
+    "language": "Language",
+    "languageHint": "The language of the app.",
+    "theme": "Theme",
+    "themeHint": "Light, dark, or follow your device.",
+    "contrast": "Contrast",
+    "contrastHint": "Stronger text and borders, easier to read.",
+    "contrastNormal": "Standard",
+    "contrastHigh": "High",
+    "textSize": "Text size",
+    "textSizeHint": "Makes all text in the app larger.",
+    "textNormal": "Standard",
+    "textLarge": "Large",
+    "textLarger": "Larger",
+    "motion": "Reduce motion",
+    "motionHint": "Fewer animations and transitions.",
+    "motionReduced": "Reduced"
   }
 }

@@ -1,6 +1,6 @@
 name: Send notification emails on staging
 
-# Emails pending client notifications (apps/api/app/email.py). Does nothing until the
+# Emails pending client notifications (apps/api/app/messaging/email.py). Does nothing until the
 # repository variable EMAIL_PROVIDER is set (Settings → Secrets and variables → Actions →
 # Variables): `gmail` (free, no domain: EMAIL_FROM is the Gmail address, the secret
 # EMAIL_API_KEY its app password) or `resend` (EMAIL_API_KEY is the Resend key).
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   send:
-    name: Send pending emails
+    name: Send pending emails and roster notices
     if: ${{ vars.EMAIL_PROVIDER != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -29,11 +29,22 @@ jobs:
         working-directory: apps/api
         run: uv sync --locked --no-dev
 
-      - name: Run
+      - name: Send client notifications
         working-directory: apps/api
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
           API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
           API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
           API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
         run: uv run python -m app.jobs send-emails
+
+      - name: Email staff their newly published shifts
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+          API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+          API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+        run: uv run python -m app.jobs notify-shifts

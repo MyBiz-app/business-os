@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "MyBiz",
+    "slug": "business-os",
+    "scheme": "mybiz",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.businessos.mybiz"
+    },
+    "android": {
+      "package": "com.businessos.mybiz",
+      "adaptiveIcon": {
+        "backgroundColor": "#3B82F6",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "supportsRTL": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-notifications"
+    ]
+  }
+}

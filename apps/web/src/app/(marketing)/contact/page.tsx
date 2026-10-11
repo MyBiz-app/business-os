@@ -1,12 +1,13 @@
 import { isVertical } from "@business-os/verticals";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { ContactForm } from "./contact-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
-  return { title: `${t("contact")} · MyBiz` };
+  return { title: `${t("contact")} · ${BRAND.name}` };
 }
 
 export default async function ContactPage({ searchParams }: PageProps<"/contact">) {

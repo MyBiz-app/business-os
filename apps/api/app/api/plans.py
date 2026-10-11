@@ -10,14 +10,22 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
+from app.api.common import (
+    RemoveResult,
+    blank_to_none,
+    delete_or_archive,
+    ensure_not_erased,
+    not_found,
+    set_clause,
+)
 from app.api.deps import TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(tags=["plans"])
 
 CatalogReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 CatalogWriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
+CatalogDeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))]
 ClientsReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 SalesDep = Annotated[TenantContext, Depends(require(Permission.SALES_MANAGE))]
 
@@ -233,7 +241,8 @@ def list_entitlements(db: Session, client_id: UUID) -> list[Entitlement]:
 def usable_entitlement(db: Session, client_id: UUID, session_id: UUID) -> UUID | None:
     """The entitlement a booking into this session should use: valid on the session's local
     date, not frozen, with a credit left. Unlimited memberships first, then the card that
-    expires soonest. Serialized per client, so two bookings never take the same last credit."""
+    expires soonest. Serialized per client, so two bookings never take the same last credit.
+    Reservations of a court or room (migration 0044) never use a plan."""
     db.execute(
         text("SELECT pg_advisory_xact_lock(hashtextextended(CAST(:id AS text), 0))"),
         {"id": client_id},
@@ -243,7 +252,7 @@ def usable_entitlement(db: Session, client_id: UUID, session_id: UUID) -> UUID |
             WITH day AS (
                 SELECT (s.starts_at AT TIME ZONE t.time_zone)::date AS value
                 FROM app.sessions s JOIN app.tenants t ON t.id = s.tenant_id
-                WHERE s.id = :session_id
+                WHERE s.id = :session_id AND NOT s.reserved  -- reservations are paid by the hour
             )
             SELECT e.id FROM app.entitlements e, day
             WHERE e.client_id = :client_id AND e.status = 'active'
@@ -359,6 +368,12 @@ def update_plan(plan_id: UUID, body: PlanUpdate, context: CatalogWriteDep) -> Pl
     if row is None:
         raise not_found()
     return Plan.model_validate(dict(row))
+
+
+@router.delete("/plans/{plan_id}")
+def delete_plan(plan_id: UUID, context: CatalogDeleteDep) -> RemoveResult:
+    """Removes a membership or punch card nobody bought; a sold one is archived (hidden)."""
+    return delete_or_archive(context.session, "plans", plan_id)
 
 
 # --- Entitlements -----------------------------------------------------------------------------

@@ -52,6 +52,35 @@
       "clientApp": "The client app",
       "help": "Questions? Just reply to this email or write to us on the contact page: {contact}",
       "signature": "Good luck,\nThe MyBiz team"
+    },
+    "leadFollowUp": {
+      "withInterest": "Hi {name}, this is {business}. You asked us about {interest}: would you like to set a time? Just reply here and we'll get back to you.",
+      "plain": "Hi {name}, this is {business}. We'd love to help: would you like to set a time? Just reply here and we'll get back to you."
+    },
+    "roster": {
+      "subject": "Your new shifts at {business}",
+      "intro": "Your roster at {business} was published. Your shifts:",
+      "line": "{day} {from}–{to} · {branch}{position}",
+      "more": "…and {count} more. See them all in the app.",
+      "weekdays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "footer": "You can turn these emails off under Personal settings."
+    },
+    "rosterChanges": {
+      "subject": "Your roster at {business} changed",
+      "intro": "Changes to your shifts at {business}:",
+      "removed": "Removed:",
+      "changed": "Changed:",
+      "arrow": "now",
+      "more": "…and {count} more changes. See your roster in the app.",
+      "footer": "You can turn these emails off under Personal settings."
     }
   },
   "modules": {
@@ -65,7 +94,18 @@
       "agent_finance": "Finance agent",
       "agent_marketing": "Marketing agent",
       "whatsapp": "WhatsApp",
-      "extra_location": "Extra locations"
+      "extra_location": "Extra locations",
+      "client_app_branded": "Branded app in the stores",
+      "crm_automation": "Leads on autopilot",
+      "whatsapp_ai": "AI on WhatsApp",
+      "pack_plus": "Plus bundle (space and messages)",
+      "pack_max": "Max bundle (space and messages)",
+      "support_priority": "Priority support",
+      "support_vip": "VIP support",
+      "setup_guided": "Guided setup",
+      "setup_full": "Done-for-you setup",
+      "noSupport": "Standard support",
+      "noPack": "Included amount"
     }
   },
   "locations": {
@@ -76,6 +116,12 @@
     "businessName": "Sample {industry}",
     "branch": "Main branch",
     "address": "1 Sample Street"
+  },
+  "bills": {
+    "title": "Bill {month}",
+    "retainer": "Retainer {month}",
+    "hours": "Hours {month}",
+    "hoursBeyond": "Hours {month} beyond the retainer"
   },
   "verticals": {
     "fitness": {
@@ -182,6 +228,84 @@
     },
     "tires": {
       "name": "Tires"
+    },
+    "padel_tennis": {
+      "name": "Padel & tennis club"
+    },
+    "football_pitches": {
+      "name": "Football pitches"
+    },
+    "rehearsal_studios": {
+      "name": "Rehearsal studios"
+    },
+    "meeting_rooms": {
+      "name": "Meeting rooms & coworking"
+    },
+    "pet_grooming": {
+      "name": "Pet grooming"
+    },
+    "dog_training": {
+      "name": "Dog training"
+    },
+    "pet_daycare": {
+      "name": "Doggy day care"
+    },
+    "cleaning": {
+      "name": "Cleaning services"
+    },
+    "ac_technicians": {
+      "name": "Air conditioning"
+    },
+    "electricians": {
+      "name": "Electricians"
+    },
+    "plumbers": {
+      "name": "Plumbers"
+    },
+    "pest_control": {
+      "name": "Pest control"
+    },
+    "photographers": {
+      "name": "Photographers & studios"
+    },
+    "djs": {
+      "name": "DJs & musicians"
+    },
+    "event_suppliers": {
+      "name": "Event suppliers"
+    },
+    "small_venues": {
+      "name": "Small venues"
+    },
+    "consultants": {
+      "name": "Consultants"
+    },
+    "accountants": {
+      "name": "Accountants & bookkeepers"
+    },
+    "lawyers": {
+      "name": "Lawyers"
+    },
+    "agencies": {
+      "name": "Agencies"
+    },
+    "food": {
+      "name": "Food & restaurants"
+    },
+    "pizzeria": {
+      "name": "Pizzerias"
+    },
+    "cafe": {
+      "name": "Cafés"
+    },
+    "restaurant": {
+      "name": "Restaurants"
+    },
+    "bakery": {
+      "name": "Bakeries"
+    },
+    "catering": {
+      "name": "Catering"
     }
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import type { components } from "@business-os/api-client";
-import { Building2, Check, CircleDot, Hand, RotateCcw } from "lucide-react";
+import { Building2, Check, CircleDot, Hand, RotateCcw, Star } from "lucide-react";
 import { isVertical } from "@business-os/verticals";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
@@ -20,6 +20,8 @@ const TONE = {
   in_progress: "bg-warning/15",
   done: "bg-success/15",
 } as const;
+
+const TIER_TONE = { priority: "bg-warning/15", vip: "bg-primary/10 text-primary" } as const;
 
 /** One request: who wrote, what they wrote, and the buttons that move it along. */
 export function RequestCard({ request, when }: { request: Request; when: string }) {
@@ -52,7 +54,13 @@ export function RequestCard({ request, when }: { request: Request; when: string 
           {request.from_business && (
             <span className="flex items-center gap-1 rounded-full bg-foreground/5 px-2.5 py-0.5 text-xs">
               <Building2 aria-hidden="true" className="size-3.5" />
-              {t("fromBusiness")}
+              {t(request.kind === "request" ? "fromBusiness" : "setupTask")}
+            </span>
+          )}
+          {request.tier !== "standard" && (
+            <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${TIER_TONE[request.tier]}`}>
+              <Star aria-hidden="true" className="size-3.5" />
+              {t(`tiers.${request.tier}`)}
             </span>
           )}
         </span>
@@ -66,6 +74,7 @@ export function RequestCard({ request, when }: { request: Request; when: string 
         {request.phone && <span>{request.phone}</span>}
       </p>
       {request.vertical && <p className="text-sm text-muted">{isVertical(request.vertical) ? text(request.vertical, "name") : tContact("otherVertical")}</p>}
+      {request.kind !== "request" && <p className="text-sm font-medium">{t(`setup.${request.kind}`)}</p>}
       {request.message && (
         <p className="whitespace-pre-wrap text-sm" dir="auto">
           {request.message}

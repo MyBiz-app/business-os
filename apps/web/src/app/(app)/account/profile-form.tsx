@@ -1,26 +1,144 @@
 "use client";
 
+import { ImageUp, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 
-import { Field } from "@/components/form/field";
+import { Avatar } from "@/components/avatar";
+import { ImageCropDialog } from "@/components/image-crop-dialog";
+import { CheckboxField, Field } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
+import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
 
-import { saveProfile } from "./actions";
+import { type PictureState, removeAvatar, saveNotifications, saveProfile, uploadAvatar } from "./actions";
 
-export function ProfileForm({ name, email }: { name: string | null; email: string }) {
+type Details = {
+  name: string | null;
+  email: string;
+  phone: string | null;
+  birthDate: string | null;
+  addressLine: string | null;
+  city: string | null;
+  postalCode: string | null;
+};
+
+export function ProfileForm({ name, email, phone, birthDate, addressLine, city, postalCode }: Details) {
   const t = useTranslations();
   const [state, action] = useActionState<FormState, FormData>(saveProfile, {});
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <Field label={t("account.name")} hint={t("account.nameHint")} name="full_name" defaultValue={name ?? ""} maxLength={120} autoComplete="name" dir="auto" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label={t("account.name")} hint={t("account.nameHint")} name="full_name" defaultValue={name ?? ""} maxLength={120} autoComplete="name" dir="auto" />
+        <Field label={t("account.phone")} hint={t("account.phoneHint")} name="phone" type="tel" defaultValue={phone ?? ""} maxLength={30} autoComplete="tel" dir="ltr" pattern="[0-9+()\- ]*" />
+      </div>
       <Field label={t("account.email")} hint={t("account.emailHint")} value={email} readOnly dir="ltr" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label={t("account.birthDate")} hint={t("account.birthDateHint")} name="birth_date" type="date" defaultValue={birthDate ?? ""} max={new Date().toISOString().slice(0, 10)} autoComplete="bday" dir="ltr" />
+      </div>
+      <fieldset className="flex flex-col gap-4">
+        <legend className="mb-1 text-sm font-medium">{t("account.detailsTitle")}</legend>
+        <p className="-mt-2 text-xs text-muted">{t("account.addressHint")}</p>
+        <Field label={t("account.addressLine")} name="address_line" defaultValue={addressLine ?? ""} maxLength={200} autoComplete="street-address" dir="auto" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label={t("account.city")} name="city" defaultValue={city ?? ""} maxLength={100} autoComplete="address-level2" dir="auto" />
+          <Field label={t("account.postalCode")} name="postal_code" defaultValue={postalCode ?? ""} maxLength={20} autoComplete="postal-code" dir="ltr" />
+        </div>
+      </fieldset>
       <div>
         <SubmitButton>{t("common.save")}</SubmitButton>
       </div>
     </form>
+  );
+}
+
+/** What the person is emailed about. */
+export function NotificationsForm({ emailRoster }: { emailRoster: boolean }) {
+  const t = useTranslations();
+  const [state, action] = useActionState<FormState, FormData>(saveNotifications, {});
+  return (
+    <form action={action} className="flex flex-col gap-4">
+      <FormFeedback state={state} />
+      <div className="flex flex-col gap-1">
+        <CheckboxField label={t("account.rosterEmails")} name="email_roster" defaultChecked={emailRoster} />
+        <p className="text-xs text-muted">{t("account.rosterEmailsHint")}</p>
+      </div>
+      <div>
+        <SubmitButton>{t("common.save")}</SubmitButton>
+      </div>
+    </form>
+  );
+}
+
+/** The person's picture: pick a file to see it at once, then save it; or remove it. */
+export function PictureForm({ id, name, src }: { id: string; name: string; src: string | null }) {
+  const t = useTranslations("account");
+  const tCommon = useTranslations("common");
+  const [state, action] = useActionState<PictureState, FormData>(uploadAvatar, {});
+  const [preview, setPreview] = useState<string | null>(null);
+  const [cropping, setCropping] = useState<File | null>(null);
+  const [cropped, setCropped] = useState<File | null>(null);
+  const input = useRef<HTMLInputElement>(null);
+  const error = state.error === "generic" ? tCommon("errors.generic") : state.error && t(`pictureErrors.${state.error}`);
+
+  return (
+    <div className="flex flex-wrap items-center gap-5">
+      <Avatar id={id} name={name} src={preview ?? src} size="xl" />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <FormError message={error} />
+        <FormNotice message={state.saved && !preview ? tCommon("saved") : undefined} />
+        <form
+          action={async (data) => {
+            if (cropped) data.set("avatar", cropped);
+            await action(data);
+            setPreview(null);
+            setCropped(null);
+          }}
+          className="flex flex-wrap items-center gap-2"
+        >
+          <label className="btn-secondary cursor-pointer px-3 py-2 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary">
+            <ImageUp aria-hidden="true" className="size-4" />
+            {src ? t("replacePicture") : t("addPicture")}
+            <input
+              ref={input}
+              type="file"
+              name="avatar"
+              accept="image/png,image/jpeg,image/webp"
+              className="sr-only"
+              onChange={(event) => {
+                // The picture is cropped to a square in a dialog first; what is saved is the crop.
+                setCropping(event.target.files?.[0] ?? null);
+              }}
+            />
+          </label>
+          {preview && <SubmitButton className="px-3 py-2 text-sm">{t("savePicture")}</SubmitButton>}
+        </form>
+        {src && !preview && (
+          <form action={removeAvatar}>
+            <button type="submit" className="btn-ghost px-2 py-1 text-sm">
+              <Trash2 aria-hidden="true" className="size-4" />
+              {t("removePicture")}
+            </button>
+          </form>
+        )}
+        <p className="text-xs text-muted">{t("pictureHint")}</p>
+      </div>
+      {cropping && (
+        <ImageCropDialog
+          file={cropping}
+          onCancel={() => {
+            setCropping(null);
+            if (input.current) input.current.value = "";
+          }}
+          onDone={(file) => {
+            setCropping(null);
+            setCropped(file);
+            setPreview(URL.createObjectURL(file));
+          }}
+        />
+      )}
+    </div>
   );
 }

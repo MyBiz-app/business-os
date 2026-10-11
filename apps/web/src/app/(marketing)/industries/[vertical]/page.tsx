@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { CtaBand, FeatureGrid } from "@/components/marketing/sections";
 import { VerticalIcon } from "@/components/vertical-icon";
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: PageProps<"/industries/[verti
   const { vertical } = await params;
   if (!findVertical(vertical)) return {};
   const { text } = industryTexts(await getTranslations());
-  return { title: `${text(vertical, "name")} · MyBiz`, description: text(vertical, "heroText") };
+  return { title: `${text(vertical, "name")} · ${BRAND.name}`, description: text(vertical, "heroText") };
 }
 
 /** One industry — a category, a sub-category or one coming soon: how MyBiz fits it. */
@@ -64,15 +65,15 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
           </ul>
           <div className="flex flex-wrap justify-center gap-3">
             {planned ? (
-              <Link href={`/contact?vertical=${key}`} className="btn-primary px-6 py-3 text-lg">
+              <Link href={`/contact?vertical=${key}`} className="btn-primary btn-lg">
                 {t("industries.notify")}
               </Link>
             ) : (
               <>
-                <Link href={`/start?vertical=${key}`} className="btn-primary px-6 py-3 text-lg">
+                <Link href={`/start?vertical=${key}`} className="btn-primary btn-lg">
                   {t("hero.ctaPrimary")}
                 </Link>
-                <Link href={`/contact?vertical=${key}`} className="btn-secondary px-6 py-3 text-lg">
+                <Link href={`/contact?vertical=${key}`} className="btn-secondary btn-lg">
                   {t("cta.contact")}
                 </Link>
               </>

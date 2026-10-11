@@ -5,6 +5,7 @@ Clients are not members of the business. Their requests run under the client pol
 client record and bookings."""
 
 import datetime as dt
+from collections.abc import Mapping
 from datetime import datetime, time, timedelta
 from typing import Annotated, Literal
 from uuid import UUID
@@ -26,8 +27,9 @@ from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionD
 from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
-from app.api.schedule import ClosedDay, ServiceSummary
-from app.scheduling import local_to_utc
+from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
+from app.catalog.verticals import CATALOG
+from app.schedule.scheduling import local_to_utc
 
 public_router = APIRouter(tags=["client"])
 router = APIRouter(prefix="/client", tags=["client"])
@@ -64,10 +66,30 @@ class ClientBusiness(BaseModel):
     currency: str
     cancellation_window_minutes: int
     online_sales: bool = Field(description="The client can buy plans in the app")
+    resource_payment: Literal["app", "venue"] = Field(
+        default="app", description="Reservations: paid in the app when booking, or at the venue"
+    )
+    dependents: Literal["pet", "child"] | None = Field(
+        default=None, description="The industry keeps the client's pets / children (#43)"
+    )
+    dependent_required: bool = Field(
+        default=False, description="Every booking says which pet / child comes"
+    )
     client_id: UUID
     first_name: str
     last_name: str | None
     phone: str | None
+
+
+def _business(row: Mapping[str, object]) -> ClientBusiness:
+    pack = CATALOG.get(str(row["vertical"]))
+    return ClientBusiness.model_validate(
+        {
+            **row,
+            "dependents": pack.dependents if pack else None,
+            "dependent_required": pack.dependent_required if pack else False,
+        }
+    )
 
 
 class ProfileUpdate(BaseModel):
@@ -89,6 +111,14 @@ class MyBooking(BaseModel):
     id: UUID
     status: BookingStatus
     waitlist_position: int | None
+    dependent_id: UUID | None = None
+    dependent_name: str | None = Field(default=None, description="The pet / child who comes")
+
+
+class ClientBookingCreate(BaseModel):
+    dependent_id: UUID | None = Field(
+        default=None, description="Which of the client's pets / children comes (#43)"
+    )
 
 
 class ClientSession(BaseModel):
@@ -102,7 +132,13 @@ class ClientSession(BaseModel):
     capacity: int
     spots_left: int
     waitlisted: int
-    my_booking: MyBooking | None
+    address: str | None = Field(default=None, description="My on-site job: where (#42)")
+    job_status: JobStatus | None = Field(default=None, description="My on-site job's progress")
+    my_booking: MyBooking | None = Field(description="The client's first live booking")
+    my_bookings: list[MyBooking] = Field(
+        default_factory=list,
+        description="All the client's live bookings (one per dependent who comes)",
+    )
 
 
 @public_router.get("/public/businesses/{code}")
@@ -127,7 +163,8 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
-           t.cancellation_window_minutes, t.online_sales, {LOGO_URL.format(t="t")} AS logo_url,
+           t.cancellation_window_minutes, t.online_sales, t.resource_payment,
+           {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
     WHERE c.user_id = app.current_user_id()
@@ -138,7 +175,7 @@ BUSINESS_SELECT = f"""
 def my_businesses(session: SessionDep) -> list[ClientBusiness]:
     """Every business the signed-in user has joined as a client."""
     rows = session.execute(text(f"{BUSINESS_SELECT} ORDER BY t.name")).mappings()
-    return [ClientBusiness.model_validate(dict(row)) for row in rows]
+    return [_business(row) for row in rows]
 
 
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
@@ -159,7 +196,7 @@ def join_business(body: JoinRequest, user: UserDep, session: SessionDep) -> Clie
         .mappings()
         .one()
     )
-    return ClientBusiness.model_validate(dict(row))
+    return _business(row)
 
 
 CLIENT_SESSION_SELECT = """
@@ -167,16 +204,25 @@ CLIENT_SESSION_SELECT = """
            l.name AS location_name, r.name AS room_name,
            greatest(s.capacity - bk.booked, 0) AS spots_left, bk.waitlisted,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
-           mine.id AS my_booking_id, mine.status AS my_booking_status,
-           app.waitlist_position(mine.id) AS my_waitlist_position
+           mine.items AS my_bookings,
+           CASE WHEN mine.items IS NOT NULL THEN s.address END AS address,
+           CASE WHEN mine.items IS NOT NULL THEN s.job_status END AS job_status
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
     CROSS JOIN LATERAL app.session_counts(s.id) bk
-    LEFT JOIN app.bookings mine
-        ON mine.session_id = s.id AND mine.client_id = app.current_client_id()
-        AND mine.status <> 'cancelled'
+    CROSS JOIN LATERAL (
+        SELECT json_agg(json_build_object(
+                   'id', b.id, 'status', b.status,
+                   'waitlist_position', app.waitlist_position(b.id),
+                   'dependent_id', b.dependent_id, 'dependent_name', d.name
+               ) ORDER BY b.created_at) AS items
+        FROM app.bookings b
+        LEFT JOIN app.dependents d ON d.id = b.dependent_id
+        WHERE b.session_id = s.id AND b.client_id = app.current_client_id()
+          AND b.status <> 'cancelled'
+    ) mine
 """
 
 
@@ -187,14 +233,8 @@ def _to_session(row: dict) -> ClientSession:
         "name": data.pop("service_name"),
         "color": data.pop("service_color"),
     }
-    booking_id = data.pop("my_booking_id")
-    booking_status = data.pop("my_booking_status")
-    position = data.pop("my_waitlist_position")
-    data["my_booking"] = (
-        {"id": booking_id, "status": booking_status, "waitlist_position": position}
-        if booking_id
-        else None
-    )
+    data["my_bookings"] = data["my_bookings"] or []
+    data["my_booking"] = data["my_bookings"][0] if data["my_bookings"] else None
     return ClientSession.model_validate(data)
 
 
@@ -228,7 +268,7 @@ def update_profile(body: ProfileUpdate, context: ClientDep) -> ClientBusiness:
         .mappings()
         .one()
     )
-    return ClientBusiness.model_validate(dict(row))
+    return _business(row)
 
 
 @router.get("/sessions")
@@ -246,7 +286,7 @@ def client_sessions(
         text(f"""
             {CLIENT_SESSION_SELECT}
             WHERE s.starts_at >= :from AND s.starts_at < :to
-              AND (sv.booking_mode = 'class' OR mine.id IS NOT NULL)
+              AND (sv.booking_mode = 'class' OR mine.items IS NOT NULL)
             ORDER BY s.starts_at
         """),
         {"from": window_start, "to": window_end},
@@ -278,8 +318,11 @@ def _ensure_upcoming(context: ClientContext, session_id: UUID) -> None:
 
 
 @router.post("/sessions/{session_id}/bookings", status_code=status.HTTP_201_CREATED)
-def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
-    """Books the signed-in client, or puts them on the waitlist when the session is full."""
+def book_session(
+    session_id: UUID, context: ClientDep, body: ClientBookingCreate | None = None
+) -> ClientSession:
+    """Books the signed-in client (or one of their pets / children), or puts them on the
+    waitlist when the session is full."""
     _ensure_upcoming(context, session_id)
     mode = context.session.execute(
         text("""
@@ -288,7 +331,7 @@ def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
         """),
         {"id": session_id},
     ).scalar()
-    if mode == "appointment":  # appointments are booked at a free time (POST /appointments)
+    if mode != "class":  # appointments and reservations are booked at a free time
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_bookable")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
     requires_plan = context.session.execute(
@@ -301,6 +344,7 @@ def book_session(session_id: UUID, context: ClientDep) -> ClientSession:
         session_id,
         context.client_id,
         requires_plan=requires_plan,
+        dependent_id=body.dependent_id if body else None,
     )
     return _load_session(context.session, session_id)
 
@@ -326,10 +370,12 @@ def my_bookings(context: ClientDep) -> list[ClientBooking]:
         text("""
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
+                   d.name AS dependent_name,
                    (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
+            LEFT JOIN app.dependents d ON d.id = b.dependent_id
             WHERE b.client_id = app.current_client_id()
             ORDER BY s.starts_at DESC
             LIMIT 200

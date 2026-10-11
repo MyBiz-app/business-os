@@ -1,0 +1,72 @@
+name: Deploy the Expo apps to the web (Vercel)
+
+# Builds the three Expo apps as static web apps on the runner and uploads the finished files
+# to Vercel (one Vercel project per app, created on the first run). Started by hand from the
+# Actions tab, so nothing is published until the owner asks for it.
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "Which app"
+        type: choice
+        default: all
+        options: [all, client-app, business-app, staff-app]
+
+env:
+  # Not a secret: names the Vercel team. Passed as --scope (VERCEL_ORG_ID alone is rejected by the CLI).
+  VERCEL_SCOPE: team_KwKjSLwpf7CxSCUP92Fbx6qK
+  VERCEL_CLI: vercel@59.26.0
+  # Public values only (the same ones the website ships to every browser).
+  EXPO_PUBLIC_API_URL: https://business-os-api-staging.onrender.com
+  EXPO_PUBLIC_SUPABASE_URL: https://mywfwzdrlbpxeheszasd.supabase.co
+  EXPO_PUBLIC_SUPABASE_KEY: sb_publishable_a9rwxNcFQSpDxyxhu1wApA_a_LHcu5A
+
+jobs:
+  deploy:
+    name: Deploy ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [client-app, business-app, staff-app]
+    steps:
+      - name: Skip apps that were not asked for
+        id: pick
+        run: |
+          if [ "${{ inputs.app }}" = "all" ] || [ "${{ inputs.app }}" = "${{ matrix.app }}" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.pick.outputs.run == 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.pick.outputs.run == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.pick.outputs.run == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install and export the web build
+        if: steps.pick.outputs.run == 'true'
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter ${{ matrix.app }} exec expo export -p web --output-dir dist
+          # Single-page app: every path serves index.html.
+          cp apps/${{ matrix.app }}/vercel.json apps/${{ matrix.app }}/dist/vercel.json
+          sed -i '/buildCommand/d;/outputDirectory/d' apps/${{ matrix.app }}/dist/vercel.json
+
+      - name: Upload to Vercel
+        if: steps.pick.outputs.run == 'true'
+        working-directory: apps/${{ matrix.app }}/dist
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -o pipefail
+          test -n "$VERCEL_TOKEN" || { echo "::error::VERCEL_TOKEN is not set"; exit 1; }
+          npx --yes "$VERCEL_CLI" deploy --prod --yes --name "mybiz-${{ matrix.app }}" --scope "$VERCEL_SCOPE" --token="$VERCEL_TOKEN" | tee url.txt
+          echo "### ${{ matrix.app }}: $(tail -n1 url.txt)" >> "$GITHUB_STEP_SUMMARY"

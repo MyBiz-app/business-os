@@ -29,11 +29,11 @@ Physical CSS (left/right) was not found in the web app.
 
 | Finding | Where | Tracking |
 |---|---|---|
-| Branch assignment of team members (`location_ids`) is stored but does not restrict anything | `api/deps.py` `set_branch` | [#64](https://github.com/adiredri/business-os/issues/64) (owner's decision) |
-| N+1 queries in loops: series update and closing a day, `/me/businesses`, staff hours insert | `api/schedule.py`, `api/businesses.py`, `api/appointments.py` | [#63](https://github.com/adiredri/business-os/issues/63) |
-| Sign-in screen identical in three apps; app root and preferences card nearly identical | `apps/*/src/app` | [#63](https://github.com/adiredri/business-os/issues/63) |
-| Money formatting duplicated (web and app-kit) and `/100` inline in three places; assumes two decimals | `apps/web/src/lib/money.ts`, `packages/app-kit/src/lib/money.ts` | [#63](https://github.com/adiredri/business-os/issues/63) |
-| Share image is English-only (needs a Hebrew font for the image renderer) | `apps/web/src/app/(marketing)/opengraph-image.tsx` | [#63](https://github.com/adiredri/business-os/issues/63) |
-| Fitness as the default industry in the start wizard and contact form | `start-wizard.tsx`, `contact-form.tsx` | [#63](https://github.com/adiredri/business-os/issues/63) |
-| Tests missing for `/me/businesses` with several businesses, closed days delete, a business's invoices in the console | `apps/api/tests` | [#63](https://github.com/adiredri/business-os/issues/63) |
+| Branch assignment of team members (`location_ids`) is stored but does not restrict anything | `api/deps.py` `set_branch` | [#64](https://github.com/MyBiz-app/business-os/issues/64) (owner's decision) |
+| N+1 queries in loops: series update and closing a day, `/me/businesses`, staff hours insert | `api/schedule.py`, `api/businesses.py`, `api/appointments.py` | ✅ Done in [#83](https://github.com/MyBiz-app/business-os/pull/83); `/me/businesses` keeps one query per business on purpose (each runs in that business's RLS context) |
+| Sign-in screen identical in three apps; app root and preferences card nearly identical | `apps/*/src/app` | ✅ Done in [#83](https://github.com/MyBiz-app/business-os/pull/83) |
+| Money formatting duplicated (web and app-kit) and `/100` inline in three places; assumes two decimals | `apps/web/src/lib/money.ts`, `packages/app-kit/src/lib/money.ts` | ✅ Done in [#83](https://github.com/MyBiz-app/business-os/pull/83) |
+| Share image is English-only (needs a Hebrew font for the image renderer) | `apps/web/src/app/(marketing)/opengraph-image.tsx` | ✅ Done in [#83](https://github.com/MyBiz-app/business-os/pull/83) |
+| Fitness as the default industry in the start wizard and contact form | `start-wizard.tsx`, `contact-form.tsx` | ✅ Done in [#83](https://github.com/MyBiz-app/business-os/pull/83) |
+| Tests missing for `/me/businesses` with several businesses, closed days delete, a business's invoices in the console | `apps/api/tests` | ✅ Done in [#83](https://github.com/MyBiz-app/business-os/pull/83) |
 | RLS is enabled but not FORCED: safe because the table owner is never the API role. Forcing it changes nothing while the owner bypasses RLS | All tables | Noted; revisit if the API ever connects as the owner |

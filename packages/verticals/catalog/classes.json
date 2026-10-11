@@ -322,6 +322,21 @@
     {
       "key": "kids_activities",
       "status": "live",
+      "dependents": "child",
+      "dependent_fields": [
+        {
+          "key": "school_grade",
+          "kind": "text"
+        },
+        {
+          "key": "allergies",
+          "kind": "text"
+        },
+        {
+          "key": "emergency_contact",
+          "kind": "text"
+        }
+      ],
       "default_services": [
         {
           "names": {

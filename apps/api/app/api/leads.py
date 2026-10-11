@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, has_module, require
 from app.api.pagination import MAX_LIMIT
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 public_router = APIRouter(prefix="/public", tags=["public"])

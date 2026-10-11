@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { termsOf } from "@business-os/verticals";
+import { termsOf, vertical } from "@business-os/verticals";
 
 import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
@@ -7,18 +7,17 @@ import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
 import { canManageSettings, canManageTeam } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
-import { getBranches, getTenant } from "@/lib/tenant";
+import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
-import { BranchPicker } from "./_menu/branch-picker";
-import { BusinessMenu } from "./_menu/business-menu";
+import { WorkspaceSwitcher } from "./_menu/workspace-switcher";
 
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const { tenant, me, branch } = await getTenant();
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
   // The branch picker appears once the business has more than one active branch.
-  const branches = await getBranches();
+  const [branches, rents] = await Promise.all([getBranches(), hasBookableRooms()]);
   const currentBranch = branches.find((b) => b.id === branch) ?? null;
 
   // Only what the user's permissions let them open.
@@ -28,12 +27,20 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/reports", label: t("nav.reports"), icon: "reports", permission: "reports.read" },
     { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
     { href: "/schedule", label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
+    ...(rents ? [{ href: "/resources", label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
     { href: "/clients", label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
     { href: "/clients/join", label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
     { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
     { href: "/messages", label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
     { href: "/services", label: t("nav.services"), icon: "services", permission: "catalog.read" },
     { href: "/plans", label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
+    { href: "/quotes", label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
+    ...(vertical(tenant.vertical)?.timeBilling
+      ? [
+          { href: "/time", label: t("nav.time"), icon: "time" as const, permission: "clients.read" },
+          { href: "/bills", label: t("nav.billingRun"), icon: "billing" as const, permission: "sales.manage" },
+        ]
+      : []),
     { href: "/sales", label: t("nav.sales"), icon: "sales", permission: "reports.read" },
     { href: "/locations", label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
   ];
@@ -50,14 +57,14 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     // The business's brand color replaces the product color inside its own area.
     <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
       <aside className="border-b border-border bg-surface/60 print:hidden backdrop-blur md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-e">
-        <BusinessMenu
+        <WorkspaceSwitcher
           name={tenant.name}
           logo={logo}
           current={tenant.id}
           memberships={me.memberships}
-          branchName={branches.length > 1 ? (currentBranch?.name ?? t("businessMenu.allBranches")) : null}
+          branches={branches.map(({ id, name }) => ({ id, name }))}
+          branch={currentBranch?.id ?? null}
         />
-        {branches.length > 1 && <BranchPicker current={currentBranch?.id ?? null} branches={branches} />}
         <SideNav items={items} />
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">

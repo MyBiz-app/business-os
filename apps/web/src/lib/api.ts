@@ -2,6 +2,8 @@ import "server-only";
 
 import { type ApiClient, createApiClient } from "@business-os/api-client";
 
+import { headers } from "next/headers";
+
 import { createClient } from "@/lib/supabase/server";
 
 export type { Me, Role, Tenant } from "@business-os/api-client";
@@ -33,12 +35,24 @@ export class ApiError extends Error {
   }
 }
 
+/** The visitor's address, passed on so the API's rate limits count each visitor rather than
+ * this server. The API believes it only together with the shared secret (API_INTERNAL_TOKEN). */
+async function forwardedFor(): Promise<Record<string, string>> {
+  const incoming = await headers();
+  const address = incoming.get("x-forwarded-for")?.split(",")[0]?.trim() || incoming.get("x-real-ip");
+  const token = process.env.API_INTERNAL_TOKEN;
+  return address && token ? { "X-Visitor-Address": address, "X-Internal-Token": token } : {};
+}
+
 async function authHeaders(): Promise<Record<string, string>> {
   const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  return session ? { Authorization: `Bearer ${session.access_token}` } : {};
+  return {
+    ...(await forwardedFor()),
+    ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}),
+  };
 }
 
 /** Uploads a file (multipart) to the API as the signed-in user, scoped to a tenant. */
@@ -47,7 +61,7 @@ export async function apiUpload(path: string, file: File, tenantId: string): Pro
   body.set("file", file);
   return fetch(`${API_URL}${path}`, {
     method: "PUT",
-    headers: { ...(await authHeaders()), "X-Tenant-Id": tenantId },
+    headers: { ...(await authHeaders()), ...(tenantId ? { "X-Tenant-Id": tenantId } : {}) },
     body,
     cache: "no-store",
   });
@@ -57,7 +71,7 @@ export async function apiUpload(path: string, file: File, tenantId: string): Pro
 export async function apiFetch(path: string, init: RequestInit, tenantId: string): Promise<Response> {
   return fetch(`${API_URL}${path}`, {
     ...init,
-    headers: { ...(await authHeaders()), "X-Tenant-Id": tenantId },
+    headers: { ...(await authHeaders()), ...(tenantId ? { "X-Tenant-Id": tenantId } : {}) },
     cache: "no-store",
   });
 }

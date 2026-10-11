@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.jobs import HORIZON_DAYS, extend_series
+from app.jobs import HORIZON_DAYS, _publish_moment, extend_series, publish_shifts
 from tests.conftest import local_today
 from tests.test_bookings import book, new_client
 
@@ -244,7 +244,7 @@ def test_todays_booked_clients_are_reminded_once(
     client: TestClient, studio: dict, engine: Engine
 ) -> None:
     from app.jobs import remind_sessions
-    from app.scheduling import local_to_utc
+    from app.schedule.scheduling import local_to_utc
 
     today = local_today()
     later_today = client.post(
@@ -395,7 +395,7 @@ def test_reminders_also_go_out_on_whatsapp_with_the_module(
     client: TestClient, studio: dict, engine: Engine
 ) -> None:
     from app.jobs import message_reminders, remind_sessions
-    from app.scheduling import local_to_utc
+    from app.schedule.scheduling import local_to_utc
 
     headers = studio["headers"]
     today = local_today()
@@ -428,3 +428,311 @@ def test_reminders_also_go_out_on_whatsapp_with_the_module(
     [message] = client.get("/messages", params={"client_id": dana}, headers=headers).json()
     assert message["channel"] == "whatsapp" and "Pilates" in message["body"]
     assert "Dana" in message["body"]
+
+
+def test_untouched_leads_get_one_follow_up_on_autopilot(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import follow_up_leads
+
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"crm": 1}}, headers=headers)
+    lead = client.post(
+        "/leads",
+        json={"first_name": "Lior", "phone": "052-3333333", "interest": "Pilates"},
+        headers=headers,
+    ).json()
+    quiet = client.post("/leads", json={"first_name": "NoPhone"}, headers=headers).json()
+    later = datetime.now(UTC) + timedelta(days=3)
+
+    with engine.begin() as connection:
+        assert follow_up_leads(connection, later) == 0  # no autopilot or WhatsApp yet
+    modules = {"crm": 1, "crm_automation": 1, "whatsapp": 1}
+    client.put("/tenants/current/modules", json={"modules": modules}, headers=headers)
+    with engine.begin() as connection:
+        assert follow_up_leads(connection, datetime.now(UTC)) == 0  # too soon
+        sent = follow_up_leads(connection, later)
+        again = follow_up_leads(connection, later + timedelta(days=3))
+
+    assert sent == 1 and again == 0
+    [message] = client.get("/messages", params={"lead_id": lead["id"]}, headers=headers).json()
+    assert message["channel"] == "whatsapp" and "Lior" in message["body"]
+    assert "Pilates" in message["body"] and "Studio Flow" in message["body"]
+    timeline = client.get(f"/leads/{lead['id']}", headers=headers).json()
+    assert any(a["kind"] == "message" for a in timeline["activities"])
+    assert client.get("/messages", params={"lead_id": quiet["id"]}, headers=headers).json() == []
+
+
+def test_expired_data_is_deleted_by_its_retention_period(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.jobs import purge_expired
+
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"crm": 1}}, headers=headers)
+    old = client.post("/leads", json={"first_name": "Old"}, headers=headers).json()
+    fresh = client.post("/leads", json={"first_name": "Fresh"}, headers=headers).json()
+    client.post(
+        "/public/contact",
+        json={"name": "Dana", "email": "dana@example.com", "message": "Hi", "locale": "he"},
+    )
+    later = datetime.now(UTC) + timedelta(days=400)  # past 12 months, before 24
+    with engine.begin() as connection:
+        # The fresh lead was touched a month before then.
+        connection.execute(
+            text("UPDATE app.leads SET updated_at = :at WHERE id = :id"),
+            {"at": later - timedelta(days=30), "id": fresh["id"]},
+        )
+        connection.execute(
+            text("UPDATE app.lead_activities SET occurred_at = :at WHERE lead_id = :id"),
+            {"at": later - timedelta(days=30), "id": fresh["id"]},
+        )
+        deleted = purge_expired(connection, later)
+        leads = connection.execute(text("SELECT id::text FROM app.leads")).scalars().all()
+    assert deleted["leads"] == 1 and deleted["contact_requests"] == 1
+    assert old["id"] not in leads and fresh["id"] in leads
+
+
+def test_the_roster_goes_out_on_schedule(client: TestClient, studio: dict, engine: Engine) -> None:
+    zone = ZoneInfo("Asia/Jerusalem")
+    # Sunday 2026-10-11 at 08:00 is the default weekly moment; the week after is covered.
+    row = {
+        "time_zone": "Asia/Jerusalem",
+        "shifts_publish_cadence": "weekly",
+        "shifts_publish_weekday": 6,
+        "shifts_publish_day": 1,
+        "shifts_publish_time": datetime(2000, 1, 1, 8).time(),
+    }
+    before = datetime(2026, 10, 11, 7, 59, tzinfo=zone)
+    after = datetime(2026, 10, 11, 8, 1, tzinfo=zone)
+    assert _publish_moment(row, before)[0] == datetime(2026, 10, 4, 8, tzinfo=zone)
+    due, end = _publish_moment(row, after)
+    assert due == datetime(2026, 10, 11, 8, tzinfo=zone)
+    assert end == datetime(2026, 10, 18, tzinfo=zone)
+    monthly = {**row, "shifts_publish_cadence": "monthly", "shifts_publish_day": 5}
+    assert _publish_moment(monthly, datetime(2026, 10, 3, 12, tzinfo=zone))[0] == datetime(
+        2026, 9, 5, 8, tzinfo=zone
+    )
+    assert _publish_moment(monthly, datetime(2026, 10, 6, 12, tzinfo=zone)) == (
+        datetime(2026, 10, 5, 8, tzinfo=zone),
+        datetime(2026, 11, 5, tzinfo=zone),
+    )
+    daily = {**row, "shifts_publish_cadence": "daily"}
+    assert _publish_moment(daily, datetime(2026, 10, 11, 6, tzinfo=zone)) == (
+        datetime(2026, 10, 10, 8, tzinfo=zone),
+        datetime(2026, 10, 12, tzinfo=zone),
+    )
+
+    # Only drafts that start before the end of the stretch go out, and only once per moment.
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+
+    def plan(day: datetime) -> None:
+        body = {
+            "user_id": coach,
+            "location_id": branch,
+            "starts_at": day.replace(hour=9).isoformat(),
+            "ends_at": day.replace(hour=15).isoformat(),
+        }
+        assert client.post("/shifts", json=body, headers=headers).status_code == 201
+
+    plan(datetime(2026, 10, 12, tzinfo=zone))  # inside the week
+    plan(datetime(2026, 10, 24, tzinfo=zone))  # the week after
+    with engine.begin() as connection:
+        assert publish_shifts(connection, after) == 1
+    with engine.begin() as connection:
+        assert publish_shifts(connection, after) == 0
+        assert publish_shifts(connection, after + timedelta(days=7, minutes=1)) == 1
+
+
+def test_staff_are_emailed_once_when_their_shifts_are_published(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import notify_roster
+
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    zone = ZoneInfo("Asia/Jerusalem")
+    soon = datetime.now(zone).replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=3)
+    for day in (0, 1):
+        day_start = soon + timedelta(days=day)
+        body = {
+            "user_id": coach,
+            "location_id": branch,
+            "starts_at": day_start.replace(hour=9).isoformat(),
+            "ends_at": day_start.replace(hour=15).isoformat(),
+            "position": "Coach",
+        }
+        assert client.post("/shifts", json=body, headers=headers).status_code == 201
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "UPDATE app.users SET email = 'coach@example.com', full_name = 'Dana Levi' "
+                "WHERE id = :id"
+            ),
+            {"id": coach},
+        )
+    sender = LogSender()
+
+    # Drafts are not announced.
+    with engine.begin() as connection:
+        assert notify_roster(connection, sender) == {"sent": 0, "failed": 0, "skipped": 0}
+
+    published = client.post(
+        "/shifts/publish", json={"start": soon.date().isoformat(), "days": 7}, headers=headers
+    )
+    assert published.json() == {"published": 2}
+    with engine.begin() as connection:
+        assert notify_roster(connection, sender) == {"sent": 1, "failed": 0, "skipped": 0}
+        assert notify_roster(connection, sender)["sent"] == 0  # once only
+    [email] = sender.sent
+    assert email.to == "coach@example.com"
+    assert email.subject == "המשמרות החדשות שלך ב" + "Studio Flow"
+    assert email.text.startswith("שלום Dana,")
+    assert email.text.count("09:00–15:00 · Main · Coach") == 2
+    with engine.connect() as connection:
+        usage = (
+            connection.execute(
+                text("SELECT quantity FROM app.usage_events WHERE source_ref = 'roster_emails'")
+            )
+            .scalars()
+            .all()
+        )
+    assert [int(quantity) for quantity in usage] == [1]
+
+
+def test_switching_roster_emails_off_sends_nothing(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import notify_roster
+
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    zone = ZoneInfo("Asia/Jerusalem")
+    day = datetime.now(zone).replace(hour=9, minute=0, second=0, microsecond=0) + timedelta(days=2)
+    body = {
+        "user_id": coach,
+        "location_id": branch,
+        "starts_at": day.isoformat(),
+        "ends_at": (day + timedelta(hours=6)).isoformat(),
+    }
+    assert client.post("/shifts", json=body, headers=headers).status_code == 201
+    client.post("/shifts/publish", json={"start": day.date().isoformat()}, headers=headers)
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "UPDATE app.users SET email = 'c@example.com', email_roster = false WHERE id = :id"
+            ),
+            {"id": coach},
+        )
+    sender = LogSender()
+    with engine.begin() as connection:
+        assert notify_roster(connection, sender) == {"sent": 0, "failed": 0, "skipped": 1}
+        unnotified = connection.execute(
+            text("SELECT count(*) FROM app.shifts WHERE notified_at IS NULL")
+        ).scalar_one()
+    assert sender.sent == [] and unnotified == 0
+
+
+def _published_shift(client: TestClient, studio: dict, engine: Engine) -> tuple[str, dict]:
+    """A published, already-announced shift of the coach three days from now."""
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    zone = ZoneInfo("Asia/Jerusalem")
+    day = datetime.now(zone).replace(hour=9, minute=0, second=0, microsecond=0) + timedelta(days=3)
+    body = {
+        "user_id": coach,
+        "location_id": branch,
+        "starts_at": day.isoformat(),
+        "ends_at": (day + timedelta(hours=6)).isoformat(),
+        "position": "Coach",
+    }
+    shift = client.post("/shifts", json=body, headers=headers).json()
+    client.post("/shifts/publish", json={"start": day.date().isoformat()}, headers=headers)
+    with engine.begin() as connection:
+        connection.execute(
+            text("UPDATE app.users SET email = 'coach@example.com' WHERE id = :id"), {"id": coach}
+        )
+        connection.execute(text("UPDATE app.shifts SET notified_at = now()"))
+    return shift["id"], body
+
+
+def test_edits_to_a_published_shift_are_emailed_once_after_a_quiet_period(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import QUIET_PERIOD, notify_roster_changes
+
+    headers = studio["headers"]
+    shift_id, body = _published_shift(client, studio, engine)
+    starts = datetime.fromisoformat(body["starts_at"])
+    # Three edits in a row: the email carries where the shift started and where it ended up.
+    for hour in (10, 11, 12):
+        edit = {
+            "starts_at": starts.replace(hour=hour).isoformat(),
+            "ends_at": (starts.replace(hour=hour) + timedelta(hours=6)).isoformat(),
+        }
+        assert client.patch(f"/shifts/{shift_id}", json=edit, headers=headers).status_code == 200
+    sender = LogSender()
+    with engine.begin() as connection:
+        # Still being edited: nothing goes out yet.
+        assert notify_roster_changes(connection, sender) == {"sent": 0, "failed": 0, "skipped": 0}
+    later = datetime.now(UTC) + QUIET_PERIOD + timedelta(minutes=1)
+    with engine.begin() as connection:
+        assert notify_roster_changes(connection, sender, later) == {
+            "sent": 1,
+            "failed": 0,
+            "skipped": 0,
+        }
+        assert notify_roster_changes(connection, sender, later)["sent"] == 0  # once only
+    [email] = sender.sent
+    assert email.to == "coach@example.com"
+    assert email.text.count("09:00–15:00 · Main · Coach") == 1
+    assert email.text.count("12:00–18:00 · Main · Coach") == 1
+    assert email.text.count("10:00") == 0 and email.text.count("11:00") == 0
+
+
+def test_a_removed_shift_is_emailed_and_one_put_back_is_not(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from app.messaging.email import LogSender
+    from app.messaging.roster import QUIET_PERIOD, notify_roster_changes
+
+    headers = studio["headers"]
+    shift_id, body = _published_shift(client, studio, engine)
+    starts = datetime.fromisoformat(body["starts_at"])
+    moved = {
+        "starts_at": starts.replace(hour=13).isoformat(),
+        "ends_at": (starts.replace(hour=19)).isoformat(),
+    }
+    assert client.patch(f"/shifts/{shift_id}", json=moved, headers=headers).status_code == 200
+    original = {"starts_at": body["starts_at"], "ends_at": body["ends_at"]}
+    assert client.patch(f"/shifts/{shift_id}", json=original, headers=headers).status_code == 200
+    later = datetime.now(UTC) + QUIET_PERIOD + timedelta(minutes=1)
+    sender = LogSender()
+    with engine.begin() as connection:
+        assert notify_roster_changes(connection, sender, later)["skipped"] == 1
+    assert sender.sent == []
+
+    assert client.delete(f"/shifts/{shift_id}", headers=headers).status_code == 204
+    with engine.begin() as connection:
+        assert notify_roster_changes(connection, sender, later)["sent"] == 1
+    [email] = sender.sent
+    assert email.text.count("09:00–15:00 · Main · Coach") == 1
+
+
+def test_drafts_and_shifts_not_yet_announced_record_no_changes(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    headers, branch, coach = studio["headers"], studio["location"]["id"], str(studio["coach"])
+    day = datetime.now(ZoneInfo("Asia/Jerusalem")).replace(hour=9, minute=0) + timedelta(days=3)
+    body = {
+        "user_id": coach,
+        "location_id": branch,
+        "starts_at": day.isoformat(),
+        "ends_at": (day + timedelta(hours=6)).isoformat(),
+    }
+    shift_id = client.post("/shifts", json=body, headers=headers).json()["id"]
+    client.patch(f"/shifts/{shift_id}", json={"position": "Lead"}, headers=headers)
+    client.post("/shifts/publish", json={"start": day.date().isoformat()}, headers=headers)
+    client.patch(f"/shifts/{shift_id}", json={"position": "Cover"}, headers=headers)
+    with engine.connect() as connection:
+        assert connection.execute(text("SELECT count(*) FROM app.shift_changes")).scalar_one() == 0

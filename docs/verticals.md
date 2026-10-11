@@ -12,7 +12,7 @@ describes the product side (section 4); this page is the how-to.
 | The catalog: one file per category, with its sub-categories under `children` | `packages/verticals/catalog/*.json` |
 | Types, inheritance and lookups for the web and the apps | `packages/verticals/src/index.ts` |
 | Copies the rest of the system reads (generated, checked in) | `packages/verticals/src/catalog.generated.ts`, `apps/api/app/verticals_catalog.json` |
-| The API's view (packs used when a business is created, client fields, health forms) | `apps/api/app/verticals.py` |
+| The API's view (packs used when a business is created, client fields, health forms) | `apps/api/app/catalog/verticals.py` |
 | Texts: name, tagline, benefits, industry page, "your studio", an example name | `verticals.<key>` in `packages/i18n/messages/{he,en}.json` |
 | Industry words in the interface (clients, schedule, …) | `terms.<set>` in the translations |
 | Client field labels and their choices | `clientFields.<key>`, `clientFields.<key>_options.<option>` |
@@ -26,10 +26,23 @@ from its parent (sub-categories can have sub-categories of their own):
 - Settings (`terms`, `client_term`, `booking_modes`, `cancellation_window_minutes`,
   `booking_requires_plan`, `health_form`, `default_preset`, `recommended_modules`, `icon`,
   `color`): the entry's own value, else the parent's.
-- `default_services`, `default_plans`: the entry's own list replaces the parent's.
+- `default_services`, `default_plans`, `default_rooms`: the entry's own list replaces the parent's.
 - `client_fields` replaces the parent's fields; `extra_client_fields` adds to them.
+- Dependents (#43): `dependents` (`pet` / `child`: the industry keeps profiles of who comes under
+  each client), `dependent_fields` (like `client_fields`, labels under `clientFields`, replace
+  the parent's) and `dependent_required` (every booking must name one: a groomer needs the dog).
 - Texts: `verticals.<key>.<text>` from the entry, else from the nearest parent that has it. A
   sub-category needs only `name` and `tagline`.
+
+A service with `"booking_mode": "resource"` is a court or room rented by the hour: its
+`duration_minutes` is the shortest length, `max_minutes` and `step_minutes` the others, and its
+`prices` are per hour. Such an industry lists `default_rooms` (names, capacity, `opens` and
+`closes`): a new business gets them in its main branch, for rent every day in those hours and
+serving its resource services, so it can take reservations from the first minute.
+
+An appointment service with `"on_site": true` happens at the client's address (#42), with
+`travel_minutes` (0–240) that block the technician before each job; booking asks for one of the
+client's addresses.
 
 Prices are integer minor units per currency. `ILS` is required; `USD` and `EUR` default to rough
 equivalents. A business keeps the key it chose (category or sub-category) in `tenants.vertical`.
@@ -66,6 +79,8 @@ footer, sitemap), in the sign-up journey, in onboarding, in the contact form, in
 in the apps. The API test `test_every_open_industry_starts_a_business` creates a business for
 every open entry.
 
-A category that needs something the core cannot do yet (courts and rooms, jobs at the client's
-address, pets under an owner, quotes and deposits) stays `planned` until that capability is
-built: see spec section 4.3 and the phase 7 issues.
+A category that needs something the core cannot do yet (jobs at the client's address, pets under
+an owner, quotes and deposits) stays `planned` until that capability is built: see spec section
+4.3 and the phase 7 issues. Courts and rooms by the hour are built (#41): Sports & facilities is
+open as beta. Dependents are built (#43): Pet services is open as beta, and Kids activities keeps a
+profile per child. On-site jobs are built (#42): Home & field services is open as beta. Quotes and deposits are built (#44): Creative & events is open as beta. Documents, retainers and time billing are built (#45): Professional services is open as beta (`"time_billing": true` in a pack shows time and monthly bills on the client card). Every category is now open.

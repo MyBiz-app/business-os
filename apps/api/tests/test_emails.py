@@ -4,7 +4,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.email import Email, LogSender, load_messages, send_emails
+from app.messaging.email import Email, LogSender, load_messages, send_emails
 from tests.conftest import AuthHeaders
 from tests.test_bookings import book, new_session
 from tests.test_client_app import member
@@ -94,7 +94,7 @@ def test_every_notification_kind_has_email_text() -> None:
 
 def test_gmail_sender_signs_in_with_the_from_address(monkeypatch) -> None:
     from app.core.config import get_settings
-    from app.email import Email, SmtpSender, sender_from_settings
+    from app.messaging.email import Email, SmtpSender, sender_from_settings
 
     monkeypatch.setenv("API_EMAIL_PROVIDER", "gmail")
     monkeypatch.setenv("API_EMAIL_API_KEY", "app-password")

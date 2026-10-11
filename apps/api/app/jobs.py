@@ -3,25 +3,40 @@
     uv run python -m app.jobs extend-series [--database-url URL]
     uv run python -m app.jobs remind-sessions
     uv run python -m app.jobs remind-plans
-    uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/email.py)
+    uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
-    uv run python -m app.jobs bill-businesses (simulated platform billing; see app/billing.py)
+    uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
+    uv run python -m app.jobs notify-shifts    (emails staff new and edited published shifts)
+    uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
+    uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
+    uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
+    uv run python -m app.jobs move-files      (documents kept in the database → the object store)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
 
 import argparse
 import json
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, create_engine, text
 
-from app.billing import bill_businesses
+from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
-from app.email import MESSAGES_DIR, load_messages, render, send_emails, sender_from_settings
-from app.scheduling import weekly_occurrences
+from app.messaging import outbox
+from app.messaging.email import (
+    MESSAGES_DIR,
+    load_messages,
+    render,
+    send_emails,
+    sender_from_settings,
+)
+from app.messaging.roster import notify_roster, notify_roster_changes
+from app.providers.choice import choose
+from app.providers.storage import tenant_key
+from app.schedule.scheduling import weekly_occurrences
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
 
@@ -195,15 +210,22 @@ def message_reminders(
     )
     texts: dict[str, dict] = {}
     per_tenant: dict[object, int] = {}
+    simulated: dict[object, tuple[bool, str]] = {}
     for row in rows:
+        if row["tenant_id"] not in simulated:  # the business's messaging provider (X13)
+            chosen = choose(conn, row["tenant_id"], "messaging")
+            simulated[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
+        is_simulated, provider = simulated[row["tenant_id"]]
         locale = row["locale"] if row["locale"] in ("he", "en") else "en"
         texts.setdefault(locale, load_messages(locale, messages_dir))
         _subject, body = render(texts[locale], row["kind"], row["payload"], row)
         conn.execute(
             text("""
                 INSERT INTO app.messages
-                    (tenant_id, client_id, channel, to_phone, body, status, notification_id)
-                VALUES (:t, :c, 'whatsapp', :phone, :body, 'sent', :n)
+                    (tenant_id, client_id, channel, to_phone, body, status, notification_id,
+                     simulated, provider, sent_at)
+                VALUES (:t, :c, 'whatsapp', :phone, :body, :status, :n, :simulated, :provider,
+                        CASE WHEN :simulated THEN now() END)
             """),
             {
                 "t": row["tenant_id"],
@@ -211,6 +233,9 @@ def message_reminders(
                 "phone": row["phone"].strip(),
                 "body": body[:1100],
                 "n": row["id"],
+                "status": "sent" if is_simulated else "queued",
+                "simulated": is_simulated,
+                "provider": provider,
             },
         )
         per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
@@ -225,6 +250,207 @@ def message_reminders(
     return len(rows)
 
 
+FOLLOW_UP_AFTER_DAYS = 2  # a lead nobody has touched for this long gets one follow-up
+FOLLOW_UP_WITHIN_DAYS = 30  # older leads are left to the team
+FOLLOW_UP_DETAILS = json.dumps({"channel": "whatsapp", "automated": True, "lead_follow_up": True})
+
+
+def follow_up_leads(
+    conn: Connection, now: datetime | None = None, messages_dir: Path = MESSAGES_DIR
+) -> int:
+    """Leads on autopilot (#104, module crm_automation): a new or contacted lead with a phone
+    that nobody has touched for two days gets one WhatsApp follow-up, written on its timeline.
+    Needs the WhatsApp module too; never twice for the same lead."""
+    now = now or datetime.now(UTC)
+    rows = (
+        conn.execute(
+            text("""
+                SELECT l.id, l.tenant_id, l.first_name, l.phone, l.interest,
+                       t.name AS business, t.locale
+                FROM app.leads l
+                JOIN app.tenants t ON t.id = l.tenant_id
+                WHERE l.stage IN ('new', 'contacted')
+                  AND nullif(trim(l.phone), '') IS NOT NULL
+                  AND l.created_at > :now - make_interval(days => :within)
+                  AND coalesce((SELECT max(a.occurred_at) FROM app.lead_activities a
+                                WHERE a.lead_id = l.id), l.created_at)
+                      < :now - make_interval(days => :after)
+                  AND (SELECT count(*) FROM app.tenant_modules m WHERE m.tenant_id = l.tenant_id
+                       AND m.module_key IN ('crm_automation', 'whatsapp')) = 2
+                  AND NOT EXISTS (SELECT 1 FROM app.messages x
+                                  WHERE x.lead_id = l.id AND x.created_by IS NULL)
+                ORDER BY l.created_at
+            """),
+            {"now": now, "within": FOLLOW_UP_WITHIN_DAYS, "after": FOLLOW_UP_AFTER_DAYS},
+        )
+        .mappings()
+        .all()
+    )
+    texts: dict[str, dict] = {}
+    per_tenant: dict[object, int] = {}
+    providers: dict[object, tuple[bool, str]] = {}
+    for row in rows:
+        if row["tenant_id"] not in providers:  # the business's messaging provider (X13)
+            chosen = choose(conn, row["tenant_id"], "messaging")
+            providers[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
+        simulated, provider = providers[row["tenant_id"]]
+        locale = row["locale"] if row["locale"] in ("he", "en") else "en"
+        texts.setdefault(locale, load_messages(locale, messages_dir))
+        interest = (row["interest"] or "").strip()
+        template = texts[locale]["leadFollowUp"]["withInterest" if interest else "plain"]
+        body = (
+            template.replace("{name}", row["first_name"])
+            .replace("{business}", row["business"])
+            .replace("{interest}", interest[:200])
+        )[:1100]
+        conn.execute(
+            text("""
+                INSERT INTO app.messages
+                    (tenant_id, lead_id, channel, to_phone, body, status, simulated, provider,
+                     sent_at)
+                VALUES (:t, :l, 'whatsapp', :phone, :body, :status, :simulated, :provider,
+                        CASE WHEN :simulated THEN now() END)
+            """),
+            {
+                "t": row["tenant_id"],
+                "l": row["id"],
+                "phone": row["phone"].strip(),
+                "body": body,
+                "status": "sent" if simulated else "queued",
+                "simulated": simulated,
+                "provider": provider,
+            },
+        )
+        conn.execute(
+            text("""
+                INSERT INTO app.lead_activities (tenant_id, lead_id, kind, note)
+                VALUES (:t, :l, 'message', :note)
+            """),
+            {"t": row["tenant_id"], "l": row["id"], "note": body[:2000]},
+        )
+        per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
+    for tenant_id, count in per_tenant.items():
+        conn.execute(
+            text("""
+                INSERT INTO app.usage_events (tenant_id, meter, quantity, details, source_ref)
+                VALUES (:t, 'messages', :n, CAST(:details AS jsonb), 'lead-follow-ups')
+            """),
+            {"t": tenant_id, "n": count, "details": FOLLOW_UP_DETAILS},
+        )
+    return len(rows)
+
+
+# How long data is kept (decision X20). A business that leaves (90 days) waits for an
+# account-closing flow.
+RETENTION_MONTHS = {"leads": 12, "contact_requests": 12, "ai_conversations": 12, "messages": 24}
+
+
+def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, int]:
+    """Deletes what has passed its time: leads that never became clients and nobody touched,
+    website and in-app requests, the AI assistant's conversations, and the message log."""
+    now = now or datetime.now(UTC)
+
+    def before(kind: str) -> datetime:
+        return now - timedelta(days=round(RETENTION_MONTHS[kind] * 30.44))
+
+    statements = {
+        "leads": """
+            DELETE FROM app.leads l
+            WHERE l.client_id IS NULL
+              AND greatest(l.updated_at, coalesce((SELECT max(a.occurred_at)
+                  FROM app.lead_activities a WHERE a.lead_id = l.id), l.updated_at)) < :before
+        """,
+        "contact_requests": "DELETE FROM app.contact_requests WHERE created_at < :before",
+        "ai_conversations": "DELETE FROM app.ai_conversations WHERE updated_at < :before",
+        "messages": "DELETE FROM app.messages WHERE created_at < :before",
+    }
+    return {
+        kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
+        for kind, sql in statements.items()
+    }
+
+
+def _publish_moment(row: dict, now: datetime) -> tuple[datetime, datetime]:
+    """The latest moment at or before `now` the business's roster is due out, and the end of the
+    stretch it covers: daily through tomorrow, weekly seven days, monthly until the same day of
+    the next month. Both are UTC."""
+    zone = ZoneInfo(row["time_zone"])
+    local = now.astimezone(zone)
+    at = row["shifts_publish_time"]
+    cadence = row["shifts_publish_cadence"]
+    day = local.date()
+    if cadence == "weekly":
+        day -= timedelta(days=(day.weekday() - row["shifts_publish_weekday"]) % 7)
+    elif cadence == "monthly":
+        if day.day < row["shifts_publish_day"]:
+            day = (day.replace(day=1) - timedelta(days=1)).replace(day=1)
+        day = day.replace(day=row["shifts_publish_day"])
+    if datetime.combine(day, at, zone) > local:
+        day -= {
+            "daily": timedelta(days=1),
+            "weekly": timedelta(days=7),
+            "monthly": timedelta(days=28),
+        }[cadence]
+        if cadence == "monthly":
+            day = day.replace(day=row["shifts_publish_day"])
+    if cadence == "daily":
+        end = day + timedelta(days=2)
+    elif cadence == "weekly":
+        end = day + timedelta(days=7)
+    else:
+        end = (day.replace(day=1) + timedelta(days=32)).replace(day=row["shifts_publish_day"])
+    due = datetime.combine(day, at, zone).astimezone(UTC)
+    return due, datetime.combine(end, time.min, zone).astimezone(UTC)
+
+
+def publish_shifts(conn: Connection, now: datetime | None = None) -> int:
+    """Publishes the draft shifts of every business whose roster is due (once per due moment).
+    Run hourly. Returns how many shifts became visible."""
+    now = now or datetime.now(UTC)
+    published = 0
+    rows = conn.execute(
+        text("""
+            SELECT id, time_zone, shifts_publish_cadence, shifts_publish_weekday,
+                   shifts_publish_day, shifts_publish_time, shifts_last_auto_published_at
+            FROM app.tenants WHERE shifts_publish_auto
+        """)
+    ).mappings()
+    for row in list(rows):
+        due, end = _publish_moment(dict(row), now)
+        last = row["shifts_last_auto_published_at"]
+        if last is not None and last >= due:
+            continue
+        published += conn.execute(
+            text("""
+                UPDATE app.shifts SET published_at = :now
+                WHERE tenant_id = :tenant AND published_at IS NULL AND starts_at < :end
+            """),
+            {"now": now, "tenant": row["id"], "end": end},
+        ).rowcount
+        conn.execute(
+            text("UPDATE app.tenants SET shifts_last_auto_published_at = :now WHERE id = :id"),
+            {"now": now, "id": row["id"]},
+        )
+    return published
+
+
+def send_messages(conn: Connection) -> dict[str, int]:
+    return outbox.send_messages(conn)
+
+
+def issue_documents(conn: Connection) -> dict[str, int]:
+    return outbox.issue_documents(conn)
+
+
+def notify_shifts(conn: Connection) -> dict[str, int] | str:
+    sender = sender_from_settings()
+    if sender is None:
+        return "email provider not configured; nothing sent"
+    published = notify_roster(conn, sender)
+    edits = notify_roster_changes(conn, sender)
+    return published | {f"changes_{key}": value for key, value in edits.items()}
+
+
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
     if sender is None:
@@ -232,13 +458,53 @@ def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     return send_emails(conn, sender)
 
 
+MOVE_BATCH = 100  # documents per run, so one run stays short; run again until it reports 0
+
+
+def move_files(conn: Connection, batch: int = MOVE_BATCH) -> dict[str, int] | str:
+    """Moves documents still kept in the database to the object store (T80), a batch per run.
+    The key is the document's own, so a run that fails half-way is simply run again."""
+    storage = choose(conn, None, "storage").instance
+    if storage.in_database:
+        return "storage provider keeps files in the database; nothing to move"
+    rows = conn.execute(
+        text("""
+            SELECT id, tenant_id, client_id, content_type, content FROM app.client_documents
+            WHERE content IS NOT NULL ORDER BY created_at LIMIT :batch
+        """),
+        {"batch": batch},
+    ).mappings()
+    moved = 0
+    for row in list(rows):
+        key = tenant_key(row["tenant_id"], "documents", row["client_id"], row["id"])
+        storage.put(key, bytes(row["content"]), row["content_type"])
+        conn.execute(
+            text(
+                "UPDATE app.client_documents SET storage_key = :key, content = NULL WHERE id = :id"
+            ),
+            {"key": key, "id": row["id"]},
+        )
+        moved += 1
+    left = conn.execute(
+        text("SELECT count(*) FROM app.client_documents WHERE content IS NOT NULL")
+    ).scalar_one()
+    return {"moved": moved, "left": left}
+
+
 JOBS = {
     "extend-series": extend_series,
     "remind-sessions": remind_sessions,
     "remind-plans": remind_plans,
     "send-emails": send_notification_emails,
+    "notify-shifts": notify_shifts,
     "message-reminders": message_reminders,
+    "follow-up-leads": follow_up_leads,
+    "purge-expired": purge_expired,
     "bill-businesses": bill_businesses,
+    "publish-shifts": publish_shifts,
+    "send-messages": send_messages,
+    "issue-documents": issue_documents,
+    "move-files": move_files,
 }
 
 

@@ -1,6 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
@@ -9,7 +10,7 @@ import { AddStaffForm, StaffRow } from "./staff-forms";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.team");
-  return { title: `${t("title")} · MyBiz` };
+  return { title: `${t("title")} · ${BRAND.name}` };
 }
 
 /** MyBiz's own team: levels, permissions, pausing and removing. The database enforces the

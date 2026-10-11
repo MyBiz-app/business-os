@@ -1,18 +1,28 @@
+from datetime import date
 from uuid import UUID
 
 from fastapi import APIRouter, status
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
+from app.api.common import set_clause
 from app.api.deps import SessionDep, TenantDep, UserDep
 from app.api.modules import check_selection, set_modules
-from app.api.schemas import Me, Membership, SupportAccess, Tenant, TenantCreate
+from app.api.schemas import (
+    Me,
+    Membership,
+    Palette,
+    PaletteColors,
+    SupportAccess,
+    Tenant,
+    TenantCreate,
+)
+from app.catalog.verticals import VERTICAL_PACKS
+from app.commerce.modules import PRESETS
 from app.core.db import set_tenant
-from app.email import load_all_messages
-from app.modules import PRESETS
-from app.permissions import effective_permissions
-from app.verticals import VERTICAL_PACKS
+from app.core.permissions import Permission, effective_permissions
+from app.messaging.email import load_all_messages
 
 router = APIRouter()
 
@@ -35,7 +45,13 @@ def load_current_tenant(session: Session) -> Tenant:
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
                        t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
-                       t.requires_health_declaration, t.online_sales,
+                       t.requires_health_declaration, t.online_sales, t.resource_payment,
+                       t.schedule_default_view,
+                       coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
+                       t.shifts_default_view, t.shifts_default_range,
+                       coalesce(t.shifts_default_branches, '{}') AS shifts_default_branches,
+                       t.shifts_publish_auto, t.shifts_publish_cadence, t.shifts_publish_weekday,
+                       t.shifts_publish_day, t.shifts_publish_time,
                        t.join_code,
                        coalesce(m.role,
                                 CASE WHEN app.support_tenant_id() IS NOT NULL THEN 'support'
@@ -47,7 +63,11 @@ def load_current_tenant(session: Session) -> Tenant:
                            AS modules,
                        CASE WHEN t.logo IS NULL THEN NULL
                             ELSE '/public/tenants/' || t.id || '/logo?v='
-                                 || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url
+                                 || extract(epoch FROM t.logo_updated_at)::bigint END AS logo_url,
+                       CASE WHEN t.cover IS NULL THEN NULL
+                            ELSE '/tenants/current/cover?v='
+                                 || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
+                       t.legal_entity_type, t.business_number
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m
                     ON m.tenant_id = t.id AND m.user_id = app.current_user_id()
@@ -62,6 +82,9 @@ def load_current_tenant(session: Session) -> Tenant:
     data["permissions"] = sorted(
         effective_permissions(data["role"], data.pop("custom_permissions"))
     )
+    # The registration number is for the people who manage the business, not the whole team.
+    if Permission.BUSINESS_SETTINGS.value not in data["permissions"]:
+        data["legal_entity_type"] = data["business_number"] = None
     return Tenant.model_validate(data)
 
 
@@ -85,12 +108,16 @@ def apply_vertical_pack(
         },
     )
     for service in pack.default_services:
+        resource = service.booking_mode == "resource"  # by the hour: prices are per hour
         session.execute(
             text("""
                 INSERT INTO app.services
                     (tenant_id, name, duration_minutes, capacity, booking_mode, price_amount,
-                     price_currency, color)
-                VALUES (:tenant_id, :name, :minutes, :capacity, :mode, :price, :currency, :color)
+                     price_currency, color, min_minutes, max_minutes, step_minutes,
+                     price_per_hour, on_site, travel_minutes)
+                VALUES (:tenant_id, :name, :minutes, :capacity, :mode, :price, :currency, :color,
+                        :min_minutes, :max_minutes, :step_minutes, :per_hour, :on_site,
+                        :travel_minutes)
             """),
             {
                 "tenant_id": tenant_id,
@@ -101,6 +128,12 @@ def apply_vertical_pack(
                 "price": service.prices.get(currency, 0),
                 "currency": currency,
                 "color": service.color,
+                "min_minutes": service.duration_minutes if resource else None,
+                "max_minutes": service.max_minutes if resource else None,
+                "step_minutes": service.step_minutes if resource else None,
+                "per_hour": service.prices.get(currency, 0) if resource else None,
+                "on_site": service.on_site,
+                "travel_minutes": service.travel_minutes if service.on_site else 0,
             },
         )
     for plan in pack.default_plans:
@@ -122,13 +155,73 @@ def apply_vertical_pack(
         )
 
 
+def apply_vertical_rooms(
+    session: Session | Connection, tenant_id: UUID, vertical: str, locale: str
+) -> None:
+    """Gives a new business its vertical's starter courts and rooms (once its branches exist):
+    in the main branch, for rent every day, serving the business's resource services."""
+    pack = VERTICAL_PACKS[vertical]
+    if not pack.default_rooms:
+        return
+    location_id = session.execute(
+        text("SELECT id FROM app.locations WHERE tenant_id = :t ORDER BY created_at, id LIMIT 1"),
+        {"t": tenant_id},
+    ).scalar_one()
+    services = (
+        session.execute(
+            text("SELECT id FROM app.services WHERE tenant_id = :t AND booking_mode = 'resource'"),
+            {"t": tenant_id},
+        )
+        .scalars()
+        .all()
+    )
+    for room in pack.default_rooms:
+        room_id = session.execute(
+            text("""
+                INSERT INTO app.rooms (tenant_id, location_id, name, capacity, bookable)
+                VALUES (:t, :location, :name, :capacity, true) RETURNING id
+            """),
+            {
+                "t": tenant_id,
+                "location": location_id,
+                "name": room.names.get(locale, room.names["en"]),
+                "capacity": room.capacity,
+            },
+        ).scalar_one()
+        session.execute(
+            text("""
+                INSERT INTO app.room_hours (tenant_id, room_id, weekday, starts, ends)
+                SELECT :t, :room, d, CAST(:opens AS time), CAST(:closes AS time)
+                FROM generate_series(0, 6) d
+            """),
+            {"t": tenant_id, "room": room_id, "opens": room.opens, "closes": room.closes},
+        )
+        for service_id in services:
+            session.execute(
+                text("""
+                    INSERT INTO app.service_rooms (tenant_id, service_id, room_id)
+                    VALUES (:t, :service, :room)
+                """),
+                {"t": tenant_id, "service": service_id, "room": room_id},
+            )
+
+
 @router.get("/me", tags=["account"])
 def get_me(user: UserDep, session: SessionDep) -> Me:
     ensure_profile(session, user.id, user.email)
     profile = (
         session.execute(
             text("""
-                SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin
+                SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
+                       phone, birth_date, address_line, city, postal_code, email_roster, palette,
+                       CASE WHEN palette_background IS NULL THEN NULL
+                            ELSE jsonb_build_object('background', palette_background,
+                                                    'text', palette_text,
+                                                    'accent', palette_accent)
+                       END AS palette_colors,
+                       CASE WHEN avatar_updated_at IS NULL THEN NULL
+                            ELSE '/me/avatar?v=' || extract(epoch FROM avatar_updated_at)::bigint
+                       END AS avatar_url
                 FROM app.users WHERE id = :id
             """),
             {"id": user.id},
@@ -172,6 +265,7 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
     apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
     set_modules(session, tenant_id, modules)
     create_first_branches(session, tenant_id, body.locale, 1 + modules.get("extra_location", 0))
+    apply_vertical_rooms(session, tenant_id, body.vertical, body.locale)
     return load_current_tenant(session)
 
 
@@ -204,8 +298,29 @@ def get_current_tenant(context: TenantDep) -> Tenant:
 
 class ProfileUpdate(BaseModel):
     full_name: str | None = Field(default=None, max_length=120)
+    phone: str | None = Field(default=None, max_length=30, pattern=r"^[0-9+()\- ]*$")
+    birth_date: date | None = None
+    address_line: str | None = Field(default=None, max_length=200)
+    city: str | None = Field(default=None, max_length=100)
+    postal_code: str | None = Field(default=None, max_length=20)
+    email_roster: bool | None = None
+    palette: Palette | None = None
+    palette_colors: PaletteColors | None = None
 
-    @field_validator("full_name", mode="before")
+    @model_validator(mode="after")
+    def custom_needs_colors(self) -> "ProfileUpdate":
+        if self.palette == "custom" and self.palette_colors is None:
+            raise ValueError("the custom palette needs its three colors")
+        return self
+
+    @field_validator("birth_date")
+    @classmethod
+    def not_in_future(cls, value: date | None) -> date | None:
+        if value is not None and value > date.today():
+            raise ValueError("the date of birth cannot be in the future")
+        return value
+
+    @field_validator("full_name", "phone", "address_line", "city", "postal_code", mode="before")
     @classmethod
     def blank(cls, value: object) -> object:
         return value.strip() or None if isinstance(value, str) else value
@@ -213,10 +328,20 @@ class ProfileUpdate(BaseModel):
 
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
-    """The signed-in person's own profile: the name the team, clients and reports see."""
+    """The signed-in person's own profile: the name the team, clients and reports see, a phone
+    number for the team, personal details (date of birth, home address), whether to email
+    them when their roster is published, and their color palette. Fields left out stay as
+    they are."""
     ensure_profile(session, user.id, user.email)
-    session.execute(
-        text("UPDATE app.users SET full_name = :name WHERE id = :id"),
-        {"name": body.full_name, "id": user.id},
-    )
+    changes = body.model_dump(exclude_unset=True)
+    colors = changes.pop("palette_colors", None)
+    if changes.get("email_roster", True) is None:
+        del changes["email_roster"]
+    if colors:
+        changes |= {f"palette_{name}": value for name, value in colors.items()}
+    if changes:
+        session.execute(
+            text(f"UPDATE app.users SET {set_clause(changes)} WHERE id = :id"),
+            {**changes, "id": user.id},
+        )
     return get_me(user, session)

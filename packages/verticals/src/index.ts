@@ -15,10 +15,10 @@ import { CATALOG } from "./catalog.generated";
 export const STATUSES = ["live", "beta", "planned"] as const;
 export const ICONS = [
   "dumbbell", "scissors", "stethoscope", "graduation-cap", "car",
-  "trophy", "wrench", "paw-print", "camera", "briefcase",
+  "trophy", "wrench", "paw-print", "camera", "briefcase", "utensils",
 ] as const;
 export const FIELD_KINDS = ["text", "long_text", "number", "date", "select"] as const;
-export const BOOKING_MODES = ["class", "appointment"] as const;
+export const BOOKING_MODES = ["class", "appointment", "resource"] as const;
 export const PRESETS = ["starter", "growing", "ai_powered"] as const;
 export const RECOMMENDABLE = ["client_app", "ai", "crm", "whatsapp"] as const;
 export const LOCALES = ["he", "en"] as const;
@@ -36,11 +36,28 @@ export type ClientField = {
 
 export type DefaultService = {
   names: Record<string, string>;
+  /** For a resource (a court or room by the hour): the shortest length offered. */
   duration_minutes: number;
   booking_mode: (typeof BOOKING_MODES)[number];
+  /** For a resource: the price per hour. */
   prices: Record<string, number>;
   color: string;
   capacity?: number;
+  /** For a resource: the longest length and the step between lengths, in minutes. */
+  max_minutes?: number;
+  step_minutes?: number;
+  /** For an appointment: at the client's address, with time to get there (#42). */
+  on_site?: boolean;
+  travel_minutes?: number;
+};
+
+/** A court or room a new business starts with, for rent by the hour every day between
+ * `opens` and `closes` (local "HH:MM"), serving the entry's resource services. */
+export type DefaultRoom = {
+  names: Record<string, string>;
+  capacity?: number;
+  opens: string;
+  closes: string;
 };
 
 export type DefaultPlan = {
@@ -65,7 +82,7 @@ export type Entry = {
   booking_modes?: string[];
   cancellation_window_minutes?: number;
   booking_requires_plan?: boolean;
-  /** The health declaration clients sign before booking (app/health.py FORMS), if any. */
+  /** The health declaration clients sign before booking (app/catalog/health.py FORMS), if any. */
   health_form?: string | null;
   default_preset?: string;
   recommended_modules?: string[];
@@ -75,6 +92,16 @@ export type Entry = {
   extra_client_fields?: ClientField[];
   default_services?: DefaultService[];
   default_plans?: DefaultPlan[];
+  /** Replaces the parent's starter courts and rooms. */
+  default_rooms?: DefaultRoom[];
+  /** Profiles under a client (#43): pets under an owner or children under a parent. */
+  dependents?: "pet" | "child" | null;
+  /** The details kept about each dependent (replaces the parent's). */
+  dependent_fields?: ClientField[];
+  /** A booking must say which dependent it is for. */
+  dependent_required?: boolean;
+  /** Time entries, retainers and monthly bills on the client card (#45). */
+  time_billing?: boolean;
   children?: Entry[];
 };
 
@@ -98,6 +125,11 @@ export type Vertical = {
   /** Starter services and plans a new business gets (inherited when the entry has none). */
   defaultServices: DefaultService[];
   defaultPlans: DefaultPlan[];
+  defaultRooms: DefaultRoom[];
+  dependents: "pet" | "child" | null;
+  dependentFields: ClientField[];
+  dependentRequired: boolean;
+  timeBilling: boolean;
   children: string[];
 };
 
@@ -130,6 +162,11 @@ function build(): Map<string, Vertical> {
       clientFields: mergeFields(parent?.clientFields ?? [], entry),
       defaultServices: entry.default_services ?? parent?.defaultServices ?? [],
       defaultPlans: entry.default_plans ?? parent?.defaultPlans ?? [],
+      defaultRooms: entry.default_rooms ?? parent?.defaultRooms ?? [],
+      dependents: entry.dependents !== undefined ? entry.dependents : (parent?.dependents ?? null),
+      dependentFields: entry.dependent_fields ?? parent?.dependentFields ?? [],
+      dependentRequired: entry.dependent_required ?? parent?.dependentRequired ?? false,
+      timeBilling: entry.time_billing ?? parent?.timeBilling ?? false,
       children: (entry.children ?? []).map((child) => child.key),
     };
     all.set(entry.key, vertical);

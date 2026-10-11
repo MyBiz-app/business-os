@@ -1,3 +1,4 @@
+import { BRAND } from "@business-os/i18n/brand";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -46,7 +47,7 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
         )}
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <p className="text-2xl font-bold">MyBiz</p>
+            <p className="text-2xl font-bold">{BRAND.name}</p>
             <h1 className="text-lg font-semibold text-muted">{t("invoiceTitle", { number: invoice.number })}</h1>
           </div>
           <dl className="grid grid-cols-[auto_auto] gap-x-4 gap-y-1 text-sm">

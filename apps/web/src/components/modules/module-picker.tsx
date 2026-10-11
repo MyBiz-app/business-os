@@ -10,8 +10,12 @@ export type Catalog = components["schemas"]["Catalog"];
 type ModuleKey = components["schemas"]["CatalogModule"]["key"];
 export type Selection = Partial<Record<ModuleKey, number>>;
 
-const AI_TIERS = ["none", "ai_basic", "ai_pro"] as const;
-type AiTier = (typeof AI_TIERS)[number];
+/** Modules sold as tiers of one thing: a choice of one (or none) instead of toggles. */
+const GROUPS = [
+  { key: "ai", legend: "aiTier", none: "none", tiers: ["ai_basic", "ai_pro"] },
+  { key: "support", legend: "supportTier", none: "noSupport", tiers: ["support_priority", "support_vip"] },
+  { key: "pack", legend: "packTier", none: "noPack", tiers: ["pack_plus", "pack_max"] },
+] as const;
 
 type Props = {
   catalog: Catalog;
@@ -32,9 +36,10 @@ export function ModulePicker({ catalog, initial, activeClients, name, branchesFo
   const money = (amount: number) => formatMoney(amount, catalog.currency, locale);
   const byKey = Object.fromEntries(catalog.modules.map((m) => [m.key, m]));
   const core = catalog.core.find((tier) => tier.up_to_clients === null || activeClients <= tier.up_to_clients)!;
-  const aiTier: AiTier = selection.ai_pro ? "ai_pro" : selection.ai_basic ? "ai_basic" : "none";
+  // One-time services (setup) were bought once and are not part of the monthly price.
   const total =
-    core.price + Object.entries(selection).reduce((sum, [key, quantity]) => sum + byKey[key].price * (quantity ?? 0), 0);
+    core.price +
+    Object.entries(selection).reduce((sum, [key, quantity]) => sum + (byKey[key]?.billing === "once" ? 0 : (byKey[key]?.price ?? 0) * (quantity ?? 0)), 0);
 
   const set = (key: ModuleKey, quantity: number) =>
     setSelection((current) => {
@@ -43,17 +48,17 @@ export function ModulePicker({ catalog, initial, activeClients, name, branchesFo
       else delete next[key];
       return next;
     });
-  const setAi = (tier: AiTier) =>
+  const setTier = (tiers: readonly ModuleKey[], tier: ModuleKey | null) =>
     setSelection((current) => {
       const next = { ...current };
-      delete next.ai_basic;
-      delete next.ai_pro;
-      if (tier !== "none") next[tier] = 1;
+      for (const key of tiers) delete next[key];
+      if (tier) next[tier] = 1;
       return next;
     });
 
-  // On/off modules; the AI tiers and per-unit locations have their own controls.
-  const special = (key: string) => ["ai_basic", "ai_pro", "extra_location"].includes(key);
+  // On/off modules; tiers and per-unit locations have their own controls, and one-time
+  // services are not changed here.
+  const special = (key: string) => key === "extra_location" || !!byKey[key]?.group || byKey[key]?.billing === "once";
   const toggles = catalog.modules.filter((m) => m.available && !special(m.key));
   const others = catalog.modules.filter((m) => !m.available && !special(m.key));
 
@@ -89,27 +94,32 @@ export function ModulePicker({ catalog, initial, activeClients, name, branchesFo
         </label>
       ))}
 
-      <fieldset className="flex flex-col gap-2 rounded-xl border border-border bg-background p-4">
-        <legend className="px-1 font-semibold">{t("aiTier")}</legend>
-        {AI_TIERS.map((tier) => (
-          <label key={tier} className="flex items-center justify-between gap-3">
-            <span className="flex items-start gap-3">
-              <input
-                type="radio"
-                name={`${name}-ai`}
-                className="mt-1 size-4 accent-[var(--primary)]"
-                checked={aiTier === tier}
-                onChange={() => setAi(tier)}
-              />
-              <span className="flex flex-col">
-                <span className="font-medium">{t(`names.${tier}`)}</span>
-                <span className="text-sm text-muted">{t(`descriptions.${tier}`)}</span>
-              </span>
-            </span>
-            {tier !== "none" && <span className="shrink-0 text-sm">{money(byKey[tier].price)}</span>}
-          </label>
-        ))}
-      </fieldset>
+      {GROUPS.map((group) => {
+        const chosen = group.tiers.find((tier) => selection[tier]) ?? null;
+        return (
+          <fieldset key={group.key} className="flex flex-col gap-2 rounded-xl border border-border bg-background p-4">
+            <legend className="px-1 font-semibold">{t(group.legend)}</legend>
+            {[null, ...group.tiers].map((tier) => (
+              <label key={tier ?? "none"} className="flex items-center justify-between gap-3">
+                <span className="flex items-start gap-3">
+                  <input
+                    type="radio"
+                    name={`${name}-${group.key}`}
+                    className="mt-1 size-4 accent-[var(--primary)]"
+                    checked={chosen === tier}
+                    onChange={() => setTier(group.tiers, tier)}
+                  />
+                  <span className="flex flex-col">
+                    <span className="font-medium">{t(`names.${tier ?? group.none}`)}</span>
+                    <span className="text-sm text-muted">{t(`descriptions.${tier ?? group.none}`)}</span>
+                  </span>
+                </span>
+                {tier && <span className="shrink-0 text-sm">{money(byKey[tier].price)}</span>}
+              </label>
+            ))}
+          </fieldset>
+        );
+      })}
 
       <label className="flex items-center justify-between gap-3 rounded-xl border border-border bg-background p-4">
         <span className="flex flex-col">

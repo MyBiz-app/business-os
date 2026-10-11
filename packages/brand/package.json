@@ -1,0 +1,17 @@
+{
+  "name": "@business-os/brand",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./assets/*": "./assets/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build:assets": "node --experimental-strip-types scripts/build-assets.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}

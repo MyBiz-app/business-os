@@ -30,7 +30,7 @@ export function BookingForm({ serviceId, slots, clients }: { serviceId: string; 
               <span className="font-semibold tabular-nums" dir="ltr">
                 {slot.time}
               </span>
-              <span className="truncate text-xs opacity-80">{slot.staff}</span>
+              <span className="truncate text-xs">{slot.staff}</span>
             </label>
           ))}
         </div>

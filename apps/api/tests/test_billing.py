@@ -1,11 +1,14 @@
 from datetime import UTC, date, datetime, timedelta
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
-from app.billing import add_months, bill_businesses, periods_due
+from app.commerce.billing import add_months, bill_businesses, periods_due
+from app.commerce.modules import ALLOWANCES, Allowance
 from tests.conftest import STUDIO, AuthHeaders, add_member, make_staff
+from tests.test_documents_time import PDF, upload
 
 
 def test_months_are_clamped_to_shorter_months() -> None:
@@ -46,6 +49,45 @@ def test_new_business_is_in_trial(client: TestClient, studio: dict) -> None:
     assert billing["estimate"]["total"] > 0
 
 
+def test_usage_counts_against_the_bundle(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    usage = client.get("/billing", headers=headers).json()["usage"]
+    assert usage["pack"] is None and usage["messages"] == 0 and usage["storage_bytes"] == 0
+    assert usage["messages_included"] == 200 and usage["storage_included_bytes"] == 2 * 1024**3
+
+    modules = {"whatsapp": 1, "pack_plus": 1}
+    client.put("/tenants/current/modules", json={"modules": modules}, headers=headers)
+    dana = client.post(
+        "/clients", json={"first_name": "Dana", "phone": "050-1111111"}, headers=headers
+    ).json()["id"]
+    sent = client.post("/messages/direct", json={"client_id": dana, "body": "Hi"}, headers=headers)
+    assert sent.status_code == 201, sent.text
+    upload(client, headers, dana, "terms.pdf")
+
+    usage = client.get("/billing", headers=headers).json()["usage"]
+    assert usage["pack"] == "pack_plus" and usage["messages_included"] == 1000
+    assert usage["messages"] == 1 and usage["storage_bytes"] == len(PDF)
+
+
+def test_uploads_stop_at_the_space_allowance(
+    client: TestClient, studio: dict, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    headers = studio["headers"]
+    monkeypatch.setitem(ALLOWANCES, None, Allowance(storage_bytes=len(PDF) * 2, messages=200))
+    dana = client.post("/clients", json={"first_name": "Dana"}, headers=headers).json()["id"]
+    upload(client, headers, dana, "one.pdf")
+    upload(client, headers, dana, "two.pdf")
+    full = client.post(
+        f"/clients/{dana}/documents",
+        files={"file": ("three.pdf", PDF, "application/pdf")},
+        data={"name": "three.pdf"},
+        headers=headers,
+    )
+    assert full.status_code == 409 and full.json()["detail"] == "storage_full"
+    usage = client.get("/billing/usage", headers=headers).json()
+    assert usage["storage_bytes"] == usage["storage_included_bytes"] == len(PDF) * 2
+
+
 def test_invoices_after_the_trial(client: TestClient, studio: dict, engine: Engine) -> None:
     headers = studio["headers"]
     client.put("/tenants/current/modules", json={"modules": {"client_app": 1}}, headers=headers)
@@ -75,6 +117,23 @@ def test_invoices_after_the_trial(client: TestClient, studio: dict, engine: Engi
     assert paid["status"] == "paid" and paid["card_last4"] == "4242"
     again = client.post(f"/billing/invoices/{first['id']}/pay", headers=headers)
     assert again.json()["detail"] == "not_open"
+
+
+def test_one_time_setup_rides_on_the_first_invoice(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    headers = studio["headers"]
+    client.put("/tenants/current/modules", json={"modules": {"setup_guided": 1}}, headers=headers)
+    end_trial(engine, studio["tenant_id"], days_ago=65)
+    run_billing(engine)
+
+    second, first = client.get("/billing", headers=headers).json()["invoices"][:2]
+    lines = client.get(f"/billing/invoices/{first['id']}", headers=headers).json()["lines"]
+    assert [(line["key"], line["amount"]) for line in lines] == [
+        ("core", 9900),
+        ("setup_guided", 24900),
+    ]
+    assert first["total"] == 9900 + 24900 and second["total"] == 9900
 
 
 def test_card_on_file_is_charged_automatically(

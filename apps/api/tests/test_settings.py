@@ -52,6 +52,78 @@ def test_update_business_details_and_color(
     assert cleared.json()["name"] == "Flow Studio"
 
 
+def test_schedule_default_view_is_kept_per_business(
+    client: TestClient, auth: AuthHeaders, studio: dict[str, UUID]
+) -> None:
+    headers = auth(studio["owner"], studio["tenant_id"])
+    branch = client.get("/locations", headers=headers).json()[0]["id"]
+    other = uuid4()
+    foreign = client.post("/tenants", json=STUDIO, headers=auth(other)).json()["id"]
+    foreign_branch = client.get("/locations", headers=auth(other, foreign)).json()[0]["id"]
+
+    initial = client.get("/tenants/current", headers=headers).json()
+    saved = client.patch(
+        "/tenants/current",
+        json={"schedule_default_view": "day", "schedule_default_branches": [branch]},
+        headers=headers,
+    )
+    cleared = client.patch(
+        "/tenants/current", json={"schedule_default_branches": []}, headers=headers
+    )
+    rejected = [
+        {"schedule_default_view": "year"},
+        {"schedule_default_branches": [foreign_branch]},
+        {"schedule_default_branches": [str(uuid4())]},
+    ]
+
+    assert (initial["schedule_default_view"], initial["schedule_default_branches"]) == ("week", [])
+    assert saved.json()["schedule_default_view"] == "day"
+    assert saved.json()["schedule_default_branches"] == [branch]
+    assert cleared.json()["schedule_default_branches"] == []
+    assert cleared.json()["schedule_default_view"] == "day"
+    for body in rejected:
+        assert client.patch("/tenants/current", json=body, headers=headers).status_code == 422
+
+
+def test_shifts_default_view_is_kept_per_business(
+    client: TestClient, auth: AuthHeaders, studio: dict[str, UUID]
+) -> None:
+    headers = auth(studio["owner"], studio["tenant_id"])
+    branch = client.get("/locations", headers=headers).json()[0]["id"]
+
+    initial = client.get("/tenants/current", headers=headers).json()
+    saved = client.patch(
+        "/tenants/current",
+        json={
+            "shifts_default_view": "branches",
+            "shifts_default_range": "day",
+            "shifts_default_branches": [branch],
+        },
+        headers=headers,
+    ).json()
+    reset = client.patch(
+        "/tenants/current",
+        json={"shifts_default_range": None, "shifts_default_branches": []},
+        headers=headers,
+    ).json()
+    rejected = [
+        {"shifts_default_view": "grid"},
+        {"shifts_default_range": "year"},
+        {"shifts_default_branches": [str(uuid4())]},
+    ]
+
+    assert initial["shifts_default_view"] == "people"
+    assert initial["shifts_default_range"] is None
+    assert initial["shifts_default_branches"] == []
+    assert (saved["shifts_default_view"], saved["shifts_default_range"]) == ("branches", "day")
+    assert saved["shifts_default_branches"] == [branch]
+    assert reset["shifts_default_range"] is None
+    assert reset["shifts_default_branches"] == []
+    assert reset["shifts_default_view"] == "branches"
+    for body in rejected:
+        assert client.patch("/tenants/current", json=body, headers=headers).status_code == 422
+
+
 def test_rejects_invalid_settings(
     client: TestClient, auth: AuthHeaders, studio: dict[str, UUID]
 ) -> None:

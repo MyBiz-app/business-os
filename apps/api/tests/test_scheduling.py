@@ -1,6 +1,6 @@
 from datetime import date, time
 
-from app.scheduling import local_to_utc, weekly_occurrences
+from app.schedule.scheduling import local_to_utc, weekly_occurrences
 
 
 def test_local_time_is_converted_with_the_business_time_zone() -> None:

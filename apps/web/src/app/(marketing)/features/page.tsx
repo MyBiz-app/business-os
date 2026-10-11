@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
 import { BranchesSection, CtaBand, FeatureGrid, SafetySection, SectionHeading } from "@/components/marketing/sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
-  return { title: `${t("features")} · MyBiz` };
+  return { title: `${t("features")} · ${BRAND.name}` };
 }
 
 export default async function FeaturesPage() {

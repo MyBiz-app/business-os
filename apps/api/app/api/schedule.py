@@ -11,11 +11,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.bookings import lock_session, promote_waitlist
-from app.api.common import blank_to_none, not_found
-from app.api.deps import TenantContext, require
-from app.notifications import live_clients, notify, notify_sessions, session_snapshot
-from app.permissions import Permission
-from app.scheduling import local_to_utc, weekly_occurrences
+from app.api.common import blank_to_none, not_found, set_clause
+from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
+from app.core.permissions import Permission
+from app.messaging.notifications import live_clients, notify, notify_sessions, session_snapshot
+from app.schedule.scheduling import local_to_utc, weekly_occurrences
 
 router = APIRouter(tags=["schedule"])
 
@@ -26,6 +26,7 @@ MAX_SERIES_DAYS = 26 * 7  # Series are expanded up front; a background job will 
 DEFAULT_SERIES_DAYS = 12 * 7
 
 SessionStatus = Literal["scheduled", "cancelled"]
+JobStatus = Literal["scheduled", "on_the_way", "in_progress", "done"]
 
 
 class Placement(BaseModel):
@@ -104,10 +105,24 @@ class ScheduledSession(BaseModel):
     )
     status: SessionStatus
     notes: str | None
-    booking_mode: Literal["class", "appointment"] = Field(
-        description="appointment: a one-to-one booking with the instructor"
+    booking_mode: Literal["class", "appointment", "resource"] = Field(
+        description="appointment: a one-to-one booking with the instructor;"
+        " resource: a room or court reserved by the hour"
     )
-    appointment_client: str | None = Field(description="For an appointment: who it is with")
+    appointment_client: str | None = Field(
+        description="For an appointment or a reservation: who it is with"
+    )
+    price_amount: int | None = Field(
+        default=None, description="For a reservation: its price, fixed when it was made"
+    )
+    price_currency: str | None = None
+    paid: bool | None = Field(default=None, description="For a reservation: whether it is paid")
+    address: str | None = Field(default=None, description="An on-site job: where (#42)")
+    address_notes: str | None = Field(
+        default=None, description="An on-site job: how to get in (gate code, floor)"
+    )
+    job_status: JobStatus | None = Field(default=None, description="An on-site job's progress")
+    travel_minutes: int = Field(default=0, description="Time to get there, before the job")
 
 
 class OptionItem(BaseModel):
@@ -148,19 +163,25 @@ SESSION_SELECT = """
            s.starts_at, s.ends_at, s.capacity, s.status, s.notes,
            bk.booked, bk.waitlisted, ss.open_ended AS series_open_ended,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
-           sv.booking_mode,
-           CASE WHEN sv.booking_mode = 'appointment' THEN (
+           sv.booking_mode, s.price_amount, s.price_currency,
+           CASE WHEN s.reserved THEN EXISTS (
+               SELECT 1 FROM app.payments p JOIN app.bookings b ON b.id = p.booking_id
+               WHERE b.session_id = s.id AND p.status = 'succeeded'
+           ) END AS paid,
+           CASE WHEN sv.booking_mode <> 'class' THEN (
                SELECT trim(c.first_name || ' ' || coalesce(c.last_name, ''))
                FROM app.bookings b JOIN app.clients c ON c.id = b.client_id
                WHERE b.session_id = s.id AND b.status <> 'cancelled'
                ORDER BY b.created_at LIMIT 1
-           ) END AS appointment_client
+           ) END AS appointment_client,
+           s.address, a.notes AS address_notes, s.job_status, s.travel_minutes
     FROM app.sessions s
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
     LEFT JOIN app.users u ON u.id = s.instructor_user_id
     LEFT JOIN app.session_series ss ON ss.id = s.series_id
+    LEFT JOIN app.client_addresses a ON a.id = s.address_id
     CROSS JOIN LATERAL app.session_counts(s.id) bk
 """
 
@@ -239,11 +260,20 @@ def list_sessions(
     start: Annotated[dt.date, Query(description="First local date (business time zone)")],
     days: Annotated[int, Query(ge=1, le=42)] = 7,
     mine: Annotated[bool, Query(description="Only sessions the user teaches")] = False,
+    location_id: Annotated[
+        list[UUID] | None,
+        Query(
+            description="Only these branches, for a multi-branch calendar (within the "
+            "person's own branches)"
+        ),
+    ] = None,
 ) -> list[ScheduledSession]:
     time_zone = _time_zone(context.session)
     window_start = local_to_utc(start, time.min, time_zone)
     window_end = local_to_utc(start + timedelta(days=days), time.min, time_zone)
     teaching = "AND s.instructor_user_id = app.current_user_id()" if mine else ""
+    if location_id:
+        teaching += " AND s.location_id = ANY(CAST(:locations AS uuid[]))"
     # An appointment whose booking was cancelled frees the time; it is not shown.
     in_window = (
         f"WHERE s.starts_at >= :from AND s.starts_at < :to {teaching}"
@@ -254,7 +284,11 @@ def list_sessions(
     )
     rows = context.session.execute(
         text(f"{SESSION_SELECT} {in_window}"),
-        {"from": window_start, "to": window_end},
+        {
+            "from": window_start,
+            "to": window_end,
+            "locations": [str(i) for i in location_id or []],
+        },
     ).mappings()
     return [_to_model(row) for row in rows]
 
@@ -262,6 +296,7 @@ def list_sessions(
 @router.post("/sessions", status_code=status.HTTP_201_CREATED)
 def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
     db = context.session
+    ensure_branch_allowed(context, body.location_id)
     service = (
         db.execute(
             text("SELECT duration_minutes, capacity FROM app.services WHERE id = :id"),
@@ -365,7 +400,9 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
 
 @router.get("/sessions/{session_id}")
 def get_session(session_id: UUID, context: ReadDep) -> ScheduledSession:
-    return _load(context.session, session_id)
+    found = _load(context.session, session_id)
+    ensure_branch_visible(context, found.location_id)
+    return found
 
 
 @router.patch("/sessions/{session_id}")
@@ -374,7 +411,9 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
     db = context.session
     lock_session(db, session_id)
     current = _load(db, session_id)
+    ensure_branch_visible(context, current.location_id)
     changes = body.model_dump(exclude_unset=True)
+    ensure_branch_allowed(context, changes.get("location_id"))
 
     assignments: dict[str, Any] = {
         key: changes[key]
@@ -399,7 +438,7 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
         assignments["starts_at"] = new_start
         assignments["ends_at"] = new_start + timedelta(minutes=duration)
 
-    set_sql = ", ".join([*(f"{key} = :{key}" for key in assignments), "updated_at = now()"])
+    set_sql = set_clause(assignments)
     try:
         db.execute(
             text(f"UPDATE app.sessions SET {set_sql} WHERE id = :id"),
@@ -445,11 +484,12 @@ def end_series(series_id: UUID, body: SeriesEnd, context: WriteDep) -> SeriesEnd
     one by one (the business must tell those clients)."""
     db = context.session
     series = db.execute(
-        text("SELECT starts_on FROM app.session_series WHERE id = :id FOR UPDATE"),
+        text("SELECT starts_on, location_id FROM app.session_series WHERE id = :id FOR UPDATE"),
         {"id": series_id},
     ).first()
     if series is None:
         raise not_found()
+    ensure_branch_visible(context, series.location_id)
     if body.last_date < series.starts_on:
         raise HTTPException(status_code=422, detail="before_series_start")
     time_zone = _time_zone(db)
@@ -501,11 +541,14 @@ def update_series(series_id: UUID, body: SeriesUpdate, context: WriteDep) -> Ser
     sessions of a series; new occurrences the daily job adds follow the new settings.
     Bookings stay; booked clients are told when the time changes."""
     db = context.session
-    exists = db.execute(
-        text("SELECT 1 FROM app.session_series WHERE id = :id FOR UPDATE"), {"id": series_id}
-    ).scalar()
-    if exists is None:
+    series = db.execute(
+        text("SELECT location_id FROM app.session_series WHERE id = :id FOR UPDATE"),
+        {"id": series_id},
+    ).first()
+    if series is None:
         raise not_found()
+    ensure_branch_visible(context, series.location_id)
+    ensure_branch_allowed(context, body.location_id)
     time_zone = _time_zone(db)
     params = {
         "id": series_id,
@@ -605,6 +648,7 @@ def copy_week(body: WeekCopy, context: WriteDep) -> WeekCopied:
                     FROM app.sessions s
                     WHERE s.series_id IS NULL AND s.status = 'scheduled'
                       AND s.starts_at >= :from_at AND s.starts_at < :to_at
+                      AND (s.location_id IS NULL OR app.in_branch(s.location_id))
                 ),
                 fresh AS (
                     SELECT src.* FROM source src

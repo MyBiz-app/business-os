@@ -11,13 +11,18 @@ import { formatTime } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 import { whatsappLink } from "@/lib/whatsapp";
+import { vertical } from "@business-os/verticals";
 
 import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
+import { AddressesSection } from "./addresses-section";
+import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
+import { QuotesSection } from "./quotes-section";
+import { DocumentsSection, TimeSection } from "./work-section";
 import { MessagesSection } from "../../messages/messages-section";
 import { NotesSection, ProfileSection } from "./profile-section";
 
@@ -75,7 +80,15 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
       {items.map((booking) => (
         <li key={booking.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
           <Link href={`/schedule/${booking.session_id}`} className="flex flex-col underline-offset-4 hover:underline">
-            <span className="font-medium">{booking.service_name}</span>
+            <span className="font-medium">
+              {booking.service_name}
+              {booking.dependent_name && (
+                <span dir="auto" className="font-normal text-muted">
+                  {" "}
+                  · {booking.dependent_name}
+                </span>
+              )}
+            </span>
             <span className="text-sm text-muted">
               {dateFormat.format(new Date(booking.starts_at))} ·{" "}
               <span dir="ltr">{formatTime(booking.starts_at, locale, tenant.time_zone)}</span>
@@ -115,6 +128,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
       ? [{ key: "rating" as const, Icon: Star, value: new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(reviews.average) }]
       : []),
   ];
+  // Time and monthly billing (#45): for industries that bill by time (their pack says so).
+  const workSections = vertical(tenant.vertical)?.timeBilling ?? false;
   const whatsapp = client.phone ? whatsappLink(client.phone, tenant.time_zone) : null;
 
   return (
@@ -217,6 +232,12 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
             )}
           </section>
 
+          <QuotesSection clientId={client.id} context={context} locked={erased} />
+
+          {workSections && <TimeSection clientId={client.id} context={context} locked={erased} />}
+
+          <DocumentsSection clientId={client.id} context={context} locked={erased} />
+
           <NotesSection clientId={client.id} bookings={bookings} context={context} locked={erased} />
 
           <MessagesSection
@@ -241,6 +262,10 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
               branches={branches}
             />
           </section>
+
+          <DependentsSection clientId={client.id} context={context} locked={erased} />
+
+          <AddressesSection clientId={client.id} context={context} locked={erased} />
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
 

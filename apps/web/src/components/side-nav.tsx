@@ -4,6 +4,9 @@ import {
   BarChart3,
   Building2,
   Inbox,
+  Clock,
+  FileSignature,
+  Plug,
   ScrollText,
   Wallet,
   Bot,
@@ -12,6 +15,7 @@ import {
   CreditCard,
   Dumbbell,
   LayoutDashboard,
+  LayoutGrid,
   Lock,
   MapPin,
   Menu,
@@ -33,6 +37,7 @@ const ICONS = {
   reports: BarChart3,
   assistant: Bot,
   schedule: CalendarDays,
+  resources: LayoutGrid,
   clients: Users,
   clientApp: Smartphone,
   leads: Target,
@@ -47,6 +52,9 @@ const ICONS = {
   inbox: Inbox,
   billing: Wallet,
   audit: ScrollText,
+  integrations: Plug,
+  quotes: FileSignature,
+  time: Clock,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;

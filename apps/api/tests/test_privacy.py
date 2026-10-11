@@ -156,3 +156,44 @@ def test_privacy_covers_the_clients_lead(client: TestClient, studio: dict) -> No
 
     client.post(f"/clients/{client_id}/erase", json={"confirm": True}, headers=headers)
     assert client.get(f"/leads/{lead['id']}", headers=headers).status_code == 404
+
+
+def test_privacy_covers_addresses_dependents_documents_and_quotes(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    from tests.test_documents_time import upload
+    from tests.test_quotes import new_quote
+
+    headers = studio["headers"]
+    dana = client.post("/clients", json={"first_name": "Dana"}, headers=headers).json()["id"]
+    address = client.post(
+        f"/clients/{dana}/addresses",
+        json={"street": "Herzl 1", "city": "Tel Aviv", "details": "Floor 3"},
+        headers=headers,
+    )
+    assert address.status_code == 201, address.text
+    with engine.begin() as connection:
+        connection.execute(
+            text("""
+                INSERT INTO app.dependents (tenant_id, client_id, kind, name)
+                VALUES (:t, :c, 'child', 'Noa')
+            """),
+            {"t": studio["tenant_id"], "c": dana},
+        )
+    upload(client, headers, dana, "contract.pdf")
+    quote = new_quote(client, headers, dana)
+    client.post(f"/quotes/{quote['id']}/send", headers=headers)
+    client.post(f"/public/quotes/{quote['token']}/answer", json={"accept": True, "name": "Dana L"})
+
+    exported = client.get(f"/clients/{dana}/export", headers=headers).json()
+    assert exported["addresses"][0]["street"] == "Herzl 1"
+    assert exported["dependents"][0]["name"] == "Noa"
+    assert exported["documents"][0]["name"] == "contract.pdf"
+    assert exported["quotes"][0]["accepted_name"] == "Dana L"
+
+    erased = client.post(f"/clients/{dana}/erase", json={"confirm": True}, headers=headers)
+    assert erased.status_code == 200, erased.text
+    after = client.get(f"/clients/{dana}/export", headers=headers).json()
+    assert after["addresses"] == [] and after["dependents"] == [] and after["documents"] == []
+    [kept] = after["quotes"]  # a commercial record stays, without the name typed to accept it
+    assert kept["status"] == "accepted" and kept["accepted_name"] != "Dana L"

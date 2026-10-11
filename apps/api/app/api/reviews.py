@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.common import blank_to_none, not_found
 from app.api.deps import ClientDep, TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
 client_router = APIRouter(prefix="/client", tags=["client"])

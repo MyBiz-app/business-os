@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { CtaBand } from "@/components/marketing/sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
-  return { title: `${t("about")} · MyBiz` };
+  return { title: `${t("about")} · ${BRAND.name}` };
 }
 
 export default async function AboutPage() {

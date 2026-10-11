@@ -2,26 +2,30 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
-from pydantic import BaseModel, Field, field_validator
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
+from sqlalchemy.exc import IntegrityError
 
-from app.api.common import blank_to_none, not_found, set_clause
+from app.api.common import RemoveResult, blank_to_none, delete_or_archive, not_found, set_clause
 from app.api.deps import TenantContext, require
-from app.permissions import Permission
+from app.core.permissions import Permission
 
 router = APIRouter(prefix="/services", tags=["services"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
+DeleteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_DELETE))]
 
 COLUMNS = (
     "id, name, description, duration_minutes, capacity, booking_mode, price_amount, "
-    "price_currency, color, active, created_at, updated_at"
+    "price_currency, color, active, created_at, updated_at, min_minutes, max_minutes, "
+    "step_minutes, price_per_hour, on_site, travel_minutes"
 )
 COLOR_PATTERN = r"^#[0-9a-fA-F]{6}$"
-# class: scheduled sessions people join; appointment: one-to-one at a free time with a staff member.
-BookingMode = Literal["class", "appointment"]
+# class: scheduled sessions people join; appointment: one-to-one at a free time with a staff member;
+# resource: a court or room reserved by the hour (migration 0044).
+BookingMode = Literal["class", "appointment", "resource"]
 
 
 class ServiceFields(BaseModel):
@@ -44,6 +48,26 @@ class ServiceCreate(ServiceFields):
         default=None, pattern=r"^[A-Z]{3}$", description="Defaults to the business currency"
     )
     active: bool = True
+    min_minutes: int | None = Field(default=None, ge=15, le=1440, description="Resource only")
+    max_minutes: int | None = Field(default=None, ge=15, le=1440, description="Resource only")
+    step_minutes: int | None = Field(default=None, ge=15, le=240, description="Resource only")
+    price_per_hour: int | None = Field(
+        default=None, ge=0, description="Resource only: minor units per hour"
+    )
+    on_site: bool = Field(default=False, description="Appointment only: at the client's address")
+    travel_minutes: int = Field(
+        default=0, ge=0, le=240, description="On-site: time to get there, before each job"
+    )
+
+    @model_validator(mode="after")
+    def resource_lengths(self) -> "ServiceCreate":
+        if self.on_site and self.booking_mode != "appointment":
+            raise ValueError("only an appointment service can be on-site")
+        if self.booking_mode == "resource":
+            check_lengths(self.min_minutes, self.max_minutes, self.step_minutes)
+            if self.price_per_hour is None:
+                raise ValueError("a resource needs a price per hour")
+        return self
 
     @field_validator("name")
     @classmethod
@@ -60,6 +84,20 @@ class ServiceUpdate(ServiceFields):
     booking_mode: BookingMode | None = None
     price_amount: int | None = Field(default=None, ge=0)
     active: bool | None = None
+    min_minutes: int | None = Field(default=None, ge=15, le=1440)
+    max_minutes: int | None = Field(default=None, ge=15, le=1440)
+    step_minutes: int | None = Field(default=None, ge=15, le=240)
+    price_per_hour: int | None = Field(default=None, ge=0)
+    on_site: bool | None = None
+    travel_minutes: int | None = Field(default=None, ge=0, le=240)
+
+
+def check_lengths(minimum: int | None, maximum: int | None, step: int | None) -> None:
+    """A resource offers lengths from the minimum to the maximum, one step at a time."""
+    if minimum is None or maximum is None or step is None:
+        raise ValueError("a resource needs a minimum, a maximum and a step")
+    if maximum < minimum or (maximum - minimum) % step:
+        raise ValueError("the maximum must be the minimum plus whole steps")
 
 
 class Service(BaseModel):
@@ -75,6 +113,12 @@ class Service(BaseModel):
     active: bool
     created_at: datetime
     updated_at: datetime
+    min_minutes: int | None = None
+    max_minutes: int | None = None
+    step_minutes: int | None = None
+    price_per_hour: int | None = None
+    on_site: bool = False
+    travel_minutes: int = 0
 
 
 @router.get("")
@@ -97,11 +141,13 @@ def create_service(body: ServiceCreate, context: WriteDep) -> Service:
             text(f"""
                 INSERT INTO app.services
                     (tenant_id, name, description, duration_minutes, capacity, booking_mode,
-                     price_amount, price_currency, color, active)
+                     price_amount, price_currency, color, active, min_minutes, max_minutes,
+                     step_minutes, price_per_hour, on_site, travel_minutes)
                 SELECT :tenant_id, :name, :description, :duration_minutes,
-                       CASE WHEN :booking_mode = 'appointment' THEN 1 ELSE :capacity END,
+                       CASE WHEN :booking_mode = 'class' THEN :capacity ELSE 1 END,
                        :booking_mode, :price_amount, coalesce(:price_currency, t.currency),
-                       :color, :active
+                       :color, :active, :min_minutes, :max_minutes, :step_minutes,
+                       :price_per_hour, :on_site, :travel_minutes
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {COLUMNS}
             """),
@@ -130,22 +176,49 @@ def get_service(service_id: UUID, context: ReadDep) -> Service:
 @router.patch("/{service_id}")
 def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> Service:
     # Required columns cannot be cleared; an explicit null for them means "no change".
-    required = {"name", "duration_minutes", "capacity", "booking_mode", "price_amount", "active"}
+    required = {
+        "name",
+        "duration_minutes",
+        "capacity",
+        "booking_mode",
+        "price_amount",
+        "active",
+        "on_site",
+        "travel_minutes",
+    }
     changes = {
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()
         if not (key in required and value is None)
     }
-    row = (
-        context.session.execute(
-            text(
-                f"UPDATE app.services SET {set_clause(changes)} WHERE id = :id RETURNING {COLUMNS}"
-            ),
-            {**changes, "id": service_id},
+    try:
+        with context.session.begin_nested():
+            row = (
+                context.session.execute(
+                    text(
+                        f"UPDATE app.services SET {set_clause(changes)}"
+                        f" WHERE id = :id RETURNING {COLUMNS}"
+                    ),
+                    {**changes, "id": service_id},
+                )
+                .mappings()
+                .first()
+            )
+    except IntegrityError as error:  # e.g. a resource without its lengths or price per hour
+        detail = (
+            "invalid_on_site"
+            if "services_on_site_appointment" in str(error.orig)
+            else "invalid_resource"
         )
-        .mappings()
-        .first()
-    )
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=detail
+        ) from error
     if row is None:
         raise not_found()
     return Service.model_validate(dict(row))
+
+
+@router.delete("/{service_id}")
+def delete_service(service_id: UUID, context: DeleteDep) -> RemoveResult:
+    """Removes a service nobody has used; one with sessions or sales is archived (hidden)."""
+    return delete_or_archive(context.session, "services", service_id)

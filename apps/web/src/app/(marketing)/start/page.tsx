@@ -3,9 +3,12 @@ import { isOpen } from "@business-os/verticals";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BRAND } from "@business-os/i18n/brand";
 
 import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
+import { providerButtons } from "@/lib/auth-providers";
+import { createClient } from "@/lib/supabase/server";
 import { CURRENCIES, type Currency, trialEndsOn, withLocations } from "@/lib/signup-plan";
 
 import { StartWizard } from "./start-wizard";
@@ -14,7 +17,7 @@ type Catalog = components["schemas"]["Catalog"];
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("start.meta");
-  return { title: `${t("title")} · MyBiz`, description: t("description") };
+  return { title: `${t("title")} · ${BRAND.name}`, description: t("description") };
 }
 
 async function loadCatalog(currency: Currency): Promise<Catalog | null> {
@@ -57,6 +60,11 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
   const currency = requestedCurrency && catalogs[requestedCurrency] ? requestedCurrency : locale === "he" && catalogs.ILS ? "ILS" : (Object.keys(catalogs)[0] as Currency);
   const preset = typeof query.preset === "string" ? query.preset : "";
   const presetModules = Object.values(catalogs)[0]!.presets[preset] ?? [];
+  const { data: claims } = await (await createClient()).auth.getClaims();
+  const signedIn = Boolean(claims?.claims);
+  const search = new URLSearchParams(
+    Object.entries(query).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+  ).toString();
 
   return (
     <main className="flex flex-col">
@@ -72,6 +80,9 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
           modules: withLocations(Object.fromEntries(presetModules.map((key) => [key, 1])), 1),
         }}
         trialEndsOn={trialEndsOn()}
+        providers={signedIn ? [] : await providerButtons()}
+        signedIn={signedIn}
+        returnTo={search ? `/start?${search}` : "/start"}
         illustrations={{
           client_app: <PhoneMock />,
           ai: <ChatMock question={t("offers.ai.question")} answer={t("offers.ai.answer")} />,

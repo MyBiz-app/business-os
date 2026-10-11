@@ -2,6 +2,7 @@
 
 import glob
 import json
+import os
 import re
 import time
 import urllib.request
@@ -9,7 +10,9 @@ import urllib.request
 BASE = "http://localhost:3000"  # web
 APP = "http://localhost:8081"  # mobile app on Expo web
 MAILBOX = "http://127.0.0.1:54324/api/v1"  # Mailpit from `supabase start`
-DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+DATABASE_URL = os.environ.get(
+    "E2E_DATABASE_URL", "postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+)
 PASSWORD = "Str0ng!Passw0rd"
 OUT = "e2e/screenshots"
 

@@ -1,0 +1,84 @@
+name: Add a team member to a business on staging
+
+# Puts an account that already signed up (and was confirmed) on staging into one of an owner's
+# businesses with a role, optionally limited to one branch. For demo managers and employees.
+# Passwords never pass through here: the person signs up with their own password first.
+on:
+  workflow_dispatch:
+    inputs:
+      member_email:
+        description: Email of the account to add (signed up and confirmed on staging)
+        required: true
+        type: string
+      owner_email:
+        description: Email of the business owner
+        required: true
+        type: string
+      business_name:
+        description: Name of the business, exactly (for example Urban Slice)
+        required: true
+        type: string
+      role:
+        description: Role in the business
+        required: true
+        type: choice
+        options: [manager, staff, front_desk]
+      branch_name:
+        description: Limit them to this branch (optional; empty means all branches)
+        required: false
+        type: string
+
+# Never at the same time as a migration.
+concurrency:
+  group: migrate-staging
+  cancel-in-progress: false
+
+jobs:
+  add:
+    name: Add the member
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - name: Install the PostgreSQL client
+        run: sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Add
+        env:
+          DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          MEMBER: ${{ inputs.member_email }}
+          OWNER: ${{ inputs.owner_email }}
+          BUSINESS: ${{ inputs.business_name }}
+          ROLE: ${{ inputs.role }}
+          BRANCH: ${{ inputs.branch_name }}
+        run: |
+          added=$(psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v member="$MEMBER" -v owner="$OWNER" \
+            -v business="$BUSINESS" -v role="$ROLE" -v branch="$BRANCH" -tA <<'SQL'
+          WITH tenant AS (
+              SELECT t.id FROM app.tenants t
+              JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner'
+              JOIN app.users o ON o.id = m.user_id
+              WHERE lower(o.email) = lower(:'owner') AND t.name = :'business'
+              LIMIT 1
+          ), person AS (
+              SELECT id FROM app.users WHERE lower(email) = lower(:'member')
+          ), branch AS (
+              SELECT coalesce(array_agg(l.id), '{}') AS ids
+              FROM app.locations l, tenant
+              WHERE :'branch' <> '' AND l.tenant_id = tenant.id AND l.name = :'branch'
+          ), added AS (
+              INSERT INTO app.tenant_members (tenant_id, user_id, role, location_ids)
+              SELECT tenant.id, person.id, :'role', branch.ids FROM tenant, person, branch
+              ON CONFLICT (tenant_id, user_id)
+              DO UPDATE SET role = EXCLUDED.role, location_ids = EXCLUDED.location_ids,
+                            custom_role_id = NULL
+              RETURNING user_id, role, location_ids
+          )
+          SELECT user_id || ' ' || role || ' branches=' || cardinality(location_ids) FROM added;
+          SQL
+          )
+          if [ -z "$added" ]; then
+            echo "::error::Nothing added. Check that the member signed up and was confirmed, and that the owner email and business name match exactly."
+            exit 1
+          fi
+          echo "Added: $added"
