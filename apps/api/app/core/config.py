@@ -32,7 +32,21 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
     )
-    ai_model: str = "claude-opus-5-5"
+    # Everyday questions run on the cheap model; a turn that needs many tool calls escalates to
+    # the stronger one (P0-6). Prices live in app/ai/gateway.py.
+    ai_model: str = "claude-haiku-5-5"
+    ai_strong_model: str = "claude-sonnet-5-5"
+    ai_escalate_after_steps: int = (
+        3  # model calls in one message before switching to the strong model
+    )
+    ai_max_tokens: int = 4096  # per model call
+    ai_timeout_seconds: float = 60.0
+    # Per user, so one account (or a stolen session) cannot hammer the model: fixed windows.
+    ai_user_messages_per_minute: int = 6
+    ai_user_messages_per_hour: int = 60
+    # Platform-wide spend alarm shown in the console: AI credits (a credit is one US cent) per
+    # UTC day.
+    ai_daily_alert_credits: int = 2000
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp

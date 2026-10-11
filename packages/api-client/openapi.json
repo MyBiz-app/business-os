@@ -17548,6 +17548,33 @@
         }
       }
     },
+    "/platform/ai-spend": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Ai Spend",
+        "description": "The daily AI spend alarm (P0-6): today's total against a configured threshold.",
+        "operationId": "ai_spend",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AISpend"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/platform/contact-requests": {
       "get": {
         "tags": [
@@ -20619,6 +20646,40 @@
   },
   "components": {
     "schemas": {
+      "AISpend": {
+        "properties": {
+          "today": {
+            "type": "number",
+            "title": "Today",
+            "description": "AI credits (US cents) spent today across the platform, UTC"
+          },
+          "alert_at": {
+            "type": "integer",
+            "title": "Alert At",
+            "description": "The daily alarm threshold, from API_AI_DAILY_ALERT_CREDITS"
+          },
+          "over": {
+            "type": "boolean",
+            "title": "Over"
+          },
+          "days": {
+            "items": {
+              "$ref": "#/components/schemas/UsagePoint"
+            },
+            "type": "array",
+            "title": "Days",
+            "description": "AI credits per day, the last 7 days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "today",
+          "alert_at",
+          "over",
+          "days"
+        ],
+        "title": "AISpend"
+      },
       "AIStatus": {
         "properties": {
           "enabled": {

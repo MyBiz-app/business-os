@@ -187,3 +187,32 @@ def test_adding_a_tier_replaces_its_group(client: TestClient, studio: dict) -> N
     client.post("/tenants/current/modules/support_priority", headers=headers)
     upgraded = client.post("/tenants/current/modules/support_vip", headers=headers).json()
     assert "support_vip" in upgraded["modules"] and "support_priority" not in upgraded["modules"]
+
+
+def test_console_daily_ai_spend_alarm(
+    client: TestClient, studio: dict, engine: Engine, auth: AuthHeaders, monkeypatch
+) -> None:
+    from app.core.config import get_settings
+
+    admin = uuid4()
+    client.get("/me", headers=auth(admin))
+    make_staff(engine, admin)
+    assert client.get("/platform/ai-spend", headers=auth(studio["owner"])).status_code == 403
+    monkeypatch.setenv("API_AI_DAILY_ALERT_CREDITS", "100")
+    get_settings.cache_clear()
+    try:
+        quiet = client.get("/platform/ai-spend", headers=auth(admin)).json()
+        assert quiet["today"] == 0 and quiet["over"] is False and quiet["alert_at"] == 100
+        with engine.begin() as connection:
+            connection.execute(
+                text("""
+                    INSERT INTO app.usage_events (tenant_id, meter, quantity)
+                    VALUES (:t, 'ai_credits', 120)
+                """),
+                {"t": studio["tenant_id"]},
+            )
+        loud = client.get("/platform/ai-spend", headers=auth(admin)).json()
+        assert loud["today"] == 120 and loud["over"] is True
+    finally:
+        monkeypatch.undo()
+        get_settings.cache_clear()

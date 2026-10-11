@@ -4,6 +4,7 @@ them all. The database functions enforce the same rules."""
 
 import datetime as dt
 import json
+import logging
 from collections.abc import Callable
 from enum import StrEnum
 from typing import Annotated, Any, Literal
@@ -17,7 +18,9 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep
 from app.api.modules import check_selection
+from app.core.config import get_settings
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/platform", tags=["platform"])
 
 
@@ -116,6 +119,29 @@ def usage(
         {"tenant_id": tenant_id, "days": days},
     ).mappings()
     return [UsagePoint.model_validate(dict(row)) for row in rows]
+
+
+class AISpend(BaseModel):
+    today: float = Field(description="AI credits (US cents) spent today across the platform, UTC")
+    alert_at: int = Field(description="The daily alarm threshold, from API_AI_DAILY_ALERT_CREDITS")
+    over: bool
+    days: list[UsagePoint] = Field(description="AI credits per day, the last 7 days")
+
+
+@router.get("/ai-spend")
+def ai_spend(db: UsageDep) -> AISpend:
+    """The daily AI spend alarm (P0-6): today's total against a configured threshold."""
+    today = dt.datetime.now(dt.UTC).date()
+    rows = db.execute(
+        text("SELECT * FROM app.platform_usage(NULL, 7) WHERE meter = 'ai_credits'")
+    ).mappings()
+    days = [UsagePoint.model_validate(dict(row)) for row in rows]
+    spent = sum(p.quantity for p in days if p.day == today)
+    threshold = get_settings().ai_daily_alert_credits
+    over = threshold > 0 and spent >= threshold
+    if over:
+        logger.warning("AI spend alarm: %.0f credits today, threshold %d", spent, threshold)
+    return AISpend(today=spent, alert_at=threshold, over=over, days=days)
 
 
 class ContactRequest(BaseModel):
