@@ -26,16 +26,23 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 1. ✅ **Supabase email templates**: in place (checked 2026-10-10, identical to `supabase/templates/`).
 2. ✅ **Supabase redirect URLs**: in place (Site URL and `https://business-os-alpha-drab.vercel.app/**`).
-3. **Google sign-in** (about 10 min):
+3. ✅ **The apps on your phone (Expo, free)**: published (2026-10-10) and open in the browser: `mybiz-client-app.vercel.app`, `mybiz-business-app.vercel.app`, `mybiz-staff-app.vercel.app`. Add them to the home screen. After a change, run the Actions workflow "Deploy the Expo apps to the web (Vercel)".
+4. **Google sign-in** (about 10 min):
    1. In [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials), create an OAuth client of type Web application.
    2. Add the Callback URL shown in [Supabase → Authentication → Sign In / Providers → Google](https://supabase.com/dashboard/project/_/auth/providers) as an authorized redirect URI.
    3. Paste the client ID and secret into Supabase and enable Google. The button appears on the site by itself within 5 minutes.
-4. **Apple sign-in** (optional, later). Needs a paid [Apple Developer](https://developer.apple.com/programs/) account.
-5. **Change the demo accounts' temporary passwords.** Never share the new ones.
-6. **Open decisions:** #46 payments provider (it brings Apple Pay / Google Pay) and #47 invoicing provider, connected when the business starts operating (X21); #36 brand name (MyBiz for now).
-7. **The owner's fixes and polish report**, before go-live.
+5. **Apple sign-in** (optional, later). Needs a paid [Apple Developer](https://developer.apple.com/programs/) account.
+6. **Change the demo accounts' temporary passwords.** Never share the new ones.
+7. **Open decisions:** #46 payments provider (it brings Apple Pay / Google Pay) and #47 invoicing provider, connected when the business starts operating (X21); #36 brand name (MyBiz for now).
+8. **The owner's fixes and polish report**, before go-live.
 
 ## In progress
+
+- Owner review of the web and apps ([#38](https://github.com/MyBiz-app/business-os/issues/38)).
+- Go-live readiness: one numbered item per thread from [the readiness review](reviews/go-live-readiness-2026-10.md) and the [launch review](reviews/launch-readiness-2026-10.md) (blockers first).
+- Technical cleanup (P2 of the launch review): oversized modules are split gradually, only when a slice touches them.
+
+## Done (recent work, newest areas first)
 
 - **Tenant isolation matrix (P1-8).** One test now checks every table that holds a business's data: someone from another business, even claiming that business's id, can't see, change, delete or add a single row, and the owner still sees all of theirs. A new table is covered automatically (`tests/test_tenant_matrix.py`).
 - **Critical-path tests, and a branch-access fix (P1-8).** A team member kept to some branches could still open, edit or cancel another branch's sessions, bookings and clients by id (only lists were filtered); now those return "not found", and filing anything under another branch is refused (`tests/test_branch_access.py`). New tests also cover signing up in every industry and language, a refused sign-up leaving nothing behind, planners kept to a branch (shifts, stations, templates, hours, publish), and a scan that fails when any route is open without a login unless it is on a short public list (`tests/test_critical_paths.py`).
@@ -50,9 +57,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - **Food & restaurants: more sub-categories (beta).** Restaurants, bakeries and catering join pizzerias and cafés, each with its own starter services (chef's table, baking workshop, tasting meeting, private events), and cafés now start with a barista workshop and a private event instead of an empty list.
 - **Personal settings.** "Settings" in the profile-picture menu opens the person's own page (outside the business area): picture, name, phone, date of birth and home address (migration 0063), and an accessibility section with language and theme (moved out of the toolbar on signed-in pages) plus contrast, text size and reduced motion, saved on the device.
 - **Roles, permissions and removing items ([spec](proposals/roles-permissions-2026-10.md), X31).** The roles page shows the built-in roles with what each can do before you create your own; every team row has a "Permissions" popover with what that person can actually do; owners and managers (not front desk or staff) can delete services, memberships and punch cards, with a confirmation, and an item that has sessions or sales is hidden instead of deleted so history stays. The API enforces it (`catalog.delete`); people without a permission don't see the button.
-- **Pictures cropped before saving (X27).** Choosing a profile picture or the business logo opens a dialog: drag and zoom the picture inside a circle (mouse, wheel, slider or keyboard), then save the square that shows. Own colors for the whole app come next.
 - **Adding a branch (X28).** Owners add a branch from one form: name, address, opening hours copied from another branch, and which team members work there. The form states the monthly price up front and needs the owner's tick; nothing is charged yet (billing providers are not connected), the extra-branch module simply follows the active branches.
-- **Pictures cropped before saving (X28).** Choosing a profile picture or the business logo opens a dialog: drag and zoom the picture inside a circle (mouse, wheel, slider or keyboard), then save the square that shows. Own colors for the whole app come next.
 - **Schedule board across branches ([spec](proposals/schedule-board-2026-10.md)).** The calendar shows branches side by side under each day with a named, colored branch header (day up to 6 branches, week up to 3, month 1), a new month view, a labeled shifts strip per branch (the unlabeled number on the side is explained), clear day/week/month arrows, a date picker, and a per-business default view the owner saves (migration 0060). The grid is a shared component (`components/calendar-board`) the staff shift board reuses.
 - **Pictures cropped before saving (X27).** Choosing a profile picture or the business logo opens a dialog: drag and zoom the picture inside a circle (mouse, wheel, slider or keyboard), then save the square that shows. Plus a fourth palette, **My own colors**: pick a background, text and accent, and the whole app follows; every other color is derived and pushed to a readable contrast, so no mix (all black, the same color three times) can break the screen. Light/dark follows the background.
 - **Workspace upgrade (owner's 16-point list, [plan](proposals/crm-upgrade-2026-10.md), X23–X26).** Personal profiles with a picture, phone and an avatar menu; three color palettes (MyBiz black/white/deep purple by default, Ocean, Forest) in light and dark; the business's legal entity and registration number (Israeli check digit) and a workspace cover; an org chart with job titles and reporting lines (never permissions); branch opening hours with breaks; a weekly shift board (overlap protection, warnings, copy last week) and a simple hours page for one-person businesses; a day/week calendar with a live "now" line, multi-branch colors and the shifts lane; branches side by side in reports; one popover to switch business and branch; shared screens refresh on focus and every minute. Demo: every demo has titles, hierarchy, hours and shifts, and the new `networks` demo seeds Urban Slice (pizza, 4 branches), Pulse Fitness (2) and Studio Bloom (3) for one owner, with a new Food & restaurants category (beta).
