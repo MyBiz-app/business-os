@@ -21,6 +21,8 @@ proposes a booking → confirmed and executed → a platform admin sees the busi
 
 Screenshots are written to `e2e/screenshots/` (git-ignored).
 
+CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by hand from the Actions tab).
+
 `roles.py` checks custom roles through the UI (create a role, assign it, access changes, in-use role is protected). Run it the same way, without arguments, against the normal API.
 
 `series.py` creates an open-ended weekly series, changes its time from one session on, stops it, and copies a week's one-off class to the next week.
