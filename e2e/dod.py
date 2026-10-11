@@ -52,6 +52,7 @@ with sync_playwright() as p:
     with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
         owner.get_by_role("button", name="שמירה").nth(1).click()
     owner.get_by_label("לוגו", exact=True).set_input_files("e2e/logo.png")
+    owner.get_by_role("button", name="להשתמש בתמונה").click()  # the crop dialog opens first
     owner.get_by_role("button", name="העלאת לוגו").click()
     expect(owner.get_by_role("img", name="תצוגה מקדימה")).to_be_visible()
     owner.goto(f"{h.BASE}/dashboard"); h.ready(owner)
