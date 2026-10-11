@@ -18,8 +18,8 @@ router = APIRouter(tags=["account"])
 
 
 @router.put("/me/avatar")
-async def upload_avatar(file: UploadFile, user: UserDep, session: SessionDep) -> Me:
-    data, content_type = await read_image(file, MAX_LOGO_BYTES)
+def upload_avatar(file: UploadFile, user: UserDep, session: SessionDep) -> Me:
+    data, content_type = read_image(file, MAX_LOGO_BYTES)
     ensure_profile(session, user.id, user.email)
     session.execute(
         text("""

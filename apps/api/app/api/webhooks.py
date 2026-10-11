@@ -4,9 +4,10 @@ A provider calls `/webhooks/payments/{provider}/{tenant_id}` when a payment ends
 payments provider verifies the notification (its signature, with the business's secret) and
 translates it; only then is the checkout completed, for exactly the amount it was opened for."""
 
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 
@@ -17,14 +18,20 @@ from app.providers.payments import WebhookRejected
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
 
+async def _raw_body(request: Request) -> bytes:
+    return await request.body()
+
+
+RawBody = Annotated[bytes, Depends(_raw_body)]
+
+
 @router.post("/payments/{provider}/{tenant_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def payment_webhook(
-    provider: str, tenant_id: UUID, request: Request, session: AnonymousSessionDep
+def payment_webhook(
+    provider: str, tenant_id: UUID, request: Request, body: RawBody, session: AnonymousSessionDep
 ) -> None:
     chosen = choose(session, tenant_id, "payments")
     if chosen.info.name != provider or chosen.instance.simulated:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
-    body = await request.body()
     try:
         event = chosen.instance.parse_webhook(dict(request.headers), body)
     except WebhookRejected as error:
