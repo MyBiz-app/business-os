@@ -2159,7 +2159,8 @@ export interface paths {
         };
         /**
          * List Client Bookings
-         * @description A client's bookings, newest session first.
+         * @description A client's bookings, newest session first (a member kept to some branches sees those
+         *     made at their branches).
          */
         get: operations["list_client_bookings"];
         put?: never;

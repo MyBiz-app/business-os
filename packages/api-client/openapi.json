@@ -11952,7 +11952,7 @@
           "bookings"
         ],
         "summary": "List Client Bookings",
-        "description": "A client's bookings, newest session first.",
+        "description": "A client's bookings, newest session first (a member kept to some branches sees those\nmade at their branches).",
         "operationId": "list_client_bookings",
         "security": [
           {

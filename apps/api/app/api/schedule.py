@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.api.bookings import lock_session, promote_waitlist
 from app.api.common import blank_to_none, not_found
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.core.permissions import Permission
 from app.messaging.notifications import live_clients, notify, notify_sessions, session_snapshot
 from app.schedule.scheduling import local_to_utc, weekly_occurrences
@@ -296,6 +296,7 @@ def list_sessions(
 @router.post("/sessions", status_code=status.HTTP_201_CREATED)
 def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
     db = context.session
+    ensure_branch_allowed(context, body.location_id)
     service = (
         db.execute(
             text("SELECT duration_minutes, capacity FROM app.services WHERE id = :id"),
@@ -399,7 +400,9 @@ def create_sessions(body: SessionCreate, context: WriteDep) -> CreatedSessions:
 
 @router.get("/sessions/{session_id}")
 def get_session(session_id: UUID, context: ReadDep) -> ScheduledSession:
-    return _load(context.session, session_id)
+    found = _load(context.session, session_id)
+    ensure_branch_visible(context, found.location_id)
+    return found
 
 
 @router.patch("/sessions/{session_id}")
@@ -408,7 +411,9 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
     db = context.session
     lock_session(db, session_id)
     current = _load(db, session_id)
+    ensure_branch_visible(context, current.location_id)
     changes = body.model_dump(exclude_unset=True)
+    ensure_branch_allowed(context, changes.get("location_id"))
 
     assignments: dict[str, Any] = {
         key: changes[key]
@@ -479,11 +484,12 @@ def end_series(series_id: UUID, body: SeriesEnd, context: WriteDep) -> SeriesEnd
     one by one (the business must tell those clients)."""
     db = context.session
     series = db.execute(
-        text("SELECT starts_on FROM app.session_series WHERE id = :id FOR UPDATE"),
+        text("SELECT starts_on, location_id FROM app.session_series WHERE id = :id FOR UPDATE"),
         {"id": series_id},
     ).first()
     if series is None:
         raise not_found()
+    ensure_branch_visible(context, series.location_id)
     if body.last_date < series.starts_on:
         raise HTTPException(status_code=422, detail="before_series_start")
     time_zone = _time_zone(db)
@@ -535,11 +541,14 @@ def update_series(series_id: UUID, body: SeriesUpdate, context: WriteDep) -> Ser
     sessions of a series; new occurrences the daily job adds follow the new settings.
     Bookings stay; booked clients are told when the time changes."""
     db = context.session
-    exists = db.execute(
-        text("SELECT 1 FROM app.session_series WHERE id = :id FOR UPDATE"), {"id": series_id}
-    ).scalar()
-    if exists is None:
+    series = db.execute(
+        text("SELECT location_id FROM app.session_series WHERE id = :id FOR UPDATE"),
+        {"id": series_id},
+    ).first()
+    if series is None:
         raise not_found()
+    ensure_branch_visible(context, series.location_id)
+    ensure_branch_allowed(context, body.location_id)
     time_zone = _time_zone(db)
     params = {
         "id": series_id,
@@ -639,6 +648,7 @@ def copy_week(body: WeekCopy, context: WriteDep) -> WeekCopied:
                     FROM app.sessions s
                     WHERE s.series_id IS NULL AND s.status = 'scheduled'
                       AND s.starts_at >= :from_at AND s.starts_at < :to_at
+                      AND (s.location_id IS NULL OR app.in_branch(s.location_id))
                 ),
                 fresh AS (
                     SELECT src.* FROM source src
