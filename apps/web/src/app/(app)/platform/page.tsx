@@ -13,10 +13,11 @@ export default async function PlatformPage() {
   const t = await getTranslations();
   const locale = await getLocale();
   const { api, can } = await getPlatform();
-  const [businesses, usage, leads] = await Promise.all([
+  const [businesses, usage, leads, spend] = await Promise.all([
     can("businesses.read") ? api.GET("/platform/businesses").then(unwrap) : null,
     can("usage.read") ? api.GET("/platform/usage", { params: { query: { days: 30 } } }).then(unwrap) : null,
     can("inbox.manage") ? api.GET("/platform/contact-requests").then(unwrap) : null,
+    can("usage.read") ? api.GET("/platform/ai-spend").then(unwrap) : null,
   ]);
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
@@ -34,6 +35,15 @@ export default async function PlatformPage() {
         <h1 className="text-3xl font-bold">{t("platform.title")}</h1>
         <p className="text-sm text-muted">{t("platform.subtitle")}</p>
       </div>
+
+      {spend?.over && (
+        <div role="alert" className="flex flex-col gap-1 rounded-lg border border-danger p-4">
+          <h2 className="font-semibold text-danger">{t("platform.aiSpendAlarmTitle")}</h2>
+          <p className="text-sm">
+            {t("platform.aiSpendAlarm", { spent: number.format(spend.today), limit: number.format(spend.alert_at) })}
+          </p>
+        </div>
+      )}
 
       {businesses && (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

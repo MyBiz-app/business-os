@@ -177,7 +177,11 @@ class DemoProvider:
     model = MODEL
 
     def create(
-        self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]]
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        strong: bool = False,
     ) -> LLMResponse:
         turn = self._current_turn(messages)
         question = next(

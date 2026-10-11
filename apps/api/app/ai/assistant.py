@@ -13,6 +13,7 @@ from app.ai.gateway import LLMProvider, LLMResponse, ProviderBusy, ProviderUnava
 from app.ai.tools import ToolContext, run_tool, tools_for
 from app.api.deps import TenantContext, has_module
 from app.catalog.verticals import CATALOG
+from app.core.config import get_settings
 
 MAX_STEPS = 8  # model calls per user message
 STEP_LIMIT_NOTE = "<context>Step limit reached. Answer with what you have.</context>"
@@ -119,10 +120,14 @@ def ask(
     ctx = ToolContext(tenant, user_id, conversation_id, row["time_zone"], modules)
 
     spent: list[LLMResponse] = []
+    escalate_after = get_settings().ai_escalate_after_steps
     work = db.begin_nested()
     try:
-        for _ in range(MAX_STEPS):
-            response = provider.create(SYSTEM_PROMPT, messages, definitions)
+        for step in range(MAX_STEPS):
+            # Everyday questions stay on the cheap model; long tool chains move to the strong one.
+            response = provider.create(
+                SYSTEM_PROMPT, messages, definitions, strong=step >= escalate_after
+            )
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
             if response.stop_reason != "tool_use":
@@ -154,7 +159,7 @@ def ask(
                     ],
                 }
             )
-            response = provider.create(SYSTEM_PROMPT, messages, definitions)
+            response = provider.create(SYSTEM_PROMPT, messages, definitions, strong=True)
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
 

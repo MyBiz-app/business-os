@@ -1282,6 +1282,7 @@
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
       "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
+      "ai_rate_limited": "You're sending questions too fast. Wait a minute and try again.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
     },
@@ -1357,6 +1358,8 @@
     "bookings30d": "Bookings (30 days)",
     "aiCredits30d": "AI credits (30 days)",
     "aiCreditsPerDay": "AI credits per day",
+    "aiSpendAlarmTitle": "AI spend alarm",
+    "aiSpendAlarm": "Today's AI spend is {spent} credits, over the {limit} credit alarm.",
     "aiCredits": "AI credits",
     "day": "Day",
     "businessesTitle": "Businesses",
