@@ -1036,6 +1036,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/closure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Closure */
+        get: operations["get_closure"];
+        put?: never;
+        /**
+         * Close Business
+         * @description Locks the business now. Its data is deleted after the grace period unless reopened.
+         */
+        post: operations["close_business"];
+        /**
+         * Reopen Business
+         * @description Reopens a closed business, as long as it has not been deleted yet.
+         */
+        delete: operations["reopen_business"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/leads": {
         parameters: {
             query?: never;
@@ -5815,6 +5840,14 @@ export interface components {
             /** Status */
             status?: ("active" | "inactive" | "lead") | null;
         };
+        /** CloseRequest */
+        CloseRequest: {
+            /**
+             * Confirm Name
+             * @description The business's exact name, typed to confirm
+             */
+            confirm_name: string;
+        };
         /** ClosedDay */
         ClosedDay: {
             /**
@@ -5845,6 +5878,19 @@ export interface components {
             closed_day: components["schemas"]["ClosedDay"];
             /** Cancelled Sessions */
             cancelled_sessions: number;
+        };
+        /** Closure */
+        Closure: {
+            /**
+             * Closed At
+             * @description Null while the business is open
+             */
+            closed_at: string | null;
+            /**
+             * Delete After
+             * @description When the closed business and its data are deleted for good
+             */
+            delete_after: string | null;
         };
         /** Complaint */
         Complaint: {
@@ -12977,6 +13023,109 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EraseResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_closure: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closure"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    close_business: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CloseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closure"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_business: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Closure"];
                 };
             };
             /** @description Validation Error */
