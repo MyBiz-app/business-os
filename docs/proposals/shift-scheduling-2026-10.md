@@ -49,4 +49,13 @@ overlapping shifts, in any branch) already prevents double-booking someone acros
 
 ## Out of scope
 
-Shift swaps and approvals, labor-law checks, payroll hours, push notifications to staff.
+Labor-law checks, payroll hours, push notifications to staff.
+
+## Requests and swaps (follow-up, 2026-10-11)
+
+Slices: **1 time-off requests** (`app.time_off_requests`: pending / approved / declined /
+cancelled; approving inserts the normal `staff_time_off` row), **2 screens** (staff app "my
+schedule" with a request form, web approval queue), **3 shift swaps** (a person offers one of
+their shifts to a named colleague; the colleague accepts; a manager approves; the shift changes
+hands and the existing roster-change email covers the rest), **4 availability** preferences.
+Staff see only their own requests; people with `staff.manage` see and decide all of them.
