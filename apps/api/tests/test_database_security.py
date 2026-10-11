@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 # Tables without tenant_id that are still protected by RLS (their own policies).
-GLOBAL_TABLES = {"tenants", "users", "platform_staff", "platform_audit"}
+GLOBAL_TABLES = {"tenants", "users", "platform_staff", "platform_audit", "push_tokens"}
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
 # API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.
 PLATFORM_TABLES = {"contact_requests", "platform_audit"}
@@ -101,3 +101,74 @@ def test_api_sends_security_headers(client: TestClient) -> None:
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["Referrer-Policy"] == "no-referrer"
+
+
+# Foreign keys that only record who did something. Nothing filters on them and a person is
+# almost never deleted, so an index would only slow down inserts (migration 0071).
+UNINDEXED_USER_KEYS = {
+    ("ai_conversations", "user_id"),
+    ("bookings", "created_by"),
+    ("campaigns", "created_by"),
+    ("client_documents", "created_by"),
+    ("client_notes", "author_user_id"),
+    ("closed_days", "created_by"),
+    ("entitlement_freezes", "created_by"),
+    ("entitlements", "sold_by"),
+    ("health_declarations", "reviewed_by"),
+    ("health_declarations", "signed_by"),
+    ("invitations", "invited_by"),
+    ("messages", "created_by"),
+    ("payments", "created_by"),
+    ("pending_actions", "decided_by"),
+    ("pending_actions", "requested_by"),
+    ("quotes", "created_by"),
+    ("reviews", "staff_user_id"),
+    ("shifts", "created_by"),
+    ("support_grants", "granted_by"),
+    ("support_grants", "revoked_by"),
+    ("tenant_integrations", "connected_by"),
+    ("time_entries", "user_id"),
+}
+
+
+def test_every_foreign_key_has_an_index(engine: Engine) -> None:
+    """Deleting a parent row checks each child table; without an index that reads all of it."""
+    missing = _query(
+        engine,
+        """
+        SELECT c.conrelid::regclass::text,
+               array_to_string(ARRAY(
+                   SELECT a.attname FROM unnest(c.conkey) WITH ORDINALITY k(attnum, ord)
+                   JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = k.attnum
+                   ORDER BY k.ord), ', ')
+        FROM pg_constraint c JOIN pg_namespace n ON n.oid = c.connamespace
+        WHERE c.contype = 'f' AND n.nspname = 'app'
+          AND NOT EXISTS (
+              SELECT 1 FROM pg_index i
+              WHERE i.indrelid = c.conrelid
+                AND (i.indkey::int2[])[0:cardinality(c.conkey) - 1] @> c.conkey
+                AND (i.indkey::int2[])[0:cardinality(c.conkey) - 1] <@ c.conkey)
+        """,
+    )
+    unexpected = [
+        (table.removeprefix("app."), columns)
+        for table, columns in missing
+        if (table.removeprefix("app."), columns) not in UNINDEXED_USER_KEYS
+    ]
+    assert unexpected == []
+
+
+def test_every_tenant_table_has_a_tenant_index(engine: Engine) -> None:
+    """RLS filters every query on tenant_id, so some index has to start with it."""
+    tables = _query(
+        engine,
+        """
+        SELECT c.relname
+        FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        JOIN pg_attribute a ON a.attrelid = c.oid AND a.attname = 'tenant_id' AND NOT a.attisdropped
+        WHERE n.nspname = 'app' AND c.relkind = 'r'
+          AND NOT EXISTS (SELECT 1 FROM pg_index i
+                          WHERE i.indrelid = c.oid AND i.indkey[0] = a.attnum)
+        """,
+    )
+    assert [name for (name,) in tables] == []

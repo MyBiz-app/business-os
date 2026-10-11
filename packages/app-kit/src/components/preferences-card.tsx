@@ -2,6 +2,7 @@ import { locales } from "@business-os/i18n";
 import { router } from "expo-router";
 import { useTranslations } from "use-intl";
 
+import { unregisterPushToken } from "../lib/push";
 import { supabase } from "../lib/supabase";
 import type { Palette } from "../lib/theme";
 import type { ThemePreference } from "../lib/preferences";
@@ -39,7 +40,11 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
         label={t("signOut")}
         variant={signOutVariant}
         palette={palette}
-        onPress={() => void supabase.auth.signOut().then(() => router.replace("/sign-in"))}
+        onPress={() =>
+          void unregisterPushToken()
+            .then(() => supabase.auth.signOut())
+            .then(() => router.replace("/sign-in"))
+        }
       />
     </>
   );
