@@ -118,6 +118,12 @@ enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
+# The API's private bucket for documents (decision T80); only the API's secret key reaches it.
+[storage.buckets.files]
+public = false
+file_size_limit = "10MiB"
+allowed_mime_types = ["application/pdf", "image/png", "image/jpeg", "image/webp", "text/plain", "text/csv", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"]
+
 # Uncomment to configure local storage buckets
 # [storage.buckets.images]
 # public = false
