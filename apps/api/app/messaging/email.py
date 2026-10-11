@@ -21,6 +21,8 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
+from app.messaging.push import PushSender, push_to_user
+
 MESSAGES_DIR = Path(__file__).resolve().parent.parent / "messages"
 FRESH_FOR = timedelta(days=1)
 MAX_ATTEMPTS = 3
@@ -168,25 +170,28 @@ EMAIL_DETAILS = json.dumps({"channel": "email", "automated": True})
 
 def send_emails(
     conn: Connection,
-    sender: Sender,
+    sender: Sender | None,
     now: datetime | None = None,
     messages_dir: Path = MESSAGES_DIR,
+    push: PushSender | None = None,
 ) -> dict[str, int]:
-    """Emails pending notifications. Returns counts per outcome."""
+    """Emails pending notifications; clients who use the app and registered a phone get a push
+    instead, with the email as the fallback. Returns counts per outcome."""
     now = now or datetime.now(UTC)
     skipped = conn.execute(
         text("""
             UPDATE app.notifications n SET email_status = 'skipped'
             FROM app.clients c
             WHERE n.email_status = 'pending' AND c.id = n.client_id
-              AND (n.created_at < :oldest OR c.email IS NULL OR c.erased_at IS NOT NULL)
+              AND (n.created_at < :oldest OR c.erased_at IS NOT NULL
+                   OR (c.email IS NULL AND (c.user_id IS NULL OR :push = false)))
         """),
-        {"oldest": now - FRESH_FOR},
+        {"oldest": now - FRESH_FOR, "push": push is not None},
     ).rowcount
     rows = (
         conn.execute(
             text("""
-                SELECT n.id, n.tenant_id, n.kind, n.payload, c.email, c.first_name,
+                SELECT n.id, n.tenant_id, n.kind, n.payload, c.email, c.first_name, c.user_id,
                        t.name AS business,
                        t.locale, t.time_zone
                 FROM app.notifications n
@@ -202,13 +207,34 @@ def send_emails(
         .all()
     )
     messages: dict[str, dict[str, Any]] = {}
-    sent = failed = 0
+    sent = failed = pushed = 0
     per_tenant: dict[Any, int] = {}
     for row in rows:
         locale = row["locale"] if row["locale"] in ("he", "en") else "en"
         if locale not in messages:
             messages[locale] = load_messages(locale, messages_dir)
         subject, body = render(messages[locale], row["kind"], row["payload"], row)
+        if push and push_to_user(conn, push, row["user_id"], subject, body.split("\n\n", 1)[-1]):
+            pushed += 1
+            conn.execute(
+                text("""
+                    UPDATE app.notifications
+                    SET email_status = 'sent', emailed_at = now(),
+                        email_attempts = email_attempts + 1
+                    WHERE id = :id
+                """),
+                {"id": row["id"]},
+            )
+            continue
+        if (
+            sender is None or not row["email"]
+        ):  # reachable only by push, and that did not go through
+            skipped += 1
+            conn.execute(
+                text("UPDATE app.notifications SET email_status = 'skipped' WHERE id = :id"),
+                {"id": row["id"]},
+            )
+            continue
         try:
             sender.send(Email(to=row["email"], subject=subject, text=body))
         except Exception as error:  # a provider error must not stop the batch
@@ -244,7 +270,8 @@ def send_emails(
             """),
             {"t": tenant_id, "n": count, "details": EMAIL_DETAILS},
         )
-    return {"sent": sent, "failed": failed, "skipped": skipped}
+    counts = {"sent": sent, "failed": failed, "skipped": skipped}
+    return counts | {"pushed": pushed} if push else counts
 
 
 def sender_from_settings() -> Sender | None:
