@@ -53,3 +53,11 @@ with Opus, implement it with Sonnet. For a pure UI or docs task, `/model sonnet`
 - The coordinator can't be stopped from waking on thread messages (platform behavior), so it
   keeps each wake small: memory is updated only on decisions and milestones, and it relays
   between threads only when they would collide.
+
+## Third-party skills are not vendored
+
+`.claude/skills/` no longer holds copies of third-party skills (143 files). `skills-lock.json` still lists
+which ones the project used (differential-review, frontend-design, supabase, supabase-postgres-best-practices,
+systematic-debugging, vercel-react-best-practices, verification-before-completion, web-design-guidelines,
+webapp-testing). Install the ones you want per user with the `skills` CLI (`npx skills add <source>`; sources are in the lock file).
+Only project-specific skills belong in `.claude/skills/`.
