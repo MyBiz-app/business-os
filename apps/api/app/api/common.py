@@ -1,5 +1,6 @@
 """Small helpers shared by the tenant-scoped CRUD endpoints."""
 
+import re
 from typing import Any, Literal
 from uuid import UUID
 
@@ -22,10 +23,16 @@ def not_found() -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
 
 
+_IDENTIFIER = re.compile(r"[a-z_][a-z0-9_]*")
+
+
 def set_clause(changes: dict[str, Any], casts: dict[str, str] | None = None) -> str:
     """SET clause for an UPDATE. Keys must come from a Pydantic model's fields, never from
     user input, because they become column names. `casts` gives a column's SQL type (jsonb)."""
     casts = casts or {}
+    for name in changes:
+        if not _IDENTIFIER.fullmatch(name):
+            raise ValueError(f"unsafe SQL identifier: {name!r}")
     assignments = [
         f"{column} = CAST(:{column} AS {casts[column]})" if column in casts
         else f"{column} = :{column}"
