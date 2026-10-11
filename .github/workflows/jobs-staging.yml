@@ -74,6 +74,13 @@ jobs:
           API_ENVIRONMENT: staging
         run: uv run python -m app.jobs purge-expired
 
+      - name: Report businesses closed more than 90 days ago (dry run; add --apply to delete, X20)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs delete-closed-businesses
+
       - name: Send queued messages through each business's provider
         working-directory: apps/api
         env:

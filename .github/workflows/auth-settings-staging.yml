@@ -1,0 +1,33 @@
+name: Apply Supabase auth settings (staging)
+
+# Pushes the auth section of supabase/config.toml to the staging project so the dashboard cannot
+# drift (docs/deploy/auth-settings.md). Dry run unless "apply" is ticked. Needs the secret
+# SUPABASE_ACCESS_TOKEN (a Supabase personal access token) in the staging environment.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Change the project (otherwise only show the differences)"
+        type: boolean
+        default: false
+
+jobs:
+  auth-settings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Compare (and apply) auth settings
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: mywfwzdrlbpxeheszasd
+          SITE_URL: https://business-os-alpha-drab.vercel.app
+          REDIRECT_URLS: https://business-os-alpha-drab.vercel.app/**,mybiz://**
+          APPLY: ${{ inputs.apply && '--apply' || '' }}
+        run: python supabase/apply_auth_settings.py $APPLY

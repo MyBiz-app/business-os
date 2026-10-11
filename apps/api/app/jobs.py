@@ -10,6 +10,7 @@
     uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
+    uv run python -m app.jobs delete-closed-businesses [--apply] (dry run unless --apply)
     uv run python -m app.jobs move-files      (documents kept in the database → the object store)
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
@@ -25,6 +26,7 @@ from sqlalchemy import Connection, create_engine, text
 
 from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
+from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 from app.messaging import outbox
 from app.messaging.email import (
     MESSAGES_DIR,
@@ -52,7 +54,7 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
                    ss.instructor_user_id, ss.capacity, ss.weekdays, ss.start_time,
                    ss.duration_minutes, ss.ends_on, t.time_zone
             FROM app.session_series ss JOIN app.tenants t ON t.id = ss.tenant_id
-            WHERE ss.open_ended
+            WHERE ss.open_ended AND t.closed_at IS NULL
         """)
         )
         .mappings()
@@ -121,7 +123,7 @@ def remind_sessions(conn: Connection, now: datetime | None = None) -> int:
             WITH due AS (
                 UPDATE app.bookings b SET reminded_at = :now
                 FROM app.sessions s, app.tenants t
-                WHERE s.id = b.session_id AND t.id = b.tenant_id
+                WHERE s.id = b.session_id AND t.id = b.tenant_id AND t.closed_at IS NULL
                   AND b.status = 'booked' AND b.reminded_at IS NULL
                   AND s.status = 'scheduled' AND s.starts_at > :now
                   AND (s.starts_at AT TIME ZONE t.time_zone)::date
@@ -152,7 +154,7 @@ def remind_plans(conn: Connection, now: datetime | None = None) -> int:
             WITH local AS (
                 SELECT id AS tenant_id,
                        (CAST(:now AS timestamptz) AT TIME ZONE time_zone)::date AS today
-                FROM app.tenants
+                FROM app.tenants WHERE closed_at IS NULL
             ),
             due AS (
                 UPDATE app.entitlements e SET ending_notified_at = :now
@@ -196,7 +198,7 @@ def message_reminders(
                 FROM app.notifications n
                 JOIN app.clients c ON c.id = n.client_id
                 JOIN app.tenants t ON t.id = n.tenant_id
-                WHERE n.kind = ANY(:kinds) AND n.created_at > :since
+                WHERE n.kind = ANY(:kinds) AND n.created_at > :since AND t.closed_at IS NULL
                   AND c.erased_at IS NULL AND nullif(trim(c.phone), '') IS NOT NULL
                   AND EXISTS (SELECT 1 FROM app.tenant_modules m
                               WHERE m.tenant_id = n.tenant_id AND m.module_key = 'whatsapp')
@@ -269,7 +271,7 @@ def follow_up_leads(
                        t.name AS business, t.locale
                 FROM app.leads l
                 JOIN app.tenants t ON t.id = l.tenant_id
-                WHERE l.stage IN ('new', 'contacted')
+                WHERE l.stage IN ('new', 'contacted') AND t.closed_at IS NULL
                   AND nullif(trim(l.phone), '') IS NOT NULL
                   AND l.created_at > :now - make_interval(days => :within)
                   AND coalesce((SELECT max(a.occurred_at) FROM app.lead_activities a
@@ -340,8 +342,8 @@ def follow_up_leads(
     return len(rows)
 
 
-# How long data is kept (decision X20). A business that leaves (90 days) waits for an
-# account-closing flow.
+# How long data is kept (decision X20). A business that closed its account is deleted after
+# CLOSED_BUSINESS_GRACE_DAYS (delete_closed_businesses below).
 RETENTION_MONTHS = {"leads": 12, "contact_requests": 12, "ai_conversations": 12, "messages": 24}
 
 
@@ -367,6 +369,48 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
     return {
         kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
         for kind, sql in statements.items()
+    }
+
+
+def delete_closed_businesses(
+    conn: Connection, now: datetime | None = None, apply: bool = False
+) -> dict[str, int | list[str]]:
+    """Deletes businesses whose owner closed the account more than CLOSED_BUSINESS_GRACE_DAYS ago,
+    with everything under them (every tenant table cascades). Irreversible, so it only reports
+    what it would delete unless `apply` is true. People's sign-in accounts are kept: they may
+    own or work in other businesses. Each deletion is noted in the MyBiz audit log."""
+    now = now or datetime.now(UTC)
+    due = (
+        conn.execute(
+            text("""
+                SELECT id, name, closed_at FROM app.tenants
+                WHERE closed_at < :before ORDER BY closed_at
+            """),
+            {"before": now - timedelta(days=CLOSED_BUSINESS_GRACE_DAYS)},
+        )
+        .mappings()
+        .all()
+    )
+    if apply:
+        for business in due:
+            conn.execute(
+                text("""
+                    INSERT INTO app.platform_audit (actor_email, action, details)
+                    VALUES ('system', 'business.deleted', jsonb_build_object(
+                        'business_id', CAST(:id AS text), 'name', CAST(:name AS text),
+                        'closed_at', CAST(:closed_at AS text)))
+                """),
+                {
+                    "id": business["id"],
+                    "name": business["name"],
+                    "closed_at": business["closed_at"],
+                },
+            )
+            conn.execute(text("DELETE FROM app.tenants WHERE id = :id"), {"id": business["id"]})
+    return {
+        "dry_run": 0 if apply else 1,
+        "businesses": len(due),
+        "ids": [str(business["id"]) for business in due],
     }
 
 
@@ -412,7 +456,7 @@ def publish_shifts(conn: Connection, now: datetime | None = None) -> int:
         text("""
             SELECT id, time_zone, shifts_publish_cadence, shifts_publish_weekday,
                    shifts_publish_day, shifts_publish_time, shifts_last_auto_published_at
-            FROM app.tenants WHERE shifts_publish_auto
+            FROM app.tenants WHERE shifts_publish_auto AND closed_at IS NULL
         """)
     ).mappings()
     for row in list(rows):
@@ -500,6 +544,7 @@ JOBS = {
     "message-reminders": message_reminders,
     "follow-up-leads": follow_up_leads,
     "purge-expired": purge_expired,
+    "delete-closed-businesses": delete_closed_businesses,
     "bill-businesses": bill_businesses,
     "publish-shifts": publish_shifts,
     "send-messages": send_messages,
@@ -512,10 +557,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run a background job.")
     parser.add_argument("job", choices=list(JOBS))
     parser.add_argument("--database-url", default=None, help="Defaults to API_DATABASE_URL")
+    parser.add_argument(
+        "--apply",
+        action="store_true",
+        help="Really delete (delete-closed-businesses only reports without it)",
+    )
     args = parser.parse_args()
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
-        result = JOBS[args.job](conn)
+        job = JOBS[args.job]
+        result = job(conn, apply=args.apply) if job is delete_closed_businesses else job(conn)
     print(f"{args.job}: {result}")
 
 

@@ -2595,6 +2595,21 @@
     "byService": "By service",
     "comments": "Latest comments"
   },
+  "timeOffQueue": {
+    "title": "Time-off requests",
+    "subtitle": "Approving blocks the days for scheduling and bookings. Appointments already booked stay.",
+    "back": "Shifts",
+    "open": "Time-off requests",
+    "pending": "{count, plural, one {# waiting for you} other {# waiting for you}}",
+    "noPending": "No requests are waiting.",
+    "shiftCount": "{count, plural, =0 {No shifts on these days} one {Already has # shift on these days} other {Already has # shifts on these days}}",
+    "note": "Note for the requester (optional)",
+    "noteHint": "Shown to the requester",
+    "approve": "Approve",
+    "decline": "Decline",
+    "decided": "Recently decided",
+    "status": { "approved": "Approved", "declined": "Declined", "cancelled": "Withdrawn" }
+  },
   "timeOff": {
     "title": "Time off",
     "hint": "No appointments are offered with this staff member on these days. Appointments already booked stay — handle them separately.",
@@ -3354,6 +3369,41 @@
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
       "on": "On",
       "off": "Off"
+    },
+    "schedule": {
+      "title": "My schedule",
+      "back": "Me",
+      "shifts": "Upcoming shifts",
+      "noShifts": "No shifts in the next four weeks.",
+      "cover": "Cover",
+      "requests": "Time off",
+      "noRequests": "No time-off requests.",
+      "request": "Request time off",
+      "from": "First day (YYYY-MM-DD)",
+      "to": "Last day (YYYY-MM-DD)",
+      "reason": "Reason (optional)",
+      "send": "Send request",
+      "sent": "Request sent. A manager will decide.",
+      "cancel": "Cancel request",
+      "dates": "{from} to {to}",
+      "oneDay": "{day}",
+      "status": {
+        "pending": "Waiting",
+        "approved": "Approved",
+        "declined": "Declined",
+        "cancelled": "Cancelled"
+      },
+      "note": "Manager's note: {note}",
+      "open": "My schedule",
+      "errors": {
+        "invalid_date": "Enter dates as YYYY-MM-DD.",
+        "ends_before_start": "The last day is before the first day.",
+        "in_the_past": "That period has already ended.",
+        "too_long": "At most a year at a time.",
+        "request_overlap": "You already have a request for these days.",
+        "invalid_period": "That period has already ended.",
+        "generic": "Something went wrong. Try again."
+      }
     },
     "back": "Back",
     "error": "Something went wrong. Try again.",

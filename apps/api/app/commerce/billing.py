@@ -69,7 +69,8 @@ def bill_businesses(
                     WHERE i.tenant_id = t.id) AS last_start,
                    a.card_last4
             FROM app.tenants t LEFT JOIN app.billing_accounts a ON a.tenant_id = t.id
-            WHERE t.trial_ends_at < :now AND (CAST(:tenant AS uuid) IS NULL OR t.id = :tenant)
+            WHERE t.trial_ends_at < :now AND t.closed_at IS NULL
+              AND (CAST(:tenant AS uuid) IS NULL OR t.id = :tenant)
         """),
         {"now": now, "tenant": tenant_id},
     ).all()
