@@ -42,6 +42,30 @@ class TenantContext:
     branches: frozenset[UUID] | None = None
 
 
+def ensure_branch_visible(context: TenantContext, location_id: UUID | None) -> None:
+    """Reading or changing something by id: a member kept to some branches gets "not found" for
+    anything filed under another one. A row with no branch belongs to everyone."""
+    if (
+        context.branches is not None
+        and location_id is not None
+        and location_id not in context.branches
+    ):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+
+
+def ensure_branch_allowed(context: TenantContext, location_id: UUID | None) -> None:
+    """A branch named in a request body: a member kept to some branches can't file anything
+    under another one."""
+    if (
+        context.branches is not None
+        and location_id is not None
+        and location_id not in context.branches
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_branch"
+        )
+
+
 def _audit_platform_visit(session: Session, tenant_id: UUID, action: str, request: Request) -> None:
     """Writes the visit to the business's own audit log, which its owner reads in settings."""
     session.execute(

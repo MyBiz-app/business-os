@@ -261,6 +261,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** S–M · **Model:** Opus for the context function (tenant isolation), Sonnet for the web.
 
 ### P1-8 · Tenant and branch isolation need a test matrix, not examples
+- **Progress:** 🟡 Part 3 done (PR pending): branch matrix for a member kept to one branch across sessions, bookings, clients, series, shifts, stations, templates, hours and publish (`tests/test_branch_access.py`); it found and fixed a real hole: by-id reads and writes ignored the branch limit. Part 2 done in spirit: `tests/test_critical_paths.py` calls every route without a login and fails unless it is on the public list. Still open: part 1 (a row-by-row cross-tenant matrix over every `tenant_id` table) and by-id branch checks on the client sub-resources (notes, documents, health declarations, dependents, receipts, quotes).
 - **Where:** `tests/test_tenant_isolation.py` (deep checks for `clients` only),
   branch scoping in `app/api/deps.py` `set_branch` (#64).
 - **Why:** each new table and route adds a way to get isolation wrong; branch-limited staff are

@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.catalog.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
 from app.core.permissions import Permission
 
@@ -232,6 +232,7 @@ def list_clients(
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 def create_client(body: ClientCreate, context: WriteDep) -> Client:
+    ensure_branch_allowed(context, body.home_location_id)
     try:
         row = (
             context.session.execute(
@@ -270,13 +271,20 @@ def get_client(client_id: UUID, context: ReadDep) -> Client:
     )
     if row is None:
         raise not_found()
+    ensure_branch_visible(context, row["home_location_id"])
     return Client.model_validate(dict(row))
 
 
 @router.patch("/{client_id}")
 def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Client:
     ensure_not_erased(context.session, client_id)
+    home = context.session.execute(
+        text("SELECT home_location_id FROM app.clients WHERE id = :id"), {"id": client_id}
+    ).first()
+    if home is not None:
+        ensure_branch_visible(context, home.home_location_id)
     changes = body.model_dump(exclude_unset=True)
+    ensure_branch_allowed(context, changes.get("home_location_id"))
     if "first_name" in changes and not changes["first_name"]:
         raise HTTPException(status_code=422, detail="first_name must not be blank")
     if "status" in changes and changes["status"] is None:

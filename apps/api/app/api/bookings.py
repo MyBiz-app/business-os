@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.plans import usable_entitlement
 from app.catalog.verticals import CATALOG, VerticalPack
@@ -107,6 +107,18 @@ def _load(db: Session, booking_id: UUID) -> Booking:
     if row is None:
         raise not_found()
     return Booking.model_validate(dict(row))
+
+
+def _check_session_branch(context: TenantContext, session_id: UUID) -> None:
+    """A member kept to some branches only reaches the sessions (and so the rosters) of theirs."""
+    if context.branches is None:
+        return
+    row = context.session.execute(
+        text("SELECT location_id FROM app.sessions WHERE id = :id"), {"id": session_id}
+    ).first()
+    if row is None:
+        raise not_found()
+    ensure_branch_visible(context, row.location_id)
 
 
 def _conflict(detail: str) -> HTTPException:
@@ -247,6 +259,7 @@ def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
 @router.get("/sessions/{session_id}/bookings")
 def list_bookings(session_id: UUID, context: ScheduleReadDep) -> list[Booking]:
     """The session's roster: live bookings first, then the waitlist in order, then history."""
+    _check_session_branch(context, session_id)
     rows = context.session.execute(
         text(f"""
             {BOOKING_SELECT}
@@ -262,6 +275,7 @@ def list_bookings(session_id: UUID, context: ScheduleReadDep) -> list[Booking]:
 @router.post("/sessions/{session_id}/bookings", status_code=status.HTTP_201_CREATED)
 def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) -> Booking:
     """Books the client if a spot is free, otherwise adds them to the waitlist."""
+    _check_session_branch(context, session_id)
     # Staff may book without a plan (walk-ins pay at the desk); the roster shows it.
     booking_id = place_booking(
         context.session,
@@ -279,6 +293,7 @@ def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) ->
 def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) -> Booking:
     db = context.session
     current = _load(db, booking_id)
+    _check_session_branch(context, current.session_id)
     lock_session(db, current.session_id)
     current = _load(db, booking_id)  # re-read under the lock
     if body.status == current.status:
@@ -304,7 +319,8 @@ def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) ->
 
 @router.get("/clients/{client_id}/bookings")
 def list_client_bookings(client_id: UUID, context: ClientsReadDep) -> list[ClientBooking]:
-    """A client's bookings, newest session first."""
+    """A client's bookings, newest session first (a member kept to some branches sees those
+    made at their branches)."""
     rows = context.session.execute(
         text("""
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
@@ -315,7 +331,7 @@ def list_client_bookings(client_id: UUID, context: ClientsReadDep) -> list[Clien
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
             LEFT JOIN app.dependents d ON d.id = b.dependent_id
-            WHERE b.client_id = :id
+            WHERE b.client_id = :id AND (s.location_id IS NULL OR app.in_branch(s.location_id))
             ORDER BY s.starts_at DESC
             LIMIT 200
         """),
