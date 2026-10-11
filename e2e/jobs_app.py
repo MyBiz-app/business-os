@@ -68,7 +68,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
     page = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, is_mobile=True).new_page()
     page.on("pageerror", lambda e: errors.append(str(e)))
-    sign_in(page, "אימייל", "שליחת קוד", "קוד בן 6 ספרות", "כניסה")
+    sign_in(page, "אימייל", "שליחת קוד", "הקוד מהמייל", "כניסה")
     page.wait_for_timeout(3000)
     page.evaluate("id => localStorage.setItem('business.tenant', id)", str(tenant_id))
     page.goto(APP)

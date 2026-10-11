@@ -59,7 +59,7 @@ with sync_playwright() as p:
     page = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, is_mobile=True).new_page()
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.on("dialog", lambda dialog: dialog.accept())
-    sign_in(page, "אימייל", "שליחת קוד", "קוד בן 6 ספרות", "כניסה")
+    sign_in(page, "אימייל", "שליחת קוד", "הקוד מהמייל", "כניסה")
     page.get_by_text("פניות פתוחות").first.wait_for(timeout=60000)
     expect(page.get_by_text("עסקים חדשים השבוע")).to_be_visible()
     expect(page.get_by_text("לקוחות פעילים")).to_be_visible()

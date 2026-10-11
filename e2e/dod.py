@@ -12,6 +12,8 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 from helpers import APP, login, otp
 
+# A session on the schedule grid links to /schedule/<id>; the other /schedule/... links are pages (new, closed, ...).
+SESSION_LINK = 'main a[href^="/schedule/"]:not([href*="?"]):not([href="/schedule/closed"])'
 ADMIN = sys.argv[1]  # a platform admin's email (see README)
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
@@ -50,8 +52,12 @@ with sync_playwright() as p:
     owner.get_by_label("שימוש בצבע ברירת המחדל").uncheck()
     owner.get_by_label("צבע המותג").fill("#0f766e")
     with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
-        owner.get_by_role("button", name="שמירה").nth(1).click()
+        owner.locator("form").filter(has=owner.get_by_label("צבע המותג")).get_by_role("button", name="שמירה").click()
+    h.ready(owner)  # the save refreshes the page; a file chosen before that is lost
     owner.get_by_label("לוגו", exact=True).set_input_files("e2e/logo.png")
+    use = owner.get_by_role("button", name="להשתמש בתמונה")  # the crop dialog opens first
+    expect(use).to_be_enabled(timeout=30000)
+    use.click()
     owner.get_by_role("button", name="העלאת לוגו").click()
     expect(owner.get_by_role("img", name="תצוגה מקדימה")).to_be_visible()
     owner.goto(f"{h.BASE}/dashboard"); h.ready(owner)
@@ -109,12 +115,12 @@ with sync_playwright() as p:
     member.goto(APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
-    member.get_by_label("קוד בן 6 ספרות").fill(otp(member_email))
-    member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join")
+    member.get_by_label("הקוד מהמייל").fill(otp(member_email))
+    member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join", timeout=90000)
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_label("שם פרטי").fill("נועה")
-    member.get_by_role("button", name="הצטרפות לסטודיו DoD").click(); member.wait_for_url("**/home")
+    member.get_by_role("button", name="הצטרפות לסטודיו DoD").click(); member.wait_for_url("**/home", timeout=90000)
     hero = member.get_by_role("heading", name="סטודיו DoD").locator("..")
     expect(hero).to_have_css("background-color", "rgb(15, 118, 110)")
     expect(member.get_by_text("היי נועה")).to_be_visible()  # claimed the client record by email
@@ -130,7 +136,7 @@ with sync_playwright() as p:
 
     # Owner sees the booking.
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
-    owner.locator("main ol li li a").first.click(); h.ready(owner)
+    owner.locator(SESSION_LINK).first.click(); h.ready(owner)
     expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible()
     print("6. owner sees the booking: ok")
 
@@ -145,7 +151,7 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="אישור").click()
     expect(owner.get_by_role("status").filter(has_text="בוצע")).to_be_visible()
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
-    owner.locator("main ol li li a").first.click(); h.ready(owner)
+    owner.locator(SESSION_LINK).first.click(); h.ready(owner)
     expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("דנה כהן")).to_be_visible()
     print("7. AI answered, proposed an action, confirmed, executed: ok")
     check_a11y(owner, "he-light session roster")

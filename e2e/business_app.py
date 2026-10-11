@@ -61,7 +61,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
     page = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, is_mobile=True).new_page()
     page.on("pageerror", lambda e: errors.append(str(e)))
-    sign_in(page, "אימייל", "שליחת קוד", "קוד בן 6 ספרות", "כניסה")
+    sign_in(page, "אימייל", "שליחת קוד", "הקוד מהמייל", "כניסה")
     page.get_by_role("heading", name="סטודיו פלואו (דמו)").wait_for(timeout=60000)
 
     # Today: what needs attention opens up, and another day of the week shows its sessions.

@@ -12,7 +12,7 @@ def tool(name, args): return LLMResponse([{"type": "tool_use", "id": f"toolu_{na
 
 class Fake:
     model = "claude-opus-5-5"
-    def create(self, system, messages, tools):
+    def create(self, system, messages, tools, strong=False):
         question = next(b["text"] for b in reversed(messages) if b["role"] == "user" and isinstance(b["content"], list) and b["content"][-1].get("type") == "text" for b in [b["content"][-1]] if not b["text"].startswith("<context>"))
         last = messages[-1]["content"][-1]
         result = json.loads(last["content"]) if last.get("type") == "tool_result" else None
