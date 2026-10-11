@@ -51,8 +51,11 @@ with sync_playwright() as p:
     owner.get_by_label("צבע המותג").fill("#0f766e")
     with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
         owner.get_by_role("button", name="שמירה").nth(1).click()
+    h.ready(owner)  # the save refreshes the page; a file chosen before that is lost
     owner.get_by_label("לוגו", exact=True).set_input_files("e2e/logo.png")
-    owner.get_by_role("button", name="להשתמש בתמונה").click()  # the crop dialog opens first
+    use = owner.get_by_role("button", name="להשתמש בתמונה")  # the crop dialog opens first
+    expect(use).to_be_enabled(timeout=30000)
+    use.click()
     owner.get_by_role("button", name="העלאת לוגו").click()
     expect(owner.get_by_role("img", name="תצוגה מקדימה")).to_be_visible()
     owner.goto(f"{h.BASE}/dashboard"); h.ready(owner)
