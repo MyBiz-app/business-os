@@ -190,6 +190,13 @@ def get_tenant_context(
         if member.location_ids and member.role not in ALL_BRANCH_ROLES
         else None
     )
+    if (
+        not request.url.path.startswith("/tenants/current/closure")
+        and session.execute(
+            text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = app.current_tenant_id()")
+        ).scalar()
+    ):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
     set_branch(session, branch_id, allowed)
     return TenantContext(
         session=session,
@@ -245,6 +252,10 @@ def get_client_context(
     client_id = session.execute(text("SELECT app.current_client_id()")).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_client")
+    if session.execute(
+        text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
     if not has_module(session, "client_app"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
     return ClientContext(session=session, tenant_id=tenant_id, client_id=client_id)

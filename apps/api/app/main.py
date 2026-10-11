@@ -18,6 +18,7 @@ from app.api import (
     client_import,
     client_notes,
     clients,
+    closure,
     dependents,
     documents,
     integrations,
@@ -147,6 +148,7 @@ def create_app() -> FastAPI:
     app.include_router(integrations.router)
     app.include_router(client_notes.router)
     app.include_router(privacy.router)
+    app.include_router(closure.router)
     app.include_router(leads.router)
     app.include_router(messaging.router)
     app.include_router(leads.public_router)
