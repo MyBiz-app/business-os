@@ -3370,6 +3370,41 @@
       "on": "On",
       "off": "Off"
     },
+    "schedule": {
+      "title": "My schedule",
+      "back": "Me",
+      "shifts": "Upcoming shifts",
+      "noShifts": "No shifts in the next four weeks.",
+      "cover": "Cover",
+      "requests": "Time off",
+      "noRequests": "No time-off requests.",
+      "request": "Request time off",
+      "from": "First day (YYYY-MM-DD)",
+      "to": "Last day (YYYY-MM-DD)",
+      "reason": "Reason (optional)",
+      "send": "Send request",
+      "sent": "Request sent. A manager will decide.",
+      "cancel": "Cancel request",
+      "dates": "{from} to {to}",
+      "oneDay": "{day}",
+      "status": {
+        "pending": "Waiting",
+        "approved": "Approved",
+        "declined": "Declined",
+        "cancelled": "Cancelled"
+      },
+      "note": "Manager's note: {note}",
+      "open": "My schedule",
+      "errors": {
+        "invalid_date": "Enter dates as YYYY-MM-DD.",
+        "ends_before_start": "The last day is before the first day.",
+        "in_the_past": "That period has already ended.",
+        "too_long": "At most a year at a time.",
+        "request_overlap": "You already have a request for these days.",
+        "invalid_period": "That period has already ended.",
+        "generic": "Something went wrong. Try again."
+      }
+    },
     "back": "Back",
     "error": "Something went wrong. Try again.",
     "session": {

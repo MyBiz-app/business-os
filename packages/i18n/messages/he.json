@@ -3370,6 +3370,41 @@
       "on": "פעיל",
       "off": "כבוי"
     },
+    "schedule": {
+      "title": "הסידור שלי",
+      "back": "אני",
+      "shifts": "המשמרות הקרובות",
+      "noShifts": "אין משמרות בארבעת השבועות הקרובים.",
+      "cover": "כיסוי",
+      "requests": "חופשה",
+      "noRequests": "אין בקשות חופשה.",
+      "request": "בקשת חופשה",
+      "from": "יום ראשון (YYYY-MM-DD)",
+      "to": "יום אחרון (YYYY-MM-DD)",
+      "reason": "סיבה (לא חובה)",
+      "send": "שליחת בקשה",
+      "sent": "הבקשה נשלחה. מנהל יחליט.",
+      "cancel": "ביטול בקשה",
+      "dates": "{from} עד {to}",
+      "oneDay": "{day}",
+      "status": {
+        "pending": "ממתינה",
+        "approved": "אושרה",
+        "declined": "נדחתה",
+        "cancelled": "בוטלה"
+      },
+      "note": "הערת המנהל: {note}",
+      "open": "הסידור שלי",
+      "errors": {
+        "invalid_date": "הזינו תאריכים בפורמט YYYY-MM-DD.",
+        "ends_before_start": "היום האחרון לפני היום הראשון.",
+        "in_the_past": "התקופה הזו כבר הסתיימה.",
+        "too_long": "עד שנה בכל פעם.",
+        "request_overlap": "כבר יש לך בקשה לימים האלה.",
+        "invalid_period": "התקופה הזו כבר הסתיימה.",
+        "generic": "משהו השתבש. נסו שוב."
+      }
+    },
     "back": "חזרה",
     "error": "משהו השתבש. נסו שוב.",
     "session": {
