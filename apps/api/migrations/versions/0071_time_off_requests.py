@@ -3,8 +3,8 @@
 An approved request creates the same `staff_time_off` row a manager would add by hand, so the
 board, the booking engine and the coverage rules need no change.
 
-Revision ID: 0070
-Revises: 0069
+Revision ID: 0071
+Revises: 0070
 Create Date: 2026-10-11
 """
 
@@ -12,8 +12,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0070"
-down_revision: str | None = "0069"
+revision: str = "0071"
+down_revision: str | None = "0070"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
