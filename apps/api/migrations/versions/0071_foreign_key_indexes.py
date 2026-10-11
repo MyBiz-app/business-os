@@ -3,10 +3,10 @@
 Supabase's advisor listed 55 foreign keys on staging without a covering index. Postgres checks
 every one of them when the parent row is deleted or its key changes, so removing a client, a
 branch, a room or a plan read the whole child table. These indexes cover the keys that point at
-business data: clients, leads, branches, rooms, stations, series, plans, quotes, entitlements
-and the team. Five tables (client notes, contact requests, entitlement freezes, message
-templates, quote lines) also had no index starting with `tenant_id`, which every RLS policy
-filters on.
+business data: clients, leads, branches, rooms, stations, series, plans, quotes, entitlements,
+the team, and the time-off requests added in 0070. Five tables (client notes, contact requests,
+entitlement freezes, message templates, quote lines) also had no index starting with
+`tenant_id`, which every RLS policy filters on.
 
 Left out on purpose: the "who did it" keys to `app.users` (`created_by`, `sold_by`,
 `reviewed_by`...). Nothing filters on them and a person is almost never deleted, so an index
@@ -15,8 +15,8 @@ would only slow down every insert.
 Two older indexes are replaced by wider ones with the same leading columns, so every query that
 used them can use the new one: `bookings_client_idx` and `sessions_location`.
 
-Revision ID: 0070
-Revises: 0069
+Revision ID: 0071
+Revises: 0070
 Create Date: 2026-10-11
 """
 
@@ -24,8 +24,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0070"
-down_revision: str | None = "0069"
+revision: str = "0071"
+down_revision: str | None = "0070"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -60,6 +60,8 @@ INDEXES: list[tuple[str, str, str]] = [
     ("tenant_members_custom_role", "tenant_members", "tenant_id, custom_role_id"),
     ("tenant_members_home_location", "tenant_members", "tenant_id, home_location_id"),
     ("time_entries_bill", "time_entries", "bill_id"),
+    ("time_off_requests_member", "time_off_requests", "tenant_id, user_id, starts_on"),
+    ("time_off_requests_time_off", "time_off_requests", "time_off_id"),
 ]
 
 # Older indexes whose columns are a prefix of a new one above.
