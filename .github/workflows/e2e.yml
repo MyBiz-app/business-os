@@ -1,0 +1,81 @@
+name: End-to-end
+
+# Runs the Definition-of-Done walk-through (e2e/dod.py) against a real local stack: Supabase
+# (Docker), the API with the scripted AI model, the website and the client app on Expo web.
+# It is slow and depends on the clock (some demo flows need sessions today/tomorrow), so it is
+# not a required check on pull requests: it runs after every merge to main and on demand.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dod:
+    name: Definition of Done walk-through
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      ADMIN_EMAIL: e2e-admin@example.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          pnpm install --frozen-lockfile
+          cd apps/api && uv sync --locked
+
+      - name: Start Supabase
+        run: pnpm exec supabase start -x studio,imgproxy,vector,logflare,edge-runtime
+
+      - name: Migrate the database and make a platform admin
+        run: |
+          (cd apps/api && uv run alembic upgrade head)
+          eval "$(pnpm exec supabase status -o env 2>/dev/null | grep -E '^(SERVICE_ROLE_KEY|API_URL)=')"
+          curl -sf "$API_URL/auth/v1/admin/users" \
+            -H "apikey: $SERVICE_ROLE_KEY" -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"Str0ng!Passw0rd\",\"email_confirm\":true}" >/dev/null
+          docker exec supabase_db_business-os psql -U postgres \
+            -c "insert into app.platform_staff (email, level) values ('$ADMIN_EMAIL', 'owner')"
+
+      - name: Start the API, the website and the client app
+        run: |
+          (cd apps/api && PYTHONPATH=../../e2e:. nohup uv run uvicorn fake_ai_api:app --port 8000 > ../../api.log 2>&1 &)
+          (cd apps/web && nohup pnpm exec next dev -p 3000 > ../../web.log 2>&1 &)
+          (cd apps/client-app && nohup pnpm exec expo start --web --port 8081 > ../../app.log 2>&1 &)
+          for url in http://localhost:8000/health http://localhost:3000 http://localhost:8081; do
+            for _ in $(seq 1 90); do curl -sf -o /dev/null "$url" && break; sleep 2; done
+            curl -sf -o /dev/null "$url" || { echo "::error::$url did not start"; tail -n 40 *.log; exit 1; }
+          done
+
+      - name: Run the walk-through
+        run: |
+          uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
+            python -m playwright install --with-deps chromium
+          uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
+            python e2e/dod.py "$ADMIN_EMAIL"
+
+      - name: Keep screenshots and logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-failure
+          path: |
+            e2e/screenshots
+            *.log
+          if-no-files-found: ignore

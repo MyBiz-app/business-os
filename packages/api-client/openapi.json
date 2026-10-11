@@ -8906,6 +8906,84 @@
         }
       }
     },
+    "/me/push-tokens": {
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Register Push Token",
+        "description": "Remember this device's push token for the signed-in person; safe to call on every launch.",
+        "operationId": "register_push_token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushTokenBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Unregister Push Token",
+        "description": "Forget a device's token, e.g. when the person signs out of it.",
+        "operationId": "unregister_push_token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushTokenBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/locations/{location_id}/hours": {
       "get": {
         "tags": [
@@ -30983,6 +31061,30 @@
           "published"
         ],
         "title": "Published"
+      },
+      "PushTokenBody": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 300,
+            "minLength": 10,
+            "title": "Token"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android"
+            ],
+            "title": "Platform"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "platform"
+        ],
+        "title": "PushTokenBody"
       },
       "Question": {
         "properties": {
