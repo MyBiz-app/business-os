@@ -3,8 +3,8 @@
 The shift only changes hands on the manager's approval, by the normal edit of `shifts.user_id`,
 so the roster-change trigger and emails (0069) cover the notification.
 
-Revision ID: 0072
-Revises: 0071
+Revision ID: 0073
+Revises: 0072
 Create Date: 2026-10-11
 """
 
@@ -12,8 +12,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0072"
-down_revision: str | None = "0071"
+revision: str = "0073"
+down_revision: str | None = "0072"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

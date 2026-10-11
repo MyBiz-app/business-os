@@ -1652,6 +1652,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/push-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Register Push Token
+         * @description Remember this device's push token for the signed-in person; safe to call on every launch.
+         */
+        put: operations["register_push_token"];
+        post?: never;
+        /**
+         * Unregister Push Token
+         * @description Forget a device's token, e.g. when the person signs out of it.
+         */
+        delete: operations["unregister_push_token"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/locations/{location_id}/hours": {
         parameters: {
             query?: never;
@@ -8132,6 +8156,16 @@ export interface components {
              * @description Draft shifts that became visible to the team
              */
             published: number;
+        };
+        /** PushTokenBody */
+        PushTokenBody: {
+            /** Token */
+            token: string;
+            /**
+             * Platform
+             * @enum {string}
+             */
+            platform: "ios" | "android";
         };
         /** Question */
         Question: {
@@ -14672,6 +14706,68 @@ export interface operations {
                     "image/jpeg": unknown;
                     "image/webp": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    register_push_token: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushTokenBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unregister_push_token: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushTokenBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

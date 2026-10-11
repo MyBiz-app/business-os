@@ -60,3 +60,28 @@ jobs:
 
       - name: Run checks
         run: pnpm turbo run lint typecheck test build
+
+  expo-web-export:
+    name: Bundle ${{ matrix.app }} (Expo web)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [client-app, business-app, staff-app]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Catches what typecheck cannot: a missing native module, a bad import, a broken app.json.
+      - name: Export the web bundle
+        run: pnpm --filter ${{ matrix.app }} exec expo export -p web --output-dir "$RUNNER_TEMP/dist"
