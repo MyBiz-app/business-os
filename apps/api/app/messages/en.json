@@ -72,6 +72,15 @@
         "Sun"
       ],
       "footer": "You can turn these emails off under Personal settings."
+    },
+    "rosterChanges": {
+      "subject": "Your roster at {business} changed",
+      "intro": "Changes to your shifts at {business}:",
+      "removed": "Removed:",
+      "changed": "Changed:",
+      "arrow": "now",
+      "more": "…and {count} more changes. See your roster in the app.",
+      "footer": "You can turn these emails off under Personal settings."
     }
   },
   "modules": {

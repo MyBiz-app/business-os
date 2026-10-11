@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 
-/** The staff member's own settings: name, business, language, appearance, sign out. */
+/** The staff member's own settings: name, shift emails, business, language, appearance, sign out. */
 export default function Me() {
   const t = useTranslations("business.me");
   const tRoles = useTranslations("roles");
@@ -17,6 +18,25 @@ export default function Me() {
   const { session } = useSession();
   const [name, setName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [emailRoster, setEmailRoster] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    api
+      .GET("/me")
+      .then(unwrap)
+      .then((me) => setEmailRoster(me.email_roster ?? true))
+      .catch(() => undefined);
+  }, [api]);
+
+  const chooseRosterEmails = async (on: boolean) => {
+    const previous = emailRoster;
+    setEmailRoster(on);
+    try {
+      unwrap(await api.PATCH("/me", { body: { email_roster: on } }));
+    } catch {
+      setEmailRoster(previous);
+    }
+  };
 
   const save = async () => {
     setSaving(true);
@@ -55,6 +75,21 @@ export default function Me() {
         />
         <Button label={t("save")} palette={palette} busy={saving} onPress={() => void save()} />
       </Card>
+
+      {emailRoster !== null && (
+        <Card palette={palette}>
+          <SegmentedControl
+            label={t("rosterEmails")}
+            value={emailRoster ? "on" : "off"}
+            options={[
+              { value: "on", label: t("on") },
+              { value: "off", label: t("off") },
+            ]}
+            onChange={(value) => void chooseRosterEmails(value === "on")}
+          />
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("rosterEmailsHint")}</Text>
+        </Card>
+      )}
 
       {(memberships?.length ?? 0) > 1 && (
         <Card palette={palette}>
