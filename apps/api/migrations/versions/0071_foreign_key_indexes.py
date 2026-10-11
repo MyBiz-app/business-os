@@ -3,10 +3,10 @@
 Supabase's advisor listed 55 foreign keys on staging without a covering index. Postgres checks
 every one of them when the parent row is deleted or its key changes, so removing a client, a
 branch, a room or a plan read the whole child table. These indexes cover the keys that point at
-business data: clients, leads, branches, rooms, stations, series, plans, quotes, entitlements
-and the team. Five tables (client notes, contact requests, entitlement freezes, message
-templates, quote lines) also had no index starting with `tenant_id`, which every RLS policy
-filters on.
+business data: clients, leads, branches, rooms, stations, series, plans, quotes, entitlements,
+the team, and the time-off requests added in 0070. Five tables (client notes, contact requests,
+entitlement freezes, message templates, quote lines) also had no index starting with
+`tenant_id`, which every RLS policy filters on.
 
 Left out on purpose: the "who did it" keys to `app.users` (`created_by`, `sold_by`,
 `reviewed_by`...). Nothing filters on them and a person is almost never deleted, so an index
@@ -58,10 +58,10 @@ INDEXES: list[tuple[str, str, str]] = [
     ("sessions_address", "sessions", "address_id"),
     ("shifts_location_station", "shifts", "tenant_id, location_id, station_id"),
     ("tenant_members_custom_role", "tenant_members", "tenant_id, custom_role_id"),
-    ("time_off_requests_tenant_user", "time_off_requests", "tenant_id, user_id, starts_on"),
-    ("time_off_requests_time_off", "time_off_requests", "time_off_id"),
     ("tenant_members_home_location", "tenant_members", "tenant_id, home_location_id"),
     ("time_entries_bill", "time_entries", "bill_id"),
+    ("time_off_requests_member", "time_off_requests", "tenant_id, user_id, starts_on"),
+    ("time_off_requests_time_off", "time_off_requests", "time_off_id"),
 ]
 
 # Older indexes whose columns are a prefix of a new one above.

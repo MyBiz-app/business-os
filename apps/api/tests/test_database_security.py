@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 # Tables without tenant_id that are still protected by RLS (their own policies).
-GLOBAL_TABLES = {"tenants", "users", "platform_staff", "platform_audit"}
+GLOBAL_TABLES = {"tenants", "users", "platform_staff", "platform_audit", "push_tokens"}
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
 # API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.
 PLATFORM_TABLES = {"contact_requests", "platform_audit"}
@@ -104,7 +104,7 @@ def test_api_sends_security_headers(client: TestClient) -> None:
 
 
 # Foreign keys that only record who did something. Nothing filters on them and a person is
-# almost never deleted, so an index would only slow down inserts (migration 0070).
+# almost never deleted, so an index would only slow down inserts (migration 0071).
 UNINDEXED_USER_KEYS = {
     ("ai_conversations", "user_id"),
     ("bookings", "created_by"),

@@ -27,6 +27,11 @@
     "extra": {
       "supportsRTL": true
     },
-    "plugins": ["expo-router", "expo-localization"]
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-secure-store",
+      "expo-notifications"
+    ]
   }
 }
