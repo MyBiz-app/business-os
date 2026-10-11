@@ -43,7 +43,11 @@ def upgrade() -> None:
         "CREATE INDEX time_off_requests_tenant ON app.time_off_requests"
         " (tenant_id, status, starts_on)"
     )
-    op.execute("CREATE INDEX time_off_requests_user ON app.time_off_requests (user_id, starts_on)")
+    op.execute(
+        "CREATE INDEX time_off_requests_user ON app.time_off_requests"
+        " (tenant_id, user_id, starts_on)"
+    )
+    op.execute("CREATE INDEX time_off_requests_time_off ON app.time_off_requests (time_off_id)")
     op.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON app.time_off_requests TO app_api")
     op.execute("ALTER TABLE app.time_off_requests ENABLE ROW LEVEL SECURITY")
     op.execute("""
