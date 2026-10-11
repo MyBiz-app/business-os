@@ -49,10 +49,15 @@ export function ImageCropDialog({ file, onDone, onCancel }: { file: File; onDone
     dialog.current?.showModal();
     const url = URL.createObjectURL(file);
     const probe = new Image();
-    probe.onload = () => setLoaded({ url, width: probe.naturalWidth, height: probe.naturalHeight });
-    probe.onerror = () => setFailed(true);
+    // A run that was cleaned up (React's development double-run) must not report its revoked URL as a failure.
+    let stale = false;
+    probe.onload = () => !stale && setLoaded({ url, width: probe.naturalWidth, height: probe.naturalHeight });
+    probe.onerror = () => !stale && setFailed(true);
     probe.src = url;
-    return () => URL.revokeObjectURL(url);
+    return () => {
+      stale = true;
+      URL.revokeObjectURL(url);
+    };
   }, [file]);
 
   const move = useCallback(
