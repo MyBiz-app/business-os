@@ -12,10 +12,9 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
-from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
-from app.api.deps import TenantContext, TenantDep, require
+from app.api.deps import TenantContext, TenantDep, ensure_client_visible, require
 from app.core.permissions import Permission
 
 router = APIRouter(prefix="/clients/{client_id}/notes", tags=["clients"])
@@ -70,7 +69,9 @@ SELECT = """
 """
 
 
-def _client_exists(db: Session, client_id: UUID) -> None:
+def _client_exists(context: TenantContext, client_id: UUID) -> None:
+    ensure_client_visible(context, client_id)
+    db = context.session
     if (
         db.execute(text("SELECT 1 FROM app.clients WHERE id = :id"), {"id": client_id}).scalar()
         is None
@@ -81,7 +82,7 @@ def _client_exists(db: Session, client_id: UUID) -> None:
 @router.get("")
 def list_notes(client_id: UUID, context: ReadDep) -> list[ClientNote]:
     db = context.session
-    _client_exists(db, client_id)
+    _client_exists(context, client_id)
     rows = db.execute(
         text(f"{SELECT} WHERE n.client_id = :id ORDER BY n.created_at DESC LIMIT 200"),
         {"id": client_id},
@@ -92,7 +93,7 @@ def list_notes(client_id: UUID, context: ReadDep) -> list[ClientNote]:
 @router.post("", status_code=status.HTTP_201_CREATED)
 def add_note(client_id: UUID, body: NoteCreate, context: WriteDep) -> ClientNote:
     db = context.session
-    _client_exists(db, client_id)
+    _client_exists(context, client_id)
     ensure_not_erased(db, client_id)
     if body.booking_id is not None:
         mine = db.execute(
@@ -115,6 +116,7 @@ def add_note(client_id: UUID, body: NoteCreate, context: WriteDep) -> ClientNote
 @router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_note(client_id: UUID, note_id: UUID, context: WriteDep) -> None:
     db = context.session
+    ensure_client_visible(context, client_id)
     author = db.execute(
         text("""
             SELECT author_user_id = app.current_user_id() FROM app.client_notes

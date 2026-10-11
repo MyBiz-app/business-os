@@ -21,7 +21,13 @@ from sqlalchemy.orm import Session
 from app.api.bookings import tenant_pack
 from app.api.clients import ClientFieldDefinition
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
-from app.api.deps import ClientDep, TenantContext, require
+from app.api.deps import (
+    ClientDep,
+    TenantContext,
+    ensure_client_row_visible,
+    ensure_client_visible,
+    require,
+)
 from app.catalog.verticals import clean_fields
 from app.core.permissions import Permission
 
@@ -198,16 +204,19 @@ def dependent_settings(context: ReadDep) -> DependentSettings:
 @router.get("/clients/{client_id}/dependents")
 def client_dependents(client_id: UUID, context: ReadDep) -> list[Dependent]:
     """The client's pets / children, active first."""
+    ensure_client_visible(context, client_id)
     return _list(context.session, client_id)
 
 
 @router.post("/clients/{client_id}/dependents", status_code=status.HTTP_201_CREATED)
 def add_dependent(client_id: UUID, body: DependentCreate, context: WriteDep) -> Dependent:
+    ensure_client_visible(context, client_id)
     return _create(context.session, context.tenant_id, client_id, body)
 
 
 @router.patch("/dependents/{dependent_id}")
 def update_dependent(dependent_id: UUID, body: DependentUpdate, context: WriteDep) -> Dependent:
+    ensure_client_row_visible(context, "dependents", dependent_id)
     return _update(context.session, context.tenant_id, dependent_id, body)
 
 

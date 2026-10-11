@@ -11,7 +11,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.common import not_found
-from app.api.deps import ClientDep, TenantContext, require
+from app.api.deps import ClientDep, TenantContext, ensure_client_row_visible, require
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["receipts"])
@@ -67,7 +67,10 @@ def list_receipts(
     rows = context.session.execute(
         text(f"""
             {SELECT}
-            WHERE CAST(:client_id AS uuid) IS NULL OR client_id = CAST(:client_id AS uuid)
+            WHERE (CAST(:client_id AS uuid) IS NULL OR client_id = CAST(:client_id AS uuid))
+              AND (client_id IS NULL OR client_id IN (
+                  SELECT id FROM app.clients
+                  WHERE home_location_id IS NULL OR app.in_branch(home_location_id)))
             ORDER BY number DESC LIMIT :limit
         """),
         {"client_id": client_id, "limit": limit},
@@ -136,6 +139,7 @@ def sales(context: SalesDep, start: date, end: date) -> Sales:
 
 @router.get("/receipts/{receipt_id}")
 def get_receipt(receipt_id: UUID, context: ReadDep) -> Receipt:
+    ensure_client_row_visible(context, "receipts", receipt_id)
     return _one(context.session, receipt_id)
 
 

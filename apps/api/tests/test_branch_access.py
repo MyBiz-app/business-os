@@ -9,6 +9,9 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine
 
 from tests.conftest import AuthHeaders, add_member, local_today
+from tests.test_documents_time import PDF
+from tests.test_quotes import new_quote, quote_body
+from tests.test_receipts import sell
 from tests.test_workspace import at
 
 
@@ -115,6 +118,91 @@ def test_a_member_kept_to_a_branch_cannot_reach_another_by_id(
     # The client's history shows only what happened at their branches.
     assert client.get(f"/clients/{south_client}/bookings", headers=mine).json() == []
     assert client.get(f"/clients/{south_client}/bookings", headers=branches["owner"]).json()
+
+
+def test_a_clients_records_follow_the_clients_branch(
+    client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict, branches: dict
+) -> None:
+    """Notes, documents, plans, receipts, quotes and the retainer of another branch's client are
+    "not found" by id, and absent from lists, for a member kept to one branch."""
+    owner, mine = branches["owner"], member_at_north(client, auth, engine, studio, branches)
+    south, north = branches["south_client"], branches["north_client"]
+
+    note = client.post(f"/clients/{south}/notes", json={"body": "private"}, headers=owner).json()
+    document = client.post(
+        f"/clients/{south}/documents",
+        files={"file": ("id.pdf", PDF, "application/pdf")},
+        headers=owner,
+    ).json()
+    sold = sell(client, studio, south)
+    quote = new_quote(client, owner, south)
+    retainer = {"monthly_amount": 1000, "included_minutes": 60, "hourly_rate": 100}
+    assert client.put(f"/clients/{south}/retainer", json=retainer, headers=owner).status_code == 200
+
+    # Their own branch's client works for every record type.
+    assert (
+        client.post(f"/clients/{north}/notes", json={"body": "ok"}, headers=mine).status_code == 201
+    )
+    uploaded = client.post(
+        f"/clients/{north}/documents",
+        files={"file": ("a.pdf", PDF, "application/pdf")},
+        headers=mine,
+    )
+    assert uploaded.status_code == 201, uploaded.text
+    assert client.get(f"/clients/{north}/entitlements", headers=mine).status_code == 200
+    assert client.post("/quotes", json=quote_body(north), headers=mine).status_code == 201
+
+    attempts = {
+        "list notes": client.get(f"/clients/{south}/notes", headers=mine),
+        "add note": client.post(f"/clients/{south}/notes", json={"body": "x"}, headers=mine),
+        "delete note": client.delete(f"/clients/{south}/notes/{note['id']}", headers=mine),
+        "list documents": client.get(f"/clients/{south}/documents", headers=mine),
+        "upload document": client.post(
+            f"/clients/{south}/documents",
+            files={"file": ("a.pdf", PDF, "application/pdf")},
+            headers=mine,
+        ),
+        "read document": client.get(f"/documents/{document['id']}/file", headers=mine),
+        "edit document": client.patch(
+            f"/documents/{document['id']}", json={"shared": True}, headers=mine
+        ),
+        "delete document": client.delete(f"/documents/{document['id']}", headers=mine),
+        "list plans": client.get(f"/clients/{south}/entitlements", headers=mine),
+        "sell plan": client.post(
+            f"/clients/{south}/entitlements",
+            json={"plan_id": sold["plan_id"], "method": "cash", "idempotency_key": "sale-key-1"},
+            headers=mine,
+        ),
+        "read receipt": client.get(f"/receipts/{sold['receipt_id']}", headers=mine),
+        "health": client.get(f"/clients/{south}/health-declarations", headers=mine),
+        "dependents": client.get(f"/clients/{south}/dependents", headers=mine),
+        "addresses": client.get(f"/clients/{south}/addresses", headers=mine),
+        "read retainer": client.get(f"/clients/{south}/retainer", headers=mine),
+        "set retainer": client.put(f"/clients/{south}/retainer", json=retainer, headers=mine),
+        "bill month": client.post(
+            f"/clients/{south}/bills", json={"month": "2026-09"}, headers=mine
+        ),
+        "read quote": client.get(f"/quotes/{quote['id']}", headers=mine),
+        "edit quote": client.put(f"/quotes/{quote['id']}", json=quote_body(south), headers=mine),
+        "send quote": client.post(f"/quotes/{quote['id']}/send", headers=mine),
+        "copy quote": client.post(f"/quotes/{quote['id']}/copy", headers=mine),
+        "pay quote": client.post(
+            f"/quotes/{quote['id']}/payments",
+            json={"amount": 1, "method": "cash", "idempotency_key": "pay-key-2"},
+            headers=mine,
+        ),
+        "quote for them": client.post("/quotes", json=quote_body(south), headers=mine),
+    }
+    for name, response in attempts.items():
+        assert response.status_code == 404, f"{name}: {response.status_code} {response.text}"
+
+    # Lists leave out the other branch's records, and nothing changed behind the refusals.
+    assert south not in {r["client_id"] for r in client.get("/receipts", headers=mine).json()}
+    assert quote["id"] not in {q["id"] for q in client.get("/quotes", headers=mine).json()}
+    assert client.get("/receipts", headers=owner).json()
+    assert len(client.get(f"/clients/{south}/notes", headers=owner).json()) == 1
+    assert len(client.get(f"/clients/{south}/documents", headers=owner).json()) == 1
+    assert len(client.get("/quotes", params={"client_id": south}, headers=owner).json()) == 1
 
 
 def test_a_member_kept_to_a_branch_cannot_file_things_under_another(

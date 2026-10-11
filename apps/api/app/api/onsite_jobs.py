@@ -19,7 +19,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
-from app.api.deps import ClientDep, TenantContext, require
+from app.api.deps import (
+    ClientDep,
+    TenantContext,
+    ensure_client_row_visible,
+    ensure_client_visible,
+    require,
+)
 from app.api.schedule import JobStatus
 from app.core.permissions import Permission
 from app.schedule.scheduling import local_to_utc
@@ -188,16 +194,19 @@ JOB_SELECT = """
 
 @router.get("/clients/{client_id}/addresses")
 def client_addresses(client_id: UUID, context: ReadDep) -> list[Address]:
+    ensure_client_visible(context, client_id)
     return _list(context.session, client_id)
 
 
 @router.post("/clients/{client_id}/addresses", status_code=status.HTTP_201_CREATED)
 def add_address(client_id: UUID, body: AddressCreate, context: WriteDep) -> Address:
+    ensure_client_visible(context, client_id)
     return _create(context.session, context.tenant_id, client_id, body)
 
 
 @router.patch("/addresses/{address_id}")
 def update_address(address_id: UUID, body: AddressUpdate, context: WriteDep) -> Address:
+    ensure_client_row_visible(context, "client_addresses", address_id)
     return _update(context.session, address_id, body)
 
 

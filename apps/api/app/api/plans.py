@@ -18,7 +18,7 @@ from app.api.common import (
     not_found,
     set_clause,
 )
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_client_visible, require
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["plans"])
@@ -381,6 +381,7 @@ def delete_plan(plan_id: UUID, context: CatalogDeleteDep) -> RemoveResult:
 
 @router.get("/clients/{client_id}/entitlements")
 def client_entitlements(client_id: UUID, context: ClientsReadDep) -> list[Entitlement]:
+    ensure_client_visible(context, client_id)
     return list_entitlements(context.session, client_id)
 
 
@@ -388,6 +389,7 @@ def client_entitlements(client_id: UUID, context: ClientsReadDep) -> list[Entitl
 def sell_plan(client_id: UUID, body: Sale, context: SalesDep) -> Entitlement:
     """Sells a plan to a client. Payment is simulated until a payment provider is connected."""
     db = context.session
+    ensure_client_visible(context, client_id)
     ensure_not_erased(db, client_id)
     payment_id = db.execute(
         text("""

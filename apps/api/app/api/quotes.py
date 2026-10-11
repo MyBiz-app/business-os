@@ -21,7 +21,14 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found
-from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
+from app.api.deps import (
+    AnonymousSessionDep,
+    ClientDep,
+    TenantContext,
+    ensure_client_row_visible,
+    ensure_client_visible,
+    require,
+)
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.providers.choice import choose
@@ -245,6 +252,8 @@ def list_quotes(
             SELECT * FROM ({SUMMARY} {FROM}) q
             WHERE (CAST(:client AS uuid) IS NULL OR q.client_id = :client)
               AND (CAST(:status AS text) IS NULL OR q.status = :status)
+              AND q.client_id IN (SELECT id FROM app.clients
+                                  WHERE home_location_id IS NULL OR app.in_branch(home_location_id))
             ORDER BY q.number DESC
             LIMIT 300
         """),
@@ -256,6 +265,7 @@ def list_quotes(
 @router.post("/quotes", status_code=status.HTTP_201_CREATED)
 def create_quote(body: QuoteCreate, context: SalesDep) -> Quote:
     db = context.session
+    ensure_client_visible(context, body.client_id)
     ensure_not_erased(db, body.client_id)
     try:
         quote_id = db.execute(
@@ -279,6 +289,7 @@ def create_quote(body: QuoteCreate, context: SalesDep) -> Quote:
 
 @router.get("/quotes/{quote_id}")
 def get_quote(quote_id: UUID, context: ReadDep) -> Quote:
+    ensure_client_row_visible(context, "quotes", quote_id)
     return _load(context.session, quote_id)
 
 
@@ -286,6 +297,7 @@ def get_quote(quote_id: UUID, context: ReadDep) -> Quote:
 def update_quote(quote_id: UUID, body: QuoteFields, context: SalesDep) -> Quote:
     """Rewrites a draft (a sent quote is changed by copying it)."""
     db = context.session
+    ensure_client_row_visible(context, "quotes", quote_id)
     updated = db.execute(
         text("""
             UPDATE app.quotes SET title = :title, deposit_percent = :deposit_percent,
@@ -307,6 +319,7 @@ def update_quote(quote_id: UUID, body: QuoteFields, context: SalesDep) -> Quote:
 def send_quote(quote_id: UUID, context: SalesDep) -> Quote:
     """Marks a draft as sent: its private link now works. Sending again is harmless."""
     db = context.session
+    ensure_client_row_visible(context, "quotes", quote_id)
     current = _load(db, quote_id)
     if current.status not in ("draft", "sent"):
         raise _conflict("already_answered")
@@ -325,6 +338,7 @@ def send_quote(quote_id: UUID, context: SalesDep) -> Quote:
 def copy_quote(quote_id: UUID, context: SalesDep) -> Quote:
     """A new draft with the same client, lines and terms (a new version of a sent quote)."""
     db = context.session
+    ensure_client_row_visible(context, "quotes", quote_id)
     current = _load(db, quote_id)
     local = None
     if current.event_starts_at is not None:
@@ -353,6 +367,7 @@ def record_quote_payment(quote_id: UUID, body: StaffPayment, context: SalesDep) 
     """Staff record a payment for an accepted quote (the deposit or the balance, at the venue
     or by transfer); never more than what is left."""
     db = context.session
+    ensure_client_row_visible(context, "quotes", quote_id)
     current = _load(db, quote_id)
     if current.status != "accepted":
         raise _conflict("not_accepted")
@@ -397,6 +412,7 @@ def events(
         text(f"""
             {SUMMARY} {FROM}
             WHERE q.status = 'accepted' AND q.event_starts_at >= :from
+              AND (c.home_location_id IS NULL OR app.in_branch(c.home_location_id))
               AND q.event_starts_at < :to
             ORDER BY q.event_starts_at
         """),

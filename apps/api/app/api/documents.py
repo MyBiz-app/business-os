@@ -17,7 +17,14 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
-from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
+from app.api.deps import (
+    AnonymousSessionDep,
+    ClientDep,
+    TenantContext,
+    ensure_client_row_visible,
+    ensure_client_visible,
+    require,
+)
 from app.commerce.modules import allowance
 from app.core.config import get_settings
 from app.core.permissions import Permission
@@ -209,6 +216,7 @@ def _list(db: Session, client_id: UUID) -> list[Document]:
 
 @router.get("/clients/{client_id}/documents")
 def client_documents(client_id: UUID, context: ReadDep) -> list[Document]:
+    ensure_client_visible(context, client_id)
     return _list(context.session, client_id)
 
 
@@ -222,6 +230,7 @@ async def upload_document(
     shared: Annotated[bool, Form()] = False,
     sign_requested: Annotated[bool, Form()] = False,
 ) -> Document:
+    ensure_client_visible(context, client_id)
     content, content_type = await _read(file)
     return _store(
         context.session,
@@ -239,11 +248,13 @@ async def upload_document(
 
 @router.get("/documents/{document_id}/file")
 def document_file(document_id: UUID, context: ReadDep) -> Response:
+    ensure_client_row_visible(context, "client_documents", document_id)
     return _file(context.session, document_id)
 
 
 @router.patch("/documents/{document_id}")
 def update_document(document_id: UUID, body: DocumentUpdate, context: WriteDep) -> Document:
+    ensure_client_row_visible(context, "client_documents", document_id)
     changes = {k: v for k, v in body.model_dump(exclude_unset=True).items() if v is not None}
     if changes.get("sign_requested"):
         changes["shared"] = True  # asking to sign shares it
@@ -270,6 +281,7 @@ def update_document(document_id: UUID, body: DocumentUpdate, context: WriteDep) 
 @router.delete("/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_document(document_id: UUID, context: WriteDep) -> None:
     db = context.session
+    ensure_client_row_visible(context, "client_documents", document_id)
     key = db.execute(
         text("DELETE FROM app.client_documents WHERE id = :id RETURNING storage_key"),
         {"id": document_id},

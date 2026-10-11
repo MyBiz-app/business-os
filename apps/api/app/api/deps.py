@@ -66,6 +66,47 @@ def ensure_branch_allowed(context: TenantContext, location_id: UUID | None) -> N
         )
 
 
+# Tables whose rows belong to one client; their branch is the client's home branch.
+CLIENT_OWNED = frozenset(
+    {
+        "client_documents",
+        "dependents",
+        "health_declarations",
+        "receipts",
+        "quotes",
+        "payments",
+        "client_addresses",
+    }
+)
+
+
+def ensure_client_visible(context: TenantContext, client_id: UUID) -> None:
+    """Anything filed under a client (notes, documents, receipts...) follows the client's home
+    branch: a member kept to some branches gets "not found" for another branch's client."""
+    if context.branches is None:
+        return
+    row = context.session.execute(
+        text("SELECT home_location_id FROM app.clients WHERE id = :id"), {"id": client_id}
+    ).first()
+    if row is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    ensure_branch_visible(context, row[0])
+
+
+def ensure_client_row_visible(context: TenantContext, table: str, row_id: UUID) -> None:
+    """The same for a row fetched by its own id; a missing row is left to the endpoint's own
+    404, so nothing is revealed about it."""
+    if context.branches is None:
+        return
+    if table not in CLIENT_OWNED:
+        raise ValueError(f"{table} is not a client-owned table")
+    owner = context.session.execute(
+        text(f"SELECT client_id FROM app.{table} WHERE id = :id"), {"id": row_id}
+    ).first()
+    if owner is not None and owner[0] is not None:
+        ensure_client_visible(context, owner[0])
+
+
 def _audit_platform_visit(session: Session, tenant_id: UUID, action: str, request: Request) -> None:
     """Writes the visit to the business's own audit log, which its owner reads in settings."""
     session.execute(

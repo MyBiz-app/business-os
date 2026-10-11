@@ -17,7 +17,13 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.common import not_found
-from app.api.deps import ClientDep, TenantContext, require
+from app.api.deps import (
+    ClientDep,
+    TenantContext,
+    ensure_client_row_visible,
+    ensure_client_visible,
+    require,
+)
 from app.catalog.health import FORMS, HealthForm
 from app.catalog.verticals import CATALOG
 from app.core.permissions import Permission
@@ -254,6 +260,7 @@ class ClientHealth(BaseModel):
 @router.get("/clients/{client_id}/health-declarations")
 def client_health_declarations(client_id: UUID, context: ReadDep) -> ClientHealth:
     db = context.session
+    ensure_client_visible(context, client_id)
     exists = db.execute(
         text("SELECT 1 FROM app.clients WHERE id = :id"), {"id": client_id}
     ).scalar()
@@ -276,6 +283,7 @@ def client_health_declarations(client_id: UUID, context: ReadDep) -> ClientHealt
 def review_health_declaration(declaration_id: UUID, body: Review, context: WriteDep) -> Declaration:
     """Approves or rejects a declaration that answered "yes" to a question."""
     db = context.session
+    ensure_client_row_visible(context, "health_declarations", declaration_id)
     current = db.execute(
         text("SELECT status FROM app.health_declarations WHERE id = :id FOR UPDATE"),
         {"id": declaration_id},
