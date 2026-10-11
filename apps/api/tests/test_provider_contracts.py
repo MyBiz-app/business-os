@@ -21,7 +21,7 @@ CONTRACT: dict[str, tuple[str, ...]] = {
     "messaging": ("simulated", "send"),
     "email": ("send",),
     "ai": ("model", "create"),
-    "storage": ("in_database", "put", "get", "delete"),
+    "storage": ("in_database", "put", "get", "delete", "signed_url"),
 }
 PROVIDERS = sorted(REGISTRY.providers.values(), key=lambda p: (p.capability, p.name))
 

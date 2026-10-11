@@ -28,6 +28,7 @@ pings it every 10 minutes so it stays awake.
 |---|---|---|
 | GitHub → Settings → Environments → `staging` | `STAGING_DATABASE_URL` | Supabase **Session pooler** connection string (port 5432), with the password filled in |
 | Render → service → Environment | `API_DATABASE_URL` | Same as above |
+| Render → service → Environment | `WEB_CONCURRENCY` (optional) | API worker processes, default 2. Keep workers × (`API_DB_POOL_SIZE` 5 + `API_DB_MAX_OVERFLOW` 10) under the database's connection limit |
 | Render → service → Environment | `API_JWKS_URL` | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` |
 | Vercel → project → Environment Variables | `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
 | Vercel | `NEXT_PUBLIC_SUPABASE_KEY` | Supabase **publishable** key |
