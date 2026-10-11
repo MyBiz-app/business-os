@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { ApiError, unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
-export type AskState = { error?: "ai_not_configured" | "ai_busy" | "ai_unavailable" | "generic" };
+export type AskState = { error?: "ai_not_configured" | "ai_busy" | "ai_unavailable" | "ai_limit_reached" | "generic" };
 
 export async function newConversation(): Promise<void> {
   const { api, scope } = await getTenant();
@@ -27,7 +27,7 @@ export async function askAssistant(conversationId: string, _state: AskState, for
     );
   } catch (error) {
     const detail = error instanceof ApiError ? (error.body as { detail?: unknown } | null)?.detail : null;
-    if (detail === "ai_not_configured" || detail === "ai_busy" || detail === "ai_unavailable") return { error: detail };
+    if (detail === "ai_not_configured" || detail === "ai_busy" || detail === "ai_unavailable" || detail === "ai_limit_reached") return { error: detail };
     return { error: "generic" };
   }
   revalidatePath("/assistant");

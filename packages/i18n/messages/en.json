@@ -1281,6 +1281,7 @@
     "errors": {
       "ai_not_configured": "The assistant isn't set up yet.",
       "ai_busy": "The assistant is busy right now. Try again in a minute.",
+      "ai_limit_reached": "You've used this month's AI allowance. The assistant is back next month, or choose a bigger AI module.",
       "ai_unavailable": "The assistant is unavailable right now. Try again later.",
       "generic": "Something went wrong. Try again."
     },
@@ -2481,6 +2482,9 @@
       },
       "nearMessages": "You've used {percent}% of this month's messages. They keep going to your clients; a bigger bundle covers more.",
       "overMessages": "You've passed this month's messages ({percent}%). They keep going to your clients; choose a bigger bundle.",
+      "ai": "AI assistant this month",
+      "nearAi": "You've used {percent}% of this month's AI allowance. At 100% the assistant pauses until next month.",
+      "overAi": "You've used this month's AI allowance, so the assistant is paused until next month. Everything else keeps working; a bigger AI module raises the allowance.",
       "nearStorage": "Your files take {percent}% of your space.",
       "overStorage": "Your space for files is full: new files can't be added. Delete some or choose a bigger bundle."
     }

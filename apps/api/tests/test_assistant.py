@@ -442,3 +442,32 @@ def test_demo_mode_answers_who_owes_money(client: TestClient, studio: dict, use_
     # At a studio "hours" is about classes, not logged time: no time tools there.
     hours = ask(client, headers, conversation_id, "כמה שעות נרשמו החודש?").json()["turns"]
     assert "נרשמו" not in [turn["text"] for turn in hours if turn["role"] == "assistant"][-1]
+
+
+def test_monthly_ai_limit_stops_new_questions(
+    client: TestClient, studio: dict, use_provider, engine: Engine
+) -> None:
+    use_provider(FakeProvider([says("Hi.")]))
+    headers = studio["headers"]
+    usage = client.get("/billing/usage", headers=headers).json()
+    included = usage["ai_credits_included"]
+    assert included > 0 and usage["ai_credits"] == 0
+
+    def spend(credits: float) -> None:
+        with engine.begin() as connection:
+            connection.execute(
+                text("""
+                    INSERT INTO app.usage_events (tenant_id, meter, quantity)
+                    SELECT id, 'ai_credits', :q FROM app.tenants
+                """),
+                {"q": credits},
+            )
+
+    spend(included * 0.8)
+    assert client.get("/billing/usage", headers=headers).json()["ai_credits"] == included * 0.8
+    assert ask(client, headers, conversation(client, headers), "hi").status_code == 200
+
+    spend(included)  # now well over 100%
+    response = ask(client, headers, conversation(client, headers), "hi again")
+    assert response.status_code == 409
+    assert response.json()["detail"] == "ai_limit_reached"

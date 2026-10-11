@@ -35841,6 +35841,16 @@
           "storage_included_bytes": {
             "type": "integer",
             "title": "Storage Included Bytes"
+          },
+          "ai_credits": {
+            "type": "number",
+            "title": "Ai Credits",
+            "description": "AI credits used this month (1 credit = 1 US cent)"
+          },
+          "ai_credits_included": {
+            "type": "integer",
+            "title": "Ai Credits Included",
+            "description": "0 when the business has no AI module"
           }
         },
         "type": "object",
@@ -35850,7 +35860,9 @@
           "messages",
           "messages_included",
           "storage_bytes",
-          "storage_included_bytes"
+          "storage_included_bytes",
+          "ai_credits",
+          "ai_credits_included"
         ],
         "title": "Usage",
         "description": "This calendar month's use against the business's bundle (space and messages)."
