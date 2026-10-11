@@ -1,6 +1,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { createContext, useContext, useEffect, useState } from "react";
 
+import { registerPushToken } from "../lib/push";
 import { supabase } from "../lib/supabase";
 
 type SessionContextValue = { session: Session | null; loading: boolean };
@@ -15,6 +16,11 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => setState({ session, loading: false }));
     return () => data.subscription.unsubscribe();
   }, []);
+
+  const userId = state.session?.user.id;
+  useEffect(() => {
+    if (userId) void registerPushToken();
+  }, [userId]);
 
   return <SessionContext.Provider value={state}>{children}</SessionContext.Provider>;
 }
