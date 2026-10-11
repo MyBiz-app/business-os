@@ -69,6 +69,20 @@ class Settings(BaseSettings):
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
 
+    # Connection pool, per API worker process. Keep workers * (pool_size + max_overflow) under the
+    # database's (or pooler's) client limit. Prepared statements are off by default so the URL can
+    # point at a transaction-mode pooler (Supavisor, port 6543); every transaction here is
+    # self-contained (`SET LOCAL`), so both pooler modes work.
+    db_pool_size: int = 5
+    db_max_overflow: int = 10
+    db_pool_timeout: float = 15.0  # seconds to wait for a free connection before failing
+    db_pool_recycle: int = 1800  # seconds; replaces connections the pooler may have closed
+    db_prepared_statements: bool = False
+
+    # Model calls hold a request thread for seconds: at most this many run at once per worker,
+    # the rest get "busy" (429) instead of using up the threads other requests need.
+    ai_max_concurrent_calls: int = 8
+
     # Statements slower than this (milliseconds) are logged; 0 turns it off.
     slow_query_ms: int = 500
 

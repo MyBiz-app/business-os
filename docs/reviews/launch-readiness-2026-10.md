@@ -176,6 +176,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 ## P1: first month of operation
 
 ### P1-1 · Blocking database calls inside `async` endpoints
+- **Progress:** ✅ All seven handlers are plain `def` (the webhook reads its body in an async dependency); `tests/test_concurrency.py` fails if any route handler becomes `async def`.
 - **Where:** `app/api/documents.py:216` and `:293`, `app/api/settings.py:91` and `:154`,
   `app/api/people.py:21`, `app/api/client_import.py:71`, `app/api/webhooks.py:21`.
 - **Why:** these are `async def` but use the synchronous SQLAlchemy session, so while one 10 MB
@@ -187,6 +188,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** S · **Model:** Sonnet.
 
 ### P1-2 · One worker, default pool, no pooler settings
+- **Progress:** ✅ `WEB_CONCURRENCY` workers (default 2) in the Dockerfile; pool size, overflow, timeout and recycle are `API_DB_*` settings; prepared statements off (works with Supavisor transaction mode, port 6543); at most `API_AI_MAX_CONCURRENT_CALLS` (8) model calls per worker, the rest get 429 `ai_busy`. Not done: load test, and a shared store for the per-process rate limits (they now count per worker).
 - **Where:** `Dockerfile` CMD (single uvicorn process), `app/core/db.py`
   (`create_engine(..., pool_pre_ping=True)`: 5 connections + 10 overflow).
 - **Why:** one Python process handles everything; the thread pool (40) can outrun the 15
