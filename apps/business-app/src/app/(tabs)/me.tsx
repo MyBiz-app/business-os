@@ -7,6 +7,7 @@ import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@busine
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
+import { BrandColorCard } from "@/components/brand-color-card";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -115,6 +116,8 @@ export default function Me() {
         />
         <Button label={t("save")} palette={palette} busy={saving} onPress={() => void save()} />
       </Card>
+
+      {can("business.settings") && <BrandColorCard />}
 
       {emailRoster !== null && (
         <Card palette={palette}>

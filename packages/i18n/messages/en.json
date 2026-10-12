@@ -3399,6 +3399,11 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "colors": "My colors",
+      "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
+      "colorHex": "Color code (#rrggbb)",
+      "useDefaultColor": "Use the default color",
+      "colorsFailed": "Could not save the color. Try again.",
       "on": "On",
       "off": "Off"
     },
