@@ -264,9 +264,9 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 8 },
+  card: { borderWidth: 1, borderRadius: 24, padding: 16, gap: 8 },
   accent: { alignSelf: "stretch", width: 4, borderRadius: 2 },
-  timeChip: { alignSelf: "flex-start", borderRadius: 8, paddingHorizontal: 8, paddingVertical: 2 },
+  timeChip: { alignSelf: "flex-start", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
   bar: { height: 4, borderRadius: 2, overflow: "hidden", marginTop: 6, marginBottom: 2, maxWidth: 180 },
   barFill: { height: "100%", borderRadius: 2 },
   row: { flexDirection: "row", alignItems: "center", gap: 12 },
