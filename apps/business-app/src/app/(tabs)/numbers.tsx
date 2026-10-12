@@ -123,7 +123,7 @@ export default function Numbers() {
                   flexGrow: 1,
                   flexBasis: "45%",
                   borderWidth: 1,
-                  borderRadius: 16,
+                  borderRadius: 20,
                   padding: 14,
                   gap: 4,
                   backgroundColor: palette.surface,

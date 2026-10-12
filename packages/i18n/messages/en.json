@@ -3470,6 +3470,9 @@
         "light": "Light",
         "dark": "Dark"
       },
+      "contrast": "Contrast",
+      "contrastNormal": "Standard",
+      "contrastHigh": "High",
       "signOut": "Sign out",
       "name": "Your name",
       "save": "Save",

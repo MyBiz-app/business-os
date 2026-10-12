@@ -3470,6 +3470,9 @@
         "light": "בהיר",
         "dark": "כהה"
       },
+      "contrast": "ניגודיות",
+      "contrastNormal": "רגילה",
+      "contrastHigh": "גבוהה",
       "signOut": "התנתקות",
       "name": "השם שלך",
       "save": "שמירה",
