@@ -1,4 +1,4 @@
-import { fontFamily } from "@business-os/design-tokens";
+import { displayFontFamily, fontFamily } from "@business-os/design-tokens";
 
 /**
  * Heebo family per weight. Use these instead of `fontWeight`: a custom font file already is one
@@ -17,4 +17,23 @@ export function familyFor(weight: unknown): string {
   if (w >= 700) return fontFamily.bold;
   if (w >= 500) return fontFamily.medium;
   return fontFamily.regular;
+}
+
+/** Bold English text is a heading or a number: it gets the web's display face, Plus Jakarta Sans. */
+export function familyForLocale(weight: unknown, locale: string): string {
+  const family = familyFor(weight);
+  return locale.startsWith("en") && family === fontFamily.bold ? displayFontFamily.bold : family;
+}
+
+type SizedStyle = { fontSize?: number; lineHeight?: number };
+
+/** The style with its font size and line height multiplied, so a larger text setting grows everything. */
+export function scaleText<T extends SizedStyle>(style: T, scale: number): T {
+  if (scale === 1) return style;
+  return {
+    ...style,
+    // 14 is react-native's default size, used when a style names none.
+    fontSize: Math.round((style.fontSize ?? 14) * scale * 10) / 10,
+    ...(style.lineHeight ? { lineHeight: Math.round(style.lineHeight * scale * 10) / 10 } : {}),
+  };
 }

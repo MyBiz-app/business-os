@@ -3473,6 +3473,15 @@
       "contrast": "Contrast",
       "contrastNormal": "Standard",
       "contrastHigh": "High",
+      "textSize": "Text size",
+      "textSizes": {
+        "normal": "Standard",
+        "large": "Large",
+        "larger": "Larger"
+      },
+      "motion": "Motion",
+      "motionNormal": "Standard",
+      "motionReduced": "Reduced",
       "signOut": "Sign out",
       "name": "Your name",
       "save": "Save",

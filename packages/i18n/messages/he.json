@@ -3473,6 +3473,15 @@
       "contrast": "ניגודיות",
       "contrastNormal": "רגילה",
       "contrastHigh": "גבוהה",
+      "textSize": "גודל טקסט",
+      "textSizes": {
+        "normal": "רגיל",
+        "large": "גדול",
+        "larger": "גדול מאוד"
+      },
+      "motion": "תנועה",
+      "motionNormal": "רגילה",
+      "motionReduced": "מופחתת",
       "signOut": "התנתקות",
       "name": "השם שלך",
       "save": "שמירה",

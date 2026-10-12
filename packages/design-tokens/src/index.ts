@@ -48,6 +48,14 @@ export const fontFamily = {
   bold: "Heebo_700Bold",
 } as const;
 
+/** Plus Jakarta Sans for English headings and numbers (the web's display face); Hebrew stays in Heebo. */
+export const displayFontFamily = {
+  bold: "PlusJakartaSans_700Bold",
+} as const;
+
+/** Text size choices (a multiplier on every font size), the same steps as the web app. */
+export const textScales = { normal: 1, large: 1.125, larger: 1.25 } as const;
+
 /** Type scale: size and line height in px. */
 export const typeScale = {
   display: { size: 28, line: 34, weight: "bold" },

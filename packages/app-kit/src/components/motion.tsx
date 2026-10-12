@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useOptionalTheme } from "../providers/theme-provider";
 import { AccessibilityInfo, Animated, Easing, Platform, Pressable, type PressableProps, type StyleProp, type ViewStyle } from "react-native";
 
 const native = Platform.OS !== "web";
 
-/** Whether the user asked the system to reduce motion; animations are skipped then. */
+/** Whether the user asked, in the system or in the app's preferences, to reduce motion; animations are skipped then. */
 export function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
+  const [systemReduced, setReduced] = useState(false);
+  const reduced = systemReduced || (useOptionalTheme()?.reduceMotion ?? false);
   useEffect(() => {
     void AccessibilityInfo.isReduceMotionEnabled().then(setReduced);
     const subscription = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduced);
