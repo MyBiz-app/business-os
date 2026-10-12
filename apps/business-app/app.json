@@ -23,13 +23,17 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "supportsRTL": true
+      "supportsRTL": true,
+      "eas": {
+        "projectId": "018c1155-b4a8-425b-b20a-9ece79cd7721"
+      }
     },
     "plugins": [
       "expo-router",
       "expo-localization",
       "expo-secure-store",
       "expo-notifications"
-    ]
+    ],
+    "owner": "adiredri"
   }
 }
