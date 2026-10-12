@@ -3512,6 +3512,26 @@
       "day": "Day",
       "time": "Court and time",
       "reserveFor": "Reserve for {name}"
+    },
+    "availability": {
+      "open": "My availability",
+      "title": "When I can work",
+      "hint": "Mark the hours you can work shifts. With nothing marked, any time is fine.",
+      "add": "Add hours",
+      "remove": "Remove these hours",
+      "from": "From",
+      "to": "To",
+      "none": "Not available",
+      "save": "Save",
+      "saved": "Saved. Managers see it on the shift board.",
+      "back": "Back",
+      "endHint": "For the end of the day, write 23:59.",
+      "errors": {
+        "invalid_time": "Write times as HH:MM, for example 08:30.",
+        "ends_before_start": "Each end must be after its start.",
+        "overlap": "Hours on the same day must not overlap.",
+        "generic": "Something went wrong. Try again."
+      }
     }
   },
   "staffApp": {
@@ -4592,7 +4612,7 @@
     "soloAvailability": "My availability",
     "soloAvailabilityHint": "The hours clients can book with you",
     "soloClosedHint": "Holidays and days off for the whole business",
-    "warningLegend": "Falls on time off or outside opening hours",
+    "warningLegend": "Falls on time off, outside opening hours or outside availability",
     "awayLegend": "Away (time off)",
     "away": "Away",
     "awayWarning": "{name} is on time off on this day. You can still save the shift.",
@@ -4611,7 +4631,8 @@
     "hoursTotal": "{hours} h",
     "warnings": {
       "timeOff": "On time off",
-      "outsideHours": "Outside opening hours"
+      "outsideHours": "Outside opening hours",
+      "outsideAvailability": "Outside their availability"
     },
     "addFor": "Add a shift for {name} on {day}",
     "editTitle": "Edit shift",
@@ -4717,7 +4738,12 @@
       "legend": "Fewer people than needed",
       "short": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
       "banner": "{count, plural, one {One stretch is short on staff} other {# stretches are short on staff}}",
-      "gap": "{have} of {needed} on shift"
+      "gap": "{have} of {needed} on shift",
+      "canCover": "Free to cover: {names}",
+      "nobodyFree": "No one who gave their availability is free then",
+      "roster": "Count",
+      "rosterPlan": "Including drafts",
+      "rosterPublished": "Published only"
     },
     "peopleOnShift": "People on shift",
     "publish": {
@@ -4749,7 +4775,8 @@
         "weekly": "Goes out every {day} at {time}",
         "monthly": "Goes out on day {day} of every month at {time}"
       }
-    }
+    },
+    "availabilityWarning": "These hours are outside the availability {name} gave. You can still save the shift."
   },
   "openingHours": {
     "title": "Opening hours",

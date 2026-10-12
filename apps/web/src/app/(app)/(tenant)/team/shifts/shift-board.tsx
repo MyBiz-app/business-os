@@ -8,11 +8,12 @@ import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { type AvailabilityWindow, outsideAvailability } from "@/lib/availability";
 import { formatDay } from "@/lib/dates";
 
 import { copyShiftsDay, copyShiftsWeek, type CopyState, deleteShift, deleteTemplate, saveShift, saveTemplate, type ShiftState, type TemplateState } from "./actions";
 
-export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null };
+export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null; availability?: AvailabilityWindow[] | null };
 export type BoardShift = {
   id: string;
   userId: string;
@@ -29,7 +30,7 @@ export type BoardShift = {
   note: string | null;
   isCover: boolean;
   homeName: string | null;
-  warning: "timeOff" | "outsideHours" | null;
+  warning: "timeOff" | "outsideAvailability" | "outsideHours" | null;
   /** Planned but not yet published: only managers see it. */
   draft: boolean;
 };
@@ -39,7 +40,7 @@ export type BoardTemplate = { id: string; locationId: string; name: string; star
 /** A named room or post of a branch that shifts are planned into. */
 export type BoardStation = { id: string; locationId: string; name: string };
 /** A stretch where a branch has fewer people on shift than its coverage rules ask. */
-export type BoardGap = { locationId: string; locationName: string; day: string; starts: string; ends: string; startMinute: number; endMinute: number; needed: number; have: number };
+export type BoardGap = { locationId: string; locationName: string; day: string; starts: string; ends: string; startMinute: number; endMinute: number; needed: number; have: number; available?: string[] };
 type Branch = { id: string; name: string; color: string };
 export type Editing = { shift: BoardShift | null; userId: string; day: string; locationId?: string; stationId?: string };
 
@@ -309,6 +310,8 @@ export function ShiftDialog({ editing, people, branches, templates = [], station
   const [starts, setStarts] = useState(shift?.starts ?? "09:00");
   const [ends, setEnds] = useState(shift?.ends ?? "17:00");
   const [position, setPosition] = useState(shift?.position ?? "");
+  const pickedPerson = people.find((p) => p.id === picked.userId);
+  const pickedOutside = outsideAvailability(pickedPerson?.availability, picked.day, starts, ends);
   const here = templates.filter((tpl) => tpl.locationId === locationId);
   const rooms = stations.filter((s) => s.locationId === locationId);
   const apply = (tpl: BoardTemplate) => {
@@ -374,7 +377,13 @@ export function ShiftDialog({ editing, people, branches, templates = [], station
             {t("awayWarning", { name: people.find((p) => p.id === picked.userId)?.name ?? "" })}
           </p>
         )}
-        {shift?.warning && !(pickedAway && shift.warning === "timeOff") && (
+        {pickedOutside && (
+          <p role="status" className="flex items-center gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm">
+            <AlertTriangle aria-hidden="true" className="size-4 shrink-0 text-warning" />
+            {t("availabilityWarning", { name: pickedPerson?.name ?? "" })}
+          </p>
+        )}
+        {shift?.warning && !(pickedAway && shift.warning === "timeOff") && shift.warning !== "outsideAvailability" && (
           <p className="flex items-center gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm">
             <AlertTriangle aria-hidden="true" className="size-4 shrink-0 text-warning" />
             {t(`warnings.${shift.warning}`)}

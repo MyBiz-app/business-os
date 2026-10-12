@@ -2092,6 +2092,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Availability */
+        get: operations["get_my_availability"];
+        /**
+         * Set My Availability
+         * @description Replaces the person's own week.
+         */
+        put: operations["set_my_availability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Availability */
+        get: operations["get_availability"];
+        /**
+         * Set Availability
+         * @description A manager records the week for someone (e.g. who told them in person).
+         */
+        put: operations["set_availability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Availability
+         * @description Everyone's stated week, for the board; people who have not said are left out.
+         */
+        get: operations["list_availability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/shift-templates": {
         parameters: {
             query?: never;
@@ -2158,7 +2220,8 @@ export interface paths {
         /**
          * Shift Coverage
          * @description Where a branch has fewer people on shift than its coverage rules ask, day by day. People
-         *     away on time off do not count. Branches without rules are never listed.
+         *     away on time off do not count. Branches without rules are never listed. Managers also get,
+         *     per gap, who said they can work it and is free.
          */
         get: operations["shift_coverage"];
         put?: never;
@@ -4692,6 +4755,14 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * Availability
+         * @description The hours of the week a person can work; an empty week means they have not said.
+         */
+        Availability: {
+            /** Windows */
+            windows: components["schemas"]["WeeklyWindow"][];
+        };
         /** AwayDays */
         AwayDays: {
             /**
@@ -5240,6 +5311,16 @@ export interface components {
              * @description The text as the first recipient gets it
              */
             preview: string | null;
+        };
+        /** Candidate */
+        Candidate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
         };
         /** Catalog */
         Catalog: {
@@ -6129,6 +6210,11 @@ export interface components {
              * @description People on shift through the stretch
              */
             have: number;
+            /**
+             * Available
+             * @description Managers only: people of the branch who said they can work the whole stretch (`/me/availability`), are not away and have no shift then
+             */
+            available?: components["schemas"]["Candidate"][];
         };
         /** CoverageRule */
         CoverageRule: {
@@ -7466,6 +7552,18 @@ export interface components {
             last_visit: string | null;
             /** Plan Ends On */
             plan_ends_on: string | null;
+        };
+        /** MemberAvailability */
+        MemberAvailability: {
+            /** Windows */
+            windows: components["schemas"]["WeeklyWindow"][];
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
         };
         /** MemberBranches */
         MemberBranches: {
@@ -9505,6 +9603,11 @@ export interface components {
              */
             outside_hours: boolean;
             /**
+             * Outside Availability
+             * @description Not within the hours the person said they can work (if they said)
+             */
+            outside_availability: boolean;
+            /**
              * Published
              * @description Visible to the team; a draft shows to managers only
              */
@@ -10502,6 +10605,24 @@ export interface components {
              * @description First local date of the target week
              */
             to_date: string;
+        };
+        /** WeeklyWindow */
+        WeeklyWindow: {
+            /**
+             * Weekday
+             * @description 0 = Monday
+             */
+            weekday: number;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             */
+            ends: string;
         };
         /** WelcomeEmail */
         WelcomeEmail: {
@@ -15884,6 +16005,183 @@ export interface operations {
             };
         };
     };
+    get_my_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_my_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Availability"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Availability"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAvailability"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_shift_templates: {
         parameters: {
             query?: {
@@ -16072,6 +16370,8 @@ export interface operations {
                 days?: number;
                 /** @description Only these branches */
                 location_id?: string[] | null;
+                /** @description Managers: count only the published roster, not drafts */
+                published_only?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;

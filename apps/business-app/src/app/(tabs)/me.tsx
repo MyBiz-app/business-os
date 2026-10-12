@@ -16,6 +16,7 @@ export default function Me() {
   const t = useTranslations("business.me");
   const tRoles = useTranslations("roles");
   const tSchedule = useTranslations("business.schedule");
+  const tAvailability = useTranslations("business.availability");
   const { palette, memberships, tenant, select, api, refresh, branches, branch, selectBranch, can } = useBusiness();
   const { session } = useSession();
   const [name, setName] = useState<string | null>(null);
@@ -72,6 +73,14 @@ export default function Me() {
           variant="secondary"
           palette={palette}
           onPress={() => router.push("/schedule")}
+        />
+      )}
+      {can("schedule.read") && (
+        <Button
+          label={tAvailability("open")}
+          variant="secondary"
+          palette={palette}
+          onPress={() => router.push("/availability")}
         />
       )}
 
