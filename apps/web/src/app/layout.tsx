@@ -9,7 +9,7 @@ import { SkipLink } from "@/components/skip-link";
 import { ThemeProvider } from "@/components/theme-provider";
 import { localeDirection } from "@/i18n/config";
 import { NONCE_HEADER } from "@/lib/csp";
-import { mainFont } from "./fonts";
+import { displayFont, mainFont } from "./fonts";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,7 +28,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={locale}
       dir={localeDirection[locale]}
-      className={`${mainFont.variable} h-full antialiased`}
+      className={`${mainFont.variable} ${displayFont.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

@@ -8,7 +8,6 @@ import { useState } from "react";
 
 import { BrandMark } from "@/components/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
-import { ThemeSwitcher } from "@/components/theme-switcher";
 
 const LINKS = [
   { href: "/features", key: "features" },
@@ -33,8 +32,8 @@ export function MarketingHeader() {
         href={link.href}
         aria-current={active ? "page" : undefined}
         onClick={() => setOpen(false)}
-        className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-          active ? "text-primary" : "text-muted hover:bg-foreground/5 hover:text-foreground"
+        className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+          active ? "text-primary" : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
         }`}
       >
         {t(link.key)}
@@ -43,7 +42,7 @@ export function MarketingHeader() {
   });
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/75 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
           <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />
@@ -56,11 +55,10 @@ export function MarketingHeader() {
 
         <div className="hidden items-center gap-2 lg:flex">
           <LocaleSwitcher />
-          <ThemeSwitcher />
           <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-foreground/5">
             {t("login")}
           </Link>
-          <Link href="/start" className="btn-primary px-4 py-2 text-sm">
+          <Link href="/start" className="btn-primary rounded-full px-5 py-2 text-sm">
             {t("start")}
           </Link>
         </div>
@@ -84,8 +82,7 @@ export function MarketingHeader() {
           </nav>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <LocaleSwitcher />
-            <ThemeSwitcher />
-          </div>
+            </div>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <Link href="/login" className="btn-secondary px-4 py-2.5">
               {t("login")}

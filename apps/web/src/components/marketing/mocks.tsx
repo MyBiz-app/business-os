@@ -57,12 +57,13 @@ export async function DashboardMock() {
   );
 }
 
-export async function ChatMock({ question, answer }: { question: string; answer: string }) {
+export async function ChatMock({ question, answer, tone = "primary" }: { question: string; answer: string; tone?: "primary" | "ai" }) {
+  const ai = tone === "ai";
   return (
     <div aria-hidden="true" className="card flex flex-col gap-3 p-5 shadow-xl">
-      <div className="self-end rounded-2xl rounded-ee-md bg-primary px-4 py-2.5 text-sm text-on-primary">{question}</div>
+      <div className={`self-end rounded-2xl rounded-ee-md px-4 py-2.5 text-sm text-white ${ai ? "bg-ai" : "bg-primary"}`}>{question}</div>
       <div className="flex items-start gap-2">
-        <span className="icon-tile size-8 shrink-0">
+        <span className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${ai ? "bg-ai/10 text-ai" : "icon-tile"}`}>
           <Sparkles className="size-4" />
         </span>
         <div className="rounded-2xl rounded-ss-md bg-foreground/5 px-4 py-2.5 text-sm">{answer}</div>

@@ -120,6 +120,10 @@
   --color-brand-strong-from: var(--brand-strong-from);
   --color-brand-strong-to: var(--brand-strong-to);
   --color-brand-ink: var(--brand-ink);
+  /* The marketing palette (see `.mk` below). */
+  --color-navy: #111827;
+  --color-ai: #7c3aed;
+  --color-electric: #06b6d4;
   /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
   --font-sans: var(--font-main), system-ui, sans-serif;
 }
@@ -160,6 +164,7 @@ body {
 
 /* A raised card. */
 @utility card {
+  color: var(--foreground);
   border-radius: 1.25rem;
   border: 1px solid var(--border);
   background: var(--surface);
@@ -588,4 +593,152 @@ html[data-motion="reduce"] *::after {
   animation-iteration-count: 1 !important;
   transition-duration: 1ms !important;
   scroll-behavior: auto !important;
+}
+
+/* ---- Marketing site -----------------------------------------------------------------------
+ * The public site has its own light palette (Midnight Navy, Primary Blue, AI Purple, Electric
+ * Cyan, Cloud White, Slate Gray, Success Green), whatever theme the person picked in the app.
+ * Purple is reserved for AI; dark surfaces are the hero, the AI band, the CTA and the footer. */
+.mk {
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #111827;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --palette-primary: #2563eb;
+  --palette-on-primary: #ffffff;
+  --primary: #2563eb;
+  --on-primary: #ffffff;
+  --success: #16a34a;
+  --shadow-color: 222 30% 18%;
+  --brand-from: #2563eb;
+  --brand-via: #7c3aed;
+  --brand-to: #06b6d4;
+  --brand-strong-from: #1d4ed8;
+  --brand-strong-to: #7c3aed;
+  --brand-ink: #1d4ed8;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-display), var(--font-main), system-ui, sans-serif;
+}
+
+/* Night: the same palette on Midnight Navy. Blue lightens a step so links keep 4.5:1. */
+.dark .mk {
+  color-scheme: dark;
+  --background: #0b1020;
+  --foreground: #f8fafc;
+  --surface: #111827;
+  --border: #263247;
+  --muted: #94a3b8;
+  --palette-primary: #3b82f6;
+  --palette-on-primary: #0b1020;
+  --primary: #3b82f6;
+  --on-primary: #0b1020;
+  --success: #22c55e;
+  --shadow-color: 222 40% 2%;
+  --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
+  --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);
+  --brand-ink: #93c5fd;
+}
+
+/* The person's high-contrast choice wins over the marketing palette too. */
+html[data-contrast="high"] .mk {
+  --muted: #334155 !important;
+  --border: #64748b !important;
+}
+html[data-contrast="high"].dark .mk {
+  --muted: #e2e8f0 !important;
+  --border: #94a3b8 !important;
+}
+
+/* Fade-and-rise on scroll (Reveal): ease-out, short, and off for people who ask for less motion. */
+[data-reveal] {
+  transition:
+    opacity 420ms var(--ease-out),
+    transform 420ms var(--ease-out);
+}
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(14px);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal="hidden"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* A faint grid behind the dark hero. */
+.mk-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent);
+}
+
+@keyframes mk-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mk-float {
+    animation: mk-float 6s ease-in-out infinite;
+  }
+}
+
+/* The demo stage (components/marketing/demo-stage.tsx): scenes rise in, bars grow, and the
+ * progress line fills over one scene's time. Pausing stops all of it. */
+@keyframes mk-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mk-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes mk-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.mk-rise {
+  animation: mk-rise 500ms var(--ease-out) both;
+}
+.mk-grow {
+  transform-origin: bottom;
+  animation: mk-grow 800ms var(--ease-out) both;
+}
+.mk-fill {
+  transform-origin: left;
+  animation: mk-fill var(--scene-ms, 5000ms) linear both;
+}
+[dir="rtl"] .mk-fill {
+  transform-origin: right;
+}
+[data-paused="true"] .mk-rise,
+[data-paused="true"] .mk-grow,
+[data-paused="true"] .mk-fill {
+  animation-play-state: paused;
 }

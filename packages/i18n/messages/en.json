@@ -2143,7 +2143,8 @@
       "privacy": "Privacy policy",
       "accessibility": "Accessibility",
       "rights": "© {year} MyBiz. All rights reserved.",
-      "status": "System status"
+      "status": "System status",
+      "social": "Social media"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -2273,6 +2274,60 @@
           "text": "Export sales and a client's data any time, and cancel with no commitment."
         }
       }
+    },
+    "home": {
+      "facts": {
+        "label": "The product in numbers",
+        "modules": "abilities in one system",
+        "industries": "business types available",
+        "apps": "apps: clients, business and team",
+        "languages": "languages: Hebrew and English"
+      },
+      "bento": {
+        "eyebrow": "Abilities",
+        "more": "And more inside"
+      },
+      "pricing": {
+        "eyebrow": "Pricing",
+        "points": [
+          "No set-up fee",
+          "No commitment",
+          "Cancel any time",
+          "Add-ons only when needed"
+        ]
+      },
+      "about": {
+        "eyebrow": "About us",
+        "more": "More about us"
+      },
+      "demo": {
+        "eyebrow": "Live preview",
+        "title": "A day of work in MyBiz",
+        "subtitle": "Calendar, AI assistant and reports in a 15-second loop. Pause it or pick a step.",
+        "scenesLabel": "Choose a step",
+        "pause": "Pause the demo",
+        "play": "Play the demo",
+        "open": "Open",
+        "booked": "Booked",
+        "approve": "Waiting for your approval",
+        "tabs": {
+          "schedule": "Calendar",
+          "ai": "AI assistant",
+          "reports": "Reports"
+        },
+        "scenes": {
+          "schedule": "Clients book on their own and the calendar updates at once.",
+          "ai": "Ask in plain language and the assistant prepares an action for your approval.",
+          "reports": "Revenue and occupancy without opening a spreadsheet."
+        }
+      }
+    },
+    "a11y": {
+      "open": "Open the accessibility menu",
+      "close": "Close",
+      "title": "Accessibility and display",
+      "reset": "Reset settings",
+      "statement": "Accessibility statement"
     }
   },
   "appointments": {
