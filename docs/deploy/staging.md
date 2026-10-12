@@ -19,8 +19,8 @@ Supabase and Render have no Israel region today; Frankfurt is close to Israel an
 (GDPR; Israel and the EU recognize each other's data protection as adequate).
 
 The free Render plan sleeps after 15 minutes without traffic; the first request then takes
-up to about a minute. During Israeli daytime [`keep-api-awake.yml`](../../.github/workflows/keep-api-awake.yml)
-pings it every 10 minutes so it stays awake.
+up to about a minute. Around the clock [`keep-api-awake.yml`](../../.github/workflows/keep-api-awake.yml)
+pings it every 10 minutes so it stays awake (GitHub may delay scheduled runs; an outside pinger or a paid plan is the sturdier fix).
 
 ## Secrets and settings (never committed)
 
