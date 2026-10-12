@@ -145,3 +145,16 @@ def test_approval_fails_if_the_colleague_is_busy_then(
     )
     clash = client.post(f"/shift-swaps/{swap['id']}/approve", json={}, headers=owner)
     assert clash.status_code == 409 and clash.json()["detail"] == "shift_overlap"
+
+
+def test_staff_can_list_colleagues_without_the_team_list(
+    client: TestClient, auth: AuthHeaders, studio: dict, engine: Engine
+) -> None:
+    tenant, coach, friend = studio["tenant_id"], studio["coach"], uuid4()
+    add_member(engine, tenant, friend, "staff")
+    coach_h = auth(coach, tenant)
+    assert client.get("/staff", headers=coach_h).status_code == 403
+    colleagues = client.get("/shift-swaps/colleagues", headers=coach_h).json()
+    ids = [c["user_id"] for c in colleagues]
+    assert str(friend) in ids and str(coach) not in ids
+    assert all(set(c) == {"user_id", "name"} for c in colleagues)

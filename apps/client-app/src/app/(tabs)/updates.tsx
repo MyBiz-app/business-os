@@ -5,21 +5,27 @@ import { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Card, EmptyState, Heading, Screen } from "@business-os/app-kit/components/ui";
+import { unwrap } from "@business-os/app-kit/lib/api";
+import { Button, Card, EmptyState, Heading, Screen } from "@business-os/app-kit/components/ui";
 import { useBusiness } from "@/providers/business-provider";
 import { useInbox } from "@/providers/inbox-provider";
 
 type Notification = components["schemas"]["Notification"];
+const PAGE = 50; // the API's default page size
 
 /** What the studio did with the client's bookings and declarations, newest first. */
 export default function Updates() {
   const t = useTranslations("client.updates");
   const locale = useLocale();
-  const { business, palette } = useBusiness();
+  const { api, scope, business, palette } = useBusiness();
   const { inbox, refresh, markAllRead } = useInbox();
   const [refreshing, setRefreshing] = useState(false);
   // Unread when the screen opened: still highlighted while the user reads them.
   const [fresh, setFresh] = useState<Set<string>>(new Set());
+  // Older pages loaded on request; the inbox itself only holds the newest page.
+  const [older, setOlder] = useState<Notification[]>([]);
+  const [exhausted, setExhausted] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -62,7 +68,26 @@ export default function Updates() {
     return t(`kinds.${n.kind}`, values);
   };
 
-  const items = inbox?.items ?? [];
+  const newest = inbox?.items ?? [];
+  const seen = new Set(newest.map((n) => n.id));
+  const items = [...newest, ...older.filter((n) => !seen.has(n.id))];
+  // The API doesn't report a total: a short page means the end of the list.
+  const hasMore = !exhausted && newest.length >= PAGE;
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const next = unwrap(
+        await api.GET("/client/notifications", { params: { ...scope, query: { limit: PAGE, offset: items.length } } }),
+      );
+      setOlder((current) => [...current, ...next.items]);
+      if (next.items.length < PAGE) setExhausted(true);
+    } catch {
+      // The button stays; tapping it again retries.
+    } finally {
+      setLoadingMore(false);
+    }
+  };
   return (
     <Screen
       palette={palette}
@@ -95,6 +120,7 @@ export default function Updates() {
           })}
         </Card>
       )}
+      {hasMore && <Button label={t("more")} variant="secondary" palette={palette} busy={loadingMore} onPress={() => void loadMore()} />}
     </Screen>
   );
 }

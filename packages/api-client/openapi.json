@@ -10411,6 +10411,78 @@
         }
       }
     },
+    "/shift-swaps/colleagues": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Colleagues",
+        "description": "Who a shift can be offered to: the other people of the business (names only, so staff\nwithout access to the team list can still pick a colleague).",
+        "operationId": "list_colleagues",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Colleague"
+                  },
+                  "title": "Response List Colleagues"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shift-swaps/{swap_id}/accept": {
       "post": {
         "tags": [
@@ -25926,6 +25998,25 @@
           "delete_after"
         ],
         "title": "Closure"
+      },
+      "Colleague": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "name"
+        ],
+        "title": "Colleague"
       },
       "Complaint": {
         "properties": {

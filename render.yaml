@@ -29,3 +29,46 @@ services:
       # assistant screen says it isn't set up yet.
       - key: API_ANTHROPIC_API_KEY
         sync: false
+
+# Production background jobs as Render cron services, kept OFF until production is approved
+# (a cron service is paid; staging runs the same jobs from GitHub Actions: jobs-staging.yml,
+# jobs-hourly-staging.yml, emails-staging.yml). To turn on: uncomment, set the secrets in
+# Render, and stop the GitHub schedules for the same database so jobs don't run twice.
+# Each run is recorded in app.job_runs; check-jobs (check-jobs-staging.yml) alerts when late.
+#
+#  - type: cron
+#    name: business-os-jobs-daily
+#    runtime: docker
+#    rootDir: apps/api
+#    dockerfilePath: ./Dockerfile
+#    dockerContext: .
+#    region: frankfurt
+#    plan: starter
+#    branch: main
+#    schedule: "17 2 * * *"  # 02:17 UTC
+#    dockerCommand: python -m app.jobs run-daily
+#    envVars:
+#      - key: API_ENVIRONMENT
+#        value: production
+#      - key: API_DATABASE_URL  # the migration (owner) connection, like the staging jobs
+#        sync: false
+#      - key: API_SECRETS_KEY
+#        sync: false
+#  - type: cron
+#    name: business-os-jobs-hourly
+#    runtime: docker
+#    rootDir: apps/api
+#    dockerfilePath: ./Dockerfile
+#    dockerContext: .
+#    region: frankfurt
+#    plan: starter
+#    branch: main
+#    schedule: "11 * * * *"
+#    dockerCommand: python -m app.jobs run-hourly
+#    envVars:
+#      - key: API_ENVIRONMENT
+#        value: production
+#      - key: API_DATABASE_URL
+#        sync: false
+#      - key: API_SECRETS_KEY
+#        sync: false
