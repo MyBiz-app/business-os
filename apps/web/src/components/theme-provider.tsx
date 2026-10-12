@@ -8,9 +8,9 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 // script is marked as a data block, which React accepts and nothing executes twice.
 const scriptProps = { type: typeof window === "undefined" ? "text/javascript" : "application/json" };
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children, nonce }: { children: React.ReactNode; nonce?: string }) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange scriptProps={scriptProps}>
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange nonce={nonce} scriptProps={scriptProps}>
       {children}
     </NextThemesProvider>
   );

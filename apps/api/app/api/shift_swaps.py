@@ -129,6 +129,27 @@ def offer_swap(body: SwapCreate, user: UserDep, context: ReadDep) -> ShiftSwap:
     return _load(db, swap_id)
 
 
+class Colleague(BaseModel):
+    user_id: UUID
+    name: str
+
+
+@router.get("/shift-swaps/colleagues")
+def list_colleagues(user: UserDep, context: ReadDep) -> list[Colleague]:
+    """Who a shift can be offered to: the other people of the business (names only, so staff
+    without access to the team list can still pick a colleague)."""
+    rows = context.session.execute(
+        text("""
+            SELECT u.id AS user_id, coalesce(u.full_name, u.email) AS name
+            FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
+            WHERE m.tenant_id = app.current_tenant_id() AND m.user_id <> :u
+            ORDER BY lower(coalesce(u.full_name, u.email))
+        """),
+        {"u": user.id},
+    ).mappings()
+    return [Colleague.model_validate(dict(r)) for r in rows]
+
+
 @router.get("/shift-swaps")
 def list_swaps(
     user: UserDep,
