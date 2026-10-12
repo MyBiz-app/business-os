@@ -70,8 +70,14 @@ only) and not the transaction pooler (port 6543).
   `X-Internal-Token` equal to `API_INTERNAL_TOKEN` (set the same value on Render and Vercel).
 - The API refuses to start when `API_ENVIRONMENT` is not one of local/test/staging/production, or
   is local/test (the default) while the database is not on localhost.
-- Counts are kept per API process. With more than one instance, a shared store (Redis) plugs
-  in behind `LimiterStore` in the same file.
+- Counts are kept per API process by default. With more than one instance, set
+  `API_RATE_LIMIT_REDIS_URL` (`redis://…`) and every instance counts in the same Redis
+  (`RedisStore` in the same file; if Redis is unreachable it counts locally instead of failing).
+  Not set anywhere yet: Redis is a paid service on Render, so it stays off until production.
+- With `API_ENVIRONMENT=production` the API also refuses to start when `API_JWKS_URL`,
+  `API_SECRETS_KEY`, `API_INTERNAL_TOKEN`, `API_WEB_URL`, `API_API_URL` or `API_CORS_ORIGINS`
+  is missing or still points at localhost; the error names the missing ones. The background-job
+  commands (`python -m app.jobs`) are not affected.
 
 ## Notes
 

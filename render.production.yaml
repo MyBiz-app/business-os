@@ -1,0 +1,45 @@
+# Render Blueprint for the PRODUCTION background jobs. Nothing here runs until you create a
+# Blueprint from this file (Render → New → Blueprint → pick this file name); a cron service is a
+# paid service (Starter), so this is switched on only when production is approved
+# (docs/deploy/go-live-checklist.md). Staging runs the same jobs from GitHub Actions
+# (jobs-staging.yml, jobs-hourly-staging.yml, emails-staging.yml); stop those schedules for the
+# same database first so jobs don't run twice. Each run is recorded in app.job_runs, and
+# check-jobs (check-jobs-staging.yml) alerts when one is late.
+# Secrets are marked `sync: false`; Render asks for them once.
+services:
+  - type: cron
+    name: business-os-jobs-daily
+    runtime: docker
+    rootDir: apps/api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    branch: main
+    schedule: "17 2 * * *"  # 02:17 UTC
+    dockerCommand: python -m app.jobs run-daily
+    envVars:
+      - key: API_ENVIRONMENT
+        value: production
+      - key: API_DATABASE_URL  # the migration (owner) connection, like the staging jobs
+        sync: false
+      - key: API_SECRETS_KEY
+        sync: false
+  - type: cron
+    name: business-os-jobs-hourly
+    runtime: docker
+    rootDir: apps/api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    branch: main
+    schedule: "11 * * * *"
+    dockerCommand: python -m app.jobs run-hourly
+    envVars:
+      - key: API_ENVIRONMENT
+        value: production
+      - key: API_DATABASE_URL
+        sync: false
+      - key: API_SECRETS_KEY
+        sync: false
