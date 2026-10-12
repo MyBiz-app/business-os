@@ -22,6 +22,16 @@ export function createNonce(): string {
 
 type Options = { dev: boolean };
 
+/** The host error reports go to (Sentry), from the DSN; nothing when monitoring is off. */
+export function sentryIngestOrigin(dsn: string | undefined = process.env.NEXT_PUBLIC_SENTRY_DSN): string | undefined {
+  if (!dsn) return undefined;
+  try {
+    return new URL(dsn).origin;
+  } catch {
+    return undefined;
+  }
+}
+
 function directives(scriptSrc: string, { dev }: Options): string[] {
   return [
     "default-src 'self'",
@@ -30,7 +40,7 @@ function directives(scriptSrc: string, { dev }: Options): string[] {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
-    "connect-src 'self'",
+    ["connect-src 'self'", sentryIngestOrigin()].filter(Boolean).join(" "),
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

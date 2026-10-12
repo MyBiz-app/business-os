@@ -15,6 +15,8 @@ from uuid import UUID, uuid4
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
+from app.core.monitoring import capture_exception
+
 request_id_var: ContextVar[str | None] = ContextVar("request_id", default=None)
 tenant_id_var: ContextVar[str | None] = ContextVar("tenant_id", default=None)
 
@@ -100,7 +102,8 @@ async def request_logging(request: Request, call_next):
     started = time.perf_counter()
     try:
         response = await call_next(request)
-    except Exception:
+    except Exception as error:
+        capture_exception(error, request_id, tenant_id_var.get())
         logger.exception(
             "unhandled error",
             extra={"fields": {"method": request.method, "path": request.url.path}},

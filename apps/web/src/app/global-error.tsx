@@ -1,5 +1,7 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 import { localeDirection, matchLanguageTag, type Locale } from "@business-os/i18n/locales";
 
 import { ERROR_MESSAGES } from "@/lib/error-messages";
@@ -20,6 +22,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   const locale = pickLocale();
   const t = ERROR_MESSAGES[locale];
   const retry = t.retry;

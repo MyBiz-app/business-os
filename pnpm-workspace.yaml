@@ -7,6 +7,8 @@ minimumReleaseAge: 1440
 
 # Native packages ship prebuilt binaries; their install scripts are not needed.
 allowBuilds:
+  # Downloads the Sentry CLI binary, only needed to upload source maps (not used yet).
+  "@sentry/cli": false
   "@parcel/watcher": false
   "@swc/core": false
   sharp: false
