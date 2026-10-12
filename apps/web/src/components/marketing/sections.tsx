@@ -48,7 +48,7 @@ export function SectionHeading({ eyebrow, title, subtitle, id, level = 2 }: { ey
   const Heading = level === 1 ? "h1" : "h2";
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
-      {eyebrow && <p className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">{eyebrow}</p>}
+      {eyebrow && <p className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-brand-ink">{eyebrow}</p>}
       <Heading id={id} className={level === 1 ? "text-4xl font-extrabold tracking-tight sm:text-5xl" : "text-3xl font-extrabold tracking-tight sm:text-5xl"}>
         {title}
       </Heading>

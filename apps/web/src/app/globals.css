@@ -15,7 +15,7 @@
   --foreground: #111827;
   --surface: #ffffff;
   --border: #e2e8f0;
-  --muted: #64748b;
+  --muted: #5a6a80;
   --palette-primary: #2563eb;
   --palette-on-primary: #ffffff;
   --primary: var(--palette-primary);
@@ -595,6 +595,22 @@ html[data-motion="reduce"] *::after {
   scroll-behavior: auto !important;
 }
 
+/* The navigation column: Midnight Navy in light and night mode. Its tokens are redefined so
+ * everything inside (workspace switcher, menu, badges) reads correctly without its own colors;
+ * a business's brand color is lightened toward white so it stays visible on navy. */
+.nav-dark {
+  color-scheme: dark;
+  --foreground: #f8fafc;
+  --surface: #172036;
+  --border: rgb(255 255 255 / 0.1);
+  --muted: #a3b2c8;
+  --primary: color-mix(in oklab, var(--brand, var(--palette-primary)) 55%, white);
+  --on-primary: #0b1020;
+  --shadow-color: 222 40% 2%;
+  background: #0f172a;
+  color: var(--foreground);
+}
+
 /* ---- Marketing site -----------------------------------------------------------------------
  * The public site has its own light palette (Midnight Navy, Primary Blue, AI Purple, Electric
  * Cyan, Cloud White, Slate Gray, Success Green), whatever theme the person picked in the app.
@@ -605,7 +621,7 @@ html[data-motion="reduce"] *::after {
   --foreground: #111827;
   --surface: #ffffff;
   --border: #e2e8f0;
-  --muted: #64748b;
+  --muted: #5a6a80;
   --palette-primary: #2563eb;
   --palette-on-primary: #ffffff;
   --primary: #2563eb;
