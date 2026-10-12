@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 
-from app.api.common import ensure_not_erased, not_found
+from app.api.common import ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
 from app.api.quotes import Quote, _load
 from app.core.permissions import Permission
@@ -177,7 +177,7 @@ def update_time(entry_id: UUID, body: TimeEntryUpdate, context: ReadDep) -> Time
     _editable(context, entry_id)
     changes = {k: v for k, v in body.model_dump(exclude_unset=True).items() if v is not None}
     if changes:
-        assignments = ", ".join(f"{column} = :{column}" for column in changes)
+        assignments = set_clause(changes, TimeEntryUpdate.model_fields, touch=False)
         context.session.execute(
             text(f"UPDATE app.time_entries SET {assignments} WHERE id = :id"),
             {**changes, "id": entry_id},

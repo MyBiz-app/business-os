@@ -176,7 +176,7 @@ def _update(db: Session, tenant_id: UUID, dependent_id: UUID, body: DependentUpd
             text(f"SELECT {COLUMNS} FROM app.dependents WHERE id = :id"), {"id": dependent_id}
         )
     else:
-        assignments = set_clause(changes, casts={"details": "jsonb"})
+        assignments = set_clause(changes, DependentUpdate.model_fields, casts={"details": "jsonb"})
         row = db.execute(
             text(f"UPDATE app.dependents SET {assignments} WHERE id = :id RETURNING {COLUMNS}"),
             {**changes, "id": dependent_id},
