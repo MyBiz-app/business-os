@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Field, styles } from "@business-os/app-kit/components/ui";

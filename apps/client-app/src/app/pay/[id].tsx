@@ -2,7 +2,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Linking, Platform, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Animated, Linking, Platform, StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { useReducedMotion } from "@business-os/app-kit/components/motion";

@@ -1,7 +1,8 @@
 import type { components } from "@business-os/api-client";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";

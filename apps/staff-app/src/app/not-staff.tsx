@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { Text } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";

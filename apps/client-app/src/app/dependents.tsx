@@ -1,7 +1,8 @@
 import type { components } from "@business-os/api-client";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { DependentForm, type DependentBody } from "@business-os/app-kit/components/dependent-form";

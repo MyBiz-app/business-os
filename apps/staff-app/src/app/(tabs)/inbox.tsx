@@ -1,6 +1,7 @@
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";

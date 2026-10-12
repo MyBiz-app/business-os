@@ -2,7 +2,8 @@ import type { components } from "@business-os/api-client";
 import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Linking, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";

@@ -2,7 +2,8 @@ import { addDays, dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
 import { toMajorUnits, toMinorUnits } from "@business-os/i18n/money";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";

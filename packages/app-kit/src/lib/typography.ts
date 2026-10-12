@@ -10,3 +10,11 @@ export const font = {
   medium: { fontFamily: fontFamily.medium },
   bold: { fontFamily: fontFamily.bold },
 } as const;
+
+/** The Heebo file for a CSS font weight ("bold", 600, "500"…); anything lighter than 500 is regular. */
+export function familyFor(weight: unknown): string {
+  const w = weight === "bold" ? 700 : Number(weight ?? 400);
+  if (w >= 700) return fontFamily.bold;
+  if (w >= 500) return fontFamily.medium;
+  return fontFamily.regular;
+}

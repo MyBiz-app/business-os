@@ -2,7 +2,8 @@ import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, SectionTitle } from "@business-os/app-kit/components/rows";

@@ -1,7 +1,8 @@
 import { dayOf, todayIn } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
-import { Image, Linking, StyleSheet, Text, View } from "react-native";
+import { Image, Linking, StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SessionCard } from "@/components/session-card";

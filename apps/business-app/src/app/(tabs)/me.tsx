@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";

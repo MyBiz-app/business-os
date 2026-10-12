@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
