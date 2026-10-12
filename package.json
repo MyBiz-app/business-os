@@ -18,8 +18,8 @@
     "vertical:new": "pnpm --filter @business-os/verticals new"
   },
   "devDependencies": {
-    "supabase": "2.119.0",
-    "turbo": "2.11.6"
+    "supabase": "2.120.0",
+    "turbo": "2.11.7"
   },
   "packageManager": "pnpm@12.8.1",
   "engines": {
