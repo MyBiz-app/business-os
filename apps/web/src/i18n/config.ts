@@ -5,6 +5,6 @@ export {
   localeDirection,
   locales,
   matchAcceptLanguage,
-} from "@business-os/i18n";
+} from "@business-os/i18n/locales";
 
 export const LOCALE_COOKIE = "NEXT_LOCALE";

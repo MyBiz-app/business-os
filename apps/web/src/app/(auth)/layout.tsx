@@ -1,7 +1,9 @@
+import { ScopedMessages } from "@/components/scoped-messages";
 import { AppHeader } from "@/components/app-header";
 
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
+    <ScopedMessages scopes={["auth"]}>
     <div className="flex flex-1 flex-col">
       <AppHeader />
       <main className="enter flex flex-1 items-start justify-center px-4 py-16">
@@ -10,5 +12,6 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
         </div>
       </main>
     </div>
+    </ScopedMessages>
   );
 }

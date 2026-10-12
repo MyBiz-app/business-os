@@ -6,6 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./messages/*.json": "./messages/*.json",
+    "./locales": "./src/locales.ts",
+    "./load": "./src/load.ts",
     "./dates": "./src/dates.ts",
     "./money": "./src/money.ts",
     "./usage": "./src/usage.ts",

@@ -1,3 +1,4 @@
+import { ScopedMessages } from "@/components/scoped-messages";
 import { getTranslations } from "next-intl/server";
 import { termsOf, vertical } from "@business-os/verticals";
 
@@ -53,8 +54,9 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team" });
   if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings" });
 
+  // The business's brand color replaces the product color inside its own area.
   return (
-    // The business's brand color replaces the product color inside its own area.
+    <ScopedMessages scopes={["app", "tenant"]}>
     <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
       <aside className="border-b border-border bg-surface/60 print:hidden backdrop-blur md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto md:border-b-0 md:border-e">
         <WorkspaceSwitcher
@@ -86,5 +88,6 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
         {children}
       </div>
     </div>
+    </ScopedMessages>
   );
 }
