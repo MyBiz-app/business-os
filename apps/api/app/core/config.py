@@ -48,6 +48,10 @@ class Settings(BaseSettings):
     # UTC day.
     ai_daily_alert_credits: int = 2000
 
+    # Error monitoring (Sentry). Without a DSN nothing is sent and nothing is loaded.
+    sentry_dsn: SecretStr | None = None
+    sentry_traces_sample_rate: float = Field(default=0.0, ge=0.0, le=1.0)
+
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp
     email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password

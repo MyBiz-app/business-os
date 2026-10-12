@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
+import { sentryDsn, sentryIngestOrigin } from "./src/lib/monitoring";
+
 const withNextIntl = createNextIntlPlugin();
 
 // Scripts and styles stay 'unsafe-inline' because Next.js and next-themes inline small bootstrap
@@ -13,7 +15,8 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
-  "connect-src 'self'",
+  // Error reports go to Sentry, only when a DSN is set.
+  `connect-src 'self'${sentryIngestOrigin(sentryDsn()) ? ` ${sentryIngestOrigin(sentryDsn())}` : ""}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

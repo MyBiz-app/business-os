@@ -15,6 +15,7 @@
     "@business-os/brand": "workspace:*",
     "@business-os/i18n": "workspace:*",
     "@business-os/verticals": "workspace:*",
+    "@sentry/nextjs": "^11.6.0",
     "@supabase/ssr": "0.12.7",
     "@supabase/supabase-js": "2.117.2",
     "lucide-react": "1.51.0",
