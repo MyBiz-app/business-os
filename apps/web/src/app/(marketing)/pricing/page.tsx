@@ -1,4 +1,3 @@
-import type { components } from "@business-os/api-client";
 import { Check } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -8,10 +7,8 @@ import { BRAND } from "@business-os/i18n/brand";
 import { CtaBand, Faq } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 import { ModuleIcon } from "@/components/modules/module-icon";
-import { API_URL } from "@/lib/api";
+import { loadCatalog } from "@/lib/pricing";
 import { formatMoney, toMajor } from "@/lib/money";
-
-type Catalog = components["schemas"]["Catalog"];
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 const PRESETS = ["starter", "growing", "ai_powered"] as const;
@@ -19,15 +16,6 @@ const PRESETS = ["starter", "growing", "ai_powered"] as const;
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
   return { title: `${t("pricing")} · ${BRAND.name}` };
-}
-
-async function loadCatalog(currency: string): Promise<Catalog | null> {
-  try {
-    const response = await fetch(`${API_URL}/public/pricing?currency=${currency}`, { next: { revalidate: 3600 } });
-    return response.ok ? ((await response.json()) as Catalog) : null;
-  } catch {
-    return null;
-  }
 }
 
 /** Prices from the API's module catalog: recommended plans, base tiers and every module. */

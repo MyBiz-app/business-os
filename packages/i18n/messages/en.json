@@ -2143,7 +2143,8 @@
       "privacy": "Privacy policy",
       "accessibility": "Accessibility",
       "rights": "© {year} MyBiz. All rights reserved.",
-      "status": "System status"
+      "status": "System status",
+      "social": "Social media"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -2272,6 +2273,32 @@
           "title": "Your data is yours",
           "text": "Export sales and a client's data any time, and cancel with no commitment."
         }
+      }
+    },
+    "home": {
+      "facts": {
+        "label": "The product in numbers",
+        "modules": "abilities in one system",
+        "industries": "business types available",
+        "apps": "apps: clients, business and team",
+        "languages": "languages: Hebrew and English"
+      },
+      "bento": {
+        "eyebrow": "Abilities",
+        "more": "And more inside"
+      },
+      "pricing": {
+        "eyebrow": "Pricing",
+        "points": [
+          "No set-up fee",
+          "No commitment",
+          "Cancel any time",
+          "Add-ons only when needed"
+        ]
+      },
+      "about": {
+        "eyebrow": "About us",
+        "more": "More about us"
       }
     }
   },

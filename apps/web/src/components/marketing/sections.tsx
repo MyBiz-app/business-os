@@ -48,8 +48,8 @@ export function SectionHeading({ eyebrow, title, subtitle, id, level = 2 }: { ey
   const Heading = level === 1 ? "h1" : "h2";
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
-      {eyebrow && <p className="text-sm font-semibold text-primary">{eyebrow}</p>}
-      <Heading id={id} className={level === 1 ? "text-4xl font-extrabold tracking-tight sm:text-5xl" : "text-3xl font-bold tracking-tight sm:text-4xl"}>
+      {eyebrow && <p className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">{eyebrow}</p>}
+      <Heading id={id} className={level === 1 ? "text-4xl font-extrabold tracking-tight sm:text-5xl" : "text-3xl font-extrabold tracking-tight sm:text-5xl"}>
         {title}
       </Heading>
       {subtitle && <p className="text-lg text-muted">{subtitle}</p>}
@@ -170,16 +170,17 @@ export async function Faq() {
 export async function CtaBand() {
   const t = await getTranslations("marketing.cta");
   return (
-    <section className="px-6 py-20">
-      <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-5 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-strong-from via-brand-via to-brand-strong-to px-6 py-14 text-center text-white shadow-2xl">
-        <div aria-hidden="true" className="pointer-events-none absolute -top-24 -end-24 size-72 rounded-full bg-white/15 blur-3xl" />
-        <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">{t("title")}</h2>
-        <p className="relative max-w-xl text-lg text-white/85">{t("text")}</p>
-        <div className="relative flex flex-wrap justify-center gap-3">
-          <Link href="/start" className="btn-lg rounded-xl bg-white font-semibold text-brand-ink shadow-lg transition-transform hover:-translate-y-0.5">
+    <section className="px-6 pb-24 pt-8">
+      <div className="relative isolate mx-auto flex max-w-5xl flex-col items-center gap-5 overflow-hidden rounded-[2rem] bg-navy px-6 py-16 text-center text-white shadow-2xl">
+        <div aria-hidden="true" className="pointer-events-none absolute -top-24 start-[15%] -z-10 size-72 rounded-full bg-primary/50 blur-[90px]" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 end-[15%] -z-10 size-72 rounded-full bg-electric/30 blur-[90px]" />
+        <h2 className="text-3xl font-extrabold tracking-tight sm:text-5xl">{t("title")}</h2>
+        <p className="max-w-xl text-lg text-white/75">{t("text")}</p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/start" className="btn-primary btn-lg rounded-full px-7">
             {t("button")}
           </Link>
-          <Link href="/contact" className="btn-lg rounded-xl border border-white/40 font-semibold text-white transition-colors hover:bg-white/10">
+          <Link href="/contact" className="btn-lg inline-flex items-center justify-center rounded-full border border-white/25 px-7 font-semibold text-white transition-colors hover:bg-white/10">
             {t("contact")}
           </Link>
         </div>
@@ -192,7 +193,7 @@ export async function CtaBand() {
 export async function BranchesSection() {
   const t = await getTranslations("marketing.branches");
   return (
-    <section aria-labelledby="branches-heading" className="bg-surface/60 py-20">
+    <section aria-labelledby="branches-heading" className="bg-surface py-24">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
         <div className="flex flex-col gap-5">
           <p className="text-sm font-semibold text-primary">{t("eyebrow")}</p>

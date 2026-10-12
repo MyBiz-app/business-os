@@ -5,7 +5,6 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "marketing": [
     "account",
     "app",
-    "appearance",
     "auth",
     "business",
     "clientFields",
