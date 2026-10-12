@@ -42,7 +42,7 @@ export function MarketingHeader() {
   });
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-white/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
         <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
           <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />

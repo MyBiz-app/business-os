@@ -623,6 +623,35 @@ html[data-motion="reduce"] *::after {
   font-family: var(--font-display), var(--font-main), system-ui, sans-serif;
 }
 
+/* Night: the same palette on Midnight Navy. Blue lightens a step so links keep 4.5:1. */
+.dark .mk {
+  color-scheme: dark;
+  --background: #0b1020;
+  --foreground: #f8fafc;
+  --surface: #111827;
+  --border: #263247;
+  --muted: #94a3b8;
+  --palette-primary: #3b82f6;
+  --palette-on-primary: #0b1020;
+  --primary: #3b82f6;
+  --on-primary: #0b1020;
+  --success: #22c55e;
+  --shadow-color: 222 40% 2%;
+  --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
+  --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);
+  --brand-ink: #93c5fd;
+}
+
+/* The person's high-contrast choice wins over the marketing palette too. */
+html[data-contrast="high"] .mk {
+  --muted: #334155 !important;
+  --border: #64748b !important;
+}
+html[data-contrast="high"].dark .mk {
+  --muted: #e2e8f0 !important;
+  --border: #94a3b8 !important;
+}
+
 /* Fade-and-rise on scroll (Reveal): ease-out, short, and off for people who ask for less motion. */
 [data-reveal] {
   transition:
@@ -664,4 +693,52 @@ html[data-motion="reduce"] *::after {
   .mk-float {
     animation: mk-float 6s ease-in-out infinite;
   }
+}
+
+/* The demo stage (components/marketing/demo-stage.tsx): scenes rise in, bars grow, and the
+ * progress line fills over one scene's time. Pausing stops all of it. */
+@keyframes mk-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mk-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes mk-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.mk-rise {
+  animation: mk-rise 500ms var(--ease-out) both;
+}
+.mk-grow {
+  transform-origin: bottom;
+  animation: mk-grow 800ms var(--ease-out) both;
+}
+.mk-fill {
+  transform-origin: left;
+  animation: mk-fill var(--scene-ms, 5000ms) linear both;
+}
+[dir="rtl"] .mk-fill {
+  transform-origin: right;
+}
+[data-paused="true"] .mk-rise,
+[data-paused="true"] .mk-grow,
+[data-paused="true"] .mk-fill {
+  animation-play-state: paused;
 }

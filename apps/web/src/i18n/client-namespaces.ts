@@ -3,8 +3,10 @@
  * scopes of its layouts (see ScopedMessages). Everything else stays on the server. */
 export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "tenant" | "platform", readonly string[]> = {
   "marketing": [
+    "accessibility",
     "account",
     "app",
+    "appearance",
     "auth",
     "business",
     "clientFields",

@@ -98,6 +98,11 @@ function Row({ label, hint, children }: { label: string; hint: string; children:
   );
 }
 
+/** Back to the default look: normal contrast, text size and motion. */
+export function resetAccessibility() {
+  save(DEFAULTS);
+}
+
 /** Language, theme, contrast, text size and motion: the choices that used to sit in the toolbar. */
 export function AccessibilitySettings() {
   const t = useTranslations("accessibility");

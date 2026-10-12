@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
-import { AboutTeaser, BentoFeatures, FactsStrip, PricingTeaser } from "@/components/marketing/home";
+import { AboutTeaser, BentoFeatures, DemoSection, FactsStrip, PricingTeaser } from "@/components/marketing/home";
 import { Reveal } from "@/components/marketing/reveal";
 import { BranchesSection, CtaBand, Faq, IndustryCards, SectionHeading } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
@@ -77,6 +77,8 @@ export default async function Home() {
       <FactsStrip />
 
       <BentoFeatures />
+
+      <DemoSection />
 
       {/* AI assistant */}
       <section aria-labelledby="ai-heading" className="relative isolate overflow-hidden bg-navy py-24 text-white">

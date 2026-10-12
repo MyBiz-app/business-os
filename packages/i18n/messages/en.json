@@ -2299,7 +2299,35 @@
       "about": {
         "eyebrow": "About us",
         "more": "More about us"
+      },
+      "demo": {
+        "eyebrow": "Live preview",
+        "title": "A day of work in MyBiz",
+        "subtitle": "Calendar, AI assistant and reports in a 15-second loop. Pause it or pick a step.",
+        "scenesLabel": "Choose a step",
+        "pause": "Pause the demo",
+        "play": "Play the demo",
+        "open": "Open",
+        "booked": "Booked",
+        "approve": "Waiting for your approval",
+        "tabs": {
+          "schedule": "Calendar",
+          "ai": "AI assistant",
+          "reports": "Reports"
+        },
+        "scenes": {
+          "schedule": "Clients book on their own and the calendar updates at once.",
+          "ai": "Ask in plain language and the assistant prepares an action for your approval.",
+          "reports": "Revenue and occupancy without opening a spreadsheet."
+        }
       }
+    },
+    "a11y": {
+      "open": "Open the accessibility menu",
+      "close": "Close",
+      "title": "Accessibility and display",
+      "reset": "Reset settings",
+      "statement": "Accessibility statement"
     }
   },
   "appointments": {

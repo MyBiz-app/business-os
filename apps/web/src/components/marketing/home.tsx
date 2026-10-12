@@ -3,6 +3,7 @@ import { ArrowLeft, Check, Sparkles } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { DemoStage } from "@/components/marketing/demo-stage";
 import { Reveal } from "@/components/marketing/reveal";
 import { FEATURES, SectionHeading } from "@/components/marketing/sections";
 import { loadCatalog } from "@/lib/pricing";
@@ -198,6 +199,21 @@ export async function AboutTeaser() {
           </li>
         ))}
       </ul>
+    </section>
+  );
+}
+
+/** The looping product tour ("a live video"): see components/marketing/demo-stage.tsx. */
+export async function DemoSection() {
+  const t = await getTranslations("marketing.home.demo");
+  return (
+    <section id="demo" aria-labelledby="demo-heading" className="mx-auto flex w-full max-w-5xl scroll-mt-20 flex-col gap-10 px-6 pb-24">
+      <Reveal>
+        <SectionHeading id="demo-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
+      </Reveal>
+      <Reveal>
+        <DemoStage />
+      </Reveal>
     </section>
   );
 }
