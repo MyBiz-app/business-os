@@ -1,13 +1,15 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Appearance, Platform, useColorScheme } from "react-native";
 
-import { colors, type Palette } from "../lib/theme";
-import { loadTheme, saveTheme, type ThemePreference } from "../lib/preferences";
+import { paletteFor, type Palette } from "../lib/theme";
+import { loadHighContrast, loadTheme, saveHighContrast, saveTheme, type ThemePreference } from "../lib/preferences";
 
 type ThemeContextValue = {
   preference: ThemePreference;
   setPreference: (preference: ThemePreference) => void;
   scheme: "light" | "dark";
+  highContrast: boolean;
+  setHighContrast: (on: boolean) => void;
   palette: Palette;
 };
 
@@ -15,6 +17,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [preference, setPreferenceState] = useState<ThemePreference>("system");
+  const [highContrast, setHighContrastState] = useState(false);
   const systemScheme = useColorScheme();
   const scheme: "light" | "dark" =
     preference === "system" ? (systemScheme === "dark" ? "dark" : "light") : preference;
@@ -37,9 +40,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [apply],
   );
 
+  useEffect(() => {
+    loadHighContrast().then(setHighContrastState);
+  }, []);
+
+  const setHighContrast = useCallback((on: boolean) => {
+    setHighContrastState(on);
+    void saveHighContrast(on);
+  }, []);
+
   const value = useMemo(
-    () => ({ preference, setPreference, scheme, palette: colors[scheme] }),
-    [preference, setPreference, scheme],
+    () => ({ preference, setPreference, scheme, highContrast, setHighContrast, palette: paletteFor(scheme, highContrast) }),
+    [preference, setPreference, scheme, highContrast, setHighContrast],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

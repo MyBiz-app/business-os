@@ -17,7 +17,7 @@ const THEMES: ThemePreference[] = ["system", "light", "dark"];
 export function PreferencesCard({ palette, signOutVariant = "secondary" }: { palette: Palette; signOutVariant?: "secondary" | "danger" }) {
   const t = useTranslations("business.me");
   const tLocales = useTranslations("locales");
-  const { preference, setPreference } = useTheme();
+  const { preference, setPreference, highContrast, setHighContrast } = useTheme();
   const { locale, setLocale } = useLocaleSetting();
 
   return (
@@ -34,6 +34,15 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
           value={preference}
           options={THEMES.map((value) => ({ value, label: t(`themes.${value}`) }))}
           onChange={setPreference}
+        />
+        <SegmentedControl
+          label={t("contrast")}
+          value={highContrast ? "high" : "normal"}
+          options={[
+            { value: "normal", label: t("contrastNormal") },
+            { value: "high", label: t("contrastHigh") },
+          ]}
+          onChange={(value) => setHighContrast(value === "high")}
         />
       </Card>
       <Button
