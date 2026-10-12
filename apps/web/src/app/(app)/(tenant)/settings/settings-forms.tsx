@@ -19,7 +19,7 @@ import { type IdentityState, type LogoState, updateBrandColor, updateDetails, up
 type Tenant = components["schemas"]["Tenant"];
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
-const DEFAULT_COLOR = "#6d28d9";
+const DEFAULT_COLOR = "#2563eb";
 const CANCELLATION_WINDOWS = [0, 60, 120, 180, 360, 720, 1440, 2880];
 
 export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: string[] }) {

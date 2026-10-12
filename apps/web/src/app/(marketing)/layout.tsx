@@ -1,5 +1,5 @@
 import { ScopedMessages } from "@/components/scoped-messages";
-import { AccessibilityWidget } from "@/components/marketing/accessibility-widget";
+import { AccessibilityWidget } from "@/components/accessibility-widget";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 

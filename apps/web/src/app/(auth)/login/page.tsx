@@ -13,12 +13,12 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">{t("login.title")}</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">{t("login.title")}</h1>
       <OAuthButtons next={nextPath} />
       <LoginForm initialError={error === "link_invalid" ? "link_invalid" : undefined} next={nextPath} />
       <p className="text-sm text-muted">
         {t("login.noAccount")}{" "}
-        <Link href={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"} className="text-primary underline-offset-4 hover:underline">
+        <Link href={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"} className="text-primary underline underline-offset-4">
           {t("login.signupLink")}
         </Link>
       </p>

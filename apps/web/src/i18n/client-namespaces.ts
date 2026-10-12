@@ -19,6 +19,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "verticals"
   ],
   "auth": [
+    "accessibility",
     "appearance",
     "auth",
     "locales",

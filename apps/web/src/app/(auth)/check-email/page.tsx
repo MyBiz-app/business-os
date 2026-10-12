@@ -8,7 +8,7 @@ export default async function CheckEmailPage({ searchParams }: PageProps<"/check
 
   return (
     <>
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
       <p>{t("body", { email: typeof email === "string" ? email : "" })}</p>
       {devMailbox && (
         <p className="rounded-xl border border-border bg-surface px-3 py-2 text-sm">

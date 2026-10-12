@@ -168,6 +168,16 @@
       "apple": "Continue with Apple",
       "or": "or with email",
       "soon": "Coming soon"
+    },
+    "panel": {
+      "eyebrow": "Welcome",
+      "title": "Your business, organized in one place",
+      "points": [
+        "Calendar, clients and payments in one system",
+        "An AI assistant that prepares actions for your approval",
+        "Full Hebrew and English, and your business data stays protected"
+      ],
+      "back": "Back to the site"
     }
   },
   "onboarding": {
@@ -2321,13 +2331,6 @@
           "reports": "Revenue and occupancy without opening a spreadsheet."
         }
       }
-    },
-    "a11y": {
-      "open": "Open the accessibility menu",
-      "close": "Close",
-      "title": "Accessibility and display",
-      "reset": "Reset settings",
-      "statement": "Accessibility statement"
     }
   },
   "appointments": {
@@ -4881,7 +4884,12 @@
     "textLarger": "Larger",
     "motion": "Reduce motion",
     "motionHint": "Fewer animations and transitions.",
-    "motionReduced": "Reduced"
+    "motionReduced": "Reduced",
+    "widgetOpen": "Open the accessibility menu",
+    "widgetClose": "Close",
+    "widgetTitle": "Accessibility and display",
+    "reset": "Reset settings",
+    "statement": "Accessibility statement"
   },
   "closure": {
     "title": "Close this business",

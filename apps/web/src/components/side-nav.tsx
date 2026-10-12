@@ -80,9 +80,9 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((value) => !value)}
-        className="mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold md:hidden"
+        className="mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold text-foreground md:hidden"
       >
-        <CurrentIcon aria-hidden="true" className="size-[18px] text-primary" />
+        <CurrentIcon aria-hidden="true" className="size-[18px] text-electric" />
         <span className="flex-1 text-start">{current?.label ?? t("menu")}</span>
         <span className="sr-only">{t("menu")}</span>
         <ChevronDown aria-hidden="true" className={`size-4 transition-transform ${open ? "rotate-180" : ""}`} />
@@ -103,7 +103,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 aria-label={item.locked ? t("lockedItem", { name: item.label }) : undefined}
                 className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                   active
-                    ? "bg-primary/10 text-primary"
+                    ? "bg-foreground/10 text-foreground"
                     : item.locked
                       ? "text-muted/80 hover:bg-foreground/5 hover:text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground"
@@ -112,13 +112,13 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 {/* Active marker on the inline-start edge (desktop column). */}
                 <span
                   aria-hidden="true"
-                  className={`absolute inset-y-2 start-0 hidden w-1 rounded-full bg-primary transition-transform duration-300 md:block ${
+                  className={`absolute inset-y-2 start-0 hidden w-1 rounded-full bg-electric transition-transform duration-300 md:block ${
                     active ? "scale-y-100" : "scale-y-0"
                   }`}
                 />
                 <Icon
                   aria-hidden="true"
-                  className={`size-[18px] shrink-0 transition-transform duration-200 ${active ? "" : "group-hover:scale-110"}`}
+                  className={`size-[18px] shrink-0 transition-transform duration-200 ${active ? "text-electric" : "group-hover:scale-110"}`}
                 />
                 <span className="truncate">{item.label}</span>
                 {item.locked && (

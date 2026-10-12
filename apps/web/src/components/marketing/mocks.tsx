@@ -101,7 +101,7 @@ export async function PhoneMock() {
             </div>
             <span
               className={`rounded-lg px-2 py-1 text-[10px] font-bold ${
-                index === 0 ? "bg-success text-white dark:text-zinc-950" : "bg-primary text-on-primary"
+                index === 0 ? "bg-[#15803d] text-white dark:bg-success dark:text-zinc-950" : "bg-primary text-on-primary"
               }`}
             >
               {index === 0 ? t("app.booked") : t("app.book")}

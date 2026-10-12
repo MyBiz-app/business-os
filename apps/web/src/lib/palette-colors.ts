@@ -5,7 +5,7 @@
 
 export type PaletteColors = { background: string; text: string; accent: string };
 
-export const DEFAULT_COLORS: PaletteColors = { background: "#ffffff", text: "#0a0a0a", accent: "#6d28d9" };
+export const DEFAULT_COLORS: PaletteColors = { background: "#ffffff", text: "#0a0a0a", accent: "#2563eb" };
 
 export const HEX = /^#[0-9a-f]{6}$/;
 

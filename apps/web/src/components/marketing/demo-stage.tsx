@@ -67,7 +67,7 @@ export function DemoStage() {
                       <span className="font-semibold tabular-nums" dir="ltr">{["07:00", "09:30", "18:00"][index]}</span>
                       <span className="h-6 w-1 rounded-full" style={{ backgroundColor: ["#2563eb", "#06b6d4", "#7c3aed"][index] }} />
                       <span className="flex-1 truncate font-medium">{name}</span>
-                      <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${index === 1 ? "mk-rise bg-success/15 text-success" : "bg-primary/10 text-primary"}`} style={index === 1 ? { animationDelay: "1400ms" } : undefined}>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${index === 1 ? "mk-rise bg-success/15 text-[#15803d] dark:text-success" : "bg-primary/10 text-primary"}`} style={index === 1 ? { animationDelay: "1400ms" } : undefined}>
                         {index === 1 && <CalendarCheck className="size-3.5" />}
                         {index === 1 ? t("booked") : t("open")}
                       </span>
