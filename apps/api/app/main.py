@@ -10,6 +10,7 @@ from app.api.registry import ROUTERS
 from app.core.config import get_settings, missing_production_settings
 from app.core.db import get_engine
 from app.core.logging import configure_logging, request_logging
+from app.core.monitoring import init_monitoring
 from app.core.rate_limit import build_store, limiter
 
 
@@ -28,6 +29,7 @@ def create_app() -> FastAPI:
     if missing := missing_production_settings(settings):
         raise RuntimeError(f"production needs these settings: {', '.join(missing)}")
     configure_logging()
+    init_monitoring(settings)
     app = FastAPI(
         title="Business OS API",
         version="0.1.0",

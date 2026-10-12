@@ -1,9 +1,15 @@
-name: Keep the staging API awake
+name: Uptime check and keep the staging API awake
 
 # Render's free plan puts the API to sleep after 15 minutes without traffic; the first request
 # then waits up to a minute and the web app shows an error. A request every 10 minutes during
-# Israeli daytime keeps it awake. The free plan's 750 hours a month cover one service running
-# all month. Remove this when the API moves to a paid plan, which never sleeps.
+# Israeli daytime keeps it awake, and doubles as the uptime check: the job fails (and GitHub
+# emails the repository's watchers) when /health/ready does not answer {"status":"ok"} after
+# three tries, or when the web app is down. The free plan's 750 hours a month cover one service
+# running all month. Remove the keep-awake part when the API moves to a paid plan, which never
+# sleeps; keep the check (or use an outside monitor, see docs/monitoring.md).
+#
+# Optional repository variables (Settings → Secrets and variables → Actions → Variables) point
+# the check at production: UPTIME_API_URL and UPTIME_WEB_URL.
 on:
   schedule:
     - cron: "*/10 4-21 * * *"  # every 10 minutes, 04:00–21:59 UTC (07:00–00:59 in Israel)
@@ -14,10 +20,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ping:
-    name: Ping /health/ready
+  check:
+    name: Check /health/ready and the web app
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 6
+    env:
+      API_URL: ${{ vars.UPTIME_API_URL || 'https://business-os-api-staging.onrender.com' }}
+      WEB_URL: ${{ vars.UPTIME_WEB_URL || 'https://business-os-alpha-drab.vercel.app' }}
     steps:
-      - name: Ping
-        run: curl --silent --show-error --fail --max-time 120 https://business-os-api-staging.onrender.com/health/ready
+      - name: API is ready
+        run: |
+          # The first try may wake a sleeping free-plan API, so allow time and retry.
+          body=$(curl --silent --show-error --fail --max-time 120 --retry 2 --retry-delay 20 \
+            --retry-all-errors "$API_URL/health/ready")
+          echo "$body"
+          echo "$body" | grep -q '"status":"ok"'
+
+      - name: Web app answers
+        run: curl --silent --show-error --fail --max-time 60 --retry 2 --retry-delay 10 --output /dev/null "$WEB_URL/"

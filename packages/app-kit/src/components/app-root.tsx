@@ -4,7 +4,10 @@ import type { ComponentType, ReactNode } from "react";
 
 import { I18nProvider } from "../providers/i18n-provider";
 import { SessionProvider } from "../providers/session-provider";
+import { initMonitoring } from "../lib/monitoring";
 import { ThemeProvider, useTheme } from "../providers/theme-provider";
+
+initMonitoring();
 
 function ThemedStack() {
   const { scheme, palette } = useTheme();
