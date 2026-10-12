@@ -429,6 +429,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/webhooks/whatsapp/{provider}/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Whatsapp Webhook */
+        post: operations["whatsapp_webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/quotes": {
         parameters: {
             query?: never;
@@ -1280,6 +1297,67 @@ export interface paths {
         post?: never;
         /** Delete Template */
         delete: operations["delete_template"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/whatsapp-ai/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Whatsapp Conversations
+         * @description The 50 most recent conversations with clients (tries are left out).
+         */
+        get: operations["list_whatsapp_conversations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/whatsapp-ai/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Whatsapp Conversation */
+        get: operations["get_whatsapp_conversation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/whatsapp-ai/try": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Try Bot
+         * @description Writes to the bot as the client with this phone number and returns its answer.
+         */
+        post: operations["try_bot"];
+        /**
+         * Reset Try
+         * @description Starts the tries over (deletes the test conversations and their offers).
+         */
+        delete: operations["reset_try"];
         options?: never;
         head?: never;
         patch?: never;
@@ -6103,36 +6181,6 @@ export interface components {
              */
             tier: "standard" | "priority" | "vip";
         };
-        /** Conversation */
-        Conversation: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Turns */
-            turns: components["schemas"]["Turn"][];
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /** ConversationSummary */
-        ConversationSummary: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Title */
-            title: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
         /** CopiedShifts */
         CopiedShifts: {
             /** Created */
@@ -7810,6 +7858,32 @@ export interface components {
             created_at: string;
             /** Read At */
             read_at: string | null;
+        };
+        /** Offer */
+        Offer: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            };
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "accepted" | "declined" | "expired" | "failed" | "replaced";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            } | null;
         };
         /**
          * OpeningHours
@@ -10487,20 +10561,22 @@ export interface components {
             /** Days */
             days: number;
         };
-        /** Turn */
-        Turn: {
+        /** TryMessage */
+        TryMessage: {
             /**
-             * Role
-             * @enum {string}
+             * Phone
+             * @description A client's phone number
              */
-            role: "user" | "assistant";
+            phone: string;
             /** Text */
             text: string;
-            /**
-             * Pending Actions
-             * @default []
-             */
-            pending_actions: components["schemas"]["PendingAction"][];
+        };
+        /** TryReply */
+        TryReply: {
+            /** Reply */
+            reply: string;
+            /** Offer Id */
+            offer_id: string | null;
         };
         /**
          * Usage
@@ -10650,6 +10726,51 @@ export interface components {
              */
             expected_active_clients: number;
         };
+        /** Conversation */
+        app__api__assistant__Conversation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Turns */
+            turns: components["schemas"]["app__api__assistant__Turn"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ConversationSummary */
+        app__api__assistant__ConversationSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** Turn */
+        app__api__assistant__Turn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /** Text */
+            text: string;
+            /**
+             * Pending Actions
+             * @default []
+             */
+            pending_actions: components["schemas"]["PendingAction"][];
+        };
         /** ProfileUpdate */
         app__api__client_app__ProfileUpdate: {
             /** First Name */
@@ -10678,6 +10799,58 @@ export interface components {
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
+        };
+        /** Conversation */
+        app__api__whatsapp_ai__Conversation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phone */
+            phone: string;
+            /** Client Id */
+            client_id: string | null;
+            /** Turns */
+            turns: components["schemas"]["app__api__whatsapp_ai__Turn"][];
+            /** Offers */
+            offers: components["schemas"]["Offer"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ConversationSummary */
+        app__api__whatsapp_ai__ConversationSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phone */
+            phone: string;
+            /** Client Id */
+            client_id: string | null;
+            /** Client Name */
+            client_name: string | null;
+            /** Last Text */
+            last_text: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** Turn */
+        app__api__whatsapp_ai__Turn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "client" | "ai";
+            /** Text */
+            text: string;
         };
     };
     responses: never;
@@ -11714,6 +11887,36 @@ export interface operations {
         };
     };
     payment_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    whatsapp_webhook: {
         parameters: {
             query?: never;
             header?: never;
@@ -13888,6 +14091,142 @@ export interface operations {
             path: {
                 template_id: string;
             };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_whatsapp_conversations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__whatsapp_ai__ConversationSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_whatsapp_conversation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__whatsapp_ai__Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    try_bot: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TryMessage"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TryReply"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_try: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -18744,7 +19083,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConversationSummary"][];
+                    "application/json": components["schemas"]["app__api__assistant__ConversationSummary"][];
                 };
             };
             /** @description Validation Error */
@@ -18777,7 +19116,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
                 };
             };
             /** @description Validation Error */
@@ -18812,7 +19151,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
                 };
             };
             /** @description Validation Error */
@@ -18851,7 +19190,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
                 };
             };
             /** @description Validation Error */

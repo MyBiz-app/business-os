@@ -33,6 +33,9 @@ OVERRIDES = {
     "shift_templates": {"ends": "'17:00'", "starts": "'09:00'"},
     "support_grants": {"expires_at": "now() + interval '1 day'"},
     "tenant_integrations": {"capability": "'payments'", "provider": "'stub'"},
+    "whatsapp_conversations": {"phone": "'0501234567'"},
+    "whatsapp_inbox": {"from_phone": "'0501234567'"},
+    "whatsapp_offers": {"kind": "'book_session'"},
 }
 # A harmless value for each kind of NOT NULL column a synthetic row has to fill.
 DUMMY = {
