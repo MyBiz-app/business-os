@@ -1,10 +1,20 @@
-import { Children, useId } from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, TextInput, type TextInputProps, View } from "react-native";
+import { Children, useEffect, useId, useRef } from "react";
+import {
+  ActivityIndicator,
+  Animated,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  type TextInputProps,
+  View,
+} from "react-native";
 import { Text } from "./text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 
-import { FadeIn, PressableScale } from "./motion";
+import { FadeIn, PressableScale, useReducedMotion } from "./motion";
 import { tint } from "../lib/brand";
 import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
@@ -97,11 +107,47 @@ export function LoadError({ palette, onRetry }: { palette: Palette; onRetry: () 
 
 /** An empty list, or a spinner while the first load runs; keeps every screen's "nothing here" look the same. */
 export function EmptyState({ palette, message, loading }: { palette: Palette; message: string; loading?: boolean }) {
-  if (loading) return <ActivityIndicator accessibilityLabel={message} color={palette.primary} />;
+  if (loading) return <SkeletonCard palette={palette} label={message} />;
   return (
     <Card palette={palette}>
       <Text style={[styles.muted, { color: palette.muted }]}>{message}</Text>
     </Card>
+  );
+}
+
+/** A soft pulsing placeholder block; holds the shape of content while it loads. */
+export function Skeleton({ palette, width, height = 14 }: { palette: Palette; width?: number | `${number}%`; height?: number }) {
+  const reduced = useReducedMotion();
+  const pulse = useRef(new Animated.Value(0.5)).current;
+  useEffect(() => {
+    if (reduced) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 800, useNativeDriver: Platform.OS !== "web" }),
+        Animated.timing(pulse, { toValue: 0.5, duration: 800, useNativeDriver: Platform.OS !== "web" }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulse, reduced]);
+  return (
+    <Animated.View
+      aria-hidden
+      style={{ width: width ?? "100%", height, borderRadius: height / 2, backgroundColor: tint(palette.muted, 0.22), opacity: reduced ? 0.7 : pulse }}
+    />
+  );
+}
+
+/** A card-shaped skeleton, announced to screen readers as "loading". */
+export function SkeletonCard({ palette, label }: { palette: Palette; label: string }) {
+  return (
+    <View accessible accessibilityRole="progressbar" accessibilityLabel={label} aria-busy>
+      <Card palette={palette}>
+        <Skeleton palette={palette} width="40%" height={12} />
+        <Skeleton palette={palette} width="75%" height={18} />
+        <Skeleton palette={palette} width="55%" height={12} />
+      </Card>
+    </View>
   );
 }
 
@@ -110,10 +156,12 @@ type ScreenProps = {
   children: React.ReactNode;
   refreshing?: boolean;
   onRefresh?: () => void;
+  /** A main action pinned above the tab bar (book, pay, save), like a sticky bottom CTA. */
+  footer?: React.ReactNode;
 };
 
 /** A safe-area, scrollable screen with optional pull-to-refresh. */
-export function Screen({ palette, children, refreshing, onRefresh }: ScreenProps) {
+export function Screen({ palette, children, refreshing, onRefresh, footer }: ScreenProps) {
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={[styles.screen, { backgroundColor: palette.background }]}>
       <ScrollView
@@ -128,6 +176,9 @@ export function Screen({ palette, children, refreshing, onRefresh }: ScreenProps
           </FadeIn>
         ))}
       </ScrollView>
+      {footer ? (
+        <View style={[styles.footer, { backgroundColor: palette.background, borderTopColor: palette.border }]}>{footer}</View>
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -155,6 +206,7 @@ export const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 20, gap: 16, paddingBottom: 40 },
   block: { gap: 16 },
+  footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
   button: { minHeight: 52, borderRadius: 999, paddingHorizontal: 24, alignItems: "center", justifyContent: "center" },
   buttonText: { fontSize: 16, ...font.bold },
   field: { gap: 6 },

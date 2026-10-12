@@ -70,7 +70,18 @@ export default function Home() {
   const update = () => void reload();
 
   return (
-    <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+    <Screen
+      palette={palette}
+      refreshing={loading}
+      onRefresh={() => void reload()}
+      footer={
+        (data?.appointments ?? 0) > 0 ? (
+          <Button label={tAppointment("cta")} palette={palette} onPress={() => router.push("/appointment")} />
+        ) : (
+          <Button label={t("bookClass")} palette={palette} onPress={() => router.navigate("/schedule")} />
+        )
+      }
+    >
       <View style={[local.hero, elevation.raised, { backgroundColor: palette.primary }]}>
         {/* Soft light circles give the brand color depth. */}
         <View aria-hidden style={[local.orb, local.orbLarge, { backgroundColor: tint(palette.onPrimary === "#ffffff" ? "#ffffff" : "#000000", 0.12) }]} />
@@ -184,32 +195,27 @@ export default function Home() {
       )}
 
       {(data?.courts ?? 0) > 0 && (
-        <Button label={tCourt("cta")} palette={palette} onPress={() => router.push("/court")} />
+        <Button label={tCourt("cta")} palette={palette} variant="secondary" onPress={() => router.push("/court")} />
       )}
-      {(data?.appointments ?? 0) > 0 ? (
-        <>
-          <Button label={tAppointment("cta")} palette={palette} onPress={() => router.push("/appointment")} />
-          <Button
-            label={tTerms(`${termsFor(business)}.appTab`)}
-            palette={palette}
-            variant="secondary"
-            onPress={() => router.navigate("/schedule")}
-          />
-        </>
-      ) : (
-        <Button label={t("bookClass")} palette={palette} onPress={() => router.navigate("/schedule")} />
+      {(data?.appointments ?? 0) > 0 && (
+        <Button
+          label={tTerms(`${termsFor(business)}.appTab`)}
+          palette={palette}
+          variant="secondary"
+          onPress={() => router.navigate("/schedule")}
+        />
       )}
     </Screen>
   );
 }
 
 const local = StyleSheet.create({
-  hero: { borderRadius: 24, padding: 22, paddingVertical: 28, gap: 6, overflow: "hidden" },
+  hero: { borderRadius: 28, padding: 24, paddingVertical: 32, gap: 6, overflow: "hidden" },
   orb: { position: "absolute", borderRadius: 999 },
   orbLarge: { width: 220, height: 220, top: -90, end: -60 },
   orbSmall: { width: 120, height: 120, bottom: -50, end: 70 },
   logo: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#ffffff" },
-  business: { fontSize: 26, fontWeight: "700", textAlign: "left" },
+  business: { fontSize: 28, fontWeight: "700", textAlign: "left" },
   greeting: { fontSize: 16, textAlign: "left" },
   reviewTitle: { fontSize: 17, fontWeight: "700", textAlign: "left" },
 });
