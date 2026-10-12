@@ -59,6 +59,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "schedule",
     "services",
     "settings",
+    "shiftSwapQueue",
     "shifts",
     "start",
     "support",
