@@ -37,7 +37,7 @@ export function Chip({ label, sublabel, selected, onPress, palette, accessibilit
 }
 
 const local = StyleSheet.create({
-  chip: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, alignItems: "center", minWidth: 64 },
+  chip: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, alignItems: "center", justifyContent: "center", minWidth: 64, minHeight: 44 },
   label: { fontSize: 15, fontWeight: "700", fontVariant: ["tabular-nums"] },
   sub: { fontSize: 11, fontWeight: "600" },
 });
