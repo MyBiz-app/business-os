@@ -82,7 +82,7 @@ error is handled, but I found no per-tenant daily token or message cap. Usage ev
 the data is there. Add a per-plan daily cap enforced in `ai/gateway.py`, soft-warn at 80% like the
 other quotas. This is the one place a single tenant can create unbounded cost.
 
-**H6. Web security headers.** The web app sends only `frame-ancestors 'none'` as its CSP. Add a
+**H6. Web security headers.** ✅ Report-only nonce CSP, report endpoint and HSTS done (2026-10-12); switch to enforcing once reports are clean. The web app sends only `frame-ancestors 'none'` as its CSP. Add a
 real CSP (script-src with nonces for Next, `connect-src` limited to the API and Supabase), HSTS
 (Vercel adds it on its domain; set it for the custom domain), and test with a report-only header
 first.

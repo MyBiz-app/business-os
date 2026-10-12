@@ -12,17 +12,24 @@
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
     uv run python -m app.jobs delete-closed-businesses [--apply] (dry run unless --apply)
     uv run python -m app.jobs move-files      (documents kept in the database → the object store)
+    uv run python -m app.jobs run-daily       (every daily job in turn, for a cron service)
+    uv run python -m app.jobs run-hourly      (every hourly job in turn)
+    uv run python -m app.jobs check-jobs      (fails when a scheduled job is late)
+
+Every run is recorded in app.job_runs (started, finished, ok, result), so a job that stopped
+running or keeps failing is noticed by check-jobs (.github/workflows/check-jobs-staging.yml).
 
 Jobs run with the migration (owner) connection, across all businesses, so they must only do
 system work that needs no user's permission."""
 
 import argparse
 import json
+import sys
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Connection, create_engine, text
+from sqlalchemy import Connection, Engine, create_engine, text
 
 from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
@@ -35,6 +42,7 @@ from app.messaging.email import (
     send_emails,
     sender_from_settings,
 )
+from app.messaging.push import push_sender_from_settings
 from app.messaging.roster import notify_roster, notify_roster_changes
 from app.providers.choice import choose
 from app.providers.storage import tenant_key
@@ -488,18 +496,20 @@ def issue_documents(conn: Connection) -> dict[str, int]:
 
 def notify_shifts(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
-    if sender is None:
-        return "email provider not configured; nothing sent"
-    published = notify_roster(conn, sender)
-    edits = notify_roster_changes(conn, sender)
+    push = push_sender_from_settings()
+    if sender is None and push is None:
+        return "no email or push provider configured; nothing sent"
+    published = notify_roster(conn, sender, push=push)
+    edits = notify_roster_changes(conn, sender, push=push)
     return published | {f"changes_{key}": value for key, value in edits.items()}
 
 
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
-    if sender is None:
-        return "email provider not configured; nothing sent"
-    return send_emails(conn, sender)
+    push = push_sender_from_settings()
+    if sender is None and push is None:
+        return "no email or push provider configured; nothing sent"
+    return send_emails(conn, sender, push=push)
 
 
 MOVE_BATCH = 100  # documents per run, so one run stays short; run again until it reports 0
@@ -552,10 +562,87 @@ JOBS = {
     "move-files": move_files,
 }
 
+# How often each scheduled job must succeed, in hours: the schedule plus slack for a delayed
+# run (GitHub's scheduler can start a run late). check-jobs reports a job as late after that.
+DAILY = [
+    "extend-series",
+    "remind-sessions",
+    "remind-plans",
+    "bill-businesses",
+    "message-reminders",
+    "follow-up-leads",
+    "purge-expired",
+    "delete-closed-businesses",
+    "send-messages",
+    "issue-documents",
+]
+HOURLY = ["publish-shifts", "send-emails", "notify-shifts"]
+MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 3 for job in HOURLY}}
+# Jobs whose staging workflow runs only once an email provider is set: they count as late only
+# after they have run at least once.
+OPTIONAL = {"send-emails", "notify-shifts"}
+
+
+def run_job(engine: Engine, name: str, apply: bool = False) -> object:
+    """Runs one job in its own transaction and records the run in app.job_runs, failed runs
+    included (the record is written apart from the job, so a rollback doesn't lose it)."""
+    with engine.begin() as conn:
+        run_id = conn.execute(
+            text("INSERT INTO app.job_runs (job) VALUES (:job) RETURNING id"), {"job": name}
+        ).scalar_one()
+    ok, result = False, None
+    try:
+        with engine.begin() as conn:
+            job = JOBS[name]
+            result = job(conn, apply=apply) if job is delete_closed_businesses else job(conn)
+        ok = True
+        return result
+    except Exception as error:
+        result = f"{type(error).__name__}: {error}"
+        raise
+    finally:
+        with engine.begin() as conn:
+            conn.execute(
+                text("""
+                UPDATE app.job_runs SET finished_at = now(), ok = :ok, result = :result
+                WHERE id = :id
+            """),
+                {"id": run_id, "ok": ok, "result": str(result)[:2000]},
+            )
+
+
+def late_jobs(conn: Connection, now: datetime | None = None) -> list[dict]:
+    """The scheduled jobs whose last successful run is older than they allow (or never ran)."""
+    now = now or datetime.now(UTC)
+    last = dict(
+        conn.execute(
+            text("SELECT job, max(finished_at) FROM app.job_runs WHERE ok GROUP BY job")
+        ).all()
+    )
+    return [
+        {"job": job, "last_ok": last.get(job), "max_hours": hours}
+        for job, hours in MAX_HOURS.items()
+        if (last.get(job) is None and job not in OPTIONAL)
+        or (last.get(job) is not None and now - last[job] > timedelta(hours=hours))
+    ]
+
+
+def run_group(engine: Engine, names: list[str]) -> list[str]:
+    """Runs jobs one after another; a failure is recorded and the rest still run.
+    Returns the names of the jobs that failed."""
+    failed = []
+    for name in names:
+        try:
+            print(f"{name}: {run_job(engine, name)}")
+        except Exception as error:
+            print(f"{name}: FAILED {type(error).__name__}: {error}", file=sys.stderr)
+            failed.append(name)
+    return failed
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a background job.")
-    parser.add_argument("job", choices=list(JOBS))
+    parser.add_argument("job", choices=[*JOBS, "run-daily", "run-hourly", "check-jobs"])
     parser.add_argument("--database-url", default=None, help="Defaults to API_DATABASE_URL")
     parser.add_argument(
         "--apply",
@@ -564,10 +651,22 @@ def main() -> None:
     )
     args = parser.parse_args()
     engine = create_engine(args.database_url or get_settings().database_url)
-    with engine.begin() as conn:
-        job = JOBS[args.job]
-        result = job(conn, apply=args.apply) if job is delete_closed_businesses else job(conn)
-    print(f"{args.job}: {result}")
+    if args.job == "check-jobs":
+        with engine.connect() as conn:
+            late = late_jobs(conn)
+        for item in late:
+            last = item["last_ok"].isoformat() if item["last_ok"] else "never"
+            # The ::error:: prefix shows as an annotation on the GitHub run.
+            print(
+                f"::error::{item['job']} is late: last success {last}, "
+                f"expected every {item['max_hours']}h at most"
+            )
+        print(f"check-jobs: {len(late)} late of {len(MAX_HOURS)}")
+        sys.exit(1 if late else 0)
+    if args.job in ("run-daily", "run-hourly"):
+        failed = run_group(engine, DAILY if args.job == "run-daily" else HOURLY)
+        sys.exit(1 if failed else 0)
+    print(f"{args.job}: {run_job(engine, args.job, apply=args.apply)}")
 
 
 if __name__ == "__main__":
