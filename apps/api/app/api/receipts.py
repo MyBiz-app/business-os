@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
+from app.api.pagination import PageDep
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["receipts"])
@@ -60,17 +61,17 @@ def _one(db: Session, receipt_id: UUID) -> Receipt:
 @router.get("/receipts")
 def list_receipts(
     context: ReadDep,
+    page: PageDep,
     client_id: Annotated[UUID | None, Query()] = None,
-    limit: Annotated[int, Query(ge=1, le=200)] = 50,
 ) -> list[Receipt]:
     """Newest first; for one client when `client_id` is given."""
     rows = context.session.execute(
         text(f"""
             {SELECT}
             WHERE CAST(:client_id AS uuid) IS NULL OR client_id = CAST(:client_id AS uuid)
-            ORDER BY number DESC LIMIT :limit
+            ORDER BY number DESC LIMIT :limit OFFSET :offset
         """),
-        {"client_id": client_id, "limit": limit},
+        {"client_id": client_id, "limit": page.limit, "offset": page.offset},
     ).mappings()
     return [Receipt.model_validate(dict(row)) for row in rows]
 

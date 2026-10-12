@@ -23,3 +23,15 @@ def page_params(
 
 
 PageDep = Annotated[Page, Depends(page_params)]
+
+
+def wide_page_params(
+    limit: Annotated[int, Query(ge=1, le=1000, description="Rows per page")] = 500,
+    offset: Annotated[int, Query(ge=0, le=100_000, description="Rows to skip")] = 0,
+) -> Page:
+    return Page(limit=limit, offset=offset)
+
+
+# For lists a screen shows whole (a week of shifts, a class roster): the default is high enough
+# that a normal view is one page, but the list can no longer grow without bound.
+WidePageDep = Annotated[Page, Depends(wide_page_params)]

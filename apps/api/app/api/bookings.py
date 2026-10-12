@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
-from app.api.pagination import PageDep
+from app.api.pagination import PageDep, WidePageDep
 from app.api.plans import usable_entitlement
 from app.catalog.verticals import CATALOG, VerticalPack
 from app.core.permissions import Permission
@@ -258,7 +258,7 @@ def cancel_booking(db: Session, booking_id: UUID, session_id: UUID) -> None:
 
 
 @router.get("/sessions/{session_id}/bookings")
-def list_bookings(session_id: UUID, context: ScheduleReadDep) -> list[Booking]:
+def list_bookings(session_id: UUID, context: ScheduleReadDep, page: WidePageDep) -> list[Booking]:
     """The session's roster: live bookings first, then the waitlist in order, then history."""
     _check_session_branch(context, session_id)
     rows = context.session.execute(
@@ -266,9 +266,10 @@ def list_bookings(session_id: UUID, context: ScheduleReadDep) -> list[Booking]:
             {BOOKING_SELECT}
             WHERE b.session_id = :id
             ORDER BY CASE b.status WHEN 'waitlisted' THEN 1 WHEN 'cancelled' THEN 2 ELSE 0 END,
-                     b.waitlisted_at NULLS FIRST, c.first_name, c.last_name, b.created_at
+                     b.waitlisted_at NULLS FIRST, c.first_name, c.last_name, b.created_at, b.id
+            LIMIT :limit OFFSET :offset
         """),
-        {"id": session_id},
+        {"id": session_id, "limit": page.limit, "offset": page.offset},
     ).mappings()
     return [Booking.model_validate(dict(row)) for row in rows]
 

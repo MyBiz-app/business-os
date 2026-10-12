@@ -8,11 +8,12 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 /** Sends the staff member where they belong: sign in, the "no business" note, or today. */
 export default function Gate() {
   const { session, loading } = useSession();
-  const { memberships, tenant } = useBusiness();
+  const { memberships, tenant, closedBusiness } = useBusiness();
   const { palette } = useTheme();
 
   if (!loading && !session) return <Redirect href="/sign-in" />;
   if (memberships && memberships.length === 0) return <Redirect href="/no-business" />;
+  if (closedBusiness) return <Redirect href="/closed" />;
   if (tenant) return <Redirect href="/today" />;
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>

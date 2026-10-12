@@ -2195,6 +2195,20 @@ export const CATALOG: Entry[] = [
             },
             "color": "#6366f1"
           }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "חבילת 4 ניקיונות",
+              "en": "4 cleanings pack"
+            },
+            "kind": "punch_card",
+            "credits": 4,
+            "validity_days": 120,
+            "prices": {
+              "ILS": 100000
+            }
+          }
         ]
       },
       {
@@ -2844,7 +2858,21 @@ export const CATALOG: Entry[] = [
     "children": [
       {
         "key": "consultants",
-        "status": "beta"
+        "status": "beta",
+        "default_plans": [
+          {
+            "names": {
+              "he": "חבילת 5 פגישות",
+              "en": "5-meeting pack"
+            },
+            "kind": "punch_card",
+            "credits": 5,
+            "validity_days": 180,
+            "prices": {
+              "ILS": 200000
+            }
+          }
+        ]
       },
       {
         "key": "accountants",
@@ -2873,6 +2901,20 @@ export const CATALOG: Entry[] = [
               "ILS": 60000
             },
             "color": "#155e75"
+          }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "חבילת 6 פגישות הנהלת חשבונות",
+              "en": "6 bookkeeping meetings"
+            },
+            "kind": "punch_card",
+            "credits": 6,
+            "validity_days": 365,
+            "prices": {
+              "ILS": 180000
+            }
           }
         ]
       },
@@ -2904,6 +2946,20 @@ export const CATALOG: Entry[] = [
             },
             "color": "#1d4ed8"
           }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "חבילת 3 פגישות ייעוץ",
+              "en": "3 legal consultations"
+            },
+            "kind": "punch_card",
+            "credits": 3,
+            "validity_days": 180,
+            "prices": {
+              "ILS": 210000
+            }
+          }
         ]
       },
       {
@@ -2933,6 +2989,20 @@ export const CATALOG: Entry[] = [
               "ILS": 20000
             },
             "color": "#6d28d9"
+          }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "חבילת 4 פגישות סטטוס",
+              "en": "4 status meetings"
+            },
+            "kind": "punch_card",
+            "credits": 4,
+            "validity_days": 120,
+            "prices": {
+              "ILS": 70000
+            }
           }
         ]
       }
@@ -3088,6 +3158,20 @@ export const CATALOG: Entry[] = [
             },
             "color": "#b45309"
           }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "כרטיסיית קפה (10 כניסות)",
+              "en": "Coffee card (10 visits)"
+            },
+            "kind": "punch_card",
+            "credits": 10,
+            "validity_days": 180,
+            "prices": {
+              "ILS": 15000
+            }
+          }
         ]
       },
       {
@@ -3149,6 +3233,20 @@ export const CATALOG: Entry[] = [
               "ILS": 3000
             },
             "color": "#f59e0b"
+          }
+        ],
+        "default_plans": [
+          {
+            "names": {
+              "he": "כרטיסיית מאפים (10 כניסות)",
+              "en": "Pastry card (10 visits)"
+            },
+            "kind": "punch_card",
+            "credits": 10,
+            "validity_days": 180,
+            "prices": {
+              "ILS": 18000
+            }
           }
         ]
       },

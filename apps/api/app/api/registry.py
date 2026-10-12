@@ -9,6 +9,7 @@ from app.api import (
     appointments,
     assistant,
     attention,
+    availability,
     billing,
     bookings,
     businesses,
@@ -52,6 +53,7 @@ from app.api import (
     time_off_requests,
     webhooks,
     welcome,
+    whatsapp_ai,
 )
 from app.api import health as health_declarations
 from app.api import settings as business_settings
@@ -80,6 +82,7 @@ ROUTERS: list[APIRouter] = [
     closure.router,
     leads.router,
     messaging.router,
+    whatsapp_ai.router,
     leads.public_router,
     services.router,
     locations.router,
@@ -89,6 +92,7 @@ ROUTERS: list[APIRouter] = [
     shifts.router,
     shift_swaps.router,
     time_off_requests.router,
+    availability.router,
     shift_planning.router,
     stations.router,
     schedule.router,
@@ -115,6 +119,7 @@ ROUTERS: list[APIRouter] = [
     client_app.public_router,
     client_app.router,
     checkouts.router,
+    checkouts.staff_router,
     receipts.router,
     receipts.client_router,
     attention.router,

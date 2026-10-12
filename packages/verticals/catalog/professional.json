@@ -62,7 +62,21 @@
   "children": [
     {
       "key": "consultants",
-      "status": "beta"
+      "status": "beta",
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 5 פגישות",
+            "en": "5-meeting pack"
+          },
+          "kind": "punch_card",
+          "credits": 5,
+          "validity_days": 180,
+          "prices": {
+            "ILS": 200000
+          }
+        }
+      ]
     },
     {
       "key": "accountants",
@@ -91,6 +105,20 @@
             "ILS": 60000
           },
           "color": "#155e75"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 6 פגישות הנהלת חשבונות",
+            "en": "6 bookkeeping meetings"
+          },
+          "kind": "punch_card",
+          "credits": 6,
+          "validity_days": 365,
+          "prices": {
+            "ILS": 180000
+          }
         }
       ]
     },
@@ -122,6 +150,20 @@
           },
           "color": "#1d4ed8"
         }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 3 פגישות ייעוץ",
+            "en": "3 legal consultations"
+          },
+          "kind": "punch_card",
+          "credits": 3,
+          "validity_days": 180,
+          "prices": {
+            "ILS": 210000
+          }
+        }
       ]
     },
     {
@@ -151,6 +193,20 @@
             "ILS": 20000
           },
           "color": "#6d28d9"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 4 פגישות סטטוס",
+            "en": "4 status meetings"
+          },
+          "kind": "punch_card",
+          "credits": 4,
+          "validity_days": 120,
+          "prices": {
+            "ILS": 70000
+          }
         }
       ]
     }

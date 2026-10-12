@@ -36,10 +36,15 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
           <h1 className="text-3xl font-bold">{t("title")}</h1>
           <p className="text-muted">{t("subtitle")}</p>
         </div>
-        <a href={`/sales/export?month=${month}`} className="btn-secondary px-4 py-2 text-sm" download>
-          <Download aria-hidden="true" className="size-4" />
-          {t("export")}
-        </a>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/sales/orders" className="btn-secondary px-4 py-2 text-sm">
+            {t("orders.link")}
+          </Link>
+          <a href={`/sales/export?month=${month}`} className="btn-secondary px-4 py-2 text-sm" download>
+            <Download aria-hidden="true" className="size-4" />
+            {t("export")}
+          </a>
+        </div>
       </div>
 
       <nav aria-label={title} className="flex items-center justify-between gap-3 card px-4 py-3">
