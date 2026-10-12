@@ -1033,6 +1033,7 @@
       "empty": "Nothing new yet. When the business changes something about your bookings, you'll see it here.",
       "new": "New",
       "note": "Note from the business: {note}",
+      "more": "Show earlier updates",
       "kinds": {
         "waitlist_promoted": "A spot opened up: you're booked into {service} on {when}.",
         "booked_by_studio": "The business booked you into {service} on {when}.",
@@ -2329,7 +2330,8 @@
     }
   },
   "leads": {
-    "truncated": "Showing the first {shown} of {total} leads. Narrow the search to see the rest.",
+    "truncated": "Showing {shown} of {total} leads.",
+    "showMore": "Show more leads",
     "title": "Leads",
     "subtitle": "People on their way to becoming clients",
     "new": "New lead",
@@ -3349,7 +3351,6 @@
       "credits": "{left} of {total} left",
       "searchHint": "Name, phone or email",
       "more": "Show more",
-      "refine": "There are more: search to find someone.",
       "noteSaved": "Note saved.",
       "selected": "Selected"
     },
