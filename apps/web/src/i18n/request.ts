@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { getRequestConfig } from "next-intl/server";
 
-import { messages } from "@business-os/i18n";
+import { loadMessages } from "@business-os/i18n/load";
 
 import { defaultLocale, isLocale, LOCALE_COOKIE, matchAcceptLanguage } from "./config";
 
@@ -15,6 +15,6 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages: messages[locale],
+    messages: await loadMessages(locale),
   };
 });

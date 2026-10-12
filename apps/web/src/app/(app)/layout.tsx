@@ -1,3 +1,4 @@
+import { ScopedMessages } from "@/components/scoped-messages";
 import { signOut } from "@/app/(auth)/actions";
 import { AppHeader } from "@/components/app-header";
 import { avatarSrc } from "@/components/avatar";
@@ -9,6 +10,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const { me } = await getActiveMembership();
 
   return (
+    <ScopedMessages scopes={["app"]}>
     <div className="flex flex-1 flex-col">
       <PaletteSync palette={me.palette ?? null} colors={me.palette_colors ?? null} />
       <AppHeader>
@@ -23,5 +25,6 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       </AppHeader>
       {children}
     </div>
+    </ScopedMessages>
   );
 }
