@@ -3512,6 +3512,26 @@
       "day": "יום",
       "time": "מגרש ושעה",
       "reserveFor": "הזמנה עבור {name}"
+    },
+    "availability": {
+      "open": "הזמינות שלי",
+      "title": "מתי אפשר לשבץ אותי",
+      "hint": "סמנו באילו שעות אפשר לשבץ אתכם למשמרות. בלי שעות מסומנות, כל שעה מתאימה.",
+      "add": "הוספת שעות",
+      "remove": "הסרת השעות",
+      "from": "משעה",
+      "to": "עד שעה",
+      "none": "אין שעות",
+      "save": "שמירה",
+      "saved": "נשמר. ההנהלה רואה את זה בלוח המשמרות.",
+      "back": "חזרה",
+      "endHint": "לסוף היום כתבו 23:59.",
+      "errors": {
+        "invalid_time": "כתבו שעות בפורמט HH:MM, למשל 08:30.",
+        "ends_before_start": "כל שעת סיום צריכה להיות אחרי שעת ההתחלה.",
+        "overlap": "שעות באותו יום לא יכולות לחפוף.",
+        "generic": "משהו השתבש. נסו שוב."
+      }
     }
   },
   "staffApp": {
@@ -4592,7 +4612,7 @@
     "soloAvailability": "הזמינות שלי",
     "soloAvailabilityHint": "השעות שבהן לקוחות יכולים לקבוע אצלך",
     "soloClosedHint": "חגים וימי חופש של כל העסק",
-    "warningLegend": "נופלת על חופשה או מחוץ לשעות הפתיחה",
+    "warningLegend": "בחופשה, מחוץ לשעות הפתיחה או מחוץ לזמינות",
     "awayLegend": "בחופשה",
     "away": "בחופשה",
     "awayWarning": "{name} בחופשה ביום הזה. אפשר לשמור את המשמרת בכל זאת.",
@@ -4611,7 +4631,8 @@
     "hoursTotal": "{hours} ש׳",
     "warnings": {
       "timeOff": "בחופשה",
-      "outsideHours": "מחוץ לשעות הפתיחה"
+      "outsideHours": "מחוץ לשעות הפתיחה",
+      "outsideAvailability": "מחוץ לזמינות"
     },
     "addFor": "הוספת משמרת ל{name} ביום {day}",
     "editTitle": "עריכת משמרת",
@@ -4717,7 +4738,12 @@
       "legend": "פחות אנשים מהנדרש",
       "short": "{count, plural, one {קטע אחד חסר איוש} other {# קטעים חסרי איוש}}",
       "banner": "{count, plural, one {קטע אחד חסר איוש} other {# קטעים חסרי איוש}}",
-      "gap": "{have} מתוך {needed} במשמרת"
+      "gap": "{have} מתוך {needed} במשמרת",
+      "canCover": "פנויים להשלמה: {names}",
+      "nobodyFree": "אין מי שהגדיר זמינות ופנוי בשעות האלה",
+      "roster": "ספירה",
+      "rosterPlan": "כולל טיוטות",
+      "rosterPublished": "רק מה שפורסם"
     },
     "peopleOnShift": "משובצים כעת",
     "publish": {
@@ -4749,7 +4775,8 @@
         "weekly": "יוצא בכל {day} בשעה {time}",
         "monthly": "יוצא ביום {day} בכל חודש בשעה {time}"
       }
-    }
+    },
+    "availabilityWarning": "השעות האלה מחוץ לזמינות שהוגדרה ל{name}. אפשר לשמור את המשמרת בכל זאת."
   },
   "openingHours": {
     "title": "שעות פתיחה",

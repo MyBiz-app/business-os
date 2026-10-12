@@ -11,7 +11,7 @@ A conversation marked `test` is the business trying the bot from its settings: t
 but nothing is sent and an accepted offer books nothing.
 
 Revision ID: 0078
-Revises: 0075
+Revises: 0077
 Create Date: 2026-10-12
 """
 
@@ -20,7 +20,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0078"
-down_revision: str | None = "0075"
+down_revision: str | None = "0077"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

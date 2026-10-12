@@ -11642,6 +11642,384 @@
         }
       }
     },
+    "/me/availability": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Get My Availability",
+        "operationId": "get_my_availability",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Availability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Set My Availability",
+        "description": "Replaces the person's own week.",
+        "operationId": "set_my_availability",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Availability"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Availability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/staff/{user_id}/availability": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Get Availability",
+        "operationId": "get_availability",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Availability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "Set Availability",
+        "description": "A manager records the week for someone (e.g. who told them in person).",
+        "operationId": "set_availability",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Availability"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Availability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shifts/availability": {
+      "get": {
+        "tags": [
+          "shifts"
+        ],
+        "summary": "List Availability",
+        "description": "Everyone's stated week, for the board; people who have not said are left out.",
+        "operationId": "list_availability",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MemberAvailability"
+                  },
+                  "title": "Response List Availability"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/shift-templates": {
       "get": {
         "tags": [
@@ -12049,7 +12427,7 @@
           "shifts"
         ],
         "summary": "Shift Coverage",
-        "description": "Where a branch has fewer people on shift than its coverage rules ask, day by day. People\naway on time off do not count. Branches without rules are never listed.",
+        "description": "Where a branch has fewer people on shift than its coverage rules ask, day by day. People\naway on time off do not count. Branches without rules are never listed. Managers also get,\nper gap, who said they can work it and is free.",
         "operationId": "shift_coverage",
         "security": [
           {
@@ -12102,6 +12480,18 @@
               "title": "Location Id"
             },
             "description": "Only these branches"
+          },
+          {
+            "name": "published_only",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Managers: count only the published roster, not drafts",
+              "default": false,
+              "title": "Published Only"
+            },
+            "description": "Managers: count only the published roster, not drafts"
           },
           {
             "name": "X-Tenant-Id",
@@ -23172,6 +23562,24 @@
         ],
         "title": "AuditEntry"
       },
+      "Availability": {
+        "properties": {
+          "windows": {
+            "items": {
+              "$ref": "#/components/schemas/WeeklyWindow"
+            },
+            "type": "array",
+            "maxItems": 42,
+            "title": "Windows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "windows"
+        ],
+        "title": "Availability",
+        "description": "The hours of the week a person can work; an empty week means they have not said."
+      },
       "AwayDays": {
         "properties": {
           "user_id": {
@@ -24448,6 +24856,25 @@
           "preview"
         ],
         "title": "CampaignResult"
+      },
+      "Candidate": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "user_name": {
+            "type": "string",
+            "title": "User Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "user_name"
+        ],
+        "title": "Candidate"
       },
       "Catalog": {
         "properties": {
@@ -26760,6 +27187,14 @@
             "type": "integer",
             "title": "Have",
             "description": "People on shift through the stretch"
+          },
+          "available": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "type": "array",
+            "title": "Available",
+            "description": "Managers only: people of the branch who said they can work the whole stretch (`/me/availability`), are not away and have no shift then"
           }
         },
         "type": "object",
@@ -30448,6 +30883,34 @@
           "plan_ends_on"
         ],
         "title": "MemberAtRisk"
+      },
+      "MemberAvailability": {
+        "properties": {
+          "windows": {
+            "items": {
+              "$ref": "#/components/schemas/WeeklyWindow"
+            },
+            "type": "array",
+            "maxItems": 42,
+            "title": "Windows"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "user_name": {
+            "type": "string",
+            "title": "User Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "windows",
+          "user_id",
+          "user_name"
+        ],
+        "title": "MemberAvailability"
       },
       "MemberBranches": {
         "properties": {
@@ -35850,6 +36313,11 @@
             "title": "Outside Hours",
             "description": "Not within the branch's opening hours (if set)"
           },
+          "outside_availability": {
+            "type": "boolean",
+            "title": "Outside Availability",
+            "description": "Not within the hours the person said they can work (if they said)"
+          },
           "published": {
             "type": "boolean",
             "title": "Published",
@@ -35874,6 +36342,7 @@
           "is_cover",
           "on_time_off",
           "outside_hours",
+          "outside_availability",
           "published"
         ],
         "title": "Shift"
@@ -38294,6 +38763,34 @@
           "to_date"
         ],
         "title": "WeekCopy"
+      },
+      "WeeklyWindow": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Weekday",
+            "description": "0 = Monday"
+          },
+          "starts": {
+            "type": "string",
+            "format": "time",
+            "title": "Starts"
+          },
+          "ends": {
+            "type": "string",
+            "format": "time",
+            "title": "Ends"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "starts",
+          "ends"
+        ],
+        "title": "WeeklyWindow"
       },
       "WelcomeEmail": {
         "properties": {
