@@ -1,5 +1,7 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
+import { useEffect } from "react";
 import { localeDirection, matchLanguageTag, messages, type Locale } from "@business-os/i18n";
 
 /** Last resort, when the root layout itself fails: it renders its own <html>, outside the
@@ -18,6 +20,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   const locale = pickLocale();
   const t = messages[locale].errorPages;
   const retry = messages[locale].common.retry;
