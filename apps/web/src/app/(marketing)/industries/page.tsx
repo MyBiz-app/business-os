@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { CtaBand, SectionHeading } from "@/components/marketing/sections";
+import { CtaBand, PageHero, SectionHeading } from "@/components/marketing/sections";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { industryTexts } from "@/lib/verticals";
 
@@ -21,8 +21,9 @@ export default async function IndustriesPage() {
   const soon = categories().filter((c) => c.status === "planned");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 py-16">
-      <SectionHeading level={1} title={t("title")} subtitle={t("subtitle")} />
+    <main className="enter flex flex-col">
+      <PageHero title={t("title")} subtitle={t("subtitle")} />
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 py-16">
       <ul className="grid gap-4 md:grid-cols-2">
         {open.map(({ key, icon, color }) => (
           <li key={key} className="card flex flex-col gap-4 p-6">
@@ -64,6 +65,7 @@ export default async function IndustriesPage() {
           </ul>
         </section>
       )}
+      </div>
       <CtaBand />
     </main>
   );

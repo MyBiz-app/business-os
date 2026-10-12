@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
+import { PageHero } from "@/components/marketing/sections";
 import { SETUP_STEPS, type SetupStep } from "@/components/getting-started";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -20,11 +21,7 @@ export default async function GettingStartedPage() {
 
   return (
     <main className="enter flex flex-col">
-      <section className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-6 pb-6 pt-16 text-center">
-        <p className="text-sm font-semibold text-primary">{t("page.eyebrow")}</p>
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{t("page.title")}</h1>
-        <p className="text-lg text-muted">{t("page.subtitle")}</p>
-      </section>
+      <PageHero eyebrow={t("page.eyebrow")} title={t("page.title")} subtitle={t("page.subtitle")} />
 
       <ol className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-6 py-10">
         {sections.map((section, index) => {

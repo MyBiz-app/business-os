@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { CtaBand, Faq } from "@/components/marketing/sections";
+import { CtaBand, Faq, PageHero } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { loadCatalog } from "@/lib/pricing";
@@ -39,10 +39,8 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
       {/* The starting price is the base tier, the same number the cards show. */}
       <OrganizationData price={toMajor(base, currency)} currency={currency} />
       <FaqData />
-      <section className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-6 pt-16 text-center">
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{t("title")}</h1>
-        <p className="text-lg text-muted">{t("subtitle")}</p>
-        <nav aria-label={t("currency")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm">
+      <PageHero title={t("title")} subtitle={t("subtitle")}>
+        <nav aria-label={t("currency")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm text-foreground shadow-sm">
           {CURRENCIES.map((code) => (
             <Link
               key={code}
@@ -54,7 +52,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
             </Link>
           ))}
         </nav>
-      </section>
+      </PageHero>
 
       {catalog && (
         <>

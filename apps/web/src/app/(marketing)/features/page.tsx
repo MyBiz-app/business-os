@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
-import { BranchesSection, CtaBand, FeatureGrid, SafetySection, SectionHeading } from "@/components/marketing/sections";
+import { BranchesSection, CtaBand, FeatureGrid, PageHero, SafetySection, SectionHeading } from "@/components/marketing/sections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
@@ -14,11 +14,8 @@ export default async function FeaturesPage() {
   const t = await getTranslations("marketing");
   return (
     <main className="enter flex flex-col">
+      <PageHero title={t("features.title")} subtitle={t("features.subtitle")} />
       <section className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 pt-16">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{t("features.title")}</h1>
-          <p className="max-w-2xl text-lg text-muted">{t("features.subtitle")}</p>
-        </div>
         <DashboardMock />
       </section>
       <FeatureGrid inFeaturesPage />
