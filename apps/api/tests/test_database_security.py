@@ -4,7 +4,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 # Tables without tenant_id that are still protected by RLS (their own policies).
-GLOBAL_TABLES = {"tenants", "users", "platform_staff", "platform_audit", "push_tokens"}
+GLOBAL_TABLES = {
+    "tenants",
+    "users",
+    "platform_staff",
+    "platform_audit",
+    "push_tokens",
+    "job_runs",
+}
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
 # API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.
 PLATFORM_TABLES = {"contact_requests", "platform_audit"}
@@ -40,7 +47,7 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
     assert [name for name, scoped in tenant_tables if not scoped] == []
     assert {name for name, _, has_tenant, _ in tables if not has_tenant} <= GLOBAL_TABLES
     # MyBiz's own tables stay unreachable from the API role.
-    own = tuple(sorted(PLATFORM_TABLES | {"platform_staff"}))
+    own = tuple(sorted(PLATFORM_TABLES | {"platform_staff", "job_runs"}))
     reachable = _query(
         engine,
         f"""
