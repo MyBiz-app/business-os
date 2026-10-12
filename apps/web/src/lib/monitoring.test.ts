@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { scrubEvent, sentryIngestOrigin } from "./monitoring.ts";
+import { sentryIngestOrigin } from "./csp.ts";
+import { scrubEvent } from "./monitoring.ts";
 
 test("scrubEvent keeps the method and the URL without its query, and drops the user", () => {
   const event = scrubEvent({

@@ -20,6 +20,7 @@ from app.messaging.email import (
     _fill,
     load_messages,
 )
+from app.messaging.push import PushSender, push_to_user
 
 MAX_LINES = 20
 # Edits to a published roster go out as one email once they have been quiet this long (or, when
@@ -56,14 +57,44 @@ def render_roster(
     return _fill(messages["roster"]["subject"], values), "\n".join(lines)
 
 
+def _deliver(
+    conn: Connection,
+    sender: Sender | None,
+    push: PushSender | None,
+    person: Any,
+    subject: str,
+    body: str,
+) -> str:
+    """Tells one person: a push to their phone first, then the email as a fallback (when they
+    have emails on). Returns "pushed", "emailed", "failed" (email error; try again later) or
+    "skipped" (no way to reach them)."""
+    if push and push_to_user(conn, push, person["user_id"], subject, body.split("\n\n", 1)[-1]):
+        return "pushed"
+    if sender and person["email_roster"] and person["email"]:
+        try:
+            sender.send(Email(to=person["email"], subject=subject, text=body))
+        except Exception as error:  # a provider error must not stop the batch
+            print(f"roster email to {person['user_id']} failed: {error}")
+            return "failed"
+        return "emailed"
+    return "skipped"
+
+
+def _counts(sent: int, failed: int, skipped: int, pushed: int, push: PushSender | None) -> dict:
+    counts = {"sent": sent, "failed": failed, "skipped": skipped}
+    return counts | {"pushed": pushed} if push else counts
+
+
 def notify_roster(
     conn: Connection,
-    sender: Sender,
+    sender: Sender | None,
     now: datetime | None = None,
     messages_dir: Path = MESSAGES_DIR,
+    push: PushSender | None = None,
 ) -> dict[str, int]:
-    """Emails the people whose shifts were published since the last run. Returns the counts of
-    emails sent and failed, and of people skipped (switched off, or no email address)."""
+    """Tells the people whose shifts were published since the last run, by push when they have
+    a phone registered and by email otherwise. Returns the counts of emails sent and failed, and
+    of people skipped (switched off, or no way to reach them); with a push sender, also pushed."""
     now = now or datetime.now(UTC)
     # Shifts that are already over need no email.
     conn.execute(
@@ -96,29 +127,29 @@ def notify_roster(
     for row in rows:
         people[(row["tenant_id"], row["user_id"])].append(row)
     messages: dict[str, dict[str, Any]] = {}
-    sent = failed = skipped = 0
+    sent = failed = skipped = pushed = 0
     per_tenant: dict[Any, int] = {}
     for (tenant_id, _user), shifts in people.items():
         first = shifts[0]
-        if first["email_roster"] and first["email"]:
-            locale = first["locale"] if first["locale"] in ("he", "en") else "en"
-            if locale not in messages:
-                messages[locale] = load_messages(locale, messages_dir)
-            subject, body = render_roster(
-                messages[locale],
-                first["business"],
-                (first["full_name"] or "").split(" ")[0] or None,
-                shifts,
-                first["time_zone"],
-            )
-            try:
-                sender.send(Email(to=first["email"], subject=subject, text=body))
-            except Exception as error:  # a provider error must not stop the batch
-                failed += 1
-                print(f"roster email to {first['user_id']} failed: {error}")
-                continue  # stays unnotified; the next run tries again until the shifts are over
+        locale = first["locale"] if first["locale"] in ("he", "en") else "en"
+        if locale not in messages:
+            messages[locale] = load_messages(locale, messages_dir)
+        subject, body = render_roster(
+            messages[locale],
+            first["business"],
+            (first["full_name"] or "").split(" ")[0] or None,
+            shifts,
+            first["time_zone"],
+        )
+        outcome = _deliver(conn, sender, push, first, subject, body)
+        if outcome == "failed":
+            failed += 1
+            continue  # stays unnotified; the next run tries again until the shifts are over
+        if outcome == "emailed":
             sent += 1
             per_tenant[tenant_id] = per_tenant.get(tenant_id, 0) + 1
+        elif outcome == "pushed":
+            pushed += 1
         else:
             skipped += 1
         conn.execute(
@@ -133,7 +164,7 @@ def notify_roster(
             """),
             {"t": tenant_id, "n": count, "details": EMAIL_DETAILS},
         )
-    return {"sent": sent, "failed": failed, "skipped": skipped}
+    return _counts(sent, failed, skipped, pushed, push)
 
 
 def render_changes(
@@ -166,9 +197,10 @@ def render_changes(
 
 def notify_roster_changes(
     conn: Connection,
-    sender: Sender,
+    sender: Sender | None,
     now: datetime | None = None,
     messages_dir: Path = MESSAGES_DIR,
+    push: PushSender | None = None,
 ) -> dict[str, int]:
     """Emails the people whose already-announced shifts were edited or removed, one email per
     person once their roster has been quiet for QUIET_PERIOD, covering every edit since: a shift
@@ -199,7 +231,7 @@ def notify_roster_changes(
         .all()
     )
     messages: dict[str, dict[str, Any]] = {}
-    sent = failed = skipped = 0
+    sent = failed = skipped = pushed = 0
     per_tenant: dict[Any, int] = {}
     for key in due:
         rows = (
@@ -257,7 +289,8 @@ def notify_roster_changes(
         person = (
             conn.execute(
                 text("""
-                    SELECT t.name AS business, t.time_zone, COALESCE(u.locale, t.locale) AS locale,
+                    SELECT u.id AS user_id, t.name AS business, t.time_zone,
+                           COALESCE(u.locale, t.locale) AS locale,
                            u.email, u.full_name, u.email_roster
                     FROM app.tenants t, app.users u
                     WHERE t.id = :t AND u.id = :u
@@ -267,7 +300,7 @@ def notify_roster_changes(
             .mappings()
             .first()
         )
-        if person and person["email_roster"] and person["email"] and (removed or changed):
+        if person and (removed or changed):
             locale = person["locale"] if person["locale"] in ("he", "en") else "en"
             if locale not in messages:
                 messages[locale] = load_messages(locale, messages_dir)
@@ -279,14 +312,17 @@ def notify_roster_changes(
                 changed,
                 person["time_zone"],
             )
-            try:
-                sender.send(Email(to=person["email"], subject=subject, text=body))
-            except Exception as error:  # a provider error must not stop the batch
+            outcome = _deliver(conn, sender, push, person, subject, body)
+            if outcome == "failed":
                 failed += 1
-                print(f"roster change email to {key['user_id']} failed: {error}")
                 continue  # stays pending; the next run tries again
-            sent += 1
-            per_tenant[key["tenant_id"]] = per_tenant.get(key["tenant_id"], 0) + 1
+            if outcome == "emailed":
+                sent += 1
+                per_tenant[key["tenant_id"]] = per_tenant.get(key["tenant_id"], 0) + 1
+            elif outcome == "pushed":
+                pushed += 1
+            else:
+                skipped += 1
         else:
             skipped += 1
         conn.execute(
@@ -304,4 +340,4 @@ def notify_roster_changes(
             """),
             {"t": tenant_id, "n": count, "details": EMAIL_DETAILS},
         )
-    return {"sent": sent, "failed": failed, "skipped": skipped}
+    return _counts(sent, failed, skipped, pushed, push)

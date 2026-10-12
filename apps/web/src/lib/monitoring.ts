@@ -14,16 +14,6 @@ export function scrubEvent<T extends SentryEventLike>(event: T): T {
   return event;
 }
 
-/** The host events are sent to, for the page's Content-Security-Policy `connect-src`. */
-export function sentryIngestOrigin(dsn: string | undefined): string | undefined {
-  if (!dsn) return undefined;
-  try {
-    return new URL(dsn).origin.replace(/^(https?:\/\/)[^@]*@/, "$1");
-  } catch {
-    return undefined;
-  }
-}
-
 export const sentryOptions = (dsn: string) => ({
   dsn,
   environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,

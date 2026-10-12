@@ -1,3 +1,4 @@
+import type { components } from "@business-os/api-client";
 import { formatDay, todayIn } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
@@ -13,10 +14,11 @@ import { useBusiness } from "@/providers/business-provider";
 
 type Filter = "all" | "valid" | "none" | "absent";
 const PAGE = 30;
-const MAX = 100; // the API's page limit; past it, searching is quicker than scrolling
 const ABSENT_DAYS = 14; // same window as the reports page and the dashboard
 
 /** The business's clients: search, quick filters, each one's plan and last visit, and adding one. */
+type ClientItem = components["schemas"]["ClientListItem"];
+
 export default function Clients() {
   const t = useTranslations("business.clients");
   const tList = useTranslations("clients.list");
@@ -27,30 +29,51 @@ export default function Clients() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
-  const [limit, setLimit] = useState(PAGE);
+  // Pages loaded after the first one; cleared whenever the search or filter changes.
+  const [more, setMore] = useState<ClientItem[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
   const tenantId = tenant?.id;
 
-  const load = useCallback(async () => {
-    if (!tenantId) return { items: [], total: 0 };
-    return unwrap(
-      await api.GET("/clients", {
-        params: {
-          ...scope,
-          query: {
-            search: query || undefined,
-            plan: filter === "valid" || filter === "none" ? filter : undefined,
-            absent_days: filter === "absent" ? ABSENT_DAYS : undefined,
-            limit,
+  const fetchPage = useCallback(
+    async (offset: number) =>
+      unwrap(
+        await api.GET("/clients", {
+          params: {
+            ...scope,
+            query: {
+              search: query || undefined,
+              plan: filter === "valid" || filter === "none" ? filter : undefined,
+              absent_days: filter === "absent" ? ABSENT_DAYS : undefined,
+              limit: PAGE,
+              offset,
+            },
           },
-        },
-      }),
-    );
-  }, [api, scope, tenantId, query, filter, limit]);
+        }),
+      ),
+    [api, scope, query, filter],
+  );
+  const load = useCallback(async () => {
+    setMore([]);
+    if (!tenantId) return { items: [], total: 0 };
+    return fetchPage(0);
+  }, [fetchPage, tenantId]);
   const { data, loading, reload } = useLoad(load);
   if (!tenant) return null;
   const terms = termsFor(tenant);
   const today = todayIn(tenant.time_zone);
-  const items = data?.items ?? [];
+  const items = [...(data?.items ?? []), ...more];
+
+  const loadMore = async () => {
+    setLoadingMore(true);
+    try {
+      const next = await fetchPage(items.length);
+      setMore((current) => [...current, ...next.items]);
+    } catch {
+      // The button stays; tapping it again retries.
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const lastVisit = (day: string | null | undefined) => {
     if (!day) return tList("never");
@@ -82,7 +105,6 @@ export default function Clients() {
         value={search}
         onChangeText={setSearch}
         onSubmitEditing={() => {
-          setLimit(PAGE);
           setQuery(search.trim());
         }}
         returnKeyType="search"
@@ -93,7 +115,6 @@ export default function Clients() {
         palette={palette}
         value={filter}
         onChange={(value) => {
-          setLimit(PAGE);
           setFilter(value);
         }}
         options={[
@@ -132,18 +153,9 @@ export default function Clients() {
               />
             );
           })}
-          {data && data.total > items.length &&
-            (limit < MAX ? (
-              <Button
-                label={t("more")}
-                variant="secondary"
-                palette={palette}
-                busy={loading}
-                onPress={() => setLimit((current) => Math.min(current + PAGE, MAX))}
-              />
-            ) : (
-              <Text style={[styles.muted, { color: palette.muted }]}>{t("refine")}</Text>
-            ))}
+          {data && data.total > items.length && (
+            <Button label={t("more")} variant="secondary" palette={palette} busy={loadingMore} onPress={() => void loadMore()} />
+          )}
         </View>
       )}
     </Screen>

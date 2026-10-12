@@ -1,28 +1,14 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-import { sentryDsn, sentryIngestOrigin } from "./src/lib/monitoring";
+import { enforcedCsp } from "./src/lib/csp";
 
 const withNextIntl = createNextIntlPlugin();
 
-// Scripts and styles stay 'unsafe-inline' because Next.js and next-themes inline small bootstrap
-// scripts; a nonce-based policy would force every page to render per request. Everything else is
-// locked to this origin: the browser never talks to the API or Supabase directly (server only).
+// The enforced policy still allows inline scripts; the strict nonce-based one runs alongside it as
+// Report-Only, set per request by src/proxy.ts. See src/lib/csp.ts.
 const isDev = process.env.NODE_ENV !== "production";
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
-  "font-src 'self' data:",
-  // Error reports go to Sentry, only when a DSN is set.
-  `connect-src 'self'${sentryIngestOrigin(sentryDsn()) ? ` ${sentryIngestOrigin(sentryDsn())}` : ""}`,
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  // The app is never shown inside another site's frame (clickjacking).
-  "frame-ancestors 'none'",
-].join("; ");
+const contentSecurityPolicy = enforcedCsp({ dev: isDev });
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@business-os/brand", "@business-os/i18n", "@business-os/api-client", "@business-os/verticals"],
@@ -39,6 +25,8 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+          // HTTPS only, for two years. Vercel adds this on its own domain; this covers a custom one.
+          ...(isDev ? [] : [{ key: "Strict-Transport-Security", value: "max-age=63072000" }]),
         ],
       },
     ];

@@ -1,0 +1,31 @@
+name: Check background jobs on staging
+
+# Fails when a scheduled job is late or keeps failing (its last success is older than allowed,
+# see MAX_HOURS in apps/api/app/jobs.py). GitHub emails the repository's watchers on a failed
+# scheduled run, so a stopped job is noticed. Runs after the 02:17 daily jobs.
+on:
+  schedule:
+    - cron: "23 6 * * *"  # 06:23 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Every scheduled job ran on time
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Check
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs check-jobs

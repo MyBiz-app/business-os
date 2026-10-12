@@ -54,6 +54,8 @@ class Settings(BaseSettings):
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp
+    push_provider: str = "expo"  # expo | log | off: push notifications to staff phones
+    expo_access_token: SecretStr | None = None  # optional; only if Expo enhanced security is on
     email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password
     email_from: str = "MyBiz <no-reply@example.com>"
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server

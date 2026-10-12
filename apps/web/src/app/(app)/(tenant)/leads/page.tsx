@@ -15,6 +15,8 @@ import { SOURCES } from "./sources";
 
 type Lead = components["schemas"]["Lead"];
 type Stage = Lead["stage"];
+const PAGE_SIZE = 200; // the API's page limit
+const MAX_PAGES = 50; // the API's offset limit (100,000 rows) is the real ceiling
 const STAGES: Stage[] = ["new", "contacted", "trial", "offer", "won", "lost"];
 const STAGE_BAR: Record<Stage, string> = {
   new: "bg-sky-500",
@@ -33,9 +35,25 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   const search = typeof params.q === "string" ? params.q : "";
   const source = SOURCES.find((s) => s === params.source);
 
-  const board = unwrap(
-    await api.GET("/leads", { params: { ...scope, query: { search: search || undefined, source } } }),
+  // "Show more" asks for one more page of leads: page `pages` is fetched along with those before it.
+  const pages = Math.min(MAX_PAGES, Math.max(1, Number(params.pages) || 1));
+  const boards = await Promise.all(
+    Array.from({ length: pages }, async (_, index) =>
+      unwrap(
+        await api.GET("/leads", {
+          params: { ...scope, query: { search: search || undefined, source, limit: PAGE_SIZE, offset: index * PAGE_SIZE } },
+        }),
+      ),
+    ),
   );
+  const board = { ...boards[0], items: boards.flatMap((b) => b.items) };
+  const moreHref = (() => {
+    const query = new URLSearchParams();
+    if (search) query.set("q", search);
+    if (source) query.set("source", source);
+    query.set("pages", String(pages + 1));
+    return `/leads?${query}`;
+  })();
   const today = todayIn(tenant.time_zone);
   const inquiryLink = `${await siteOrigin()}/inquiry/${tenant.join_code}`;
   const rate = board.conversion_rate === null ? "—" : `${Math.round(board.conversion_rate * 100)}%`;
@@ -105,7 +123,14 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
       </div>
 
       {board.total > board.items.length && (
-        <p role="status" className="text-sm text-muted">{t("truncated", { shown: board.items.length, total: board.total })}</p>
+        <p role="status" className="flex flex-wrap items-center gap-3 text-sm text-muted">
+          {t("truncated", { shown: board.items.length, total: board.total })}
+          {pages < MAX_PAGES && (
+            <Link href={moreHref} scroll={false} className="btn-secondary px-3 py-1.5">
+              {t("showMore")}
+            </Link>
+          )}
+        </p>
       )}
 
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
