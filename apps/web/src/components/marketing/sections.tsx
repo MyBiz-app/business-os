@@ -268,3 +268,21 @@ export async function SafetySection() {
     </section>
   );
 }
+
+/** The dark band that opens a marketing subpage: eyebrow, the page's own h1, a subtitle and
+ * optional extra content (a switcher, a button), on the same navy glow as the home hero. */
+export function PageHero({ eyebrow, title, subtitle, children }: { eyebrow?: string; title: string; subtitle?: string; children?: React.ReactNode }) {
+  return (
+    <section className="relative isolate overflow-hidden bg-navy text-white">
+      <div aria-hidden="true" className="mk-grid pointer-events-none absolute inset-0 -z-10" />
+      <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-[15%] -z-10 size-[28rem] rounded-full bg-primary/35 blur-[120px]" />
+      <div aria-hidden="true" className="pointer-events-none absolute -bottom-48 end-[10%] -z-10 size-[24rem] rounded-full bg-electric/20 blur-[120px]" />
+      <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-6 py-16 text-center sm:py-20">
+        {eyebrow && <p className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/85">{eyebrow}</p>}
+        <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">{title}</h1>
+        {subtitle && <p className="text-lg leading-relaxed text-white/75 sm:text-xl">{subtitle}</p>}
+        {children}
+      </div>
+    </section>
+  );
+}
