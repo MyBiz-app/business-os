@@ -2,7 +2,11 @@
 
 A provider calls `/webhooks/payments/{provider}/{tenant_id}` when a payment ends. The business's
 payments provider verifies the notification (its signature, with the business's secret) and
-translates it; only then is the checkout completed, for exactly the amount it was opened for."""
+translates it; only then is the checkout completed, for exactly the amount it was opened for.
+
+`/webhooks/whatsapp/{provider}/{tenant_id}` receives clients' WhatsApp messages the same way: the
+business's messaging provider verifies and translates them, and they wait in the inbox for the
+AI replies (module `whatsapp_ai`). Closed while the provider is the simulated one."""
 
 from typing import Annotated
 from uuid import UUID
@@ -61,3 +65,29 @@ def payment_webhook(
         if code == "22023":
             raise HTTPException(status_code=409, detail="amount_mismatch") from error
         raise
+
+
+@router.post("/whatsapp/{provider}/{tenant_id}", status_code=status.HTTP_204_NO_CONTENT)
+def whatsapp_webhook(
+    provider: str, tenant_id: UUID, request: Request, body: RawBody, session: AnonymousSessionDep
+) -> None:
+    chosen = choose(session, tenant_id, "messaging")
+    parse = getattr(chosen.instance, "parse_inbound", None)
+    if chosen.info.name != provider or chosen.instance.simulated or parse is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    try:
+        incoming = parse(dict(request.headers), body)
+    except WebhookRejected as error:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="rejected") from error
+    for message in incoming:
+        # Filed only while the business has the module; a retried notification is ignored.
+        session.execute(
+            text("SELECT app.receive_whatsapp(:tenant, :provider, :ref, :phone, :body)"),
+            {
+                "tenant": tenant_id,
+                "provider": provider,
+                "ref": message.provider_ref,
+                "phone": message.from_phone,
+                "body": message.body,
+            },
+        )

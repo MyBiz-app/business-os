@@ -9,19 +9,21 @@ import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
-const icon =
-  (name: IconName) =>
-  ({ color, size }: { color: ColorValue; size: number }) => <Ionicons name={name} color={color as string} size={size} />;
+const icon = (name: IconName) =>
+  function TabIcon({ color, size }: { color: ColorValue; size: number }) {
+    return <Ionicons name={name} color={color as string} size={size} />;
+  };
 
 /** The business app's tabs, in the business's own brand color. Tabs follow permissions. */
 export default function TabsLayout() {
   const { session, loading } = useSession();
-  const { memberships, tenant, palette, can } = useBusiness();
+  const { memberships, tenant, closedBusiness, palette, can } = useBusiness();
   const t = useTranslations("business.tabs");
   const tTerms = useTranslations("terms");
 
   if (!loading && !session) return <Redirect href="/sign-in" />;
   if (memberships && memberships.length === 0) return <Redirect href="/no-business" />;
+  if (closedBusiness) return <Redirect href="/closed" />;
   if (!tenant) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>

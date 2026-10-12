@@ -397,7 +397,7 @@ def set_member_organization(user_id: UUID, body: MemberOrganization, context: Ma
             raise HTTPException(status_code=422, detail="reporting_cycle")
         if _member_role(context.session, changes["reports_to"]) is None:
             raise HTTPException(status_code=422, detail="invalid_reference")
-    assignments = ", ".join(f"{column} = :{column}" for column in changes)
+    assignments = set_clause(changes, MemberOrganization.model_fields, touch=False)
     try:
         with context.session.begin_nested():
             context.session.execute(
@@ -469,9 +469,10 @@ def update_role(role_id: UUID, body: RoleUpdate, context: ManageDep) -> CustomRo
     if "permissions" in changes:
         _check_within_own(context, changes["permissions"])
     if changes:
+        assignments = set_clause(changes, RoleUpdate.model_fields)
         try:
             context.session.execute(
-                text(f"UPDATE app.tenant_roles SET {set_clause(changes)} WHERE id = :id"),
+                text(f"UPDATE app.tenant_roles SET {assignments} WHERE id = :id"),
                 {**changes, "id": role_id},
             )
         except IntegrityError as error:

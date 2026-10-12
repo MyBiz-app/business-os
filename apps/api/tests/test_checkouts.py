@@ -86,3 +86,25 @@ def test_inactive_plans_cannot_be_bought(
     response = client.post("/client/checkouts", json={"plan_id": card["id"]}, headers=headers)
 
     assert response.status_code == 404
+
+
+def test_staff_page_through_online_orders(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    joined, headers, card = setup(client, auth, studio)
+    ids = []
+    for _ in range(3):
+        started = client.post("/client/checkouts", json={"plan_id": card["id"]}, headers=headers)
+        ids.append(started.json()["id"])
+    client.post(f"/client/checkouts/{ids[0]}/simulate-payment", headers=headers)
+
+    first = client.get("/orders", params={"limit": 2}, headers=studio["headers"]).json()
+    rest = client.get("/orders", params={"limit": 2, "offset": 2}, headers=studio["headers"]).json()
+    paid = client.get("/orders", params={"status": "paid"}, headers=studio["headers"]).json()
+
+    assert first["total"] == 3 and len(first["items"]) == 2 and len(rest["items"]) == 1
+    assert {o["id"] for o in first["items"] + rest["items"]} == set(ids)
+    assert [o["id"] for o in paid["items"]] == [ids[0]] and paid["total"] == 1
+    assert paid["items"][0]["client_id"] == joined["client_id"]
+    # Clients can't read the business's orders.
+    assert client.get("/orders", headers=headers).status_code in (401, 403)

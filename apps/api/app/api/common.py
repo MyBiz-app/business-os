@@ -1,6 +1,7 @@
 """Small helpers shared by the tenant-scoped CRUD endpoints."""
 
 import re
+from collections.abc import Collection, Iterable
 from typing import Any, Literal
 from uuid import UUID
 
@@ -26,19 +27,32 @@ def not_found() -> HTTPException:
 _IDENTIFIER = re.compile(r"[a-z_][a-z0-9_]*")
 
 
-def set_clause(changes: dict[str, Any], casts: dict[str, str] | None = None) -> str:
-    """SET clause for an UPDATE. Keys must come from a Pydantic model's fields, never from
-    user input, because they become column names. `casts` gives a column's SQL type (jsonb)."""
-    casts = casts or {}
-    for name in changes:
-        if not _IDENTIFIER.fullmatch(name):
+def check_columns(names: Iterable[str], allowed: Collection[str]) -> None:
+    """Refuses any name that is not an allowed column, before it is put into SQL text.
+    `allowed` is usually a Pydantic model's `model_fields`, plus columns the code adds."""
+    for name in names:
+        if name not in allowed or not _IDENTIFIER.fullmatch(name):
             raise ValueError(f"unsafe SQL identifier: {name!r}")
+
+
+def set_clause(
+    changes: dict[str, Any],
+    allowed: Collection[str],
+    casts: dict[str, str] | None = None,
+    touch: bool = True,
+) -> str:
+    """SET clause for an UPDATE. Every key must be in `allowed`, because keys become column
+    names. `casts` gives a column's SQL type (jsonb); `touch` also sets updated_at."""
+    casts = casts or {}
+    check_columns(changes, allowed)
     assignments = [
         f"{column} = CAST(:{column} AS {casts[column]})" if column in casts
         else f"{column} = :{column}"
         for column in changes
     ]  # fmt: skip
-    return ", ".join([*assignments, "updated_at = now()"])
+    if touch:
+        assignments.append("updated_at = now()")
+    return ", ".join(assignments)
 
 
 def ensure_not_erased(db: Session, client_id: UUID) -> None:

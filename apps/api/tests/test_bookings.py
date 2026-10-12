@@ -244,3 +244,25 @@ def test_filter_by_plan_and_absence(client: TestClient, studio: dict) -> None:
     assert rows["Regular"]["last_visit"] == (local_today() - timedelta(days=1)).isoformat()
     assert rows["Member"]["last_visit"] is None
     assert rows["Lead"]["plan_name"] is None
+
+
+def test_a_session_roster_can_be_paged(client: TestClient, studio: dict) -> None:
+    session_id = new_session(client, studio, capacity=5)
+    booked = [
+        book(client, studio["headers"], session_id, new_client(client, studio["headers"], f"C{i}"))
+        for i in range(3)
+    ]
+    assert all(b.status_code == 201 for b in booked)
+
+    everyone = client.get(f"/sessions/{session_id}/bookings", headers=studio["headers"]).json()
+    first = client.get(
+        f"/sessions/{session_id}/bookings", params={"limit": 2}, headers=studio["headers"]
+    ).json()
+    rest = client.get(
+        f"/sessions/{session_id}/bookings",
+        params={"limit": 2, "offset": 2},
+        headers=studio["headers"],
+    ).json()
+
+    assert len(everyone) == 3 and len(first) == 2 and len(rest) == 1
+    assert [b["id"] for b in first + rest] == [b["id"] for b in everyone]

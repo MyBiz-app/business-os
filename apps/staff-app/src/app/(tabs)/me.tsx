@@ -11,7 +11,6 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 /** The team member's own settings and what their level allows. */
 export default function Me() {
   const t = useTranslations("staffApp.me");
-  const tBusiness = useTranslations("business.me");
   const tLevels = useTranslations("platform.levels");
   const tPermissions = useTranslations("platform.permissions");
   const { staff } = useStaff();

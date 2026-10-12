@@ -348,8 +348,9 @@ def update_lead(lead_id: UUID, body: LeadUpdate, context: WriteDep) -> LeadDetai
     if changes.get("email"):
         changes["email"] = changes["email"].lower()
     if changes:
+        assignments = set_clause(changes, LeadUpdate.model_fields)
         updated = db.execute(
-            text(f"UPDATE app.leads SET {set_clause(changes)} WHERE id = :id RETURNING id"),
+            text(f"UPDATE app.leads SET {assignments} WHERE id = :id RETURNING id"),
             {**changes, "id": lead_id},
         ).scalar()
         if updated is None:

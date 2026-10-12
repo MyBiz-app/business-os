@@ -196,7 +196,7 @@ def update_service(service_id: UUID, body: ServiceUpdate, context: WriteDep) -> 
             row = (
                 context.session.execute(
                     text(
-                        f"UPDATE app.services SET {set_clause(changes)}"
+                        f"UPDATE app.services SET {set_clause(changes, ServiceUpdate.model_fields)}"
                         f" WHERE id = :id RETURNING {COLUMNS}"
                     ),
                     {**changes, "id": service_id},

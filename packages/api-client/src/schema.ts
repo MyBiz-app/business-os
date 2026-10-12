@@ -429,6 +429,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/webhooks/whatsapp/{provider}/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Whatsapp Webhook */
+        post: operations["whatsapp_webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/quotes": {
         parameters: {
             query?: never;
@@ -1285,6 +1302,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/whatsapp-ai/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Whatsapp Conversations
+         * @description The 50 most recent conversations with clients (tries are left out).
+         */
+        get: operations["list_whatsapp_conversations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/whatsapp-ai/conversations/{conversation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Whatsapp Conversation */
+        get: operations["get_whatsapp_conversation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/whatsapp-ai/try": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Try Bot
+         * @description Writes to the bot as the client with this phone number and returns its answer.
+         */
+        post: operations["try_bot"];
+        /**
+         * Reset Try
+         * @description Starts the tries over (deletes the test conversations and their offers).
+         */
+        delete: operations["reset_try"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/public/businesses/{code}/inquiries": {
         parameters: {
             query?: never;
@@ -2092,6 +2170,68 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get My Availability */
+        get: operations["get_my_availability"];
+        /**
+         * Set My Availability
+         * @description Replaces the person's own week.
+         */
+        put: operations["set_my_availability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Availability */
+        get: operations["get_availability"];
+        /**
+         * Set Availability
+         * @description A manager records the week for someone (e.g. who told them in person).
+         */
+        put: operations["set_availability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/shifts/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Availability
+         * @description Everyone's stated week, for the board; people who have not said are left out.
+         */
+        get: operations["list_availability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/shift-templates": {
         parameters: {
             query?: never;
@@ -2158,7 +2298,8 @@ export interface paths {
         /**
          * Shift Coverage
          * @description Where a branch has fewer people on shift than its coverage rules ask, day by day. People
-         *     away on time off do not count. Branches without rules are never listed.
+         *     away on time off do not count. Branches without rules are never listed. Managers also get,
+         *     per gap, who said they can work it and is free.
          */
         get: operations["shift_coverage"];
         put?: never;
@@ -4123,6 +4264,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Orders
+         * @description Online purchases by clients, newest first (the business's own tenant only, by RLS).
+         */
+        get: operations["list_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/receipts": {
         parameters: {
             query?: never;
@@ -4692,6 +4853,14 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * Availability
+         * @description The hours of the week a person can work; an empty week means they have not said.
+         */
+        Availability: {
+            /** Windows */
+            windows: components["schemas"]["WeeklyWindow"][];
+        };
         /** AwayDays */
         AwayDays: {
             /**
@@ -5240,6 +5409,16 @@ export interface components {
              * @description The text as the first recipient gets it
              */
             preview: string | null;
+        };
+        /** Candidate */
+        Candidate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
         };
         /** Catalog */
         Catalog: {
@@ -6022,36 +6201,6 @@ export interface components {
              */
             tier: "standard" | "priority" | "vip";
         };
-        /** Conversation */
-        Conversation: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Turns */
-            turns: components["schemas"]["Turn"][];
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /** ConversationSummary */
-        ConversationSummary: {
-            /**
-             * Id
-             * Format: uuid
-             */
-            id: string;
-            /** Title */
-            title: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
         /** CopiedShifts */
         CopiedShifts: {
             /** Created */
@@ -6129,6 +6278,11 @@ export interface components {
              * @description People on shift through the stretch
              */
             have: number;
+            /**
+             * Available
+             * @description Managers only: people of the branch who said they can work the whole stretch (`/me/availability`), are not away and have no shift then
+             */
+            available?: components["schemas"]["Candidate"][];
         };
         /** CoverageRule */
         CoverageRule: {
@@ -7467,6 +7621,18 @@ export interface components {
             /** Plan Ends On */
             plan_ends_on: string | null;
         };
+        /** MemberAvailability */
+        MemberAvailability: {
+            /** Windows */
+            windows: components["schemas"]["WeeklyWindow"][];
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+        };
         /** MemberBranches */
         MemberBranches: {
             /**
@@ -7713,6 +7879,32 @@ export interface components {
             /** Read At */
             read_at: string | null;
         };
+        /** Offer */
+        Offer: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            };
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "accepted" | "declined" | "expired" | "failed" | "replaced";
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            } | null;
+        };
         /**
          * OpeningHours
          * @description A branch's week: one or more intervals per open day (a break is the gap between two);
@@ -7749,6 +7941,54 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /** Order */
+        Order: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /** Plan Name */
+            plan_name: string;
+            /**
+             * Amount
+             * @description What the client pays, minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "paid" | "cancelled" | "failed";
+            /**
+             * Simulated
+             * @description Test payment: no money is charged
+             */
+            simulated: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /** OrderPage */
+        OrderPage: {
+            /** Items */
+            items: components["schemas"]["Order"][];
+            /** Total */
+            total: number;
         };
         /**
          * PaletteColors
@@ -9505,6 +9745,11 @@ export interface components {
              */
             outside_hours: boolean;
             /**
+             * Outside Availability
+             * @description Not within the hours the person said they can work (if they said)
+             */
+            outside_availability: boolean;
+            /**
              * Published
              * @description Visible to the team; a draft shows to managers only
              */
@@ -10384,20 +10629,22 @@ export interface components {
             /** Days */
             days: number;
         };
-        /** Turn */
-        Turn: {
+        /** TryMessage */
+        TryMessage: {
             /**
-             * Role
-             * @enum {string}
+             * Phone
+             * @description A client's phone number
              */
-            role: "user" | "assistant";
+            phone: string;
             /** Text */
             text: string;
-            /**
-             * Pending Actions
-             * @default []
-             */
-            pending_actions: components["schemas"]["PendingAction"][];
+        };
+        /** TryReply */
+        TryReply: {
+            /** Reply */
+            reply: string;
+            /** Offer Id */
+            offer_id: string | null;
         };
         /**
          * Usage
@@ -10503,6 +10750,24 @@ export interface components {
              */
             to_date: string;
         };
+        /** WeeklyWindow */
+        WeeklyWindow: {
+            /**
+             * Weekday
+             * @description 0 = Monday
+             */
+            weekday: number;
+            /**
+             * Starts
+             * Format: time
+             */
+            starts: string;
+            /**
+             * Ends
+             * Format: time
+             */
+            ends: string;
+        };
         /** WelcomeEmail */
         WelcomeEmail: {
             /**
@@ -10528,6 +10793,51 @@ export interface components {
              * @default 0
              */
             expected_active_clients: number;
+        };
+        /** Conversation */
+        app__api__assistant__Conversation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Turns */
+            turns: components["schemas"]["app__api__assistant__Turn"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ConversationSummary */
+        app__api__assistant__ConversationSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** Turn */
+        app__api__assistant__Turn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /** Text */
+            text: string;
+            /**
+             * Pending Actions
+             * @default []
+             */
+            pending_actions: components["schemas"]["PendingAction"][];
         };
         /** ProfileUpdate */
         app__api__client_app__ProfileUpdate: {
@@ -10557,6 +10867,58 @@ export interface components {
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
+        };
+        /** Conversation */
+        app__api__whatsapp_ai__Conversation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phone */
+            phone: string;
+            /** Client Id */
+            client_id: string | null;
+            /** Turns */
+            turns: components["schemas"]["app__api__whatsapp_ai__Turn"][];
+            /** Offers */
+            offers: components["schemas"]["Offer"][];
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ConversationSummary */
+        app__api__whatsapp_ai__ConversationSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Phone */
+            phone: string;
+            /** Client Id */
+            client_id: string | null;
+            /** Client Name */
+            client_name: string | null;
+            /** Last Text */
+            last_text: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** Turn */
+        app__api__whatsapp_ai__Turn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "client" | "ai";
+            /** Text */
+            text: string;
         };
     };
     responses: never;
@@ -11593,6 +11955,36 @@ export interface operations {
         };
     };
     payment_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    whatsapp_webhook: {
         parameters: {
             query?: never;
             header?: never;
@@ -13789,6 +14181,142 @@ export interface operations {
             };
         };
     };
+    list_whatsapp_conversations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__whatsapp_ai__ConversationSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_whatsapp_conversation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__whatsapp_ai__Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    try_bot: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TryMessage"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TryReply"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_try: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     submit_inquiry: {
         parameters: {
             query?: never;
@@ -15125,6 +15653,10 @@ export interface operations {
                 location_id?: string[] | null;
                 /** @description Only this person's shifts */
                 user_id?: string | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -15884,6 +16416,183 @@ export interface operations {
             };
         };
     };
+    get_my_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_my_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Availability"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Availability"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Availability"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_availability: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MemberAvailability"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_shift_templates: {
         parameters: {
             query?: {
@@ -16072,6 +16781,8 @@ export interface operations {
                 days?: number;
                 /** @description Only these branches */
                 location_id?: string[] | null;
+                /** @description Managers: count only the published roster, not drafts */
+                published_only?: boolean;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -16655,7 +17366,12 @@ export interface operations {
     };
     list_bookings: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -18444,7 +19160,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ConversationSummary"][];
+                    "application/json": components["schemas"]["app__api__assistant__ConversationSummary"][];
                 };
             };
             /** @description Validation Error */
@@ -18477,7 +19193,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
                 };
             };
             /** @description Validation Error */
@@ -18512,7 +19228,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
                 };
             };
             /** @description Validation Error */
@@ -18551,7 +19267,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Conversation"];
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
                 };
             };
             /** @description Validation Error */
@@ -20334,11 +21050,53 @@ export interface operations {
             };
         };
     };
+    list_orders: {
+        parameters: {
+            query?: {
+                status?: ("pending" | "paid" | "cancelled" | "failed") | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_receipts: {
         parameters: {
             query?: {
                 client_id?: string | null;
+                /** @description Rows per page */
                 limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;

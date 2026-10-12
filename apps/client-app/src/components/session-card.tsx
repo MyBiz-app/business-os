@@ -8,7 +8,6 @@ import { useLocale, useTranslations } from "use-intl";
 import { Chip } from "@business-os/app-kit/components/chip";
 import { Button, elevation } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
-import { ApiError } from "@business-os/app-kit/lib/api";
 import { confirm } from "@business-os/app-kit/lib/confirm";
 import { useBusiness } from "@/providers/business-provider";
 

@@ -112,25 +112,29 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   const allShown = shown.length === branches.length;
   const branchFilter = allShown ? {} : { location_id: shown };
   const canEdit = canManageTeam(tenant);
-  const [shifts, awayRanges, rawTemplates, rawStations, rawGaps, ruleSets] = await Promise.all([
+  // Managers can check the gaps against what the team already sees, leaving drafts out.
+  const roster: "plan" | "published" = canEdit && query.roster === "published" ? "published" : "plan";
+  const [shifts, awayRanges, rawTemplates, rawStations, rawGaps, ruleSets, availability] = await Promise.all([
     api.GET("/shifts", { params: { ...scope, query: { start: win.start, days: win.days, ...branchFilter } } }).then(unwrap),
     api.GET("/shifts/time-off", { params: { ...scope, query: { start: win.start, days: win.days } } }).then(unwrap),
     api.GET("/shift-templates", { params: scope }).then(unwrap),
     api.GET("/stations", { params: scope }).then(unwrap),
-    api.GET("/shifts/coverage", { params: { ...scope, query: { start: win.start, days: win.days, ...branchFilter } } }).then(unwrap),
+    api.GET("/shifts/coverage", { params: { ...scope, query: { start: win.start, days: win.days, ...branchFilter, ...(roster === "published" ? { published_only: true } : {}) } } }).then(unwrap),
     canEdit
       ? Promise.all(branches.map(async (b) => ({ id: b.id, rules: (await api.GET("/locations/{location_id}/coverage-rules", { params: { ...scope, path: { location_id: b.id } } })).data?.rules ?? [] })))
       : Promise.resolve([]),
+    canEdit ? api.GET("/shifts/availability", { params: scope }).then(unwrap) : Promise.resolve([]),
   ]);
+  const availabilityOf = new Map(availability.map((a) => [a.user_id, a.windows]));
   const templates: BoardTemplate[] = rawTemplates.map((x) => ({ id: x.id, locationId: x.location_id, name: x.name, starts: x.starts.slice(0, 5), ends: x.ends.slice(0, 5), position: x.position ?? null }));
   const stations: BoardStation[] = rawStations.map((x) => ({ id: x.id, locationId: x.location_id, name: x.name }));
-  const gaps: BoardGap[] = rawGaps.map((g) => ({ locationId: g.location_id, locationName: g.location_name, day: g.day, starts: minuteToTime(g.starts_minute), ends: minuteToTime(g.ends_minute), startMinute: g.starts_minute, endMinute: g.ends_minute, needed: g.needed, have: g.have }));
+  const gaps: BoardGap[] = rawGaps.map((g) => ({ locationId: g.location_id, locationName: g.location_name, day: g.day, starts: minuteToTime(g.starts_minute), ends: minuteToTime(g.ends_minute), startMinute: g.starts_minute, endMinute: g.ends_minute, needed: g.needed, have: g.have, available: (g.available ?? []).map((c) => c.user_name) }));
   // Monday first, as the coverage rules count weekdays.
   const weekdays = Array.from({ length: 7 }, (_, i) => formatDay(addDays("2024-01-01", i), locale, { weekday: "long" }));
 
   const href = (changes: Record<string, string | undefined>) => {
     // "all" keeps every branch when the saved default is a narrower set.
-    const next: Record<string, string | undefined> = { view, range, date: anchor, b: allShown ? (savedBranches.length ? "all" : undefined) : shown.join(","), ...changes };
+    const next: Record<string, string | undefined> = { view, range, date: anchor, roster: roster === "published" ? roster : undefined, b: allShown ? (savedBranches.length ? "all" : undefined) : shown.join(","), ...changes };
     const params = new URLSearchParams(Object.entries(next).filter((e): e is [string, string] => Boolean(e[1])));
     return `/team/shifts?${params}`;
   };
@@ -140,6 +144,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     title: m.job_title ?? m.custom_role_name ?? t(`roles.${m.role}`),
     avatar: avatarSrc(m.user_id, m.avatar_url),
     homeId: m.home_location_id ?? null,
+    availability: availabilityOf.get(m.user_id) ?? null,
   }));
   // Each away day in the window as `userId:day` (a range is spread over the days it covers).
   const away: Record<string, string | null> = {};
@@ -162,7 +167,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
     note: s.note ?? null,
     isCover: s.is_cover,
     homeName: s.home_location_name ?? null,
-    warning: s.on_time_off ? "timeOff" : s.outside_hours ? "outsideHours" : null,
+    warning: s.on_time_off ? "timeOff" : s.outside_availability ? "outsideAvailability" : s.outside_hours ? "outsideHours" : null,
     draft: !s.published,
   }));
   const drafts = boardShifts.filter((s) => s.draft).length;
@@ -285,7 +290,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
 
       {canEdit && <PublishBar key={`${win.start}-${win.days}-${drafts}`} drafts={drafts} start={win.start} days={win.days} branches={allShown ? [] : shown} summary={publishSummary} />}
 
-      <CoverageBanner gaps={gaps} locale={locale} showBranch={branches.length > 1} />
+      <CoverageBanner gaps={gaps} locale={locale} showBranch={branches.length > 1} roster={canEdit ? { current: roster, plan: href({ roster: undefined }), published: href({ roster: "published" }) } : undefined} />
 
       {showSave && <SaveShiftsDefault view={view} range={range} branches={currentSet} />}
 

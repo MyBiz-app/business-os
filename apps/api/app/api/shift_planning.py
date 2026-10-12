@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.api.availability import Candidate, candidates
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, require
 from app.api.shifts import SHIFT_SELECT, Shift, _branch_visible, _time_zone, drafts_hidden
@@ -180,6 +181,11 @@ class CoverageGap(BaseModel):
     ends_minute: int
     needed: int
     have: int = Field(description="People on shift through the stretch")
+    available: list[Candidate] = Field(
+        default_factory=list,
+        description="Managers only: people of the branch who said they can work the whole "
+        "stretch (`/me/availability`), are not away and have no shift then",
+    )
 
 
 def _gaps(
@@ -208,9 +214,13 @@ def shift_coverage(
     start: Annotated[dt.date, Query(description="First local date (business time zone)")],
     days: Annotated[int, Query(ge=1, le=42)] = 7,
     location_id: Annotated[list[UUID] | None, Query(description="Only these branches")] = None,
+    published_only: Annotated[
+        bool, Query(description="Managers: count only the published roster, not drafts")
+    ] = False,
 ) -> list[CoverageGap]:
     """Where a branch has fewer people on shift than its coverage rules ask, day by day. People
-    away on time off do not count. Branches without rules are never listed."""
+    away on time off do not count. Branches without rules are never listed. Managers also get,
+    per gap, who said they can work it and is free."""
     session = context.session
     time_zone = _time_zone(session)
     wanted = [str(i) for i in location_id] if location_id else None
@@ -231,9 +241,10 @@ def shift_coverage(
     for loc, name, weekday, a, b, minimum in rule_rows:
         rules.setdefault(loc, []).append((weekday, a, b, minimum))
         names[loc] = name
+    roster = " AND sh.published_at IS NOT NULL" if published_only else drafts_hidden(context)
     rows = session.execute(
         text(
-            f"{SHIFT_SELECT} AND sh.starts_at < :to AND sh.ends_at > :from{drafts_hidden(context)}"
+            f"{SHIFT_SELECT} AND sh.starts_at < :to AND sh.ends_at > :from{roster}"
             " AND sh.location_id = ANY(CAST(:locations AS uuid[]))"
         ),
         {
@@ -281,4 +292,15 @@ def shift_coverage(
                     )
                 )
     result.sort(key=lambda g: (g.day, g.starts_minute, g.location_name))
+    if Permission.STAFF_MANAGE in context.permissions:
+
+        def at(day: dt.date, minute: int) -> dt.datetime:
+            day, minute = day + timedelta(days=minute // DAY), minute % DAY
+            return local_to_utc(day, time(minute // 60, minute % 60), time_zone)
+
+        periods = [
+            (g.location_id, at(g.day, g.starts_minute), at(g.day, g.ends_minute)) for g in result
+        ]
+        for gap, people in zip(result, candidates(session, periods, time_zone), strict=True):
+            gap.available = people
     return result

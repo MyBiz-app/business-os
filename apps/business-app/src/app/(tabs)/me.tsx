@@ -3,10 +3,11 @@ import { router } from "expo-router";
 import { Text, View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { Button, Card, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
-import { unwrap } from "@business-os/app-kit/lib/api";
+import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
+import { BrandColorCard } from "@/components/brand-color-card";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -16,11 +17,16 @@ export default function Me() {
   const t = useTranslations("business.me");
   const tRoles = useTranslations("roles");
   const tSchedule = useTranslations("business.schedule");
+  const tAvailability = useTranslations("business.availability");
   const { palette, memberships, tenant, select, api, refresh, branches, branch, selectBranch, can } = useBusiness();
   const { session } = useSession();
   const [name, setName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [emailRoster, setEmailRoster] = useState<boolean | null>(null);
+  const tClosure = useTranslations("closure");
+  const [confirmName, setConfirmName] = useState("");
+  const [closing, setClosing] = useState(false);
+  const [closeError, setCloseError] = useState<string | null>(null);
 
   useEffect(() => {
     api
@@ -37,6 +43,22 @@ export default function Me() {
       unwrap(await api.PATCH("/me", { body: { email_roster: on } }));
     } catch {
       setEmailRoster(previous);
+    }
+  };
+
+  const closeBusiness = async () => {
+    if (!tenant) return;
+    setClosing(true);
+    setCloseError(null);
+    try {
+      unwrap(await api.POST("/tenants/current/closure", { params: { header: { "X-Tenant-Id": tenant.id } }, body: { confirm_name: confirmName } }));
+      await refresh();
+      router.replace("/");
+    } catch (error) {
+      const detail = error instanceof ApiError ? error.detail : undefined;
+      setCloseError(tClosure(detail === "name_mismatch" || detail === "already_closed" || detail === "owner_only" ? `errors.${detail}` : "errors.generic"));
+    } finally {
+      setClosing(false);
     }
   };
 
@@ -74,6 +96,14 @@ export default function Me() {
           onPress={() => router.push("/schedule")}
         />
       )}
+      {can("schedule.read") && (
+        <Button
+          label={tAvailability("open")}
+          variant="secondary"
+          palette={palette}
+          onPress={() => router.push("/availability")}
+        />
+      )}
 
       <Card palette={palette}>
         <Field
@@ -86,6 +116,8 @@ export default function Me() {
         />
         <Button label={t("save")} palette={palette} busy={saving} onPress={() => void save()} />
       </Card>
+
+      {can("business.settings") && <BrandColorCard />}
 
       {emailRoster !== null && (
         <Card palette={palette}>
@@ -135,6 +167,30 @@ export default function Me() {
       )}
 
       <PreferencesCard palette={palette} />
+
+      {tenant?.role === "owner" && (
+        <Card palette={palette}>
+          <Text style={{ color: palette.danger, fontWeight: "600" }}>{tClosure("title")}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{tClosure("intro", { days: 90 })}</Text>
+          <Field
+            label={tClosure("confirmLabel", { name: tenant.name })}
+            palette={palette}
+            value={confirmName}
+            onChangeText={setConfirmName}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <ErrorText message={closeError} palette={palette} />
+          <Button
+            label={tClosure("confirmButton")}
+            variant="danger"
+            palette={palette}
+            busy={closing}
+            disabled={confirmName.trim() !== tenant.name}
+            onPress={() => void closeBusiness()}
+          />
+        </Card>
+      )}
     </Screen>
   );
 }

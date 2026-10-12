@@ -1,0 +1,5 @@
+{
+  "client": "com.businessos.mybiz",
+  "business": "com.businessos.mybiz.business",
+  "staff": "com.businessos.mybiz.team"
+}
