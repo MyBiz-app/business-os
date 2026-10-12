@@ -7,7 +7,7 @@ export default async function ResetPasswordPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
       <ResetForm />
     </>
   );

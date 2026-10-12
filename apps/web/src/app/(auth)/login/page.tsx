@@ -13,7 +13,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <>
-      <h1 className="text-2xl font-bold">{t("login.title")}</h1>
+      <h1 className="text-3xl font-extrabold tracking-tight">{t("login.title")}</h1>
       <OAuthButtons next={nextPath} />
       <LoginForm initialError={error === "link_invalid" ? "link_invalid" : undefined} next={nextPath} />
       <p className="text-sm text-muted">

@@ -9,7 +9,7 @@ export default async function ForgotPasswordPage() {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
         <p className="text-sm text-muted">{t("body")}</p>
       </div>
       <ForgotForm />

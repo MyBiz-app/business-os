@@ -84,7 +84,7 @@ export function useCustomPalette(): boolean {
 
 // The swatches show each palette's own colors, whatever the current one is.
 const SWATCHES: Record<Exclude<Palette, "custom">, { light: string; ink: string; accent: string }> = {
-  mybiz: { light: "#ffffff", ink: "#0a0a0a", accent: "#6d28d9" },
+  mybiz: { light: "#ffffff", ink: "#0a0a0a", accent: "#2563eb" },
   ocean: { light: "#f4f7f9", ink: "#0b1a22", accent: "#0e7490" },
   forest: { light: "#f5f7f4", ink: "#0f1611", accent: "#166534" },
 };

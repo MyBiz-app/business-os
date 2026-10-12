@@ -13,7 +13,7 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
   return (
     <>
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">{t("signup.title")}</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">{t("signup.title")}</h1>
         <p className="text-sm text-muted">{t("signup.subtitle")}</p>
       </div>
       <OAuthButtons next={nextPath} />

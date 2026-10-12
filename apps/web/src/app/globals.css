@@ -11,19 +11,19 @@
  * Surfaces: `background` is the page canvas, `surface` the raised cards on it. Accents are
  * mixed from `primary`, so a business's brand color carries through the whole UI. */
 :root {
-  --background: #f7f7f8;
-  --foreground: #0a0a0a;
+  --background: #f8fafc;
+  --foreground: #111827;
   --surface: #ffffff;
-  --border: #e5e4ea;
-  --muted: #52525b;
-  --palette-primary: #6d28d9;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --palette-primary: #2563eb;
   --palette-on-primary: #ffffff;
   --primary: var(--palette-primary);
   --on-primary: var(--palette-on-primary);
-  --success: #15803d;
+  --success: #16a34a;
   --danger: #b91c1c;
   --warning: #b45309;
-  --shadow-color: 260 12% 18%;
+  --shadow-color: 222 30% 18%;
   --elevation:
     0 1px 2px hsl(var(--shadow-color) / 0.06),
     0 2px 6px hsl(var(--shadow-color) / 0.04);
@@ -32,26 +32,26 @@
     0 10px 24px -6px hsl(var(--shadow-color) / 0.14);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   /* MyBiz's own brand (logo tile, accents, the call-to-action band) — not a business's color. */
-  --brand-from: #6366f1;
+  --brand-from: #2563eb;
   --brand-via: #7c3aed;
-  --brand-to: #d946ef;
-  --brand-strong-from: #4f46e5;
-  --brand-strong-to: #c026d3;
-  --brand-ink: #4338ca;
+  --brand-to: #06b6d4;
+  --brand-strong-from: #1d4ed8;
+  --brand-strong-to: #7c3aed;
+  --brand-ink: #1d4ed8;
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #fafafa;
-  --surface: #121214;
-  --border: #2a2a30;
-  --muted: #a1a1aa;
-  --palette-primary: #a78bfa;
-  --palette-on-primary: #0a0a0a;
+  --background: #0b1020;
+  --foreground: #f8fafc;
+  --surface: #111827;
+  --border: #263247;
+  --muted: #94a3b8;
+  --palette-primary: #3b82f6;
+  --palette-on-primary: #0b1020;
   --success: #22c55e;
   --danger: #f87171;
   --warning: #fbbf24;
-  --shadow-color: 260 30% 2%;
+  --shadow-color: 222 40% 2%;
   --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
   --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);
 }
@@ -125,7 +125,7 @@
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
   /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
-  --font-sans: var(--font-main), system-ui, sans-serif;
+  --font-sans: var(--font-display), var(--font-main), system-ui, sans-serif;
 }
 
 body {
