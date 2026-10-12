@@ -10,7 +10,7 @@ it is a new provider class, or a different choice in settings.
 |---|---|---|---|
 | Payments | `payments.py`: `PaymentProvider` — `create_checkout`, `parse_webhook`, `refund` | `simulated` | each business (settings → Integrations), else `API_PAYMENTS_PROVIDER` |
 | Invoicing | `invoicing.py`: `InvoiceProvider` — `issue` | `internal` (MyBiz receipts) | each business, else `API_INVOICING_PROVIDER` |
-| Messaging | `messaging.py`: `MessageProvider` — `send` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
+| Messaging | `messaging.py`: `MessageProvider` — `send`; a WhatsApp provider also implements `parse_inbound` (verify the notification, return `IncomingMessage`s) to feed the AI replies via `/webhooks/whatsapp/{provider}/{tenant_id}` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
 | Email | `email.py` (senders in `app/messaging/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
 | Push notifications | `app/messaging/push.py` (Expo push; phones register via `PUT /me/push-tokens`) | `expo` | the platform: `API_PUSH_PROVIDER` (`expo` / `log` / `off`), optional `API_EXPO_ACCESS_TOKEN` |
 | AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_ANTHROPIC_API_KEY` |

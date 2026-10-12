@@ -4775,5 +4775,14 @@
     "motion": "Reduce motion",
     "motionHint": "Fewer animations and transitions.",
     "motionReduced": "Reduced"
+  },
+  "whatsappAi": {
+    "offer": "To book {service} on {starts}, reply 1. Reply 0 to cancel. This offer holds for {minutes} minutes.",
+    "booked": "You're booked: {service}, {starts}. See you there!",
+    "waitlisted": "{service} on {starts} filled up, so you're on the waiting list. We'll let you know if a spot opens.",
+    "declined": "OK, nothing was booked.",
+    "expired": "That offer has expired. Ask again and I'll check what's free.",
+    "failed": "Sorry, I couldn't book that one. Ask again and I'll check what's free.",
+    "unavailable": "I can't answer right now. The team will get back to you soon."
   }
 }

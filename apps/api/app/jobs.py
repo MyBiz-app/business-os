@@ -9,6 +9,8 @@
     uv run python -m app.jobs notify-shifts    (emails staff new and edited published shifts)
     uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
+    uv run python -m app.jobs answer-whatsapp (AI replies to clients' WhatsApp messages; idle
+                                               until a real WhatsApp provider fills the inbox)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
     uv run python -m app.jobs delete-closed-businesses [--apply] (dry run unless --apply)
     uv run python -m app.jobs move-files      (documents kept in the database → the object store)
@@ -44,6 +46,7 @@ from app.messaging.email import (
 )
 from app.messaging.push import push_sender_from_settings
 from app.messaging.roster import notify_roster, notify_roster_changes
+from app.messaging.whatsapp_ai import answer_inbox
 from app.providers.choice import choose
 from app.providers.storage import tenant_key
 from app.schedule.scheduling import weekly_occurrences
@@ -352,12 +355,20 @@ def follow_up_leads(
 
 # How long data is kept (decision X20). A business that closed its account is deleted after
 # CLOSED_BUSINESS_GRACE_DAYS (delete_closed_businesses below).
-RETENTION_MONTHS = {"leads": 12, "contact_requests": 12, "ai_conversations": 12, "messages": 24}
+RETENTION_MONTHS = {
+    "leads": 12,
+    "contact_requests": 12,
+    "ai_conversations": 12,
+    "whatsapp_conversations": 12,  # AI chats, on WhatsApp
+    "whatsapp_inbox": 12,  # the clients' messages those chats answered
+    "messages": 24,
+}
 
 
 def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, int]:
     """Deletes what has passed its time: leads that never became clients and nobody touched,
-    website and in-app requests, the AI assistant's conversations, and the message log."""
+    website and in-app requests, the AI's conversations (in the app and on WhatsApp) with the
+    WhatsApp messages they answered, and the message log."""
     now = now or datetime.now(UTC)
 
     def before(kind: str) -> datetime:
@@ -372,6 +383,10 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
         """,
         "contact_requests": "DELETE FROM app.contact_requests WHERE created_at < :before",
         "ai_conversations": "DELETE FROM app.ai_conversations WHERE updated_at < :before",
+        "whatsapp_conversations": (
+            "DELETE FROM app.whatsapp_conversations WHERE updated_at < :before"
+        ),
+        "whatsapp_inbox": "DELETE FROM app.whatsapp_inbox WHERE received_at < :before",
         "messages": "DELETE FROM app.messages WHERE created_at < :before",
     }
     return {
@@ -558,6 +573,7 @@ JOBS = {
     "bill-businesses": bill_businesses,
     "publish-shifts": publish_shifts,
     "send-messages": send_messages,
+    "answer-whatsapp": answer_inbox,
     "issue-documents": issue_documents,
     "move-files": move_files,
 }

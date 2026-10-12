@@ -2,9 +2,9 @@
 
 Erasure keeps the client row (as "Deleted client") so bookings, plans and payments keep their
 history; payments, receipts, quotes and bills must be kept for accounting. It clears the
-personal fields, removes health declarations, notifications, notes, messages, addresses (and
-the copies on-site jobs keep), pets and children and documents, frees upcoming bookings and
-unlinks the client app account.
+personal fields, removes health declarations, notifications, notes, messages (and WhatsApp
+chats with the AI), addresses (and the copies on-site jobs keep), pets and children and
+documents, frees upcoming bookings and unlinks the client app account.
 Both actions are for owners (permission `clients.privacy`) and are written to the audit log."""
 
 import json
@@ -149,6 +149,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "whatsapp_ai_conversations": _rows(
+            db,
+            """
+            SELECT phone, messages, created_at, updated_at FROM app.whatsapp_conversations
+            WHERE client_id = :id AND NOT test ORDER BY created_at
+            """,
+            client_id,
+        ),
         "visit_notes": _rows(
             db,
             """
@@ -266,6 +274,19 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
     db.execute(text("DELETE FROM app.client_notes WHERE client_id = :id"), {"id": client_id})
     db.execute(text("DELETE FROM app.messages WHERE client_id = :id"), {"id": client_id})
+    # Their WhatsApp chats with the AI, and the messages those answered.
+    db.execute(
+        text("""
+            DELETE FROM app.whatsapp_inbox i USING app.whatsapp_conversations c
+            WHERE c.client_id = :id AND i.tenant_id = c.tenant_id
+              AND regexp_replace(regexp_replace(i.from_phone, '\\D', '', 'g'), '^972', '0')
+                  = c.phone_key
+        """),
+        {"id": client_id},
+    )
+    db.execute(
+        text("DELETE FROM app.whatsapp_conversations WHERE client_id = :id"), {"id": client_id}
+    )
     # Ratings stay in the business's averages; the comments (free text) go.
     db.execute(
         text("UPDATE app.reviews SET comment = NULL WHERE client_id = :id"), {"id": client_id}

@@ -2131,6 +2131,51 @@
         }
       }
     },
+    "/webhooks/whatsapp/{provider}/{tenant_id}": {
+      "post": {
+        "tags": [
+          "webhooks"
+        ],
+        "summary": "Whatsapp Webhook",
+        "operationId": "whatsapp_webhook",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/quotes": {
       "get": {
         "tags": [
@@ -6830,6 +6875,292 @@
               "title": "Template Id"
             }
           },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/whatsapp-ai/conversations": {
+      "get": {
+        "tags": [
+          "whatsapp-ai"
+        ],
+        "summary": "List Whatsapp Conversations",
+        "description": "The 50 most recent conversations with clients (tries are left out).",
+        "operationId": "list_whatsapp_conversations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/app__api__whatsapp_ai__ConversationSummary"
+                  },
+                  "title": "Response List Whatsapp Conversations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/whatsapp-ai/conversations/{conversation_id}": {
+      "get": {
+        "tags": [
+          "whatsapp-ai"
+        ],
+        "summary": "Get Whatsapp Conversation",
+        "operationId": "get_whatsapp_conversation",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__api__whatsapp_ai__Conversation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/whatsapp-ai/try": {
+      "post": {
+        "tags": [
+          "whatsapp-ai"
+        ],
+        "summary": "Try Bot",
+        "description": "Writes to the bot as the client with this phone number and returns its answer.",
+        "operationId": "try_bot",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TryMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TryReply"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "whatsapp-ai"
+        ],
+        "summary": "Reset Try",
+        "description": "Starts the tries over (deletes the test conversations and their offers).",
+        "operationId": "reset_try",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
           {
             "name": "X-Tenant-Id",
             "in": "header",
@@ -17255,7 +17586,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ConversationSummary"
+                    "$ref": "#/components/schemas/app__api__assistant__ConversationSummary"
                   },
                   "title": "Response List Conversations"
                 }
@@ -17322,7 +17653,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Conversation"
+                  "$ref": "#/components/schemas/app__api__assistant__Conversation"
                 }
               }
             }
@@ -17399,7 +17730,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Conversation"
+                  "$ref": "#/components/schemas/app__api__assistant__Conversation"
                 }
               }
             }
@@ -17486,7 +17817,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Conversation"
+                  "$ref": "#/components/schemas/app__api__assistant__Conversation"
                 }
               }
             }
@@ -26296,59 +26627,6 @@
         ],
         "title": "ContactRequest"
       },
-      "Conversation": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "turns": {
-            "items": {
-              "$ref": "#/components/schemas/Turn"
-            },
-            "type": "array",
-            "title": "Turns"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updated At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "turns",
-          "updated_at"
-        ],
-        "title": "Conversation"
-      },
-      "ConversationSummary": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "updated_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Updated At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "title",
-          "updated_at"
-        ],
-        "title": "ConversationSummary"
-      },
       "CopiedShifts": {
         "properties": {
           "created": {
@@ -30781,6 +31059,58 @@
           "read_at"
         ],
         "title": "Notification"
+      },
+      "Offer": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "preview": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Preview"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "accepted",
+              "declined",
+              "expired",
+              "failed",
+              "replaced"
+            ],
+            "title": "Status"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "preview",
+          "status",
+          "expires_at",
+          "result"
+        ],
+        "title": "Offer"
       },
       "OpeningHours": {
         "properties": {
@@ -37713,35 +38043,54 @@
         ],
         "title": "TrialExtension"
       },
-      "Turn": {
+      "TryMessage": {
         "properties": {
-          "role": {
+          "phone": {
             "type": "string",
-            "enum": [
-              "user",
-              "assistant"
-            ],
-            "title": "Role"
+            "maxLength": 30,
+            "minLength": 3,
+            "title": "Phone",
+            "description": "A client's phone number"
           },
           "text": {
             "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
             "title": "Text"
-          },
-          "pending_actions": {
-            "items": {
-              "$ref": "#/components/schemas/PendingAction"
-            },
-            "type": "array",
-            "title": "Pending Actions",
-            "default": []
           }
         },
         "type": "object",
         "required": [
-          "role",
+          "phone",
           "text"
         ],
-        "title": "Turn"
+        "title": "TryMessage"
+      },
+      "TryReply": {
+        "properties": {
+          "reply": {
+            "type": "string",
+            "title": "Reply"
+          },
+          "offer_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reply",
+          "offer_id"
+        ],
+        "title": "TryReply"
       },
       "Usage": {
         "properties": {
@@ -37996,6 +38345,89 @@
         "type": "object",
         "title": "WelcomeRequest"
       },
+      "app__api__assistant__Conversation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/app__api__assistant__Turn"
+            },
+            "type": "array",
+            "title": "Turns"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "turns",
+          "updated_at"
+        ],
+        "title": "Conversation"
+      },
+      "app__api__assistant__ConversationSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "updated_at"
+        ],
+        "title": "ConversationSummary"
+      },
+      "app__api__assistant__Turn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "pending_actions": {
+            "items": {
+              "$ref": "#/components/schemas/PendingAction"
+            },
+            "type": "array",
+            "title": "Pending Actions",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "Turn"
+      },
       "app__api__client_app__ProfileUpdate": {
         "properties": {
           "first_name": {
@@ -38151,6 +38583,137 @@
         },
         "type": "object",
         "title": "ProfileUpdate"
+      },
+      "app__api__whatsapp_ai__Conversation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/app__api__whatsapp_ai__Turn"
+            },
+            "type": "array",
+            "title": "Turns"
+          },
+          "offers": {
+            "items": {
+              "$ref": "#/components/schemas/Offer"
+            },
+            "type": "array",
+            "title": "Offers"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "phone",
+          "client_id",
+          "turns",
+          "offers",
+          "updated_at"
+        ],
+        "title": "Conversation"
+      },
+      "app__api__whatsapp_ai__ConversationSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Name"
+          },
+          "last_text": {
+            "type": "string",
+            "title": "Last Text"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "phone",
+          "client_id",
+          "client_name",
+          "last_text",
+          "updated_at"
+        ],
+        "title": "ConversationSummary"
+      },
+      "app__api__whatsapp_ai__Turn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "ai"
+            ],
+            "title": "Role"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "Turn"
       }
     },
     "securitySchemes": {

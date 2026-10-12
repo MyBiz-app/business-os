@@ -52,6 +52,7 @@ from app.api import (
     time_off_requests,
     webhooks,
     welcome,
+    whatsapp_ai,
 )
 from app.api import health as health_declarations
 from app.api import settings as business_settings
@@ -80,6 +81,7 @@ ROUTERS: list[APIRouter] = [
     closure.router,
     leads.router,
     messaging.router,
+    whatsapp_ai.router,
     leads.public_router,
     services.router,
     locations.router,
