@@ -12,6 +12,7 @@ it is a new provider class, or a different choice in settings.
 | Invoicing | `invoicing.py`: `InvoiceProvider` — `issue` | `internal` (MyBiz receipts) | each business, else `API_INVOICING_PROVIDER` |
 | Messaging | `messaging.py`: `MessageProvider` — `send` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
 | Email | `email.py` (senders in `app/messaging/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
+| Push notifications | `app/messaging/push.py` (Expo push; phones register via `PUT /me/push-tokens`) | `expo` | the platform: `API_PUSH_PROVIDER` (`expo` / `log` / `off`), optional `API_EXPO_ACCESS_TOKEN` |
 | AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_ANTHROPIC_API_KEY` |
 | Storage | `storage.py`: `StorageProvider` — `put`, `get`, `delete`, `signed_url` | `database` (also `supabase`: Supabase Storage, T80) | the platform: `API_STORAGE_PROVIDER` |
 
