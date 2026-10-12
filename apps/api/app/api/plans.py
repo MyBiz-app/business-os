@@ -357,7 +357,7 @@ def update_plan(plan_id: UUID, body: PlanUpdate, context: CatalogWriteDep) -> Pl
     row = (
         context.session.execute(
             text(f"""
-                UPDATE app.plans SET {set_clause(changes)} WHERE id = :id
+                UPDATE app.plans SET {set_clause(changes, PlanUpdate.model_fields)} WHERE id = :id
                 RETURNING {PLAN_COLUMNS}
             """),
             {**changes, "id": plan_id},

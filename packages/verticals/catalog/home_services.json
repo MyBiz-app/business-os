@@ -95,6 +95,20 @@
           },
           "color": "#6366f1"
         }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "חבילת 4 ניקיונות",
+            "en": "4 cleanings pack"
+          },
+          "kind": "punch_card",
+          "credits": 4,
+          "validity_days": 120,
+          "prices": {
+            "ILS": 100000
+          }
+        }
       ]
     },
     {

@@ -4,6 +4,7 @@ Three different times, kept apart on purpose:
 - a branch's opening hours (`location_hours`): when the doors are open;
 - a member's shifts (`shifts`): when they work, and where;
 - a member's availability (`staff_hours`): when clients can book appointments with them.
+  (When they can work shifts is `staff_availability`, in `app.api.availability`.)
 
 Shifts follow the current branch like every list (`app.in_branch`), so a member kept to some
 branches sees and plans only those. One person never has two overlapping shifts."""
@@ -22,6 +23,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, UserDep, require
+from app.api.pagination import WidePageDep
 from app.core.permissions import Permission
 from app.schedule.scheduling import local_to_utc
 
@@ -183,6 +185,9 @@ class Shift(BaseModel):
     is_cover: bool = Field(description="At a branch other than the person's home branch")
     on_time_off: bool = Field(description="Falls on a day the person is away")
     outside_hours: bool = Field(description="Not within the branch's opening hours (if set)")
+    outside_availability: bool = Field(
+        description="Not within the hours the person said they can work (if they said)"
+    )
     published: bool = Field(description="Visible to the team; a draft shows to managers only")
 
 
@@ -264,6 +269,8 @@ SHIFT_SELECT = """
                  AND (sh.ends_at AT TIME ZONE t.time_zone)::date
                      = (sh.starts_at AT TIME ZONE t.time_zone)::date
            ) AS outside_hours,
+           app.outside_availability(sh.tenant_id, sh.user_id, sh.starts_at, sh.ends_at,
+                                    t.time_zone) AS outside_availability,
            sh.published_at IS NOT NULL AS published
     FROM app.shifts sh
     JOIN app.tenants t ON t.id = sh.tenant_id
@@ -306,10 +313,14 @@ def list_shifts(
         list[UUID] | None, Query(description="Only these branches (within the person's own)")
     ] = None,
     user_id: Annotated[UUID | None, Query(description="Only this person's shifts")] = None,
+    *,
+    page: WidePageDep,
 ) -> list[Shift]:
     time_zone = _time_zone(context.session)
     filters = drafts_hidden(context)
     params: dict[str, object] = {
+        "limit": page.limit,
+        "offset": page.offset,
         "from": local_to_utc(start, time.min, time_zone),
         "to": local_to_utc(start + timedelta(days=days), time.min, time_zone),
     }
@@ -322,7 +333,7 @@ def list_shifts(
     rows = context.session.execute(
         text(
             f"{SHIFT_SELECT} AND sh.starts_at < :to AND sh.ends_at > :from {filters}"
-            " ORDER BY sh.starts_at, user_name"
+            " ORDER BY sh.starts_at, user_name, sh.id LIMIT :limit OFFSET :offset"
         ),
         params,
     ).mappings()

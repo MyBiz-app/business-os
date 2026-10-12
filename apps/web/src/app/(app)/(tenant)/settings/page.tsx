@@ -8,6 +8,7 @@ import { canManageSettings } from "@/lib/permissions";
 import { coverSrc } from "@/lib/workspace";
 import { getTenant } from "@/lib/tenant";
 
+import { CloseSection } from "./close-section";
 import { removeCover, removeLogo } from "./actions";
 import { BrandColorForm, CoverForm, DetailsForm, IdentityForm, LogoForm } from "./settings-forms";
 import { SupportSection } from "./support-section";
@@ -108,6 +109,7 @@ export default async function SettingsPage() {
       </section>
       {tenant.role === "owner" && <SupportSection context={context} />}
       <WriteToMyBiz />
+      {tenant.role === "owner" && <CloseSection name={tenant.name} />}
     </main>
   );
 }
