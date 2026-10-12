@@ -19,16 +19,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
-<<<<<<< HEAD
-  const messages = await clientMessages([]);
-=======
   // Set by the proxy for the strict Content-Security-Policy (lib/csp.ts). The layout already
   // renders per request (the locale comes from a cookie), so reading it costs nothing.
   const nonce = (await headers()).get(NONCE_HEADER) ?? undefined;
-  const messages = Object.fromEntries(
-    Object.entries(await getMessages()).filter(([namespace]) => !SERVER_ONLY_NAMESPACES.includes(namespace)),
-  );
->>>>>>> origin/main
+  const messages = await clientMessages([]);
 
   return (
     <html
