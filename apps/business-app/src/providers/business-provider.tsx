@@ -2,7 +2,7 @@ import type { ApiClient, components } from "@business-os/api-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
+import { ApiError, apiClient, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
 import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
@@ -11,6 +11,8 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 export type Tenant = components["schemas"]["Tenant"];
 export type Membership = components["schemas"]["Membership"];
 export type Branch = { id: string; name: string };
+/** A business the person belongs to that was closed (it is locked until its owner reopens it). */
+export type ClosedBusiness = { id: string; name: string; owner: boolean };
 
 const SELECTED_KEY = "business.tenant";
 /** The current branch, remembered per business (none: all branches). */
@@ -21,6 +23,8 @@ type BusinessContextValue = {
   memberships: Membership[] | null;
   /** The business being worked in, with this person's permissions in it. */
   tenant: Tenant | null;
+  /** Set instead of `tenant` while the chosen business is closed. */
+  closedBusiness: ClosedBusiness | null;
   api: ApiClient;
   /** Scopes requests to the business and, when one is chosen, to the current branch. */
   scope: { header: { "X-Tenant-Id": string; "X-Location-Id"?: string } };
@@ -43,11 +47,13 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   const { palette } = useTheme();
   const [memberships, setMemberships] = useState<Membership[] | null>(null);
   const [tenant, setTenant] = useState<Tenant | null>(null);
+  const [closedBusiness, setClosedBusiness] = useState<ClosedBusiness | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [branchId, setBranchId] = useState<string | null>(null);
   const userId = session?.user.id;
 
-  const load = useCallback(async (tenantId: string | null) => {
+  const load = useCallback(async (tenantId: string | null, list: Membership[] = []) => {
+    setClosedBusiness(null);
     if (!tenantId) {
       setTenant(null);
       setBranches([]);
@@ -55,7 +61,18 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     const header = { "X-Tenant-Id": tenantId };
-    const current = unwrap(await apiClient().GET("/tenants/current", { params: { header } }));
+    let current: Tenant;
+    try {
+      current = unwrap(await apiClient().GET("/tenants/current", { params: { header } }));
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.detail !== "business_closed") throw error;
+      const membership = list.find((m) => m.tenant_id === tenantId);
+      setTenant(null);
+      setBranches([]);
+      setBranchId(null);
+      setClosedBusiness({ id: tenantId, name: membership?.tenant_name ?? "", owner: membership?.role === "owner" });
+      return;
+    }
     const active = current.permissions.includes("catalog.read")
       ? ((await apiClient().GET("/locations", { params: { header } })).data ?? []).filter((b) => b.active)
       : [];
@@ -79,7 +96,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     const chosen = me.memberships.some((m) => m.tenant_id === stored)
       ? stored
       : (me.memberships[0]?.tenant_id ?? null);
-    await load(chosen);
+    await load(chosen, me.memberships);
   }, [userId, load]);
 
   useEffect(() => {
@@ -89,9 +106,9 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
   const select = useCallback(
     async (tenantId: string) => {
       await AsyncStorage.setItem(SELECTED_KEY, tenantId);
-      await load(tenantId);
+      await load(tenantId, memberships ?? []);
     },
-    [load],
+    [load, memberships],
   );
 
   const selectBranch = useCallback(
@@ -108,6 +125,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
     () => ({
       memberships,
       tenant,
+      closedBusiness,
       api: apiClient(),
       scope: { header: { "X-Tenant-Id": tenant?.id ?? "", ...(branchId ? { "X-Location-Id": branchId } : {}) } },
       branches,
@@ -118,7 +136,7 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
       select,
       refresh,
     }),
-    [memberships, tenant, palette, select, refresh, branches, branchId, selectBranch],
+    [memberships, tenant, closedBusiness, palette, select, refresh, branches, branchId, selectBranch],
   );
 
   return <BusinessContext.Provider value={value}>{children}</BusinessContext.Provider>;

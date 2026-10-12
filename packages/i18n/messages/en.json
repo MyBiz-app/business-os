@@ -4776,6 +4776,24 @@
     "motionHint": "Fewer animations and transitions.",
     "motionReduced": "Reduced"
   },
+  "closure": {
+    "title": "Close this business",
+    "intro": "Closing locks the business for your staff and clients, stops billing and automatic reminders. Your data is kept for {days} days. You can reopen the business any time before then; after that everything is deleted for good.",
+    "confirmLabel": "Type the business name to confirm: {name}",
+    "confirmButton": "Close the business",
+    "errors": {
+      "name_mismatch": "The name doesn't match. Type it exactly as shown.",
+      "already_closed": "This business is already closed.",
+      "owner_only": "Only the owner can do this.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "closedTitle": "This business is closed",
+    "closedOn": "Closed on {date}.",
+    "deleteOn": "Everything is deleted for good on {date}. Reopen before then to keep it.",
+    "reopen": "Reopen the business",
+    "notOwner": "Only the owner can reopen it. Ask the owner of {name}.",
+    "signOut": "Sign out"
+  },
   "whatsappAi": {
     "offer": "To book {service} on {starts}, reply 1. Reply 0 to cancel. This offer holds for {minutes} minutes.",
     "booked": "You're booked: {service}, {starts}. See you there!",
