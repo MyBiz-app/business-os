@@ -85,3 +85,43 @@ jobs:
       # Catches what typecheck cannot: a missing native module, a bad import, a broken app.json.
       - name: Export the web bundle
         run: pnpm --filter ${{ matrix.app }} exec expo export -p web --output-dir "$RUNNER_TEMP/dist"
+
+  load-test:
+    name: Load test (10x demo data)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: public.ecr.aws/docker/library/postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install Python dependencies
+        working-directory: apps/api
+        run: uv sync --locked
+
+      # The busiest business-app journeys on a demo ten times its usual size. The budget is loose:
+      # it catches a missing index or a query per client, not a slow runner.
+      - name: Run the load test
+        working-directory: apps/api
+        env:
+          LOAD_TEST: "1"
+          LOAD_REPORT: ${{ runner.temp }}/load-report.md
+        run: |
+          uv run pytest tests/load -s -p no:logging
+          cat "$LOAD_REPORT" >> "$GITHUB_STEP_SUMMARY"
