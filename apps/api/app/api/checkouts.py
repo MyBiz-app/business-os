@@ -4,23 +4,28 @@ built-in simulated provider the app's "pay" button completes it. The business tu
 sales on in its settings."""
 
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 
 from app.api.common import not_found
-from app.api.deps import ClientDep
+from app.api.deps import ClientDep, TenantContext, require
+from app.api.pagination import PageDep
 from app.api.plans import Entitlement, issue_receipts_now, load_entitlement
 from app.commerce.payments import provider_for_business
 from app.core.config import get_settings
+from app.core.permissions import Permission
 from app.providers.choice import choose
 from app.providers.payments import CheckoutRequest, PaymentsUnavailable
 
 router = APIRouter(prefix="/client", tags=["client"])
+staff_router = APIRouter(tags=["orders"])
+
+OrdersDep = Annotated[TenantContext, Depends(require(Permission.REPORTS_READ))]
 
 
 class CheckoutCreate(BaseModel):
@@ -200,3 +205,60 @@ def simulate_payment(checkout_id: UUID, context: ClientDep) -> CheckoutPaid:
     return CheckoutPaid(
         checkout=_load(context, checkout_id), entitlement=load_entitlement(db, entitlement_id)
     )
+
+
+class Order(BaseModel):
+    id: UUID
+    client_id: UUID
+    client_name: str
+    plan_name: str
+    amount: int = Field(description="What the client pays, minor units")
+    currency: str
+    status: Literal["pending", "paid", "cancelled", "failed"]
+    simulated: bool = Field(description="Test payment: no money is charged")
+    created_at: datetime
+    completed_at: datetime | None
+
+
+class OrderPage(BaseModel):
+    items: list[Order]
+    total: int
+
+
+@staff_router.get("/orders")
+def list_orders(
+    context: OrdersDep,
+    page: PageDep,
+    order_status: Annotated[
+        Literal["pending", "paid", "cancelled", "failed"] | None, Query(alias="status")
+    ] = None,
+) -> OrderPage:
+    """Online purchases by clients, newest first (the business's own tenant only, by RLS)."""
+    params: dict[str, object] = {
+        "status": order_status,
+        "limit": page.limit,
+        "offset": page.offset,
+    }
+    db = context.session
+    total = db.execute(
+        text("""
+            SELECT count(*) FROM app.checkouts k
+            WHERE CAST(:status AS text) IS NULL OR k.status = CAST(:status AS text)
+        """),
+        params,
+    ).scalar_one()
+    rows = db.execute(
+        text("""
+            SELECT k.id, k.client_id, concat_ws(' ', c.first_name, c.last_name) AS client_name,
+                   p.name AS plan_name, k.amount, k.currency, k.status,
+                   k.provider = 'simulated' AS simulated, k.created_at, k.completed_at
+            FROM app.checkouts k
+            JOIN app.clients c ON c.id = k.client_id
+            JOIN app.plans p ON p.id = k.plan_id
+            WHERE CAST(:status AS text) IS NULL OR k.status = CAST(:status AS text)
+            ORDER BY k.created_at DESC, k.id
+            LIMIT :limit OFFSET :offset
+        """),
+        params,
+    ).mappings()
+    return OrderPage(items=[Order.model_validate(dict(row)) for row in rows], total=total)

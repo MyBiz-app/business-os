@@ -3277,7 +3277,27 @@
       "Amount",
       "Currency",
       "Sample"
-    ]
+    ],
+    "orders": {
+      "title": "Online orders",
+      "subtitle": "Plans clients bought in the app, newest first.",
+      "date": "Date",
+      "client": "Client",
+      "item": "Plan",
+      "status": "Status",
+      "amount": "Amount",
+      "empty": "No online orders yet.",
+      "sample": "test payment",
+      "showing": "Showing {shown} of {total}",
+      "more": "Show more orders",
+      "link": "Online orders",
+      "statuses": {
+        "pending": "Waiting for payment",
+        "paid": "Paid",
+        "cancelled": "Cancelled",
+        "failed": "Failed"
+      }
+    }
   },
   "business": {
     "tabs": {

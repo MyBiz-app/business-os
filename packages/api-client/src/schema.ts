@@ -4264,6 +4264,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Orders
+         * @description Online purchases by clients, newest first (the business's own tenant only, by RLS).
+         */
+        get: operations["list_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/receipts": {
         parameters: {
             query?: never;
@@ -7921,6 +7941,54 @@ export interface components {
             id: string;
             /** Name */
             name: string;
+        };
+        /** Order */
+        Order: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** Client Name */
+            client_name: string;
+            /** Plan Name */
+            plan_name: string;
+            /**
+             * Amount
+             * @description What the client pays, minor units
+             */
+            amount: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "paid" | "cancelled" | "failed";
+            /**
+             * Simulated
+             * @description Test payment: no money is charged
+             */
+            simulated: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Completed At */
+            completed_at: string | null;
+        };
+        /** OrderPage */
+        OrderPage: {
+            /** Items */
+            items: components["schemas"]["Order"][];
+            /** Total */
+            total: number;
         };
         /**
          * PaletteColors
@@ -15585,6 +15653,10 @@ export interface operations {
                 location_id?: string[] | null;
                 /** @description Only this person's shifts */
                 user_id?: string | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -17294,7 +17366,12 @@ export interface operations {
     };
     list_bookings: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -20973,11 +21050,53 @@ export interface operations {
             };
         };
     };
+    list_orders: {
+        parameters: {
+            query?: {
+                status?: ("pending" | "paid" | "cancelled" | "failed") | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrderPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_receipts: {
         parameters: {
             query?: {
                 client_id?: string | null;
+                /** @description Rows per page */
                 limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
