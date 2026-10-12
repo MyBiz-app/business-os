@@ -1,6 +1,6 @@
 import { Redirect, router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Text } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Heading, Screen, styles } from "@business-os/app-kit/components/ui";

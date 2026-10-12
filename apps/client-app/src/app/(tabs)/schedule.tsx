@@ -2,7 +2,8 @@ import { addDays, dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { PressableScale } from "@business-os/app-kit/components/motion";

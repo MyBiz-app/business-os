@@ -1,7 +1,8 @@
 import type { components } from "@business-os/api-client";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";

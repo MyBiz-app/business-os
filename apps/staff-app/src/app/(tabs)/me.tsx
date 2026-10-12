@@ -1,4 +1,4 @@
-import { Text } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";

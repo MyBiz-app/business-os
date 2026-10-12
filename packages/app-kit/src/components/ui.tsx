@@ -1,14 +1,6 @@
 import { Children, useId } from "react";
-import {
-  ActivityIndicator,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  type TextInputProps,
-  View,
-} from "react-native";
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, TextInput, type TextInputProps, View } from "react-native";
+import { Text } from "./text";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslations } from "use-intl";
 

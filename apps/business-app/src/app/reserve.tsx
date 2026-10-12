@@ -2,7 +2,8 @@ import type { components } from "@business-os/api-client";
 import { addDays, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Avatar, BackBar, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";

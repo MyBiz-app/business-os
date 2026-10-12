@@ -1,7 +1,7 @@
 import type { components } from "@business-os/api-client";
 import { router } from "expo-router";
 import { useCallback } from "react";
-import { Text } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, ListRow } from "@business-os/app-kit/components/rows";

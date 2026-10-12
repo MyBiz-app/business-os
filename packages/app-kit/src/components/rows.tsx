@@ -1,6 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { localeDirection, type Locale } from "@business-os/i18n";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "./text";
 import { useLocale } from "use-intl";
 
 import { PressableScale } from "./motion";

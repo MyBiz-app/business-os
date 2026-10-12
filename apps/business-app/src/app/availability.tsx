@@ -1,7 +1,8 @@
 import { formatDay } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, SectionTitle } from "@business-os/app-kit/components/rows";

@@ -3,7 +3,8 @@ import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
 import { toMajorUnits, toMinorUnits } from "@business-os/i18n/money";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { useCallback, useRef, useState } from "react";
-import { Linking, Share, Text, View } from "react-native";
+import { Linking, Share, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { BackBar, Badge, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";

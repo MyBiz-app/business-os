@@ -4,7 +4,8 @@ import { addDays, dayOf, formatDay, formatTime, todayIn } from "@business-os/i18
 import { usageWarnings } from "@business-os/i18n/usage";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";

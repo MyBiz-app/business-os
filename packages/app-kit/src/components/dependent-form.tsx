@@ -1,6 +1,7 @@
 import type { components } from "@business-os/api-client";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
+import { Text } from "./text";
 import { useTranslations } from "use-intl";
 
 import { PillRow } from "./rows";
