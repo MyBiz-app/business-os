@@ -43,6 +43,9 @@ export default async function TeamPage() {
           <Link href="/team/time-off" className="btn-secondary px-3 py-2 text-sm">
             {t("timeOffQueue.open")}
           </Link>
+          <Link href="/team/shift-swaps" className="btn-secondary px-3 py-2 text-sm">
+            {t("shiftSwapQueue.open")}
+          </Link>
           <Link href="/team/roles" className="btn-ghost px-3 py-2 text-sm">
             {t("team.manageRoles")}
           </Link>

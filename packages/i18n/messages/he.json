@@ -567,6 +567,7 @@
     "pageOf": "עמוד {page} מתוך {pages}"
   },
   "common": {
+    "skipToContent": "דלג לתוכן הראשי",
     "loadFailed": "לא הצלחנו לטעון כרגע.",
     "retry": "נסו שוב",
     "save": "שמירה",
@@ -2611,7 +2612,34 @@
     "approve": "אישור",
     "decline": "דחייה",
     "decided": "הוחלטו לאחרונה",
-    "status": { "approved": "אושרה", "declined": "נדחתה", "cancelled": "בוטלה על ידי המבקש" }
+    "status": {
+      "approved": "אושרה",
+      "declined": "נדחתה",
+      "cancelled": "בוטלה על ידי המבקש"
+    }
+  },
+  "shiftSwapQueue": {
+    "title": "החלפות משמרות",
+    "subtitle": "אישור מעביר את המשמרת לעמית ומעדכן את הסידור. העמית צריך להסכים קודם.",
+    "back": "משמרות",
+    "open": "החלפות משמרות",
+    "pending": "{count, plural, one {# מחכה לך} other {# מחכות לך}}",
+    "noPending": "אין החלפות שמחכות.",
+    "waitingColleague": "ממתין לעמית",
+    "fromTo": "{from} ← {to}",
+    "note": "הערה לשני הצדדים (לא חובה)",
+    "noteHint": "תוצג לשני הצדדים",
+    "approve": "אישור",
+    "decline": "דחייה",
+    "decided": "הוחלטו לאחרונה",
+    "status": {
+      "pending_colleague": "ממתין לעמית",
+      "pending_manager": "ממתין לך",
+      "approved": "אושר",
+      "declined": "נדחה",
+      "refused": "העמית סירב",
+      "cancelled": "נמשך"
+    }
   },
   "timeOff": {
     "title": "חופשות והיעדרויות",
@@ -3406,6 +3434,37 @@
         "request_overlap": "כבר יש לך בקשה לימים האלה.",
         "invalid_period": "התקופה הזו כבר הסתיימה.",
         "generic": "משהו השתבש. נסו שוב."
+      },
+      "swap": {
+        "title": "החלפת משמרת",
+        "offer": "הציעו החלפה",
+        "pick": "הצעה אל",
+        "none": "אין עמיתים להציע להם.",
+        "note": "הערה (לא חובה)",
+        "send": "שלחו הצעה",
+        "sent": "ההצעה נשלחה. {name} עונה קודם, ואז מנהל מחליט.",
+        "incoming": "הוצע לכם",
+        "incomingText": "{from} מציע/ה לכם את המשמרת: {when}",
+        "accept": "מסכימים",
+        "refuse": "מסרבים",
+        "mine": "הצעות ההחלפה שלכם",
+        "to": "אל {name}",
+        "cancel": "משכו את ההצעה",
+        "close": "סגירה",
+        "status": {
+          "pending_colleague": "ממתין לעמית",
+          "pending_manager": "ממתין למנהל",
+          "approved": "אושר",
+          "declined": "נדחה",
+          "refused": "העמית סירב",
+          "cancelled": "נמשך"
+        },
+        "errors": {
+          "swap_open": "כבר יש הצעה פתוחה למשמרת הזו.",
+          "swap_not_pending": "כבר ענו על ההצעה הזו.",
+          "not_found": "אי אפשר להציע את המשמרת הזו יותר.",
+          "generic": "משהו השתבש. נסו שוב."
+        }
       }
     },
     "back": "חזרה",

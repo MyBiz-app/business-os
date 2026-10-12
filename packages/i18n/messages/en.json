@@ -567,6 +567,7 @@
     "pageOf": "Page {page} of {pages}"
   },
   "common": {
+    "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
     "retry": "Try again",
     "save": "Save",
@@ -2611,7 +2612,34 @@
     "approve": "Approve",
     "decline": "Decline",
     "decided": "Recently decided",
-    "status": { "approved": "Approved", "declined": "Declined", "cancelled": "Withdrawn" }
+    "status": {
+      "approved": "Approved",
+      "declined": "Declined",
+      "cancelled": "Withdrawn"
+    }
+  },
+  "shiftSwapQueue": {
+    "title": "Shift swaps",
+    "subtitle": "Approving moves the shift to the colleague and updates the roster. Colleagues must accept first.",
+    "back": "Shifts",
+    "open": "Shift swaps",
+    "pending": "{count, plural, one {# waiting for you} other {# waiting for you}}",
+    "noPending": "No swaps are waiting.",
+    "waitingColleague": "Waiting for the colleague",
+    "fromTo": "{from} → {to}",
+    "note": "Note for both people (optional)",
+    "noteHint": "Shown to both people",
+    "approve": "Approve",
+    "decline": "Decline",
+    "decided": "Recently decided",
+    "status": {
+      "pending_colleague": "Waiting for colleague",
+      "pending_manager": "Waiting for you",
+      "approved": "Approved",
+      "declined": "Declined",
+      "refused": "Refused by colleague",
+      "cancelled": "Withdrawn"
+    }
   },
   "timeOff": {
     "title": "Time off",
@@ -3406,6 +3434,37 @@
         "request_overlap": "You already have a request for these days.",
         "invalid_period": "That period has already ended.",
         "generic": "Something went wrong. Try again."
+      },
+      "swap": {
+        "title": "Swap a shift",
+        "offer": "Offer to swap",
+        "pick": "Offer to",
+        "none": "No colleagues to offer to.",
+        "note": "Note (optional)",
+        "send": "Send offer",
+        "sent": "Offer sent. {name} answers first, then a manager decides.",
+        "incoming": "Offered to you",
+        "incomingText": "{from} offers you this shift: {when}",
+        "accept": "Accept",
+        "refuse": "Refuse",
+        "mine": "Your swap offers",
+        "to": "To {name}",
+        "cancel": "Withdraw offer",
+        "close": "Close",
+        "status": {
+          "pending_colleague": "Waiting for colleague",
+          "pending_manager": "Waiting for manager",
+          "approved": "Approved",
+          "declined": "Declined",
+          "refused": "Refused",
+          "cancelled": "Withdrawn"
+        },
+        "errors": {
+          "swap_open": "This shift already has an open offer.",
+          "swap_not_pending": "This offer was already answered.",
+          "not_found": "That shift can't be offered any more.",
+          "generic": "Something went wrong. Try again."
+        }
       }
     },
     "back": "Back",

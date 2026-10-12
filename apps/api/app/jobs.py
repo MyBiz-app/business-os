@@ -35,6 +35,7 @@ from app.messaging.email import (
     send_emails,
     sender_from_settings,
 )
+from app.messaging.push import push_sender_from_settings
 from app.messaging.roster import notify_roster, notify_roster_changes
 from app.providers.choice import choose
 from app.providers.storage import tenant_key
@@ -488,18 +489,20 @@ def issue_documents(conn: Connection) -> dict[str, int]:
 
 def notify_shifts(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
-    if sender is None:
-        return "email provider not configured; nothing sent"
-    published = notify_roster(conn, sender)
-    edits = notify_roster_changes(conn, sender)
+    push = push_sender_from_settings()
+    if sender is None and push is None:
+        return "no email or push provider configured; nothing sent"
+    published = notify_roster(conn, sender, push=push)
+    edits = notify_roster_changes(conn, sender, push=push)
     return published | {f"changes_{key}": value for key, value in edits.items()}
 
 
 def send_notification_emails(conn: Connection) -> dict[str, int] | str:
     sender = sender_from_settings()
-    if sender is None:
-        return "email provider not configured; nothing sent"
-    return send_emails(conn, sender)
+    push = push_sender_from_settings()
+    if sender is None and push is None:
+        return "no email or push provider configured; nothing sent"
+    return send_emails(conn, sender, push=push)
 
 
 MOVE_BATCH = 100  # documents per run, so one run stays short; run again until it reports 0

@@ -1898,6 +1898,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/shift-swaps/colleagues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Colleagues
+         * @description Who a shift can be offered to: the other people of the business (names only, so staff
+         *     without access to the team list can still pick a colleague).
+         */
+        get: operations["list_colleagues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/shift-swaps/{swap_id}/accept": {
         parameters: {
             query?: never;
@@ -5891,6 +5912,16 @@ export interface components {
              * @description When the closed business and its data are deleted for good
              */
             delete_after: string | null;
+        };
+        /** Colleague */
+        Colleague: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
         };
         /** Complaint */
         Complaint: {
@@ -15441,6 +15472,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ShiftSwap"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_colleagues: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Colleague"][];
                 };
             };
             /** @description Validation Error */
