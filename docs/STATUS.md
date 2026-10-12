@@ -42,7 +42,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 - Owner review of the web and apps ([#38](https://github.com/MyBiz-app/business-os/issues/38)).
 - Go-live readiness: one numbered item per thread from [the readiness review](reviews/go-live-readiness-2026-10.md) and the [launch review](reviews/launch-readiness-2026-10.md) (blockers first).
-- Apps redesign (Airbnb/Linear/Wix style, accessible bottom tab bar, MyBiz palette): plan in the project files; steps 1-3a merged (shared `packages/design-tokens`, Heebo everywhere, rounded components, accessible tab bar), step 3b (client app screens: skeleton loading, pinned main button) in review; previous apps kept on branch `backup/apps-v1`.
+- Apps redesign (Airbnb/Linear/Wix style, accessible bottom tab bar, MyBiz palette): plan in the project files; steps 1-3b merged (shared `packages/design-tokens`, Heebo everywhere, rounded components, accessible tab bar, skeleton loading, pinned main button on the client home), 3c (client schedule) in review; next: business app, staff app, accessibility screen; previous apps kept on branch `backup/apps-v1`.
 - Technical cleanup (P2 of the launch review): oversized modules are split gradually, only when a slice touches them.
 
 ## Done (recent work, newest areas first)

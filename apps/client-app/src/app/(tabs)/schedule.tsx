@@ -84,14 +84,14 @@ export default function Schedule() {
         <PressableScale
           accessibilityRole="button"
           onPress={() => router.push("/court")}
-          style={[local.cta, elevation.raised, { backgroundColor: palette.primary }]}
+          style={[local.cta, { backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.border }]}
         >
-          <Ionicons name="tennisball-outline" size={28} color={palette.onPrimary} />
+          <Ionicons name="tennisball-outline" size={28} color={palette.primary} />
           <View style={local.ctaText}>
-            <Text style={[local.ctaTitle, { color: palette.onPrimary }]}>{tCourt("cta")}</Text>
-            <Text style={[local.ctaSub, { color: palette.onPrimary }]}>{tCourt("ctaText")}</Text>
+            <Text style={[local.ctaTitle, { color: palette.foreground }]}>{tCourt("cta")}</Text>
+            <Text style={[local.ctaSub, { color: palette.muted }]}>{tCourt("ctaText")}</Text>
           </View>
-          <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={22} color={palette.onPrimary} />
+          <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={22} color={palette.muted} />
         </PressableScale>
       )}
       <ScrollView
@@ -158,12 +158,12 @@ export default function Schedule() {
 
 const local = StyleSheet.create({
   days: { gap: 8, paddingVertical: 2 },
-  day: { width: 56, paddingVertical: 10, borderRadius: 14, borderWidth: 1, alignItems: "center", gap: 2 },
+  day: { width: 60, minHeight: 72, paddingVertical: 10, borderRadius: 30, justifyContent: "center", borderWidth: 1, alignItems: "center", gap: 2 },
   weekday: { fontSize: 12, fontWeight: "600" },
   date: { fontSize: 18, fontWeight: "700" },
   closed: { fontSize: 11, fontWeight: "600" },
   list: { gap: 12 },
-  cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 20, padding: 18 },
+  cta: { flexDirection: "row", alignItems: "center", gap: 14, borderRadius: 24, padding: 18 },
   ctaText: { flex: 1, gap: 2 },
   ctaTitle: { fontSize: 18, fontWeight: "800", textAlign: "left" },
   ctaSub: { fontSize: 14, textAlign: "left" }, // full opacity: it sits on the brand color
