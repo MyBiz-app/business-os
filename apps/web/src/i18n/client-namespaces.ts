@@ -33,6 +33,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "clientFields",
     "clientImport",
     "clients",
+    "closure",
     "common",
     "dependents",
     "documents",
