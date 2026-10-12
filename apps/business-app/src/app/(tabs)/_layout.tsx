@@ -16,12 +16,13 @@ const icon =
 /** The business app's tabs, in the business's own brand color. Tabs follow permissions. */
 export default function TabsLayout() {
   const { session, loading } = useSession();
-  const { memberships, tenant, palette, can } = useBusiness();
+  const { memberships, tenant, closedBusiness, palette, can } = useBusiness();
   const t = useTranslations("business.tabs");
   const tTerms = useTranslations("terms");
 
   if (!loading && !session) return <Redirect href="/sign-in" />;
   if (memberships && memberships.length === 0) return <Redirect href="/no-business" />;
+  if (closedBusiness) return <Redirect href="/closed" />;
   if (!tenant) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: palette.background }}>
