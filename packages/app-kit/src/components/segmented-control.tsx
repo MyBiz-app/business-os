@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { font } from "../lib/typography";
 import { useTheme } from "../providers/theme-provider";
 
 type Option<T extends string> = { value: T; label: string };
@@ -46,7 +47,7 @@ export function SegmentedControl<T extends string>({ label, options, value, onCh
 
 const styles = StyleSheet.create({
   container: { gap: 8 },
-  label: { fontSize: 13, fontWeight: "600" },
-  group: { flexDirection: "row", borderWidth: 1, borderRadius: 10, padding: 3, gap: 3 },
-  option: { flex: 1, alignItems: "center", justifyContent: "center", minHeight: 44, paddingVertical: 8, borderRadius: 7 },
+  label: { fontSize: 13, ...font.medium },
+  group: { flexDirection: "row", borderWidth: 1, borderRadius: 999, padding: 3, gap: 3 },
+  option: { flex: 1, alignItems: "center", justifyContent: "center", minHeight: 44, paddingVertical: 8, borderRadius: 999 },
 });

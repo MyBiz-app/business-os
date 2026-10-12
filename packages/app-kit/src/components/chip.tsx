@@ -2,6 +2,7 @@ import { StyleSheet, Text } from "react-native";
 
 import { PressableScale } from "./motion";
 import { tint } from "../lib/brand";
+import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
 
 type Props = {
@@ -37,7 +38,7 @@ export function Chip({ label, sublabel, selected, onPress, palette, accessibilit
 }
 
 const local = StyleSheet.create({
-  chip: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10, alignItems: "center", justifyContent: "center", minWidth: 64, minHeight: 44 },
-  label: { fontSize: 15, fontWeight: "700", fontVariant: ["tabular-nums"] },
-  sub: { fontSize: 11, fontWeight: "600" },
+  chip: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 10, alignItems: "center", justifyContent: "center", minWidth: 64, minHeight: 44 },
+  label: { fontSize: 15, ...font.bold, fontVariant: ["tabular-nums"] },
+  sub: { fontSize: 11, ...font.medium },
 });

@@ -6,6 +6,7 @@ import { useLocale } from "use-intl";
 import { PressableScale } from "./motion";
 import { tint } from "../lib/brand";
 import { initials } from "../lib/names";
+import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
@@ -45,7 +46,7 @@ export function Avatar({ name, color, palette, size = 40 }: { name: string; colo
         { width: size, height: size, borderRadius: size / 2, backgroundColor: tint(base, 0.14), borderColor: tint(base, 0.3) },
       ]}
     >
-      <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: size * 0.36 }}>{initials(name)}</Text>
+      <Text style={{ color: palette.foreground, ...font.bold, fontSize: size * 0.36 }}>{initials(name)}</Text>
     </View>
   );
 }
@@ -201,24 +202,24 @@ export function TileGrid({ children }: { children: React.ReactNode }) {
 
 const local = StyleSheet.create({
   back: { flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", minHeight: 44 },
-  backText: { fontSize: 16, fontWeight: "600" },
+  backText: { fontSize: 16, ...font.medium },
   avatar: { alignItems: "center", justifyContent: "center", borderWidth: 1 },
   badge: { borderWidth: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3, alignSelf: "flex-start" },
-  badgeText: { fontSize: 12, fontWeight: "700" },
-  rowBox: { borderWidth: 1, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 12 },
+  badgeText: { fontSize: 12, ...font.bold },
+  rowBox: { borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 12 },
   row: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 32 },
   rowText: { flex: 1, gap: 2 },
-  rowTitle: { fontSize: 16, fontWeight: "600", textAlign: "left" },
-  rowSub: { fontSize: 13, textAlign: "left" },
+  rowTitle: { fontSize: 16, ...font.medium, textAlign: "left" },
+  rowSub: { fontSize: 13, ...font.regular, textAlign: "left" },
   section: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
-  sectionTitle: { fontSize: 18, fontWeight: "700", textAlign: "left" },
-  sectionAction: { fontSize: 15, fontWeight: "600", paddingVertical: 10 },
+  sectionTitle: { fontSize: 20, ...font.bold, textAlign: "left" },
+  sectionAction: { fontSize: 15, ...font.medium, paddingVertical: 12, minHeight: 44 },
   pills: { gap: 8, paddingVertical: 2 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  stat: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: 16, padding: 14, gap: 4 },
-  statLabel: { fontSize: 13, fontWeight: "600", textAlign: "left" },
-  statValue: { fontSize: 24, fontWeight: "700", textAlign: "left", fontVariant: ["tabular-nums"] },
-  pill: { minWidth: 56, minHeight: 44, justifyContent: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 14, borderWidth: 1, alignItems: "center", gap: 2 },
-  pillSub: { fontSize: 12, fontWeight: "600" },
-  pillText: { fontSize: 16, fontWeight: "700" },
+  stat: { flexGrow: 1, flexBasis: "45%", borderWidth: 1, borderRadius: 20, padding: 14, gap: 4 },
+  statLabel: { fontSize: 13, ...font.medium, textAlign: "left" },
+  statValue: { fontSize: 24, ...font.bold, textAlign: "left", fontVariant: ["tabular-nums"] },
+  pill: { minWidth: 56, minHeight: 44, justifyContent: "center", paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, borderWidth: 1, alignItems: "center", gap: 2 },
+  pillSub: { fontSize: 12, ...font.medium },
+  pillText: { fontSize: 16, ...font.bold },
 });

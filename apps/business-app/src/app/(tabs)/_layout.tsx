@@ -1,23 +1,19 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Redirect, Tabs } from "expo-router";
-import { ActivityIndicator, type ColorValue, View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { useTranslations } from "use-intl";
+
+import { tabIcon, useTabScreenOptions } from "@business-os/app-kit/components/tab-options";
 
 import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
-
-const icon = (name: IconName) =>
-  function TabIcon({ color, size }: { color: ColorValue; size: number }) {
-    return <Ionicons name={name} color={color as string} size={size} />;
-  };
-
 /** The business app's tabs, in the business's own brand color. Tabs follow permissions. */
 export default function TabsLayout() {
   const { session, loading } = useSession();
   const { memberships, tenant, closedBusiness, palette, can } = useBusiness();
+  const screenOptions = useTabScreenOptions(palette);
+  const icon = (name: Parameters<typeof tabIcon>[0]) => tabIcon(name, palette);
   const t = useTranslations("business.tabs");
   const tTerms = useTranslations("terms");
 
@@ -36,20 +32,14 @@ export default function TabsLayout() {
 
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: palette.primary,
-        tabBarInactiveTintColor: palette.muted,
-        tabBarStyle: { backgroundColor: palette.surface, borderTopColor: palette.border },
-        sceneStyle: { backgroundColor: palette.background },
-      }}
+      screenOptions={screenOptions}
     >
-      <Tabs.Screen name="today" options={{ title: t("today"), tabBarIcon: icon("today-outline") }} />
+      <Tabs.Screen name="today" options={{ title: t("today"), tabBarIcon: icon("today") }} />
       <Tabs.Screen
         name="clients"
         options={{
           title: tTerms(`${termsFor(tenant)}.clients`),
-          tabBarIcon: icon("people-outline"),
+          tabBarIcon: icon("people"),
           href: can("clients.read") ? undefined : null,
         }}
       />
@@ -57,7 +47,7 @@ export default function TabsLayout() {
         name="inbox"
         options={{
           title: crm ? t("leads") : t("messages"),
-          tabBarIcon: icon(crm ? "funnel-outline" : "chatbubbles-outline"),
+          tabBarIcon: icon(crm ? "funnel" : "chatbubbles"),
           href: can("clients.read") && (crm || tenant.modules.includes("whatsapp")) ? undefined : null,
         }}
       />
@@ -65,11 +55,11 @@ export default function TabsLayout() {
         name="numbers"
         options={{
           title: t("numbers"),
-          tabBarIcon: icon("stats-chart-outline"),
+          tabBarIcon: icon("stats-chart"),
           href: can("reports.read") ? undefined : null,
         }}
       />
-      <Tabs.Screen name="me" options={{ title: t("me"), tabBarIcon: icon("person-outline") }} />
+      <Tabs.Screen name="me" options={{ title: t("me"), tabBarIcon: icon("person") }} />
     </Tabs>
   );
 }
