@@ -405,6 +405,13 @@ def get_session(session_id: UUID, context: ReadDep) -> ScheduledSession:
     return found
 
 
+# Columns update_session may set: the editable fields plus the recomputed start and end.
+SESSION_COLUMNS = frozenset(
+    {"location_id", "room_id", "instructor_user_id", "notes", "capacity", "status"}
+    | {"starts_at", "ends_at"}
+)
+
+
 @router.patch("/sessions/{session_id}")
 def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> ScheduledSession:
     """Changes one occurrence; the rest of its series is not affected."""
@@ -438,7 +445,7 @@ def update_session(session_id: UUID, body: SessionUpdate, context: WriteDep) -> 
         assignments["starts_at"] = new_start
         assignments["ends_at"] = new_start + timedelta(minutes=duration)
 
-    set_sql = set_clause(assignments)
+    set_sql = set_clause(assignments, SESSION_COLUMNS)
     try:
         db.execute(
             text(f"UPDATE app.sessions SET {set_sql} WHERE id = :id"),
