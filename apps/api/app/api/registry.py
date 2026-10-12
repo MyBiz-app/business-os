@@ -119,6 +119,7 @@ ROUTERS: list[APIRouter] = [
     client_app.public_router,
     client_app.router,
     checkouts.router,
+    checkouts.staff_router,
     receipts.router,
     receipts.client_router,
     attention.router,

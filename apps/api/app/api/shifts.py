@@ -23,6 +23,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found
 from app.api.deps import TenantContext, UserDep, require
+from app.api.pagination import WidePageDep
 from app.core.permissions import Permission
 from app.schedule.scheduling import local_to_utc
 
@@ -312,10 +313,14 @@ def list_shifts(
         list[UUID] | None, Query(description="Only these branches (within the person's own)")
     ] = None,
     user_id: Annotated[UUID | None, Query(description="Only this person's shifts")] = None,
+    *,
+    page: WidePageDep,
 ) -> list[Shift]:
     time_zone = _time_zone(context.session)
     filters = drafts_hidden(context)
     params: dict[str, object] = {
+        "limit": page.limit,
+        "offset": page.offset,
         "from": local_to_utc(start, time.min, time_zone),
         "to": local_to_utc(start + timedelta(days=days), time.min, time_zone),
     }
@@ -328,7 +333,7 @@ def list_shifts(
     rows = context.session.execute(
         text(
             f"{SHIFT_SELECT} AND sh.starts_at < :to AND sh.ends_at > :from {filters}"
-            " ORDER BY sh.starts_at, user_name"
+            " ORDER BY sh.starts_at, user_name, sh.id LIMIT :limit OFFSET :offset"
         ),
         params,
     ).mappings()
