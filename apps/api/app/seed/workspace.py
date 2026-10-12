@@ -100,6 +100,7 @@ def seed_workspace(
     # (two fixed days off each); a long day splits into a morning and an evening shift.
     rows = []
     free: dict[UUID, set[date]] = {}  # who has no shift on which open day (cover candidates)
+    said: set[UUID] = set()  # people whose availability is in (one row set per person)
     first = today - timedelta(days=14)
     station_names = STATIONS.get(category, ())
     for branch, team in staff.items():
@@ -122,6 +123,24 @@ def seed_workspace(
                 {"t": tenant_id, "l": branch, "u": person},
             )
         days_off = {person: set(rng.sample(range(7), 2)) for person in team}
+        # Each person says they can work the open hours of the days they are not off, so the
+        # coverage report can suggest who could fill a gap.
+        windows = [
+            {"t": tenant_id, "u": person, "w": weekday, "starts": i[0][0], "ends": i[-1][1]}
+            for person in team
+            if person not in said
+            for weekday, i in hours.items()
+            if i and weekday not in days_off[person]
+        ]
+        said.update(team)
+        if windows:
+            conn.execute(
+                text("""
+                    INSERT INTO app.staff_availability (tenant_id, user_id, weekday, starts, ends)
+                    VALUES (:t, :u, :w, :starts, :ends)
+                """),
+                windows,
+            )
         positions = [None, *(team_titles[i % len(team_titles)] for i in range(len(team) - 1))]
         for offset in range(35):
             day = first + timedelta(days=offset)
