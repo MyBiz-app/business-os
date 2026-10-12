@@ -50,6 +50,7 @@ export default function Join() {
   useEffect(() => {
     if (params.code) void lookUp(normalize(params.code));
     // Only for a code that arrived in the link.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.code]);
 
   const confirmJoin = async () => {

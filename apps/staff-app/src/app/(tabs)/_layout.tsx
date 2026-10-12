@@ -9,9 +9,10 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
-const icon =
-  (name: IconName) =>
-  ({ color, size }: { color: ColorValue; size: number }) => <Ionicons name={name} color={color as string} size={size} />;
+const icon = (name: IconName) =>
+  function TabIcon({ color, size }: { color: ColorValue; size: number }) {
+    return <Ionicons name={name} color={color as string} size={size} />;
+  };
 
 /** The MyBiz team's tabs; each one appears only for someone whose permissions cover it. */
 export default function TabsLayout() {
