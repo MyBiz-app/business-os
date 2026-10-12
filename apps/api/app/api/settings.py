@@ -80,8 +80,9 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
         ).scalar_one()
         if known != len(set(branches)):
             raise HTTPException(status_code=422, detail="unknown_branch")
+    assignments = set_clause(changes, TenantUpdate.model_fields)
     context.session.execute(
-        text(f"UPDATE app.tenants SET {set_clause(changes)} WHERE id = app.current_tenant_id()"),
+        text(f"UPDATE app.tenants SET {assignments} WHERE id = app.current_tenant_id()"),
         changes,
     )
     return load_current_tenant(context.session)

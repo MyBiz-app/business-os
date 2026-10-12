@@ -336,23 +336,32 @@ def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRi
                 SELECT time_zone, (now() AT TIME ZONE time_zone)::date AS today
                 FROM app.tenants WHERE id = app.current_tenant_id()
             ),
+            -- One pass over each table instead of a lookup per client: this runs on the
+            -- dashboard and the reports page, so it must stay flat as the client list grows.
+            plans AS (
+                SELECT e.client_id,
+                       max(e.ends_on) FILTER (WHERE e.status = 'active'
+                                              AND e.ends_on >= t.today) AS plan_ends_on,
+                       bool_or(e.status = 'active'
+                               AND t.today BETWEEN e.starts_on AND e.ends_on) AS holds_valid
+                FROM app.entitlements e CROSS JOIN t
+                GROUP BY e.client_id
+            ),
+            visits AS (
+                SELECT b.client_id, max(s.starts_at) AS last_visit
+                FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+                WHERE b.status = 'checked_in'
+                GROUP BY b.client_id
+            ),
             members AS (
                 SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
-                       (SELECT max(e.ends_on) FROM app.entitlements e
-                        WHERE e.client_id = c.id AND e.status = 'active'
-                          AND e.ends_on >= t.today) AS plan_ends_on,
-                       (SELECT max(s.starts_at) FROM app.bookings b
-                        JOIN app.sessions s ON s.id = b.session_id
-                        WHERE b.client_id = c.id AND b.status = 'checked_in') AS last_visit
-                FROM app.clients c CROSS JOIN t
+                       p.plan_ends_on, v.last_visit
+                FROM app.clients c
+                JOIN plans p ON p.client_id = c.id AND p.holds_valid
+                LEFT JOIN visits v ON v.client_id = c.id
                 WHERE c.erased_at IS NULL
                   -- clients without a home branch belong to every branch
                   AND (c.home_location_id IS NULL OR app.in_branch(c.home_location_id))
-                  AND EXISTS (
-                    SELECT 1 FROM app.entitlements e
-                    WHERE e.client_id = c.id AND e.status = 'active'
-                      AND t.today BETWEEN e.starts_on AND e.ends_on
-                )
             )
             SELECT m.id::text AS client_id, m.name,
                    CASE WHEN m.last_visit IS NULL

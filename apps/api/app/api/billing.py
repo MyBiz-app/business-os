@@ -13,7 +13,7 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from app.ai import budget as ai_budget
-from app.api.common import blank_to_none, not_found
+from app.api.common import blank_to_none, check_columns, not_found
 from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
 from app.commerce.billing import add_months
@@ -214,7 +214,14 @@ def usage(db: Session, today: date) -> Usage:
     )
 
 
+# Columns _upsert may write: the billing details form plus the test card fields.
+_ACCOUNT_COLUMNS = frozenset(
+    {*BillingDetails.model_fields, "card_brand", "card_last4", "card_exp", "card_simulated"}
+)
+
+
 def _upsert(db: Session, tenant_id: UUID, values: dict) -> None:
+    check_columns(values, _ACCOUNT_COLUMNS)
     columns = ", ".join(values)
     placeholders = ", ".join(f":{k}" for k in values)
     updates = ", ".join(f"{k} = EXCLUDED.{k}" for k in values)
