@@ -146,7 +146,7 @@ def _update(db: Session, address_id: UUID, body: AddressUpdate) -> Address:
     if changes:
         row = db.execute(
             text(
-                f"UPDATE app.client_addresses SET {set_clause(changes)}"
+                f"UPDATE app.client_addresses SET {set_clause(changes, AddressUpdate.model_fields)}"
                 f" WHERE id = :id RETURNING {COLUMNS}"
             ),
             {**changes, "id": address_id},

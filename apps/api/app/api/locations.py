@@ -269,8 +269,9 @@ def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) 
         ).scalar_one()
         if others == 0:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_branch")
+    assignments = set_clause(changes, LocationUpdate.model_fields)
     updated = context.session.execute(
-        text(f"UPDATE app.locations SET {set_clause(changes)} WHERE id = :id RETURNING id"),
+        text(f"UPDATE app.locations SET {assignments} WHERE id = :id RETURNING id"),
         {**changes, "id": location_id},
     ).first()
     if updated is None:
@@ -306,7 +307,8 @@ def update_room(room_id: UUID, body: RoomUpdate, context: WriteDep) -> Room:
         for key, value in body.model_dump(exclude_unset=True).items()
         if not (key in {"name", "active", "bookable"} and value is None)
     }
-    sql = f"UPDATE app.rooms SET {set_clause(changes)} WHERE id = :id RETURNING {ROOM_COLUMNS}"
+    assignments = set_clause(changes, RoomUpdate.model_fields)
+    sql = f"UPDATE app.rooms SET {assignments} WHERE id = :id RETURNING {ROOM_COLUMNS}"
     row = (
         context.session.execute(
             text(sql),

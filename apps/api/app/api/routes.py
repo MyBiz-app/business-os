@@ -326,6 +326,12 @@ class ProfileUpdate(BaseModel):
         return value.strip() or None if isinstance(value, str) else value
 
 
+# Columns update_me may set: the form's fields, with the custom palette split into its colors.
+PROFILE_COLUMNS = frozenset(
+    {*ProfileUpdate.model_fields, *(f"palette_{name}" for name in PaletteColors.model_fields)}
+)
+
+
 @router.patch("/me", tags=["account"])
 def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
     """The signed-in person's own profile: the name the team, clients and reports see, a phone
@@ -341,7 +347,7 @@ def update_me(body: ProfileUpdate, user: UserDep, session: SessionDep) -> Me:
         changes |= {f"palette_{name}": value for name, value in colors.items()}
     if changes:
         session.execute(
-            text(f"UPDATE app.users SET {set_clause(changes)} WHERE id = :id"),
+            text(f"UPDATE app.users SET {set_clause(changes, PROFILE_COLUMNS)} WHERE id = :id"),
             {**changes, "id": user.id},
         )
     return get_me(user, session)

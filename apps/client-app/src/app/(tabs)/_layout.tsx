@@ -10,9 +10,10 @@ import { useSession } from "@business-os/app-kit/providers/session-provider";
 
 type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
-const icon =
-  (name: IconName) =>
-  ({ color, size }: { color: ColorValue; size: number }) => <Ionicons name={name} color={color as string} size={size} />;
+const icon = (name: IconName) =>
+  function TabIcon({ color, size }: { color: ColorValue; size: number }) {
+    return <Ionicons name={name} color={color as string} size={size} />;
+  };
 
 /** The client app's bottom tabs, in the selected business's brand color. */
 export default function TabsLayout() {

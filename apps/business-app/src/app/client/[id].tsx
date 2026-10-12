@@ -1,6 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
-import { todayIn } from "@business-os/i18n/dates";
+import { dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Linking, Text, View } from "react-native";

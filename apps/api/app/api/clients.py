@@ -291,7 +291,7 @@ def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Cli
         del changes["status"]
     if "custom_fields" in changes:
         changes["custom_fields"] = _custom_fields(context.session, changes["custom_fields"])
-    assignments = set_clause(changes, casts={"custom_fields": "jsonb"})
+    assignments = set_clause(changes, ClientUpdate.model_fields, casts={"custom_fields": "jsonb"})
     sql = f"UPDATE app.clients SET {assignments} WHERE id = :id RETURNING {COLUMNS}"
     try:
         row = (

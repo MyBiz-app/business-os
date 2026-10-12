@@ -10,10 +10,13 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types src/lib/*.test.ts"
+    "test": "node --test --experimental-strip-types src/lib/*.test.ts test/*.test.mjs",
+    "lint": "eslint ."
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "eslint": "9.39.5",
+    "eslint-config-expo": "57.0.2",
     "typescript": "^5"
   },
   "dependencies": {
