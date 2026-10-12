@@ -6,30 +6,58 @@
   "color": "from-red-500 to-orange-600",
   "terms": "food",
   "client_term": "guest",
-  "booking_modes": ["appointment", "class"],
+  "booking_modes": [
+    "appointment",
+    "class"
+  ],
   "cancellation_window_minutes": 1440,
   "booking_requires_plan": false,
   "default_preset": "growing",
-  "recommended_modules": ["client_app", "whatsapp", "crm"],
+  "recommended_modules": [
+    "client_app",
+    "whatsapp",
+    "crm"
+  ],
   "client_fields": [
-    { "key": "dietary_restrictions", "kind": "text", "max_length": 200 },
-    { "key": "allergies", "kind": "text", "max_length": 200 },
-    { "key": "preferences", "kind": "text" }
+    {
+      "key": "dietary_restrictions",
+      "kind": "text",
+      "max_length": 200
+    },
+    {
+      "key": "allergies",
+      "kind": "text",
+      "max_length": 200
+    },
+    {
+      "key": "preferences",
+      "kind": "text"
+    }
   ],
   "default_services": [
     {
-      "names": { "he": "אירוע פרטי", "en": "Private event" },
+      "names": {
+        "he": "אירוע פרטי",
+        "en": "Private event"
+      },
       "duration_minutes": 180,
       "booking_mode": "appointment",
-      "prices": { "ILS": 250000 },
+      "prices": {
+        "ILS": 250000
+      },
       "color": "#dc2626"
     },
     {
-      "names": { "he": "סדנת בישול", "en": "Cooking workshop" },
+      "names": {
+        "he": "סדנת בישול",
+        "en": "Cooking workshop"
+      },
       "duration_minutes": 120,
       "booking_mode": "class",
       "capacity": 12,
-      "prices": { "ILS": 18000 },
+      "prices": {
+        "ILS": 18000
+      },
       "color": "#ea580c"
     }
   ],
@@ -39,35 +67,55 @@
       "status": "beta",
       "default_services": [
         {
-          "names": { "he": "סדנת פיצה", "en": "Pizza workshop" },
+          "names": {
+            "he": "סדנת פיצה",
+            "en": "Pizza workshop"
+          },
           "duration_minutes": 120,
           "booking_mode": "class",
           "capacity": 12,
-          "prices": { "ILS": 16000 },
+          "prices": {
+            "ILS": 16000
+          },
           "color": "#dc2626"
         },
         {
-          "names": { "he": "מסיבת יום הולדת", "en": "Birthday party" },
+          "names": {
+            "he": "מסיבת יום הולדת",
+            "en": "Birthday party"
+          },
           "duration_minutes": 150,
           "booking_mode": "appointment",
-          "prices": { "ILS": 120000 },
+          "prices": {
+            "ILS": 120000
+          },
           "color": "#f59e0b"
         },
         {
-          "names": { "he": "אירוע פרטי", "en": "Private event" },
+          "names": {
+            "he": "אירוע פרטי",
+            "en": "Private event"
+          },
           "duration_minutes": 180,
           "booking_mode": "appointment",
-          "prices": { "ILS": 250000 },
+          "prices": {
+            "ILS": 250000
+          },
           "color": "#b91c1c"
         }
       ],
       "default_plans": [
         {
-          "names": { "he": "כרטיסיית סדנאות (4)", "en": "Workshop card (4)" },
+          "names": {
+            "he": "כרטיסיית סדנאות (4)",
+            "en": "Workshop card (4)"
+          },
           "kind": "punch_card",
           "credits": 4,
           "validity_days": 180,
-          "prices": { "ILS": 56000 }
+          "prices": {
+            "ILS": 56000
+          }
         }
       ]
     },
@@ -76,18 +124,43 @@
       "status": "beta",
       "default_services": [
         {
-          "names": { "he": "סדנת בריסטה", "en": "Barista workshop" },
+          "names": {
+            "he": "סדנת בריסטה",
+            "en": "Barista workshop"
+          },
           "duration_minutes": 90,
-          "booking_mode": "class", "capacity": 10,
-          "prices": { "ILS": 14000 },
+          "booking_mode": "class",
+          "capacity": 10,
+          "prices": {
+            "ILS": 14000
+          },
           "color": "#92400e"
         },
         {
-          "names": { "he": "אירוע פרטי בקפה", "en": "Private café event" },
+          "names": {
+            "he": "אירוע פרטי בקפה",
+            "en": "Private café event"
+          },
           "duration_minutes": 120,
           "booking_mode": "appointment",
-          "prices": { "ILS": 150000 },
+          "prices": {
+            "ILS": 150000
+          },
           "color": "#b45309"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "כרטיסיית קפה (10 כניסות)",
+            "en": "Coffee card (10 visits)"
+          },
+          "kind": "punch_card",
+          "credits": 10,
+          "validity_days": 180,
+          "prices": {
+            "ILS": 15000
+          }
         }
       ]
     },
@@ -96,17 +169,28 @@
       "status": "beta",
       "default_services": [
         {
-          "names": { "he": "שולחן שף", "en": "Chef's table" },
+          "names": {
+            "he": "שולחן שף",
+            "en": "Chef's table"
+          },
           "duration_minutes": 150,
-          "booking_mode": "class", "capacity": 10,
-          "prices": { "ILS": 32000 },
+          "booking_mode": "class",
+          "capacity": 10,
+          "prices": {
+            "ILS": 32000
+          },
           "color": "#b91c1c"
         },
         {
-          "names": { "he": "הזמנת קבוצה", "en": "Group booking" },
+          "names": {
+            "he": "הזמנת קבוצה",
+            "en": "Group booking"
+          },
           "duration_minutes": 120,
           "booking_mode": "appointment",
-          "prices": { "ILS": 80000 },
+          "prices": {
+            "ILS": 80000
+          },
           "color": "#dc2626"
         }
       ]
@@ -116,18 +200,43 @@
       "status": "beta",
       "default_services": [
         {
-          "names": { "he": "סדנת אפייה", "en": "Baking workshop" },
+          "names": {
+            "he": "סדנת אפייה",
+            "en": "Baking workshop"
+          },
           "duration_minutes": 120,
-          "booking_mode": "class", "capacity": 12,
-          "prices": { "ILS": 15000 },
+          "booking_mode": "class",
+          "capacity": 12,
+          "prices": {
+            "ILS": 15000
+          },
           "color": "#d97706"
         },
         {
-          "names": { "he": "טעימות והזמנה מיוחדת", "en": "Tasting for a custom order" },
+          "names": {
+            "he": "טעימות והזמנה מיוחדת",
+            "en": "Tasting for a custom order"
+          },
           "duration_minutes": 30,
           "booking_mode": "appointment",
-          "prices": { "ILS": 3000 },
+          "prices": {
+            "ILS": 3000
+          },
           "color": "#f59e0b"
+        }
+      ],
+      "default_plans": [
+        {
+          "names": {
+            "he": "כרטיסיית מאפים (10 כניסות)",
+            "en": "Pastry card (10 visits)"
+          },
+          "kind": "punch_card",
+          "credits": 10,
+          "validity_days": 180,
+          "prices": {
+            "ILS": 18000
+          }
         }
       ]
     },
@@ -136,17 +245,27 @@
       "status": "beta",
       "default_services": [
         {
-          "names": { "he": "פגישת טעימות לקייטרינג", "en": "Catering tasting meeting" },
+          "names": {
+            "he": "פגישת טעימות לקייטרינג",
+            "en": "Catering tasting meeting"
+          },
           "duration_minutes": 60,
           "booking_mode": "appointment",
-          "prices": { "ILS": 10000 },
+          "prices": {
+            "ILS": 10000
+          },
           "color": "#be123c"
         },
         {
-          "names": { "he": "אירוע פרטי בקייטרינג", "en": "Catered private event" },
+          "names": {
+            "he": "אירוע פרטי בקייטרינג",
+            "en": "Catered private event"
+          },
           "duration_minutes": 240,
           "booking_mode": "appointment",
-          "prices": { "ILS": 600000 },
+          "prices": {
+            "ILS": 600000
+          },
           "color": "#9f1239"
         }
       ]
