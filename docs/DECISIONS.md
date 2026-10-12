@@ -151,6 +151,11 @@ When a decision changes, update the row and note the date — do not delete hist
 | X38 | Store ids and "my colors" (go-live slice 9, 2026-10-12): the three apps' bundle ids / Android packages live in `packages/brand/app-ids.json` and are injected by each `app.config.js`, so the owner's final choice is a one-line change before the first upload. A business's brand color (`primary_color`) is editable from the business app (permission `business.settings`) as well as the web, and themes all three surfaces. Store listings, data-safety answers and the asset checklist are in `docs/store/`. | DECIDED (2026-10-12, delegated) |
 | X39 | Marketing site look (owner, 2026-10-12): Wix-like modern style in a fixed palette (Midnight Navy #111827, Primary Blue #2563EB, AI Purple #7C3AED for AI only, Electric Cyan #06B6D4, Cloud White #F8FAFC, Slate Gray #64748B, Success Green #16A34A). Dark surfaces only for hero, AI band, CTA and footer; day or night follows the person's choice (accessibility button, every public page, Hebrew and English). No invented numbers or testimonials: the facts strip counts real product data. The "low cost" section is the live pricing teaser. Previous page: branch `backup/landing-v1`. | `apps/web/src/app/globals.css` (`.mk`) |
 
+### Apps accessibility preferences (2026-10-12)
+
+- The Expo apps' shared preferences card offers text size (1 / 1.125 / 1.25, same steps as the web), a reduce-motion switch (in addition to the system setting) and high contrast. All are stored on the device.
+- Bold English text uses Plus Jakarta Sans (as on the web); Hebrew and regular text stay in Heebo.
+
 ## Open
 
 | # | Question |
