@@ -758,3 +758,16 @@ html[data-contrast="high"].dark .mk {
 [data-paused="true"] .mk-fill {
   animation-play-state: paused;
 }
+
+/* The business app and the console: page titles match the extra-bold, tight titles of the
+ * marketing pages and sign-in screens. Not in a layer, so it wins over each page's `font-bold`. */
+:has(> .nav-dark) main h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* A heading that receives focus from script (the signup wizard moves focus to each step's title)
+ * is not interactive, so it shows no focus box. */
+h1[tabindex="-1"]:focus {
+  outline: none;
+}
