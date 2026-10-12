@@ -14,12 +14,13 @@ import { useTranslations } from "use-intl";
 
 import { FadeIn, PressableScale } from "./motion";
 import { tint } from "../lib/brand";
+import { font } from "../lib/typography";
 import type { Palette } from "../lib/theme";
 
 /** Soft layered shadows for raised surfaces (same feel as the web app's cards). */
 export const elevation = {
-  card: { boxShadow: "0px 1px 2px rgba(24, 24, 40, 0.06), 0px 4px 14px rgba(24, 24, 40, 0.06)" },
-  raised: { boxShadow: "0px 2px 4px rgba(24, 24, 40, 0.08), 0px 10px 24px rgba(24, 24, 40, 0.12)" },
+  card: { boxShadow: "0px 1px 2px rgba(17, 24, 39, 0.05), 0px 4px 16px rgba(17, 24, 39, 0.07)" },
+  raised: { boxShadow: "0px 2px 4px rgba(17, 24, 39, 0.08), 0px 10px 28px rgba(17, 24, 39, 0.14)" },
 } as const;
 
 type ButtonProps = {
@@ -162,15 +163,15 @@ export const styles = StyleSheet.create({
   screen: { flex: 1 },
   content: { padding: 20, gap: 16, paddingBottom: 40 },
   block: { gap: 16 },
-  button: { minHeight: 48, borderRadius: 14, paddingHorizontal: 16, alignItems: "center", justifyContent: "center" },
-  buttonText: { fontSize: 16, fontWeight: "600" },
+  button: { minHeight: 52, borderRadius: 999, paddingHorizontal: 24, alignItems: "center", justifyContent: "center" },
+  buttonText: { fontSize: 16, ...font.bold },
   field: { gap: 6 },
-  label: { fontSize: 14, fontWeight: "600", textAlign: "left" },
-  input: { minHeight: 48, borderWidth: 1, borderRadius: 14, paddingHorizontal: 14, fontSize: 17 },
-  hint: { fontSize: 13, textAlign: "left" },
-  error: { fontSize: 14, textAlign: "left" },
-  card: { borderWidth: 1, borderRadius: 20, padding: 16, gap: 10 },
-  h1: { fontSize: 28, fontWeight: "700", textAlign: "left" },
-  h2: { fontSize: 18, fontWeight: "600", textAlign: "left" },
-  muted: { fontSize: 15, textAlign: "left" },
+  label: { fontSize: 14, ...font.medium, textAlign: "left" },
+  input: { minHeight: 52, borderWidth: 1, borderRadius: 14, paddingHorizontal: 16, fontSize: 17, ...font.regular },
+  hint: { fontSize: 13, ...font.regular, textAlign: "left" },
+  error: { fontSize: 14, ...font.medium, textAlign: "left" },
+  card: { borderWidth: 1, borderRadius: 20, padding: 18, gap: 10 },
+  h1: { fontSize: 28, lineHeight: 34, ...font.bold, textAlign: "left" },
+  h2: { fontSize: 20, lineHeight: 26, ...font.bold, textAlign: "left" },
+  muted: { fontSize: 15, ...font.regular, textAlign: "left" },
 });
