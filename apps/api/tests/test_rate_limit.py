@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
-from app.core.rate_limit import MemoryStore, Rule, limiter
+from app.core.rate_limit import MemoryStore, RedisStore, Rule, build_store, limiter
 
 RULES = (
     Rule("public-write", "/public/", 2, methods=frozenset({"POST"})),
@@ -122,3 +122,51 @@ def test_rate_limits_are_on_outside_local_development() -> None:
 def test_ready_checks_the_database(client: TestClient) -> None:
     ready = client.get("/health/ready")
     assert ready.status_code == 200 and ready.json() == {"status": "ok", "database": "ok"}
+
+
+class FakePipeline:
+    def __init__(self, store: dict[str, int]) -> None:
+        self._store = store
+        self._ops: list[str] = []
+
+    def incr(self, key: str) -> None:
+        self._ops.append(key)
+
+    def expire(self, key: str, seconds: int) -> None:
+        pass
+
+    def execute(self) -> list[int]:
+        key = self._ops[0]
+        self._store[key] = self._store.get(key, 0) + 1
+        return [self._store[key]]
+
+
+class FakeRedis:
+    def __init__(self) -> None:
+        self.data: dict[str, int] = {}
+
+    def pipeline(self) -> FakePipeline:
+        return FakePipeline(self.data)
+
+
+class BrokenRedis:
+    def pipeline(self):
+        raise ConnectionError("down")
+
+
+def test_redis_store_counts_per_window_and_key() -> None:
+    store = RedisStore(FakeRedis())
+    assert [store.hit("a", 60, 100.0)[0] for _ in range(3)] == [1, 2, 3]
+    assert store.hit("b", 60, 100.0)[0] == 1
+    assert store.hit("a", 60, 119.0) == (4, 120.0)  # same window (60..120)
+    assert store.hit("a", 60, 121.0) == (1, 180.0)  # next window
+
+
+def test_redis_store_falls_back_to_local_counts_when_redis_is_down() -> None:
+    store = RedisStore(BrokenRedis())
+    assert [store.hit("a", 60, 100.0)[0] for _ in range(2)] == [1, 2]
+
+
+def test_store_is_in_memory_unless_a_redis_url_is_set() -> None:
+    assert isinstance(build_store(None), MemoryStore)
+    assert isinstance(build_store("redis://localhost:6379/0"), RedisStore)

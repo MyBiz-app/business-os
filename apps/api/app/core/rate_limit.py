@@ -5,9 +5,11 @@ calls get a generous ceiling that a person never reaches.
 
 Counts live in a store behind a small interface: the built-in in-memory store counts per API
 process, which is enough for one instance; with several instances a shared store (Redis) plugs in
-here without touching the rules."""
+here without touching the rules. `RedisStore` is that shared store; it is used only when
+`API_RATE_LIMIT_REDIS_URL` is set (off by default)."""
 
 import hmac
+import logging
 import math
 import threading
 import time
@@ -17,6 +19,8 @@ from typing import Protocol
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -64,6 +68,40 @@ class MemoryStore:
             count += 1
             self._counts[key] = (start, count)
         return count, start + window
+
+
+class RedisStore:
+    """Fixed windows shared by every API instance, kept in Redis. If Redis cannot be reached the
+    request is counted by a local `MemoryStore` instead, so an outage never takes the API down."""
+
+    def __init__(self, client, prefix: str = "rl", fallback: LimiterStore | None = None) -> None:
+        self._client = client
+        self._prefix = prefix
+        self._fallback = fallback or MemoryStore()
+
+    @classmethod
+    def from_url(cls, url: str) -> "RedisStore":
+        import redis  # imported here: only needed when a Redis URL is configured
+
+        return cls(redis.Redis.from_url(url, socket_timeout=0.25, socket_connect_timeout=0.25))
+
+    def hit(self, key: str, window: int, now: float) -> tuple[int, float]:
+        start = now - now % window
+        redis_key = f"{self._prefix}:{key}:{int(start)}"
+        try:
+            pipe = self._client.pipeline()
+            pipe.incr(redis_key)
+            pipe.expire(redis_key, window + 1)
+            count = int(pipe.execute()[0])
+        except Exception:
+            logger.warning("rate limit store unavailable; counting locally", exc_info=True)
+            return self._fallback.hit(key, window, now)
+        return count, start + window
+
+
+def build_store(redis_url: str | None) -> LimiterStore:
+    """The in-process store unless a Redis URL is configured."""
+    return RedisStore.from_url(redis_url) if redis_url else MemoryStore()
 
 
 VISITOR_HEADER = "x-visitor-address"

@@ -7,11 +7,11 @@ from pydantic import BaseModel
 from sqlalchemy import Engine, text
 
 from app.api.registry import ROUTERS
-from app.core.config import get_settings
+from app.core.config import get_settings, missing_production_settings
 from app.core.db import get_engine
 from app.core.logging import configure_logging, request_logging
 from app.core.monitoring import init_monitoring
-from app.core.rate_limit import MemoryStore, limiter
+from app.core.rate_limit import build_store, limiter
 
 
 class HealthResponse(BaseModel):
@@ -26,6 +26,8 @@ class ReadyResponse(BaseModel):
 
 def create_app() -> FastAPI:
     settings = get_settings()
+    if missing := missing_production_settings(settings):
+        raise RuntimeError(f"production needs these settings: {', '.join(missing)}")
     configure_logging()
     init_monitoring(settings)
     app = FastAPI(
@@ -48,7 +50,11 @@ def create_app() -> FastAPI:
         token = settings.internal_token.get_secret_value() if settings.internal_token else None
         app.middleware("http")(
             limiter(
-                MemoryStore(),
+                build_store(
+                    settings.rate_limit_redis_url.get_secret_value()
+                    if settings.rate_limit_redis_url
+                    else None
+                ),
                 trust_forwarded=settings.trust_forwarded_for,
                 internal_token=token,
             )

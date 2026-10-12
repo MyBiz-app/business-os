@@ -100,6 +100,9 @@ class Settings(BaseSettings):
     # Shared with the web server, which then names the real visitor in X-Visitor-Address.
     internal_token: SecretStr | None = None
 
+    # Shared rate-limit counts for several API instances (redis://…). Unset: counts per process.
+    rate_limit_redis_url: SecretStr | None = None
+
     @property
     def rate_limits_on(self) -> bool:
         if self.rate_limits is not None:
@@ -136,6 +139,30 @@ class Settings(BaseSettings):
             if value.startswith(prefix):
                 return "postgresql+psycopg://" + value.removeprefix(prefix)
         return value
+
+
+def missing_production_settings(settings: Settings) -> list[str]:
+    """Names of the settings a production API must not start without: a default would point it at
+    local addresses, leave provider secrets unencrypted or let the web app's visitor header be
+    forged. Empty outside production."""
+    if settings.environment != "production":
+        return []
+    local = ("localhost", "127.0.0.1", "::1")
+    missing: list[str] = []
+    if urlparse(settings.jwks_url).hostname in local:
+        missing.append("API_JWKS_URL")
+    if settings.secrets_key is None:
+        missing.append("API_SECRETS_KEY")
+    if settings.internal_token is None:
+        missing.append("API_INTERNAL_TOKEN")
+    for name, value in (("API_WEB_URL", settings.web_url), ("API_API_URL", settings.api_url)):
+        if urlparse(value).hostname in local:
+            missing.append(name)
+    if not settings.cors_origins or any(
+        urlparse(origin).hostname in local for origin in settings.cors_origins
+    ):
+        missing.append("API_CORS_ORIGINS")
+    return missing
 
 
 @lru_cache
