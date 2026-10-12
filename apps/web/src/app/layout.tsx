@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
+import { clientMessages } from "@/components/scoped-messages";
 import { PaletteScript } from "@/components/palette-script";
 import { SkipLink } from "@/components/skip-link";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -16,18 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("name"), description: t("tagline") };
 }
 
-// Message namespaces that belong to the email templates and the Expo apps; no web screen reads
-// them, so they are not worth sending to every browser.
-const SERVER_ONLY_NAMESPACES = ["email", "client", "staffApp"];
-
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const locale = await getLocale();
   // Set by the proxy for the strict Content-Security-Policy (lib/csp.ts). The layout already
   // renders per request (the locale comes from a cookie), so reading it costs nothing.
   const nonce = (await headers()).get(NONCE_HEADER) ?? undefined;
-  const messages = Object.fromEntries(
-    Object.entries(await getMessages()).filter(([namespace]) => !SERVER_ONLY_NAMESPACES.includes(namespace)),
-  );
+  const messages = await clientMessages([]);
 
   return (
     <html

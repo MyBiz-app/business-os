@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "i18n:client": "node scripts/client-namespaces.mjs",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "node --import @business-os/verticals/node-resolve --test --experimental-strip-types src/lib/*.test.ts"
   },

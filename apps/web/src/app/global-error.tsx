@@ -2,7 +2,9 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
-import { localeDirection, matchLanguageTag, messages, type Locale } from "@business-os/i18n";
+import { localeDirection, matchLanguageTag, type Locale } from "@business-os/i18n/locales";
+
+import { ERROR_MESSAGES } from "@/lib/error-messages";
 
 /** Last resort, when the root layout itself fails: it renders its own <html>, outside the
  * providers, so it reads the translations directly and picks the language from the saved
@@ -25,8 +27,8 @@ export default function GlobalError({
   }, [error]);
 
   const locale = pickLocale();
-  const t = messages[locale].errorPages;
-  const retry = messages[locale].common.retry;
+  const t = ERROR_MESSAGES[locale];
+  const retry = t.retry;
 
   return (
     <html lang={locale} dir={localeDirection[locale]}>
