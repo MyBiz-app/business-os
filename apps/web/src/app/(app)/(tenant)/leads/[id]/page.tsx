@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Avatar } from "@/components/avatar";
+import { Ltr, UserText } from "@/components/bidi";
+import { Container } from "@/components/layout/container";
 import { SubmitButton } from "@/components/form/submit-button";
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
@@ -28,7 +30,7 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
   const name = [lead.first_name, lead.last_name].filter(Boolean).join(" ");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/leads" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
@@ -36,23 +38,23 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
       <header className="card-accent flex flex-wrap items-center gap-4 p-6">
         <Avatar id={lead.id} name={name} size="lg" />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h1 dir="auto" className="truncate text-3xl font-bold">{name}</h1>
+          <h1 dir="auto" className="truncate text-3xl font-extrabold tracking-tight">{name}</h1>
           <p className="text-sm text-muted">
             {t(`stages.${lead.stage}`)} · {t(`sources.${lead.source}`)}
-            {lead.campaign && ` · ${lead.campaign}`}
+            {lead.campaign && <> · <UserText>{lead.campaign}</UserText></>}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
           {lead.phone && (
             <a href={`tel:${lead.phone}`} className="btn-secondary px-3 py-2 text-sm">
               <Phone aria-hidden="true" className="size-4" />
-              <span dir="ltr">{lead.phone}</span>
+              <Ltr>{lead.phone}</Ltr>
             </a>
           )}
           {lead.email && (
             <a href={`mailto:${lead.email}`} className="btn-secondary px-3 py-2 text-sm">
               <Mail aria-hidden="true" className="size-4" />
-              <span dir="ltr">{lead.email}</span>
+              <Ltr>{lead.email}</Ltr>
             </a>
           )}
         </div>
@@ -115,6 +117,6 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
           )}
         </section>
       </div>
-    </main>
+    </Container>
   );
 }
