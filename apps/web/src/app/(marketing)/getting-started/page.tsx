@@ -4,7 +4,8 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { PageHero } from "@/components/marketing/sections";
+import { Section } from "@/components/layout/section";
+import { SubpageHero } from "@/components/marketing/subpage";
 import { SETUP_STEPS, type SetupStep } from "@/components/getting-started";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,13 +22,14 @@ export default async function GettingStartedPage() {
 
   return (
     <main className="enter flex flex-col">
-      <PageHero eyebrow={t("page.eyebrow")} title={t("page.title")} subtitle={t("page.subtitle")} />
+      <SubpageHero eyebrow={t("page.eyebrow")} title={t("page.title")} description={t("page.subtitle")} />
 
-      <ol className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-6 py-10">
+      <Section spacing="compact">
+      <ol className="grid gap-5 lg:grid-cols-2">
         {sections.map((section, index) => {
           const { href, Icon } = SETUP_STEPS[section.key];
           return (
-            <li key={section.key} className="card flex flex-col gap-4 p-6 sm:flex-row sm:gap-6">
+            <li key={section.key} className="card card-hover flex flex-col gap-4 p-6 sm:flex-row sm:gap-6">
               <div className="flex items-center gap-3 sm:flex-col sm:items-center">
                 <span aria-hidden="true" className="btn-primary size-11 text-lg">
                   {index + 1}
@@ -62,8 +64,9 @@ export default async function GettingStartedPage() {
           );
         })}
       </ol>
+      </Section>
 
-      <section className="mx-auto mb-16 flex w-full max-w-3xl flex-col items-center gap-3 px-6 text-center">
+      <Section tone="surface" innerClassName="flex flex-col items-center gap-3 text-center">
         <span aria-hidden="true" className="icon-tile size-12">
           <LifeBuoy className="size-6" />
         </span>
@@ -77,7 +80,7 @@ export default async function GettingStartedPage() {
             {t("page.startCta")}
           </Link>
         </div>
-      </section>
+      </Section>
     </main>
   );
 }
