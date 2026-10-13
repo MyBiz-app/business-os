@@ -2,7 +2,7 @@
 
 import { Users } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
 import { capLanes, coverage, layOut, minutesIn, visibleHours } from "@/lib/calendar";
@@ -127,7 +127,24 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [days, events, lanes, max]);
   const hasShifts = shifts.length > 0;
-  const [peek, setPeek] = useState<{ x: number; y: number; shifts: GridShift[] } | null>(null);
+  const [peek, setPeek] = useState<{ x: number; top: number; bottom: number; shifts: GridShift[] } | null>(null);
+  const peekRef = useRef<HTMLDivElement>(null);
+  const [peekPos, setPeekPos] = useState<{ left: number; top: number } | null>(null);
+  // Anchor the popup next to the tapped element and keep it fully on screen: below it when
+  // there is room, above it otherwise, clamped to the viewport edges.
+  useLayoutEffect(() => {
+    if (!peek || !peekRef.current) {
+      setPeekPos(null);
+      return;
+    }
+    const gap = 8;
+    const margin = 12;
+    const { width, height } = peekRef.current.getBoundingClientRect();
+    const left = Math.min(Math.max(peek.x - width / 2, margin), window.innerWidth - width - margin);
+    const fitsBelow = peek.bottom + gap + height <= window.innerHeight - margin;
+    const wanted = fitsBelow ? peek.bottom + gap : peek.top - gap - height;
+    setPeekPos({ left, top: Math.min(Math.max(wanted, margin), Math.max(margin, window.innerHeight - height - margin)) });
+  }, [peek]);
   useEffect(() => {
     if (!peek) return;
     const close = (event: Event) => {
@@ -142,7 +159,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
   }, [peek]);
   const openPeek = (element: HTMLElement, list: GridShift[]) => {
     const box = element.getBoundingClientRect();
-    setPeek({ x: Math.min(Math.max(box.left + box.width / 2, 150), window.innerWidth - 150), y: Math.min(box.top + box.height / 2, window.innerHeight - 40), shifts: list });
+    setPeek({ x: box.left + box.width / 2, top: box.top, bottom: box.bottom, shifts: list });
   };
   const hourLabel = (hour: number) =>
     new Intl.DateTimeFormat(locale, {
@@ -382,11 +399,12 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
       </div>
       {peek && (
         <div
+          ref={peekRef}
           data-peek
           role="dialog"
           aria-label={labels.peopleOnShift}
-          className="fixed z-50 w-72 max-w-[calc(100vw-1.5rem)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-surface p-3 shadow-2xl ring-1 ring-border"
-          style={{ left: peek.x, top: peek.y }}
+          className="fixed z-50 w-72 max-w-[calc(100vw-1.5rem)] rounded-2xl bg-surface p-3 shadow-2xl ring-1 ring-border"
+          style={{ left: peekPos?.left ?? 0, top: peekPos?.top ?? 0, visibility: peekPos ? "visible" : "hidden" }}
         >
           <div className="mb-2 flex items-center justify-between gap-2">
             <p className="text-xs font-semibold text-muted">{peek.shifts.length > 1 ? `${labels.peopleOnShift} (${peek.shifts.length})` : labels.shifts}</p>
@@ -394,7 +412,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
               ×
             </button>
           </div>
-          <ul className="flex max-h-72 flex-col gap-2 overflow-auto">
+          <ul className="flex max-h-[min(18rem,50dvh)] flex-col gap-2 overflow-auto">
             {peek.shifts.map((shift) => (
               <li key={shift.id} className="flex items-start gap-2.5">
                 <Avatar id={shift.userId} name={shift.name} src={shift.avatar} size="md" />

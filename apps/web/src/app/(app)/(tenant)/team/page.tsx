@@ -32,7 +32,7 @@ export default async function TeamPage() {
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <div className="flex flex-col gap-4">
         <PageHeader title={t("team.title")} description={t("team.subtitle")} />
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-2 *:justify-center sm:flex sm:flex-wrap">
           <Link href="/team/organization" className="btn-secondary px-3 py-2 text-sm">
             <Network aria-hidden="true" className="size-4" />
             {t("organization.title")}

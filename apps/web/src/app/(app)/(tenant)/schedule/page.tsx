@@ -238,13 +238,13 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             </Link>
           )}
           <DateJump value={anchor} href={link({ date: "__day__" })} label={t("goToDate")} />
-          <div role="group" aria-label={t("view")} className="ms-1 flex rounded-xl border border-border bg-surface p-0.5 text-sm">
+          <div role="group" aria-label={t("view")} className="order-last flex w-full rounded-xl border border-border bg-surface p-0.5 text-sm sm:order-none sm:ms-1 sm:w-auto">
             {(["day", "week", "month"] as const).map((option) => (
               <Link
                 key={option}
                 href={viewLink(option)}
                 aria-current={view === option ? "page" : undefined}
-                className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${view === option ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"}`}
+                className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors sm:flex-none ${view === option ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"}`}
               >
                 {t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView")}
               </Link>
