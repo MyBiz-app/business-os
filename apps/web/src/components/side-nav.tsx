@@ -59,7 +59,7 @@ const ICONS = {
 
 export type NavIcon = keyof typeof ICONS;
 /** `locked`: a module the business doesn't have; the link opens its preview. */
-export type NavItem = { href: string; label: string; icon: NavIcon; locked?: boolean };
+export type NavItem = { href: string; label: string; icon: NavIcon; locked?: boolean; group?: string };
 
 export function SideNav({ items, label }: { items: NavItem[]; label?: string }) {
   const t = useTranslations("nav");
@@ -91,11 +91,17 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
         id={listId}
         className={`${open ? "grid" : "hidden"} grid-cols-2 gap-1 px-3 pb-3 md:flex md:flex-col`}
       >
-        {items.map((item) => {
+        {items.map((item, index) => {
           const active = item.href === current?.href;
           const Icon = ICONS[item.icon];
+          const heading = item.group && item.group !== items[index - 1]?.group ? item.group : null;
           return (
             <li key={item.href}>
+              {heading && (
+                <p className="mb-1 mt-4 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted/80 md:block">
+                  {heading}
+                </p>
+              )}
               <Link
                 href={item.href}
                 onClick={() => setOpen(false)}
@@ -103,7 +109,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
                 aria-label={item.locked ? t("lockedItem", { name: item.label }) : undefined}
                 className={`group relative flex items-center gap-3 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors duration-200 ${
                   active
-                    ? "bg-foreground/10 text-foreground"
+                    ? "bg-primary/20 text-foreground"
                     : item.locked
                       ? "text-muted/80 hover:bg-foreground/5 hover:text-foreground"
                       : "text-muted hover:bg-foreground/5 hover:text-foreground"

@@ -287,7 +287,15 @@
     "resources": "Courts & rooms",
     "quotes": "Quotes",
     "time": "My time",
-    "billingRun": "Billing"
+    "billingRun": "Billing",
+    "groups": {
+      "overview": "Overview",
+      "work": "Work",
+      "clients": "Clients",
+      "catalog": "Catalog",
+      "money": "Money",
+      "business": "Business"
+    }
   },
   "terms": {
     "fitness": {

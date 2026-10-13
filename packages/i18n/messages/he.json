@@ -287,7 +287,15 @@
     "resources": "מגרשים וחדרים",
     "quotes": "הצעות מחיר",
     "time": "השעות שלי",
-    "billingRun": "חיוב חודשי"
+    "billingRun": "חיוב חודשי",
+    "groups": {
+      "overview": "סקירה",
+      "work": "עבודה",
+      "clients": "לקוחות",
+      "catalog": "קטלוג",
+      "money": "כספים",
+      "business": "העסק"
+    }
   },
   "terms": {
     "fitness": {
