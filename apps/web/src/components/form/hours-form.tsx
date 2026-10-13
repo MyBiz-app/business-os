@@ -16,12 +16,15 @@ export function HoursForm({
   initial,
   weekStartsOn,
   emptyLabel,
+  savedLabel,
 }: {
   save: (blocks: Block[]) => Promise<HoursState>;
   initial: Block[];
   weekStartsOn: number;
   /** What a day without hours means here (defaults to "not working"). */
   emptyLabel?: string;
+  /** The confirmation after saving (defaults to "hours saved"). */
+  savedLabel?: string;
 }) {
   const t = useTranslations("hours");
   const names = t.raw("weekdays") as string[];
@@ -42,7 +45,7 @@ export function HoursForm({
       className="flex flex-col gap-4"
     >
       <FormError message={state.error && t(`errors.${state.error}`)} />
-      <FormNotice message={state.saved ? t("saved") : undefined} />
+      <FormNotice message={state.saved ? (savedLabel ?? t("saved")) : undefined} />
       <ul className="flex flex-col divide-y divide-border">
         {days.map((day) => {
           const mine = blocks.map((block, index) => ({ block, index })).filter(({ block }) => block.weekday === day);
