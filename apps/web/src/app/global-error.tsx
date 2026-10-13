@@ -32,8 +32,14 @@ export default function GlobalError({
 
   return (
     <html lang={locale} dir={localeDirection[locale]}>
+      <head>
+        {/* The root layout (and its tokens) failed to load, so this page carries its own light/dark palette. */}
+        <style>{`:root{--bg:#f8fafc;--fg:#111827;--accent:#2563eb}@media (prefers-color-scheme:dark){:root{--bg:#0b1020;--fg:#f1f5f9;--accent:#2563eb}}`}</style>
+      </head>
       <body
         style={{
+          background: "var(--bg)",
+          color: "var(--fg)",
           margin: 0,
           minHeight: "100vh",
           display: "flex",
@@ -43,7 +49,7 @@ export default function GlobalError({
           gap: "1rem",
           padding: "1rem",
           textAlign: "center",
-          fontFamily: "system-ui, sans-serif",
+          fontFamily: "Assistant, system-ui, sans-serif",
         }}
       >
         <h1 style={{ fontSize: "1.5rem", margin: 0 }}>{t.title}</h1>
@@ -53,7 +59,7 @@ export default function GlobalError({
             {t.reference.replace("{code}", error.digest)}
           </p>
         ) : null}
-        <button type="button" onClick={reset} style={{ padding: "0.5rem 1rem", fontSize: "1rem" }}>
+        <button type="button" onClick={reset} style={{ padding: "0.625rem 1.5rem", fontSize: "1rem", fontWeight: 600, color: "#fff", background: "var(--accent)", border: 0, borderRadius: "999px", cursor: "pointer" }}>
           {retry}
         </button>
       </body>
