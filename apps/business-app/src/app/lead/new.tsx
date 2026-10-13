@@ -71,7 +71,7 @@ export default function NewLead() {
           onChangeText={setPhone}
           keyboardType="phone-pad"
           autoComplete="tel"
-          style={{ writingDirection: "ltr" }}
+          dir="ltr"
         />
         <Field
           label={tLeads("email")}
@@ -81,7 +81,7 @@ export default function NewLead() {
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
-          style={{ writingDirection: "ltr" }}
+          dir="ltr"
         />
         <Field label={tLeads("interest")} palette={palette} value={interest} onChangeText={setInterest} />
         <View style={{ gap: 6 }}>

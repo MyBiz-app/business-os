@@ -1,6 +1,9 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
+import { View } from "react-native";
 import { Text } from "../components/text";
+import { ThemeToggle } from "../components/theme-toggle";
+import { ltr } from "../components/ltr";
 import { useTranslations } from "use-intl";
 
 import { Button, ErrorText, Field, Heading, Screen, styles } from "../components/ui";
@@ -49,15 +52,21 @@ export function SignInScreen() {
 
   return (
     <Screen palette={palette}>
-      <Heading palette={palette}>{t("title")}</Heading>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <Heading palette={palette}>{t("title")}</Heading>
+        </View>
+        <ThemeToggle />
+      </View>
       {sentTo ? (
         <>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("codeSent", { email: sentTo })}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("codeSent", { email: ltr(sentTo) })}</Text>
           <Field
             label={t("code")}
             palette={palette}
             value={code}
             onChangeText={(value) => setCode(value.replace(/\D/g, "").slice(0, MAX_CODE_LENGTH))}
+            dir="ltr"
             keyboardType="number-pad"
             autoComplete="one-time-code"
             textContentType="oneTimeCode"
@@ -76,6 +85,7 @@ export function SignInScreen() {
             palette={palette}
             value={email}
             onChangeText={setEmail}
+            dir="ltr"
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"

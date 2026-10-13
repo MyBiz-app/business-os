@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Text } from "@business-os/app-kit/components/text";
+import { useToast } from "@business-os/app-kit/components/toast";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Field, styles } from "@business-os/app-kit/components/ui";
@@ -9,6 +10,7 @@ import { useBusiness } from "@/providers/business-provider";
 /** The client's own name and phone in the current business. */
 export function ProfileForm() {
   const t = useTranslations("client.profile");
+  const toast = useToast();
   const { api, scope, business, palette, refresh } = useBusiness();
   const [firstName, setFirstName] = useState(business?.first_name ?? "");
   const [lastName, setLastName] = useState(business?.last_name ?? "");
@@ -29,9 +31,10 @@ export function ProfileForm() {
         }),
       );
       await refresh();
-      setStatus({ ok: true, message: t("saved") });
+      toast("success", t("saved"));
     } catch {
       setStatus({ ok: false, message: t("saveFailed") });
+      toast("error", t("saveFailed"));
     } finally {
       setBusy(false);
     }
@@ -50,14 +53,9 @@ export function ProfileForm() {
         keyboardType="phone-pad"
         autoComplete="tel"
         textContentType="telephoneNumber"
+        dir="ltr"
       />
-      {status?.ok ? (
-        <Text accessibilityLiveRegion="polite" style={[styles.muted, { color: palette.primary }]}>
-          {status.message}
-        </Text>
-      ) : (
-        <ErrorText message={status?.message} palette={palette} />
-      )}
+      <ErrorText message={status?.ok ? null : status?.message} palette={palette} />
       <Button label={t("save")} palette={palette} busy={busy} onPress={() => void save()} />
     </Card>
   );

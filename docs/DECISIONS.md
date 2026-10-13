@@ -155,7 +155,7 @@ When a decision changes, update the row and note the date — do not delete hist
 ### Apps accessibility preferences (2026-10-12)
 
 - The Expo apps' shared preferences card offers text size (1 / 1.125 / 1.25, same steps as the web), a reduce-motion switch (in addition to the system setting) and high contrast. All are stored on the device.
-- Bold English text uses Plus Jakarta Sans (as on the web); Hebrew and regular text stay in Heebo.
+- Bold English text uses Plus Jakarta Sans (as on the web); Hebrew and regular text stay in Assistant (round 2, 2026-10-13).
 
 ## Open
 

@@ -1,8 +1,9 @@
+import { useToast } from "@business-os/app-kit/components/toast";
 import type { components } from "@business-os/api-client";
 import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
 import { toMajorUnits, toMinorUnits } from "@business-os/i18n/money";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Linking, Share, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
@@ -33,7 +34,15 @@ export default function QuoteScreen() {
   const [method, setMethod] = useState<Method>("card");
   const [paymentKey, setPaymentKey] = useState(newIdempotencyKey);
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(created ? t("saved") : null);
+  const toast = useToast();
+  // Arriving from "create" announces the saved quote once.
+  const announced = useRef(false);
+  useEffect(() => {
+    if (created && !announced.current) {
+      announced.current = true;
+      toast("success", t("saved"));
+    }
+  }, [created, t, toast]);
   const [error, setError] = useState<string | null>(null);
   const tenantId = tenant?.id;
 
@@ -77,10 +86,9 @@ export default function QuoteScreen() {
   const act = async (action: () => Promise<string | null>) => {
     setBusy(true);
     setError(null);
-    setNotice(null);
     try {
       const done = await action();
-      setNotice(done);
+      if (done) toast("success", done);
       await reload();
     } catch {
       setError(tBusiness("error"));
@@ -145,7 +153,6 @@ export default function QuoteScreen() {
       </View>
 
       <View accessibilityLiveRegion="polite">
-        {notice ? <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text> : null}
         <ErrorText message={error} palette={palette} />
       </View>
 

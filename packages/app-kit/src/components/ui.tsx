@@ -58,9 +58,15 @@ export function Button({ label, onPress, palette, variant = "primary", busy, dis
   );
 }
 
-type FieldProps = TextInputProps & { label: string; palette: Palette; hint?: string };
+type FieldProps = TextInputProps & {
+  label: string;
+  palette: Palette;
+  hint?: string;
+  /** "ltr" for emails, phones, codes and numbers: they read and type left to right even in a Hebrew screen. */
+  dir?: "ltr";
+};
 
-export function Field({ label, palette, hint, style, ...inputProps }: FieldProps) {
+export function Field({ label, palette, hint, dir, style, ...inputProps }: FieldProps) {
   const id = useId();
   return (
     <View style={styles.field}>
@@ -74,6 +80,7 @@ export function Field({ label, palette, hint, style, ...inputProps }: FieldProps
         style={[
           styles.input,
           { color: palette.foreground, borderColor: palette.border, backgroundColor: palette.surface },
+          dir === "ltr" && { writingDirection: "ltr", textAlign: "left" },
           style,
         ]}
         {...inputProps}
