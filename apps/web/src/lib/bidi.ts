@@ -4,3 +4,18 @@
 export function isolate(text: string | null | undefined): string {
   return `⁨${text ?? ""}⁩`;
 }
+
+/** The `dir` for an input by its type: addresses and secrets are always left to right; free text
+ * follows what the person types. */
+export function inputDir(type: string | undefined): "ltr" | "auto" {
+  switch (type) {
+    case "email":
+    case "tel":
+    case "url":
+    case "password":
+    case "number":
+      return "ltr";
+    default:
+      return "auto";
+  }
+}

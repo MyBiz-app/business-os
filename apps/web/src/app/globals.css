@@ -125,7 +125,8 @@
   --color-ai: #7c3aed;
   --color-electric: #06b6d4;
   /* The site's font: set once in app/fonts.ts (see docs/design-system.md). */
-  --font-sans: var(--font-display), var(--font-main), system-ui, sans-serif;
+  --font-sans: var(--font-main), system-ui, sans-serif;
+  --font-display-stack: var(--font-display), var(--font-main), system-ui, sans-serif;
 }
 
 body {
@@ -136,6 +137,14 @@ body {
   background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Latin headings use the display face; Hebrew glyphs fall through to the main font. */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display-stack);
 }
 
 ::selection {
@@ -399,6 +408,40 @@ body {
   }
 }
 
+/* Page width system (components/layout): the side gutters grow with the screen, bands get a
+   steady vertical rhythm, and `section-inverse` marks an always-dark band whose text must stay
+   light in both themes. */
+@utility page-gutter {
+  --swipe-gutter: clamp(1rem, 4vw, 3rem);
+  padding-inline: var(--swipe-gutter);
+}
+@utility section-y-compact {
+  padding-block: clamp(2.5rem, 5vw, 4rem);
+}
+@utility section-y {
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+}
+@utility section-y-loose {
+  padding-block: clamp(4.5rem, 9vw, 8rem);
+}
+
+/* ---- Direction (Hebrew and English mixed) -------------------------------------------------
+ * Addresses and secrets are always typed left to right; free text follows its first letters.
+ * Form fields (components/form/field.tsx) also set `dir`; this covers plain inputs. */
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+input[type="number"] {
+  direction: ltr;
+}
+input:not([type]),
+input[type="text"],
+input[type="search"],
+textarea {
+  unicode-bidi: plaintext;
+}
+
 /* ---- Motion ------------------------------------------------------------------------------ */
 
 @keyframes rise {
@@ -636,13 +679,13 @@ html[data-motion="reduce"] *::after {
   --brand-ink: #1d4ed8;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-display), var(--font-main), system-ui, sans-serif;
+  font-family: var(--font-main), system-ui, sans-serif;
 }
 
 /* Night: the same palette on Midnight Navy. Blue lightens a step so links keep 4.5:1. */
 .dark .mk {
   color-scheme: dark;
-  --background: #0b1020;
+  --background: #0b1220;
   --foreground: #f8fafc;
   --surface: #111827;
   --border: #263247;
