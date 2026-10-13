@@ -921,7 +921,10 @@
       "invalidEmail": "Enter a valid email address.",
       "invalidCode": "That code is wrong or has expired.",
       "tooMany": "Too many attempts. Wait a minute and try again.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "unknownEmail": "We don't recognise this email address. Check it, or ask the business to add you.",
+      "emailNotAllowed": "We can't send email to this address yet. Try another address or contact support.",
+      "genericWithCode": "Something went wrong sending the code ({code}). Try again."
     },
     "join": {
       "title": "Join a business",
