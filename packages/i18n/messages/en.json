@@ -166,7 +166,12 @@
       "over_email_send_rate_limit": "Too many emails were sent. Please wait a minute and try again.",
       "link_invalid": "This link is invalid or has expired. Please try again.",
       "generic": "Something went wrong. Please try again.",
-      "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us."
+      "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us.",
+      "invalid_phone": "Enter a valid mobile number, for example 050-123-4567.",
+      "unknown_phone": "We don't know this number. Sign in with your email first and add the number to your account.",
+      "invalid_code": "That code is wrong or has expired.",
+      "over_sms_send_rate_limit": "Too many codes were sent. Please wait a minute and try again.",
+      "invalid_email": "Enter a valid email address."
     },
     "oauth": {
       "google": "Continue with Google",
@@ -185,7 +190,26 @@
       "back": "Back to the site"
     },
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "codeLogin": {
+      "title": "Sign in with a code",
+      "subtitle": "We'll send you a one-time 6-digit code. No password needed.",
+      "channel": "Send the code by",
+      "email": "Email",
+      "phone": "Mobile number",
+      "send": "Send code",
+      "codeSent": "We sent a code to {target}. It's valid for one hour.",
+      "code": "6-digit code",
+      "verify": "Sign in",
+      "change": "Use a different email or number",
+      "usePassword": "Sign in with a password",
+      "useCode": "Sign in with a one-time code",
+      "channels": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp"
+      }
+    }
   },
   "onboarding": {
     "title": "Create your business",
@@ -911,17 +935,28 @@
     },
     "signIn": {
       "title": "Sign in",
-      "subtitle": "Enter your email and we'll send you a one-time code. No password needed.",
+      "subtitle": "Choose where to get a one-time 6-digit code. No password needed.",
       "email": "Email",
       "sendCode": "Send code",
-      "codeSent": "We sent a code to {email}. It's valid for one hour.",
-      "code": "Code from the email",
+      "codeSent": "We sent a code to {target}. It's valid for one hour.",
+      "code": "The 6-digit code",
       "verify": "Sign in",
       "changeEmail": "Use a different email",
       "invalidEmail": "Enter a valid email address.",
       "invalidCode": "That code is wrong or has expired.",
       "tooMany": "Too many attempts. Wait a minute and try again.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "codeSentPhone": "We sent a code to {target}. It's valid for one hour.",
+      "codePhone": "The 6-digit code",
+      "changePhone": "Use a different number",
+      "phone": "Mobile number",
+      "invalidPhone": "Enter a valid mobile number, for example 050-123-4567.",
+      "unknownPhone": "We don't know this number. Sign in with your email first and add the number to your account.",
+      "channel": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp"
+      }
     },
     "join": {
       "title": "Join a business",
@@ -3352,7 +3387,18 @@
     "addressHint": "Your home address. Only you see it.",
     "notificationsTitle": "Email notifications",
     "rosterEmails": "Email me when my roster is published",
-    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed."
+    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed.",
+    "phoneLogin": {
+      "title": "Sign in with your phone",
+      "hint": "Verify your mobile number to sign in with a code by SMS or WhatsApp.",
+      "phone": "Mobile number",
+      "send": "Send code",
+      "code": "6-digit code",
+      "verify": "Verify number",
+      "verified": "Verified number: {phone}",
+      "sent": "We sent a code to {target}.",
+      "done": "Your number is verified."
+    }
   },
   "sales": {
     "title": "Sales",

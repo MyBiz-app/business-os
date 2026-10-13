@@ -236,7 +236,7 @@ secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
 max_frequency = "1s"
 # Number of characters used in the email OTP.
-otp_length = 8
+otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
 
@@ -286,6 +286,9 @@ subject = "Reset your password · איפוס סיסמה"
 content_path = "./supabase/templates/recovery.html"
 
 [auth.sms]
+# Phone and WhatsApp sign-in codes are for people who already verified a phone number on their
+# account (account page / profile), so signing up by phone stays off. Turn on a provider below
+# (Twilio does both SMS and WhatsApp) only at go-live: it costs per message (docs/deploy/auth-settings.md).
 # Allow/disallow new user signups via SMS to your project.
 enable_signup = false
 # If enabled, users need to confirm their phone number before signing in.
