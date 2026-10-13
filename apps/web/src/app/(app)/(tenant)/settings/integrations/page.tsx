@@ -8,6 +8,9 @@ import { unwrap } from "@/lib/api";
 import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+
 import { disconnectProvider } from "./actions";
 import { ProviderForm } from "./provider-form";
 
@@ -25,17 +28,19 @@ export default async function IntegrationsPage() {
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/settings" className="text-sm text-primary underline-offset-4 hover:underline">
         {tSettings("title")}
       </Link>
-      <div className="flex flex-col gap-1">
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          <Plug aria-hidden="true" className="size-7 text-primary" />
-          {t("title")}
-        </h1>
-        <p className="text-sm text-muted">{t("subtitle")}</p>
-      </div>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <Plug aria-hidden="true" className="size-8 shrink-0 text-primary" />
+            {t("title")}
+          </span>
+        }
+        description={t("subtitle")}
+      />
       {integrations.map((integration) => {
         const Icon = ICONS[integration.capability];
         const heading = `integration-${integration.capability}`;
@@ -70,6 +75,6 @@ export default async function IntegrationsPage() {
           </section>
         );
       })}
-    </main>
+    </Container>
   );
 }

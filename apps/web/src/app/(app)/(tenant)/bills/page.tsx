@@ -6,6 +6,9 @@ import { todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+
 import { RunForm } from "./run-form";
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
@@ -35,14 +38,16 @@ export default async function BillsPage({ searchParams }: PageProps<"/bills">) {
   const toBill = preview.filter((row) => !row.billed && row.total > 0);
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          <Receipt aria-hidden="true" className="size-7 text-primary" />
-          {t("title")}
-        </h1>
-        <p className="text-sm text-muted">{t("subtitle")}</p>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <Receipt aria-hidden="true" className="size-8 shrink-0 text-primary" />
+            {t("title")}
+          </span>
+        }
+        description={t("subtitle")}
+      />
       <form className="flex flex-wrap items-end gap-3" aria-label={t("chooseMonth")}>
         <label className="flex flex-col gap-1 text-sm font-medium">
           {tTime("month")}
@@ -88,6 +93,6 @@ export default async function BillsPage({ searchParams }: PageProps<"/bills">) {
           }))}
         />
       )}
-    </main>
+    </Container>
   );
 }

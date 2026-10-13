@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 
+import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type RunState, runBilling } from "./actions";
@@ -101,11 +102,7 @@ export function RunForm({ month, rows }: { month: string; rows: Row[] }) {
           </tbody>
         </table>
       </div>
-      {state.error && (
-        <p role="alert" className="text-sm text-danger">
-          {t("failed")}
-        </p>
-      )}
+      <FormError message={state.error ? t("failed") : undefined} />
       <div>
         <SubmitButton disabled={chosen.size === 0}>{t("run", { count: chosen.size })}</SubmitButton>
       </div>
