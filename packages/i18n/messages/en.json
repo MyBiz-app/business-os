@@ -2399,6 +2399,14 @@
       "address_required": "Choose one of the client's addresses."
     }
   },
+  "availability": {
+    "title": "Shift availability",
+    "subtitle": "The hours of the week {name} can work shifts.",
+    "hint": "Add the hours this person can work. Days without hours count as unavailable, and a shift outside them is flagged on the shift board. Leave the whole week empty for no limit.",
+    "link": "Availability",
+    "none": "Not available",
+    "saved": "Availability saved."
+  },
   "hours": {
     "title": "Working hours",
     "subtitle": "Personal appointments with {name} can be booked in these hours.",

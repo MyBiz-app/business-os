@@ -125,6 +125,9 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
         <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
         </Link>
+        <Link href={`/team/${userId}/availability`} className="btn-secondary px-3 py-1.5 text-sm">
+          {t("availability.link")}
+        </Link>
         <form action={roleAction}>
           <select
             name="role"
