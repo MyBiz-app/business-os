@@ -8,6 +8,8 @@ import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 import { deletePromoCode, setPromoActive } from "./promo-actions";
 import { PromoForm } from "./promo-form";
@@ -29,24 +31,24 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "short", year: "numeric" });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       {(removed === "deleted" || removed === "archived") && <FormNotice message={t(`plans.removed.${removed}`)} />}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("plans.title")}</h1>
-          <p className="text-sm text-muted">{t("plans.subtitle")}</p>
-        </div>
-        {canWriteCatalog(tenant) && (
-          <Link href="/plans/new" className="btn-primary px-4 py-2.5">
-            {t("plans.add")}
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title={t("plans.title")}
+        description={t("plans.subtitle")}
+        actions={
+          canWriteCatalog(tenant) && (
+            <Link href="/plans/new" className="btn-primary px-4 py-2.5">
+              {t("plans.add")}
+            </Link>
+          )
+        }
+      />
 
       {plans.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("plans.empty")}</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {plans.map((plan) => (
             <li key={plan.id}>
               <Link
@@ -58,7 +60,7 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
                     {plan.kind === "membership" ? <BadgeCheck className="size-5" /> : <Ticket className="size-5" />}
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="font-semibold">{plan.name}</span>
+                    <span dir="auto" className="font-semibold">{plan.name}</span>
                     <span className="text-sm text-muted">
                       {t(`plans.kinds.${plan.kind}`)} ·{" "}
                       {plan.credits ? `${t("plans.creditsCount", { count: plan.credits })} · ` : ""}
@@ -144,6 +146,6 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
           </div>
         )}
       </section>
-    </main>
+    </Container>
   );
 }

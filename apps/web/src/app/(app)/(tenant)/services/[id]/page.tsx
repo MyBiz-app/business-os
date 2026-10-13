@@ -9,6 +9,8 @@ import { getTenantFor } from "@/lib/tenant";
 import { deleteService, saveServiceRooms, updateService } from "../actions";
 import { ServiceForm } from "../service-form";
 import { ServiceRooms } from "../service-rooms";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function ServicePage({ params }: PageProps<"/services/[id]">) {
   const { id } = await params;
@@ -33,11 +35,11 @@ export default async function ServicePage({ params }: PageProps<"/services/[id]"
   const selected = resources.find((r) => r.id === service.id)?.rooms.map((room) => room.id) ?? [];
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/services" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
-      <h1 className="text-3xl font-bold">{service.name}</h1>
+      <PageHeader title={<bdi dir="auto">{service.name}</bdi>} />
       <ServiceForm
         action={updateService.bind(null, service.id)}
         service={service}
@@ -57,6 +59,6 @@ export default async function ServicePage({ params }: PageProps<"/services/[id]"
           <ServiceRooms action={saveServiceRooms.bind(null, service.id)} rooms={bookable} selected={selected} readOnly={readOnly} />
         </section>
       )}
-    </main>
+    </Container>
   );
 }

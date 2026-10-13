@@ -9,6 +9,8 @@ import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
 import { StatusBadge } from "./status-badge";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
 
 const PAGE_SIZE = 25;
@@ -64,33 +66,31 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
   };
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 id="clients-heading" className="text-3xl font-bold">{term("clients")}</h1>
-          <p className="text-sm text-muted">{t("clients.total", { count: result.total })}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {tenant.modules.includes("client_app") && (
-            <Link href="/clients/join" className="btn-secondary px-4 py-2.5">
-              {t("join.inviteToApp")}
-            </Link>
-          )}
-          {canWriteClients(tenant) && (
-            <Link href="/clients/import" className="btn-secondary px-4 py-2.5">
-              {t("clientImport.button")}
-            </Link>
-          )}
-          {canWriteClients(tenant) && (
-            <Link
-              href="/clients/new"
-              className="btn-primary px-4 py-2.5"
-            >
-              {term("addClient")}
-            </Link>
-          )}
-        </div>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        titleId="clients-heading"
+        title={term("clients")}
+        description={t("clients.total", { count: result.total })}
+        actions={
+          <>
+            {tenant.modules.includes("client_app") && (
+              <Link href="/clients/join" className="btn-secondary px-4 py-2.5">
+                {t("join.inviteToApp")}
+              </Link>
+            )}
+            {canWriteClients(tenant) && (
+              <Link href="/clients/import" className="btn-secondary px-4 py-2.5">
+                {t("clientImport.button")}
+              </Link>
+            )}
+            {canWriteClients(tenant) && (
+              <Link href="/clients/new" className="btn-primary px-4 py-2.5">
+                {term("addClient")}
+              </Link>
+            )}
+          </>
+        }
+      />
 
       <form role="search" className="flex flex-wrap items-end gap-3">
         <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-medium">
@@ -168,7 +168,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                   <td className="px-4 py-2.5">
                     <Link href={`/clients/${client.id}`} className="group flex items-center gap-3 font-medium">
                       <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} />
-                      <span className="text-primary underline-offset-4 group-hover:underline">
+                      <span dir="auto" className="text-primary underline-offset-4 group-hover:underline">
                         {[client.first_name, client.last_name].filter(Boolean).join(" ")}
                       </span>
                     </Link>
@@ -178,7 +178,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                   <td className="hidden px-4 py-3 lg:table-cell">
                     {client.plan_name ? (
                       <span className="flex flex-col">
-                        <span className="font-medium">{client.plan_name}</span>
+                        <span dir="auto" className="font-medium">{client.plan_name}</span>
                         {client.plan_ends_on && (
                           <span className="text-xs text-muted">{t("clients.list.planUntil", { date: shortDate(client.plan_ends_on) })}</span>
                         )}
@@ -207,6 +207,6 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           {page < pages ? <Link href={pageHref(page + 1)} className="text-primary">{t("clients.next")}</Link> : <span />}
         </nav>
       )}
-    </main>
+    </Container>
   );
 }

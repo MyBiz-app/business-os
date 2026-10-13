@@ -5,6 +5,8 @@ import QRCode from "qrcode";
 
 import { siteOrigin } from "@/lib/origin";
 import { getTenantFor } from "@/lib/tenant";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** The business's join code and QR code, to print for the front desk or share. */
 export default async function JoinCodePage() {
@@ -16,14 +18,11 @@ export default async function JoinCodePage() {
   const qr = await QRCode.toString(link, { type: "svg", margin: 1, errorCorrectionLevel: "M" });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/clients" className="text-sm text-primary underline-offset-4 hover:underline print:hidden">
         {term("back")}
       </Link>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("inviteToApp")}</h1>
-        <p className="text-muted">{t("staffHint")}</p>
-      </div>
+      <PageHeader title={t("inviteToApp")} description={t("staffHint")} />
 
       <section className="flex flex-col items-center gap-5 card p-8 text-center">
         <p className="text-xl font-semibold">{tenant.name}</p>
@@ -48,6 +47,6 @@ export default async function JoinCodePage() {
           {link}
         </p>
       </section>
-    </main>
+    </Container>
   );
 }
