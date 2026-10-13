@@ -10,6 +10,7 @@ import { I18nProvider } from "../providers/i18n-provider";
 import { SessionProvider } from "../providers/session-provider";
 import { initMonitoring } from "../lib/monitoring";
 import { ThemeProvider, useTheme } from "../providers/theme-provider";
+import { AppLockGate } from "./app-lock-gate";
 import { ToastProvider } from "./toast";
 
 initMonitoring();
@@ -41,7 +42,9 @@ export function AppRoot({ Provider }: { Provider: ComponentType<{ children: Reac
         <SessionProvider>
           <Provider>
             <ToastProvider>
-              <ThemedStack />
+              <AppLockGate>
+                <ThemedStack />
+              </AppLockGate>
             </ToastProvider>
           </Provider>
         </SessionProvider>
