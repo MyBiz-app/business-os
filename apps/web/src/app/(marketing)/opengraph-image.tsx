@@ -7,7 +7,7 @@ import { join } from "node:path";
 
 import { visualRtl } from "@/lib/visual-rtl";
 
-// Israel first: the shared picture speaks Hebrew, with the site's own font (Heebo, OFL, in
+// Israel first: the shared picture speaks Hebrew, with the site's own font (Assistant, OFL, in
 // ./fonts with its license) and the same words as the home page. The renderer draws left to
 // right only, so each Hebrew line is passed in visual order.
 const messages = all.he;
@@ -15,8 +15,8 @@ const hero = messages.marketing.hero;
 const mark = `data:image/svg+xml;base64,${Buffer.from(markSvg()).toString("base64")}`;
 const FONTS = join(process.cwd(), "src/app/(marketing)/fonts");
 const [medium, extraBold] = await Promise.all([
-  readFile(join(FONTS, "Heebo-Medium.ttf")),
-  readFile(join(FONTS, "Heebo-ExtraBold.ttf")),
+  readFile(join(FONTS, "Assistant-Medium.ttf")),
+  readFile(join(FONTS, "Assistant-ExtraBold.ttf")),
 ]);
 
 export const alt = `${BRAND.name} – ${messages.app.tagline}`;
@@ -38,7 +38,7 @@ export default function OpengraphImage() {
           padding: 80,
           background: "linear-gradient(135deg, #4f46e5 0%, #c026d3 100%)",
           color: "white",
-          fontFamily: "Heebo",
+          fontFamily: "Assistant",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 44, fontWeight: 800 }}>
@@ -53,8 +53,8 @@ export default function OpengraphImage() {
     {
       ...size,
       fonts: [
-        { name: "Heebo", data: medium, weight: 500, style: "normal" },
-        { name: "Heebo", data: extraBold, weight: 800, style: "normal" },
+        { name: "Assistant", data: medium, weight: 500, style: "normal" },
+        { name: "Assistant", data: extraBold, weight: 800, style: "normal" },
       ],
     },
   );

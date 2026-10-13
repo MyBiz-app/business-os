@@ -44,6 +44,8 @@
     "themeLight": "בהיר",
     "themeDark": "כהה",
     "themeSystem": "לפי המערכת",
+    "themeToggleToDark": "מעבר למצב כהה",
+    "themeToggleToLight": "מעבר למצב בהיר",
     "themeFollowsColors": "נקבע לפי הצבעים שלך",
     "title": "הגדרות",
     "subtitle": "פרטי העסק ואיך הוא נראה ללקוחות.",

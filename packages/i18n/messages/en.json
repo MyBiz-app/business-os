@@ -44,6 +44,8 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "themeSystem": "System",
+    "themeToggleToDark": "Switch to dark mode",
+    "themeToggleToLight": "Switch to light mode",
     "themeFollowsColors": "Set by your colors",
     "title": "Settings",
     "subtitle": "Your business details and how it looks to clients.",

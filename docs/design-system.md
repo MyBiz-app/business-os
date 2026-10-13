@@ -9,7 +9,11 @@ same value in several files, it should become a token here first.
 | I want to change… | Edit | Notes |
 |---|---|---|
 | The product's name ("MyBiz" for now, X21) | `packages/i18n/brand.json` | Translations write "MyBiz" and every app swaps it for this name (`@business-os/i18n/brand`); then `pnpm --filter @business-os/i18n export:api` for the API's copy. The store names live in each Expo app's `app.json` (`expo.name`). The logo and icons are separate assets. |
-| The website's font | `apps/web/src/app/fonts.ts` | Swap `Heebo` for another `next/font/google` font with Hebrew + Latin (Rubik, Assistant, Noto Sans Hebrew…). Exposed as `--font-main`. |
+| The website's font | `apps/web/src/app/fonts.ts` | Assistant (Hebrew + Latin) is the body font, exposed as `--font-main`; Latin headings (h1-h3, `.font-display`) use Plus Jakarta Sans. To swap, change the import in `fonts.ts` and the two files in `app/(marketing)/fonts/` used by the share image. |
+| Page width, gutters, section bands, page heading | `components/layout/` (`Container`, `Section`, `PageHeader`) and the `page-gutter`, `section-y*` utilities in `globals.css` | Containers cap at 1440px (`wide`), CRM uses `size="full"`. Bands (`Section`) reach the screen edges. |
+| Mixed Hebrew/English text | `components/bidi.tsx` (`Ltr`, `UserText`, `brandText`, `DIRECTIONAL_ICON`), `lib/bidi.ts` (`inputDir`) | Emails, phones, URLs, prices go in `<Ltr>`; user-typed text in `<UserText>`; the lint rule `direction/no-physical-classes` forbids `ml-`, `left-`, `text-left` and similar. |
+| Light/dark one-click button | `components/theme-toggle.tsx` (`ThemeToggle`) | For the marketing header/footer and the CRM top bar. The three-way choice stays in `ThemeSwitcher`. |
+| Screenshots of every screen (he/en, light/dark, 390/1440/1920) | `e2e/screen_sweep.py` | Also flags pages that scroll sideways. |
 | UI colors (page, cards, text, borders, success/danger/warning) | `apps/web/src/app/globals.css` → `:root` (light) and `.dark` (dark) | Components use only these tokens (`bg-surface`, `text-muted`, `border-border`…), never raw hex. |
 | The default accent (buttons, links, focus) | `--primary` / `--on-primary` in `globals.css` | A business's own brand color overrides it inside its pages (`.brand`, set by `lib/brand.ts`). |
 | MyBiz's brand gradient (logo tile, hero accent, call-to-action band, badges) | `--brand-from`, `--brand-via`, `--brand-to`, `--brand-strong-*`, `--brand-ink` in `globals.css` | Used as `from-brand-from to-brand-to`. |
