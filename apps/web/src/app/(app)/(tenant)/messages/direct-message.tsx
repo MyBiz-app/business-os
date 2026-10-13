@@ -8,6 +8,7 @@ import { TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
 import type { FormState } from "@/lib/form-state";
+import { FormNotice } from "@/components/form/form-message";
 
 type Props = { action: (state: FormState, formData: FormData) => Promise<FormState> };
 
@@ -18,7 +19,7 @@ export function DirectMessageForm({ action }: Props) {
   return (
     <form action={formAction} className="flex flex-col gap-3">
       <FormFeedback state={state.error ? state : {}} />
-      {state.saved && <p role="status" className="text-sm text-success">{t("sentOne")}</p>}
+      <FormNotice message={state.saved ? t("sentOne") : undefined} />
       <TextAreaField label={t("text")} name="body" required maxLength={1000} rows={2} />
       <input type="hidden" name="channel" value="whatsapp" />
       <div>

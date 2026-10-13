@@ -577,6 +577,7 @@
     "pageOf": "Page {page} of {pages}"
   },
   "common": {
+    "dismiss": "Close notification",
     "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
     "retry": "Try again",
