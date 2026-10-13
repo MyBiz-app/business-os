@@ -680,7 +680,16 @@
       "staffHint": "Team members kept to specific branches. Everyone else already works at all branches.",
       "accept": "I understand the monthly charge for the new branch",
       "submit": "Add branch"
-    }
+    },
+    "brandingTitle": "Branch branding",
+    "brandingHint": "Unless set here, the branch shows the network's logo and color. Each branch can have its own.",
+    "logo": "Branch logo",
+    "logoHint": "PNG, JPG or WebP, up to 512 KB. A square image works best.",
+    "logoNetwork": "This branch uses the network's logo",
+    "logoUpload": "Upload logo",
+    "logoRemove": "Back to the network's logo",
+    "color": "Branch color",
+    "colorNetwork": "Use the network's color"
   },
   "team": {
     "title": "Team",
