@@ -13,6 +13,9 @@ import { getTenant } from "@/lib/tenant";
 
 import { addTestCard, payInvoice, removeCard } from "./actions";
 import { DetailsForm } from "./details-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+import { Ltr } from "@/components/bidi";
 import { ScrollRegion } from "@/components/scroll-region";
 
 const TRIAL_DAYS = 14;
@@ -45,19 +48,21 @@ export default async function BillingPage() {
   ];
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/settings" className="text-sm text-primary underline-offset-4 hover:underline">
         {tSettings("title")}
       </Link>
-      <div className="flex items-center gap-3">
-        <span className="icon-tile size-11">
-          <CreditCard aria-hidden="true" className="size-5" />
-        </span>
-        <div className="flex flex-col gap-0.5">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-muted">{t("subtitle")}</p>
-        </div>
-      </div>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <span className="icon-tile size-11 shrink-0">
+              <CreditCard aria-hidden="true" className="size-5" />
+            </span>
+            {t("title")}
+          </span>
+        }
+        description={t("subtitle")}
+      />
 
       <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
         <FlaskConical aria-hidden="true" className="size-4 shrink-0" />
@@ -227,7 +232,7 @@ export default async function BillingPage() {
               <tbody>
                 {billing.invoices.map((invoice) => (
                   <tr key={invoice.id} className="border-b border-border last:border-0">
-                    <td className="py-3 tabular-nums">{invoice.number}</td>
+                    <td className="py-3 tabular-nums"><Ltr>{invoice.number}</Ltr></td>
                     <td className="py-3">
                       {formatDay(invoice.period_start, locale, { day: "numeric", month: "short" })} –{" "}
                       {formatDay(invoice.period_end, locale, { day: "numeric", month: "short", year: "numeric" })}
@@ -263,7 +268,7 @@ export default async function BillingPage() {
           </ScrollRegion>
         )}
       </section>
-    </main>
+    </Container>
   );
 }
 

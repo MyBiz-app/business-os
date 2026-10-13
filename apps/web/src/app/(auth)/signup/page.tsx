@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { AuthHeading } from "@/components/auth/auth-shell";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { safeNext } from "@/lib/navigation";
 
@@ -12,10 +13,7 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
 
   return (
     <>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-extrabold tracking-tight">{t("signup.title")}</h1>
-        <p className="text-sm text-muted">{t("signup.subtitle")}</p>
-      </div>
+      <AuthHeading title={t("signup.title")} subtitle={t("signup.subtitle")} />
       <OAuthButtons next={nextPath} />
       <SignupForm next={nextPath} />
       <p className="text-sm text-muted">

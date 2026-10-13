@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
-import { Field } from "@/components/form/field";
+import { PasswordField } from "@/components/form/password-field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
@@ -16,11 +16,10 @@ export function ResetForm() {
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
-      <Field
+      <PasswordField
         label={t("newPassword")}
         hint={t("passwordHint")}
         name="password"
-        type="password"
         autoComplete="new-password"
         minLength={8}
         required

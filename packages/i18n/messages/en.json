@@ -128,7 +128,8 @@
       "submit": "Log in",
       "noAccount": "Don't have an account?",
       "signupLink": "Sign up",
-      "forgot": "Forgot your password?"
+      "forgot": "Forgot your password?",
+      "subtitle": "Good to see you again."
     },
     "signup": {
       "title": "Create your account",
@@ -141,7 +142,8 @@
       "title": "Check your inbox",
       "body": "We sent a confirmation link to {email}. Open it to finish signing up.",
       "devMailbox": "Local development: emails arrive at the test mailbox",
-      "backToLogin": "Back to log in"
+      "backToLogin": "Back to log in",
+      "hint": "Can't find it? Check your spam folder."
     },
     "forgot": {
       "title": "Reset your password",
@@ -152,7 +154,8 @@
     },
     "reset": {
       "title": "Choose a new password",
-      "submit": "Save password"
+      "submit": "Save password",
+      "subtitle": "Pick something at least 8 characters long."
     },
     "signOut": "Sign out",
     "errors": {
@@ -180,7 +183,9 @@
         "Full Hebrew and English, and your business data stays protected"
       ],
       "back": "Back to the site"
-    }
+    },
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "onboarding": {
     "title": "Create your business",

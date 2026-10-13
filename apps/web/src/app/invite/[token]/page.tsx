@@ -1,15 +1,17 @@
+import { MailPlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { signOut } from "@/app/(auth)/actions";
-import { AppHeader } from "@/components/app-header";
+import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
+import { ScopedMessages } from "@/components/scoped-messages";
 import { getApi } from "@/lib/api";
 import { createClient } from "@/lib/supabase/server";
 
 import { acceptInvitation } from "./actions";
 import { isolate } from "@/lib/bidi";
 
-const BUTTON = "rounded-lg bg-primary px-4 py-2.5 text-center font-semibold text-on-primary";
+const BUTTON = "btn-primary px-4 py-2.5 text-center";
 
 export default async function InvitePage({ params }: PageProps<"/invite/[token]">) {
   const { token } = await params;
@@ -45,9 +47,9 @@ export default async function InvitePage({ params }: PageProps<"/invite/[token]"
     } else if (invite.email.toLowerCase() !== email?.toLowerCase()) {
       content = (
         <>
-          <p>{t("invite.wrongEmail", { invited: invite.email, current: email ?? "" })}</p>
+          <p>{t("invite.wrongEmail", { invited: isolate(invite.email), current: isolate(email ?? "") })}</p>
           <form action={signOut}>
-            <button type="submit" className="text-sm text-primary underline-offset-4 hover:underline">
+            <button type="submit" className="btn-secondary w-full px-4 py-2.5">
               {t("auth.signOut")}
             </button>
           </form>
@@ -68,14 +70,11 @@ export default async function InvitePage({ params }: PageProps<"/invite/[token]"
   }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader />
-      <main className="enter flex flex-1 items-start justify-center px-4 py-16">
-        <div className="flex w-full max-w-sm flex-col gap-6 card p-6 sm:p-8">
-          <h1 className="text-2xl font-bold">{t("invite.title")}</h1>
-          {content}
-        </div>
-      </main>
-    </div>
+    <ScopedMessages scopes={["auth"]}>
+      <AuthShell>
+        <AuthHeading title={t("invite.title")} icon={<MailPlus className="size-6" />} />
+        {content}
+      </AuthShell>
+    </ScopedMessages>
   );
 }

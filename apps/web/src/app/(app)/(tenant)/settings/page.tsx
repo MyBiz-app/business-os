@@ -11,6 +11,9 @@ import { getTenant } from "@/lib/tenant";
 import { CloseSection } from "./close-section";
 import { removeCover, removeLogo } from "./actions";
 import { BrandColorForm, CoverForm, DetailsForm, IdentityForm, LogoForm } from "./settings-forms";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+
 import { SupportSection } from "./support-section";
 import { WriteToMyBiz } from "./write-to-mybiz";
 
@@ -22,11 +25,8 @@ export default async function SettingsPage() {
   const logo = apiAssetUrl(tenant.logo_url);
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-muted">{t("subtitle")}</p>
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+      <PageHeader title={t("title")} description={t("subtitle")} />
 
       <div className="grid gap-4 sm:grid-cols-2">
         {[
@@ -110,6 +110,6 @@ export default async function SettingsPage() {
       {tenant.role === "owner" && <SupportSection context={context} />}
       <WriteToMyBiz />
       {tenant.role === "owner" && <CloseSection name={tenant.name} />}
-    </main>
+    </Container>
   );
 }
