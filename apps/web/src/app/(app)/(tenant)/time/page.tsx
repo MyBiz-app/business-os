@@ -5,6 +5,8 @@ import Link from "next/link";
 import { unwrap } from "@/lib/api";
 import { addDays, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** My time (#45): what I logged in the last 30 days, by day, with the week's and month's totals. */
 export default async function MyTimePage() {
@@ -20,14 +22,16 @@ export default async function MyTimePage() {
   const dayLabel = (day: string) => new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(new Date(`${day}T12:00:00`));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          <Clock aria-hidden="true" className="size-7 text-primary" />
-          {t("myTitle")}
-        </h1>
-        <p className="text-sm text-muted">{t("mySubtitle")}</p>
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={
+          <span className="flex items-center gap-2">
+            <Clock aria-hidden="true" className="size-7 text-primary" />
+            {t("myTitle")}
+          </span>
+        }
+        description={t("mySubtitle")}
+      />
       <ul className="grid gap-3 sm:grid-cols-3">
         {[
           { label: t("today"), value: sum(today) },
@@ -63,6 +67,6 @@ export default async function MyTimePage() {
           </section>
         ))
       )}
-    </main>
+    </Container>
   );
 }

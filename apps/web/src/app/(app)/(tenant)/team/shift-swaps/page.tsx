@@ -10,6 +10,9 @@ import { canManageTeam } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { DecisionForm } from "./decision-form";
+import { isolate } from "@/lib/bidi";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("shiftSwapQueue");
@@ -30,12 +33,9 @@ export default async function ShiftSwapsPage() {
     `${formatTime(swap.starts_at, locale, tenant.time_zone)}–${formatTime(swap.ends_at, locale, tenant.time_zone)} · ${swap.location_name}`;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/team/shifts" label={t("back")} />
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="text-sm text-muted">{t("subtitle")}</p>
-      </div>
+      <PageHeader title={t("title")} description={t("subtitle")} />
       <section aria-labelledby="pending-heading" className="flex flex-col gap-3">
         <h2 id="pending-heading" className="text-lg font-semibold">
           {t("pending", { count: waiting.length })}
@@ -44,9 +44,9 @@ export default async function ShiftSwapsPage() {
         {waiting.map((swap) => (
           <article key={swap.id} className="card flex flex-col gap-3 p-5">
             <div className="flex flex-col gap-1">
-              <h3 className="font-medium">{t("fromTo", { from: swap.from_user_name, to: swap.to_user_name })}</h3>
+              <h3 className="font-medium">{t("fromTo", { from: isolate(swap.from_user_name), to: isolate(swap.to_user_name) })}</h3>
               <p className="text-sm">{when(swap)}</p>
-              {swap.note && <p className="text-sm text-muted">{swap.note}</p>}
+              {swap.note && <p dir="auto" className="text-sm text-muted">{swap.note}</p>}
             </div>
             <DecisionForm swapId={swap.id} />
           </article>
@@ -73,6 +73,6 @@ export default async function ShiftSwapsPage() {
           </ul>
         </section>
       )}
-    </main>
+    </Container>
   );
 }

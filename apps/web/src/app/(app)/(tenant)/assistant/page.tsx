@@ -4,6 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { canUseAssistant } from "@/lib/permissions";
@@ -129,18 +131,18 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short", timeZone: tenant.time_zone });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-muted">{t("subtitle")}</p>
-        </div>
-        <form action={newConversation}>
-          <button type="submit" className="btn-secondary px-4 py-2.5">
-            {t("newConversation")}
-          </button>
-        </form>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <form action={newConversation}>
+            <button type="submit" className="btn-secondary px-4 py-2.5">
+              {t("newConversation")}
+            </button>
+          </form>
+        }
+      />
 
       {status.demo && (
         <p role="note" className="flex items-start gap-2 rounded-2xl border border-warning/50 bg-warning/10 p-4 text-sm">
@@ -155,13 +157,13 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_16rem]">
-        <section aria-label={t("conversation")} className="flex min-h-96 flex-col gap-4 card p-5">
+      <div className="grid flex-1 gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] 2xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <section aria-label={t("conversation")} className="flex min-h-[28rem] flex-col gap-4 card p-5 sm:p-6 lg:min-h-[32rem]">
           {!conversation ? (
             <p className="text-muted">{t("empty")}</p>
           ) : (
             <>
-              <ol className="flex flex-1 flex-col gap-4">
+              <ol className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-4">
                 {conversation.turns.length === 0 && <li className="text-muted">{t("intro")}</li>}
                 {conversation.turns.map((turn, index) => (
                   <li key={index} className={`flex flex-col gap-2 ${turn.role === "user" ? "items-end" : "items-start"}`}>
@@ -202,7 +204,7 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
         </section>
 
         {conversations.length > 0 && (
-          <nav aria-label={t("history")} className="flex flex-col gap-1">
+          <nav aria-label={t("history")} className="card flex h-fit flex-col gap-1 p-3">
             <h2 className="px-2 text-sm font-semibold text-muted">{t("history")}</h2>
             {conversations.map((item) => (
               <Link
@@ -220,6 +222,6 @@ export default async function AssistantPage({ searchParams }: PageProps<"/assist
           </nav>
         )}
       </div>
-    </main>
+    </Container>
   );
 }

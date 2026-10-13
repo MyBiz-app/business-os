@@ -4,6 +4,8 @@ import { CheckCircle2, Send } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
+import { ToastOnChange } from "@/components/toast/toaster";
+
 import { type PublishState, publishShifts } from "./actions";
 
 /** Managers: how many shifts of the visible stretch are still drafts, and a button to send them
@@ -26,11 +28,8 @@ export function PublishBar({ drafts, start, days, branches, summary }: { drafts:
         )}
         <span className="text-xs text-muted">{summary}</span>
       </p>
-      {state.error && (
-        <span role="alert" className="text-danger">
-          {t("error")}
-        </span>
-      )}
+      <ToastOnChange source={state} tone="success" message={state.published ? t("done", { count: state.published }) : undefined} />
+      <ToastOnChange source={state} tone="error" message={state.error ? t("error") : undefined} />
       {drafts > 0 && (
         <button
           type="button"

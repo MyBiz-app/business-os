@@ -14,6 +14,9 @@ import { endSeries, recordVenuePayment, setSessionStatus, updateSession } from "
 import { SessionForm } from "../session-form";
 import { JobPanel } from "./job-panel";
 import { Roster } from "./roster";
+import { UserText, Ltr } from "@/components/bidi";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function SessionPage({ params, searchParams }: PageProps<"/schedule/[id]">) {
   const { id } = await params;
@@ -49,19 +52,23 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   const ended = endedParam?.length === 2 && endedParam.every(Number.isFinite) ? endedParam : null;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href={`/schedule?week=${day}`} className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
-      <div className="flex flex-col gap-1">
-        <h1 className={`text-3xl font-bold ${cancelled ? "line-through" : ""}`}>{session.service.name}</h1>
-        <p className="text-muted">
-          {formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })} ·{" "}
-          <span dir="ltr">
-            {formatTime(session.starts_at, locale, tenant.time_zone)}–{formatTime(session.ends_at, locale, tenant.time_zone)}
-          </span>
-          {cancelled && ` · ${t("cancelled")}`}
-        </p>
+      <div className="flex flex-col gap-2">
+        <PageHeader
+          title={<UserText className={cancelled ? "line-through" : ""}>{session.service.name}</UserText>}
+          description={
+            <>
+              {formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })} ·{" "}
+              <Ltr>
+                {formatTime(session.starts_at, locale, tenant.time_zone)}–{formatTime(session.ends_at, locale, tenant.time_zone)}
+              </Ltr>
+              {cancelled && ` · ${t("cancelled")}`}
+            </>
+          }
+        />
         {session.series_id && (
           <p className="text-sm text-muted">
             {t("series")} {session.series_open_ended && t("seriesOpen")}
@@ -148,6 +155,6 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           </button>
         </form>
       )}
-    </main>
+    </Container>
   );
 }
