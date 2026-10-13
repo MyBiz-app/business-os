@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { oauthSignIn } from "@/app/(auth)/actions";
+import { Container } from "@/components/layout/container";
 import { PROVIDER_MARKS } from "@/components/auth/provider-marks";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { OfferPicture } from "@/components/modules/offer-picture";
@@ -42,8 +43,7 @@ import {
   BoardingPass,
   ChoiceGroup,
   Confetti,
-  FlightPath,
-  OFFER_ICON,
+    OFFER_ICON,
   StepHeading,
   Stepper,
   TextInput,
@@ -278,7 +278,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           title={<h1 {...headingProps}>{t("industry.kindTitle", { name: text(category, "name") })}</h1>}
           subtitle={t("industry.kindSubtitle")}
         />
-        <ul className="enter-items grid gap-4 sm:grid-cols-2">
+        <ul className="enter-items grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {kinds.map(({ key }) => (
             <li key={key}>{card(key, draft.vertical === key, () => choose(key), text(key, "name"), text(key, "tagline"))}</li>
           ))}
@@ -290,7 +290,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     ) : (
       <>
         <StepHeading eyebrow={null} title={<h1 {...headingProps}>{t("industry.title")}</h1>} subtitle={t("industry.subtitle")} />
-        <ul className="enter-items grid gap-4 sm:grid-cols-2">
+        <ul className="enter-items grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {categories()
             .filter((c) => c.status !== "planned")
             .map(({ key, children }) => (
@@ -611,7 +611,6 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const groupIndex = GROUPS.findIndex((group) => (group.steps as readonly string[]).includes(step));
   const isOffer = (OFFERS as readonly string[]).includes(step);
   const showContinue = step === "business" || step === "base";
-  const percent = Math.round((stepIndex / (steps.length - 1)) * 100);
 
   const decided = isOffer && (tierOf(step as Offer, draft.modules) !== null || declined.includes(step as Offer) || OFFER_TIERS[step as Offer].some((tier) => tier.modules.length === 0));
   const arrow = <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />;
@@ -641,23 +640,30 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   ) : null;
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 pb-36 pt-6 sm:px-6 lg:grid-cols-[1fr_20rem] lg:pb-16 lg:pt-8">
+    <Container size="default" className="grid grid-cols-1 gap-8 pb-36 pt-6 lg:grid-cols-[1fr_22rem] lg:gap-12 lg:pb-16 lg:pt-10">
       <div className="flex min-w-0 flex-col gap-6 lg:short:gap-4">
         <nav aria-label={t("progress.label")} className="flex flex-col gap-2">
-          <FlightPath percent={percent} />
-          <ol className="grid grid-cols-5 gap-2">
-            {GROUPS.map((group, index) => (
-              <li
-                key={group.key}
-                aria-current={index === groupIndex ? "step" : undefined}
-                className={`truncate text-xs font-semibold ${index <= groupIndex ? "text-foreground" : "text-muted"}`}
-              >
-                {t(`progress.${group.key}`)}
-              </li>
-            ))}
+          <ol className="flex items-center">
+            {GROUPS.map((group, index) => {
+              const done = index < groupIndex;
+              const current = index === groupIndex;
+              return (
+                <li key={group.key} aria-current={current ? "step" : undefined} className="flex flex-1 items-center gap-2 last:flex-none">
+                  <span
+                    className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+                      done ? "bg-primary text-on-primary" : current ? "bg-primary/10 text-primary ring-2 ring-primary" : "bg-foreground/8 text-muted"
+                    }`}
+                  >
+                    {done ? <Check aria-hidden="true" className="size-4" /> : index + 1}
+                  </span>
+                  <span className={`truncate text-sm font-semibold max-sm:sr-only ${current ? "text-foreground" : "text-muted"}`}>{t(`progress.${group.key}`)}</span>
+                  {index < GROUPS.length - 1 && <span aria-hidden="true" className={`h-0.5 min-w-3 flex-1 rounded-full ${done ? "bg-primary" : "bg-foreground/10"}`} />}
+                </li>
+              );
+            })}
           </ol>
-          <p className="text-xs text-muted lg:short:hidden">
-            {t("progress.step", { step: stepIndex + 1, total: steps.length })} · {t("progress.flight", { percent })}
+          <p className="text-xs text-muted sm:hidden">
+            {t("progress.step", { step: stepIndex + 1, total: steps.length })} · {t(`progress.${GROUPS[groupIndex]?.key ?? "summary"}`)}
           </p>
         </nav>
 
@@ -726,6 +732,6 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
       <p aria-live="polite" className="sr-only">
         {notice}
       </p>
-    </div>
+    </Container>
   );
 }

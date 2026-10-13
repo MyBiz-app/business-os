@@ -2123,7 +2123,24 @@
       "note": "Launch prices, subject to change.",
       "currency": "Currency",
       "modulesText": "Add only what your business needs. Turn any add-on on or off whenever you like.",
-      "oneTime": "one-time"
+      "oneTime": "one-time",
+      "trialNote": "14 days free, no card needed",
+      "compareTitle": "Which plan fits you",
+      "compareText": "What each plan includes. You can always add more.",
+      "coreShort": "The base: calendar, clients, team, reports and payments",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "calc": {
+        "title": "What will it cost your business",
+        "subtitle": "Pick a size and add-ons and watch the monthly price update.",
+        "size": "How many active clients do you have",
+        "none": "None",
+        "locations": "Extra locations",
+        "fewer": "Fewer locations",
+        "more": "One more location",
+        "total": "Total per month",
+        "daily": "That's about {price} a day"
+      }
     },
     "faq": {
       "title": "Frequently asked questions",
