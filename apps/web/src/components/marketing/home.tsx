@@ -3,6 +3,7 @@ import { ArrowLeft, Check, Sparkles } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { Section } from "@/components/layout/section";
 import { DemoStage } from "@/components/marketing/demo-stage";
 import { Reveal } from "@/components/marketing/reveal";
 import { FEATURES, SectionHeading } from "@/components/marketing/sections";
@@ -19,7 +20,7 @@ export async function FactsStrip() {
     { value: 2, label: t("languages") },
   ];
   return (
-    <section aria-label={t("label")} className="mx-auto w-full max-w-6xl px-6 pt-16">
+    <Section aria-label={t("label")} spacing="compact">
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-border shadow-[0_1px_2px_rgb(17_24_39/0.06)] lg:grid-cols-4">
         {facts.map(({ value, label }) => (
           <div key={label} className="flex flex-col items-center gap-1 bg-surface px-4 py-7 text-center">
@@ -28,7 +29,7 @@ export async function FactsStrip() {
           </div>
         ))}
       </dl>
-    </section>
+    </Section>
   );
 }
 
@@ -47,7 +48,7 @@ export async function BentoFeatures() {
   const lead = new Set<string>(BENTO.map((b) => b.key));
   const rest = FEATURES.filter(({ key }) => !lead.has(key));
   return (
-    <section id="features" aria-labelledby="features-heading" className="mx-auto flex w-full max-w-6xl scroll-mt-20 flex-col gap-10 px-6 py-24">
+    <Section id="features" aria-labelledby="features-heading" className="scroll-mt-20" innerClassName="flex flex-col gap-10">
       <Reveal>
         <SectionHeading id="features-heading" eyebrow={th("bento.eyebrow")} title={t("title")} subtitle={t("subtitle")} />
       </Reveal>
@@ -85,7 +86,7 @@ export async function BentoFeatures() {
           ))}
         </ul>
       </Reveal>
-    </section>
+    </Section>
   );
 }
 
@@ -104,8 +105,8 @@ export async function PricingTeaser() {
   const priceOf = (key: string) => catalog?.modules.find((m) => m.key === key)?.price ?? 0;
   const presetPrice = (preset: (typeof PRESETS)[number]) => base + (catalog?.presets[preset] ?? []).reduce((sum, key) => sum + priceOf(key), 0);
   return (
-    <section id="pricing" aria-labelledby="pricing-heading" className="scroll-mt-20 bg-gradient-to-b from-background to-primary/[0.06] py-24">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6">
+    <Section id="pricing" aria-labelledby="pricing-heading" className="scroll-mt-20 bg-gradient-to-b from-background to-primary/[0.06]" innerClassName="flex flex-col gap-10">
+      <>
         <Reveal>
           <SectionHeading id="pricing-heading" eyebrow={th("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
         </Reveal>
@@ -163,8 +164,8 @@ export async function PricingTeaser() {
           {t("seeAll")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>
-      </div>
-    </section>
+      </>
+    </Section>
   );
 }
 
@@ -174,7 +175,7 @@ export async function AboutTeaser() {
   const th = await getTranslations("marketing.home.about");
   const values = t.raw("values") as { title: string; text: string }[];
   return (
-    <section aria-labelledby="about-heading" className="mx-auto grid w-full max-w-6xl gap-12 px-6 py-24 lg:grid-cols-[1fr_1.4fr]">
+    <Section aria-labelledby="about-heading" innerClassName="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
       <Reveal className="flex flex-col items-start gap-5">
         <p className="text-sm font-semibold text-primary">{th("eyebrow")}</p>
         <h2 id="about-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -199,7 +200,7 @@ export async function AboutTeaser() {
           </li>
         ))}
       </ul>
-    </section>
+    </Section>
   );
 }
 
@@ -207,13 +208,13 @@ export async function AboutTeaser() {
 export async function DemoSection() {
   const t = await getTranslations("marketing.home.demo");
   return (
-    <section id="demo" aria-labelledby="demo-heading" className="mx-auto flex w-full max-w-5xl scroll-mt-20 flex-col gap-10 px-6 pb-24">
+    <Section id="demo" aria-labelledby="demo-heading" className="scroll-mt-20 !pt-0" innerClassName="flex flex-col gap-10">
       <Reveal>
         <SectionHeading id="demo-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
       </Reveal>
-      <Reveal>
+      <Reveal className="mx-auto w-full max-w-6xl">
         <DemoStage />
       </Reveal>
-    </section>
+    </Section>
   );
 }
