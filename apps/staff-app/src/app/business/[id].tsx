@@ -1,3 +1,4 @@
+import { useToast } from "@business-os/app-kit/components/toast";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Linking, View } from "react-native";
@@ -31,7 +32,7 @@ export default function BusinessScreen() {
   const { palette } = useTheme();
   const [days, setDays] = useState<Days>("14");
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const toast = useToast();
   const [error, setError] = useState<string | null>(null);
   const billing = can("billing.manage");
 
@@ -53,12 +54,11 @@ export default function BusinessScreen() {
   const extend = async () => {
     setBusy(true);
     setError(null);
-    setNotice(null);
     try {
       const trial = unwrap(
         await api.POST("/platform/businesses/{tenant_id}/trial", { params: { path: { tenant_id: id } }, body: { days: Number(days) } }),
       );
-      setNotice(tActions("trialDone", { date: date(trial.trial_ends_at) }));
+      toast("success", tActions("trialDone", { date: date(trial.trial_ends_at) }));
     } catch {
       setError(tActions("errors.generic"));
     } finally {
@@ -120,7 +120,6 @@ export default function BusinessScreen() {
       </Card>
 
       <View accessibilityLiveRegion="polite">
-        {notice ? <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text> : null}
         <ErrorText message={error} palette={palette} />
       </View>
 

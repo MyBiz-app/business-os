@@ -75,7 +75,7 @@ export default function NewClient() {
           onChangeText={setPhone}
           keyboardType="phone-pad"
           autoComplete="tel"
-          style={{ writingDirection: "ltr" }}
+          dir="ltr"
         />
         <Field
           label={tClients("email")}
@@ -85,7 +85,7 @@ export default function NewClient() {
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
-          style={{ writingDirection: "ltr" }}
+          dir="ltr"
         />
         <View style={{ gap: 6 }}>
           <Text style={{ color: palette.foreground, fontSize: 14, fontWeight: "600", textAlign: "left" }}>{tClients("source")}</Text>

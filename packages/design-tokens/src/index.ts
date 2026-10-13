@@ -41,14 +41,14 @@ export const highContrast = {
   dark: { muted: "#cbd5e1", border: "#94a3b8" },
 } as const;
 
-/** Heebo covers Hebrew and Latin; the family names are the ones the font loader registers. */
+/** Assistant covers Hebrew and Latin (the web's round-2 font); the family names are the ones the font loader registers. */
 export const fontFamily = {
-  regular: "Heebo_400Regular",
-  medium: "Heebo_500Medium",
-  bold: "Heebo_700Bold",
+  regular: "Assistant_400Regular",
+  medium: "Assistant_500Medium",
+  bold: "Assistant_700Bold",
 } as const;
 
-/** Plus Jakarta Sans for English headings and numbers (the web's display face); Hebrew stays in Heebo. */
+/** Plus Jakarta Sans for English headings and numbers (the web's display face); Hebrew stays in Assistant. */
 export const displayFontFamily = {
   bold: "PlusJakartaSans_700Bold",
 } as const;

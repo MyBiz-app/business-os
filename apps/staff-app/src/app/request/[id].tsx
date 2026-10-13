@@ -1,3 +1,4 @@
+import { useToast } from "@business-os/app-kit/components/toast";
 import type { components } from "@business-os/api-client";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
@@ -27,7 +28,7 @@ export default function RequestScreen() {
   const { palette } = useTheme();
   const [notes, setNotes] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const toast = useToast();
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -39,10 +40,9 @@ export default function RequestScreen() {
   const update = async (body: Update, done: string) => {
     setBusy(true);
     setError(null);
-    setNotice(null);
     try {
       unwrap(await api.PATCH("/platform/contact-requests/{request_id}", { params: { path: { request_id: id } }, body }));
-      setNotice(done);
+      toast("success", done);
       await reload();
     } catch {
       setError(t("error"));
@@ -125,7 +125,6 @@ export default function RequestScreen() {
       </View>
 
       <View accessibilityLiveRegion="polite">
-        {notice ? <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text> : null}
         <ErrorText message={error} palette={palette} />
       </View>
 

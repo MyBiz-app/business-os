@@ -551,9 +551,9 @@ importers:
       '@business-os/verticals':
         specifier: workspace:*
         version: link:../verticals
-      '@expo-google-fonts/heebo':
-        specifier: ^0.4.2
-        version: 0.4.2
+      '@expo-google-fonts/assistant':
+        specifier: 0.4.1
+        version: 0.4.1
       '@expo-google-fonts/plus-jakarta-sans':
         specifier: 0.4.2
         version: 0.4.2
@@ -1108,8 +1108,8 @@ packages:
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@expo-google-fonts/heebo@0.4.2':
-    resolution: {integrity: sha512-mNSjLv9kikSexvdNteFElzeYEOrOPXHQctAJOGEfnUZPU9PgiEaSMcKM6K50Geahy2Aiq/xlbMD0OwhGRhSBiQ==}
+  '@expo-google-fonts/assistant@0.4.1':
+    resolution: {integrity: sha512-i+hPqY1IQiloYoimxSrCxyYy4arML2TaAbFnbMHYQa7Lar3kU+F64dwe2NEA0LH0Hvg2UsS3vTSgoVZB6o6vZw==}
 
   '@expo-google-fonts/material-symbols@0.4.48':
     resolution: {integrity: sha512-aZztj44PyA/sj3TXSwwpLJwqMlTUJ49okbZJYURzEcuERxMQB0KbX7RrLBi8WJnuWz5HFOLlTRxORrJfNnUPNQ==}
@@ -6894,7 +6894,7 @@ snapshots:
       '@eslint/core': 0.17.0
       levn: 0.4.1
 
-  '@expo-google-fonts/heebo@0.4.2': {}
+  '@expo-google-fonts/assistant@0.4.1': {}
 
   '@expo-google-fonts/material-symbols@0.4.48': {}
 

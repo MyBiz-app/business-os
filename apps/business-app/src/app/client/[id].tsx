@@ -3,6 +3,7 @@ import { dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Linking, View } from "react-native";
+import { ltr } from "@business-os/app-kit/components/ltr";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -188,7 +189,7 @@ export default function ClientScreen() {
         {visits[0]
           ? t("lastVisit", { date: formatDay(dayOf(visits[0].starts_at, timeZone), locale, { day: "numeric", month: "short" }) })
           : t("neverVisited")}
-        {client.phone ? ` · ${client.phone}` : ""}
+        {client.phone ? ` · ${ltr(client.phone)}` : ""}
       </Text>
 
       <View accessibilityLiveRegion="polite">

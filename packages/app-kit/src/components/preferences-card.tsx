@@ -1,5 +1,6 @@
 import { locales } from "@business-os/i18n";
 import { router } from "expo-router";
+import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { unregisterPushToken } from "../lib/push";
@@ -9,6 +10,7 @@ import type { TextSize, ThemePreference } from "../lib/preferences";
 import { useLocaleSetting } from "../providers/i18n-provider";
 import { useTheme } from "../providers/theme-provider";
 import { SegmentedControl } from "./segmented-control";
+import { ThemeToggle } from "./theme-toggle";
 import { Button, Card } from "./ui";
 
 const TEXT_SIZES: TextSize[] = ["normal", "large", "larger"];
@@ -30,12 +32,17 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
           options={locales.map((value) => ({ value, label: tLocales(value) }))}
           onChange={(value) => void setLocale(value)}
         />
-        <SegmentedControl
-          label={t("theme")}
-          value={preference}
-          options={THEMES.map((value) => ({ value, label: t(`themes.${value}`) }))}
-          onChange={setPreference}
-        />
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <View style={{ flex: 1 }}>
+            <SegmentedControl
+              label={t("theme")}
+              value={preference}
+              options={THEMES.map((value) => ({ value, label: t(`themes.${value}`) }))}
+              onChange={setPreference}
+            />
+          </View>
+          <ThemeToggle />
+        </View>
         <SegmentedControl
           label={t("contrast")}
           value={highContrast ? "high" : "normal"}
