@@ -6,6 +6,8 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { createPlan } from "../actions";
 import { PlanForm } from "../plan-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function NewPlanPage() {
   const t = await getTranslations();
@@ -13,9 +15,9 @@ export default async function NewPlanPage() {
   if (!canWriteCatalog(tenant)) redirect("/plans");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-      <h1 className="text-3xl font-bold">{t("plans.new")}</h1>
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader title={t("plans.new")} />
       <PlanForm action={createPlan} currency={tenant.currency} submitLabel={t("common.create")} />
-    </main>
+    </Container>
   );
 }

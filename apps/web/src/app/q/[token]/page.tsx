@@ -11,6 +11,7 @@ import { formatMoney } from "@/lib/money";
 
 import { payDeposit } from "./actions";
 import { AnswerForm } from "./answer-form";
+import { Container } from "@/components/layout/container";
 
 const TONE: Record<string, Tone> = { sent: "primary", accepted: "success", declined: "muted", expired: "warning" };
 
@@ -50,7 +51,7 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
   return (
     <div className="brand flex flex-1 flex-col" style={brandStyle(found.business_color)}>
       <AppHeader />
-      <main className="enter mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-10 sm:px-6">
+      <Container as="main" size="narrow" className="enter flex max-w-3xl flex-1 flex-col gap-6 py-8 sm:py-10">
         <div className="flex flex-col gap-1">
           <p dir="auto" className="text-sm font-semibold text-primary">{found.business_name}</p>
           <div className="flex flex-wrap items-center gap-3">
@@ -141,7 +142,7 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
         )}
         {found.status === "declined" && <p className="text-muted">{t("public.declined")}</p>}
         {found.status === "expired" && <p className="text-muted">{t("public.expired")}</p>}
-      </main>
+      </Container>
     </div>
   );
 }

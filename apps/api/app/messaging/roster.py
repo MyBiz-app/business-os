@@ -72,7 +72,8 @@ def _deliver(
         return "pushed"
     if sender and person["email_roster"] and person["email"]:
         try:
-            sender.send(Email(to=person["email"], subject=subject, text=body))
+            locale = person["locale"] if person["locale"] in ("he", "en") else "en"
+            sender.send(Email(to=person["email"], subject=subject, text=body, locale=locale))
         except Exception as error:  # a provider error must not stop the batch
             print(f"roster email to {person['user_id']} failed: {error}")
             return "failed"

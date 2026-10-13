@@ -31,7 +31,7 @@ export async function AttentionPanel({ context }: { context: Pick<Awaited<Return
       <h2 id="attention-heading" className="text-lg font-semibold">
         {t("title")}
       </h2>
-      <ul className="grid gap-4 md:grid-cols-2">
+      <ul className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
         {lists.map((list) => {
           const { Icon, item, all } = KINDS[list.kind];
           return (

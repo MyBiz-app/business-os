@@ -4,6 +4,9 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+import { Ltr } from "@/components/bidi";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -30,22 +33,22 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
     new Date(instant).toLocaleDateString(locale, { day: "numeric", month: "short", timeZone: tenant.time_zone });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-muted">{t("subtitle")}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/sales/orders" className="btn-secondary px-4 py-2 text-sm">
-            {t("orders.link")}
-          </Link>
-          <a href={`/sales/export?month=${month}`} className="btn-secondary px-4 py-2 text-sm" download>
-            <Download aria-hidden="true" className="size-4" />
-            {t("export")}
-          </a>
-        </div>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          <>
+            <Link href="/sales/orders" className="btn-secondary px-4 py-2 text-sm">
+              {t("orders.link")}
+            </Link>
+            <a href={`/sales/export?month=${month}`} className="btn-secondary px-4 py-2 text-sm" download>
+              <Download aria-hidden="true" className="size-4" />
+              {t("export")}
+            </a>
+          </>
+        }
+      />
 
       <nav aria-label={title} className="flex items-center justify-between gap-3 card px-4 py-3">
         <Link href={`/sales?month=${previous}`} aria-label={t("previous")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
@@ -119,7 +122,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
                   <tr key={r.id} className="border-t border-border transition-colors hover:bg-primary/4">
                     <td className="px-4 py-2.5">
                       <Link href={`/receipts/${r.id}`} className="font-medium text-primary underline-offset-4 hover:underline">
-                        {r.number}
+                        <Ltr>{r.number}</Ltr>
                       </Link>
                     </td>
                     <td className="whitespace-nowrap px-4 py-2.5">{day(r.issued_at)}</td>
@@ -140,6 +143,6 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
           </ScrollRegion>
         )}
       </section>
-    </main>
+    </Container>
   );
 }

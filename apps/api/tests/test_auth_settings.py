@@ -19,7 +19,7 @@ def payload(env: dict) -> dict:
 
 def test_config_toml_becomes_the_management_api_settings() -> None:
     result = payload({})
-    assert result["mailer_otp_length"] == 6 and result["mailer_otp_exp"] == 3600
+    assert result["mailer_otp_length"] == 8 and result["mailer_otp_exp"] == 3600
     assert result["mailer_autoconfirm"] is False  # confirmations are on
     assert result["external_anonymous_users_enabled"] is False
     assert result["refresh_token_rotation_enabled"] is True
@@ -42,3 +42,25 @@ def test_only_changed_settings_are_reported() -> None:
         "b": (2, 3),
         "c": (None, 4),
     }
+
+
+def test_email_templates_are_up_to_date_and_bilingual() -> None:
+    spec = importlib.util.spec_from_file_location("build", ROOT / "supabase/templates/build.py")
+    build = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(build)
+    brand = (ROOT / "packages/i18n/brand.json").read_text("utf-8")
+    assert f'"name": "{build.BRAND}"' in brand
+    for name, (subject, document) in build.build().items():
+        assert (ROOT / f"supabase/templates/{name}.html").read_text("utf-8") == document, name
+        assert 'dir="rtl"' in document and 'dir="ltr"' in document, name
+        assert "prefers-color-scheme: dark" in document, name
+        assert any("֐" <= ch <= "׿" for ch in subject) and subject.isascii() is False
+    magic = build.build()["magic_link"][1]
+    assert "{{ .Token }}" in magic and "{{ .TokenHash }}" in build.build()["recovery"][1]
+
+
+def test_notifications_are_in_the_payload() -> None:
+    result = payload({})
+    assert result["mailer_notifications_password_changed_enabled"] is True
+    assert "mailer_templates_email_changed_notification_content" in result
+    assert "mailer_templates_invite_content" in result

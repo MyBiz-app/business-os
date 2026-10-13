@@ -16,7 +16,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 API = "https://api.supabase.com/v1/projects/{ref}/config/auth"
-TEMPLATES = {"confirmation": "confirmation", "magic_link": "magic_link", "recovery": "recovery"}
+TEMPLATES = {
+    name: name
+    for name in (
+        "confirmation",
+        "magic_link",
+        "recovery",
+        "invite",
+        "email_change",
+        "reauthentication",
+    )
+}
+# Security notifications (config.toml: [auth.email.notification.*]) are named differently in the API.
+NOTIFICATIONS = ("password_changed", "email_changed")
 
 
 def build_payload(config: dict, root: Path = ROOT, env: dict | None = None) -> dict:
@@ -46,6 +58,12 @@ def build_payload(config: dict, root: Path = ROOT, env: dict | None = None) -> d
         payload[f"mailer_subjects_{key}"] = template["subject"]
         path = root / template["content_path"].removeprefix("./")
         payload[f"mailer_templates_{key}_content"] = path.read_text(encoding="utf-8")
+    for name in NOTIFICATIONS:
+        notification = email["notification"][name]
+        payload[f"mailer_notifications_{name}_enabled"] = notification["enabled"]
+        payload[f"mailer_subjects_{name}_notification"] = notification["subject"]
+        path = root / notification["content_path"].removeprefix("./")
+        payload[f"mailer_templates_{name}_notification_content"] = path.read_text(encoding="utf-8")
     return payload
 
 
@@ -79,6 +97,15 @@ def main(argv: list[str]) -> int:
     url = API.format(ref=ref)
     current = call("GET", url, token)
     unknown = [key for key in wanted if key not in current]
+    optional = [
+        key
+        for key in unknown
+        if key.startswith("mailer_") and "_notification" in key or "mailer_notifications_" in key
+    ]
+    if optional:  # older projects may lack the security-notification emails: skip those only
+        print(f"Skipping settings this project does not have: {optional}", file=sys.stderr)
+        wanted = {k: v for k, v in wanted.items() if k not in optional}
+        unknown = [key for key in unknown if key not in optional]
     if unknown:
         print(f"Settings the API does not know (nothing changed): {unknown}", file=sys.stderr)
         return 1

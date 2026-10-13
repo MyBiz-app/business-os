@@ -9,6 +9,7 @@ import { termsOf } from "@business-os/verticals";
 
 import { ColumnChart } from "@/components/charts/column-chart";
 import { GettingStartedCard } from "@/components/getting-started";
+import { Container } from "@/components/layout/container";
 import { LiveRefresh } from "@/components/live-refresh";
 import { CountUp } from "@/components/motion/count-up";
 import { unwrap } from "@/lib/api";
@@ -142,7 +143,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const weekLabel = (bucket: string) => formatDay(bucket, locale, { day: "numeric", month: "numeric" });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <LiveRefresh />
       {billingNotice && (
         <Link
@@ -233,7 +234,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               ))}
             </nav>
           </div>
-          <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
             {metrics.map((metric) => {
               const delta =
                 metric.value !== null && metric.previous !== null ? metric.value - metric.previous : null;
@@ -333,6 +334,6 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           sessionList(todays)
         )}
       </section>}
-    </main>
+    </Container>
   );
 }

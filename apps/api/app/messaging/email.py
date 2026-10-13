@@ -5,7 +5,6 @@ app/messages holds the API's checked-in copy (pnpm --filter @business-os/i18n ex
 both the API image and the jobs can render emails. A notification is emailed once, within a
 day of happening; older ones, and ones for clients without an email address, are skipped."""
 
-import html
 import json
 import re
 import smtplib
@@ -21,6 +20,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
+from app.messaging import email_layout as layout
 from app.messaging.push import PushSender, push_to_user
 
 MESSAGES_DIR = Path(__file__).resolve().parent.parent / "messages"
@@ -34,16 +34,29 @@ class Email:
     to: str
     subject: str
     text: str
-    html: str | None = None  # a designed version; otherwise the text is turned into HTML
+    html: str | None = None  # a designed version; otherwise the text is put in the MyBiz layout
+    locale: str = "he"
 
 
 def _html(email: Email) -> str:
     if email.html is not None:
         return email.html
-    return (
-        '<div dir="auto">'
-        + "<br>".join(html.escape(line) for line in email.text.split("\n"))
-        + "</div>"
+    lang = email.locale if email.locale in ("he", "en") else "he"
+    greeting, _, rest = email.text.partition("\n\n")
+    body = layout.text_block(greeting, lang) + "".join(
+        layout.text_block(block, lang) for block in rest.split("\n\n") if block.strip()
+    )
+    footer = (
+        "הודעה אוטומטית, אין צורך להשיב."
+        if lang == "he"
+        else "Automated message, no need to reply."
+    )
+    return layout.shell(
+        [layout.Section(lang, layout.title(email.subject, lang) + body)],
+        subject=email.subject,
+        preheader=greeting.split("\n")[0],
+        brand=layout.BRAND,
+        footer=[(lang, f"{layout.BRAND} · {footer}")],
     )
 
 
@@ -236,7 +249,7 @@ def send_emails(
             )
             continue
         try:
-            sender.send(Email(to=row["email"], subject=subject, text=body))
+            sender.send(Email(to=row["email"], subject=subject, text=body, locale=locale))
         except Exception as error:  # a provider error must not stop the batch
             failed += 1
             print(f"email {row['id']} failed: {error}")

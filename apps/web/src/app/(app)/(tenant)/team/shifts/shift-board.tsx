@@ -12,6 +12,7 @@ import { type AvailabilityWindow, outsideAvailability } from "@/lib/availability
 import { formatDay } from "@/lib/dates";
 
 import { copyShiftsDay, copyShiftsWeek, type CopyState, deleteShift, deleteTemplate, saveShift, saveTemplate, type ShiftState, type TemplateState } from "./actions";
+import { ToastOnChange } from "@/components/toast/toaster";
 
 export type BoardPerson = { id: string; name: string; title: string; avatar: string | null; homeId: string | null; availability?: AvailabilityWindow[] | null };
 export type BoardShift = {
@@ -155,16 +156,8 @@ export function ShiftBoard(props: {
                 {t("copyDo")}
               </button>
             </div>
-            {copy.copied && (
-              <p role="status" className="text-xs text-muted">
-                {t("copied", { created: copy.copied.created, skipped: copy.copied.skipped })}
-              </p>
-            )}
-            {copy.error && (
-              <p role="alert" className="text-xs text-danger">
-                {tCommon("errors.generic")}
-              </p>
-            )}
+            <ToastOnChange source={copy} tone="success" message={copy.copied ? t("copied", { created: copy.copied.created, skipped: copy.copied.skipped }) : undefined} />
+            <ToastOnChange source={copy} tone="error" message={copy.error ? tCommon("errors.generic") : undefined} />
           </div>
         )}
       </div>

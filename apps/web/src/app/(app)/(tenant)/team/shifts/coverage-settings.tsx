@@ -7,6 +7,7 @@ import { useState, useTransition } from "react";
 import { endInputValue, minuteToTime, timeToMinute } from "@/lib/coverage";
 
 import { type CoverageRuleInput, type CoverageState, saveCoverageRules } from "./actions";
+import { ToastOnChange } from "@/components/toast/toaster";
 
 type Branch = { id: string; name: string; color: string; rules: CoverageRuleInput[] };
 type Row = { weekday: number; starts: string; ends: string; min: number };
@@ -89,9 +90,11 @@ function CoverageBranch({ branch, weekdays }: { branch: Branch; weekdays: string
         <button type="button" onClick={save} disabled={saving} aria-busy={saving} className="btn-primary px-3 py-1.5 text-sm">
           {t("planning.save")}
         </button>
-        <span role="status" className="text-xs text-muted">
-          {state.saved ? t("planning.saved") : state.error ? t("errors.invalid") : ""}
-        </span>
+        <ToastOnChange
+          source={state}
+          tone={state.saved ? "success" : "error"}
+          message={state.saved ? t("planning.saved") : state.error ? t("errors.invalid") : undefined}
+        />
       </div>
     </li>
   );

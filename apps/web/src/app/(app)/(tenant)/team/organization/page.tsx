@@ -9,6 +9,8 @@ import { canManageTeam } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { type OrgPerson, OrgChart } from "./org-chart";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("organization");
@@ -36,13 +38,10 @@ export default async function OrganizationPage() {
   }));
 
   return (
-    <main className="enter flex w-full flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <div className="flex flex-col gap-2">
-        <BackLink href="/team" label={t("team.title")} />
-        <h1 className="text-3xl font-bold">{t("organization.title")}</h1>
-        <p className="max-w-2xl text-sm text-muted">{t("organization.subtitle")}</p>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <BackLink href="/team" label={t("team.title")} />
+      <PageHeader title={t("organization.title")} description={t("organization.subtitle")} />
       <OrgChart people={people} canEdit={canManageTeam(tenant)} />
-    </main>
+    </Container>
   );
 }

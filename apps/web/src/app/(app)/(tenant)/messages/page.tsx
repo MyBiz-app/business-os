@@ -2,6 +2,8 @@ import { FlaskConical, MessageCircle, Trash2 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { unwrap } from "@/lib/api";
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
@@ -27,16 +29,18 @@ export default async function MessagesPage() {
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: tenant.time_zone });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex items-center gap-3">
-        <span className="icon-tile size-11">
-          <MessageCircle aria-hidden="true" className="size-5" />
-        </span>
-        <div className="flex flex-col gap-0.5">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-muted">{t("subtitle")}</p>
-        </div>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <span className="icon-tile size-11">
+              <MessageCircle aria-hidden="true" className="size-5" />
+            </span>
+            {t("title")}
+          </span>
+        }
+        description={t("subtitle")}
+      />
 
       <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
         <FlaskConical aria-hidden="true" className="size-4 shrink-0" />
@@ -116,6 +120,6 @@ export default async function MessagesPage() {
           )}
         </section>
       </div>
-    </main>
+    </Container>
   );
 }

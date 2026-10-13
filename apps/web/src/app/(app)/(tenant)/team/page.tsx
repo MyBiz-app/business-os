@@ -10,6 +10,8 @@ import { getBranches, getTenant } from "@/lib/tenant";
 
 import { revokeInvitation } from "./actions";
 import { InviteForm, MemberRow } from "./team-forms";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function TeamPage() {
   const t = await getTranslations();
@@ -27,11 +29,10 @@ export default async function TeamPage() {
     new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone }).format(new Date(iso));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("team.title")}</h1>
-        <p className="text-sm text-muted">{t("team.subtitle")}</p>
-        <div className="mt-2 flex flex-wrap gap-2">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+      <div className="flex flex-col gap-4">
+        <PageHeader title={t("team.title")} description={t("team.subtitle")} />
+        <div className="flex flex-wrap gap-2">
           <Link href="/team/organization" className="btn-secondary px-3 py-2 text-sm">
             <Network aria-hidden="true" className="size-4" />
             {t("organization.title")}
@@ -119,6 +120,6 @@ export default async function TeamPage() {
           </ul>
         )}
       </section>
-    </main>
+    </Container>
   );
 }

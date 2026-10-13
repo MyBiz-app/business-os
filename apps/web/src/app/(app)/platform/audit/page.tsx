@@ -7,6 +7,8 @@ import { BRAND } from "@business-os/i18n/brand";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatform } from "@/lib/platform";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.audit");
@@ -35,13 +37,8 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       .join(" · ");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 id="audit-heading" className="text-3xl font-bold">
-          {t("audit.title")}
-        </h1>
-        <p className="text-muted">{t("audit.subtitle")}</p>
-      </div>
+    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader titleId="audit-heading" title={t("audit.title")} description={t("audit.subtitle")} />
       {entries.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("audit.empty")}</p>
       ) : (
@@ -84,6 +81,6 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
           {entries.length === PAGE_SIZE ? <Link href={`/platform/audit?page=${page + 1}`} className="text-primary">{t("audit.next")}</Link> : <span />}
         </nav>
       )}
-    </main>
+    </Container>
   );
 }

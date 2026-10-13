@@ -9,6 +9,8 @@ import { toBlocks, weekStartFor } from "@/lib/hours";
 import { getTenantFor } from "@/lib/tenant";
 
 import { saveRoomHours } from "../../../actions";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** A bookable room's (a court's) weekly opening hours: when it can be reserved. */
 export default async function RoomHoursPage({ params }: PageProps<"/locations/[id]/rooms/[roomId]">) {
@@ -21,18 +23,15 @@ export default async function RoomHoursPage({ params }: PageProps<"/locations/[i
   const hours = unwrap(await api.GET("/rooms/{room_id}/hours", { params: { ...scope, path: { room_id: roomId } } }));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href={`/locations/${id}`} className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("locations.openingHours", { name: isolate(room.name) })}</h1>
-        <p className="text-muted">{t("resources.hoursHint", { branch: isolate(location.name) })}</p>
-      </div>
+      <PageHeader title={t("locations.openingHours", { name: isolate(room.name) })} description={t("resources.hoursHint", { branch: isolate(location.name) })} />
       {!room.bookable && <p role="status" className="card p-4 text-sm">{t("resources.notBookable")}</p>}
       <section className="card p-6">
         <HoursForm save={saveRoomHours.bind(null, roomId, id)} weekStartsOn={weekStartFor(tenant.locale)} initial={toBlocks(hours.blocks)} />
       </section>
-    </main>
+    </Container>
   );
 }
