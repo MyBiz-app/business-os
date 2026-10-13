@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState } from "react";
 
 import { copyWeek, type CopyWeekState } from "./actions";
+import { FormError, FormNotice } from "@/components/form/form-message";
 
 /** Copies this week's one-off classes to the next week (weekly series repeat on their own). */
 export function CopyWeek({ weekStart, nextWeek }: { weekStart: string; nextWeek: string }) {
@@ -22,19 +23,13 @@ export function CopyWeek({ weekStart, nextWeek }: { weekStart: string; nextWeek:
       >
         {t("copyWeek")}
       </button>
+      <FormNotice message={state.copied ? t("copyWeekDone", { created: state.copied.created, skipped: state.copied.skipped }) : undefined} />
       {state.copied && (
-        <p role="status" className="text-sm">
-          {t("copyWeekDone", { created: state.copied.created, skipped: state.copied.skipped })}{" "}
-          <Link href={`/schedule?week=${nextWeek}`} className="text-primary underline-offset-4 hover:underline">
-            {t("nextWeek")}
-          </Link>
-        </p>
+        <Link href={`/schedule?week=${nextWeek}`} className="text-sm text-primary underline-offset-4 hover:underline">
+          {t("nextWeek")}
+        </Link>
       )}
-      {state.error && (
-        <p role="alert" className="text-sm text-danger">
-          {t("copyWeekError")}
-        </p>
-      )}
+      <FormError message={state.error ? t("copyWeekError") : undefined} />
     </form>
   );
 }

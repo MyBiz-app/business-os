@@ -1,11 +1,11 @@
 "use client";
 
 import type { components } from "@business-os/api-client";
-import { CheckCheck, MessageCircle, Send, Smartphone } from "lucide-react";
+import { MessageCircle, Send, Smartphone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState, useRef, useState } from "react";
 
-import { FormError } from "@/components/form/form-message";
+import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type SendState, sendCampaign } from "./actions";
@@ -52,12 +52,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
     <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
       <form action={action} className="flex flex-col gap-4">
         <FormError message={state.error && t("errors.generic")} />
-        {state.sent !== undefined && (
-          <p role="status" className="flex items-center gap-2 rounded-xl border border-success/40 bg-success/10 px-4 py-2 text-sm font-medium">
-            <CheckCheck aria-hidden="true" className="size-4" />
-            {t("sentTo", { count: state.sent })}
-          </p>
-        )}
+        <FormNotice message={state.sent !== undefined ? t("sentTo", { count: state.sent }) : undefined} />
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {t("audience")}
           <select

@@ -292,7 +292,15 @@
     "resources": "מגרשים וחדרים",
     "quotes": "הצעות מחיר",
     "time": "השעות שלי",
-    "billingRun": "חיוב חודשי"
+    "billingRun": "חיוב חודשי",
+    "groups": {
+      "overview": "סקירה",
+      "work": "עבודה",
+      "clients": "לקוחות",
+      "catalog": "קטלוג",
+      "money": "כספים",
+      "business": "העסק"
+    }
   },
   "terms": {
     "fitness": {
@@ -584,6 +592,7 @@
     "pageOf": "עמוד {page} מתוך {pages}"
   },
   "common": {
+    "dismiss": "סגירת ההודעה",
     "skipToContent": "דלג לתוכן הראשי",
     "loadFailed": "לא הצלחנו לטעון כרגע.",
     "retry": "נסו שוב",
