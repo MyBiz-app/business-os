@@ -6,7 +6,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BRAND } from "@business-os/i18n/brand";
 
+import { Section } from "@/components/layout/section";
 import { CtaBand, FeatureGrid } from "@/components/marketing/sections";
+import { SubpageHero } from "@/components/marketing/subpage";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { formatMoney } from "@/lib/money";
 import { industryTexts } from "@/lib/verticals";
@@ -35,13 +37,14 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
 
   return (
     <main className="enter flex flex-col">
-      <section className="relative overflow-hidden">
-        <div aria-hidden="true" className={`pointer-events-none absolute -top-32 -end-32 size-[28rem] rounded-full bg-gradient-to-br ${color} opacity-20 blur-3xl`} />
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-6 py-20 text-center">
+      <SubpageHero
+        lead={
           <span aria-hidden="true" className={`flex size-16 items-center justify-center rounded-3xl bg-gradient-to-br ${color} text-white shadow-xl`}>
             <VerticalIcon icon={icon} className="size-8" />
           </span>
-          <p className="flex flex-wrap items-center justify-center gap-2 text-sm font-semibold text-primary">
+        }
+        eyebrow={
+          <span className="flex flex-wrap items-center gap-2">
             {match.parent && (
               <>
                 <Link href={`/industries/${match.category}`} className="underline-offset-4 hover:underline">
@@ -51,43 +54,46 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
               </>
             )}
             <span>{text(key, "name")}</span>
-            {planned && <span className="rounded-full bg-warning/15 px-2.5 py-0.5 text-xs text-foreground">{t("industries.soon")}</span>}
-          </p>
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">{text(key, "heroTitle")}</h1>
-          <p className="max-w-2xl text-lg text-muted">{planned ? t("industries.soonPage", { name: text(key, "name") }) : text(key, "heroText")}</p>
-          <ul className="flex flex-wrap justify-center gap-3">
+            {planned && <span className="rounded-full bg-warning/20 px-2.5 py-0.5 text-xs">{t("industries.soon")}</span>}
+          </span>
+        }
+        title={text(key, "heroTitle")}
+        description={planned ? t("industries.soonPage", { name: text(key, "name") }) : text(key, "heroText")}
+        aside={
+          <ul className="flex flex-col gap-3 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur sm:p-8">
             {points(key).map((point) => (
-              <li key={point} className="flex items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm font-medium shadow-sm ring-1 ring-border">
-                <Check aria-hidden="true" className="size-4 text-success" />
+              <li key={point} className="flex items-start gap-3 text-lg font-medium text-white/90">
+                <Check aria-hidden="true" className="mt-1 size-5 shrink-0 text-electric" />
                 {point}
               </li>
             ))}
           </ul>
-          <div className="flex flex-wrap justify-center gap-3">
-            {planned ? (
-              <Link href={`/contact?vertical=${key}`} className="btn-primary btn-lg">
-                {t("industries.notify")}
+        }
+      >
+        <div className="flex flex-wrap gap-3">
+          {planned ? (
+            <Link href={`/contact?vertical=${key}`} className="btn-primary btn-lg">
+              {t("industries.notify")}
+            </Link>
+          ) : (
+            <>
+              <Link href={`/start?vertical=${key}`} className="btn-primary btn-lg">
+                {t("hero.ctaPrimary")}
               </Link>
-            ) : (
-              <>
-                <Link href={`/start?vertical=${key}`} className="btn-primary btn-lg">
-                  {t("hero.ctaPrimary")}
-                </Link>
-                <Link href={`/contact?vertical=${key}`} className="btn-secondary btn-lg">
-                  {t("cta.contact")}
-                </Link>
-              </>
-            )}
-          </div>
+              <Link href={`/contact?vertical=${key}`} className="btn-lg inline-flex items-center justify-center rounded-full border border-white/25 px-7 font-semibold text-white transition-colors hover:bg-white/10">
+                {t("cta.contact")}
+              </Link>
+            </>
+          )}
         </div>
-      </section>
+      </SubpageHero>
 
       {kinds.length > 0 && (
-        <section aria-labelledby="kinds-heading" className="mx-auto flex w-full max-w-4xl flex-col items-center gap-4 px-6 pb-10">
+        <Section spacing="compact" aria-labelledby="kinds-heading" innerClassName="flex flex-col gap-4">
           <h2 id="kinds-heading" className="text-lg font-semibold">
             {t("industries.kinds", { name: text(match.category, "name") })}
           </h2>
-          <ul className="flex flex-wrap justify-center gap-2">
+          <ul className="flex flex-wrap gap-2">
             {kinds.map((kind) => (
               <li key={kind.key}>
                 <Link
@@ -102,16 +108,17 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
               </li>
             ))}
           </ul>
-        </section>
+        </Section>
       )}
 
       {!planned && <ReadySection match={match} />}
 
       {/* Named by its own heading, so it never collides with the footer's industries nav. */}
-      <h2 id="all-industries" className="pt-6 text-center text-lg font-semibold">
+      <Section spacing="compact" tone="surface" innerClassName="flex flex-col gap-4">
+      <h2 id="all-industries" className="text-lg font-semibold">
         {t("industries.all")}
       </h2>
-      <nav aria-labelledby="all-industries" className="mx-auto mt-4 flex flex-wrap justify-center gap-2 px-6">
+      <nav aria-labelledby="all-industries" className="flex flex-wrap gap-2">
         {categories().map((other) => (
           <Link
             key={other.key}
@@ -125,6 +132,7 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
           </Link>
         ))}
       </nav>
+      </Section>
 
       <FeatureGrid />
       <CtaBand />
@@ -220,18 +228,18 @@ async function ReadySection({ match }: { match: Vertical }) {
   ].filter(Boolean);
 
   return (
-    <section aria-labelledby="ready-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h2 id="ready-heading" className="text-3xl font-bold tracking-tight">
+    <Section tone="surface" aria-labelledby="ready-heading" innerClassName="flex flex-col gap-8">
+      <div className="flex max-w-[44rem] flex-col gap-2">
+        <h2 id="ready-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">
           {t("title")}
         </h2>
-        <p className="max-w-2xl text-muted">{t("subtitle")}</p>
+        <p className="text-lg text-muted">{t("subtitle")}</p>
       </div>
       <div className={`grid gap-4 ${columns.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>{columns}</div>
-      <p className="flex items-center justify-center gap-2 text-sm text-muted">
+      <p className="flex items-center gap-2 text-sm text-muted">
         <Check aria-hidden="true" className="size-4 text-success" />
         {t("note")}
       </p>
-    </section>
+    </Section>
   );
 }

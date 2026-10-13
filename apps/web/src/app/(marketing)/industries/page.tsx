@@ -4,7 +4,9 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { CtaBand, PageHero, SectionHeading } from "@/components/marketing/sections";
+import { Section } from "@/components/layout/section";
+import { CtaBand, SectionHeading } from "@/components/marketing/sections";
+import { SubpageHero } from "@/components/marketing/subpage";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { industryTexts } from "@/lib/verticals";
 
@@ -22,9 +24,9 @@ export default async function IndustriesPage() {
 
   return (
     <main className="enter flex flex-col">
-      <PageHero title={t("title")} subtitle={t("subtitle")} />
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6 py-16">
-      <ul className="grid gap-4 md:grid-cols-2">
+      <SubpageHero title={t("title")} description={t("subtitle")} />
+      <Section spacing="compact">
+      <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {open.map(({ key, icon, color }) => (
           <li key={key} className="card flex flex-col gap-4 p-6">
             <Link href={`/industries/${key}`} className="group flex items-center gap-4">
@@ -48,9 +50,10 @@ export default async function IndustriesPage() {
           </li>
         ))}
       </ul>
+      </Section>
 
       {soon.length > 0 && (
-        <section aria-labelledby="soon-heading" className="flex flex-col gap-6">
+        <Section tone="surface" aria-labelledby="soon-heading" innerClassName="flex flex-col gap-8">
           <SectionHeading id="soon-heading" title={t("soonTitle")} subtitle={t("soonText")} />
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {soon.map(({ key, icon }) => (
@@ -63,9 +66,8 @@ export default async function IndustriesPage() {
               </li>
             ))}
           </ul>
-        </section>
+        </Section>
       )}
-      </div>
       <CtaBand />
     </main>
   );
