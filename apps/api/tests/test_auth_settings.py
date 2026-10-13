@@ -19,7 +19,7 @@ def payload(env: dict) -> dict:
 
 def test_config_toml_becomes_the_management_api_settings() -> None:
     result = payload({})
-    assert result["mailer_otp_length"] == 6 and result["mailer_otp_exp"] == 3600
+    assert result["mailer_otp_length"] == 8 and result["mailer_otp_exp"] == 3600
     assert result["mailer_autoconfirm"] is False  # confirmations are on
     assert result["external_anonymous_users_enabled"] is False
     assert result["refresh_token_rotation_enabled"] is True
