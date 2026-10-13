@@ -16,6 +16,8 @@ import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { CopyWeek } from "./copy-week";
 import { SaveDefault } from "./save-default";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
   const t = await getTranslations("schedule");
@@ -170,17 +172,18 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const customized = isBoardRange(query.view) || explicit || isDay(query.date) || isDay(query.week);
 
   return (
-    <main className="enter flex w-full flex-1 flex-col gap-5 px-4 py-8 sm:px-6 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-8 sm:py-10">
       <LiveRefresh />
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{term("schedule")}</h1>
-          <p className="flex items-center gap-2 text-sm text-muted">
+      <PageHeader
+        title={term("schedule")}
+        description={
+          <span className="flex items-center gap-2 text-base">
             <span>{range}</span>
             {includesToday && <span className="rounded-full bg-primary/12 px-2 py-0.5 text-xs font-semibold text-primary">{t("today")}</span>}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
+          </span>
+        }
+        actions={
+          <>
           {canWriteSchedule(tenant) && (
             <Link href="/schedule/closed" className="btn-ghost px-3 py-2 text-sm">
               {t("closedDays")}
@@ -197,8 +200,9 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {term("newSession")}
             </Link>
           )}
-        </div>
-      </div>
+          </>
+        }
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={term("schedule")} className="flex flex-wrap items-center gap-1.5">
@@ -331,7 +335,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         />
       )}
       {gridShifts.length > 0 && <p className="text-xs text-muted">{t("shiftsLegend")}</p>}
-    </main>
+    </Container>
   );
 }
 

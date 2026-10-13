@@ -5,6 +5,8 @@ import Link from "next/link";
 import { unwrap } from "@/lib/api";
 import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function LocationsPage() {
   const t = await getTranslations();
@@ -12,18 +14,18 @@ export default async function LocationsPage() {
   const locations = unwrap(await api.GET("/locations", { params: scope }));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("locations.title")}</h1>
-          <p className="text-sm text-muted">{t("locations.subtitle")}</p>
-        </div>
-        {canWriteCatalog(tenant) && (
-          <Link href="/locations/new" className="btn-primary px-4 py-2.5">
-            {t("locations.add")}
-          </Link>
-        )}
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={t("locations.title")}
+        description={t("locations.subtitle")}
+        actions={
+          canWriteCatalog(tenant) && (
+            <Link href="/locations/new" className="btn-primary px-4 py-2.5">
+              {t("locations.add")}
+            </Link>
+          )
+        }
+      />
 
       {locations.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("locations.empty")}</p>
@@ -39,8 +41,8 @@ export default async function LocationsPage() {
                   <MapPin className="size-5" />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
-                  <span className="font-semibold">{location.name}</span>
-                  {location.address && <span className="text-sm text-muted">{location.address}</span>}
+                  <span dir="auto" className="font-semibold">{location.name}</span>
+                  {location.address && <span dir="auto" className="text-sm text-muted">{location.address}</span>}
                   <span className="inline-flex items-center gap-1.5 text-sm text-muted">
                     <DoorOpen aria-hidden="true" className="size-4" />
                     {t("locations.roomsCount", { count: location.rooms.length })}
@@ -52,6 +54,6 @@ export default async function LocationsPage() {
           ))}
         </ul>
       )}
-    </main>
+    </Container>
   );
 }

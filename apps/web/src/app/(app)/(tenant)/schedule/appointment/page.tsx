@@ -7,6 +7,8 @@ import { formatTime, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
 
 import { BookingForm } from "./booking-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** Book a personal appointment: service, staff and day pick the free times; then the client. */
 export default async function NewAppointmentPage({ searchParams }: PageProps<"/schedule/appointment">) {
@@ -76,11 +78,11 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
   const terms = (key: string) => t(`terms.${termsOf(tenant.vertical)}.${key}` as "terms.fitness.clients");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/schedule" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
-      <h1 className="text-3xl font-bold">{t("appointments.title")}</h1>
+      <PageHeader title={t("appointments.title")} />
 
       {appointmentServices.length === 0 ? (
         <p className="card p-6 text-muted">{t("appointments.noServices")}</p>
@@ -159,6 +161,6 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
           </section>
         </>
       )}
-    </main>
+    </Container>
   );
 }
