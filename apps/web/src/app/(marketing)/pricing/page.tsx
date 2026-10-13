@@ -1,10 +1,13 @@
-import { Check } from "lucide-react";
+import { Check, Minus } from "lucide-react";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
-import { CtaBand, Faq, PageHero } from "@/components/marketing/sections";
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
+import { PricingCalculator } from "@/components/marketing/pricing-calculator";
+import { CtaBand, Faq, PageHero, SectionHeading } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { loadCatalog } from "@/lib/pricing";
@@ -21,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** Prices from the API's module catalog: recommended plans, base tiers and every module. */
 export default async function PricingPage({ searchParams }: PageProps<"/pricing">) {
   const t = await getTranslations("marketing.pricing");
+  const th = await getTranslations("marketing.home.pricing");
   const tModules = await getTranslations("modules");
   const locale = await getLocale();
   const query = await searchParams;
@@ -34,13 +38,24 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
   const presetPrice = (preset: (typeof PRESETS)[number]) =>
     base + (catalog?.presets[preset] ?? []).reduce((sum, key) => sum + priceOf(key), 0);
 
+  // Every module that appears in a recommended plan, for the comparison table.
+  const compared = [...new Set(PRESETS.flatMap((preset) => catalog?.presets[preset] ?? []))];
+
   return (
     <main className="enter flex flex-col">
       {/* The starting price is the base tier, the same number the cards show. */}
       <OrganizationData price={toMajor(base, currency)} currency={currency} />
       <FaqData />
       <PageHero title={t("title")} subtitle={t("subtitle")}>
-        <nav aria-label={t("currency")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm text-foreground shadow-sm">
+        <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-white/90">
+          {(th.raw("points") as string[]).map((point) => (
+            <li key={point} className="flex items-center gap-2">
+              <Check aria-hidden="true" className="size-4 text-cyan-300" />
+              {point}
+            </li>
+          ))}
+        </ul>
+        <nav aria-label={t("currency")} className="mt-2 flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm text-foreground shadow-sm">
           {CURRENCIES.map((code) => (
             <Link
               key={code}
@@ -56,19 +71,12 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
 
       {catalog && (
         <>
-          <section aria-label={t("presetsTitle")} className="swipe mx-auto w-full max-w-6xl gap-5 px-6 py-12 sm:grid md:grid-cols-3">
+          <Section aria-label={t("presetsTitle")} innerClassName="swipe gap-6 sm:grid md:grid-cols-3">
             {PRESETS.map((preset) => {
               const popular = preset === "growing";
               return (
-                <article
-                  key={preset}
-                  className={`relative flex flex-col gap-5 p-7 ${popular ? "card-accent shadow-xl md:-translate-y-2" : "card"}`}
-                >
-                  {popular && (
-                    <p className="absolute -top-3 start-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-on-primary shadow">
-                      {t("popular")}
-                    </p>
-                  )}
+                <article key={preset} className={`relative flex flex-col gap-5 p-7 ${popular ? "card-accent shadow-xl md:-translate-y-2" : "card"}`}>
+                  {popular && <p className="absolute -top-3 start-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-on-primary shadow">{t("popular")}</p>}
                   <h2 className="text-xl font-bold">{t(`presets.${preset}`)}</h2>
                   <p className="text-sm text-muted">{t(`presetText.${preset}`)}</p>
                   <p className="flex items-baseline gap-1">
@@ -90,48 +98,82 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                       </li>
                     ))}
                   </ul>
-                  <Link href={`/start?preset=${preset}&currency=${currency}`} className={`mt-auto px-5 py-3 ${popular ? "btn-primary" : "btn-secondary"}`}>
+                  <Link href={`/start?preset=${preset}&currency=${currency}`} className={`mt-auto rounded-full px-5 py-3 text-center ${popular ? "btn-primary" : "btn-secondary"}`}>
                     {t("cta")}
                   </Link>
+                  <p className="text-center text-xs text-muted">{t("trialNote")}</p>
                 </article>
               );
             })}
-          </section>
+          </Section>
 
-          <section aria-labelledby="tiers-heading" className="mx-auto w-full max-w-6xl px-6 pb-12">
-            <div className="card-accent flex flex-col gap-5 p-6 sm:p-8">
-              <div className="flex flex-col gap-1">
-                <h2 id="tiers-heading" className="text-2xl font-extrabold tracking-tight">
-                  {t("core")}
-                </h2>
-                <p className="text-muted">{t("coreText")}</p>
-              </div>
-              <ul className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {catalog.core.map((tier) => (
-                  <li key={tier.up_to_clients ?? "custom"} className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4">
-                    <span className="text-sm text-muted">{tier.up_to_clients ? t("upTo", { count: tier.up_to_clients }) : t("custom")}</span>
-                    <span className="text-xl font-extrabold">
-                      {tier.up_to_clients ? (
-                        <>
-                          <bdi>{money(tier.price)}</bdi> <span className="text-sm font-medium text-muted">{t("perMonth")}</span>
-                        </>
-                      ) : (
-                        t("customPrice")
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+          <Section tone="muted" aria-labelledby="tiers-heading" innerClassName="flex flex-col gap-8">
+            <SectionHeading id="tiers-heading" title={t("core")} subtitle={t("coreText")} />
+            <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {catalog.core.map((tier) => (
+                <li key={tier.up_to_clients ?? "custom"} className="card flex flex-col gap-1 p-5">
+                  <span className="text-sm text-muted">{tier.up_to_clients ? t("upTo", { count: tier.up_to_clients }) : t("custom")}</span>
+                  <span className="text-2xl font-extrabold">
+                    {tier.up_to_clients ? (
+                      <>
+                        <bdi>{money(tier.price)}</bdi> <span className="text-sm font-medium text-muted">{t("perMonth")}</span>
+                      </>
+                    ) : (
+                      t("customPrice")
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Section>
+
+          <Section size="default" aria-labelledby="compare-heading" innerClassName="flex flex-col gap-8">
+            <SectionHeading id="compare-heading" title={t("compareTitle")} subtitle={t("compareText")} />
+            <div className="card overflow-x-auto">
+              <table className="w-full min-w-[34rem] text-sm">
+                <caption className="sr-only">{t("compareTitle")}</caption>
+                <thead>
+                  <tr className="border-b border-border text-start">
+                    <td />
+                    {PRESETS.map((preset) => (
+                      <th key={preset} scope="col" className={`px-4 py-4 text-center ${preset === "growing" ? "bg-primary/5" : ""}`}>
+                        <span className="block font-bold">{t(`presets.${preset}`)}</span>
+                        <span className="block text-lg font-extrabold">
+                          <bdi>{money(presetPrice(preset))}</bdi>
+                        </span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {["core", ...compared].map((key) => (
+                    <tr key={key} className="border-b border-border last:border-0">
+                      <th scope="row" className="px-4 py-3 text-start font-medium">
+                        {key === "core" ? t("coreShort") : tModules(`names.${key}` as "names.client_app")}
+                      </th>
+                      {PRESETS.map((preset) => {
+                        const has = key === "core" || (catalog.presets[preset] ?? []).includes(key as never);
+                        return (
+                          <td key={preset} className={`px-4 py-3 text-center ${preset === "growing" ? "bg-primary/5" : ""}`}>
+                            {has ? <Check aria-label={t("included")} className="mx-auto size-5 text-success" /> : <Minus aria-label={t("notIncluded")} className="mx-auto size-4 text-muted" />}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </section>
-          <section aria-labelledby="modules-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 pb-12">
-            <div className="flex flex-col gap-2 text-center">
-              <h2 id="modules-heading" className="text-3xl font-extrabold tracking-tight">
-                {t("modulesTitle")}
-              </h2>
-              <p className="text-muted">{t("modulesText")}</p>
-            </div>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          </Section>
+
+          <Section tone="muted" aria-labelledby="calc-heading" innerClassName="flex flex-col gap-8">
+            <SectionHeading id="calc-heading" title={t("calc.title")} subtitle={t("calc.subtitle")} />
+            <PricingCalculator catalog={catalog} />
+          </Section>
+
+          <Section aria-labelledby="modules-heading" innerClassName="flex flex-col gap-8">
+            <SectionHeading id="modules-heading" title={t("modulesTitle")} subtitle={t("modulesText")} />
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
               {[...catalog.modules].sort((x, y) => Number(y.available) - Number(x.available)).map((module) => (
                 <li
                   key={module.key}
@@ -160,9 +202,9 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                 </li>
               ))}
             </ul>
-          </section>
+          </Section>
 
-          <p className="px-6 text-center text-sm text-muted">{t("note")}</p>
+          <Container as="p" className="pb-10 text-center text-sm text-muted">{t("note")}</Container>
         </>
       )}
       <Faq />

@@ -34,24 +34,6 @@ export function StepHeading({ eyebrow, title, subtitle }: { eyebrow: ReactNode; 
   );
 }
 
-/** The progress as a flight: a plane moving along the route (decorative; the steps are text). */
-export function FlightPath({ percent }: { percent: number }) {
-  return (
-    <div aria-hidden="true" className="relative mx-3 h-2 rounded-full bg-foreground/10">
-      <div
-        className="absolute inset-y-0 start-0 rounded-full bg-gradient-to-r from-brand-from to-brand-to transition-[width] duration-700 ease-out rtl:bg-gradient-to-l"
-        style={{ width: `${percent}%` }}
-      />
-      <span
-        className="absolute top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-full bg-surface text-primary shadow-md ring-1 ring-border transition-[inset-inline-start] duration-700 ease-out ltr:-translate-x-1/2 rtl:translate-x-1/2"
-        style={{ insetInlineStart: `${percent}%` }}
-      >
-        <Plane className="size-4 rotate-45 rtl:-rotate-45 rtl:-scale-x-100" />
-      </span>
-    </div>
-  );
-}
-
 /** One choice on an add-on screen: what it is, what it costs, and a button to take it. */
 export function TierCard({
   icon,

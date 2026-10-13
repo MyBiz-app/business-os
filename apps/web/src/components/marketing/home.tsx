@@ -111,9 +111,9 @@ export async function PricingTeaser() {
           <SectionHeading id="pricing-heading" eyebrow={th("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
         </Reveal>
         <Reveal>
-          <ul className="mx-auto flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold">
+          <ul className="mx-auto flex flex-wrap justify-center gap-3 text-sm font-semibold">
             {(th.raw("points") as string[]).map((point) => (
-              <li key={point} className="flex items-center gap-2">
+              <li key={point} className="flex items-center gap-2 rounded-full bg-surface px-4 py-2 shadow-sm ring-1 ring-border">
                 <Check aria-hidden="true" className="size-4 text-success" />
                 {point}
               </li>
@@ -153,6 +153,7 @@ export async function PricingTeaser() {
                       <Link href={`/start?preset=${preset}&currency=${currency}`} className={`mt-auto rounded-full px-5 py-3 ${popular ? "btn-primary" : "btn-secondary"}`}>
                         {t("cta")}
                       </Link>
+                      <p className="text-center text-xs text-muted">{t("trialNote")}</p>
                     </article>
                   </Reveal>
                 </li>
