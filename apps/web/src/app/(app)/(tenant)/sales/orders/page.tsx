@@ -3,6 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -27,13 +29,8 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
     new Date(instant).toLocaleDateString(locale, { day: "numeric", month: "short", timeZone: tenant.time_zone });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 id="orders-heading" className="text-3xl font-bold">
-          {t("orders.title")}
-        </h1>
-        <p className="text-muted">{t("orders.subtitle")}</p>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader titleId="orders-heading" title={t("orders.title")} description={t("orders.subtitle")} />
       {items.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("orders.empty")}</p>
       ) : (
@@ -79,6 +76,6 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
           )}
         </>
       )}
-    </main>
+    </Container>
   );
 }
