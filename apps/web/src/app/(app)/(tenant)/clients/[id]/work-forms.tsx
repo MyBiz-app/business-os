@@ -6,6 +6,7 @@ import { useActionState } from "react";
 import { CheckboxField, Field, SelectField } from "@/components/form/field";
 import { FileField } from "@/components/form/file-field";
 import { FormFeedback } from "@/components/form/form-feedback";
+import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type BillState, billMonth, logTime, saveRetainer, uploadDocument } from "./work-actions";
@@ -81,8 +82,8 @@ export function BillForm({ clientId, months }: { clientId: string; months: { val
     <form action={action} className="flex flex-wrap items-end gap-3">
       <SelectField label={t("month")} name="month" defaultValue={months[0]?.value} options={months} />
       <SubmitButton>{t("bill")}</SubmitButton>
-      {state.nothing && <p role="status" className="w-full text-sm text-muted">{t("nothingToBill")}</p>}
-      {state.error && <p role="alert" className="w-full text-sm text-danger">{t("billFailed")}</p>}
+      <FormNotice message={state.nothing ? t("nothingToBill") : undefined} />
+      <FormError toastOnly message={state.error ? t("billFailed") : undefined} />
     </form>
   );
 }

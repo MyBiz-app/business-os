@@ -6,6 +6,7 @@ import { ApiError, unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
+import { Container } from "@/components/layout/container";
 import { PrintButton } from "@/components/print-button";
 
 /** A payment's receipt, laid out as a printable document. */
@@ -27,7 +28,7 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
   const amount = formatMoney(receipt.amount, receipt.currency, locale);
 
   return (
-    <main className="enter mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-10 print:max-w-none print:p-0">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link href={`/clients/${receipt.client_id}`} className="text-sm text-primary underline-offset-4 hover:underline">
           {t("back")}
@@ -105,6 +106,6 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
           <span>{t("thanks")}</span>
         </footer>
       </article>
-    </main>
+    </Container>
   );
 }

@@ -6,6 +6,7 @@ import { getApi } from "@/lib/api";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { reopenBusiness } from "./actions";
+import { Container } from "@/components/layout/container";
 
 /** Where people land in a business that was closed: its owner can reopen it for 90 days, anyone
  * else is told to ask the owner. Does not use getTenant (which sends closed businesses here). */
@@ -22,7 +23,7 @@ export default async function ClosedPage() {
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "long" });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 px-6 py-12">
+    <Container as="main" size="prose" className="enter flex max-w-xl flex-1 flex-col justify-center gap-6 py-12">
       <section aria-labelledby="closed-heading" className="flex flex-col gap-4 card p-6">
         <h1 id="closed-heading" className="text-2xl font-bold">
           {t("closedTitle")}
@@ -46,6 +47,6 @@ export default async function ClosedPage() {
           {t("signOut")}
         </button>
       </form>
-    </main>
+    </Container>
   );
 }

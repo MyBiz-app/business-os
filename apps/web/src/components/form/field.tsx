@@ -1,5 +1,7 @@
 import { useId } from "react";
 
+import { inputDir } from "@/lib/bidi";
+
 const CONTROL =
   "control w-full min-w-0 px-3 py-2";
 
@@ -16,7 +18,7 @@ export function Field({ label, hint, ...inputProps }: FieldProps) {
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <input id={id} aria-describedby={hintId} className={CONTROL} {...inputProps} />
+      <input id={id} aria-describedby={hintId} className={CONTROL} dir={inputDir(inputProps.type)} {...inputProps} />
       {hint && (
         <p id={hintId} className="text-xs text-muted">
           {hint}
@@ -35,7 +37,7 @@ export function TextAreaField({ label, ...textAreaProps }: TextAreaFieldProps) {
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <textarea id={id} rows={4} className={CONTROL} {...textAreaProps} />
+      <textarea id={id} rows={4} className={CONTROL} dir="auto" {...textAreaProps} />
     </div>
   );
 }

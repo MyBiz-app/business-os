@@ -2,6 +2,8 @@ import { FileSignature, Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -25,24 +27,26 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
   const canSell = tenant.permissions.includes("sales.manage");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="flex items-center gap-2 text-3xl font-bold">
-            <FileSignature aria-hidden="true" className="size-7 text-primary" />
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <FileSignature aria-hidden="true" className="size-8 shrink-0 text-primary" />
             {t("title")}
-          </h1>
-          <p className="text-sm text-muted">{t("subtitle")}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/events" className="btn-secondary px-4 py-2">{t("eventsLink")}</Link>
-          {canSell && (
-            <Link href="/quotes/new" className="btn-primary px-4 py-2">
-              <Plus aria-hidden="true" className="size-4" /> {t("new")}
-            </Link>
-          )}
-        </div>
-      </div>
+          </span>
+        }
+        description={t("subtitle")}
+        actions={
+          <>
+            <Link href="/events" className="btn-secondary px-4 py-2">{t("eventsLink")}</Link>
+            {canSell && (
+              <Link href="/quotes/new" className="btn-primary px-4 py-2">
+                <Plus aria-hidden="true" className="size-4" /> {t("new")}
+              </Link>
+            )}
+          </>
+        }
+      />
       <nav aria-label={t("filter")} className="flex flex-wrap gap-2">
         {FILTERS.map((f) => (
           <Link
@@ -80,6 +84,6 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
           ))}
         </ul>
       )}
-    </main>
+    </Container>
   );
 }

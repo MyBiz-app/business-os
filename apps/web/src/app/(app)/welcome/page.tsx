@@ -7,6 +7,7 @@ import { resumePath } from "@/lib/resume";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { SampleForm } from "./sample-form";
+import { Container } from "@/components/layout/container";
 
 /** Where a new account lands (decision T79): create the business now, or first explore a
  * sample business filled with fictitious data. People who already have a business go on,
@@ -23,7 +24,7 @@ export default async function WelcomePage({ searchParams }: PageProps<"/welcome"
   const t = await getTranslations("welcome");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 py-12 sm:px-6">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <div className="flex flex-col items-center gap-3 text-center">
         <span aria-hidden="true" className="flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-from to-brand-to text-white shadow-lg">
           <Sparkles className="size-7" />
@@ -55,6 +56,6 @@ export default async function WelcomePage({ searchParams }: PageProps<"/welcome"
           <SampleForm />
         </section>
       </div>
-    </main>
+    </Container>
   );
 }

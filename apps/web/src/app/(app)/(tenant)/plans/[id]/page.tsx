@@ -8,6 +8,8 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { deletePlan, updatePlan } from "../actions";
 import { PlanForm } from "../plan-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
   const { id } = await params;
@@ -17,11 +19,11 @@ export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
   if (!plan) notFound();
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/plans" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
-      <h1 className="text-3xl font-bold">{plan.name}</h1>
+      <PageHeader title={<bdi dir="auto">{plan.name}</bdi>} />
       <PlanForm
         action={updatePlan.bind(null, plan.id)}
         plan={plan}
@@ -32,6 +34,6 @@ export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
       {canDeleteCatalog(tenant) && (
         <ConfirmDelete action={deletePlan.bind(null, plan.id)} label={t("plans.delete")} confirm={t("plans.deleteConfirm", { name: plan.name })} />
       )}
-    </main>
+    </Container>
   );
 }

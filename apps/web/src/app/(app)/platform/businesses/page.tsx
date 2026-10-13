@@ -6,6 +6,8 @@ import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
 import { industryTexts } from "@/lib/verticals";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 const PAGE_SIZE = 25;
 const SORTS = ["newest", "name", "clients", "bookings", "ai"] as const;
@@ -48,13 +50,8 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
   const date = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "2-digit" });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 id="businesses-heading" className="text-3xl font-bold">
-          {t("platform.businessesTitle")}
-        </h1>
-        <p className="text-sm text-muted">{t("platform.subtitle")}</p>
-      </div>
+    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader titleId="businesses-heading" title={t("platform.businessesTitle")} description={t("platform.subtitle")} />
       <form role="search" className="flex flex-wrap items-end gap-3">
         <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-medium">
           {t("platform.list.search")}
@@ -124,6 +121,6 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
           {page < pages ? <Link href={pageHref(page + 1)} className="text-primary">{t("platform.list.next")}</Link> : <span />}
         </nav>
       )}
-    </main>
+    </Container>
   );
 }

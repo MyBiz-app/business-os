@@ -22,6 +22,8 @@ import { categories } from "@business-os/verticals";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
 import { BranchesMock } from "@/components/marketing/mocks";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { VerticalIcon } from "@/components/vertical-icon";
@@ -47,7 +49,7 @@ export const FEATURES = [
 export function SectionHeading({ eyebrow, title, subtitle, id, level = 2 }: { eyebrow?: string; title: string; subtitle?: string; id?: string; level?: 1 | 2 }) {
   const Heading = level === 1 ? "h1" : "h2";
   return (
-    <div className="mx-auto flex max-w-2xl flex-col items-center gap-3 text-center">
+    <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 text-center">
       {eyebrow && <p className="rounded-full bg-primary/10 px-3 py-1 text-sm font-semibold text-brand-ink">{eyebrow}</p>}
       <Heading id={id} className={level === 1 ? "text-4xl font-extrabold tracking-tight sm:text-5xl" : "text-3xl font-extrabold tracking-tight sm:text-5xl"}>
         {title}
@@ -62,13 +64,13 @@ export function SectionHeading({ eyebrow, title, subtitle, id, level = 2 }: { ey
 export async function FeatureGrid({ inFeaturesPage = false }: { inFeaturesPage?: boolean }) {
   const t = await getTranslations("marketing.features");
   return (
-    <section aria-labelledby="features-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
+    <Section aria-labelledby="features-heading" innerClassName="flex flex-col gap-10">
       <SectionHeading
         id="features-heading"
         title={inFeaturesPage ? t("gridTitle") : t("title")}
         subtitle={inFeaturesPage ? t("gridSubtitle") : t("subtitle")}
       />
-      <ul className="enter-items swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="enter-items swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
         {FEATURES.map(({ key, Icon }) => (
           <li key={key} className="card card-hover flex flex-col gap-3 p-6">
             <span className="icon-tile size-11">
@@ -79,7 +81,7 @@ export async function FeatureGrid({ inFeaturesPage = false }: { inFeaturesPage?:
           </li>
         ))}
       </ul>
-    </section>
+    </Section>
   );
 }
 
@@ -89,7 +91,7 @@ export async function IndustryCards() {
   const open = categories().filter((c) => c.status !== "planned");
   const soon = categories().filter((c) => c.status === "planned");
   return (
-    <section aria-labelledby="industries-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
+    <Section aria-labelledby="industries-heading" innerClassName="flex flex-col gap-10">
       <SectionHeading id="industries-heading" title={t("title")} subtitle={t("subtitle")} />
       <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
         {open.map(({ key, icon, color }) => (
@@ -140,7 +142,7 @@ export async function IndustryCards() {
           </li>
         )}
       </ul>
-    </section>
+    </Section>
   );
 }
 
@@ -148,9 +150,9 @@ export async function Faq() {
   const t = await getTranslations("marketing.faq");
   const items = t.raw("items") as { q: string; a: string }[];
   return (
-    <section aria-labelledby="faq-heading" className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-6 py-20">
+    <Section aria-labelledby="faq-heading" innerClassName="flex flex-col gap-8">
       <SectionHeading id="faq-heading" title={t("title")} />
-      <div className="flex flex-col gap-3">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
         {items.map((item) => (
           <details key={item.q} className="card group p-5 open:shadow-md">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
@@ -163,15 +165,15 @@ export async function Faq() {
           </details>
         ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
 export async function CtaBand() {
   const t = await getTranslations("marketing.cta");
   return (
-    <section className="px-6 pb-24 pt-8">
-      <div className="relative isolate mx-auto flex max-w-5xl flex-col items-center gap-5 overflow-hidden rounded-[2rem] bg-navy px-6 py-16 text-center text-white shadow-2xl">
+    <Section tone="inverse" spacing="loose" className="relative isolate overflow-hidden" innerClassName="flex flex-col items-center gap-5 text-center">
+        <div aria-hidden="true" className="mk-grid pointer-events-none absolute inset-0 -z-10" />
         <div aria-hidden="true" className="pointer-events-none absolute -top-24 start-[15%] -z-10 size-72 rounded-full bg-primary/50 blur-[90px]" />
         <div aria-hidden="true" className="pointer-events-none absolute -bottom-24 end-[15%] -z-10 size-72 rounded-full bg-electric/30 blur-[90px]" />
         <h2 className="text-3xl font-extrabold tracking-tight sm:text-5xl">{t("title")}</h2>
@@ -184,8 +186,7 @@ export async function CtaBand() {
             {t("contact")}
           </Link>
         </div>
-      </div>
-    </section>
+    </Section>
   );
 }
 
@@ -193,8 +194,8 @@ export async function CtaBand() {
 export async function BranchesSection() {
   const t = await getTranslations("marketing.branches");
   return (
-    <section aria-labelledby="branches-heading" className="bg-surface py-24">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 lg:grid-cols-2">
+    <Section tone="surface" aria-labelledby="branches-heading" innerClassName="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+      <>
         <div className="flex flex-col gap-5">
           <p className="text-sm font-semibold text-primary">{t("eyebrow")}</p>
           <h2 id="branches-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -211,8 +212,8 @@ export async function BranchesSection() {
           </ul>
         </div>
         <BranchesMock />
-      </div>
-    </section>
+      </>
+    </Section>
   );
 }
 
@@ -223,7 +224,7 @@ export async function AddOnsStrip() {
   const t = await getTranslations("marketing.addOns");
   const tModules = await getTranslations("modules");
   return (
-    <section aria-labelledby="add-ons-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-16">
+    <Section aria-labelledby="add-ons-heading" spacing="compact" innerClassName="flex flex-col gap-8">
       <SectionHeading id="add-ons-heading" title={t("title")} subtitle={t("subtitle")} />
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {ADD_ONS.map((key) => (
@@ -237,7 +238,7 @@ export async function AddOnsStrip() {
         {t("cta")}
         <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
       </Link>
-    </section>
+    </Section>
   );
 }
 
@@ -252,7 +253,7 @@ const SAFETY = [
 export async function SafetySection() {
   const t = await getTranslations("marketing.safety");
   return (
-    <section aria-labelledby="safety-heading" className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-20">
+    <Section aria-labelledby="safety-heading" innerClassName="flex flex-col gap-10">
       <SectionHeading id="safety-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {SAFETY.map(({ key, Icon }) => (
@@ -265,7 +266,7 @@ export async function SafetySection() {
           </li>
         ))}
       </ul>
-    </section>
+    </Section>
   );
 }
 
@@ -277,12 +278,12 @@ export function PageHero({ eyebrow, title, subtitle, children }: { eyebrow?: str
       <div aria-hidden="true" className="mk-grid pointer-events-none absolute inset-0 -z-10" />
       <div aria-hidden="true" className="pointer-events-none absolute -top-40 start-[15%] -z-10 size-[28rem] rounded-full bg-primary/35 blur-[120px]" />
       <div aria-hidden="true" className="pointer-events-none absolute -bottom-48 end-[10%] -z-10 size-[24rem] rounded-full bg-electric/20 blur-[120px]" />
-      <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-6 py-16 text-center sm:py-20">
+      <Container className="flex flex-col items-center gap-4 py-16 text-center sm:py-20 lg:py-24">
         {eyebrow && <p className="rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-sm font-medium text-white/85">{eyebrow}</p>}
         <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">{title}</h1>
-        {subtitle && <p className="text-lg leading-relaxed text-white/75 sm:text-xl">{subtitle}</p>}
+        {subtitle && <p className="max-w-3xl text-lg leading-relaxed text-white/75 sm:text-xl">{subtitle}</p>}
         {children}
-      </div>
+    </Container>
     </section>
   );
 }

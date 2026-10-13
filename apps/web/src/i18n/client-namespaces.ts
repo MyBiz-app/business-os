@@ -10,6 +10,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "auth",
     "business",
     "clientFields",
+    "common",
     "locales",
     "marketing",
     "modules",
@@ -22,6 +23,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "accessibility",
     "appearance",
     "auth",
+    "common",
     "locales",
     "settings"
   ],

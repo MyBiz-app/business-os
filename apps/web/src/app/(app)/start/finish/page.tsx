@@ -12,6 +12,7 @@ import { industryTexts } from "@/lib/verticals";
 
 import { FinishForm } from "./finish-form";
 import { isolate } from "@/lib/bidi";
+import { Container } from "@/components/layout/container";
 
 type Catalog = components["schemas"]["Catalog"];
 
@@ -40,7 +41,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
 
   if (!plan || !catalog) {
     return (
-      <main className="enter mx-auto flex max-w-xl flex-col items-center gap-4 px-6 py-24 text-center">
+      <Container as="main" size="prose" className="enter flex max-w-xl flex-col items-center gap-4 py-24 text-center">
         <h1 className="text-2xl font-bold">{t("finish.title")}</h1>
         <p className="text-muted">{t(plan ? "finish.errors.generic" : "finish.invalid")}</p>
         <Link href="/start" className="btn-primary px-5 py-3">
@@ -49,7 +50,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
         <Link href="/welcome?fresh=1" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
           {t("finish.later")}
         </Link>
-      </main>
+      </Container>
     );
   }
 
@@ -58,7 +59,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
   const trialEnds = new Date(`${trialEndsOn()}T12:00:00`).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 
   return (
-    <main className="mx-auto grid w-full max-w-5xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1fr_20rem]">
+    <Container as="main" size="default" className="grid gap-8 py-8 sm:py-10 lg:grid-cols-[1fr_20rem]">
       <section aria-labelledby="finish-heading" className="enter flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <h1 id="finish-heading" className="text-3xl font-extrabold tracking-tight">
@@ -111,6 +112,6 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
           {t("summary.edit")}
         </Link>
       </aside>
-    </main>
+    </Container>
   );
 }

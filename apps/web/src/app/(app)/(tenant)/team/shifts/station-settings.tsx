@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 
 import { deleteStation, renameStation, saveStation, type StationState } from "./actions";
+import { ToastOnChange } from "@/components/toast/toaster";
 
 type Branch = { id: string; name: string; color: string; stations: { id: string; name: string }[] };
 
@@ -84,7 +85,7 @@ function StationBranch({ branch }: { branch: Branch }) {
           {t("stations.add")}
         </button>
       </form>
-      <p role="status" className="text-xs text-danger">{message}</p>
+      <ToastOnChange source={state} tone="error" message={message || undefined} />
     </li>
   );
 }

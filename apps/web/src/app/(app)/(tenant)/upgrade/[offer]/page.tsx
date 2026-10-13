@@ -14,6 +14,9 @@ import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 import { hasUpgrade, isUpgrade, UPGRADES } from "@/lib/upgrades";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+
 import { addToPlan } from "./actions";
 
 export async function generateMetadata({ params }: PageProps<"/upgrade/[offer]">): Promise<Metadata> {
@@ -68,15 +71,13 @@ export default async function UpgradePage({ params }: PageProps<"/upgrade/[offer
   );
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-10">
-      <div className="flex flex-col items-start gap-3">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+      <div className="flex flex-col items-start gap-4">
         <p className="flex items-center gap-1.5 rounded-full bg-foreground/5 px-3 py-1 text-sm font-semibold text-muted">
           <Lock aria-hidden="true" className="size-3.5" />
           {t("notInPlan")}
         </p>
-        <p className="text-sm font-semibold text-primary">{tOffers(`${offer}.eyebrow`)}</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">{tOffers(`${offer}.title`)}</h1>
-        <p className="max-w-2xl text-lg text-muted">{tOffers(`${offer}.text`)}</p>
+        <PageHeader eyebrow={tOffers(`${offer}.eyebrow`)} title={tOffers(`${offer}.title`)} description={tOffers(`${offer}.text`)} />
       </div>
 
       <div className="grid items-start gap-8 lg:grid-cols-2">
@@ -163,6 +164,6 @@ export default async function UpgradePage({ params }: PageProps<"/upgrade/[offer
           </div>
         </figure>
       </div>
-    </main>
+    </Container>
   );
 }

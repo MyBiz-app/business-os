@@ -6,6 +6,8 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { createService } from "../actions";
 import { ServiceForm } from "../service-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function NewServicePage() {
   const t = await getTranslations();
@@ -13,9 +15,9 @@ export default async function NewServicePage() {
   if (!canWriteCatalog(tenant)) redirect("/services");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
-      <h1 className="text-3xl font-bold">{t("services.new")}</h1>
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader title={t("services.new")} />
       <ServiceForm action={createService} currency={tenant.currency} submitLabel={t("common.create")} />
-    </main>
+    </Container>
   );
 }

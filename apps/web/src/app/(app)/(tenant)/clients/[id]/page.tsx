@@ -21,6 +21,8 @@ import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
+import { UserText } from "@/components/bidi";
+import { Container } from "@/components/layout/container";
 import { QuotesSection } from "./quotes-section";
 import { DocumentsSection, TimeSection } from "./work-section";
 import { MessagesSection } from "../../messages/messages-section";
@@ -133,7 +135,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const whatsapp = client.phone ? whatsappLink(client.phone, tenant.time_zone) : null;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/clients" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
@@ -144,7 +146,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
             <Avatar id={client.id} name={name} size="lg" />
             <div className="flex min-w-0 flex-col gap-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="truncate text-3xl font-bold">{name}</h1>
+                <h1 dir="auto" className="truncate text-3xl font-extrabold tracking-tight">{name}</h1>
                 <StatusBadge status={client.status} />
               </div>
               <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
@@ -152,7 +154,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
                 {home && (
                   <span className="flex items-center gap-1">
                     <MapPin aria-hidden="true" className="size-3.5" />
-                    {home.name}
+                    <UserText>{home.name}</UserText>
                   </span>
                 )}
               </p>
@@ -285,6 +287,6 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           {!erased && tenant.permissions.includes("clients.privacy") && <PrivacySection clientId={client.id} name={name} />}
         </div>
       </div>
-    </main>
+    </Container>
   );
 }

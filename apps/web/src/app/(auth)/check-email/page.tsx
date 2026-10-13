@@ -1,5 +1,9 @@
+import { MailCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+
+import { AuthHeading } from "@/components/auth/auth-shell";
+import { isolate } from "@/lib/bidi";
 
 export default async function CheckEmailPage({ searchParams }: PageProps<"/check-email">) {
   const t = await getTranslations("auth.checkEmail");
@@ -8,8 +12,9 @@ export default async function CheckEmailPage({ searchParams }: PageProps<"/check
 
   return (
     <>
-      <h1 className="text-3xl font-extrabold tracking-tight">{t("title")}</h1>
-      <p>{t("body", { email: typeof email === "string" ? email : "" })}</p>
+      <AuthHeading title={t("title")} icon={<MailCheck className="size-6" />} />
+      <p>{t("body", { email: isolate(typeof email === "string" ? email : "") })}</p>
+      <p className="text-sm text-muted">{t("hint")}</p>
       {devMailbox && (
         <p className="rounded-xl border border-border bg-surface px-3 py-2 text-sm">
           {t("devMailbox")}:{" "}
@@ -18,7 +23,7 @@ export default async function CheckEmailPage({ searchParams }: PageProps<"/check
           </a>
         </p>
       )}
-      <Link href="/login" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/login" className="btn-secondary px-4 py-2.5 text-center">
         {t("backToLogin")}
       </Link>
     </>
