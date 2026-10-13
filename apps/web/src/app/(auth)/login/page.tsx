@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { AuthHeading } from "@/components/auth/auth-shell";
 import { OAuthButtons } from "@/components/auth/oauth-buttons";
 import { safeNext } from "@/lib/navigation";
 
@@ -13,7 +14,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
 
   return (
     <>
-      <h1 className="text-3xl font-extrabold tracking-tight">{t("login.title")}</h1>
+      <AuthHeading title={t("login.title")} subtitle={t("login.subtitle")} />
       <OAuthButtons next={nextPath} />
       <LoginForm initialError={error === "link_invalid" ? "link_invalid" : undefined} next={nextPath} />
       <p className="text-sm text-muted">
