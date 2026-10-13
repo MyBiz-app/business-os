@@ -35,7 +35,14 @@ export function SignInScreen() {
     setError(null);
     const { error: failed } = await supabase.auth.signInWithOtp({ email: address, options: { shouldCreateUser: true } });
     setBusy(false);
-    if (failed) return setError(failed.status === 429 ? t("tooMany") : t("generic"));
+    if (failed) {
+      // Name the known causes; only an unknown failure is generic (with its code, so it can be traced).
+      const code = (failed as { code?: string }).code;
+      if (failed.status === 429 || code === "over_email_send_rate_limit") return setError(t("tooMany"));
+      if (code === "signup_disabled" || code === "otp_disabled") return setError(t("unknownEmail"));
+      if (code === "email_address_not_authorized") return setError(t("emailNotAllowed"));
+      return setError(t("genericWithCode", { code: code ?? String(failed.status ?? "network") }));
+    }
     setSentTo(address);
     setCode("");
   };
