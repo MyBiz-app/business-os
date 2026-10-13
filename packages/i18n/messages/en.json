@@ -956,7 +956,10 @@
         "email": "Email",
         "sms": "SMS",
         "whatsapp": "WhatsApp"
-      }
+      },
+      "unknownEmail": "We don't recognise this email address. Check it, or ask the business to add you.",
+      "emailNotAllowed": "We can't send email to this address yet. Try another address or contact support.",
+      "genericWithCode": "Something went wrong sending the code ({code}). Try again."
     },
     "join": {
       "title": "Join a business",
@@ -2481,6 +2484,9 @@
     "cancel": "Cancel",
     "search": "Search",
     "filter": "Filter",
+    "stageFilter": "Stages",
+    "allStages": "All stages",
+    "stagesShown": "{shown} of {total} stages",
     "allSources": "All sources",
     "emptyStage": "No leads here",
     "due": "Follow up today",

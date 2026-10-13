@@ -14,6 +14,7 @@ import { canWriteClients } from "@/lib/permissions";
 import { getCrm } from "./crm";
 import { CopyLink } from "./copy-link";
 import { SOURCES } from "./sources";
+import { StageFilter } from "./stage-filter";
 
 type Lead = components["schemas"]["Lead"];
 type Stage = Lead["stage"];
@@ -36,6 +37,9 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   const params = await searchParams;
   const search = typeof params.q === "string" ? params.q : "";
   const source = SOURCES.find((s) => s === params.source);
+  // Which pipeline columns to show: none chosen (or all) means every column.
+  const chosen = (Array.isArray(params.stage) ? params.stage : [params.stage]).filter((s): s is Stage => STAGES.includes(s as Stage));
+  const shownStages = chosen.length > 0 ? STAGES.filter((s) => chosen.includes(s)) : STAGES;
 
   // "Show more" asks for one more page of leads: page `pages` is fetched along with those before it.
   const pages = Math.min(MAX_PAGES, Math.max(1, Number(params.pages) || 1));
@@ -53,6 +57,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
     const query = new URLSearchParams();
     if (search) query.set("q", search);
     if (source) query.set("source", source);
+    if (chosen.length > 0) for (const stage of chosen) query.append("stage", stage);
     query.set("pages", String(pages + 1));
     return `/leads?${query}`;
   })();
@@ -119,6 +124,13 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
               ))}
             </select>
           </label>
+          <StageFilter
+            stages={STAGES.map((value) => ({ value, label: t(`stages.${value}`) }))}
+            selected={shownStages}
+            label={t("stageFilter")}
+            allLabel={t("allStages")}
+            countLabel={t("stagesShown", { shown: shownStages.length, total: STAGES.length })}
+          />
           <button type="submit" className="btn-secondary px-4 py-2">
             {t("filter")}
           </button>
@@ -139,8 +151,8 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
 
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
       <div role="region" aria-label={t("pipeline")} tabIndex={0} className="overflow-x-auto pb-2">
-        <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:min-w-[58rem] lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-6">
-          {STAGES.map((stage) => {
+        <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:auto-cols-fr">
+          {shownStages.map((stage) => {
             const leads = board.items.filter((lead) => lead.stage === stage);
             const headingId = `stage-${stage}`;
             return (
