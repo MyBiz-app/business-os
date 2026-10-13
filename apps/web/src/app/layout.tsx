@@ -7,6 +7,7 @@ import { clientMessages } from "@/components/scoped-messages";
 import { PaletteScript } from "@/components/palette-script";
 import { SkipLink } from "@/components/skip-link";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/toast/toaster";
 import { localeDirection } from "@/i18n/config";
 import { NONCE_HEADER } from "@/lib/csp";
 import { displayFont, mainFont } from "./fonts";
@@ -38,7 +39,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeProvider nonce={nonce}>
           <NextIntlClientProvider messages={messages}>
             <SkipLink />
-            {children}
+            <Toaster>{children}</Toaster>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

@@ -3,6 +3,7 @@ import { signOut } from "@/app/(auth)/actions";
 import { AppHeader } from "@/components/app-header";
 import { avatarSrc } from "@/components/avatar";
 import { PaletteSync } from "@/components/palette";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
 import { getActiveMembership } from "@/lib/tenant";
 
@@ -14,6 +15,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     <div className="flex flex-1 flex-col">
       <PaletteSync palette={me.palette ?? null} colors={me.palette_colors ?? null} />
       <AppHeader>
+        <ThemeToggle />
         <UserMenu
           id={me.id}
           name={me.full_name || me.email}

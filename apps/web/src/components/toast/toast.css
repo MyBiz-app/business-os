@@ -1,0 +1,112 @@
+/* Toasts: confirmations and errors that stay in view wherever the page is scrolled. Built on the
+ * shared colour tokens, so light and dark mode follow the theme. */
+.toaster {
+  position: fixed;
+  inset: auto 0 0 0;
+  margin: 0;
+  padding: 0 1rem max(1rem, env(safe-area-inset-bottom));
+  width: auto;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+/* On a phone, sit above the accessibility button in the corner. */
+@media (max-width: 40rem) {
+  .toaster {
+    padding-bottom: max(4.75rem, env(safe-area-inset-bottom));
+  }
+}
+.toaster:not(:popover-open) {
+  display: none;
+}
+.toast {
+  --toast-tone: var(--success);
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: min(100%, 26rem);
+  padding: 0.75rem 0.75rem 0.75rem 1rem;
+  padding-inline: 1rem 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--toast-tone) 35%, var(--border));
+  border-inline-start: 4px solid var(--toast-tone);
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--toast-tone) 6%, var(--background));
+  color: var(--foreground);
+  box-shadow: 0 10px 30px -8px rgb(17 24 39 / 0.28), 0 2px 6px rgb(17 24 39 / 0.1);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  animation: toast-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.toast[data-tone="error"] {
+  --toast-tone: var(--danger);
+}
+.toast[data-leaving="true"] {
+  animation: toast-out 0.18s ease-in forwards;
+}
+.toast-icon {
+  flex: none;
+  margin-top: 0.0625rem;
+  color: var(--toast-tone);
+}
+.toast-message {
+  flex: 1;
+  min-width: 0;
+  padding-block: 0.0625rem;
+  overflow-wrap: anywhere;
+}
+.toast-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.toast-close:hover {
+  background: color-mix(in oklab, var(--foreground) 8%, transparent);
+  color: var(--foreground);
+}
+.toast-bar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--toast-tone);
+  opacity: 0.55;
+  transform-origin: left center;
+  animation: toast-bar var(--toast-ms) linear forwards;
+}
+[dir="rtl"] .toast-bar {
+  transform-origin: right center;
+}
+.toast:hover .toast-bar,
+.toast:focus-within .toast-bar {
+  animation-play-state: paused;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(1rem) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(0.5rem) scale(0.97); }
+}
+@keyframes toast-bar {
+  to { transform: scaleX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast, .toast[data-leaving="true"] { animation: none; }
+  .toast-bar { display: none; }
+}

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { type DefaultViewState, saveShiftsDefault } from "./actions";
+import { FormError, FormNotice } from "@/components/form/form-message";
 
 /** Owners: keeps the current view, range and branches as the way the shifts board opens. */
 export function SaveShiftsDefault({ view, range, branches }: { view: "people" | "branches"; range: "day" | "week" | "month" | "custom"; branches: string[] }) {
@@ -17,16 +18,8 @@ export function SaveShiftsDefault({ view, range, branches }: { view: "people" | 
         <Bookmark aria-hidden="true" className="size-4" />
         {t("saveDefault")}
       </button>
-      {state.saved && (
-        <span role="status" className="text-sm text-muted">
-          {t("defaultSaved")}
-        </span>
-      )}
-      {state.error && (
-        <span role="alert" className="text-sm text-danger">
-          {t("defaultError")}
-        </span>
-      )}
+      <FormNotice message={state.saved ? t("defaultSaved") : undefined} />
+      <FormError toastOnly message={state.error ? t("defaultError") : undefined} />
     </form>
   );
 }

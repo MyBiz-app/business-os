@@ -23,36 +23,42 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
 
   // Only what the user's permissions let them open.
   const allowed = (permission: string) => tenant.permissions.includes(permission);
+  const order = ["overview", "work", "clients", "catalog", "money", "business"] as const;
+  const g = (key: (typeof order)[number]) => t(`nav.groups.${key}`);
   const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
-    { href: "/dashboard", label: t("nav.dashboard"), icon: "dashboard" },
-    { href: "/reports", label: t("nav.reports"), icon: "reports", permission: "reports.read" },
-    { href: "/assistant", label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
-    { href: "/schedule", label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
-    ...(rents ? [{ href: "/resources", label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
-    { href: "/clients", label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
-    { href: "/clients/join", label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
-    { href: "/leads", label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
-    { href: "/messages", label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
-    { href: "/services", label: t("nav.services"), icon: "services", permission: "catalog.read" },
-    { href: "/plans", label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
-    { href: "/quotes", label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
+    { href: "/dashboard", group: g("overview"), label: t("nav.dashboard"), icon: "dashboard" },
+    { href: "/reports", group: g("overview"), label: t("nav.reports"), icon: "reports", permission: "reports.read" },
+    { href: "/assistant", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
+    { href: "/schedule", group: g("work"), label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
+    ...(rents ? [{ href: "/resources", group: g("work"), label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
+    { href: "/clients", group: g("clients"), label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },
+    { href: "/clients/join", group: g("clients"), label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
+    { href: "/leads", group: g("clients"), label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
+    { href: "/messages", group: g("clients"), label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
+    { href: "/services", group: g("catalog"), label: t("nav.services"), icon: "services", permission: "catalog.read" },
+    { href: "/plans", group: g("catalog"), label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
+    { href: "/quotes", group: g("money"), label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
     ...(vertical(tenant.vertical)?.timeBilling
       ? [
-          { href: "/time", label: t("nav.time"), icon: "time" as const, permission: "clients.read" },
-          { href: "/bills", label: t("nav.billingRun"), icon: "billing" as const, permission: "sales.manage" },
+          { href: "/time", group: g("work"), label: t("nav.time"), icon: "time" as const, permission: "clients.read" },
+          { href: "/bills", group: g("money"), label: t("nav.billingRun"), icon: "billing" as const, permission: "sales.manage" },
         ]
       : []),
-    { href: "/sales", label: t("nav.sales"), icon: "sales", permission: "reports.read" },
-    { href: "/locations", label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
+    { href: "/sales", group: g("money"), label: t("nav.sales"), icon: "sales", permission: "reports.read" },
+    { href: "/locations", group: g("business"), label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
   ];
   // Modules the business doesn't have stay in the menu, locked, and open a preview.
   const items: NavItem[] = candidates
     .filter((item) => !item.permission || allowed(item.permission))
-    .map(({ href, label, icon, upgrade }) =>
-      upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, locked: true } : { href, label, icon },
+    .map(({ href, label, icon, upgrade, group }) =>
+      upgrade && !hasUpgrade(tenant.modules, upgrade) ? { href: `/upgrade/${upgrade}`, label, icon, group, locked: true } : { href, label, icon, group },
     );
-  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team" });
-  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings" });
+  if (canManageTeam(tenant)) items.push({ href: "/team", label: t("nav.team"), icon: "team", group: g("business") });
+  if (canManageSettings(tenant)) items.push({ href: "/settings", label: t("nav.settings"), icon: "settings", group: g("business") });
+
+  // Items of one section sit together (the sort is stable, so the order inside a section stays).
+  const rank = (item: NavItem) => order.findIndex((key) => g(key) === item.group);
+  items.sort((a, b) => rank(a) - rank(b));
 
   // The business's brand color replaces the product color inside its own area.
   return (
