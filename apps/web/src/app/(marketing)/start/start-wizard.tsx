@@ -684,13 +684,15 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
 
         {/* Back and Continue: a floating bar at the bottom of the steps on wide screens (on phones
             they sit in the bar with the plan, so they are always within reach). */}
-        <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-3 rounded-2xl bg-surface/90 p-3 shadow-lg ring-1 ring-border backdrop-blur lg:flex">
-          {backButton ?? <span />}
-          {stepIndex > 0 && step !== "summary" && (
-            <p className="hidden text-sm text-muted xl:block">{t("progress.step", { step: stepIndex + 1, total: steps.length })}</p>
-          )}
-          {forwardButton}
-        </div>
+        {(backButton || forwardButton) && (
+          <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-3 rounded-2xl bg-surface/90 p-3 shadow-lg ring-1 ring-border backdrop-blur lg:flex">
+            {backButton ?? <span />}
+            {stepIndex > 0 && step !== "summary" && (
+              <p className="hidden text-sm text-muted xl:block">{t("progress.step", { step: stepIndex + 1, total: steps.length })}</p>
+            )}
+            {forwardButton}
+          </div>
+        )}
         {step === "summary" && !signedIn && (
           <p className="text-sm text-muted lg:text-end">
             {t("summary.haveAccount")}{" "}
