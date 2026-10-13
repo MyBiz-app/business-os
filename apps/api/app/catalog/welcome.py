@@ -2,11 +2,11 @@
 business's join code, the first steps and the links they need. Text from app/messages
 (email.welcome); the HTML is a simple, email-client-safe layout (tables, inline styles)."""
 
-import html
 from dataclasses import dataclass
 from datetime import date
 
 from app.commerce.modules import CORE_TIERS, quote
+from app.messaging import email_layout as layout
 from app.messaging.email import Email, load_all_messages
 
 
@@ -100,61 +100,36 @@ def build_welcome(details: WelcomeDetails) -> Email:
         ]
     )
 
-    e = html.escape
-    direction = "rtl" if locale == "he" else "ltr"
-    align = "right" if locale == "he" else "left"
-    far = "left" if locale == "he" else "right"
-    rows = "".join(
-        f'<tr><td style="padding:8px 0;border-bottom:1px solid #eceef5">{e(label)}</td>'
-        f'<td style="padding:8px 0;border-bottom:1px solid #eceef5;text-align:{far};'
-        f'white-space:nowrap">{e(money(amount))}</td></tr>'
-        for label, amount in lines
+    lang = locale if locale in ("he", "en") else "he"
+    parts = [
+        layout.title(subject, lang),
+        layout.paragraph(t["hello"], lang),
+        layout.paragraph(_fill(t["intro"], business=details.business), lang),
+        layout.subheading(t["planTitle"], lang),
+        layout.rows(
+            [(label, money(amount)) for label, amount in lines]
+            + [(t["total"], money(priced.total))],
+            lang,
+        ),
+        layout.paragraph(trial, lang, muted=True),
+    ]
+    if details.simulated:
+        parts.append(layout.paragraph(t["simulated"], lang, muted=True))
+    parts += [
+        layout.subheading(t["joinTitle"], lang),
+        layout.code_box(layout.e(details.join_code)),
+        layout.paragraph(t["joinText"], lang, muted=True),
+        layout.subheading(t["stepsTitle"], lang),
+        layout.steps(list(t["steps"]), lang),
+        "".join(layout.button(label, url, primary=i == 0) for i, (label, url) in enumerate(links)),
+        layout.paragraph(_fill(t["help"], contact=contact), lang, muted=True),
+        layout.text_block(t["signature"], lang),
+    ]
+    body = layout.shell(
+        [layout.Section(lang, "".join(parts))],
+        subject=subject,
+        preheader=t["preheader"],
+        brand=layout.BRAND,
+        footer=[(lang, layout.BRAND)],
     )
-    steps = "".join(f'<li style="margin:0 0 6px">{e(step)}</li>' for step in t["steps"])
-    buttons = "".join(
-        f'<a href="{e(url)}" style="display:inline-block;margin:4px;padding:12px 18px;'
-        f"border-radius:12px;text-decoration:none;font-weight:700;"
-        f'{"background:#4f46e5;color:#ffffff" if i == 0 else "background:#eef0ff;color:#3730a3"}">'
-        f"{e(label)}</a>"
-        for i, (label, url) in enumerate(links)
-    )
-    simulated = (
-        f'<p style="margin:8px 0 0;font-size:13px;color:#92400e">{e(t["simulated"])}</p>'
-        if details.simulated
-        else ""
-    )
-    signature = "<br>".join(e(line) for line in t["signature"].split("\n"))
-    body = f"""<!doctype html>
-<html lang="{locale}" dir="{direction}"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>{e(subject)}</title></head>
-<body style="margin:0;background:#f4f5fb;font-family:Arial,Helvetica,sans-serif;color:#18181b">
-<span style="display:none;max-height:0;overflow:hidden">{e(t["preheader"])}</span>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f5fb">
-<tr><td align="center" style="padding:24px 12px">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-  style="max-width:560px;background:#ffffff;border-radius:20px;overflow:hidden;text-align:{align}" dir="{direction}">
-<tr><td style="background:linear-gradient(135deg,#4f46e5,#c026d3);background-color:#4f46e5;padding:28px 28px 24px;color:#ffffff">
-<div style="font-size:15px;font-weight:700;opacity:.9">MyBiz</div>
-<div style="font-size:26px;font-weight:800;margin-top:8px">{e(subject)}</div>
-</td></tr>
-<tr><td style="padding:24px 28px;font-size:15px;line-height:1.6">
-<p style="margin:0 0 12px">{e(t["hello"])}</p>
-<p style="margin:0 0 20px">{e(_fill(t["intro"], business=details.business))}</p>
-<h2 style="font-size:17px;margin:0 0 8px">{e(t["planTitle"])}</h2>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px">{rows}
-<tr><td style="padding:10px 0;font-weight:800">{e(t["total"])}</td>
-<td style="padding:10px 0;font-weight:800;text-align:{far};white-space:nowrap">{e(money(priced.total))}</td></tr>
-</table>
-<p style="margin:8px 0 0;font-size:14px;color:#52525b">{e(trial)}</p>{simulated}
-<div style="margin:22px 0;padding:16px;border-radius:14px;background:#f4f5fb;text-align:center">
-<div style="font-size:13px;color:#52525b">{e(t["joinTitle"])}</div>
-<div style="font-size:30px;font-weight:800;letter-spacing:6px;direction:ltr">{e(details.join_code)}</div>
-<div style="font-size:13px;color:#52525b">{e(t["joinText"])}</div>
-</div>
-<h2 style="font-size:17px;margin:0 0 8px">{e(t["stepsTitle"])}</h2>
-<ol style="margin:0 0 20px;padding-{align}:20px">{steps}</ol>
-<div style="text-align:center;margin:8px 0 20px">{buttons}</div>
-<p style="margin:0 0 16px;font-size:14px;color:#52525b">{e(_fill(t["help"], contact=contact))}</p>
-<p style="margin:0">{signature}</p>
-</td></tr></table></td></tr></table></body></html>"""
     return Email(to=details.to, subject=subject, text=text, html=body)

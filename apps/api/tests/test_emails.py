@@ -114,3 +114,12 @@ def test_gmail_sender_signs_in_with_the_from_address(monkeypatch) -> None:
     message = sender.message(Email(to="dana@example.com", subject="שלום", text="שורה 1\nשורה 2"))
     assert message["From"] == "MyBiz <studio.mybiz@gmail.com>"
     assert "שורה 1<br>שורה 2" in message.get_body(("html",)).get_content()
+
+
+def test_text_emails_use_the_designed_layout_in_their_language() -> None:
+    from app.messaging.email import _html
+
+    he = _html(Email(to="a@b.c", subject="תור <חדש>", text="שלום דנה\n\nהתור אושר", locale="he"))
+    assert 'dir="rtl"' in he and "&lt;חדש&gt;" in he and "<חדש>" not in he and "MyBiz" in he
+    en = _html(Email(to="a@b.c", subject="Booked", text="Hi Dana\n\nConfirmed", locale="en"))
+    assert 'lang="en"' in en and 'dir="ltr"' in en and "prefers-color-scheme" in en
