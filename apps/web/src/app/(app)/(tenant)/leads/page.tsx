@@ -34,6 +34,8 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   const params = await searchParams;
   const search = typeof params.q === "string" ? params.q : "";
   const source = SOURCES.find((s) => s === params.source);
+  const stageFilter = STAGES.find((s) => s === params.stage);
+  const shownStages = stageFilter ? [stageFilter] : STAGES;
 
   // "Show more" asks for one more page of leads: page `pages` is fetched along with those before it.
   const pages = Math.min(MAX_PAGES, Math.max(1, Number(params.pages) || 1));
@@ -51,6 +53,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
     const query = new URLSearchParams();
     if (search) query.set("q", search);
     if (source) query.set("source", source);
+    if (stageFilter) query.set("stage", stageFilter);
     query.set("pages", String(pages + 1));
     return `/leads?${query}`;
   })();
@@ -115,6 +118,17 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
               ))}
             </select>
           </label>
+          <label className="flex flex-col gap-1.5 text-sm font-medium">
+            {t("stage")}
+            <select name="stage" defaultValue={stageFilter ?? ""} className="control px-3 py-2 font-normal">
+              <option value="">{t("allStages")}</option>
+              {STAGES.map((value) => (
+                <option key={value} value={value}>
+                  {t(`stages.${value}`)}
+                </option>
+              ))}
+            </select>
+          </label>
           <button type="submit" className="btn-secondary px-4 py-2">
             {t("filter")}
           </button>
@@ -136,7 +150,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
       <div role="region" aria-label={t("pipeline")} tabIndex={0} className="-mx-6 overflow-x-auto px-6 pb-2">
         <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:min-w-[58rem] lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-6">
-          {STAGES.map((stage) => {
+          {shownStages.map((stage) => {
             const leads = board.items.filter((lead) => lead.stage === stage);
             const headingId = `stage-${stage}`;
             return (
