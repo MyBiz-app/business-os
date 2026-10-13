@@ -12,6 +12,8 @@ import { toBlocks, weekStartFor } from "@/lib/hours";
 import { removeTimeOff, saveHours } from "./actions";
 import { TimeOffForm } from "./time-off";
 import { isolate } from "@/lib/bidi";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function StaffHoursPage({ params }: PageProps<"/team/[userId]/hours">) {
   const { userId } = await params;
@@ -29,16 +31,11 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
   const weekStartsOn = weekStartFor(tenant.locale);
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/team" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("hours.title")}</h1>
-        <p className="text-muted">
-          {t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })}
-        </p>
-      </div>
+      <PageHeader title={t("hours.title")} description={t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })} />
       <section className="card p-6">
         <HoursForm save={saveHours.bind(null, userId)} weekStartsOn={weekStartsOn} initial={toBlocks(hours.blocks)} />
       </section>
@@ -69,6 +66,6 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
         )}
         <TimeOffForm userId={userId} today={todayIn(tenant.time_zone)} />
       </section>
-    </main>
+    </Container>
   );
 }

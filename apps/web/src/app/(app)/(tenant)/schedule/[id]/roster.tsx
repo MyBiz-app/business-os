@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import type { getTenant } from "@/lib/tenant";
 import { Pill, type Tone } from "@/components/pill";
+import { ToastOnChange } from "@/components/toast/toaster";
 import { unwrap } from "@/lib/api";
 
 import { HEALTH_TONE } from "../../clients/[id]/health-section";
@@ -162,6 +163,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           {isKnownError(error) ? t(`errors.${error}`) : t("errors.generic")}
         </p>
       )}
+      <ToastOnChange source={error} tone="error" message={error ? (isKnownError(error) ? t(`errors.${error}`) : t("errors.generic")) : undefined} />
 
       {canBook && (
         <div className="flex flex-col gap-3">

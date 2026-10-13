@@ -157,11 +157,7 @@ export function ShiftBoard(props: {
               </button>
             </div>
             <ToastOnChange source={copy} tone="success" message={copy.copied ? t("copied", { created: copy.copied.created, skipped: copy.copied.skipped }) : undefined} />
-            {copy.error && (
-              <p role="alert" className="text-xs text-danger">
-                {tCommon("errors.generic")}
-              </p>
-            )}
+            <ToastOnChange source={copy} tone="error" message={copy.error ? tCommon("errors.generic") : undefined} />
           </div>
         )}
       </div>

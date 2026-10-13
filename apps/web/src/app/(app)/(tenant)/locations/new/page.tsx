@@ -8,6 +8,8 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { addBranch } from "../actions";
 import { NewBranchForm } from "./new-branch-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function NewLocationPage() {
   const t = await getTranslations();
@@ -26,9 +28,9 @@ export default async function NewLocationPage() {
     .map((m) => ({ id: m.user_id, name: m.full_name ?? m.email }));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/locations" label={t("nav.locations")} />
-      <h1 className="text-3xl font-bold">{t("locations.addBranch.title")}</h1>
+      <PageHeader title={t("locations.addBranch.title")} />
       {preview.chargeable && (
         <section aria-labelledby="charge-heading" className="card flex flex-col gap-2 border-primary/40 p-5">
           <h2 id="charge-heading" className="font-semibold">
@@ -50,6 +52,6 @@ export default async function NewLocationPage() {
         branches={locations.filter((l) => l.active).map((l) => ({ id: l.id, name: l.name }))}
         people={people}
       />
-    </main>
+    </Container>
   );
 }

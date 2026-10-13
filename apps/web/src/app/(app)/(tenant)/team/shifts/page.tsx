@@ -29,6 +29,8 @@ import { SaveShiftsDefault } from "./save-default";
 import { StationSettings } from "./station-settings";
 import { Segmented } from "./segmented";
 import { type BoardGap, type BoardPerson, type BoardShift, type BoardStation, type BoardTemplate, type Editing, ShiftBoard } from "./shift-board";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("shifts");
@@ -54,12 +56,9 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
       branches.map(async (b) => ({ branch: b, hours: (await api.GET("/locations/{location_id}/hours", { params: { ...scope, path: { location_id: b.id } } })).data?.intervals ?? [] })),
     );
     return (
-      <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-        <div className="flex flex-col gap-2">
-          <BackLink href="/team" label={t("team.title")} />
-          <h1 className="text-3xl font-bold">{t("shifts.soloTitle")}</h1>
-          <p className="text-sm text-muted">{t("shifts.soloSubtitle")}</p>
-        </div>
+      <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+        <BackLink href="/team" label={t("team.title")} />
+        <PageHeader title={t("shifts.soloTitle")} description={t("shifts.soloSubtitle")} />
         {hours.map(({ branch, hours }) => (
           <section key={branch.id} className="card flex flex-col gap-4 p-6">
             <div className="flex items-center justify-between gap-3">
@@ -90,7 +89,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
             </span>
           </Link>
         </div>
-      </main>
+      </Container>
     );
   }
 
@@ -223,12 +222,10 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
   const branchList = branches.map((b) => ({ ...b, color: colorOf.get(b.id) ?? "" }));
 
   return (
-    <main className="enter flex w-full flex-1 flex-col gap-5 px-4 py-8 sm:px-6 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-8 sm:py-10">
       <LiveRefresh />
-      <div className="flex flex-col gap-2">
-        <BackLink href="/team" label={t("team.title")} />
-        <h1 className="text-3xl font-bold">{t("shifts.title")}</h1>
-      </div>
+      <BackLink href="/team" label={t("team.title")} />
+      <PageHeader title={t("shifts.title")} />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={t("shifts.navigate")} className="flex items-center gap-1.5">
@@ -334,6 +331,6 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
       {canEdit && <CoverageSettings weekdays={weekdays} branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, rules: ruleSets.find((r) => r.id === b.id)?.rules ?? [] }))} />}
       {canManageSettings(tenant) && <PublishSettings auto={tenant.shifts_publish_auto} cadence={tenant.shifts_publish_cadence} weekday={tenant.shifts_publish_weekday} day={tenant.shifts_publish_day} time={publishTime} weekdays={weekdays} />}
       {canEdit && <PlanningSettings branches={branchList.map((b) => ({ id: b.id, name: b.name, color: b.color, cadence: rhythm.get(b.id)?.cadence ?? "weekly", days: rhythm.get(b.id)?.days ?? null }))} />}
-    </main>
+    </Container>
   );
 }

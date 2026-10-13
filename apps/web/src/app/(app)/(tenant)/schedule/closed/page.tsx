@@ -7,6 +7,8 @@ import { getTenantFor } from "@/lib/tenant";
 
 import { reopenDay } from "./actions";
 import { CloseDayForm } from "./close-day-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** Closed days (holidays): close a day, see upcoming closed days, reopen one. */
 export default async function ClosedDaysPage() {
@@ -17,11 +19,11 @@ export default async function ClosedDaysPage() {
   const days = unwrap(await api.GET("/closed-days", { params: scope }));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/schedule" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
-      <h1 className="text-3xl font-bold">{t("closedDays")}</h1>
+      <PageHeader title={t("closedDays")} />
       <section aria-labelledby="close-heading" className="flex flex-col gap-4 card p-6">
         <h2 id="close-heading" className="text-lg font-semibold">
           {t("closeDay")}
@@ -57,6 +59,6 @@ export default async function ClosedDaysPage() {
           </ul>
         )}
       </section>
-    </main>
+    </Container>
   );
 }
