@@ -141,7 +141,7 @@ export function BoardingPass({ title, name, vertical, from, via, to, date }: Rec
 
 /** A short, one-time burst of confetti over the summary (none with reduced motion). */
 export function Confetti() {
-  const colors = ["#6366f1", "#d946ef", "#f59e0b", "#10b981", "#0ea5e9", "#f43f5e"];
+  const colors = ["#2563eb", "#7c3aed", "#06b6d4", "#f59e0b", "#10b981", "#f43f5e"];
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-0 overflow-visible motion-reduce:hidden">
       {Array.from({ length: 28 }, (_, i) => (
