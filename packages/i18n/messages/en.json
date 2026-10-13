@@ -4946,6 +4946,9 @@
     "motionReduced": "Reduced",
     "widgetOpen": "Open the accessibility menu",
     "widgetClose": "Close",
+    "widgetDrag": "Drag to move, click to open",
+    "widgetHide": "Hide the accessibility button",
+    "widgetShow": "Show the accessibility button",
     "widgetTitle": "Accessibility and display",
     "reset": "Reset settings",
     "statement": "Accessibility statement"
