@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type PlanningState, savePlanning } from "./actions";
+import { FormError, FormNotice } from "@/components/form/form-message";
 
 type Branch = { id: string; name: string; color: string; cadence: "daily" | "weekly" | "monthly" | "custom"; days: number | null };
 
@@ -57,9 +58,8 @@ function PlanningRow({ branch }: { branch: Branch }) {
           </label>
         )}
         <SubmitButton className="px-3 py-1.5 text-sm">{t("planning.save")}</SubmitButton>
-        <span role="status" className="min-w-16 text-xs text-muted">
-          {state.saved ? t("planning.saved") : state.error ? t("errors.invalid") : ""}
-        </span>
+        <FormNotice message={state.saved ? t("planning.saved") : undefined} />
+        <FormError toastOnly message={state.error ? t("errors.invalid") : undefined} />
       </form>
     </li>
   );

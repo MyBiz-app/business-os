@@ -7,6 +7,7 @@ import { useActionState, useState } from "react";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type PublishingState, savePublishing } from "./actions";
+import { FormError, FormNotice } from "@/components/form/form-message";
 
 type Cadence = "daily" | "weekly" | "monthly";
 type Props = { auto: boolean; cadence: Cadence; weekday: number; day: number; time: string; weekdays: string[] };
@@ -78,9 +79,8 @@ export function PublishSettings({ auto, cadence: initial, weekday, day, time, we
           </>
         )}
         <SubmitButton className="px-3 py-1.5 text-sm">{t("save")}</SubmitButton>
-        <span role="status" className="min-w-16 text-xs text-muted">
-          {state.saved ? t("saved") : state.error ? t("saveError") : ""}
-        </span>
+        <FormNotice message={state.saved ? t("saved") : undefined} />
+        <FormError toastOnly message={state.error ? t("saveError") : undefined} />
       </form>
       <p className="border-t border-border px-5 py-2 text-xs text-muted">{t("explain")}</p>
     </details>

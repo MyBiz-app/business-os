@@ -579,6 +579,7 @@
     "pageOf": "עמוד {page} מתוך {pages}"
   },
   "common": {
+    "dismiss": "סגירת ההודעה",
     "skipToContent": "דלג לתוכן הראשי",
     "loadFailed": "לא הצלחנו לטעון כרגע.",
     "retry": "נסו שוב",

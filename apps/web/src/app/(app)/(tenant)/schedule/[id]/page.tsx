@@ -1,3 +1,4 @@
+import { FormNotice } from "@/components/form/form-message";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -66,11 +67,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
             {t("series")} {session.series_open_ended && t("seriesOpen")}
           </p>
         )}
-        {ended && (
-          <p role="status" className="rounded-lg bg-surface px-3 py-2 text-sm">
-            {t("seriesEnded", { cancelled: ended[0], kept: ended[1] })}
-          </p>
-        )}
+        <FormNotice message={ended ? t("seriesEnded", { cancelled: ended[0], kept: ended[1] }) : undefined} />
       </div>
 
       {reservation && session.price_amount != null && (
