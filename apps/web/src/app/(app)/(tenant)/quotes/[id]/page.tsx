@@ -10,6 +10,9 @@ import { getTenantFor } from "@/lib/tenant";
 import { whatsappLink } from "@/lib/whatsapp";
 
 import { copyQuote, sendQuote } from "../actions";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+
 import { STATUS_TONE } from "../status";
 import { CopyLink } from "./copy-link";
 import { PaymentForm } from "./payment-form";
@@ -36,21 +39,23 @@ export default async function QuotePage({ params }: PageProps<"/quotes/[id]">) {
   const due = quote.total - quote.paid;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/quotes" className="text-sm text-primary underline-offset-4 hover:underline">{t("back")}</Link>
-      <div className="flex flex-col gap-1">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-3xl font-bold">
+      <PageHeader
+        title={
+          <>
             <span className="tabular-nums text-muted">#{quote.number}</span> <span dir="auto">{quote.title}</span>
-          </h1>
-          <Pill tone={STATUS_TONE[quote.status]}>{t(`statuses.${quote.status}`)}</Pill>
-        </div>
-        <p className="text-muted">
-          <Link href={`/clients/${quote.client_id}`} dir="auto" className="underline-offset-4 hover:underline">{quote.client_name}</Link>
-          {quote.event_starts_at && ` · ${when.format(new Date(quote.event_starts_at))}`}
-          {quote.event_place && <span dir="auto"> · {quote.event_place}</span>}
-        </p>
-      </div>
+          </>
+        }
+        description={
+          <>
+            <Link href={`/clients/${quote.client_id}`} dir="auto" className="underline-offset-4 hover:underline">{quote.client_name}</Link>
+            {quote.event_starts_at && ` · ${when.format(new Date(quote.event_starts_at))}`}
+            {quote.event_place && <span dir="auto"> · {quote.event_place}</span>}
+          </>
+        }
+        actions={<Pill tone={STATUS_TONE[quote.status]}>{t(`statuses.${quote.status}`)}</Pill>}
+      />
 
       {canSell && (
         <section aria-labelledby="actions-heading" className="card flex flex-col gap-3 p-6">
@@ -126,6 +131,6 @@ export default async function QuotePage({ params }: PageProps<"/quotes/[id]">) {
           <PaymentForm quoteId={quote.id} paymentKey={`quote-${quote.id}-${quote.paid}`} due={toMajorUnits(due, quote.currency)} currency={quote.currency} />
         </section>
       )}
-    </main>
+    </Container>
   );
 }

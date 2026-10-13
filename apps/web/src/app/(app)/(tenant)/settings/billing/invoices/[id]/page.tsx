@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/money";
 import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
+import { Container } from "@/components/layout/container";
 import { PrintButton } from "@/components/print-button";
 
 /** A MyBiz invoice to the business, laid out as a printable document. */
@@ -31,7 +32,7 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
   const label = (key: string) => (key === "core" ? tModules("core") : tModules(`names.${key as "client_app"}`));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-10 print:max-w-none print:p-0">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link href="/settings/billing" className="text-sm text-primary underline-offset-4 hover:underline">
           {t("back")}
@@ -103,6 +104,6 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
           </span>
         </footer>
       </article>
-    </main>
+    </Container>
   );
 }
