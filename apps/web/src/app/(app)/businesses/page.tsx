@@ -13,6 +13,8 @@ import { getActiveMembership } from "@/lib/tenant";
 import { industryTexts } from "@/lib/verticals";
 
 import { switchBusiness } from "../(tenant)/_menu/actions";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("businesses");
@@ -32,17 +34,17 @@ export default async function BusinessesPage() {
   const branchCount = businesses.reduce((sum, b) => sum + b.branches.length, 0);
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-muted">{t("summary", { businesses: businesses.length, branches: branchCount })}</p>
-        </div>
-        <Link href="/onboarding" className="btn-primary gap-2 px-4 py-2">
-          <Plus aria-hidden="true" className="size-4" />
-          {t("add")}
-        </Link>
-      </div>
+    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+      <PageHeader
+        title={t("title")}
+        description={t("summary", { businesses: businesses.length, branches: branchCount })}
+        actions={
+          <Link href="/onboarding" className="btn-primary gap-2 px-4 py-2">
+            <Plus aria-hidden="true" className="size-4" />
+            {t("add")}
+          </Link>
+        }
+      />
 
       <ul className="enter-items grid gap-5 md:grid-cols-2">
         {businesses.map((business) => {
@@ -130,7 +132,7 @@ export default async function BusinessesPage() {
           </Link>
         </li>
       </ul>
-    </main>
+    </Container>
   );
 }
 

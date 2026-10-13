@@ -11,6 +11,9 @@ import { getPlatformFor } from "@/lib/platform";
 import { openAsSupport } from "../../actions";
 
 import { BusinessActions } from "./business-actions";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
+import { Ltr, UserText } from "@/components/bidi";
 
 /** Platform console (P-2): one business's modules and usage. Its own data opens only through
  * support access, which the owner grants for a limited time (read-only and audited). */
@@ -37,18 +40,18 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
   const mayAct = can("businesses.act");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/platform/businesses" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("platform.businessesTitle")}
       </Link>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold" dir="auto">
-          {business.name}
-        </h1>
-        <p className="text-sm text-muted">
-          <span dir="ltr">{business.owner_email}</span> · {business.time_zone} · {business.currency}
-        </p>
-      </div>
+      <PageHeader
+        title={<UserText>{business.name}</UserText>}
+        description={
+          <>
+            <Ltr>{business.owner_email}</Ltr> · {business.time_zone} · {business.currency}
+          </>
+        }
+      />
       <dl className="grid gap-3 sm:grid-cols-4">
         {(
           [
@@ -132,6 +135,6 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
           />
         )}
       </section>
-    </main>
+    </Container>
   );
 }

@@ -6,6 +6,8 @@ import { BRAND } from "@business-os/i18n/brand";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { getPlatform } from "@/lib/platform";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.integrations");
@@ -26,11 +28,8 @@ export default async function PlatformIntegrationsPage() {
       : t(`capabilities.${capability as "email"}`);
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="text-muted">{t("subtitle")}</p>
-      </div>
+    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader title={t("title")} description={t("subtitle")} />
       <div className="grid gap-4 md:grid-cols-2">
         {capabilities.map((capability) => (
           <section key={capability.capability} aria-labelledby={`cap-${capability.capability}`} className="flex flex-col gap-3 card p-6">
@@ -61,6 +60,6 @@ export default async function PlatformIntegrationsPage() {
         ))}
       </div>
       <p className="text-sm text-muted">{t("howTo")}</p>
-    </main>
+    </Container>
   );
 }

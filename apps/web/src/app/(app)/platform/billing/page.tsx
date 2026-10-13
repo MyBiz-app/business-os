@@ -5,6 +5,8 @@ import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getPlatformFor } from "@/lib/platform";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** What MyBiz billed businesses, per month and currency. */
 export default async function PlatformBillingPage() {
@@ -26,13 +28,8 @@ export default async function PlatformBillingPage() {
   });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 id="billing-heading" className="text-3xl font-bold">
-          {t("billing")}
-        </h1>
-        <p className="text-sm text-muted">{t("billingHint")}</p>
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader titleId="billing-heading" title={t("billing")} description={t("billingHint")} />
       {billing.length === 0 ? (
         <p className="text-muted">{t("noBilling")}</p>
       ) : (
@@ -90,6 +87,6 @@ export default async function PlatformBillingPage() {
         </ScrollRegion>
         </>
       )}
-    </main>
+    </Container>
   );
 }
