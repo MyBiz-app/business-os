@@ -2,7 +2,9 @@ import { categories } from "@business-os/verticals";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { Container } from "@/components/layout/container";
 import { BrandMark } from "@/components/brand-mark";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { socialLinks } from "@/lib/social";
 import { industryTexts } from "@/lib/verticals";
 
@@ -49,7 +51,7 @@ export async function MarketingFooter() {
   const social = socialLinks();
   return (
     <footer className="bg-navy text-white">
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-8 px-6 py-12 md:grid-cols-[1.5fr_repeat(4,1fr)] md:gap-10">
+      <Container className="grid grid-cols-2 gap-x-6 gap-y-8 py-14 md:grid-cols-[1.5fr_repeat(4,1fr)] md:gap-10 lg:py-16">
         <div className="col-span-2 flex flex-col gap-3 md:col-span-1">
           <span className="flex items-center gap-2 text-lg font-bold">
             <BrandMark className="size-8" />
@@ -78,10 +80,13 @@ export async function MarketingFooter() {
             ))}
           </nav>
         ))}
+      </Container>
+      <div className="border-t border-white/10">
+        <Container className="flex flex-wrap items-center justify-between gap-4 py-5">
+          <p className="text-xs text-white/50">{t("footer.rights", { year: new Date().getFullYear() })}</p>
+          <ThemeToggle className="!border-white/20 !bg-white/5 !text-white/80 hover:!bg-white/10 hover:!text-white" />
+        </Container>
       </div>
-      <p className="border-t border-white/10 px-6 py-5 text-center text-xs text-white/50">
-        {t("footer.rights", { year: new Date().getFullYear() })}
-      </p>
     </footer>
   );
 }

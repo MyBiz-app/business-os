@@ -44,6 +44,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - Go-live readiness: one numbered item per thread from [the readiness review](reviews/go-live-readiness-2026-10.md) and the [launch review](reviews/launch-readiness-2026-10.md) (blockers first).
 - Apps redesign (Airbnb/Linear/Wix style, accessible bottom tab bar, MyBiz palette): plan in the project files; steps 1-3b merged (shared `packages/design-tokens`, Heebo everywhere, rounded components, accessible tab bar, skeleton loading, pinned main button on the client home), 3c (client schedule) merged, 4/6 (business app tiles, high-contrast preference in the shared preferences card) in review; next: text-size setting, reduce-motion, English display font, RTL/dark QA; previous apps kept on branch `backup/apps-v1`.
 - Design round 2 (whole web site + CRM): plan in the project files. Slice S1 (foundations: Assistant font, width system, direction rules, theme toggle component, screenshot sweep) is in review; the page slices follow.
+- Design round 2, slice S2 (home page, header, footer): full-width bands on the new Container/Section, sun/moon theme toggle in the marketing header and footer, night mode checked on every home section.
 - Technical cleanup (P2 of the launch review): oversized modules are split gradually, only when a slice touches them.
 
 ## Done (recent work, newest areas first)
