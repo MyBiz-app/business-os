@@ -11,6 +11,9 @@ import { getTenantFor } from "@/lib/tenant";
 import { saveOpeningHours, updateLocation } from "../actions";
 import { LocationForm } from "../location-form";
 import { Rooms } from "../rooms";
+import { UserText } from "@/components/bidi";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function LocationPage({ params }: PageProps<"/locations/[id]">) {
   const { id } = await params;
@@ -24,9 +27,9 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
   const hours = (await api.GET("/locations/{location_id}/hours", { params: { ...scope, path: { location_id: id } } })).data;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <BackLink href="/locations" label={t("nav.locations")} />
-      <h1 className="text-3xl font-bold">{location.name}</h1>
+      <PageHeader title={<UserText>{location.name}</UserText>} />
       <LocationForm
         action={updateLocation.bind(null, location.id)}
         location={location}
@@ -57,6 +60,6 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
         </h2>
         <Rooms locationId={location.id} rooms={location.rooms} readOnly={readOnly} />
       </section>
-    </main>
+    </Container>
   );
 }

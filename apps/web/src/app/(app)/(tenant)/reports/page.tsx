@@ -2,6 +2,8 @@ import type { components } from "@business-os/api-client";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
 import { ReviewsSummary } from "@/components/reviews-summary";
 import { unwrap } from "@/lib/api";
@@ -113,25 +115,25 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   );
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("title")}</h1>
-          <p className="text-muted">{t("intro")}</p>
-        </div>
-        <nav aria-label={t("period")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm">
-          {(Object.keys(PERIODS) as Period[]).map((value) => (
-            <Link
-              key={value}
-              href={`/reports?period=${value}`}
-              aria-current={value === period ? "page" : undefined}
-              className={`whitespace-nowrap rounded-lg px-3 py-1 transition-colors ${value === period ? "bg-primary text-on-primary shadow-sm" : "hover:bg-foreground/5"}`}
-            >
-              {t("lastDays", { count: PERIODS[value] })}
-            </Link>
-          ))}
-        </nav>
-      </div>
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={t("title")}
+        description={t("intro")}
+        actions={
+          <nav aria-label={t("period")} className="flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm">
+            {(Object.keys(PERIODS) as Period[]).map((value) => (
+              <Link
+                key={value}
+                href={`/reports?period=${value}`}
+                aria-current={value === period ? "page" : undefined}
+                className={`whitespace-nowrap rounded-lg px-3 py-1 transition-colors ${value === period ? "bg-primary text-on-primary shadow-sm" : "hover:bg-foreground/5"}`}
+              >
+                {t("lastDays", { count: PERIODS[value] })}
+              </Link>
+            ))}
+          </nav>
+        }
+      />
 
       <ReviewsSummary
         summary={reviews}
@@ -142,8 +144,11 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {compared.length > 1 && <BranchComparison rows={compared} currency={tenant.currency} locale={locale} />}
       {/* Comparing branches matters once there is more than one (and none is selected). */}
       {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"))}
-      {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
-      {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
+      {/* Side by side on a wide screen; stacked on a laptop or phone. */}
+      <div className="grid items-start gap-6 2xl:grid-cols-2">
+        {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
+        {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
+      </div>
       {bySlot.length > 0 && <BusyHours rows={bySlot} locale={locale} />}
       {/* Courts and rooms rented by the hour: how much of their open time was reserved. */}
       {courts.length > 0 && (
@@ -214,7 +219,6 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
           </details>
         )}
       </section>
-
-    </main>
+    </Container>
   );
 }
