@@ -6,8 +6,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { Container } from "@/components/layout/container";
 import { BrandMark } from "@/components/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINKS = [
   { href: "/features", key: "features" },
@@ -43,7 +45,7 @@ export function MarketingHeader() {
 
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-surface/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-6">
+      <Container className="flex h-16 items-center justify-between gap-4">
         <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
           <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />
           {tApp("name")}
@@ -55,6 +57,7 @@ export function MarketingHeader() {
 
         <div className="hidden items-center gap-2 lg:flex">
           <LocaleSwitcher />
+          <ThemeToggle />
           <Link href="/login" className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-foreground/5">
             {t("login")}
           </Link>
@@ -73,16 +76,17 @@ export function MarketingHeader() {
         >
           {open ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
         </button>
-      </div>
+      </Container>
 
       {open && (
-        <div id="marketing-menu" className="border-t border-border bg-background px-6 py-4 lg:hidden">
+        <div id="marketing-menu" className="page-gutter border-t border-border bg-background py-4 lg:hidden">
           <nav aria-label={t("menu")} className="flex flex-col gap-1">
             {links}
           </nav>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <LocaleSwitcher />
-            </div>
+            <ThemeToggle />
+          </div>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <Link href="/login" className="btn-secondary px-4 py-2.5">
               {t("login")}
