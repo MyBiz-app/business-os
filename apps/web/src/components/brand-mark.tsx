@@ -1,13 +1,17 @@
+import { useId } from "react";
+
 import { LOGO_GRADIENT, MARK } from "@business-os/brand";
 
 /** The MyBiz mark (gradient tile with the networked M), drawn from the shared brand package. */
 export function BrandMark({ className }: { className?: string }) {
-  // Every copy on a page defines the same gradient, so a shared id is harmless.
-  const fill = "url(#mybiz-mark)";
+  // Each copy needs its own gradient id: a gradient defined inside a hidden copy (display: none)
+  // does not paint in the others, which left the mark invisible on phones.
+  const gradientId = `mybiz-mark-${useId().replace(/:/g, "")}`;
+  const fill = `url(#${gradientId})`;
   return (
     <svg viewBox={`0 0 ${MARK.size} ${MARK.size}`} fill="none" aria-hidden="true" focusable="false" className={className}>
       <defs>
-        <linearGradient id="mybiz-mark" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
           {LOGO_GRADIENT.map((color, i) => (
             <stop key={color} offset={i / (LOGO_GRADIENT.length - 1)} stopColor={color} />
           ))}
