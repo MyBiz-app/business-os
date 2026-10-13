@@ -5,6 +5,7 @@ import { useActionState } from "react";
 
 import { Field } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
+import { PasswordField } from "@/components/form/password-field";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type FormState, signup } from "../actions";
@@ -18,11 +19,10 @@ export function SignupForm({ next }: { next?: string }) {
       {next && <input type="hidden" name="next" value={next} />}
       <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
       <Field label={t("email")} name="email" type="email" autoComplete="email" required defaultValue={state.email} />
-      <Field
+      <PasswordField
         label={t("password")}
         hint={t("passwordHint")}
         name="password"
-        type="password"
         autoComplete="new-password"
         minLength={8}
         required
