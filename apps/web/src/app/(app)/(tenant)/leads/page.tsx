@@ -4,6 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Avatar } from "@/components/avatar";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
 import { siteOrigin } from "@/lib/origin";
@@ -65,24 +67,26 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   ];
 
   return (
-    <main className="enter mx-auto flex w-full max-w-[96rem] flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="icon-tile size-11">
-            <Target aria-hidden="true" className="size-5" />
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader
+        title={
+          <span className="flex items-center gap-3">
+            <span className="icon-tile size-11">
+              <Target aria-hidden="true" className="size-5" />
+            </span>
+            {t("title")}
           </span>
-          <div className="flex flex-col gap-0.5">
-            <h1 className="text-3xl font-bold">{t("title")}</h1>
-            <p className="text-sm text-muted">{t("subtitle")}</p>
-          </div>
-        </div>
-        {canWriteClients(tenant) && (
-          <Link href="/leads/new" className="btn-primary px-4 py-2.5">
-            <Plus aria-hidden="true" className="size-4" />
-            {t("new")}
-          </Link>
-        )}
-      </div>
+        }
+        description={t("subtitle")}
+        actions={
+          canWriteClients(tenant) && (
+            <Link href="/leads/new" className="btn-primary px-4 py-2.5">
+              <Plus aria-hidden="true" className="size-4" />
+              {t("new")}
+            </Link>
+          )
+        }
+      />
 
       <ul className="enter-items grid grid-cols-2 gap-3 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon }) => (
@@ -134,7 +138,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
       )}
 
       {/* Scrolls sideways on narrow screens; focusable so keyboard users can scroll it too. */}
-      <div role="region" aria-label={t("pipeline")} tabIndex={0} className="-mx-6 overflow-x-auto px-6 pb-2">
+      <div role="region" aria-label={t("pipeline")} tabIndex={0} className="overflow-x-auto pb-2">
         <div className="grid auto-cols-[15rem] grid-flow-col gap-3 lg:min-w-[58rem] lg:auto-cols-auto lg:grid-flow-row lg:grid-cols-6">
           {STAGES.map((stage) => {
             const leads = board.items.filter((lead) => lead.stage === stage);
@@ -194,6 +198,6 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
           })}
         </div>
       </div>
-    </main>
+    </Container>
   );
 }

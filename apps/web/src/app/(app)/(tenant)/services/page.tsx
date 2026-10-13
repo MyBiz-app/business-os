@@ -9,6 +9,8 @@ import { addDays, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canReadReports, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default async function ServicesPage({ searchParams }: PageProps<"/services">) {
   const { removed } = await searchParams;
@@ -33,24 +35,24 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
   const usageOf = new Map(usage.map((row) => [row.key, row]));
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       {(removed === "deleted" || removed === "archived") && <FormNotice message={t(`services.removed.${removed}`)} />}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold">{t("services.title")}</h1>
-          <p className="text-sm text-muted">{t("services.subtitle")}</p>
-        </div>
-        {canWriteCatalog(tenant) && (
-          <Link href="/services/new" className="btn-primary px-4 py-2.5">
-            {t("services.add")}
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title={t("services.title")}
+        description={t("services.subtitle")}
+        actions={
+          canWriteCatalog(tenant) && (
+            <Link href="/services/new" className="btn-primary px-4 py-2.5">
+              {t("services.add")}
+            </Link>
+          )
+        }
+      />
 
       {services.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("services.empty")}</p>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {services.map((service) => (
             <li key={service.id}>
               <Link
@@ -61,7 +63,7 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
                 <span className="flex items-start gap-3">
                   <span aria-hidden="true" className="mt-0.5 h-10 w-1.5 shrink-0 rounded-full bg-(--service)" />
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span className="font-semibold">{service.name}</span>
+                    <span dir="auto" className="font-semibold">{service.name}</span>
                     <span className="text-sm text-muted">
                       {t("services.minutes", { count: service.duration_minutes })} ·{" "}
                       {service.booking_mode === "appointment"
@@ -95,6 +97,6 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
           ))}
         </ul>
       )}
-    </main>
+    </Container>
   );
 }

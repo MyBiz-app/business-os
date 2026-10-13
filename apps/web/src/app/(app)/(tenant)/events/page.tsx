@@ -3,6 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { unwrap } from "@/lib/api";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 import { formatMoney } from "@/lib/money";
 import { todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
@@ -16,15 +18,17 @@ export default async function EventsPage() {
   const when = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "long", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: tenant.time_zone });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/quotes" className="text-sm text-primary underline-offset-4 hover:underline">{t("title")}</Link>
-      <div className="flex flex-col gap-1">
-        <h1 className="flex items-center gap-2 text-3xl font-bold">
-          <CalendarHeart aria-hidden="true" className="size-7 text-primary" />
-          {t("eventsTitle")}
-        </h1>
-        <p className="text-sm text-muted">{t("eventsSubtitle")}</p>
-      </div>
+      <PageHeader
+        title={
+          <span className="flex items-center gap-2">
+            <CalendarHeart aria-hidden="true" className="size-7 text-primary" />
+            {t("eventsTitle")}
+          </span>
+        }
+        description={t("eventsSubtitle")}
+      />
       {events.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("noEvents")}</p>
       ) : (
@@ -48,6 +52,6 @@ export default async function EventsPage() {
           ))}
         </ul>
       )}
-    </main>
+    </Container>
   );
 }
