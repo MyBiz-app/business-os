@@ -6,6 +6,8 @@ import { ColumnChart } from "@/components/charts/column-chart";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getPlatform } from "@/lib/platform";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 /** The console's home: the platform in numbers, and what's new — each part for whoever may
  * see it. */
@@ -30,11 +32,8 @@ export default async function PlatformPage() {
   });
 
   return (
-    <main className="enter mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("platform.title")}</h1>
-        <p className="text-sm text-muted">{t("platform.subtitle")}</p>
-      </div>
+    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+      <PageHeader title={t("platform.title")} description={t("platform.subtitle")} />
 
       {spend?.over && (
         <div role="alert" className="flex flex-col gap-1 rounded-lg border border-danger p-4">
@@ -134,6 +133,6 @@ export default async function PlatformPage() {
           </section>
         )}
       </div>
-    </main>
+    </Container>
   );
 }

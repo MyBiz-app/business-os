@@ -11,6 +11,8 @@ import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
 import { NotificationsForm, PictureForm, ProfileForm } from "./profile-form";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
@@ -24,11 +26,8 @@ export default async function AccountPage() {
   const name = me.full_name || me.email;
 
   return (
-    <main className="enter mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("account.title")}</h1>
-        <p className="text-muted">{t("account.subtitle")}</p>
-      </div>
+    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader title={t("account.title")} description={t("account.subtitle")} />
       <section aria-labelledby="profile-heading" className="card flex flex-col gap-6 p-6">
         <h2 id="profile-heading" className="sr-only">
           {t("account.title")}
@@ -95,6 +94,6 @@ export default async function AccountPage() {
           </ul>
         </section>
       )}
-    </main>
+    </Container>
   );
 }

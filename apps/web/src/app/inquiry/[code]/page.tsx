@@ -9,6 +9,7 @@ import { brandStyle } from "@/lib/brand";
 
 import { InquiryForm } from "./inquiry-form";
 import { isolate } from "@/lib/bidi";
+import { Container } from "@/components/layout/container";
 
 async function business(code: string) {
   const { data } = await (await getApi()).GET("/public/businesses/{code}", { params: { path: { code } } });
@@ -32,7 +33,7 @@ export default async function InquiryPage({ params }: PageProps<"/inquiry/[code]
   return (
     <div className="brand flex flex-1 flex-col" style={brandStyle(found.primary_color)}>
       <AppHeader />
-      <main className="enter mx-auto flex w-full max-w-lg flex-1 flex-col items-center gap-6 px-6 py-12">
+      <Container as="main" size="prose" className="enter flex max-w-lg flex-1 flex-col items-center gap-6 py-10 sm:py-14">
         {logo ? (
           <Image src={logo} alt="" width={80} height={80} unoptimized className="size-20 rounded-2xl border border-border object-contain" />
         ) : (
@@ -49,7 +50,7 @@ export default async function InquiryPage({ params }: PageProps<"/inquiry/[code]
             <InquiryForm code={code} />
           </section>
         )}
-      </main>
+      </Container>
     </div>
   );
 }

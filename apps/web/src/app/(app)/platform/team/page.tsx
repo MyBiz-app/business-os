@@ -7,6 +7,8 @@ import { unwrap } from "@/lib/api";
 import { getPlatformFor } from "@/lib/platform";
 
 import { AddStaffForm, StaffRow } from "./staff-forms";
+import { Container } from "@/components/layout/container";
+import { PageHeader } from "@/components/layout/page-header";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform.team");
@@ -27,11 +29,8 @@ export default async function PlatformTeamPage() {
     email !== staff.email && level !== "primary_owner" && (isOwner || level === "employee");
 
   return (
-    <main className="enter mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-6 py-10">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="text-muted">{t("subtitle")}</p>
-      </div>
+    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <PageHeader title={t("title")} description={t("subtitle")} />
       <p className="flex items-start gap-2 rounded-xl bg-primary/10 px-4 py-3 text-sm">
         <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-primary" />
         {t("rules")}
@@ -57,6 +56,6 @@ export default async function PlatformTeamPage() {
         </h2>
         <AddStaffForm actor={{ levels: [...actor.levels], permissions: actor.permissions }} />
       </section>
-    </main>
+    </Container>
   );
 }
