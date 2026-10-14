@@ -1915,6 +1915,7 @@
     }
   },
   "email": {
+    "details": { "service": "Class", "when": "When" },
     "greeting": "Hi {name},",
     "note": "Note from the business: {note}",
     "footer": "This message was sent by {business}. You can see all updates in the app.",
@@ -2248,7 +2249,35 @@
       ],
       "phoneTitle": "Schedule",
       "book": "Book",
-      "booked": "Booked ✓"
+      "booked": "Booked ✓",
+      "phone": {
+        "title": "Schedule",
+        "days": [
+          "Sun",
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu"
+        ],
+        "classes": [
+          "Spinning",
+          "Yoga flow",
+          "HIIT"
+        ],
+        "friendsTitle": "Friends",
+        "friends": [
+          "Maya",
+          "Noam",
+          "Dana",
+          "Eli"
+        ],
+        "friendsNote": "3 friends are in tonight's class",
+        "inviteTitle": "Invite a friend",
+        "inviteClass": "HIIT · 18:00",
+        "inviteFriend": "Maya",
+        "inviteCta": "Send invite",
+        "inviteSent": "Spot held for Maya"
+      }
     },
     "pricing": {
       "title": "Pay only for what you need",
@@ -2295,6 +2324,12 @@
         "more": "One more location",
         "total": "Total per month",
         "daily": "That's about {price} a day"
+      },
+      "groups": {
+        "run": "Run the business (every plan)",
+        "clients": "Your clients' experience",
+        "ai": "AI assistant and agents",
+        "growth": "Growth and sales"
       }
     },
     "faq": {
