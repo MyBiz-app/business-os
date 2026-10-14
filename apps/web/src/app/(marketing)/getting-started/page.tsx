@@ -5,6 +5,7 @@ import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { Section } from "@/components/layout/section";
+import { Reveal } from "@/components/marketing/reveal";
 import { SubpageHero } from "@/components/marketing/subpage";
 import { SETUP_STEPS, type SetupStep } from "@/components/getting-started";
 
@@ -29,9 +30,10 @@ export default async function GettingStartedPage() {
         {sections.map((section, index) => {
           const { href, Icon } = SETUP_STEPS[section.key];
           return (
-            <li key={section.key} className="card card-hover flex flex-col gap-4 p-6 sm:flex-row sm:gap-6">
+            <li key={section.key}>
+            <Reveal delay={(index % 2) * 90} className="card card-hover mk-shine flex h-full flex-col gap-4 p-6 sm:flex-row sm:gap-6">
               <div className="flex items-center gap-3 sm:flex-col sm:items-center">
-                <span aria-hidden="true" className="btn-primary size-11 text-lg">
+                <span aria-hidden="true" className="btn-primary mk-pulse size-11 text-lg">
                   {index + 1}
                 </span>
                 <span aria-hidden="true" className="icon-tile size-11">
@@ -60,6 +62,7 @@ export default async function GettingStartedPage() {
                   <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
                 </Link>
               </div>
+            </Reveal>
             </li>
           );
         })}

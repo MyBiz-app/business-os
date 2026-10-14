@@ -6,6 +6,7 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
+import { CurrencyBadge } from "@/components/marketing/currency-badge";
 import { PricingCalculator } from "@/components/marketing/pricing-calculator";
 import { CtaBand, Faq, PageHero, SectionHeading } from "@/components/marketing/sections";
 import { FaqData, OrganizationData } from "@/components/marketing/structured-data";
@@ -15,6 +16,14 @@ import { formatMoney, toMajor } from "@/lib/money";
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 const PRESETS = ["starter", "growing", "ai_powered"] as const;
+
+/** "What's included": feature groups. `core` rows come with every plan; `module` rows depend on the catalog presets. */
+const GROUPS = [
+  { key: "run", rows: [{ core: "schedule" }, { core: "clients" }, { core: "plans" }, { core: "payments" }, { core: "reports" }, { core: "team" }] },
+  { key: "clients", rows: [{ module: "client_app" }, { module: "client_app_branded" }] },
+  { key: "ai", rows: [{ module: "ai_basic" }, { module: "ai_pro" }, { module: "agent_finance" }, { module: "agent_marketing" }] },
+  { key: "growth", rows: [{ module: "crm" }, { module: "crm_automation" }, { module: "whatsapp" }, { module: "analytics_pro" }] },
+] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing.meta");
@@ -26,6 +35,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
   const t = await getTranslations("marketing.pricing");
   const th = await getTranslations("marketing.home.pricing");
   const tModules = await getTranslations("modules");
+  const tFeatures = await getTranslations("marketing.features.items");
   const locale = await getLocale();
   const query = await searchParams;
   const requested = typeof query.currency === "string" ? query.currency : "";
@@ -38,8 +48,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
   const presetPrice = (preset: (typeof PRESETS)[number]) =>
     base + (catalog?.presets[preset] ?? []).reduce((sum, key) => sum + priceOf(key), 0);
 
-  // Every module that appears in a recommended plan, for the comparison table.
-  const compared = [...new Set(PRESETS.flatMap((preset) => catalog?.presets[preset] ?? []))];
+  const inPreset = (preset: (typeof PRESETS)[number], key: string) => (catalog?.presets[preset] ?? []).includes(key as never);
 
   return (
     <main className="enter flex flex-col">
@@ -81,7 +90,8 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                   <p className="text-sm text-muted">{t(`presetText.${preset}`)}</p>
                   <p className="flex items-baseline gap-1">
                     <span className="text-sm text-muted">{t("from")}</span>
-                    <span className="text-4xl font-extrabold tracking-tight">
+                    <span className="group flex items-center gap-2 text-4xl font-extrabold tracking-tight">
+                      <CurrencyBadge currency={currency} />
                       <bdi>{money(presetPrice(preset))}</bdi>
                     </span>
                     <span className="text-sm text-muted">{t("perMonth")}</span>
@@ -113,9 +123,10 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
               {catalog.core.map((tier) => (
                 <li key={tier.up_to_clients ?? "custom"} className="card flex flex-col gap-1 p-5">
                   <span className="text-sm text-muted">{tier.up_to_clients ? t("upTo", { count: tier.up_to_clients }) : t("custom")}</span>
-                  <span className="text-2xl font-extrabold">
+                  <span className="group flex items-center gap-2 text-2xl font-extrabold">
                     {tier.up_to_clients ? (
                       <>
+                        <CurrencyBadge currency={currency} />
                         <bdi>{money(tier.price)}</bdi> <span className="text-sm font-medium text-muted">{t("perMonth")}</span>
                       </>
                     ) : (
@@ -138,30 +149,41 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                     {PRESETS.map((preset) => (
                       <th key={preset} scope="col" className={`px-4 py-4 text-center ${preset === "growing" ? "bg-primary/5" : ""}`}>
                         <span className="block font-bold">{t(`presets.${preset}`)}</span>
-                        <span className="block text-lg font-extrabold">
+                        <span className="group flex items-center justify-center gap-1.5 text-lg font-extrabold">
+                          <CurrencyBadge currency={currency} />
                           <bdi>{money(presetPrice(preset))}</bdi>
                         </span>
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody>
-                  {["core", ...compared].map((key) => (
-                    <tr key={key} className="border-b border-border last:border-0">
-                      <th scope="row" className="px-4 py-3 text-start font-medium">
-                        {key === "core" ? t("coreShort") : tModules(`names.${key}` as "names.client_app")}
+                {GROUPS.map((group) => (
+                  <tbody key={group.key}>
+                    <tr className="bg-foreground/5">
+                      <th scope="colgroup" colSpan={PRESETS.length + 1} className="px-4 py-2 text-start text-xs font-bold uppercase tracking-wide text-muted">
+                        {t(`groups.${group.key}`)}
                       </th>
-                      {PRESETS.map((preset) => {
-                        const has = key === "core" || (catalog.presets[preset] ?? []).includes(key as never);
-                        return (
-                          <td key={preset} className={`px-4 py-3 text-center ${preset === "growing" ? "bg-primary/5" : ""}`}>
-                            {has ? <Check aria-label={t("included")} className="mx-auto size-5 text-success" /> : <Minus aria-label={t("notIncluded")} className="mx-auto size-4 text-muted" />}
-                          </td>
-                        );
-                      })}
                     </tr>
-                  ))}
-                </tbody>
+                    {group.rows.map((row) => {
+                      const key = "core" in row ? row.core : row.module;
+                      return (
+                        <tr key={key} className="border-b border-border last:border-0 motion-safe:transition-colors hover:bg-primary/5">
+                          <th scope="row" className="px-4 py-3 text-start font-medium">
+                            {"core" in row ? tFeatures(`${row.core}.title` as "schedule.title") : tModules(`names.${row.module}` as "names.client_app")}
+                          </th>
+                          {PRESETS.map((preset) => {
+                            const has = "core" in row || inPreset(preset, key);
+                            return (
+                              <td key={preset} className={`px-4 py-3 text-center ${preset === "growing" ? "bg-primary/5" : ""}`}>
+                                {has ? <Check aria-label={t("included")} className="mx-auto size-5 text-success" /> : <Minus aria-label={t("notIncluded")} className="mx-auto size-4 text-muted" />}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                ))}
               </table>
             </div>
           </Section>
@@ -194,8 +216,9 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                       : tModules(`descriptions.${module.key}` as "descriptions.client_app")}
                   </p>
                   <p className="flex items-baseline gap-1 sm:border-t sm:border-border sm:pt-3">
-                    <span className="text-lg font-extrabold sm:text-2xl">
-                      + <bdi>{money(module.price)}</bdi>
+                    <span className="flex items-center gap-1.5 text-lg font-extrabold sm:text-2xl">
+                      +<CurrencyBadge currency={currency} />
+                      <bdi>{money(module.price)}</bdi>
                     </span>
                     <span className="text-sm text-muted">{module.billing === "once" ? t("oneTime") : t("perMonth")}</span>
                   </p>
