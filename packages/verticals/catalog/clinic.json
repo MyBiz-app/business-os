@@ -5,6 +5,8 @@
   "icon": "stethoscope",
   "color": "from-teal-500 to-emerald-500",
   "terms": "clinic",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "patient",
   "booking_modes": [
     "appointment"

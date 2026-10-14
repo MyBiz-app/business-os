@@ -113,6 +113,28 @@ def _email_taken(error: IntegrityError) -> HTTPException | None:
     return None
 
 
+def _join_home_branch(db: Session, client_id: UUID, location_id: UUID | None) -> None:
+    """A client's home branch is always on its "my branches" list."""
+    if location_id is None:
+        return
+    db.execute(
+        text("""
+            INSERT INTO app.client_locations (tenant_id, client_id, location_id)
+            VALUES (app.current_tenant_id(), :client, :location) ON CONFLICT DO NOTHING
+        """),
+        {"client": client_id, "location": location_id},
+    )
+
+
+def _client_row(context: TenantContext, client_id: UUID) -> None:
+    home = context.session.execute(
+        text("SELECT home_location_id FROM app.clients WHERE id = :id"), {"id": client_id}
+    ).first()
+    if home is None:
+        raise not_found()
+    ensure_branch_visible(context, home.home_location_id)
+
+
 def _pack(db: Session) -> VerticalPack:
     vertical = db.execute(
         text("SELECT vertical FROM app.tenants WHERE id = app.current_tenant_id()")
@@ -172,7 +194,17 @@ def list_clients(
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
     # The current branch's clients, and those without a home branch (they belong to all).
-    where = "WHERE (home_location_id IS NULL OR app.in_branch(home_location_id))"
+    # In a branch-scoped business a client belongs to the branches on its "my branches" list
+    # (see client_locations); one on no list belongs to all.
+    where = """WHERE (
+        CASE WHEN (SELECT network_scope FROM app.tenants WHERE id = app.current_tenant_id())
+                  = 'branch'
+             THEN NOT EXISTS (SELECT 1 FROM app.client_locations cl
+                              WHERE cl.client_id = app.clients.id)
+                  OR EXISTS (SELECT 1 FROM app.client_locations cl
+                             WHERE cl.client_id = app.clients.id AND app.in_branch(cl.location_id))
+             ELSE home_location_id IS NULL OR app.in_branch(home_location_id)
+        END)"""
     params: dict[str, object] = {"limit": page_of.limit, "offset": page_of.offset}
     if search and search.strip():
         where += """ AND concat_ws(' ', first_name, last_name, email, phone) ILIKE :pattern"""
@@ -257,7 +289,49 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
         )
     except IntegrityError as error:
         raise _email_taken(error) or error from error
+    _join_home_branch(context.session, row["id"], row["home_location_id"])
     return Client.model_validate(dict(row))
+
+
+@router.get("/{client_id}/branches")
+def client_branches(client_id: UUID, context: ReadDep) -> list[UUID]:
+    """The branches on the client's "my branches" list."""
+    _client_row(context, client_id)
+    return list(
+        context.session.execute(
+            text(
+                "SELECT location_id FROM app.client_locations WHERE client_id = :id"
+                " ORDER BY created_at, location_id"
+            ),
+            {"id": client_id},
+        ).scalars()
+    )
+
+
+class ClientBranches(BaseModel):
+    location_ids: list[UUID] = Field(max_length=100)
+
+
+@router.put("/{client_id}/branches")
+def set_client_branches(client_id: UUID, body: ClientBranches, context: WriteDep) -> list[UUID]:
+    """Replaces the client's "my branches" list. A member kept to some branches may only
+    change the list within them."""
+    _client_row(context, client_id)
+    wanted = set(body.location_ids)
+    known = context.session.execute(
+        text("SELECT count(*) FROM app.locations WHERE id = ANY(:ids)"), {"ids": list(wanted)}
+    ).scalar_one()
+    if known != len(wanted):
+        raise HTTPException(status_code=422, detail="unknown_branch")
+    for location_id in wanted:
+        ensure_branch_allowed(context, location_id)
+    context.session.execute(
+        text("DELETE FROM app.client_locations WHERE client_id = :id AND location_id <> ALL(:ids)"),
+        {"id": client_id, "ids": list(wanted)},
+    )
+    for location_id in wanted:
+        _join_home_branch(context.session, client_id, location_id)
+    return client_branches(client_id, context)
 
 
 @router.get("/{client_id}")
@@ -306,4 +380,5 @@ def update_client(client_id: UUID, body: ClientUpdate, context: WriteDep) -> Cli
         raise _email_taken(error) or error from error
     if row is None:
         raise not_found()
+    _join_home_branch(context.session, client_id, row["home_location_id"])
     return Client.model_validate(dict(row))

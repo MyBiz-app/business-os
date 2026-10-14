@@ -5,6 +5,8 @@
   "icon": "car",
   "color": "from-amber-500 to-orange-500",
   "terms": "automotive",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "customer",
   "booking_modes": [
     "appointment"

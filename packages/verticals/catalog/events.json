@@ -5,6 +5,8 @@
   "icon": "camera",
   "color": "from-fuchsia-500 to-purple-600",
   "terms": "events",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"

@@ -5,6 +5,8 @@
   "icon": "wrench",
   "color": "from-slate-500 to-zinc-700",
   "terms": "home_services",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"
