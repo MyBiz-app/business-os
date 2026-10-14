@@ -1,0 +1,63 @@
+name: Publish Expo app updates (EAS Update)
+
+# Publishes an over-the-air update of the three Expo apps to the "preview" branch, so Expo Go and
+# preview builds pick it up. The public EXPO_PUBLIC_* values are set here because `eas update`
+# bundles them at publish time (the `env` in eas.json only applies to `eas build`); publishing
+# from a computer without them makes the app fall back to http://<host>:8000 and every request
+# fails with "(0)". Needs the EXPO_TOKEN secret in the "staging" environment.
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: "Which app"
+        type: choice
+        default: all
+        options: [all, client-app, business-app, staff-app]
+      message:
+        description: "Update message"
+        default: "Update from GitHub Actions"
+
+env:
+  # Public values only (the same ones the website ships to every browser).
+  EXPO_PUBLIC_API_URL: https://business-os-api-staging.onrender.com
+  EXPO_PUBLIC_SUPABASE_URL: https://mywfwzdrlbpxeheszasd.supabase.co
+  EXPO_PUBLIC_SUPABASE_KEY: sb_publishable_a9rwxNcFQSpDxyxhu1wApA_a_LHcu5A
+
+jobs:
+  publish:
+    name: Publish ${{ matrix.app }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [client-app, business-app, staff-app]
+    steps:
+      - name: Skip apps that were not asked for
+        id: pick
+        run: |
+          if [ "${{ inputs.app }}" = "all" ] || [ "${{ inputs.app }}" = "${{ matrix.app }}" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.pick.outputs.run == 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.pick.outputs.run == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.pick.outputs.run == 'true'
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Publish the update
+        if: steps.pick.outputs.run == 'true'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        working-directory: apps/${{ matrix.app }}
+        run: |
+          pnpm install --frozen-lockfile --dir ../..
+          npx --yes eas-cli@latest update --branch preview --platform all --non-interactive --message "${{ inputs.message }}"
