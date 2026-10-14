@@ -4,6 +4,7 @@ import { BRAND } from "@business-os/i18n/brand";
 
 import { Section } from "@/components/layout/section";
 import { ChatMock, DashboardMock, PhoneMock } from "@/components/marketing/mocks";
+import { Reveal } from "@/components/marketing/reveal";
 import { BandText, SubpageHero } from "@/components/marketing/subpage";
 import { BranchesSection, CtaBand, FeatureGrid, SafetySection } from "@/components/marketing/sections";
 
@@ -20,11 +21,13 @@ export default async function FeaturesPage() {
       <FeatureGrid inFeaturesPage />
       <Section tone="surface" innerClassName="grid items-center gap-12 lg:grid-cols-2">
         <BandText eyebrow={t("ai.eyebrow")} title={t("ai.title")} text={t("ai.text")} />
-        <ChatMock question={t("ai.q")} answer={t("ai.a")} />
+        <Reveal delay={120} className="mk-float"><ChatMock question={t("ai.q")} answer={t("ai.a")} /></Reveal>
       </Section>
       <Section innerClassName="grid items-center gap-12 lg:grid-cols-2">
-        <PhoneMock />
-        <BandText eyebrow={t("app.eyebrow")} title={t("app.title")} text={t("app.text")} />
+        <Reveal className="mk-float"><PhoneMock /></Reveal>
+        <Reveal delay={120}>
+          <BandText eyebrow={t("app.eyebrow")} title={t("app.title")} text={t("app.text")} />
+        </Reveal>
       </Section>
       <BranchesSection />
       <SafetySection />
