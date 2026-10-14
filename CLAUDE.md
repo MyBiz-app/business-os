@@ -25,7 +25,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 |---|---|
 | `apps/api` | Python API (FastAPI, Alembic migrations, tests). In `app/`: `api/` the endpoints, domain logic in `schedule/`, `commerce/`, `messaging/`, `catalog/`, `reports/`, plus `core/`, `providers/`, `ai/`, `seed/` and `jobs.py` |
 | `apps/web` | Next.js: marketing site, business web app, MyBiz console |
-| `apps/client-app`, `apps/business-app`, `apps/staff-app` | Expo apps: the clients' app, the business app, the MyBiz team app |
+| `apps/client-app` | The one Expo app ("MyBiz"): the clients', business and MyBiz team areas in a single app |
 | `packages/app-kit` | Shared screens, components and providers for the Expo apps |
 | `packages/i18n` | Translations (`he`, `en`) and locale-aware formatting (money) |
 | `packages/brand` | The MyBiz logo: one source for the web mark, favicon and app icons (the name comes from `packages/i18n/brand.json`) |
