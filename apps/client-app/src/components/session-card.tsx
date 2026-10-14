@@ -10,6 +10,8 @@ import { Chip } from "@business-os/app-kit/components/chip";
 import { Button, elevation } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { confirm } from "@business-os/app-kit/lib/confirm";
+import { InstructorAvatar } from "@/components/instructor-avatar";
+import { fillRatio } from "@/lib/class-filters";
 import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];
@@ -129,7 +131,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
 
   const place = [session.location_name, session.room_name].filter(Boolean).join(" · ");
   const color = session.service.color ?? palette.primary;
-  const fill = session.capacity ? Math.min((session.capacity - session.spots_left) / session.capacity, 1) : 0;
+  const fill = fillRatio(session.capacity, session.spots_left);
   const label = `${session.service.name}, ${day ? `${day} ` : ""}${time}`;
 
   return (
@@ -152,6 +154,12 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
           <Text style={[styles.name, { color: palette.foreground }, cancelled && styles.strike]}>
             {session.service.name}
           </Text>
+          {session.instructor?.name ? (
+            <View style={styles.coach}>
+              <InstructorAvatar name={session.instructor.name} path={session.instructor.avatar_url} palette={palette} />
+              <Text style={[styles.meta, { color: palette.foreground }]}>{session.instructor.name}</Text>
+            </View>
+          ) : null}
           {place ? <Text style={[styles.meta, { color: palette.muted }]}>{place}</Text> : null}
           {/* An on-site job (#42): where the technician comes. */}
           {session.address ? <Text style={[styles.meta, { color: palette.muted }]}>{session.address}</Text> : null}
@@ -278,6 +286,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 17, fontWeight: "700", textAlign: "left" },
   meta: { fontSize: 14, textAlign: "left" },
   bold: { fontWeight: "600" },
+  coach: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
   who: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 },
   mineRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   strike: { textDecorationLine: "line-through" },

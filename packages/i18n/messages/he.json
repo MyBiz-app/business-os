@@ -1026,7 +1026,14 @@
       "empty": "אין שיעורים ביום הזה.",
       "closed": "סגורים ביום הזה.",
       "closedReason": "סגורים ביום הזה ({reason}).",
-      "closedShort": "סגור"
+      "closedShort": "סגור",
+      "allInstructors": "כל המאמנים",
+      "allClasses": "כל השיעורים",
+      "noMatch": "אין שיעורים שמתאימים לסינון ביום הזה.",
+      "releaseOpens": "המערכת לשבוע הבא תיפתח ב{when}.",
+      "remindMe": "הזכירו לי",
+      "reminderSet": "התזכורת נקבעה",
+      "releaseReminderBody": "המערכת לשבוע הבא נפתחה. אפשר להירשם לשיעורים!"
     },
     "bookings": {
       "title": "ההרשמות שלי",
@@ -2075,7 +2082,7 @@
         },
         {
           "title": "תשלומים",
-          "meta": "\u200e+18%\u200e"
+          "meta": "‎+18%‎"
         },
         {
           "title": "הודעות",
