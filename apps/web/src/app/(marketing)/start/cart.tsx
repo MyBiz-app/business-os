@@ -112,6 +112,7 @@ export function Cart({
   onToggle,
   onRemove,
   t,
+  steps,
   actions,
 }: {
   lines: CartLine[];
@@ -123,6 +124,8 @@ export function Cart({
   onToggle: () => void;
   onRemove: (key: ModuleKey) => void;
   t: T;
+  /** The steps column shown above the plan on wide screens. */
+  steps?: ReactNode;
   actions: ReactNode;
 }) {
   const list = (items: CartLine[]) => (
@@ -183,8 +186,9 @@ export function Cart({
 
   return (
     <>
-      <aside aria-label={t("cart.title")} className="hidden lg:block">
-        <div className="card sticky top-24 flex flex-col gap-4 p-5">
+      <aside aria-label={t("cart.title")} className="sticky top-24 hidden flex-col gap-4 self-start lg:order-first lg:flex">
+        {steps}
+        <div className="card flex flex-col gap-4 p-5">
           <h2 className="flex items-center gap-2 font-bold">
             <ShoppingBag aria-hidden="true" className="size-5 text-primary" />
             {t("cart.title")}

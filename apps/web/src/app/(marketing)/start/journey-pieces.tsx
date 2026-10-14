@@ -173,13 +173,23 @@ export function TextInput({
   value,
   placeholder,
   onChange,
+  inputMode,
+  required = true,
+  error,
+  hint,
 }: {
   label: string;
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
+  inputMode?: "numeric";
+  required?: boolean;
+  error?: string;
+  hint?: string;
 }) {
   const id = useId();
+  const noteId = `${id}-note`;
+  const numeric = inputMode === "numeric";
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className="font-semibold">
@@ -188,13 +198,22 @@ export function TextInput({
       <input
         id={id}
         value={value}
-        required
-        maxLength={120}
-        autoComplete="organization"
+        required={required}
+        maxLength={numeric ? 20 : 120}
+        autoComplete={numeric ? "off" : "organization"}
+        inputMode={inputMode}
+        dir={numeric ? "ltr" : undefined}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error || hint ? noteId : undefined}
         placeholder={placeholder}
         onChange={(event) => onChange(event.target.value)}
         className="control w-full px-4 py-3 text-lg"
       />
+      {(error || hint) && (
+        <p id={noteId} role={error ? "alert" : undefined} className={`text-sm ${error ? "text-danger" : "text-muted"}`}>
+          {error ?? hint}
+        </p>
+      )}
     </div>
   );
 }

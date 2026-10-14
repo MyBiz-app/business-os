@@ -3007,7 +3007,12 @@
         "EUR": "€ Euro"
       },
       "yoursGeneric": "your business",
-      "exampleGeneric": "Dana's business"
+      "exampleGeneric": "Dana's business",
+      "number": "Company number (ח.פ. / ID)",
+      "numberOptional": "Company registration number (optional)",
+      "numberPlaceholder": "9 digits",
+      "numberHint": "Used for invoices. Companies use the ח.פ. number, sole traders their ID number.",
+      "numberInvalid": "Check the number: it should be up to 9 digits with a valid check digit."
     },
     "base": {
       "eyebrow": "Your base plan",
@@ -3281,7 +3286,7 @@
       }
     },
     "cart": {
-      "title": "Your plan",
+      "title": "My plan",
       "monthly": "Monthly after the trial",
       "today": "Due today",
       "free": "Free",

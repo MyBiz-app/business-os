@@ -39,7 +39,31 @@ export type SignupPlan = {
   locations: number;
   currency: Currency;
   modules: Modules;
+  /** Company registration number (ח.פ.): required for Israeli (ILS) businesses, optional elsewhere. */
+  businessNumber?: string;
 };
+
+/** The Israeli ID / company number check digit (the same rule as the API): up to 9 digits. */
+export function israeliNumberValid(number: string): boolean {
+  if (!/^\d{1,9}$/.test(number)) return false;
+  let total = 0;
+  [...number.padStart(9, "0")].forEach((digit, index) => {
+    const value = Number(digit) * (1 + (index % 2));
+    total += value > 9 ? value - 9 : value;
+  });
+  return total % 10 === 0 && Number(number) > 0;
+}
+
+/** Digits only (people type spaces or dashes). */
+export const cleanBusinessNumber = (value: string) => value.replace(/[\s-]/g, "");
+
+/** Whether the number may be submitted: required with a check digit in Israel, optional (up to 20
+ * characters) abroad. */
+export function businessNumberOk(currency: Currency, value: string): boolean {
+  const number = cleanBusinessNumber(value);
+  if (currency === "ILS") return israeliNumberValid(number);
+  return number.length <= 20;
+}
 
 /** The choices on each add-on screen, from the basic one up (2–4 per screen, decision X16).
  * A tier with no modules is what every plan already has ("included"). Prices come from the
@@ -246,6 +270,7 @@ export function decodePlan(value: unknown): SignupPlan | null {
     if (!(MODULE_KEYS as readonly string[]).includes(key) || !whole(quantity, 1, 50)) return null;
     modules[key as ModuleKey] = quantity as number;
   }
+  const number = typeof raw.businessNumber === "string" ? cleanBusinessNumber(raw.businessNumber) : "";
   return {
     vertical: raw.vertical,
     name,
@@ -254,5 +279,6 @@ export function decodePlan(value: unknown): SignupPlan | null {
     locations: raw.locations as number,
     currency: raw.currency as Currency,
     modules,
+    ...(number && number.length <= 20 ? { businessNumber: number } : {}),
   };
 }
