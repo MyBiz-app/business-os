@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useTranslations } from "use-intl";
 
-import { authenticate, isAppLockSupported, loadAppLock, saveAppLock } from "../lib/app-lock";
+import { authenticate, isAppLockSupported, loadAppLock, loadLockTimeout, LOCK_TIMEOUTS, saveAppLock, saveLockTimeout, type LockTimeout } from "../lib/app-lock";
 import { unregisterPushToken } from "../lib/push";
 import { supabase } from "../lib/supabase";
 import type { Palette } from "../lib/theme";
@@ -27,7 +27,9 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
   const tLock = useTranslations("appLock");
   const [lockSupported, setLockSupported] = useState(false);
   const [lockOn, setLockOn] = useState(false);
+  const [lockTimeout, setLockTimeout] = useState<LockTimeout>("30s");
   useEffect(() => {
+    void loadLockTimeout().then(setLockTimeout);
     void isAppLockSupported().then(setLockSupported);
     void loadAppLock().then(setLockOn);
   }, []);
@@ -91,6 +93,17 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
               { value: "on", label: tLock("on") },
             ]}
             onChange={(value) => void changeLock(value === "on")}
+          />
+        ) : null}
+        {lockSupported && lockOn ? (
+          <SegmentedControl
+            label={tLock("timeout")}
+            value={lockTimeout}
+            options={LOCK_TIMEOUTS.map((value) => ({ value, label: tLock(`timeouts.${value}`) }))}
+            onChange={(value) => {
+              setLockTimeout(value);
+              void saveLockTimeout(value);
+            }}
           />
         ) : null}
       </Card>

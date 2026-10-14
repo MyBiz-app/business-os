@@ -5067,6 +5067,22 @@
     "cancel": "Cancel",
     "setting": "Unlock with Face ID or fingerprint",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "retry": "Try again",
+    "timeout": "Lock the app after",
+    "timeouts": {
+      "immediate": "Right away",
+      "30s": "30 seconds",
+      "5m": "5 minutes"
+    },
+    "offerTitle": "Open with Face ID or fingerprint next time?",
+    "offerBody": "Skip the code: confirm with your face or fingerprint when you open the app. You can change this any time in Settings.",
+    "offerYes": "Turn on",
+    "offerLater": "Not now"
+  },
+  "authUi": {
+    "tagline": "Your business, organised, in your pocket.",
+    "resend": "Send the code again",
+    "channelLabel": "Get the code by"
   }
 }

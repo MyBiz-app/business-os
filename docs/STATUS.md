@@ -40,6 +40,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- App sign-in, launch screen and Face ID (round 3, slice R7): branded sign-in with moving backdrop, glass card and a 6-box code input that pastes and submits itself; launch and lock screens with a tilting, light-swept logo; one-time "open with Face ID or fingerprint next time?" offer after the first sign-in; lock timeout setting (right away / 30 seconds / 5 minutes); illustrated empty states.
 - One app for every role (round 3, slice R4): the MyBiz app (`apps/client-app`) now builds the person's areas (MyBiz team, businesses they work in, businesses they are a client of), opens the last one used and has a "Switch area" list in the profile. The client screens live in `(client)`; the business and MyBiz-team areas are placeholders until their screens move in (R5, R6). `business-app` and `staff-app` keep working until then.
 - Owner review of the web and apps ([#38](https://github.com/MyBiz-app/business-os/issues/38)).
 - Go-live readiness: one numbered item per thread from [the readiness review](reviews/go-live-readiness-2026-10.md) and the [launch review](reviews/launch-readiness-2026-10.md) (blockers first).
