@@ -298,3 +298,71 @@ def test_adding_a_branch_states_the_charge_and_sets_it_up(
     add_member(engine, studio["tenant_id"], desk, "staff")
     desk_headers = auth(desk, studio["tenant_id"])
     assert client.get("/locations/new-branch", headers=desk_headers).status_code == 403
+
+
+def test_a_branch_has_its_own_logo_and_color_or_the_networks(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    from tests.test_settings import tiny_png
+
+    headers = auth(studio["owner"], studio["tenant_id"])
+    branch = studio["location"]["id"]
+    png = tiny_png()
+
+    # Nothing set anywhere: initials are shown.
+    plain = client.get(f"/locations/{branch}", headers=headers).json()
+    assert plain["effective_logo_url"] is None
+    assert plain["effective_primary_color"] is None
+
+    # The network's logo and color are the default.
+    client.put(
+        "/tenants/current/logo", files={"file": ("l.png", png, "image/png")}, headers=headers
+    )
+    client.patch("/tenants/current", json={"primary_color": "#112233"}, headers=headers)
+    inherited = client.get(f"/locations/{branch}", headers=headers).json()
+    assert inherited["logo_url"] is None
+    assert inherited["effective_logo_url"].startswith(f"/public/tenants/{studio['tenant_id']}/")
+    assert inherited["effective_primary_color"] == "#112233"
+
+    # The branch's own wins, and is served publicly.
+    up = client.put(
+        f"/locations/{branch}/logo", files={"file": ("b.png", png, "image/png")}, headers=headers
+    )
+    assert up.status_code == 200
+    own = up.json()
+    assert own["effective_logo_url"] == own["logo_url"]
+    assert own["logo_url"].startswith(f"/public/locations/{branch}/logo?v=")
+    assert client.get(own["logo_url"]).content == png
+    colored = client.patch(
+        f"/locations/{branch}", json={"primary_color": "#abcdef"}, headers=headers
+    ).json()
+    assert colored["effective_primary_color"] == "#abcdef"
+    bad = client.patch(f"/locations/{branch}", json={"primary_color": "red"}, headers=headers)
+    assert bad.status_code == 422
+
+    # Removing them falls back to the network again.
+    removed = client.delete(f"/locations/{branch}/logo", headers=headers).json()
+    assert removed["logo_url"] is None
+    assert removed["effective_logo_url"].startswith("/public/tenants/")
+    cleared = client.patch(
+        f"/locations/{branch}", json={"primary_color": None}, headers=headers
+    ).json()
+    assert cleared["effective_primary_color"] == "#112233"
+    assert client.get(f"/public/locations/{branch}/logo").status_code == 404
+
+
+def test_only_settings_managers_change_branch_branding(
+    client: TestClient, auth: AuthHeaders, studio: dict
+) -> None:
+    from tests.test_settings import tiny_png
+
+    coach = auth(studio["coach"], studio["tenant_id"])
+    branch = studio["location"]["id"]
+    logo = client.put(
+        f"/locations/{branch}/logo",
+        files={"file": ("b.png", tiny_png(), "image/png")},
+        headers=coach,
+    )
+    assert logo.status_code == 403
+    color = client.patch(f"/locations/{branch}", json={"primary_color": "#abcdef"}, headers=coach)
+    assert color.status_code == 403

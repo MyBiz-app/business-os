@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
-import { getApi, unwrap } from "@/lib/api";
+import { apiAssetUrl, getApi, unwrap } from "@/lib/api";
 
 export const TENANT_COOKIE = "TENANT_ID";
 /** The current branch, remembered per business (none: all branches). */
@@ -97,7 +97,7 @@ const getActiveLocations = cache(async () => {
   return ((await fetchLocations(tenant.id, branch ?? undefined)).data ?? []).filter((b) => b.active);
 });
 
-export const getBranches = cache(async () => (await getActiveLocations()).map(({ id, name }) => ({ id, name })));
+export const getBranches = cache(async () => (await getActiveLocations()).map(({ id, name, logo_url, effective_logo_url, effective_primary_color }) => ({ id, name, ownLogo: apiAssetUrl(logo_url), logo: apiAssetUrl(effective_logo_url), color: effective_primary_color })));
 
 /** Whether the business rents out courts or rooms by the hour (an active bookable room). */
 export const hasBookableRooms = cache(async () => (await getActiveLocations()).some((branch) => branch.rooms.some((room) => room.active && room.bookable)));
