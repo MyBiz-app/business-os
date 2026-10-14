@@ -91,7 +91,7 @@ writeFileSync(join(web, "favicon.ico"), ico([16, 32, 48].map((size) => ({ size, 
 png(markSvg({ radius: 0 }), 180, join(web, "apple-icon.png"));
 
 // Expo apps: the stores mask the icon themselves, so it is a full square.
-for (const app of ["client-app", "business-app", "staff-app"]) {
+for (const app of ["client-app"]) {
   const dir = join(root, "apps", app, "assets");
   png(markSvg({ radius: 0 }), 1024, join(dir, "icon.png"));
   png(markSvg(), 48, join(dir, "favicon.png"));

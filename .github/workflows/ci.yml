@@ -68,7 +68,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [client-app, business-app, staff-app]
+        app: [client-app]
     steps:
       - uses: actions/checkout@v4
 
@@ -115,7 +115,7 @@ jobs:
         working-directory: apps/api
         run: uv sync --locked
 
-      # The busiest business-app journeys on a demo ten times its usual size. The budget is loose:
+      # The busiest business journeys on a demo ten times its usual size. The budget is loose:
       # it catches a missing index or a query per client, not a slow runner.
       - name: Run the load test
         working-directory: apps/api
