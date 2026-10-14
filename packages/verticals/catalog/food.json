@@ -5,6 +5,8 @@
   "icon": "utensils",
   "color": "from-red-500 to-orange-600",
   "terms": "food",
+  "schedule_view": "class_blocks",
+  "social": "off",
   "client_term": "guest",
   "booking_modes": [
     "appointment",

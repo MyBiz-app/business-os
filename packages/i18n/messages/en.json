@@ -112,7 +112,23 @@
     "uploadCover": "Upload cover",
     "removeCover": "Remove cover",
     "noCover": "No cover yet: the dashboard uses your brand color.",
-    "coverTooLarge": "The image is larger than 1.5 MB. Choose a smaller one."
+    "coverTooLarge": "The image is larger than 1.5 MB. Choose a smaller one.",
+    "classRelease": "Opening classes for booking",
+    "bookingHorizon": "Classes open for booking",
+    "bookingHorizonDays": "{days, plural, one {# day} other {# days}} ahead",
+    "releaseWeekday": "Weekly release",
+    "releaseRolling": "Rolling: always the next few days",
+    "releaseTime": "Release time",
+    "classReleaseHint": "With a weekly release, the next week opens for clients on the chosen day and time. You can also publish earlier from the schedule.",
+    "releaseWeekdays": {
+      "0": "Monday",
+      "1": "Tuesday",
+      "2": "Wednesday",
+      "3": "Thursday",
+      "4": "Friday",
+      "5": "Saturday",
+      "6": "Sunday"
+    }
   },
   "locales": {
     "he": "עברית",
@@ -891,7 +907,12 @@
     "saveDefaultHint": "The schedule will open with this range and these branches for everyone in the business.",
     "defaultSaved": "Saved.",
     "defaultError": "Could not save. Try again.",
-    "resetView": "Back to the default view"
+    "resetView": "Back to the default view",
+    "publishWeek": "Publish next week",
+    "publishWeekHint": "Opens the next week of classes for clients now, ahead of the scheduled release.",
+    "publishWeekDone": "The schedule is open for clients until {date}.",
+    "publishWeekAlready": "The next week is already published.",
+    "publishWeekError": "Couldn't publish the week. Try again."
   },
   "bookings": {
     "title": "Bookings",
@@ -1064,6 +1085,19 @@
     },
     "profile": {
       "title": "Profile",
+      "photoLabel": "Profile picture",
+      "takePhoto": "Take a photo",
+      "choosePhoto": "Choose a photo",
+      "removePhoto": "Remove photo",
+      "photoSaved": "Picture updated",
+      "photoFailed": "Could not update the picture",
+      "photoPermission": "Allow access in your phone settings to add a picture",
+      "status": "Status",
+      "statusPlaceholder": "A short line about you",
+      "statusCount": "{count}/{max}",
+      "saveStatus": "Save status",
+      "statusSaved": "Status saved",
+      "statusFailed": "Could not save the status",
       "signedInAs": "Signed in as {email}",
       "business": "Business",
       "joinAnother": "Join another business",
@@ -3837,7 +3871,11 @@
       "no": "Keep it",
       "note": "Note",
       "noteFor": "A note about {name}'s visit",
-      "noteSaved": "Note saved on {name}'s card."
+      "noteSaved": "Note saved on {name}'s card.",
+      "cancelClass": "Cancel class",
+      "cancelClassConfirm": "Cancel this class? {count, plural, =0 {Nobody is booked.} one {# booked client will be told.} other {# booked clients will be told.}}",
+      "restoreClass": "Restore class",
+      "classRestored": "The class is back on the schedule."
     },
     "leads": {
       "open": "Open",

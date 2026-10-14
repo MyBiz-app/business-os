@@ -5,6 +5,8 @@
   "icon": "dumbbell",
   "color": "from-indigo-500 to-violet-500",
   "terms": "fitness",
+  "schedule_view": "class_blocks",
+  "social": "on",
   "client_term": "member",
   "booking_modes": [
     "class",

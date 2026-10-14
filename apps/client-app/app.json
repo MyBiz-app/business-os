@@ -34,6 +34,13 @@
       "expo-secure-store",
       "expo-notifications",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow MyBiz to use your photos for your profile picture.",
+          "cameraPermission": "Allow MyBiz to use the camera to take your profile picture."
+        }
+      ],
+      [
         "expo-local-authentication",
         {
           "faceIDPermission": "Allow MyBiz to use Face ID to unlock the app."
