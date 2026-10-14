@@ -8,6 +8,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { formatMoney } from "@/lib/money";
 import { todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
+import { EmptyState } from "@/components/empty-state";
 
 /** Event projects (#44): accepted quotes with an event date, soonest first, with what's left to pay. */
 export default async function EventsPage() {
@@ -30,7 +31,7 @@ export default async function EventsPage() {
         description={t("eventsSubtitle")}
       />
       {events.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("noEvents")}</p>
+        <EmptyState variant="calendar">{t("noEvents")}</EmptyState>
       ) : (
         <ul className="flex flex-col gap-3">
           {events.map((event) => (

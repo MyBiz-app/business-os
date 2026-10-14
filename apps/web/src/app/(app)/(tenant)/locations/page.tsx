@@ -7,6 +7,7 @@ import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/empty-state";
 
 export default async function LocationsPage() {
   const t = await getTranslations();
@@ -28,7 +29,7 @@ export default async function LocationsPage() {
       />
 
       {locations.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("locations.empty")}</p>
+        <EmptyState variant="list">{t("locations.empty")}</EmptyState>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {locations.map((location) => (
