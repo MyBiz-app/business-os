@@ -1,4 +1,4 @@
-import { addDays, dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
+import { dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import * as Notifications from "expo-notifications";
@@ -7,7 +7,9 @@ import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native"
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
+import { CalendarViewSwitch, DayStrip, MonthGrid, weekDays } from "@business-os/app-kit/components/calendar-strip";
 import { Chip } from "@business-os/app-kit/components/chip";
+import { type CalendarView, stepDay } from "@business-os/app-kit/lib/calendar-range";
 import { PressableScale } from "@business-os/app-kit/components/motion";
 import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Button, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
@@ -16,11 +18,10 @@ import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { NO_FILTERS, applyFilters, filterOptions, upcomingRelease, type ClassFilters } from "@/lib/class-filters";
 import { useDependents } from "@/lib/use-dependents";
+import { useScheduleWindow } from "@/lib/use-schedule-window";
 import { useBusiness } from "@/providers/business-provider";
 
-const DAYS = 14;
-
-/** The next two weeks, one day at a time. */
+/** The class schedule: a day strip centred on the chosen day, drilling up to a week and a month. */
 export default function Schedule() {
   const t = useTranslations("client.schedule");
   const tAppointment = useTranslations("client.appointment");
@@ -32,37 +33,30 @@ export default function Schedule() {
   const today = business ? todayIn(business.time_zone) : "";
   const [day, setDay] = useState(today);
 
+  const [view, setView] = useState<CalendarView>("day");
+  const win = useScheduleWindow(view, day);
   const load = useCallback(async () => {
-    if (!business) return { sessions: [], closed: [], appointments: [], courts: [], release: null };
-    const query = { start: todayIn(business.time_zone), days: DAYS };
-    const [sessions, closed, appointments, courts, release] = await Promise.all([
-      api.GET("/client/sessions", { params: { ...scope, query } }),
-      api.GET("/client/closed-days", { params: { ...scope, query } }),
+    if (!business) return { appointments: [], courts: [], release: null };
+    const [appointments, courts, release] = await Promise.all([
       api.GET("/client/appointments/services", { params: scope }),
       api.GET("/client/resources", { params: scope }),
       api.GET("/client/schedule-release", { params: scope }),
     ]);
-    return {
-      sessions: unwrap(sessions),
-      closed: unwrap(closed),
-      appointments: appointments.data ?? [],
-      courts: courts.data ?? [],
-      release: release.data ?? null,
-    };
+    return { appointments: appointments.data ?? [], courts: courts.data ?? [], release: release.data ?? null };
   }, [api, scope, business]);
-  const { data, loading, reload } = useLoad(load);
+  const { data, loading: loadingStatic } = useLoad(load);
+  const loading = loadingStatic || win.loading;
   const [overrides, setOverrides] = useState<Record<string, ClientSession>>({});
   const [filters, setFilters] = useState<ClassFilters>(NO_FILTERS);
   const [reminded, setReminded] = useState(false);
 
   if (!business) return null;
-  const days = Array.from({ length: DAYS }, (_, i) => addDays(today, i));
-  const closedDays = new Map((data?.closed ?? []).map((c) => [c.day, c]));
+  const closedDays = new Map(win.closed.map((c) => [c.day, c]));
   const closed = closedDays.get(day);
-  const sessions = (data?.sessions ?? [])
-    .map((s) => overrides[s.id] ?? s)
-    .filter((s) => dayOf(s.starts_at, business.time_zone) === day);
-  const allSessions = (data?.sessions ?? []).map((s) => overrides[s.id] ?? s);
+  const allSessions = win.sessions.map((s) => overrides[s.id] ?? s);
+  const sessions = allSessions.filter((s) => dayOf(s.starts_at, business.time_zone) === day);
+  const marked = new Set(allSessions.map((s) => dayOf(s.starts_at, business.time_zone)));
+  const closedSet = new Set(closedDays.keys());
   const options = filterOptions(allSessions.filter((s) => s.service.id && s.capacity > 1));
   const visible = applyFilters(sessions, filters);
   const opening = upcomingRelease(data?.release?.next_release_at, Date.now());
@@ -97,7 +91,7 @@ export default function Schedule() {
       refreshing={loading}
       onRefresh={() => {
         setOverrides({});
-        void reload();
+        win.reload();
       }}
     >
       <Heading palette={palette}>{t("title")}</Heading>
@@ -129,43 +123,54 @@ export default function Schedule() {
           <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={22} color={palette.muted} />
         </PressableScale>
       )}
-      <ScrollView
-        horizontal
-        accessibilityRole="tablist"
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={local.days}
-      >
-        {days.map((value) => {
-          const selected = value === day;
-          const isClosed = closedDays.has(value);
-          const label = formatDay(value, locale, { weekday: "long", day: "numeric", month: "long" });
-          return (
-            <Pressable
-              key={value}
-              accessibilityRole="tab"
-              accessibilityState={{ selected }}
-              accessibilityLabel={isClosed ? `${label}, ${t("closedShort")}` : label}
-              onPress={() => setDay(value)}
-              style={[
-                local.day,
-                { borderColor: palette.border, backgroundColor: selected ? palette.primary : palette.surface },
-              ]}
-            >
-              <Text style={[local.weekday, { color: selected ? palette.onPrimary : palette.muted }]}>
-                {value === today ? t("today") : formatDay(value, locale, { weekday: "short" })}
-              </Text>
-              <Text style={[local.date, { color: selected ? palette.onPrimary : palette.foreground }]}>
-                {formatDay(value, locale, { day: "numeric" })}
-              </Text>
-              {isClosed && (
-                <Text style={[local.closed, { color: selected ? palette.onPrimary : palette.muted }]}>
-                  {t("closedShort")}
-                </Text>
-              )}
+      <View style={local.bar}>
+        <CalendarViewSwitch
+          view={view}
+          onChange={setView}
+          palette={palette}
+          labels={{ day: t("viewDay"), week: t("viewWeek"), month: t("viewMonth") }}
+        />
+        {day !== today && (
+          <Chip label={t("today")} selected={false} onPress={() => setDay(today)} palette={palette} role="tab" />
+        )}
+      </View>
+      {view === "month" ? (
+        <>
+          <View style={local.bar}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t("previous")} onPress={() => setDay(stepDay("month", day, -1))}>
+              <Ionicons name={locale === "he" ? "chevron-forward" : "chevron-back"} size={24} color={palette.foreground} />
             </Pressable>
-          );
-        })}
-      </ScrollView>
+            <Text style={[local.monthTitle, { color: palette.foreground }]}>
+              {formatDay(day, locale, { month: "long", year: "numeric" })}
+            </Text>
+            <Pressable accessibilityRole="button" accessibilityLabel={t("next")} onPress={() => setDay(stepDay("month", day, 1))}>
+              <Ionicons name={locale === "he" ? "chevron-back" : "chevron-forward"} size={24} color={palette.foreground} />
+            </Pressable>
+          </View>
+          <MonthGrid
+            selected={day}
+            today={today}
+            marked={marked}
+            closed={closedSet}
+            palette={palette}
+            onPick={(picked) => {
+              setDay(picked);
+              setView("day");
+            }}
+          />
+        </>
+      ) : (
+        <DayStrip
+          selected={day}
+          today={today}
+          onSelect={setDay}
+          marked={marked}
+          closed={closedSet}
+          palette={palette}
+          todayLabel={t("today")}
+          closedLabel={t("closedShort")}
+        />
+      )}
 
       {closed && (
         <Text accessibilityRole="alert" style={[styles.muted, { color: palette.foreground }]}>
@@ -235,7 +240,35 @@ export default function Schedule() {
         </View>
       )}
 
-      {closed && sessions.length === 0 ? null : visible.length === 0 && sessions.length > 0 ? (
+      {view === "week" ? (
+        <View style={local.list}>
+          {weekDays(day).map((d) => {
+            const daySessions = applyFilters(
+              allSessions.filter((x) => dayOf(x.starts_at, business.time_zone) === d),
+              filters,
+            );
+            if (daySessions.length === 0) return null;
+            return (
+              <View key={d} style={local.list}>
+                <Text style={[local.weekHead, { color: palette.foreground }]}>
+                  {formatDay(d, locale, { weekday: "long", day: "numeric", month: "long" })}
+                </Text>
+                {daySessions.map((session) => (
+                  <SessionCard
+                    key={session.id}
+                    session={session}
+                    dependents={dependents}
+                    onChange={(changed) => setOverrides((current) => ({ ...current, [changed.id]: changed }))}
+                  />
+                ))}
+              </View>
+            );
+          })}
+          {!loading && weekDays(day).every((d) => !marked.has(d)) && (
+            <Text style={[styles.muted, { color: palette.muted }]}>{tTerms(`${termsFor(business)}.appEmpty`)}</Text>
+          )}
+        </View>
+      ) : view === "month" ? null : closed && sessions.length === 0 ? null : visible.length === 0 && sessions.length > 0 ? (
         <Text style={[styles.muted, { color: palette.muted }]}>{t("noMatch")}</Text>
       ) : sessions.length === 0 ? (
         <Text style={[styles.muted, { color: palette.muted }]}>{loading ? "…" : tTerms(`${termsFor(business)}.appEmpty`)}</Text>
@@ -256,11 +289,9 @@ export default function Schedule() {
 }
 
 const local = StyleSheet.create({
-  days: { gap: 8, paddingVertical: 2 },
-  day: { width: 60, minHeight: 72, paddingVertical: 10, borderRadius: 30, justifyContent: "center", borderWidth: 1, alignItems: "center", gap: 2 },
-  weekday: { fontSize: 12, fontWeight: "600" },
-  date: { fontSize: 18, fontWeight: "700" },
-  closed: { fontSize: 11, fontWeight: "600" },
+  bar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },
+  monthTitle: { fontSize: 18, fontWeight: "700" },
+  weekHead: { fontSize: 15, fontWeight: "700", marginTop: 4 },
   list: { gap: 12 },
   filters: { gap: 8 },
   chips: { gap: 8, paddingVertical: 2 },
