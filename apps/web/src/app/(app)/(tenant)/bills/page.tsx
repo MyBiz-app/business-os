@@ -10,6 +10,7 @@ import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
 import { RunForm } from "./run-form";
+import { EmptyState } from "@/components/empty-state";
 
 const MONTH = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -76,7 +77,7 @@ export default async function BillsPage({ searchParams }: PageProps<"/bills">) {
         ))}
       </ul>
       {preview.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("none")}</p>
+        <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (
         <RunForm
           key={month}

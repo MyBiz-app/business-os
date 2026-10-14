@@ -13,6 +13,7 @@ import { PageHeader } from "@/components/layout/page-header";
 
 import { deletePromoCode, setPromoActive } from "./promo-actions";
 import { PromoForm } from "./promo-form";
+import { EmptyState } from "@/components/empty-state";
 
 export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
   const { removed } = await searchParams;
@@ -46,7 +47,7 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
       />
 
       {plans.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("plans.empty")}</p>
+        <EmptyState variant="list">{t("plans.empty")}</EmptyState>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {plans.map((plan) => (
