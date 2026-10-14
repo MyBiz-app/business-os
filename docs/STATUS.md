@@ -1,6 +1,6 @@
 # Project status
 
-_Last updated: 2026-10-10_ · Updated with every merged pull request. Open work lives in
+_Last updated: 2026-10-14_ · Updated with every merged pull request. Open work lives in
 [GitHub issues](https://github.com/MyBiz-app/business-os/issues); each phase is an `epic` issue
 whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
@@ -52,6 +52,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - Technical cleanup (P2 of the launch review): oversized modules are split gradually, only when a slice touches them.
 
 ## Done (recent work, newest areas first)
+- **Apps in Expo and on the web, in sync.** The three Expo apps were republished (EAS Update, branch `preview`) with the staging API and Supabase addresses bundled in, which fixed the "something went wrong sending the code (0)" sign-in error; the EAS project links (update URL, runtime version, bundle IDs) are now committed in each `app.json`. The apps' web builds, the marketing site and the CRM were redeployed from the same commit. Publishing from a computer needs `--environment preview` and the three `EXPO_PUBLIC_*` values set; the workflow "Publish Expo app updates (EAS Update)" does the same from GitHub.
 - **CRM on a phone, tidied.** Page-header buttons (calendar, team) form an even grid, the calendar's day/week/month switch has its own full-width row, date and time fields are compact instead of full width, and the "people on shift" popup opens next to the tap and stays fully on screen.
 - **Branch logo and color.** Each branch can have its own logo and accent color (branch page, for people who manage settings); a branch that sets none shows the network's. The side menu shows the selected branch's logo and color, and branches with their own logo show it in the branch list. API: `PUT/DELETE /locations/{id}/logo`, `primary_color` on a branch, `effective_logo_url` / `effective_primary_color` on every branch; migration 0079. Not yet in the Expo apps.
 - **Apps: Face ID / fingerprint lock.** In the profile card of all three apps, a new switch locks the app behind Face ID, fingerprint or the phone passcode, at launch and after 30 s in the background (the session stays in the secure store; the screen is covered, so unlocking returns to the same place). Needs a native build or a development build for Face ID on iPhone (Expo Go on iPhone has no Face ID); a fingerprint works in Expo Go on Android. Passkeys are not built: Supabase Auth has no passkey sign-in yet.
