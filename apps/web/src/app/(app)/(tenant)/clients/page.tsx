@@ -12,6 +12,7 @@ import { StatusBadge } from "./status-badge";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { ScrollRegion } from "@/components/scroll-region";
+import { EmptyState } from "@/components/empty-state";
 
 const PAGE_SIZE = 25;
 const STATUSES = ["active", "lead", "inactive"] as const;
@@ -146,9 +147,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       </form>
 
       {result.items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">
+        <EmptyState variant="people">
           {search || status || plan || absent ? term("noResults") : term("noClients")}
-        </p>
+        </EmptyState>
       ) : (
         <ScrollRegion labelledBy="clients-heading" className="rounded-2xl border border-border">
           <table className="w-full text-start text-sm">

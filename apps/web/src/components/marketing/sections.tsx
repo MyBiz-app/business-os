@@ -25,6 +25,7 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { BranchesMock } from "@/components/marketing/mocks";
+import { Reveal } from "@/components/marketing/reveal";
 import { ModuleIcon } from "@/components/modules/module-icon";
 import { VerticalIcon } from "@/components/vertical-icon";
 import { industryTexts } from "@/lib/verticals";
@@ -65,22 +66,26 @@ export async function FeatureGrid({ inFeaturesPage = false }: { inFeaturesPage?:
   const t = await getTranslations("marketing.features");
   return (
     <Section aria-labelledby="features-heading" innerClassName="flex flex-col gap-10">
-      <SectionHeading
+      <Reveal>
+        <SectionHeading
         id="features-heading"
         title={inFeaturesPage ? t("gridTitle") : t("title")}
         subtitle={inFeaturesPage ? t("gridSubtitle") : t("subtitle")}
       />
-      <ul className="enter-items swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
-        {FEATURES.map(({ key, Icon }) => (
-          <li key={key} className="card card-hover flex flex-col gap-3 p-6">
-            <span className="icon-tile size-11">
-              <Icon aria-hidden="true" className="size-5" />
-            </span>
-            <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>
-            <p className="text-sm text-muted">{t(`items.${key}.text`)}</p>
-          </li>
-        ))}
-      </ul>
+      </Reveal>
+      <Reveal delay={80}>
+        <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
+          {FEATURES.map(({ key, Icon }) => (
+            <li key={key} className="card card-hover flex flex-col gap-3 p-6">
+              <span className="icon-tile size-11">
+                <Icon aria-hidden="true" className="size-5" />
+              </span>
+              <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>
+              <p className="text-sm text-muted">{t(`items.${key}.text`)}</p>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
     </Section>
   );
 }
@@ -92,56 +97,60 @@ export async function IndustryCards() {
   const soon = categories().filter((c) => c.status === "planned");
   return (
     <Section aria-labelledby="industries-heading" innerClassName="flex flex-col gap-10">
-      <SectionHeading id="industries-heading" title={t("title")} subtitle={t("subtitle")} />
-      <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-        {open.map(({ key, icon, color }) => (
-          <li key={key}>
-            <Link href={`/industries/${key}`} className="card card-hover group flex h-full flex-col gap-4 p-6">
-              <span aria-hidden="true" className={`flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg`}>
-                <VerticalIcon icon={icon} className="size-6" />
-              </span>
-              <span className="flex flex-col gap-1">
-                <span className="text-lg font-semibold">{text(key, "name")}</span>
-                <span className="text-sm text-muted">{text(key, "tagline")}</span>
-              </span>
-              <ul className="flex flex-col gap-1.5 text-sm">
-                {points(key).map((point) => (
-                  <li key={point} className="flex items-start gap-2">
-                    <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-              <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                {t("more")}
-                <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
-              </span>
-            </Link>
-          </li>
-        ))}
-        {soon.length > 0 && (
-          <li>
-            <Link href="/industries" className="card card-hover group flex h-full flex-col gap-4 p-6">
-              <span className="flex flex-col gap-1">
-                <span className="text-lg font-semibold">{t("soonTitle")}</span>
-                <span className="text-sm text-muted">{t("soonText")}</span>
-              </span>
-              <ul className="flex flex-wrap gap-2 text-sm">
-                {soon.map(({ key, icon }) => (
-                  <li key={key} className="flex items-center gap-1.5 rounded-full bg-background px-3 py-1 ring-1 ring-border">
-                    <VerticalIcon icon={icon} className="size-3.5 text-muted" />
-                    {text(key, "name")}
-                  </li>
-                ))}
-              </ul>
-              <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                {t("all")}
-                <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
-              </span>
-            </Link>
-          </li>
-        )}
-      </ul>
+      <Reveal>
+        <SectionHeading id="industries-heading" title={t("title")} subtitle={t("subtitle")} />
+      </Reveal>
+      <Reveal delay={80}>
+        <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+          {open.map(({ key, icon, color }) => (
+            <li key={key}>
+              <Link href={`/industries/${key}`} className="card card-hover group flex h-full flex-col gap-4 p-6">
+                <span aria-hidden="true" className={`flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg`}>
+                  <VerticalIcon icon={icon} className="size-6" />
+                </span>
+                <span className="flex flex-col gap-1">
+                  <span className="text-lg font-semibold">{text(key, "name")}</span>
+                  <span className="text-sm text-muted">{text(key, "tagline")}</span>
+                </span>
+                <ul className="flex flex-col gap-1.5 text-sm">
+                  {points(key).map((point) => (
+                    <li key={point} className="flex items-start gap-2">
+                      <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                      {point}
+                    </li>
+                  ))}
+                </ul>
+                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                  {t("more")}
+                  <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </li>
+          ))}
+          {soon.length > 0 && (
+            <li>
+              <Link href="/industries" className="card card-hover group flex h-full flex-col gap-4 p-6">
+                <span className="flex flex-col gap-1">
+                  <span className="text-lg font-semibold">{t("soonTitle")}</span>
+                  <span className="text-sm text-muted">{t("soonText")}</span>
+                </span>
+                <ul className="flex flex-wrap gap-2 text-sm">
+                  {soon.map(({ key, icon }) => (
+                    <li key={key} className="flex items-center gap-1.5 rounded-full bg-background px-3 py-1 ring-1 ring-border">
+                      <VerticalIcon icon={icon} className="size-3.5 text-muted" />
+                      {text(key, "name")}
+                    </li>
+                  ))}
+                </ul>
+                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                  {t("all")}
+                  <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </li>
+          )}
+        </ul>
+      </Reveal>
     </Section>
   );
 }
@@ -151,20 +160,24 @@ export async function Faq() {
   const items = t.raw("items") as { q: string; a: string }[];
   return (
     <Section aria-labelledby="faq-heading" innerClassName="flex flex-col gap-8">
-      <SectionHeading id="faq-heading" title={t("title")} />
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
-        {items.map((item) => (
-          <details key={item.q} className="card group p-5 open:shadow-md">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
-              {item.q}
-              <span aria-hidden="true" className="text-xl text-primary transition-transform group-open:rotate-45">
-                +
-              </span>
-            </summary>
-            <p className="mt-3 text-muted">{item.a}</p>
-          </details>
-        ))}
-      </div>
+      <Reveal>
+        <SectionHeading id="faq-heading" title={t("title")} />
+      </Reveal>
+      <Reveal delay={80}>
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-3">
+          {items.map((item) => (
+            <details key={item.q} className="card group p-5 open:shadow-md">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
+                {item.q}
+                <span aria-hidden="true" className="text-xl text-primary transition-transform group-open:rotate-45">
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-muted">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </Reveal>
     </Section>
   );
 }
@@ -196,7 +209,7 @@ export async function BranchesSection() {
   return (
     <Section tone="surface" aria-labelledby="branches-heading" innerClassName="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
       <>
-        <div className="flex flex-col gap-5">
+        <Reveal className="flex flex-col gap-5">
           <p className="text-sm font-semibold text-primary">{t("eyebrow")}</p>
           <h2 id="branches-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t("title")}
@@ -210,8 +223,10 @@ export async function BranchesSection() {
               </li>
             ))}
           </ul>
-        </div>
-        <BranchesMock />
+        </Reveal>
+        <Reveal delay={120}>
+          <BranchesMock />
+        </Reveal>
       </>
     </Section>
   );
@@ -225,15 +240,19 @@ export async function AddOnsStrip() {
   const tModules = await getTranslations("modules");
   return (
     <Section aria-labelledby="add-ons-heading" spacing="compact" innerClassName="flex flex-col gap-8">
-      <SectionHeading id="add-ons-heading" title={t("title")} subtitle={t("subtitle")} />
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {ADD_ONS.map((key) => (
-          <li key={key} className="card card-hover flex flex-col items-center gap-3 p-5 text-center">
-            <ModuleIcon module={key} size="lg" />
-            <span className="font-semibold">{tModules(`names.${key}`)}</span>
-          </li>
-        ))}
-      </ul>
+      <Reveal>
+        <SectionHeading id="add-ons-heading" title={t("title")} subtitle={t("subtitle")} />
+      </Reveal>
+      <Reveal delay={80}>
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {ADD_ONS.map((key) => (
+            <li key={key} className="card card-hover flex flex-col items-center gap-3 p-5 text-center">
+              <ModuleIcon module={key} size="lg" />
+              <span className="font-semibold">{tModules(`names.${key}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
       <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary">
         {t("cta")}
         <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
@@ -254,18 +273,22 @@ export async function SafetySection() {
   const t = await getTranslations("marketing.safety");
   return (
     <Section aria-labelledby="safety-heading" innerClassName="flex flex-col gap-10">
-      <SectionHeading id="safety-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {SAFETY.map(({ key, Icon }) => (
-          <li key={key} className="card flex flex-col gap-3 p-6">
-            <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
-              <Icon className="size-5" />
-            </span>
-            <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>
-            <p className="text-sm text-muted">{t(`items.${key}.text`)}</p>
-          </li>
-        ))}
-      </ul>
+      <Reveal>
+        <SectionHeading id="safety-heading" eyebrow={t("eyebrow")} title={t("title")} subtitle={t("subtitle")} />
+      </Reveal>
+      <Reveal delay={80}>
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {SAFETY.map(({ key, Icon }) => (
+            <li key={key} className="card flex flex-col gap-3 p-6">
+              <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
+                <Icon className="size-5" />
+              </span>
+              <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>
+              <p className="text-sm text-muted">{t(`items.${key}.text`)}</p>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
     </Section>
   );
 }

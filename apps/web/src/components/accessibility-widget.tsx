@@ -3,7 +3,7 @@
 import { Accessibility, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useCallback, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 
 import { AccessibilitySettings, resetAccessibility } from "@/components/accessibility";
 import { useDismiss } from "@/components/use-dismiss";
@@ -12,6 +12,7 @@ const SIZE = 56;
 const MARGIN = 8;
 const DRAG_THRESHOLD = 6;
 const NUDGE = 16;
+const PANEL_WIDTH = 384;
 const POS_KEY = "a11y-widget-pos";
 const HIDDEN_KEY = "a11y-widget-hidden";
 
@@ -83,13 +84,41 @@ export function AccessibilityWidget() {
   const [dragPos, setDragPos] = useState<Pos | null>(null);
   const saved = ready ? parsePos(storedPos) : null;
   const pos = dragPos ?? saved;
-  const [placement, setPlacement] = useState({ below: false, atEnd: false });
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const drag = useRef<{ id: number; startX: number; startY: number; originX: number; originY: number; moved: boolean } | null>(null);
   const panelId = useId();
   const close = useCallback(() => setOpen(false), []);
   useDismiss(open, close, root, trigger);
+
+  // The panel is fixed to the viewport and placed from the button's rectangle: it opens toward the side with
+  // more room (so it never leaves the screen, in LTR or RTL) and is re-placed on resize and when the button moves.
+  useEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const button = trigger.current;
+      if (!button) return;
+      const rect = button.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const width = Math.min(PANEL_WIDTH, vw - 2 * MARGIN);
+      const alignRight = rect.left + rect.width / 2 > vw / 2;
+      const left = Math.min(Math.max(alignRight ? rect.right - width : rect.left, MARGIN), vw - width - MARGIN);
+      const spaceBelow = vh - rect.bottom - MARGIN * 2;
+      const spaceAbove = rect.top - MARGIN * 2;
+      const below = spaceBelow >= spaceAbove;
+      const maxHeight = Math.max(160, Math.min(vh * 0.7, below ? spaceBelow : spaceAbove));
+      setPanelStyle(
+        below
+          ? { left, width, maxHeight, top: rect.bottom + MARGIN }
+          : { left, width, maxHeight, bottom: vh - rect.top + MARGIN },
+      );
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [open, pos?.x, pos?.y]);
 
   const move = (next: Pos) => {
     writeStorage(POS_KEY, JSON.stringify(clamp(next)));
@@ -134,10 +163,6 @@ export function AccessibilityWidget() {
 
   const onClick = () => {
     if (drag.current?.moved) return;
-    if (!open && trigger.current) {
-      const rect = trigger.current.getBoundingClientRect();
-      setPlacement({ below: rect.top + rect.height / 2 < window.innerHeight / 2, atEnd: rect.left + rect.width / 2 > window.innerWidth / 2 });
-    }
     setOpen((value) => !value);
   };
 
@@ -164,8 +189,6 @@ export function AccessibilityWidget() {
   if (!ready || hidden) return null;
 
   const placed = pos ? { left: pos.x, top: pos.y } : undefined;
-  const panelSide = placement.atEnd ? "end-0" : "start-0";
-  const panelVertical = placement.below ? "top-16" : "bottom-16";
 
   return (
     <div
@@ -178,7 +201,8 @@ export function AccessibilityWidget() {
           id={panelId}
           role="dialog"
           aria-label={t("widgetTitle")}
-          className={`popover absolute ${panelVertical} ${panelSide} flex max-h-[70vh] w-[min(24rem,calc(100vw-2.5rem))] flex-col gap-4 overflow-y-auto p-5`}
+          style={panelStyle}
+          className="popover fixed flex flex-col gap-4 overflow-y-auto p-5"
           data-open="true"
         >
           <div className="flex items-center justify-between gap-3">

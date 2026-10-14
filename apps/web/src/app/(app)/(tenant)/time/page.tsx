@@ -7,6 +7,7 @@ import { addDays, todayIn } from "@/lib/dates";
 import { getTenantFor } from "@/lib/tenant";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/empty-state";
 
 /** My time (#45): what I logged in the last 30 days, by day, with the week's and month's totals. */
 export default async function MyTimePage() {
@@ -45,7 +46,7 @@ export default async function MyTimePage() {
         ))}
       </ul>
       {entries.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("myNone")}</p>
+        <EmptyState variant="calendar">{t("myNone")}</EmptyState>
       ) : (
         [...byDay.entries()].map(([day, items]) => (
           <section key={day} aria-label={dayLabel(day)} className="card flex flex-col gap-2 p-5">
