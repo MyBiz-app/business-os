@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
+import { AreaSwitcher } from "@/components/area-switcher";
 import { ProfileForm } from "@/components/profile-form";
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
@@ -113,6 +114,7 @@ export default function Profile() {
           onChange={(id) => void select(id)}
         />
       )}
+      <AreaSwitcher palette={palette} />
       <Button label={t("client.profile.joinAnother")} variant="secondary" palette={palette} onPress={() => router.push("/join")} />
 
       <PreferencesCard palette={palette} signOutVariant="danger" />

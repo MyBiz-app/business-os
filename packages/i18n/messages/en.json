@@ -933,6 +933,22 @@
     "noPlan": "No plan",
     "showAll": "Show the whole history ({count})"
   },
+  "areas": {
+    "switch": "Switch area",
+    "current": "Current",
+    "client": "Member",
+    "platform": "MyBiz team",
+    "role": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "staff": "Staff",
+      "front_desk": "Front desk"
+    },
+    "soon": {
+      "business": "The business tools are moving into this app. Until then, use the MyBiz Business app, or switch to another area below.",
+      "platform": "The MyBiz team tools are moving into this app. Until then, use the MyBiz Team app, or switch to another area below."
+    }
+  },
   "client": {
     "tabs": {
       "home": "Home",

@@ -411,3 +411,59 @@ def test_court_usage_report(client: TestClient, club: dict) -> None:
     assert (first["reservations"], first["revenue"]) == (1, 18000)
     assert first["occupancy_percent"] == round(150 / 14, 1)
     assert second["reserved_hours"] == 0 and second["occupancy_percent"] == 0
+
+
+def suggest(client: TestClient, club: dict, headers: dict, hhmm: str, minutes: int = 60, **extra):
+    query = {**params(club, minutes), "time": hhmm, **extra}
+    return client.get("/client/resources/suggestions", params=query, headers=headers)
+
+
+def test_suggestions_return_the_exact_slot_and_nearest_alternatives(
+    client: TestClient, club: dict, auth: AuthHeaders
+) -> None:
+    me = club_member(client, club, auth)
+    free = suggest(client, club, me, "19:00").json()
+    assert {s["room_name"] for s in free["exact"]} == {"Court 1", "Court 2"}
+    assert len(free["suggestions"]) == 5
+    near = [abs(s["offset_minutes"]) for s in free["suggestions"]]
+    assert near == sorted(near) and near[0] == 15
+    assert all(s["offset_minutes"] != 0 for s in free["suggestions"])
+    starts = [s["starts_at"] for s in free["suggestions"]]
+    assert len(set(starts)) == len(starts)  # one room per start
+
+    # Both courts taken at 19:00: no exact slot, and the alternatives step around the booking.
+    for court in (0, 1):
+        taken = client.post(
+            "/resources/reservations",
+            json=reservation(club, court, "19:00", 60, new_client(client, club["headers"], "X")),
+            headers=club["headers"],
+        )
+        assert taken.status_code == 201, taken.text
+    busy = suggest(client, club, me, "19:00", limit=3).json()
+    assert busy["exact"] == []
+    offsets = [s["offset_minutes"] for s in busy["suggestions"]]
+    assert len(offsets) == 3 and min(abs(o) for o in offsets) == 60
+
+
+def test_suggestions_reach_other_days_and_validate(
+    client: TestClient, club: dict, auth: AuthHeaders
+) -> None:
+    me = club_member(client, club, auth)
+    late = suggest(client, club, me, "21:45").json()  # 21:45 + 60 min is past closing
+    assert late["exact"] == [] and late["suggestions"]
+    assert suggest(client, club, me, "19:00", minutes=75).status_code == 422
+    assert suggest(client, club, me, "19:00", limit=20).status_code == 422
+
+
+def test_suggestions_are_tenant_isolated(client: TestClient, club: dict, auth: AuthHeaders) -> None:
+    other = uuid4()
+    business = {
+        "name": "Other",
+        "vertical": "fitness",
+        "locale": "en",
+        "time_zone": "Asia/Jerusalem",
+        "currency": "ILS",
+    }
+    tenant_id = client.post("/tenants", json=business, headers=auth(other)).json()["id"]
+    theirs = auth(other, tenant_id)
+    assert suggest(client, club, theirs, "19:00").status_code in (403, 404)
