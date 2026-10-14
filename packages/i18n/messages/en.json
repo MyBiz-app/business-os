@@ -187,7 +187,12 @@
         "An AI assistant that prepares actions for your approval",
         "Full Hebrew and English, and your business data stays protected"
       ],
-      "back": "Back to the site"
+      "back": "Back to the site",
+      "scene": {
+        "today": "Today",
+        "newClient": "New client joined",
+        "revenue": "This week"
+      }
     },
     "showPassword": "Show password",
     "hidePassword": "Hide password",
