@@ -2961,6 +2961,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/resources/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Resource Suggestions
+         * @description The exact slot if free, else the nearest free ones ("When suits you?").
+         */
+        get: operations["my_resource_suggestions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/resources/reservations": {
         parameters: {
             query?: never;
@@ -9039,6 +9059,53 @@ export interface components {
             price_amount: number;
             /** Price Currency */
             price_currency: string;
+        };
+        /** ResourceSuggestion */
+        ResourceSuggestion: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /** Room Name */
+            room_name: string;
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /**
+             * Offset Minutes
+             * @description Minutes from the requested time; negative means earlier
+             */
+            offset_minutes: number;
+        };
+        /** ResourceSuggestions */
+        ResourceSuggestions: {
+            /**
+             * Requested Starts At
+             * Format: date-time
+             */
+            requested_starts_at: string;
+            /**
+             * Exact
+             * @description Rooms free at exactly the requested time (empty when none)
+             */
+            exact: components["schemas"]["ResourceSlot"][];
+            /**
+             * Suggestions
+             * @description Other free starts, nearest to the requested time first, one room per start
+             */
+            suggestions: components["schemas"]["ResourceSuggestion"][];
         };
         /** ResourceUsageRow */
         ResourceUsageRow: {
@@ -18432,6 +18499,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResourceSlot"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_resource_suggestions: {
+        parameters: {
+            query: {
+                service_id: string;
+                date: string;
+                /** @description Local time, HH:MM */
+                time: string;
+                minutes: number;
+                limit?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceSuggestions"];
                 };
             };
             /** @description Validation Error */
