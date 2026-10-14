@@ -10,6 +10,14 @@
     "class",
     "appointment"
   ],
+  "client_home": [
+    "next_booking",
+    "membership",
+    "shortcuts",
+    "health",
+    "updates",
+    "business_info"
+  ],
   "cancellation_window_minutes": 120,
   "booking_requires_plan": true,
   "health_form": "fitness",

@@ -7,6 +7,7 @@
   "terms": "pets",
   "client_term": "owner",
   "booking_modes": ["appointment", "class"],
+  "client_home": ["next_booking", "dependents", "rebook", "shortcuts", "updates", "business_info"],
   "cancellation_window_minutes": 1440,
   "booking_requires_plan": false,
   "default_preset": "starter",

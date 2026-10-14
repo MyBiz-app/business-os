@@ -1,58 +1,60 @@
-import { dayOf, todayIn } from "@business-os/i18n/dates";
+import { todayIn } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
-import { SessionCard } from "@/components/session-card";
+import { HOME_CARDS, type HomeData } from "@/components/home-cards";
 import { Badge, ListRow } from "@business-os/app-kit/components/rows";
-import { Button, Card, elevation, EmptyState, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Card, elevation, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { assetUrl, unwrap } from "@business-os/app-kit/lib/api";
 import { WEB_URL } from "@business-os/app-kit/lib/env";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { useHealth } from "@/lib/use-health";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { homeCardsFor } from "@business-os/app-kit/lib/vertical";
 import { useAccount } from "@/lib/use-account";
-import { useDependents } from "@/lib/use-dependents";
+import { useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
 
-/** Branded home: the business, the client's next booking and what's on today. */
+/** Branded home: what needs attention, then the cards the business's industry lists (its
+ * `client_home` in the industry catalog). */
 export default function Home() {
   const t = useTranslations("client.home");
   const tHealth = useTranslations("client.health");
-  const tTerms = useTranslations("terms");
   const tAppointment = useTranslations("client.appointment");
   const tReview = useTranslations("client.review");
-  const tCourt = useTranslations("client.court");
   const health = useHealth();
   const locale = useLocale();
   const formatDay = (day: string) =>
     new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${day}T12:00:00Z`));
   const { api, scope, business, palette } = useBusiness();
-  const dependents = useDependents();
   const account = useAccount();
 
   const load = useCallback(async () => {
-    if (!business) return { sessions: [], appointments: 0, courts: 0, toReview: [] };
+    if (!business) return null;
     const start = todayIn(business.time_zone);
-    const [sessions, services, pending, courts] = await Promise.all([
+    const [bookings, sessions, entitlements, services, pending, courts] = await Promise.all([
+      api.GET("/client/bookings", { params: scope }),
       api.GET("/client/sessions", { params: { ...scope, query: { start, days: 14 } } }),
+      api.GET("/client/entitlements", { params: scope }),
       api.GET("/client/appointments/services", { params: scope }),
       api.GET("/client/reviews/pending", { params: scope }),
       api.GET("/client/resources", { params: scope }),
     ]);
     return {
+      bookings: unwrap(bookings),
       sessions: unwrap(sessions),
+      entitlements: entitlements.data ?? [],
       appointments: services.data?.length ?? 0,
       courts: courts.data?.length ?? 0,
       toReview: pending.data ?? [],
     };
   }, [api, scope, business]);
   const { data, error, loading, reload } = useLoad(load);
-  const sessions = data?.sessions;
+  const locations = useLocations();
   // Coming back (e.g. after rating a visit) shows fresh data.
   useFocusEffect(
     useCallback(() => {
@@ -61,13 +63,9 @@ export default function Home() {
   );
 
   if (!business) return null;
-  const today = todayIn(business.time_zone);
-  const next = sessions?.find((s) => s.my_booking && s.status === "scheduled");
-  const todays = (sessions ?? []).filter(
-    (s) => dayOf(s.starts_at, business.time_zone) === today && s.status === "scheduled" && s.id !== next?.id,
-  );
+  const homeCards = homeCardsFor(business);
+  const homeData = (loaded: NonNullable<typeof data>): HomeData => ({ ...loaded, locations, reload: () => void reload() });
   const logo = assetUrl(business.logo_url);
-  const update = () => void reload();
 
   return (
     <Screen
@@ -172,39 +170,10 @@ export default function Home() {
 
       {error !== undefined && !data && <LoadError palette={palette} onRetry={() => void reload()} />}
 
-      <Heading palette={palette} level={2}>
-        {tTerms(`${termsFor(business)}.nextBooking`)}
-      </Heading>
-      {next ? (
-        <SessionCard session={next} onChange={update} showDay dependents={dependents} />
-      ) : (
-        error !== undefined && !data ? null : (
-          <EmptyState palette={palette} message={t("noUpcoming")} loading={loading} />
-        )
-      )}
-
-      {todays.length > 0 && (
-        <>
-          <Heading palette={palette} level={2}>
-            {t("today")}
-          </Heading>
-          {todays.map((session) => (
-            <SessionCard key={session.id} session={session} onChange={update} dependents={dependents} />
-          ))}
-        </>
-      )}
-
-      {(data?.courts ?? 0) > 0 && (
-        <Button label={tCourt("cta")} palette={palette} variant="secondary" onPress={() => router.push("/court")} />
-      )}
-      {(data?.appointments ?? 0) > 0 && (
-        <Button
-          label={tTerms(`${termsFor(business)}.appTab`)}
-          palette={palette}
-          variant="secondary"
-          onPress={() => router.navigate("/schedule")}
-        />
-      )}
+      {homeCards.map((card) => {
+        const Card = HOME_CARDS[card];
+        return data ? <Card key={card} data={homeData(data)} /> : null;
+      })}
     </Screen>
   );
 }
