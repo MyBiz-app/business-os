@@ -40,6 +40,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 
 ## In progress
 
+- App sign-in, launch screen and Face ID (round 3, slice R7): branded sign-in with moving backdrop, glass card and a 6-box code input that pastes and submits itself; launch and lock screens with a tilting, light-swept logo; one-time "open with Face ID or fingerprint next time?" offer after the first sign-in; lock timeout setting (right away / 30 seconds / 5 minutes); illustrated empty states.
 - One app for every role (round 3, slice R4): the MyBiz app (`apps/client-app`) now builds the person's areas (MyBiz team, businesses they work in, businesses they are a client of), opens the last one used and has a "Switch area" list in the profile. The client screens live in `(client)`; the business and MyBiz-team areas are placeholders until their screens move in (R5, R6). `business-app` and `staff-app` keep working until then.
 - One app, business area (round 3, slice R5): the business screens (Today, Clients, Inbox, Numbers, Me, plus client, lead, quote, session, jobs, reserve, availability and schedule) now live in the MyBiz app's business area, with tabs following permissions. `business-app` still works until it is removed (R13); the MyBiz-team area is still a placeholder (R6).
 - One app, MyBiz-team area (round 3, slice R6): the team screens (Home, Businesses, Inbox, Me, plus a business and a contact request) now live in the MyBiz app under `/platform`, with tabs following the team permissions and the area switcher in Me. `staff-app` still works until it is removed (R13).
