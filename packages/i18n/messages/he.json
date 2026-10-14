@@ -1241,6 +1241,40 @@
         "health_declaration_review": "הצהרת הבריאות שלך ממתינה לעסק.",
         "generic": "משהו השתבש. נסו שוב."
       }
+    },
+    "homeCards": {
+      "nothingBooked": "עדיין לא נקבע כלום.",
+      "bookNow": "להזמין עכשיו",
+      "navigate": "ניווט",
+      "addToCalendar": "הוספה ליומן",
+      "cancelFailed": "הביטול לא הושלם. נסו שוב.",
+      "membership": "המנוי שלך",
+      "noPlan": "אין מנוי פעיל",
+      "noPlanHint": "אפשר לראות את המנויים והכרטיסיות שבהצעה",
+      "bookTitle": "הזמנה",
+      "rebook": "להזמין שוב",
+      "rebookTitle": "להזמין שוב: {service}",
+      "rebookHint": "הביקור האחרון שלך היה ב-{date}",
+      "manage": "ניהול",
+      "health": "הצהרת בריאות",
+      "healthOk": "חתומה ומעודכנת",
+      "healthUntil": "בתוקף עד {date}",
+      "documents": "מסמכים",
+      "documentsCount": "{count, plural, =0 {עדיין לא שותף כלום} one {מסמך אחד} other {# מסמכים}}",
+      "quotes": "הצעות מחיר וחשבונות",
+      "quotesCount": "{count, plural, =0 {עדיין אין} one {הצעה או חשבון אחד} other {# הצעות וחשבונות}}",
+      "addresses": "הכתובות שלי",
+      "addressesHint": "לאן אנחנו מגיעים אליך",
+      "updates": "עדכונים אחרונים",
+      "seeAll": "הצג הכול",
+      "noUpdates": "אין חדש כרגע.",
+      "businessInfo": "איפה אנחנו",
+      "noAddress": "עדיין לא הוגדרה כתובת",
+      "groups": {
+        "today": "היום",
+        "week": "השבוע",
+        "earlier": "קודם"
+      }
     }
   },
   "join": {

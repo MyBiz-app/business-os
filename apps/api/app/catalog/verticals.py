@@ -77,6 +77,8 @@ class VerticalPack:
     default_preset: str  # modules a new business starts with (app/commerce/modules.py PRESETS)
     health_form: str | None = None  # app/catalog/health.py FORMS key clients sign before booking
     recommended_modules: tuple[str, ...] = ()
+    # The client app's home cards, top to bottom (CLIENT_HOME_CARDS in packages/verticals).
+    client_home: tuple[str, ...] = ("next_booking", "shortcuts", "updates", "business_info")
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
     default_services: tuple[DefaultService, ...] = field(default_factory=tuple)
     default_rooms: tuple[DefaultRoom, ...] = field(default_factory=tuple)
@@ -176,6 +178,7 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
         default_preset=get("default_preset", "starter"),
         health_form=get("health_form"),
         recommended_modules=tuple(get("recommended_modules", ())),
+        client_home=tuple(get("client_home", VerticalPack.client_home)),
         default_plans=(
             tuple(_plan(p) for p in raw["default_plans"])
             if "default_plans" in raw

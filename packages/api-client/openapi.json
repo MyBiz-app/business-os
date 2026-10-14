@@ -21036,6 +21036,59 @@
         ]
       }
     },
+    "/client/locations": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Business Locations",
+        "description": "The business's branches with their addresses (the home screen's business details).",
+        "operationId": "business_locations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClientLocation"
+                  },
+                  "title": "Response Business Locations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/profile": {
       "patch": {
         "tags": [
@@ -26125,6 +26178,14 @@
             "description": "Every booking says which pet / child comes",
             "default": false
           },
+          "home_cards": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Home Cards",
+            "description": "The cards of the client's home screen, top to bottom (from the industry)"
+          },
           "client_id": {
             "type": "string",
             "format": "uuid",
@@ -26594,6 +26655,37 @@
         ],
         "title": "ClientListItem",
         "description": "A row of the clients list: the client plus what the list shows at a glance."
+      },
+      "ClientLocation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "address"
+        ],
+        "title": "ClientLocation"
       },
       "ClientNote": {
         "properties": {

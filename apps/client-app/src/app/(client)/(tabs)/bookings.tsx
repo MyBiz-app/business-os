@@ -1,16 +1,19 @@
 import type { components } from "@business-os/api-client";
-import { formatTime } from "@business-os/i18n/dates";
+import { formatTime, todayIn } from "@business-os/i18n/dates";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
-import { Badge, SectionTitle } from "@business-os/app-kit/components/rows";
+import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { Button, Card, EmptyState, Heading, LoadError, Screen, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
+import { tint } from "@business-os/app-kit/lib/brand";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { BookingActions } from "@/components/booking-actions";
+import { addressOf, useLocations } from "@/lib/use-locations";
 import { useBusiness } from "@/providers/business-provider";
 
 type Booking = components["schemas"]["ClientBooking"];
@@ -39,10 +42,12 @@ export default function Bookings() {
 
   const load = useCallback(async () => {
     if (!business) return null;
-    const [all, entitlements, plans] = await Promise.all([
+    const [all, entitlements, plans, sessions] = await Promise.all([
       api.GET("/client/bookings", { params: scope }).then(unwrap),
       api.GET("/client/entitlements", { params: scope }).then(unwrap),
       api.GET("/client/plans", { params: scope }).then(unwrap),
+      // Only to learn where each upcoming booking takes place (navigation).
+      api.GET("/client/sessions", { params: { ...scope, query: { start: todayIn(business.time_zone), days: 14 } } }).then((r) => r.data ?? []),
     ]);
     const now = Date.now();
     return {
@@ -50,9 +55,11 @@ export default function Bookings() {
       past: all.filter((b) => Date.parse(b.starts_at) < now || b.status === "cancelled"),
       current: entitlements.filter((e) => CURRENT.has(e.state)),
       plans,
+      branchOf: new Map(sessions.map((x) => [x.id, x.location_name])),
     };
   }, [api, scope, business]);
   const { data, error, loading, reload } = useLoad(load);
+  const locations = useLocations();
   const [buying, setBuying] = useState<string | null>(null);
   const [allHistory, setAllHistory] = useState(false);
   const [purchase, setPurchase] = useState<{ ok: boolean; message: string } | null>(null);
@@ -107,6 +114,34 @@ export default function Bookings() {
         }
         tone={TONE[booking.session_status === "cancelled" ? "cancelled" : booking.status] ?? "muted"}
         palette={palette}
+      />
+    </View>
+  );
+
+  const dayNumber = new Intl.DateTimeFormat(locale, { day: "numeric", timeZone: business.time_zone });
+  const monthShort = new Intl.DateTimeFormat(locale, { month: "short", timeZone: business.time_zone });
+  /** An upcoming booking: its date, time and status, with navigate / calendar / cancel. */
+  const upcomingCard = (booking: Booking) => (
+    <View key={booking.id} style={[local.upcoming, { borderColor: palette.border }]}>
+      <View style={local.upcomingHead}>
+        <View style={[local.dateBlock, { backgroundColor: tint(palette.primary, 0.12) }]}>
+          <Text style={[local.dateDay, { color: palette.primary }]}>{dayNumber.format(new Date(booking.starts_at))}</Text>
+          <Text style={[local.dateMonth, { color: palette.primary }]}>{monthShort.format(new Date(booking.starts_at))}</Text>
+        </View>
+        <View style={local.info}>
+          <Text style={[local.name, { color: palette.foreground }]}>{booking.service_name}</Text>
+          <Text style={[local.meta, { color: palette.muted }]}>
+            {formatTime(booking.starts_at, locale, business.time_zone)}–{formatTime(booking.ends_at, locale, business.time_zone)}
+            {booking.dependent_name ? ` · ${booking.dependent_name}` : ""}
+          </Text>
+        </View>
+        <Badge label={tStatus(`statuses.${booking.status}`)} tone={TONE[booking.status] ?? "muted"} palette={palette} />
+      </View>
+      <BookingActions
+        booking={booking}
+        address={addressOf(locations, data?.branchOf.get(booking.session_id))}
+        onChange={() => void reload()}
+        only={booking.status === "waitlisted" ? "cancel" : undefined}
       />
     </View>
   );
@@ -206,7 +241,7 @@ export default function Bookings() {
         {t("upcoming")}
       </Heading>
       {data?.upcoming.length ? (
-        <Card palette={palette}>{data.upcoming.map(row)}</Card>
+        <View style={local.upcomingList}>{data.upcoming.map(upcomingCard)}</View>
       ) : error !== undefined && !data ? null : (
         <EmptyState palette={palette} message={t("noUpcoming")} loading={loading} />
       )}
@@ -221,6 +256,7 @@ export default function Bookings() {
           <Card palette={palette}>{(allHistory ? data.past : data.past.slice(0, HISTORY_PAGE)).map(row)}</Card>
         </>
       ) : null}
+      <ListRow palette={palette} title={t("receipts")} onPress={() => router.push("/receipts")} />
     </Screen>
   );
 }
@@ -232,4 +268,10 @@ const local = StyleSheet.create({
   meta: { fontSize: 14, textAlign: "left" },
   status: { fontSize: 14, fontWeight: "600" },
   buy: { minWidth: 96 },
+  upcomingList: { gap: 12 },
+  upcoming: { borderWidth: 1, borderRadius: 20, padding: 14, gap: 12 },
+  upcomingHead: { flexDirection: "row", alignItems: "center", gap: 12 },
+  dateBlock: { width: 54, paddingVertical: 8, borderRadius: 14, alignItems: "center" },
+  dateDay: { fontSize: 20, fontWeight: "800" },
+  dateMonth: { fontSize: 12, fontWeight: "600", textTransform: "uppercase" },
 });
