@@ -653,6 +653,21 @@ html[data-motion="reduce"] *::after {
   scroll-behavior: auto !important;
 }
 
+/* The navigation frame (top bar + side menu): Midnight Navy in light and night mode, one token. */
+:root {
+  --frame: #0f172a;
+}
+
+/* The page behind the cards of the business app and the console: a soft blue-gray in light
+ * mode (cards stay white on it); the plain background in night mode. */
+.app-shell {
+  --page: color-mix(in oklab, var(--background) 92%, #475569);
+  background: var(--page);
+}
+.dark .app-shell {
+  --page: var(--background);
+}
+
 /* The navigation column: Midnight Navy in light and night mode. Its tokens are redefined so
  * everything inside (workspace switcher, menu, badges) reads correctly without its own colors;
  * a business's brand color is lightened toward white so it stays visible on navy. */
@@ -665,7 +680,7 @@ html[data-motion="reduce"] *::after {
   --primary: color-mix(in oklab, var(--brand, var(--palette-primary)) 55%, white);
   --on-primary: #0b1020;
   --shadow-color: 222 40% 2%;
-  background: #0f172a;
+  background: var(--frame);
   color: var(--foreground);
 }
 

@@ -8,7 +8,12 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 export async function AppHeader({ children }: { children?: React.ReactNode }) {
   const t = await getTranslations("app");
   return (
-    <header className="sticky top-0 z-30 flex print:hidden flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border/70 bg-background/75 px-4 py-3 sm:px-6 backdrop-blur-xl md:h-16 md:py-0">
+    <header
+      className={`sticky top-0 z-30 flex print:hidden flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border/70 px-4 py-3 sm:px-6 md:h-16 md:py-0 ${
+        // Signed in: the top bar is part of the navy frame (same tokens as the side menu).
+        children ? "nav-dark" : "bg-background/75 backdrop-blur-xl"
+      }`}
+    >
       <Link href="/" className="group flex items-center gap-2 text-lg font-bold">
         <BrandMark className="size-8 drop-shadow-md transition-transform duration-300 group-hover:rotate-12" />
         {t("name")}
