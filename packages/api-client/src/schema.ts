@@ -2491,6 +2491,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/publish-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Week
+         * @description Opens the next week for clients ahead of the scheduled release (or the rolling horizon).
+         */
+        post: operations["publish_week"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/closed-days": {
         parameters: {
             query?: never;
@@ -4097,9 +4117,50 @@ export interface paths {
         };
         /**
          * Client Sessions
-         * @description Upcoming sessions in the window (past ones are left out).
+         * @description Upcoming sessions in the window (past ones are left out). Classes the business has not
+         *     released yet are left out too, unless the client already holds a booking in them.
          */
         get: operations["client_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/schedule-release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Schedule Release
+         * @description How far ahead classes can be booked and when the next week opens.
+         */
+        get: operations["client_schedule_release"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/instructors/{user_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Instructor Avatar
+         * @description The picture of someone who works in the client's business.
+         */
+        get: operations["instructor_avatar"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6088,6 +6149,8 @@ export interface components {
             spots_left: number;
             /** Waitlisted */
             waitlisted: number;
+            /** @description Who teaches or serves */
+            instructor?: components["schemas"]["Instructor"] | null;
             /**
              * Address
              * @description My on-site job: where (#42)
@@ -7076,6 +7139,24 @@ export interface components {
             /** Website */
             website?: string | null;
         };
+        /** Instructor */
+        Instructor: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Name
+             * @description Their name, if they set one
+             */
+            name: string | null;
+            /**
+             * Avatar Url
+             * @description Path of their picture on this API (members of the business only), if any
+             */
+            avatar_url: string | null;
+        };
         /** InstructorOption */
         InstructorOption: {
             /**
@@ -7664,6 +7745,11 @@ export interface components {
              * @description Path of the person's own picture on this API, if any
              */
             avatar_url?: string | null;
+            /**
+             * Status Text
+             * @description A short free-text status shown on the profile (up to 80)
+             */
+            status_text?: string | null;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
             /**
@@ -8601,6 +8687,15 @@ export interface components {
              */
             published: number;
         };
+        /** PublishedWeek */
+        PublishedWeek: {
+            /**
+             * Published Until
+             * Format: date
+             * @description Last local date clients can now book
+             */
+            published_until: string;
+        };
         /** PushTokenBody */
         PushTokenBody: {
             /** Token */
@@ -9445,6 +9540,35 @@ export interface components {
             rooms: components["schemas"]["RoomOption"][];
             /** Instructors */
             instructors: components["schemas"]["InstructorOption"][];
+        };
+        /** ScheduleRelease */
+        ScheduleRelease: {
+            /**
+             * Published Until
+             * Format: date
+             * @description Last local date classes can be booked
+             */
+            published_until: string;
+            /**
+             * Next Release At
+             * @description When the next week opens by itself (weekly release only)
+             */
+            next_release_at: string | null;
+            /**
+             * Weekly Release Weekday
+             * @description 0 = Monday, 6 = Sunday
+             */
+            weekly_release_weekday: number | null;
+            /**
+             * Weekly Release Time
+             * @description Local time the next week opens
+             */
+            weekly_release_time: string | null;
+            /**
+             * Booking Horizon Days
+             * @description Days ahead classes open without a weekly release
+             */
+            booking_horizon_days: number;
         };
         /** ScheduledSession */
         ScheduledSession: {
@@ -10407,6 +10531,22 @@ export interface components {
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
+             * Booking Horizon Days
+             * @description Without a weekly release: how many days ahead classes open
+             * @default 7
+             */
+            booking_horizon_days: number;
+            /**
+             * Weekly Release Weekday
+             * @description Weekly release: 0 = Monday, 6 = Sunday; none: rolling horizon
+             */
+            weekly_release_weekday?: number | null;
+            /**
+             * Weekly Release Time
+             * @description Weekly release: local time the next week opens
+             */
+            weekly_release_time?: string | null;
+            /**
              * Booking Requires Plan
              * @description Clients need a valid plan to book in the app
              */
@@ -10558,6 +10698,12 @@ export interface components {
             primary_color?: string | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes?: number | null;
+            /** Booking Horizon Days */
+            booking_horizon_days?: number | null;
+            /** Weekly Release Weekday */
+            weekly_release_weekday?: number | null;
+            /** Weekly Release Time */
+            weekly_release_time?: string | null;
             /** Booking Requires Plan */
             booking_requires_plan?: boolean | null;
             /** Requires Health Declaration */
@@ -11033,6 +11179,8 @@ export interface components {
             postal_code?: string | null;
             /** Email Roster */
             email_roster?: boolean | null;
+            /** Status Text */
+            status_text?: string | null;
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
@@ -17502,6 +17650,39 @@ export interface operations {
             };
         };
     };
+    publish_week: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishedWeek"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_closed_days: {
         parameters: {
             query?: {
@@ -20964,6 +21145,8 @@ export interface operations {
                 /** @description First local date (business time zone) */
                 start: string;
                 days?: number;
+                /** @description Only this instructor's */
+                instructor_id?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -20980,6 +21163,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_schedule_release: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleRelease"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    instructor_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
                 };
             };
             /** @description Validation Error */

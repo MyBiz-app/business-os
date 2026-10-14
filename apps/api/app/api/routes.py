@@ -44,7 +44,8 @@ def load_current_tenant(session: Session) -> Tenant:
         session.execute(
             text("""
                 SELECT t.id, t.name, t.vertical, t.locale, t.time_zone, t.currency,
-                       t.primary_color, t.cancellation_window_minutes, t.booking_requires_plan,
+                       t.primary_color, t.cancellation_window_minutes, t.booking_horizon_days,
+                       t.weekly_release_weekday, t.weekly_release_time, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.resource_payment,
                        t.schedule_default_view,
                        coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
@@ -221,7 +222,7 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
                        END AS palette_colors,
                        CASE WHEN avatar_updated_at IS NULL THEN NULL
                             ELSE '/me/avatar?v=' || extract(epoch FROM avatar_updated_at)::bigint
-                       END AS avatar_url
+                       END AS avatar_url, status_text
                 FROM app.users WHERE id = :id
             """),
             {"id": user.id},
@@ -304,6 +305,7 @@ class ProfileUpdate(BaseModel):
     city: str | None = Field(default=None, max_length=100)
     postal_code: str | None = Field(default=None, max_length=20)
     email_roster: bool | None = None
+    status_text: str | None = Field(default=None, max_length=80)
     palette: Palette | None = None
     palette_colors: PaletteColors | None = None
 
@@ -320,7 +322,9 @@ class ProfileUpdate(BaseModel):
             raise ValueError("the date of birth cannot be in the future")
         return value
 
-    @field_validator("full_name", "phone", "address_line", "city", "postal_code", mode="before")
+    @field_validator(
+        "full_name", "phone", "address_line", "city", "postal_code", "status_text", mode="before"
+    )
     @classmethod
     def blank(cls, value: object) -> object:
         return value.strip() or None if isinstance(value, str) else value

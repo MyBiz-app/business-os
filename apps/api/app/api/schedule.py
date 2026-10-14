@@ -15,6 +15,7 @@ from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.core.permissions import Permission
 from app.messaging.notifications import live_clients, notify, notify_sessions, session_snapshot
+from app.schedule.release import MAX_AHEAD_DAYS, load_release
 from app.schedule.scheduling import local_to_utc, weekly_occurrences
 
 router = APIRouter(tags=["schedule"])
@@ -711,6 +712,29 @@ class ClosedDayCreate(BaseModel):
 class ClosedDayCreated(BaseModel):
     closed_day: ClosedDay
     cancelled_sessions: int
+
+
+class PublishedWeek(BaseModel):
+    published_until: dt.date = Field(description="Last local date clients can now book")
+
+
+@router.post("/sessions/publish-week")
+def publish_week(context: WriteDep) -> PublishedWeek:
+    """Opens the next week for clients ahead of the scheduled release (or the rolling horizon)."""
+    db = context.session
+    release, time_zone = load_release(db)
+    today = datetime.now(ZoneInfo(time_zone)).date()
+    until = release.published_until + timedelta(days=7)
+    if until > today + timedelta(days=MAX_AHEAD_DAYS):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="already_published")
+    db.execute(
+        text("""
+            UPDATE app.tenants SET schedule_published_until = :until
+            WHERE id = app.current_tenant_id()
+        """),
+        {"until": until},
+    )
+    return PublishedWeek(published_until=until)
 
 
 @router.get("/closed-days")
