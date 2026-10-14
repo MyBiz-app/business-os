@@ -5028,5 +5028,17 @@
     "expired": "That offer has expired. Ask again and I'll check what's free.",
     "failed": "Sorry, I couldn't book that one. Ask again and I'll check what's free.",
     "unavailable": "I can't answer right now. The team will get back to you soon."
+  },
+  "appLock": {
+    "title": "MyBiz is locked",
+    "subtitle": "Verify it's you to continue.",
+    "failed": "Couldn't verify you. Try again.",
+    "unlock": "Unlock",
+    "signOut": "Sign out",
+    "prompt": "Unlock MyBiz",
+    "cancel": "Cancel",
+    "setting": "Unlock with Face ID or fingerprint",
+    "on": "On",
+    "off": "Off"
   }
 }
