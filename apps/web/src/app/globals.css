@@ -829,3 +829,59 @@ html[data-contrast="high"].dark .mk {
 h1[tabindex="-1"]:focus {
   outline: none;
 }
+
+/* The launch screen (components/launch-splash.tsx): covers the page for a moment, the mark
+ * pops in and breathes, then the whole layer fades out by itself and stops intercepting
+ * taps. Plays once per browser session. Reduced motion: a short plain fade, no movement. */
+.launch-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  pointer-events: none;
+  animation: launch-fade 0.45s ease 1.05s both;
+}
+:root[data-splash="off"] .launch-splash {
+  display: none;
+}
+.launch-splash-mark {
+  filter: drop-shadow(0 12px 28px color-mix(in srgb, var(--brand-via) 35%, transparent));
+  animation:
+    launch-pop 0.7s var(--ease-out) both,
+    launch-breathe 1.2s ease-in-out 0.7s both;
+}
+@keyframes launch-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes launch-breathe {
+  50% {
+    transform: scale(1.06);
+  }
+}
+@keyframes launch-fade {
+  from {
+    opacity: 1;
+    visibility: visible;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .launch-splash {
+    animation: launch-fade 0.3s ease 0.4s both;
+  }
+  .launch-splash-mark {
+    animation: none;
+  }
+}

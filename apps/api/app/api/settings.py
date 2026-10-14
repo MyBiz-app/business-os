@@ -1,7 +1,8 @@
 """Business settings and branding."""
 
+from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response, UploadFile, status
@@ -196,17 +197,7 @@ def get_cover(context: TenantDep) -> Response:
 public_router = APIRouter(prefix="/public", tags=["public"])
 
 
-@public_router.get(
-    "/tenants/{tenant_id}/logo",
-    response_class=Response,
-    responses={200: {"content": {"image/png": {}, "image/jpeg": {}, "image/webp": {}}}},
-)
-def get_logo(tenant_id: UUID, session: AnonymousSessionDep) -> Response:
-    row = (
-        session.execute(text("SELECT * FROM app.tenant_logo(:id)"), {"id": tenant_id})
-        .mappings()
-        .first()
-    )
+def _public_logo(row: Mapping[str, Any] | None) -> Response:
     if row is None:
         raise not_found()
     # URLs carry ?v=<updated_at>, so a logo URL never changes content and can be cached long.
@@ -219,4 +210,24 @@ def get_logo(tenant_id: UUID, session: AnonymousSessionDep) -> Response:
             "Expires": expires.strftime("%a, %d %b %Y %H:%M:%S GMT"),
             "X-Content-Type-Options": "nosniff",
         },
+    )
+
+
+@public_router.get("/tenants/{tenant_id}/logo", response_class=Response, responses=IMAGE_RESPONSES)
+def get_logo(tenant_id: UUID, session: AnonymousSessionDep) -> Response:
+    return _public_logo(
+        session.execute(text("SELECT * FROM app.tenant_logo(:id)"), {"id": tenant_id})
+        .mappings()
+        .first()
+    )
+
+
+@public_router.get(
+    "/locations/{location_id}/logo", response_class=Response, responses=IMAGE_RESPONSES
+)
+def get_location_logo(location_id: UUID, session: AnonymousSessionDep) -> Response:
+    return _public_logo(
+        session.execute(text("SELECT * FROM app.location_logo(:id)"), {"id": location_id})
+        .mappings()
+        .first()
     )

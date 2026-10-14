@@ -1519,6 +1519,24 @@ export interface paths {
         patch: operations["update_room"];
         trace?: never;
     };
+    "/locations/{location_id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload Location Logo */
+        put: operations["upload_location_logo"];
+        post?: never;
+        /** Delete Location Logo */
+        delete: operations["delete_location_logo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -4562,6 +4580,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/locations/{location_id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Location Logo */
+        get: operations["get_location_logo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5055,6 +5090,11 @@ export interface components {
              * @default false
              */
             sign_requested: boolean;
+        };
+        /** Body_upload_location_logo */
+        Body_upload_location_logo: {
+            /** File */
+            file: string;
         };
         /** Body_upload_logo */
         Body_upload_logo: {
@@ -7471,6 +7511,26 @@ export interface components {
             updated_at: string;
             /** Rooms */
             rooms: components["schemas"]["Room"][];
+            /**
+             * Primary Color
+             * @description The branch's own color, if it set one
+             */
+            primary_color: string | null;
+            /**
+             * Logo Url
+             * @description The branch's own logo (public path), if it set one
+             */
+            logo_url: string | null;
+            /**
+             * Effective Primary Color
+             * @description The branch's color, else the network's
+             */
+            effective_primary_color: string | null;
+            /**
+             * Effective Logo Url
+             * @description The branch's logo, else the network's logo, else none (show initials)
+             */
+            effective_logo_url: string | null;
         };
         /** LocationCreate */
         LocationCreate: {
@@ -7487,6 +7547,11 @@ export interface components {
             address?: string | null;
             /** Active */
             active?: boolean | null;
+            /**
+             * Primary Color
+             * @description The branch's own accent color; null falls back to the network's
+             */
+            primary_color?: string | null;
         };
         /** MarkRead */
         MarkRead: {
@@ -14825,6 +14890,80 @@ export interface operations {
             };
         };
     };
+    upload_location_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_location_logo"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_location_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_team: {
         parameters: {
             query?: never;
@@ -21723,6 +21862,39 @@ export interface operations {
             header?: never;
             path: {
                 tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_location_logo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
             };
             cookie?: never;
         };

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
+import { ShowAccessibilityButton } from "@/components/marketing/show-accessibility-button";
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { socialLinks } from "@/lib/social";
@@ -84,6 +85,7 @@ export async function MarketingFooter() {
       <div className="border-t border-white/10">
         <Container className="flex flex-wrap items-center justify-between gap-4 py-5">
           <p className="text-xs text-white/50">{t("footer.rights", { year: new Date().getFullYear() })}</p>
+          <ShowAccessibilityButton />
           <ThemeToggle className="!border-white/20 !bg-white/5 !text-white/80 hover:!bg-white/10 hover:!text-white" />
         </Container>
       </div>

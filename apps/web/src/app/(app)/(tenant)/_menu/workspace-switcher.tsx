@@ -14,9 +14,11 @@ import { switchBranch, switchBusiness } from "./actions";
 type Props = {
   name: string;
   logo: string | null;
+  /** The letter shown when there is no logo. */
+  initial: string;
   current: string;
   memberships: { tenant_id: string; tenant_name: string }[];
-  branches: { id: string; name: string }[];
+  branches: { id: string; name: string; /** The branch's own logo, if it has one */ logo: string | null }[];
   /** The current branch, or null for all of them. */
   branch: string | null;
 };
@@ -26,7 +28,7 @@ const SEARCH_FROM = 8;
 /** The business ("network") and branch at the top of the side menu, in one popover: the open
  * business with its branches (each in the color it has in the calendar and reports), then the
  * person's other businesses. Long lists get a search field. */
-export function WorkspaceSwitcher({ name, logo, current, memberships, branches, branch }: Props) {
+export function WorkspaceSwitcher({ name, logo, initial, current, memberships, branches, branch }: Props) {
   const t = useTranslations("businessMenu");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -80,7 +82,7 @@ export function WorkspaceSwitcher({ name, logo, current, memberships, branches, 
           <Image src={logo} alt="" width={40} height={40} unoptimized className="size-10 shrink-0 rounded-xl object-contain shadow-sm" />
         ) : (
           <span aria-hidden="true" className="btn-primary size-10 shrink-0 text-lg">
-            {name.slice(0, 1)}
+            {initial}
           </span>
         )}
         <span className="flex min-w-0 flex-1 flex-col">
@@ -150,11 +152,15 @@ export function WorkspaceSwitcher({ name, logo, current, memberships, branches, 
                 {shownBranches.map((b) => (
                   <li key={b.id}>
                     <button type="button" data-item aria-current={b.id === branch} onClick={() => run(switchBranch, "branch_id", b.id)} className={option}>
-                      <span
-                        aria-hidden="true"
-                        className="relative mx-1 size-2 shrink-0 rounded-full ring-4 ring-surface"
-                        style={{ background: branchColor(b.index) }}
-                      />
+                      {b.logo ? (
+                        <Image src={b.logo} alt="" width={24} height={24} unoptimized className="relative size-6 shrink-0 rounded-md bg-surface object-contain ring-2 ring-surface" />
+                      ) : (
+                        <span
+                          aria-hidden="true"
+                          className="relative mx-1 size-2 shrink-0 rounded-full ring-4 ring-surface"
+                          style={{ background: branchColor(b.index) }}
+                        />
+                      )}
                       <span dir="auto" className="flex-1 truncate">
                         {b.name}
                       </span>

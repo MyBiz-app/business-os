@@ -2,13 +2,14 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import TenantContext, require
+from app.api.settings import MAX_LOGO_BYTES, read_image
 from app.commerce.modules import MODULES
 from app.core.permissions import Permission
 
@@ -18,7 +19,21 @@ ReadDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CATALOG_WRITE))]
 SettingsDep = Annotated[TenantContext, Depends(require(Permission.BUSINESS_SETTINGS))]
 
-LOCATION_COLUMNS = "id, name, address, active, created_at, updated_at"
+# A branch shows its own logo and color, else the network's (the business's own).
+LOCATION_COLUMNS = """
+    l.id, l.name, l.address, l.active, l.created_at, l.updated_at,
+    l.primary_color,
+    CASE WHEN l.logo IS NULL THEN NULL
+         ELSE '/public/locations/' || l.id || '/logo?v='
+              || extract(epoch FROM l.logo_updated_at)::bigint END AS logo_url,
+    coalesce(l.primary_color, t.primary_color) AS effective_primary_color,
+    CASE WHEN l.logo IS NOT NULL
+              THEN '/public/locations/' || l.id || '/logo?v='
+                   || extract(epoch FROM l.logo_updated_at)::bigint
+         WHEN t.logo IS NOT NULL
+              THEN '/public/tenants/' || t.id || '/logo?v='
+                   || extract(epoch FROM t.logo_updated_at)::bigint END AS effective_logo_url
+"""
 ROOM_COLUMNS = "id, location_id, name, capacity, active, bookable"
 
 
@@ -47,6 +62,11 @@ class LocationUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     address: str | None = Field(default=None, max_length=300)
     active: bool | None = None
+    primary_color: str | None = Field(
+        default=None,
+        pattern=r"^#[0-9a-fA-F]{6}$",
+        description="The branch's own accent color; null falls back to the network's",
+    )
 
     @field_validator("address", mode="before")
     @classmethod
@@ -91,14 +111,23 @@ class Location(BaseModel):
     created_at: datetime
     updated_at: datetime
     rooms: list[Room]
+    primary_color: str | None = Field(description="The branch's own color, if it set one")
+    logo_url: str | None = Field(description="The branch's own logo (public path), if it set one")
+    effective_primary_color: str | None = Field(
+        description="The branch's color, else the network's"
+    )
+    effective_logo_url: str | None = Field(
+        description="The branch's logo, else the network's logo, else none (show initials)"
+    )
 
 
 def _load_locations(session: Session, location_id: UUID | None = None) -> list[Location]:
-    where, params = ("WHERE id = :id", {"id": location_id}) if location_id else ("", {})
+    where, params = ("WHERE l.id = :id", {"id": location_id}) if location_id else ("", {})
     locations = session.execute(
         text(
-            f"SELECT {LOCATION_COLUMNS} FROM app.locations {where}"
-            " ORDER BY active DESC, created_at, name"
+            f"SELECT {LOCATION_COLUMNS} FROM app.locations l"
+            f" JOIN app.tenants t ON t.id = l.tenant_id {where}"
+            " ORDER BY l.active DESC, l.created_at, l.name"
         ),
         params,
     ).mappings()
@@ -269,6 +298,8 @@ def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) 
         ).scalar_one()
         if others == 0:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_branch")
+    if "primary_color" in changes and Permission.BUSINESS_SETTINGS not in context.permissions:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
     assignments = set_clause(changes, LocationUpdate.model_fields)
     updated = context.session.execute(
         text(f"UPDATE app.locations SET {assignments} WHERE id = :id RETURNING id"),
@@ -320,3 +351,35 @@ def update_room(room_id: UUID, body: RoomUpdate, context: WriteDep) -> Room:
     if row is None:
         raise not_found()
     return Room.model_validate(dict(row))
+
+
+@router.put("/locations/{location_id}/logo")
+def upload_location_logo(location_id: UUID, file: UploadFile, context: SettingsDep) -> Location:
+    data, content_type = read_image(file, MAX_LOGO_BYTES)
+    updated = context.session.execute(
+        text("""
+            UPDATE app.locations
+            SET logo = :logo, logo_content_type = :content_type, logo_updated_at = now(),
+                updated_at = now()
+            WHERE id = :id RETURNING id
+        """),
+        {"logo": data, "content_type": content_type, "id": location_id},
+    ).first()
+    if updated is None:
+        raise not_found()
+    return _one_location(context.session, location_id)
+
+
+@router.delete("/locations/{location_id}/logo")
+def delete_location_logo(location_id: UUID, context: SettingsDep) -> Location:
+    updated = context.session.execute(
+        text("""
+            UPDATE app.locations
+            SET logo = NULL, logo_content_type = NULL, logo_updated_at = NULL, updated_at = now()
+            WHERE id = :id RETURNING id
+        """),
+        {"id": location_id},
+    ).first()
+    if updated is None:
+        raise not_found()
+    return _one_location(context.session, location_id)

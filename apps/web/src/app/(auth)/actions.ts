@@ -4,13 +4,17 @@ import type { AuthError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { appleEnabled, OAUTH_PROVIDERS, type OAuthProvider } from "@/lib/auth-providers";
+import { appleEnabled, OAUTH_PROVIDERS, type OAuthProvider, whatsappEnabled } from "@/lib/auth-providers";
 import { AUTH_NEXT_COOKIE, safeNext } from "@/lib/navigation";
+import { OTP_LENGTH, type OtpChannel, toE164 } from "@/lib/otp";
 import { siteOrigin } from "@/lib/origin";
 import { resumeMetadata } from "@/lib/resume";
 import { createClient } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; notice?: string; email?: string };
+
+/** State of the one-time-code sign-in: after the code is sent `target` is the email or E.164 number. */
+export type CodeState = { error?: string; channel?: OtpChannel; target?: string };
 
 const KNOWN_ERRORS = new Set([
   "invalid_credentials",
@@ -19,6 +23,7 @@ const KNOWN_ERRORS = new Set([
   "user_already_exists",
   "over_email_send_rate_limit",
   "email_send_failed",
+  "over_sms_send_rate_limit",
 ]);
 
 /** Maps a Supabase auth error to a translation key under `auth.errors`. */
@@ -109,4 +114,40 @@ export async function signOut(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Step one of signing in with a code: email (new people are signed up) or, for someone who
+ * verified a number on their account, SMS or WhatsApp. */
+export async function sendLoginCode(_state: CodeState, formData: FormData): Promise<CodeState> {
+  const channel = field(formData, "channel") as OtpChannel;
+  const supabase = await createClient();
+  if (channel === "email") {
+    const email = field(formData, "email").toLowerCase();
+    if (!EMAIL.test(email)) return { error: "invalid_email" };
+    const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+    if (error) return { error: errorKey(error) };
+    return { channel, target: email };
+  }
+  if (channel !== "sms" && (channel !== "whatsapp" || !whatsappEnabled())) return { error: "generic" };
+  const phone = toE164(field(formData, "phone"));
+  if (!phone) return { error: "invalid_phone" };
+  const { error } = await supabase.auth.signInWithOtp({ phone, options: { shouldCreateUser: false, channel } });
+  if (error) return { error: error.code === "otp_disabled" || error.code === "user_not_found" ? "unknown_phone" : errorKey(error) };
+  return { channel, target: phone };
+}
+
+/** Step two: the six digits. */
+export async function verifyLoginCode(_state: CodeState, formData: FormData): Promise<CodeState> {
+  const channel = field(formData, "channel") as OtpChannel;
+  const target = field(formData, "target");
+  const token = field(formData, "code");
+  if (!new RegExp(`^\\d{${OTP_LENGTH}}$`).test(token)) return { error: "invalid_code", channel, target };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp(
+    channel === "email" ? { email: target, token, type: "email" } : { phone: target, token, type: "sms" },
+  );
+  if (error) return { error: "invalid_code", channel, target };
+  redirect(safeNext(formData.get("next")) ?? "/dashboard");
 }
