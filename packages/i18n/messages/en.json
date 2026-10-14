@@ -1915,6 +1915,7 @@
     }
   },
   "email": {
+    "details": { "service": "Class", "when": "When" },
     "greeting": "Hi {name},",
     "note": "Note from the business: {note}",
     "footer": "This message was sent by {business}. You can see all updates in the app.",
