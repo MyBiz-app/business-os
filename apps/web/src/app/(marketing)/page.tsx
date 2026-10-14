@@ -8,7 +8,6 @@ import { Section } from "@/components/layout/section";
 import {
   ChatMock,
   DashboardMock,
-  PhoneMock,
 } from "@/components/marketing/mocks";
 import {
   AboutTeaser,
@@ -17,6 +16,7 @@ import {
   FactsStrip,
   PricingTeaser,
 } from "@/components/marketing/home";
+import { HomePhone } from "@/components/marketing/home-phone";
 import { HeroIntro } from "@/components/marketing/hero-intro";
 import { Reveal } from "@/components/marketing/reveal";
 import {
@@ -186,7 +186,7 @@ export default async function Home() {
         innerClassName="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"
       >
         <Reveal>
-          <PhoneMock />
+          <HomePhone />
         </Reveal>
         <Reveal className="flex max-w-xl flex-col gap-5">
           <p className="text-sm font-semibold text-primary">
