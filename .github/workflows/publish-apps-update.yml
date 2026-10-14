@@ -60,4 +60,4 @@ jobs:
         working-directory: apps/${{ matrix.app }}
         run: |
           pnpm install --frozen-lockfile --dir ../..
-          npx --yes eas-cli@latest update --branch preview --platform all --non-interactive --message "${{ inputs.message }}"
+          npx --yes eas-cli@latest update --branch preview --environment preview --platform all --non-interactive --message "${{ inputs.message }}"
