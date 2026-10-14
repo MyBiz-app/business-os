@@ -6,6 +6,7 @@ import {
   ALL_VERTICALS,
   BOOKING_MODES,
   CATEGORIES,
+  CLIENT_HOME_CARDS,
   CURRENCIES,
   type Entry,
   FIELD_KINDS,
@@ -61,7 +62,7 @@ test("keys are unique, lower snake case, and statuses known", () => {
 test("every open category sets everything its sub-categories inherit", () => {
   for (const category of CATEGORIES.filter((c) => c.status !== "planned")) {
     for (const name of ["terms", "client_term", "booking_modes", "cancellation_window_minutes",
-      "booking_requires_plan", "default_preset", "recommended_modules", "client_fields"] as const) {
+      "booking_requires_plan", "default_preset", "recommended_modules", "client_fields", "client_home"] as const) {
       assert.notEqual(category[name], undefined, `${category.key}: ${name}`);
     }
   }
@@ -86,6 +87,12 @@ test("settings, starter content and client fields are valid", () => {
     for (const module of entry.recommended_modules ?? []) {
       assert.ok(RECOMMENDABLE.includes(module as (typeof RECOMMENDABLE)[number]), `${where}: module ${module}`);
     }
+    const home = entry.client_home ?? [];
+    assert.equal(new Set(home).size, home.length, `${where}: client_home repeats a card`);
+    for (const card of home) {
+      assert.ok(CLIENT_HOME_CARDS.includes(card), `${where}: client_home card ${card}`);
+    }
+    if (entry.client_home) assert.ok(home.includes("next_booking"), `${where}: client_home needs next_booking`);
     for (const mode of entry.booking_modes ?? []) {
       assert.ok(BOOKING_MODES.includes(mode as (typeof BOOKING_MODES)[number]), `${where}: mode ${mode}`);
     }
@@ -202,5 +209,14 @@ test("an industry by the hour starts with courts its services are booked in", ()
     const resources = v.defaultServices.filter((service) => service.booking_mode === "resource");
     if (resources.length > 0) assert.ok(v.defaultRooms.length > 0, `${v.key}: resource services need default_rooms`);
     if (resources.length > 0) assert.ok(v.bookingModes.includes("resource"), `${v.key}: booking_modes`);
+  }
+});
+
+test("a sub-category inherits its category's home cards unless it lists its own", () => {
+  for (const v of ALL_VERTICALS) {
+    const own = [...all].find(([e]) => e.key === v.key)![0].client_home;
+    const parent = v.parent ? vertical(v.parent)! : null;
+    assert.deepEqual(v.clientHome, own ?? parent?.clientHome ?? v.clientHome, v.key);
+    assert.ok(v.clientHome.length > 0, `${v.key}: has home cards`);
   }
 });

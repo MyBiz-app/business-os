@@ -19,12 +19,18 @@ export const ICONS = [
 ] as const;
 export const FIELD_KINDS = ["text", "long_text", "number", "date", "select"] as const;
 export const BOOKING_MODES = ["class", "appointment", "resource"] as const;
+/** The cards a client's home screen can show, in the order the entry lists them. */
+export const CLIENT_HOME_CARDS = [
+  "next_booking", "membership", "shortcuts", "rebook", "dependents", "health",
+  "documents", "quotes", "addresses", "updates", "business_info",
+] as const;
 export const PRESETS = ["starter", "growing", "ai_powered"] as const;
 export const RECOMMENDABLE = ["client_app", "ai", "crm", "whatsapp"] as const;
 export const LOCALES = ["he", "en"] as const;
 export const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 
 export type Status = (typeof STATUSES)[number];
+export type ClientHomeCard = (typeof CLIENT_HOME_CARDS)[number];
 export type Icon = (typeof ICONS)[number];
 
 export type ClientField = {
@@ -80,6 +86,8 @@ export type Entry = {
   terms?: string;
   client_term?: string;
   booking_modes?: string[];
+  /** The client app's home cards, top to bottom (replaces the parent's). */
+  client_home?: ClientHomeCard[];
   cancellation_window_minutes?: number;
   booking_requires_plan?: boolean;
   /** The health declaration clients sign before booking (app/catalog/health.py FORMS), if any. */
@@ -120,6 +128,7 @@ export type Vertical = {
   terms: string;
   clientTerm: string;
   bookingModes: string[];
+  clientHome: ClientHomeCard[];
   recommendedModules: string[];
   clientFields: ClientField[];
   /** Starter services and plans a new business gets (inherited when the entry has none). */
@@ -135,6 +144,9 @@ export type Vertical = {
 
 /** The categories in display order (catalog/*.json, gathered by `pnpm verticals:export`). */
 export const CATEGORIES: Entry[] = [...CATALOG].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+/** For an entry whose category lists none. */
+const DEFAULT_CLIENT_HOME: ClientHomeCard[] = ["next_booking", "shortcuts", "updates", "business_info"];
 
 function mergeFields(inherited: ClientField[], entry: Entry): ClientField[] {
   const base = entry.client_fields ?? inherited;
@@ -158,6 +170,7 @@ function build(): Map<string, Vertical> {
       terms: entry.terms ?? parent?.terms ?? "",
       clientTerm: entry.client_term ?? parent?.clientTerm ?? "client",
       bookingModes: entry.booking_modes ?? parent?.bookingModes ?? [],
+      clientHome: entry.client_home ?? parent?.clientHome ?? DEFAULT_CLIENT_HOME,
       recommendedModules: entry.recommended_modules ?? parent?.recommendedModules ?? [],
       clientFields: mergeFields(parent?.clientFields ?? [], entry),
       defaultServices: entry.default_services ?? parent?.defaultServices ?? [],

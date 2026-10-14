@@ -14,6 +14,14 @@ export const CATALOG: Entry[] = [
       "class",
       "appointment"
     ],
+    "client_home": [
+      "next_booking",
+      "membership",
+      "shortcuts",
+      "health",
+      "updates",
+      "business_info"
+    ],
     "cancellation_window_minutes": 120,
     "booking_requires_plan": true,
     "health_form": "fitness",
@@ -334,6 +342,13 @@ export const CATALOG: Entry[] = [
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "rebook",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 180,
     "booking_requires_plan": false,
@@ -839,6 +854,14 @@ export const CATALOG: Entry[] = [
     "booking_modes": [
       "appointment"
     ],
+    "client_home": [
+      "next_booking",
+      "health",
+      "documents",
+      "shortcuts",
+      "updates",
+      "business_info"
+    ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
     "default_preset": "growing",
@@ -1226,6 +1249,14 @@ export const CATALOG: Entry[] = [
       "class",
       "appointment"
     ],
+    "client_home": [
+      "next_booking",
+      "dependents",
+      "membership",
+      "shortcuts",
+      "updates",
+      "business_info"
+    ],
     "cancellation_window_minutes": 720,
     "booking_requires_plan": true,
     "default_preset": "growing",
@@ -1595,6 +1626,13 @@ export const CATALOG: Entry[] = [
     "booking_modes": [
       "appointment"
     ],
+    "client_home": [
+      "next_booking",
+      "rebook",
+      "shortcuts",
+      "updates",
+      "business_info"
+    ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
     "default_preset": "starter",
@@ -1845,6 +1883,14 @@ export const CATALOG: Entry[] = [
     "booking_modes": [
       "resource",
       "class"
+    ],
+    "client_home": [
+      "next_booking",
+      "rebook",
+      "membership",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -2108,6 +2154,13 @@ export const CATALOG: Entry[] = [
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "addresses",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -2375,6 +2428,14 @@ export const CATALOG: Entry[] = [
       "appointment",
       "class"
     ],
+    "client_home": [
+      "next_booking",
+      "dependents",
+      "rebook",
+      "shortcuts",
+      "updates",
+      "business_info"
+    ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
     "default_preset": "starter",
@@ -2571,6 +2632,13 @@ export const CATALOG: Entry[] = [
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "quotes",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 2880,
     "booking_requires_plan": false,
@@ -2805,6 +2873,14 @@ export const CATALOG: Entry[] = [
     "booking_modes": [
       "appointment"
     ],
+    "client_home": [
+      "next_booking",
+      "documents",
+      "quotes",
+      "shortcuts",
+      "updates",
+      "business_info"
+    ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
     "default_preset": "growing",
@@ -3019,6 +3095,12 @@ export const CATALOG: Entry[] = [
     "booking_modes": [
       "appointment",
       "class"
+    ],
+    "client_home": [
+      "next_booking",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,

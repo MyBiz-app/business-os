@@ -75,10 +75,20 @@ class ClientBusiness(BaseModel):
     dependent_required: bool = Field(
         default=False, description="Every booking says which pet / child comes"
     )
+    home_cards: list[str] = Field(
+        default_factory=list,
+        description="The cards of the client's home screen, top to bottom (from the industry)",
+    )
     client_id: UUID
     first_name: str
     last_name: str | None
     phone: str | None
+
+
+class ClientLocation(BaseModel):
+    id: UUID
+    name: str
+    address: str | None
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -88,6 +98,7 @@ def _business(row: Mapping[str, object]) -> ClientBusiness:
             **row,
             "dependents": pack.dependents if pack else None,
             "dependent_required": pack.dependent_required if pack else False,
+            "home_cards": list(pack.client_home) if pack else [],
         }
     )
 
@@ -176,6 +187,15 @@ def my_businesses(session: SessionDep) -> list[ClientBusiness]:
     """Every business the signed-in user has joined as a client."""
     rows = session.execute(text(f"{BUSINESS_SELECT} ORDER BY t.name")).mappings()
     return [_business(row) for row in rows]
+
+
+@router.get("/locations")
+def business_locations(context: ClientDep) -> list[ClientLocation]:
+    """The business's branches with their addresses (the home screen's business details)."""
+    rows = context.session.execute(
+        text("SELECT id, name, address FROM app.locations WHERE active ORDER BY name, id")
+    ).mappings()
+    return [ClientLocation.model_validate(dict(row)) for row in rows]
 
 
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)

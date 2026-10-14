@@ -17,6 +17,7 @@ import {
   FactsStrip,
   PricingTeaser,
 } from "@/components/marketing/home";
+import { HeroIntro } from "@/components/marketing/hero-intro";
 import { Reveal } from "@/components/marketing/reveal";
 import {
   BranchesSection,
@@ -46,8 +47,10 @@ export default async function Home() {
     <main className="enter flex flex-col">
       <OrganizationData />
       <FaqData />
+      <HeroIntro />
       {/* Hero */}
       <Section
+        id="hero"
         tone="inverse"
         spacing="loose"
         className="relative isolate overflow-hidden"

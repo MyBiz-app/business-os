@@ -9,8 +9,8 @@ import { useBusiness } from "@/providers/business-provider";
 
 const ACTIVE_KEY = "app.area";
 
-/** Areas whose screens already live in this app. R5 adds `business`, R6 adds `platform`. */
-export const READY_AREAS: readonly AreaKind[] = ["client"];
+/** Areas whose screens live in this app. */
+export const READY_AREAS: readonly AreaKind[] = ["client", "business", "platform"];
 
 type AreaContextValue = {
   /** null until loaded (or while signed out). */

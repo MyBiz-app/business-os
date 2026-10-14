@@ -1241,6 +1241,40 @@
         "health_declaration_review": "Your health declaration is waiting for the business.",
         "generic": "Something went wrong. Try again."
       }
+    },
+    "homeCards": {
+      "nothingBooked": "Nothing booked yet.",
+      "bookNow": "Book now",
+      "navigate": "Navigate",
+      "addToCalendar": "Add to calendar",
+      "cancelFailed": "The cancellation didn't go through. Try again.",
+      "membership": "Your plan",
+      "noPlan": "No active plan",
+      "noPlanHint": "See the plans and cards on offer",
+      "bookTitle": "Book",
+      "rebook": "Book again",
+      "rebookTitle": "Book {service} again",
+      "rebookHint": "Your last visit was on {date}",
+      "manage": "Manage",
+      "health": "Health declaration",
+      "healthOk": "Signed and up to date",
+      "healthUntil": "Valid until {date}",
+      "documents": "Documents",
+      "documentsCount": "{count, plural, =0 {Nothing shared yet} one {# document} other {# documents}}",
+      "quotes": "Quotes and bills",
+      "quotesCount": "{count, plural, =0 {Nothing yet} one {# quote or bill} other {# quotes and bills}}",
+      "addresses": "My addresses",
+      "addressesHint": "Where we come to you",
+      "updates": "Latest updates",
+      "seeAll": "See all",
+      "noUpdates": "Nothing new right now.",
+      "businessInfo": "Find us",
+      "noAddress": "No address set yet",
+      "groups": {
+        "today": "Today",
+        "week": "This week",
+        "earlier": "Earlier"
+      }
     }
   },
   "join": {
@@ -2006,6 +2040,40 @@
       "close": "Close",
       "dashboard": "Go to dashboard",
       "guide": "Getting started guide"
+    },
+    "intro": {
+      "eyebrow": "Everything in one place",
+      "title": "Calendar, clients, payments and messages.",
+      "titleAccent": "One system.",
+      "text": "The pieces of your business, scattered across apps and notebooks, snap together here.",
+      "scroll": "Continue to the page",
+      "sceneLabel": "Animation: calendar, clients, payments, messages, team and reports connect into one system",
+      "tiles": [
+        {
+          "title": "Calendar",
+          "meta": "8 today"
+        },
+        {
+          "title": "Clients",
+          "meta": "129 active"
+        },
+        {
+          "title": "Payments",
+          "meta": "+18%"
+        },
+        {
+          "title": "Messages",
+          "meta": "24 sent"
+        },
+        {
+          "title": "Team",
+          "meta": "6 on shift"
+        },
+        {
+          "title": "Reports",
+          "meta": "Live"
+        }
+      ]
     },
     "hero": {
       "eyebrow": "Business management + an AI workforce for small businesses",

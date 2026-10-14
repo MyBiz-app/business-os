@@ -1,13 +1,19 @@
 import type { ReactNode } from "react";
 
 import { AreaProvider } from "@/providers/area-provider";
+import { PlatformProvider } from "@/providers/platform-provider";
+import { StaffProvider } from "@/providers/staff-provider";
 import { BusinessProvider } from "@/providers/business-provider";
 
-/** The business first (the client areas), then the areas built on top of it. */
+/** The client businesses first, then the areas built on them, then the business being worked in. */
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <BusinessProvider>
-      <AreaProvider>{children}</AreaProvider>
+      <AreaProvider>
+        <StaffProvider>
+          <PlatformProvider>{children}</PlatformProvider>
+        </StaffProvider>
+      </AreaProvider>
     </BusinessProvider>
   );
 }
