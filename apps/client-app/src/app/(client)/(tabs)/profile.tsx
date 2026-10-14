@@ -3,10 +3,11 @@ import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
 import { AreaSwitcher } from "@/components/area-switcher";
+import { ProfileHeader } from "@/components/profile-header";
 import { ProfileForm } from "@/components/profile-form";
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
-import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
 import { useAccount } from "@/lib/use-account";
 import { useHealth } from "@/lib/use-health";
@@ -35,14 +36,10 @@ export default function Profile() {
   return (
     <Screen palette={palette}>
       <Heading palette={palette}>{t("client.profile.title")}</Heading>
-      <Card palette={palette}>
-        <Text style={[styles.h2, { color: palette.foreground }]}>
-          {[business?.first_name, business?.last_name].filter(Boolean).join(" ")}
-        </Text>
-        <Text style={[styles.muted, { color: palette.muted }]}>
-          {t("client.profile.signedInAs", { email: session?.user.email ?? "" })}
-        </Text>
-      </Card>
+      <ProfileHeader name={[business?.first_name, business?.last_name].filter(Boolean).join(" ")} />
+      <Text style={[styles.muted, { color: palette.muted }]}>
+        {t("client.profile.signedInAs", { email: session?.user.email ?? "" })}
+      </Text>
 
       {hasAccountRows && <SectionTitle title={t("client.profile.account")} palette={palette} />}
       {account.documents.length > 0 && (
