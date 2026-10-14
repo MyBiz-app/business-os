@@ -1,5 +1,9 @@
 {
   "email": {
+    "details": {
+      "service": "שיעור",
+      "when": "מועד"
+    },
     "greeting": "שלום {name},",
     "note": "הערת העסק: {note}",
     "footer": "ההודעה נשלחה מ{business}. את כל העדכונים אפשר לראות באפליקציה.",
