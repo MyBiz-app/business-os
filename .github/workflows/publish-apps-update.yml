@@ -1,6 +1,6 @@
 name: Publish Expo app updates (EAS Update)
 
-# Publishes an over-the-air update of the three Expo apps to the "preview" branch, so Expo Go and
+# Publishes an over-the-air update of the Expo app to the "preview" branch, so Expo Go and
 # preview builds pick it up. The public EXPO_PUBLIC_* values are set here because `eas update`
 # bundles them at publish time (the `env` in eas.json only applies to `eas build`); publishing
 # from a computer without them makes the app fall back to http://<host>:8000 and every request
@@ -12,7 +12,7 @@ on:
         description: "Which app"
         type: choice
         default: all
-        options: [all, client-app, business-app, staff-app]
+        options: [all, client-app]
       message:
         description: "Update message"
         default: "Update from GitHub Actions"
@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [client-app, business-app, staff-app]
+        app: [client-app]
     steps:
       - name: Skip apps that were not asked for
         id: pick

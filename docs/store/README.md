@@ -10,16 +10,14 @@ bundle ids and brand name are placeholders until the owner decides.
 | [`data-safety.md`](data-safety.md) | Answers for Google Play's Data safety form and Apple's privacy labels, taken from what the code stores |
 | This file | Assets, links and the owner's checklist |
 
-## The three apps
+## The app
 
 | App | Folder | Id (one line to change: [`packages/brand/app-ids.json`](../../packages/brand/app-ids.json)) |
 |---|---|---|
-| Clients' app | `apps/client-app` | `client` |
-| Business app (owners and staff) | `apps/business-app` | `business` |
-| MyBiz team app | `apps/staff-app` | `staff` |
+| MyBiz (clients, business and team areas in one app) | `apps/client-app` | `client` |
 
 The ids can never change after the first store upload. Editing `app-ids.json` changes iOS and
-Android for that app, and the check in `packages/brand/test` keeps them valid and distinct. The
+Android, and the check in `packages/brand/test` keeps it valid. The
 brand name comes from `packages/i18n/brand.json`; the app display name is in each `app.json`.
 
 ## Links the stores require

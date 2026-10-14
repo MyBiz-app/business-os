@@ -10,7 +10,7 @@ from datetime import datetime, time, timedelta
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -28,7 +28,9 @@ from app.api.health import ensure_may_book
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
 from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
+from app.api.settings import IMAGE_RESPONSES, image_response
 from app.catalog.verticals import CATALOG
+from app.schedule.release import load_release
 from app.schedule.scheduling import local_to_utc
 
 public_router = APIRouter(tags=["client"])
@@ -75,10 +77,20 @@ class ClientBusiness(BaseModel):
     dependent_required: bool = Field(
         default=False, description="Every booking says which pet / child comes"
     )
+    home_cards: list[str] = Field(
+        default_factory=list,
+        description="The cards of the client's home screen, top to bottom (from the industry)",
+    )
     client_id: UUID
     first_name: str
     last_name: str | None
     phone: str | None
+
+
+class ClientLocation(BaseModel):
+    id: UUID
+    name: str
+    address: str | None
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -88,6 +100,7 @@ def _business(row: Mapping[str, object]) -> ClientBusiness:
             **row,
             "dependents": pack.dependents if pack else None,
             "dependent_required": pack.dependent_required if pack else False,
+            "home_cards": list(pack.client_home) if pack else [],
         }
     )
 
@@ -121,6 +134,26 @@ class ClientBookingCreate(BaseModel):
     )
 
 
+class Instructor(BaseModel):
+    id: UUID
+    name: str | None = Field(description="Their name, if they set one")
+    avatar_url: str | None = Field(
+        description="Path of their picture on this API (members of the business only), if any"
+    )
+
+
+class ScheduleRelease(BaseModel):
+    published_until: dt.date = Field(description="Last local date classes can be booked")
+    next_release_at: datetime | None = Field(
+        description="When the next week opens by itself (weekly release only)"
+    )
+    weekly_release_weekday: int | None = Field(description="0 = Monday, 6 = Sunday")
+    weekly_release_time: time | None = Field(description="Local time the next week opens")
+    booking_horizon_days: int = Field(
+        description="Days ahead classes open without a weekly release"
+    )
+
+
 class ClientSession(BaseModel):
     id: UUID
     service: ServiceSummary
@@ -132,6 +165,7 @@ class ClientSession(BaseModel):
     capacity: int
     spots_left: int
     waitlisted: int
+    instructor: Instructor | None = Field(default=None, description="Who teaches or serves")
     address: str | None = Field(default=None, description="My on-site job: where (#42)")
     job_status: JobStatus | None = Field(default=None, description="My on-site job's progress")
     my_booking: MyBooking | None = Field(description="The client's first live booking")
@@ -178,6 +212,15 @@ def my_businesses(session: SessionDep) -> list[ClientBusiness]:
     return [_business(row) for row in rows]
 
 
+@router.get("/locations")
+def business_locations(context: ClientDep) -> list[ClientLocation]:
+    """The business's branches with their addresses (the home screen's business details)."""
+    rows = context.session.execute(
+        text("SELECT id, name, address FROM app.locations WHERE active ORDER BY name, id")
+    ).mappings()
+    return [ClientLocation.model_validate(dict(row)) for row in rows]
+
+
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
 def join_business(body: JoinRequest, user: UserDep, session: SessionDep) -> ClientBusiness:
     ensure_profile(session, user.id, user.email)
@@ -204,6 +247,10 @@ CLIENT_SESSION_SELECT = """
            l.name AS location_name, r.name AS room_name,
            greatest(s.capacity - bk.booked, 0) AS spots_left, bk.waitlisted,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
+           ins.id AS instructor_id, ins.full_name AS instructor_name,
+           CASE WHEN ins.avatar_updated_at IS NULL THEN NULL
+                ELSE '/client/instructors/' || ins.id || '/avatar?v='
+                     || extract(epoch FROM ins.avatar_updated_at)::bigint END AS instructor_avatar,
            mine.items AS my_bookings,
            CASE WHEN mine.items IS NOT NULL THEN s.address END AS address,
            CASE WHEN mine.items IS NOT NULL THEN s.job_status END AS job_status
@@ -211,6 +258,7 @@ CLIENT_SESSION_SELECT = """
     JOIN app.services sv ON sv.id = s.service_id
     LEFT JOIN app.locations l ON l.id = s.location_id
     LEFT JOIN app.rooms r ON r.id = s.room_id
+    LEFT JOIN LATERAL app.client_instructor(s.instructor_user_id) ins ON true
     CROSS JOIN LATERAL app.session_counts(s.id) bk
     CROSS JOIN LATERAL (
         SELECT json_agg(json_build_object(
@@ -233,6 +281,13 @@ def _to_session(row: dict) -> ClientSession:
         "name": data.pop("service_name"),
         "color": data.pop("service_color"),
     }
+    instructor_id = data.pop("instructor_id")
+    instructor_name, instructor_avatar = data.pop("instructor_name"), data.pop("instructor_avatar")
+    data["instructor"] = (
+        {"id": instructor_id, "name": instructor_name, "avatar_url": instructor_avatar}
+        if instructor_id
+        else None
+    )
     data["my_bookings"] = data["my_bookings"] or []
     data["my_booking"] = data["my_bookings"][0] if data["my_bookings"] else None
     return ClientSession.model_validate(data)
@@ -276,10 +331,12 @@ def client_sessions(
     context: ClientDep,
     start: Annotated[dt.date, Query(description="First local date (business time zone)")],
     days: Annotated[int, Query(ge=1, le=14)] = 7,
+    instructor_id: Annotated[UUID | None, Query(description="Only this instructor's")] = None,
 ) -> list[ClientSession]:
-    """Upcoming sessions in the window (past ones are left out)."""
+    """Upcoming sessions in the window (past ones are left out). Classes the business has not
+    released yet are left out too, unless the client already holds a booking in them."""
     db = context.session
-    time_zone = _time_zone(db)
+    release, time_zone = load_release(db)
     window_start = max(local_to_utc(start, time.min, time_zone), datetime.now(dt.UTC))
     window_end = local_to_utc(start + timedelta(days=days), time.min, time_zone)
     rows = db.execute(
@@ -287,11 +344,52 @@ def client_sessions(
             {CLIENT_SESSION_SELECT}
             WHERE s.starts_at >= :from AND s.starts_at < :to
               AND (sv.booking_mode = 'class' OR mine.items IS NOT NULL)
+              AND (s.starts_at < :released OR mine.items IS NOT NULL)
+              AND (CAST(:instructor AS uuid) IS NULL OR s.instructor_user_id = :instructor)
             ORDER BY s.starts_at
         """),
-        {"from": window_start, "to": window_end},
+        {
+            "from": window_start,
+            "to": window_end,
+            "released": release.opens_before(time_zone),
+            "instructor": instructor_id,
+        },
     ).mappings()
     return [_to_session(row) for row in rows]
+
+
+@router.get("/schedule-release")
+def client_schedule_release(context: ClientDep) -> ScheduleRelease:
+    """How far ahead classes can be booked and when the next week opens."""
+    db = context.session
+    release, _ = load_release(db)
+    policy = (
+        db.execute(
+            text("""
+                SELECT booking_horizon_days, weekly_release_weekday, weekly_release_time
+                FROM app.tenants WHERE id = app.client_tenant_id()
+            """)
+        )
+        .mappings()
+        .one()
+    )
+    return ScheduleRelease(
+        published_until=release.published_until,
+        next_release_at=release.next_release_at,
+        **policy,
+    )
+
+
+@router.get("/instructors/{user_id}/avatar", response_class=Response, responses=IMAGE_RESPONSES)
+def instructor_avatar(user_id: UUID, context: ClientDep) -> Response:
+    """The picture of someone who works in the client's business."""
+    row = context.session.execute(
+        text("SELECT avatar, content_type FROM app.client_instructor_avatar(:id)"),
+        {"id": user_id},
+    ).first()
+    if row is None:
+        raise not_found()
+    return image_response(row.avatar, row.content_type)
 
 
 @router.get("/closed-days")
@@ -333,6 +431,12 @@ def book_session(
     ).scalar()
     if mode != "class":  # appointments and reservations are booked at a free time
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_bookable")
+    release, time_zone = load_release(context.session)
+    starts_at = context.session.execute(
+        text("SELECT starts_at FROM app.sessions WHERE id = :id"), {"id": session_id}
+    ).scalar_one()
+    if starts_at >= release.opens_before(time_zone):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_released")
     ensure_may_book(context.session, context.tenant_id, context.client_id)
     requires_plan = context.session.execute(
         text("SELECT booking_requires_plan FROM app.tenants WHERE id = :id"),

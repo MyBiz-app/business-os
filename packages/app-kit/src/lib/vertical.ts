@@ -1,3 +1,4 @@
+import { knownCards, type HomeCard } from "./client-home";
 import { isVertical, termsOf, textKey, vertical } from "@business-os/verticals";
 
 /** The set of industry words (`terms.<set>` in the translations) for a business, from the
@@ -30,4 +31,16 @@ export function dependentsFor(business: { vertical?: string | null } | null | un
 export function billsByTime(business: { vertical?: string | null } | null | undefined): boolean {
   const entry = business?.vertical && isVertical(business.vertical) ? vertical(business.vertical) : undefined;
   return entry?.timeBilling ?? false;
+}
+
+/** The cards of the client's home, top to bottom: the API's list for the business, or the
+ * industry catalog's when the API predates it. */
+export function homeCardsFor(business: { vertical?: string | null; home_cards?: string[] | null } | null | undefined): HomeCard[] {
+  const listed = business?.home_cards?.length ? business.home_cards : vertical(business?.vertical)?.clientHome;
+  return knownCards(listed ?? ["next_booking", "shortcuts", "updates", "business_info"]);
+}
+
+/** The kinds of booking an industry takes: classes, appointments, rentals by the hour. */
+export function bookingModesFor(business: { vertical?: string | null } | null | undefined): string[] {
+  return vertical(business?.vertical)?.bookingModes ?? [];
 }

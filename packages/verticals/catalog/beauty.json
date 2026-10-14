@@ -9,6 +9,13 @@
   "booking_modes": [
     "appointment"
   ],
+  "client_home": [
+    "next_booking",
+    "rebook",
+    "shortcuts",
+    "updates",
+    "business_info"
+  ],
   "cancellation_window_minutes": 180,
   "booking_requires_plan": false,
   "default_preset": "growing",

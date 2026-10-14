@@ -54,10 +54,8 @@ flowchart LR
   |---|---|
   | `apps/web` | ‏Next.js: האתר השיווקי ומסע ההרשמה, מערכת העסק (CRM), קונסולת MyBiz |
   | `apps/api` | ‏FastAPI: כל נקודות הקצה (`app/api/`), הלוגיקה מקובצת לפי תחום (`app/schedule`, `commerce`, `messaging`, `catalog`, `reports`), מיגרציות של מסד הנתונים (Alembic), משימות רקע, עוזר ה-AI, בדיקות |
-  | `apps/client-app` | אפליקציית הלקוחות (Expo, רצה גם בדפדפן) |
-  | `apps/business-app` | אפליקציית העסק לבעלים ולצוות בדרכים (Expo) |
-  | `apps/staff-app` | אפליקציית צוות MyBiz ‏(Expo) |
-  | `packages/app-kit` | מה ששלוש אפליקציות ה-Expo חולקות: מסכים, רכיבים, התחברות, ערכת צבעים |
+  | `apps/client-app` | האפליקציה האחת: אזורי הלקוחות, העסק וצוות MyBiz (Expo, רצה גם בדפדפן) |
+  | `packages/app-kit` | ממה שאפליקציית ה-Expo בנויה: מסכים, רכיבים, התחברות, ערכת צבעים |
   | `packages/i18n` | הטקסטים בעברית ובאנגלית, ועיצוב סכומים ותאריכים |
   | `packages/verticals` | קטלוג התחומים (קטגוריות ← תתי־קטגוריות ← חבילות) |
   | `packages/api-client` | לקוח ה-API עם טיפוסים, שנוצר מהסכמה של השרת |

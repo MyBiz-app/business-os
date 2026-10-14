@@ -13754,6 +13754,74 @@
         }
       }
     },
+    "/sessions/publish-week": {
+      "post": {
+        "tags": [
+          "schedule"
+        ],
+        "summary": "Publish Week",
+        "description": "Opens the next week for clients ahead of the scheduled release (or the rolling horizon).",
+        "operationId": "publish_week",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishedWeek"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/closed-days": {
       "get": {
         "tags": [
@@ -21036,6 +21104,59 @@
         ]
       }
     },
+    "/client/locations": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Business Locations",
+        "description": "The business's branches with their addresses (the home screen's business details).",
+        "operationId": "business_locations",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClientLocation"
+                  },
+                  "title": "Response Business Locations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/profile": {
       "patch": {
         "tags": [
@@ -21101,7 +21222,7 @@
           "client"
         ],
         "summary": "Client Sessions",
-        "description": "Upcoming sessions in the window (past ones are left out).",
+        "description": "Upcoming sessions in the window (past ones are left out). Classes the business has not\nreleased yet are left out too, unless the client already holds a booking in them.",
         "operationId": "client_sessions",
         "security": [
           {
@@ -21134,6 +21255,25 @@
             }
           },
           {
+            "name": "instructor_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only this instructor's",
+              "title": "Instructor Id"
+            },
+            "description": "Only this instructor's"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -21157,6 +21297,112 @@
                   "title": "Response Client Sessions"
                 }
               }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/schedule-release": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Client Schedule Release",
+        "description": "How far ahead classes can be booked and when the next week opens.",
+        "operationId": "client_schedule_release",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleRelease"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/client/instructors/{user_id}/avatar": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Instructor Avatar",
+        "description": "The picture of someone who works in the client's business.",
+        "operationId": "instructor_avatar",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {},
+              "image/webp": {}
             }
           },
           "422": {
@@ -26125,6 +26371,14 @@
             "description": "Every booking says which pet / child comes",
             "default": false
           },
+          "home_cards": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Home Cards",
+            "description": "The cards of the client's home screen, top to bottom (from the industry)"
+          },
           "client_id": {
             "type": "string",
             "format": "uuid",
@@ -26595,6 +26849,37 @@
         "title": "ClientListItem",
         "description": "A row of the clients list: the client plus what the list shows at a glance."
       },
+      "ClientLocation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "address"
+        ],
+        "title": "ClientLocation"
+      },
       "ClientNote": {
         "properties": {
           "id": {
@@ -26922,6 +27207,17 @@
           "waitlisted": {
             "type": "integer",
             "title": "Waitlisted"
+          },
+          "instructor": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Instructor"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Who teaches or serves"
           },
           "address": {
             "anyOf": [
@@ -29529,6 +29825,46 @@
         ],
         "title": "InquiryCreate"
       },
+      "Instructor": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name",
+            "description": "Their name, if they set one"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url",
+            "description": "Path of their picture on this API (members of the business only), if any"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "avatar_url"
+        ],
+        "title": "Instructor"
+      },
       "InstructorOption": {
         "properties": {
           "user_id": {
@@ -31221,6 +31557,18 @@
             ],
             "title": "Avatar Url",
             "description": "Path of the person's own picture on this API, if any"
+          },
+          "status_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Text",
+            "description": "A short free-text status shown on the profile (up to 80)"
           },
           "memberships": {
             "items": {
@@ -33559,6 +33907,21 @@
         ],
         "title": "Published"
       },
+      "PublishedWeek": {
+        "properties": {
+          "published_until": {
+            "type": "string",
+            "format": "date",
+            "title": "Published Until",
+            "description": "Last local date clients can now book"
+          }
+        },
+        "type": "object",
+        "required": [
+          "published_until"
+        ],
+        "title": "PublishedWeek"
+      },
       "PushTokenBody": {
         "properties": {
           "token": {
@@ -35701,6 +36064,68 @@
           "instructors"
         ],
         "title": "ScheduleOptions"
+      },
+      "ScheduleRelease": {
+        "properties": {
+          "published_until": {
+            "type": "string",
+            "format": "date",
+            "title": "Published Until",
+            "description": "Last local date classes can be booked"
+          },
+          "next_release_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Release At",
+            "description": "When the next week opens by itself (weekly release only)"
+          },
+          "weekly_release_weekday": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Release Weekday",
+            "description": "0 = Monday, 6 = Sunday"
+          },
+          "weekly_release_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Release Time",
+            "description": "Local time the next week opens"
+          },
+          "booking_horizon_days": {
+            "type": "integer",
+            "title": "Booking Horizon Days",
+            "description": "Days ahead classes open without a weekly release"
+          }
+        },
+        "type": "object",
+        "required": [
+          "published_until",
+          "next_release_at",
+          "weekly_release_weekday",
+          "weekly_release_time",
+          "booking_horizon_days"
+        ],
+        "title": "ScheduleRelease"
       },
       "ScheduledSession": {
         "properties": {
@@ -38221,6 +38646,37 @@
             "type": "integer",
             "title": "Cancellation Window Minutes"
           },
+          "booking_horizon_days": {
+            "type": "integer",
+            "title": "Booking Horizon Days",
+            "description": "Without a weekly release: how many days ahead classes open",
+            "default": 7
+          },
+          "weekly_release_weekday": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Release Weekday",
+            "description": "Weekly release: 0 = Monday, 6 = Sunday; none: rolling horizon"
+          },
+          "weekly_release_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Release Time",
+            "description": "Weekly release: local time the next week opens"
+          },
           "booking_requires_plan": {
             "type": "boolean",
             "title": "Booking Requires Plan",
@@ -38594,6 +39050,44 @@
               }
             ],
             "title": "Cancellation Window Minutes"
+          },
+          "booking_horizon_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 60.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Horizon Days"
+          },
+          "weekly_release_weekday": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 6.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Release Weekday"
+          },
+          "weekly_release_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekly Release Time"
           },
           "booking_requires_plan": {
             "anyOf": [
@@ -39802,6 +40296,18 @@
               }
             ],
             "title": "Email Roster"
+          },
+          "status_text": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Text"
           },
           "palette": {
             "anyOf": [
