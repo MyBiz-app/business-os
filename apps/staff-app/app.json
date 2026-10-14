@@ -40,6 +40,12 @@
         }
       ]
     ],
-    "owner": "adiredri"
+    "owner": "adiredri",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/5c41706e-f776-427a-a905-e7ff453803b2"
+    }
   }
 }

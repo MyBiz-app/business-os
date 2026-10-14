@@ -22,6 +22,9 @@
     },
     "dev": {
       "cache": false,
+      "passThroughEnv": [
+        "SWC_NATIVE_BINDING_CACHE"
+      ],
       "persistent": true
     }
   }
