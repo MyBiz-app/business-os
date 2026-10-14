@@ -2287,6 +2287,12 @@
         "more": "One more location",
         "total": "Total per month",
         "daily": "That's about {price} a day"
+      },
+      "groups": {
+        "run": "Run the business (every plan)",
+        "clients": "Your clients' experience",
+        "ai": "AI assistant and agents",
+        "growth": "Growth and sales"
       }
     },
     "faq": {
