@@ -10,6 +10,14 @@
     "class",
     "appointment"
   ],
+  "client_home": [
+    "next_booking",
+    "dependents",
+    "membership",
+    "shortcuts",
+    "updates",
+    "business_info"
+  ],
   "cancellation_window_minutes": 720,
   "booking_requires_plan": true,
   "default_preset": "growing",

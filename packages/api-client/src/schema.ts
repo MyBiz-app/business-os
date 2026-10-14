@@ -4048,6 +4048,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Locations
+         * @description The business's branches with their addresses (the home screen's business details).
+         */
+        get: operations["business_locations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/profile": {
         parameters: {
             query?: never;
@@ -5770,6 +5790,11 @@ export interface components {
              */
             dependent_required: boolean;
             /**
+             * Home Cards
+             * @description The cards of the client's home screen, top to bottom (from the industry)
+             */
+            home_cards?: string[];
+            /**
              * Client Id
              * Format: uuid
              */
@@ -5905,6 +5930,18 @@ export interface components {
              * @description Last check-in, in the business's time zone
              */
             last_visit: string | null;
+        };
+        /** ClientLocation */
+        ClientLocation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Address */
+            address: string | null;
         };
         /** ClientNote */
         ClientNote: {
@@ -20842,6 +20879,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientBusiness"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    business_locations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientLocation"][];
                 };
             };
             /** @description Validation Error */

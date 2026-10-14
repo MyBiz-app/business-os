@@ -1129,6 +1129,72 @@ h1[tabindex="-1"]:focus {
   }
 }
 
+/* ---- Auth side panel (components/auth/auth-scene.tsx) -------------------------------------- */
+
+/* A frosted card on the navy panel. */
+.au-card {
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 0.07);
+  color: #fff;
+  box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.55);
+  backdrop-filter: blur(10px);
+}
+@keyframes au-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+@keyframes au-bob {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+@keyframes au-bar {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes au-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes au-scan {
+  from {
+    inset-inline-start: 4%;
+  }
+  to {
+    inset-inline-start: 96%;
+  }
+}
+/* Fade in first, then bob forever; the second delay in the markup is the bob's. */
+.au-in {
+  animation:
+    au-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    au-bob 6s ease-in-out infinite;
+}
+.au-bar {
+  transform-origin: left center;
+  animation: au-bar 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+[dir="rtl"] .au-bar {
+  transform-origin: right center;
+}
+.au-draw {
+  stroke-dasharray: 1;
+  animation: au-draw 1.6s ease-out 1.2s both;
+}
+.au-scan {
+  animation: au-scan 7s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .au-scan {
+    display: none;
+  }
+}
+
 /* ---- Illustrations: animated empty states and the looping mini visuals of the feature cards ---
  * Decorative only (aria-hidden). Every loop stops for reduced motion by the rule above. */
 @keyframes es-bob {

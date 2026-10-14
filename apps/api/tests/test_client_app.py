@@ -305,3 +305,22 @@ def test_client_sees_closed_days_of_their_business(
 
     assert response.status_code == 200, response.text
     assert [(d["day"], d["reason"]) for d in response.json()] == [(day, "Holiday")]
+
+
+def test_client_home_cards_and_branches_follow_the_business(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    user = uuid4()
+    joined = join(client, auth, user, join_code(client, studio))
+    # A fitness studio's home: its booking, membership, health form and shortcuts.
+    assert joined["home_cards"][0] == "next_booking"
+    assert "health" in joined["home_cards"] and "membership" in joined["home_cards"]
+
+    headers = auth(user, studio["tenant_id"])
+    branches = client.get("/client/locations", headers=headers)
+    assert branches.status_code == 200, branches.text
+    assert all({"id", "name", "address"} <= set(b) for b in branches.json())
+
+    # A client who never joined this business sees none of its branches.
+    stranger = client.get("/client/locations", headers=auth(uuid4(), studio["tenant_id"]))
+    assert stranger.status_code in (403, 404)
