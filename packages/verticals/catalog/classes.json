@@ -5,6 +5,8 @@
   "icon": "graduation-cap",
   "color": "from-sky-500 to-blue-600",
   "terms": "classes",
+  "schedule_view": "class_blocks",
+  "social": "on",
   "client_term": "student",
   "booking_modes": [
     "class",
@@ -329,6 +331,7 @@
     },
     {
       "key": "kids_activities",
+      "social": "default_off",
       "status": "live",
       "dependents": "child",
       "dependent_fields": [

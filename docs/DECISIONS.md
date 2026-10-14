@@ -162,6 +162,8 @@ When a decision changes, update the row and note the date — do not delete hist
 | X47 | Round 3, Face ID / fingerprint: tested on Android now; iPhone at launch, because an Apple developer account is paid (see the no-paid-upgrades decision). The code is written to be ready for iPhone. | DECIDED (2026-10-14) |
 | X48 | Round 3, profile status: a short free-text sentence of up to 80 characters (`users.status_text`, set with `PATCH /me`), not a fixed list. Clients also see the instructor of a class (name and picture only, never the email) through business-scoped functions, since clients cannot read `app.users`. | DECIDED (2026-10-14) |
 | X49 | Round 3, "3D": light depth effects in the app (layers, tilt, shadows), no 3D engine, so weak phones and start-up time are not hurt. | DECIDED (2026-10-14) |
+| X50 | Round 4, branch kinds (migration 0081): a branch may have a `kind`, a sub-category of the business's own category (never another category). Category-level catalog fields `schedule_view` (class_blocks / appointments / courts), `social` (on / off / default_off, kids' classes default off) and optional `branch_kinds` drive the behaviour; no per-industry branches in code. | DECIDED (2026-10-14) |
+| X51 | Round 4, network policy (migration 0081): `tenants.network_scope` is `network` (default; clients shared by all branches) or `branch` (each client has a "my branches" list, `client_locations`; a client on no list belongs to all). A plan valid across a chosen group of branches is a follow-up, not part of B1; no cross-branch price list. | DECIDED (2026-10-14) |
 
 ### Apps accessibility preferences (2026-10-12)
 

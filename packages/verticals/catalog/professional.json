@@ -5,6 +5,8 @@
   "icon": "briefcase",
   "color": "from-cyan-600 to-sky-700",
   "terms": "professional",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"

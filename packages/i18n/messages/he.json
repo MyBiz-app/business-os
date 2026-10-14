@@ -112,7 +112,23 @@
     "uploadCover": "העלאת תמונת כיסוי",
     "removeCover": "הסרת תמונת הכיסוי",
     "noCover": "עדיין אין תמונת כיסוי: לוח הבקרה משתמש בצבע המותג.",
-    "coverTooLarge": "התמונה גדולה מ-1.5MB. כדאי לבחור תמונה קטנה יותר."
+    "coverTooLarge": "התמונה גדולה מ-1.5MB. כדאי לבחור תמונה קטנה יותר.",
+    "classRelease": "פתיחת שיעורים להרשמה",
+    "bookingHorizon": "שיעורים נפתחים להרשמה",
+    "bookingHorizonDays": "{days, plural, one {יום אחד} other {# ימים}} קדימה",
+    "releaseWeekday": "פרסום שבועי",
+    "releaseRolling": "רציף: תמיד הימים הקרובים",
+    "releaseTime": "שעת הפרסום",
+    "classReleaseHint": "עם פרסום שבועי, השבוע הבא נפתח ללקוחות ביום ובשעה שבחרתם. אפשר גם לפרסם מוקדם מלוח השיעורים.",
+    "releaseWeekdays": {
+      "0": "יום שני",
+      "1": "יום שלישי",
+      "2": "יום רביעי",
+      "3": "יום חמישי",
+      "4": "יום שישי",
+      "5": "יום שבת",
+      "6": "יום ראשון"
+    }
   },
   "locales": {
     "he": "עברית",
@@ -891,7 +907,12 @@
     "saveDefaultHint": "היומן ייפתח עם הטווח והסניפים האלה לכל מי שבעסק.",
     "defaultSaved": "נשמר.",
     "defaultError": "השמירה נכשלה. נסו שוב.",
-    "resetView": "חזרה לתצוגת ברירת המחדל"
+    "resetView": "חזרה לתצוגת ברירת המחדל",
+    "publishWeek": "פרסום השבוע הבא",
+    "publishWeekHint": "פותח עכשיו ללקוחות את שיעורי השבוע הבא, לפני הפרסום המתוזמן.",
+    "publishWeekDone": "הלוח פתוח ללקוחות עד {date}.",
+    "publishWeekAlready": "השבוע הבא כבר פורסם.",
+    "publishWeekError": "לא הצלחנו לפרסם את השבוע. נסו שוב."
   },
   "bookings": {
     "title": "הרשמות",
@@ -1059,6 +1080,19 @@
     },
     "profile": {
       "title": "פרופיל",
+      "photoLabel": "תמונת פרופיל",
+      "takePhoto": "צילום תמונה",
+      "choosePhoto": "בחירה מהגלריה",
+      "removePhoto": "הסרת התמונה",
+      "photoSaved": "התמונה עודכנה",
+      "photoFailed": "לא הצלחנו לעדכן את התמונה",
+      "photoPermission": "אפשרו גישה בהגדרות הטלפון כדי להוסיף תמונה",
+      "status": "סטטוס",
+      "statusPlaceholder": "משפט קצר עליכם",
+      "statusCount": "{count}/{max}",
+      "saveStatus": "שמירת סטטוס",
+      "statusSaved": "הסטטוס נשמר",
+      "statusFailed": "לא הצלחנו לשמור את הסטטוס",
       "signedInAs": "מחובר/ת בתור {email}",
       "business": "עסק",
       "joinAnother": "הצטרפות לעסק נוסף",
@@ -3837,7 +3871,11 @@
       "no": "להשאיר",
       "note": "הערה",
       "noteFor": "הערה על הביקור של {name}",
-      "noteSaved": "ההערה נשמרה בכרטיס של {name}."
+      "noteSaved": "ההערה נשמרה בכרטיס של {name}.",
+      "cancelClass": "ביטול שיעור",
+      "cancelClassConfirm": "לבטל את השיעור? {count, plural, =0 {אין נרשמים.} one {נרשם אחד יקבל הודעה.} other {# נרשמים יקבלו הודעה.}}",
+      "restoreClass": "שחזור שיעור",
+      "classRestored": "השיעור חזר ללוח."
     },
     "leads": {
       "open": "פתוחים",

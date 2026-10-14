@@ -173,6 +173,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/{client_id}/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Branches
+         * @description The branches on the client's "my branches" list.
+         */
+        get: operations["client_branches"];
+        /**
+         * Set Client Branches
+         * @description Replaces the client's "my branches" list. A member kept to some branches may only
+         *     change the list within them.
+         */
+        put: operations["set_client_branches"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}": {
         parameters: {
             query?: never;
@@ -5338,6 +5363,11 @@ export interface components {
             /** Address */
             address?: string | null;
             /**
+             * Kind
+             * @description The branch's sub-category (a catalog key); null: as the business
+             */
+            kind?: string | null;
+            /**
              * Copy Hours From
              * @description Start with another branch's opening hours
              */
@@ -5797,6 +5827,11 @@ export interface components {
              * @description Which of the client's pets / children comes (#43)
              */
             dependent_id?: string | null;
+        };
+        /** ClientBranches */
+        ClientBranches: {
+            /** Location Ids */
+            location_ids: string[];
         };
         /** ClientBusiness */
         ClientBusiness: {
@@ -7650,6 +7685,26 @@ export interface components {
             /** Rooms */
             rooms: components["schemas"]["Room"][];
             /**
+             * Kind
+             * @description The branch's own sub-category, if it set one
+             */
+            kind: string | null;
+            /**
+             * Effective Kind
+             * @description The branch's kind, else the business's industry
+             */
+            effective_kind: string;
+            /**
+             * Schedule View
+             * @description class_blocks | appointments | courts: how clients see this branch's schedule
+             */
+            schedule_view: string;
+            /**
+             * Social
+             * @description on | off | default_off: friends and participant lists
+             */
+            social: string;
+            /**
              * Primary Color
              * @description The branch's own color, if it set one
              */
@@ -7676,6 +7731,11 @@ export interface components {
             name: string;
             /** Address */
             address?: string | null;
+            /**
+             * Kind
+             * @description The branch's sub-category (a catalog key); null: as the business
+             */
+            kind?: string | null;
         };
         /** LocationUpdate */
         LocationUpdate: {
@@ -7685,6 +7745,11 @@ export interface components {
             address?: string | null;
             /** Active */
             active?: boolean | null;
+            /**
+             * Kind
+             * @description The branch's sub-category (a catalog key); null: as the business
+             */
+            kind?: string | null;
             /**
              * Primary Color
              * @description The branch's own accent color; null falls back to the network's
@@ -10562,6 +10627,13 @@ export interface components {
              */
             online_sales: boolean;
             /**
+             * Network Scope
+             * @description network: clients shared by all branches; branch: each branch keeps its own
+             * @default network
+             * @enum {string}
+             */
+            network_scope: "network" | "branch";
+            /**
              * Resource Payment
              * @description Reservations of courts and rooms: paid in the app or at the venue
              * @default app
@@ -10728,6 +10800,8 @@ export interface components {
              * @description Branches the shifts board opens with; empty means all of them
              */
             shifts_default_branches?: string[] | null;
+            /** Network Scope */
+            network_scope?: ("network" | "branch") | null;
             /** Shifts Publish Auto */
             shifts_publish_auto?: boolean | null;
             /** Shifts Publish Cadence */
@@ -11609,6 +11683,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_branches: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_client_branches: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientBranches"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
             /** @description Validation Error */

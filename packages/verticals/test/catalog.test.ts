@@ -62,7 +62,7 @@ test("keys are unique, lower snake case, and statuses known", () => {
 test("every open category sets everything its sub-categories inherit", () => {
   for (const category of CATEGORIES.filter((c) => c.status !== "planned")) {
     for (const name of ["terms", "client_term", "booking_modes", "cancellation_window_minutes",
-      "booking_requires_plan", "default_preset", "recommended_modules", "client_fields", "client_home"] as const) {
+      "booking_requires_plan", "default_preset", "recommended_modules", "client_fields", "client_home", "schedule_view", "social"] as const) {
       assert.notEqual(category[name], undefined, `${category.key}: ${name}`);
     }
   }
