@@ -3,7 +3,9 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
+import { AppStoresStrip } from "@/components/marketing/app-stores-strip";
 import { ShowAccessibilityButton } from "@/components/marketing/show-accessibility-button";
+import { SocialIcon } from "@/components/marketing/social-icons";
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { socialLinks } from "@/lib/social";
@@ -63,8 +65,8 @@ export async function MarketingFooter() {
             <ul aria-label={t("footer.social")} className="mt-2 flex flex-wrap gap-2">
               {social.map(({ key, label, url }) => (
                 <li key={key}>
-                  <a href={url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-white/20 px-3 py-1 text-xs font-medium text-white/80 transition-colors hover:border-electric hover:text-white">
-                    {label}
+                  <a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label} className="flex size-9 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-electric hover:text-white">
+                    <SocialIcon name={key} className="size-4" />
                   </a>
                 </li>
               ))}
@@ -82,6 +84,7 @@ export async function MarketingFooter() {
           </nav>
         ))}
       </Container>
+      <AppStoresStrip />
       <div className="border-t border-white/10">
         <Container className="flex flex-wrap items-center justify-between gap-4 py-5">
           <p className="text-xs text-white/50">{t("footer.rights", { year: new Date().getFullYear() })}</p>

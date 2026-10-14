@@ -2334,7 +2334,12 @@
       "accessibility": "הצהרת נגישות",
       "rights": "© {year} MyBiz. כל הזכויות שמורות.",
       "status": "מצב המערכת",
-      "social": "רשתות חברתיות"
+      "social": "רשתות חברתיות",
+      "appsTitle": "האפליקציה בחנויות",
+      "appsText": "מנהלים את העסק מהטלפון, והלקוחות קובעים תורים משלהם.",
+      "storeIos": "App Store",
+      "storeAndroid": "Google Play",
+      "comingSoon": "בקרוב"
     },
     "about": {
       "title": "בונים את המערכת שעסקים קטנים ראויים לה",
