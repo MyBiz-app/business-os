@@ -76,6 +76,22 @@ class ResourceSlot(BaseModel):
     price_currency: str
 
 
+class ResourceSuggestion(ResourceSlot):
+    offset_minutes: int = Field(
+        description="Minutes from the requested time; negative means earlier"
+    )
+
+
+class ResourceSuggestions(BaseModel):
+    requested_starts_at: datetime
+    exact: list[ResourceSlot] = Field(
+        description="Rooms free at exactly the requested time (empty when none)"
+    )
+    suggestions: list[ResourceSuggestion] = Field(
+        description="Other free starts, nearest to the requested time first, one room per start"
+    )
+
+
 class ReservationFields(BaseModel):
     service_id: UUID
     room_id: UUID
@@ -318,6 +334,51 @@ def resource_slots(
     return sorted(slots, key=lambda slot: (slot.starts_at, slot.room_name))
 
 
+SUGGESTION_DAYS_BEFORE = 1
+SUGGESTION_DAYS_AFTER = 2
+
+
+def resource_suggestions(
+    db: Session,
+    service_id: UUID,
+    day: dt.date,
+    at: time,
+    minutes: int,
+    limit: int,
+) -> ResourceSuggestions:
+    """The requested time if a room is free, plus the nearest other free starts.
+
+    Searches the requested day, the day before and the two after, so a full evening still
+    yields "tomorrow 20:00". Past starts never appear (free_starts skips them)."""
+    tz = db.execute(
+        text("""
+            SELECT time_zone FROM app.tenants
+            WHERE id = coalesce(app.current_tenant_id(), app.client_tenant_id())
+        """)
+    ).scalar_one()
+    wanted = local_to_utc(day, at, tz)
+    found: list[ResourceSlot] = []
+    for delta in range(-SUGGESTION_DAYS_BEFORE, SUGGESTION_DAYS_AFTER + 1):
+        found += resource_slots(db, service_id, day + timedelta(days=delta), minutes, None)
+    exact = [slot for slot in found if slot.starts_at == wanted]
+    nearest: dict[datetime, ResourceSlot] = {}
+    for slot in found:  # already sorted by start, then room name: the first room wins a start
+        if slot.starts_at != wanted:
+            nearest.setdefault(slot.starts_at, slot)
+    ranked = sorted(nearest.values(), key=lambda s: (abs(s.starts_at - wanted), s.starts_at))
+    return ResourceSuggestions(
+        requested_starts_at=wanted,
+        exact=exact,
+        suggestions=[
+            ResourceSuggestion(
+                **slot.model_dump(),
+                offset_minutes=int((slot.starts_at - wanted).total_seconds() // 60),
+            )
+            for slot in ranked[:limit]
+        ],
+    )
+
+
 def create_resource_session(db: Session, body: ReservationFields) -> UUID:
     if body.starts_at <= datetime.now(UTC):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="session_started")
@@ -521,6 +582,19 @@ def my_resource_free_times(
     room_id: Annotated[UUID | None, Query()] = None,
 ) -> list[ResourceSlot]:
     return resource_slots(context.session, service_id, day, minutes, room_id)
+
+
+@client_router.get("/resources/suggestions")
+def my_resource_suggestions(
+    context: ClientDep,
+    service_id: Annotated[UUID, Query()],
+    day: Annotated[dt.date, Query(alias="date")],
+    at: Annotated[time, Query(alias="time", description="Local time, HH:MM")],
+    minutes: Annotated[int, Query(ge=15, le=1440)],
+    limit: Annotated[int, Query(ge=1, le=8)] = 5,
+) -> ResourceSuggestions:
+    """The exact slot if free, else the nearest free ones ("When suits you?")."""
+    return resource_suggestions(context.session, service_id, day, at, minutes, limit)
 
 
 def _payment(db: Session, payment_id: UUID) -> ReservationPayment:
