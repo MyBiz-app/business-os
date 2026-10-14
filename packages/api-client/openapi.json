@@ -746,6 +746,180 @@
         }
       }
     },
+    "/clients/{client_id}/branches": {
+      "get": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Client Branches",
+        "description": "The branches on the client's \"my branches\" list.",
+        "operationId": "client_branches",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": "Response Client Branches"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Set Client Branches",
+        "description": "Replaces the client's \"my branches\" list. A member kept to some branches may only\nchange the list within them.",
+        "operationId": "set_client_branches",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientBranches"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "title": "Response Set Client Branches"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/clients/{client_id}": {
       "get": {
         "tags": [
@@ -25145,6 +25319,19 @@
             ],
             "title": "Address"
           },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind",
+            "description": "The branch's sub-category (a catalog key); null: as the business"
+          },
           "copy_hours_from": {
             "anyOf": [
               {
@@ -26275,6 +26462,24 @@
         },
         "type": "object",
         "title": "ClientBookingCreate"
+      },
+      "ClientBranches": {
+        "properties": {
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Location Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_ids"
+        ],
+        "title": "ClientBranches"
       },
       "ClientBusiness": {
         "properties": {
@@ -31244,6 +31449,33 @@
             "type": "array",
             "title": "Rooms"
           },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind",
+            "description": "The branch's own sub-category, if it set one"
+          },
+          "effective_kind": {
+            "type": "string",
+            "title": "Effective Kind",
+            "description": "The branch's kind, else the business's industry"
+          },
+          "schedule_view": {
+            "type": "string",
+            "title": "Schedule View",
+            "description": "class_blocks | appointments | courts: how clients see this branch's schedule"
+          },
+          "social": {
+            "type": "string",
+            "title": "Social",
+            "description": "on | off | default_off: friends and participant lists"
+          },
           "primary_color": {
             "anyOf": [
               {
@@ -31302,6 +31534,10 @@
           "created_at",
           "updated_at",
           "rooms",
+          "kind",
+          "effective_kind",
+          "schedule_view",
+          "social",
           "primary_color",
           "logo_url",
           "effective_primary_color",
@@ -31328,6 +31564,19 @@
               }
             ],
             "title": "Address"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind",
+            "description": "The branch's sub-category (a catalog key); null: as the business"
           }
         },
         "type": "object",
@@ -31373,6 +31622,19 @@
               }
             ],
             "title": "Active"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind",
+            "description": "The branch's sub-category (a catalog key); null: as the business"
           },
           "primary_color": {
             "anyOf": [
@@ -38692,6 +38954,16 @@
             "title": "Online Sales",
             "description": "Clients can buy plans in the app"
           },
+          "network_scope": {
+            "type": "string",
+            "enum": [
+              "network",
+              "branch"
+            ],
+            "title": "Network Scope",
+            "description": "network: clients shared by all branches; branch: each branch keeps its own",
+            "default": "network"
+          },
           "resource_payment": {
             "type": "string",
             "enum": [
@@ -39218,6 +39490,21 @@
             ],
             "title": "Shifts Default Branches",
             "description": "Branches the shifts board opens with; empty means all of them"
+          },
+          "network_scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "network",
+                  "branch"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Network Scope"
           },
           "shifts_publish_auto": {
             "anyOf": [

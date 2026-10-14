@@ -133,6 +133,7 @@ class TenantUpdate(BaseModel):
         max_length=3,
         description="Branches the shifts board opens with; empty means all of them",
     )
+    network_scope: Literal["network", "branch"] | None = None
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
@@ -207,6 +208,10 @@ class Tenant(BaseModel):
         description="Clients need a valid health declaration to book in the app"
     )
     online_sales: bool = Field(description="Clients can buy plans in the app")
+    network_scope: Literal["network", "branch"] = Field(
+        default="network",
+        description="network: clients shared by all branches; branch: each branch keeps its own",
+    )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",
         description="Reservations of courts and rooms: paid in the app or at the venue",

@@ -5,6 +5,8 @@
   "icon": "scissors",
   "color": "from-pink-500 to-rose-500",
   "terms": "beauty",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"
