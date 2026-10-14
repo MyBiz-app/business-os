@@ -950,6 +950,7 @@ h1[tabindex="-1"]:focus {
   .au-scan {
     display: none;
   }
+}
 
 /* ---- Illustrations: animated empty states and the looping mini visuals of the feature cards ---
  * Decorative only (aria-hidden). Every loop stops for reduced motion by the rule above. */
