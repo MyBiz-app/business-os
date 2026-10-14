@@ -442,6 +442,21 @@ textarea {
   unicode-bidi: plaintext;
 }
 
+/* Date and time pickers size to their content: a phone otherwise stretches them to the full
+   form width, which looks oversized for a short value. */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"] {
+  max-inline-size: min(100%, 14rem);
+  min-block-size: 2.5rem;
+  font-size: 1rem;
+  text-align: start;
+}
+input[type="datetime-local"] {
+  max-inline-size: min(100%, 17rem);
+}
+
 /* ---- Motion ------------------------------------------------------------------------------ */
 
 @keyframes rise {

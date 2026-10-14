@@ -5,7 +5,7 @@ type PageHeaderProps = {
   description?: ReactNode;
   /** A small label above the title. */
   eyebrow?: ReactNode;
-  /** Buttons on the far side of the title row; they wrap under it on a phone. */
+  /** Buttons on the far side of the title row; on a phone they fill a tidy grid under it. */
   actions?: ReactNode;
   /** Id for the heading, so a section can name itself with aria-labelledby. */
   titleId?: string;
@@ -23,7 +23,7 @@ export function PageHeader({ title, description, eyebrow, actions, titleId, clas
         </h1>
         {description && <p className="text-base text-muted text-pretty sm:text-lg">{description}</p>}
       </div>
-      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      {actions && <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-center gap-2 *:justify-center sm:flex sm:w-auto sm:flex-wrap">{actions}</div>}
     </header>
   );
 }
