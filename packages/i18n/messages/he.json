@@ -4998,6 +4998,9 @@
     "motionReduced": "מופחתת",
     "widgetOpen": "פתיחת תפריט נגישות",
     "widgetClose": "סגירה",
+    "widgetDrag": "גררו כדי להזיז, לחצו כדי לפתוח",
+    "widgetHide": "הסתרת כפתור הנגישות",
+    "widgetShow": "הצגת כפתור הנגישות",
     "widgetTitle": "נגישות והתאמות",
     "reset": "איפוס הגדרות",
     "statement": "הצהרת נגישות"
