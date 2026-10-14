@@ -1991,6 +1991,40 @@
       "dashboard": "Go to dashboard",
       "guide": "Getting started guide"
     },
+    "intro": {
+      "eyebrow": "Everything in one place",
+      "title": "Calendar, clients, payments and messages.",
+      "titleAccent": "One system.",
+      "text": "The pieces of your business, scattered across apps and notebooks, snap together here.",
+      "scroll": "Continue to the page",
+      "sceneLabel": "Animation: calendar, clients, payments, messages, team and reports connect into one system",
+      "tiles": [
+        {
+          "title": "Calendar",
+          "meta": "8 today"
+        },
+        {
+          "title": "Clients",
+          "meta": "129 active"
+        },
+        {
+          "title": "Payments",
+          "meta": "+18%"
+        },
+        {
+          "title": "Messages",
+          "meta": "24 sent"
+        },
+        {
+          "title": "Team",
+          "meta": "6 on shift"
+        },
+        {
+          "title": "Reports",
+          "meta": "Live"
+        }
+      ]
+    },
     "hero": {
       "eyebrow": "Business management + an AI workforce for small businesses",
       "title": "Your business, organized.",
