@@ -7,9 +7,12 @@ import { BRAND } from "@business-os/i18n/brand";
 import { avatarSrc } from "@/components/avatar";
 import { PalettePicker } from "@/components/palette";
 import { AccessibilitySettings } from "@/components/accessibility";
+import { codeChannels } from "@/lib/auth-providers";
+import { createClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
+import { PhoneLogin } from "./phone-login";
 import { NotificationsForm, PictureForm, ProfileForm } from "./profile-form";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -24,6 +27,9 @@ export default async function AccountPage() {
   const t = await getTranslations();
   const { me } = await getActiveMembership();
   const name = me.full_name || me.email;
+  // A phone code needs an SMS provider on the project; until then the section stays hidden.
+  const phoneCodes = (await codeChannels()).includes("sms");
+  const { data: auth } = phoneCodes ? await (await createClient()).auth.getUser() : { data: null };
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
@@ -44,6 +50,17 @@ export default async function AccountPage() {
           postalCode={me.postal_code ?? null}
         />
       </section>
+      {phoneCodes && (
+        <section id="phone-login" aria-labelledby="phone-login-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
+          <div className="flex flex-col gap-1">
+            <h2 id="phone-login-heading" className="font-semibold">
+              {t("account.phoneLogin.title")}
+            </h2>
+            <p className="text-sm text-muted">{t("account.phoneLogin.hint")}</p>
+          </div>
+          <PhoneLogin verifiedPhone={auth?.user?.phone_confirmed_at ? (auth.user.phone ?? null) : null} />
+        </section>
+      )}
       <section id="notifications" aria-labelledby="notifications-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
         <h2 id="notifications-heading" className="font-semibold">
           {t("account.notificationsTitle")}

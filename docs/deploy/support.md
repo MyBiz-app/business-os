@@ -33,7 +33,7 @@ Languages: Hebrew first, English. Reply in the language of the message.
 
 | Request | Answer |
 |---|---|
-| "I can't sign in" | Check the email spelling; the code is 8 digits and expires; resend; check spam. If email is down, see [on-call](on-call.md) |
+| "I can't sign in" | Check the email spelling; the code is 6 digits and expires; resend; check spam. If email is down, see [on-call](on-call.md) |
 | "Delete my account / my data" | Owners close the account from settings; the business is deleted after 90 days. A client's export and erasure are in the client profile |
 | "Export my data" | Client export from the profile; business export is a support task until built |
 | "Wrong time shown" | Check the business time zone in settings; times are stored in UTC |
