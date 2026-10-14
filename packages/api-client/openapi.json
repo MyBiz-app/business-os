@@ -16173,6 +16173,110 @@
         }
       }
     },
+    "/client/resources/suggestions": {
+      "get": {
+        "tags": [
+          "client"
+        ],
+        "summary": "My Resource Suggestions",
+        "description": "The exact slot if free, else the nearest free ones (\"When suits you?\").",
+        "operationId": "my_resource_suggestions",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Service Id"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Date"
+            }
+          },
+          {
+            "name": "time",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "time",
+              "description": "Local time, HH:MM",
+              "title": "Time"
+            },
+            "description": "Local time, HH:MM"
+          },
+          {
+            "name": "minutes",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 1440,
+              "minimum": 15,
+              "title": "Minutes"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 8,
+              "minimum": 1,
+              "default": 5,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceSuggestions"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/resources/reservations": {
       "post": {
         "tags": [
@@ -34724,6 +34828,85 @@
           "price_currency"
         ],
         "title": "ResourceSlot"
+      },
+      "ResourceSuggestion": {
+        "properties": {
+          "starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Starts At"
+          },
+          "ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Ends At"
+          },
+          "room_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Room Id"
+          },
+          "room_name": {
+            "type": "string",
+            "title": "Room Name"
+          },
+          "price_amount": {
+            "type": "integer",
+            "title": "Price Amount"
+          },
+          "price_currency": {
+            "type": "string",
+            "title": "Price Currency"
+          },
+          "offset_minutes": {
+            "type": "integer",
+            "title": "Offset Minutes",
+            "description": "Minutes from the requested time; negative means earlier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "starts_at",
+          "ends_at",
+          "room_id",
+          "room_name",
+          "price_amount",
+          "price_currency",
+          "offset_minutes"
+        ],
+        "title": "ResourceSuggestion"
+      },
+      "ResourceSuggestions": {
+        "properties": {
+          "requested_starts_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Requested Starts At"
+          },
+          "exact": {
+            "items": {
+              "$ref": "#/components/schemas/ResourceSlot"
+            },
+            "type": "array",
+            "title": "Exact",
+            "description": "Rooms free at exactly the requested time (empty when none)"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/ResourceSuggestion"
+            },
+            "type": "array",
+            "title": "Suggestions",
+            "description": "Other free starts, nearest to the requested time first, one room per start"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requested_starts_at",
+          "exact",
+          "suggestions"
+        ],
+        "title": "ResourceSuggestions"
       },
       "ResourceUsageRow": {
         "properties": {
