@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { LaunchSplash } from "@/components/launch-splash";
 import { clientMessages } from "@/components/scoped-messages";
 import { PaletteScript } from "@/components/palette-script";
 import { SkipLink } from "@/components/skip-link";
@@ -36,6 +37,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <PaletteScript nonce={nonce} />
       </head>
       <body className="min-h-full flex flex-col">
+        <LaunchSplash nonce={nonce} />
         <ThemeProvider nonce={nonce}>
           <NextIntlClientProvider messages={messages}>
             <SkipLink />
