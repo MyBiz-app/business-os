@@ -57,7 +57,15 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()
         if value is not None
-        or key in ("primary_color", "legal_entity_type", "business_number", "shifts_default_range")
+        or key
+        in (
+            "primary_color",
+            "legal_entity_type",
+            "business_number",
+            "shifts_default_range",
+            "weekly_release_weekday",
+            "weekly_release_time",
+        )
     }
     if changes.get("business_number"):
         currency = (
