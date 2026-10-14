@@ -39,7 +39,7 @@ export async function BusyHours({ rows, locale }: { rows: Row[]; locale: string 
         <p className="text-sm font-medium">{t("heatmap.busiest", { slot: `${dayName(busyDay, "long")} ${hourLabel(busyHour)}` })}</p>
       </div>
       <ScrollRegion labelledBy="busy-heading">
-        <table className="w-full border-separate border-spacing-1 text-xs">
+        <table data-plain className="w-full border-separate border-spacing-1 text-xs">
           <thead>
             <tr>
               <td />

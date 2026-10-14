@@ -163,7 +163,7 @@ export function ShiftBoard(props: {
       </div>
 
       <div className="card overflow-x-auto p-0 max-md:hidden">
-        <table className="w-full border-collapse text-sm" style={{ minWidth: `${13 + days.length * (compact ? 6 : 7)}rem` }}>
+        <table data-plain className="w-full border-collapse text-sm" style={{ minWidth: `${13 + days.length * (compact ? 6 : 7)}rem` }}>
           <caption className="sr-only">{t("title")}</caption>
           <thead>
             <tr className="border-b border-border">
