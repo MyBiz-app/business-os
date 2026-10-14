@@ -1026,7 +1026,14 @@
       "empty": "Nothing on this day.",
       "closed": "Closed on this day.",
       "closedReason": "Closed on this day ({reason}).",
-      "closedShort": "Closed"
+      "closedShort": "Closed",
+      "allInstructors": "All coaches",
+      "allClasses": "All classes",
+      "noMatch": "No classes match this filter on this day.",
+      "releaseOpens": "The next week opens on {when}.",
+      "remindMe": "Remind me",
+      "reminderSet": "Reminder set",
+      "releaseReminderBody": "The schedule for the next week is open. Book your spot!"
     },
     "bookings": {
       "title": "My bookings",
@@ -1921,6 +1928,7 @@
     }
   },
   "email": {
+    "details": { "service": "Class", "when": "When" },
     "greeting": "Hi {name},",
     "note": "Note from the business: {note}",
     "footer": "This message was sent by {business}. You can see all updates in the app.",
@@ -2213,6 +2221,7 @@
       "subtitle": "The same powerful system, with each industry's terms, forms and settings.",
       "more": "Learn more",
       "soon": "Coming soon",
+      "pick": "Pick your industry",
       "soonTitle": "More industries coming soon",
       "soonText": "Sports and facility booking, home services, pet services, events and professional services are on the way.",
       "all": "All industries",
@@ -2253,7 +2262,35 @@
       ],
       "phoneTitle": "Schedule",
       "book": "Book",
-      "booked": "Booked ✓"
+      "booked": "Booked ✓",
+      "phone": {
+        "title": "Schedule",
+        "days": [
+          "Sun",
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu"
+        ],
+        "classes": [
+          "Spinning",
+          "Yoga flow",
+          "HIIT"
+        ],
+        "friendsTitle": "Friends",
+        "friends": [
+          "Maya",
+          "Noam",
+          "Dana",
+          "Eli"
+        ],
+        "friendsNote": "3 friends are in tonight's class",
+        "inviteTitle": "Invite a friend",
+        "inviteClass": "HIIT · 18:00",
+        "inviteFriend": "Maya",
+        "inviteCta": "Send invite",
+        "inviteSent": "Spot held for Maya"
+      }
     },
     "pricing": {
       "title": "Pay only for what you need",
@@ -2300,6 +2337,12 @@
         "more": "One more location",
         "total": "Total per month",
         "daily": "That's about {price} a day"
+      },
+      "groups": {
+        "run": "Run the business (every plan)",
+        "clients": "Your clients' experience",
+        "ai": "AI assistant and agents",
+        "growth": "Growth and sales"
       }
     },
     "faq": {
@@ -2347,7 +2390,12 @@
       "accessibility": "Accessibility",
       "rights": "© {year} MyBiz. All rights reserved.",
       "status": "System status",
-      "social": "Social media"
+      "social": "Social media",
+      "appsTitle": "Get the app",
+      "appsText": "Manage your business from your phone, or clients book from theirs.",
+      "storeIos": "App Store",
+      "storeAndroid": "Google Play",
+      "comingSoon": "Coming soon"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -5164,6 +5212,22 @@
     "cancel": "Cancel",
     "setting": "Unlock with Face ID or fingerprint",
     "on": "On",
-    "off": "Off"
+    "off": "Off",
+    "retry": "Try again",
+    "timeout": "Lock the app after",
+    "timeouts": {
+      "immediate": "Right away",
+      "30s": "30 seconds",
+      "5m": "5 minutes"
+    },
+    "offerTitle": "Open with Face ID or fingerprint next time?",
+    "offerBody": "Skip the code: confirm with your face or fingerprint when you open the app. You can change this any time in Settings.",
+    "offerYes": "Turn on",
+    "offerLater": "Not now"
+  },
+  "authUi": {
+    "tagline": "Your business, organised, in your pocket.",
+    "resend": "Send the code again",
+    "channelLabel": "Get the code by"
   }
 }

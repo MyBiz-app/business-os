@@ -1,12 +1,15 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
 import { Text } from "../components/text";
-import { ThemeToggle } from "../components/theme-toggle";
 import { ltr } from "../components/ltr";
 import { useTranslations } from "use-intl";
 
-import { Button, ErrorText, Field, Heading, Screen, styles } from "../components/ui";
+import { AuthCard, AuthShell } from "../components/auth-shell";
+import { DepthLogo } from "../components/launch-splash";
+import { FadeIn } from "../components/motion";
+import { OtpInput } from "../components/otp-input";
+import { SegmentedControl } from "../components/segmented-control";
+import { Button, ErrorText, Field, Heading, styles } from "../components/ui";
 import { SUPABASE_KEY, SUPABASE_URL } from "../lib/env";
 import { availableChannels, OTP_LENGTH, toE164, type OtpChannel } from "../lib/otp";
 import { supabase } from "../lib/supabase";
@@ -38,6 +41,7 @@ function useChannels(): OtpChannel[] {
  * project offers it. Each app's `sign-in` route re-exports it. */
 export function SignInScreen() {
   const t = useTranslations("client.signIn");
+  const tAuth = useTranslations("authUi");
   const { palette } = useTheme();
   // Set when a join link sent the user here first.
   const { code: joinCode } = useLocalSearchParams<{ code?: string }>();
@@ -80,12 +84,12 @@ export function SignInScreen() {
     setCode("");
   };
 
-  const verify = async () => {
-    if (!sentTo) return;
+  const verify = async (entered = code) => {
+    if (!sentTo || busy) return;
     setBusy(true);
     setError(null);
     const { error: failed } = await supabase.auth.verifyOtp(
-      channel === "email" ? { email: sentTo, token: code.trim(), type: "email" } : { phone: sentTo, token: code.trim(), type: "sms" },
+      channel === "email" ? { email: sentTo, token: entered.trim(), type: "email" } : { phone: sentTo, token: entered.trim(), type: "sms" },
     );
     setBusy(false);
     if (failed) return setError(t("invalidCode"));
@@ -93,81 +97,74 @@ export function SignInScreen() {
   };
 
   return (
-    <Screen palette={palette}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <View style={{ flex: 1 }}>
-          <Heading palette={palette}>{t("title")}</Heading>
-        </View>
-        <ThemeToggle />
-      </View>
-      {sentTo ? (
-        <>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t(channel === "email" ? "codeSent" : "codeSentPhone", { target: ltr(sentTo) })}</Text>
-          <Field
-            label={t(channel === "email" ? "code" : "codePhone")}
-            palette={palette}
-            value={code}
-            onChangeText={(value) => setCode(value.replace(/\D/g, "").slice(0, OTP_LENGTH))}
-            dir="ltr"
-            keyboardType="number-pad"
-            autoComplete="one-time-code"
-            textContentType="oneTimeCode"
-            autoFocus
-            onSubmitEditing={() => void verify()}
-          />
-          <ErrorText message={error} palette={palette} />
-          <Button label={t("verify")} palette={palette} busy={busy} disabled={code.length < OTP_LENGTH} onPress={() => void verify()} />
-          <Button label={t(channel === "email" ? "changeEmail" : "changePhone")} variant="secondary" palette={palette} onPress={() => setSentTo(null)} />
-        </>
-      ) : (
-        <>
-          <Text style={[styles.muted, { color: palette.muted }]}>{t("subtitle")}</Text>
-          {channels.length > 1 && (
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-              {channels.map((option) => (
-                <Button
-                  key={option}
-                  label={t(`channel.${option}`)}
-                  variant={channel === option ? "primary" : "secondary"}
-                  palette={palette}
-                  onPress={() => {
-                    setChannel(option);
-                    setError(null);
-                  }}
-                />
-              ))}
-            </View>
-          )}
-          {channel === "email" ? (
-            <Field
-              label={t("email")}
+    <AuthShell>
+      <FadeIn index={0} style={{ alignItems: "center", gap: 6 }}>
+        <DepthLogo size={0.8} />
+        <Heading palette={palette}>{t("title")}</Heading>
+        <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{sentTo ? t(channel === "email" ? "codeSent" : "codeSentPhone", { target: ltr(sentTo) }) : t("subtitle")}</Text>
+      </FadeIn>
+      <AuthCard>
+        {sentTo ? (
+          <>
+            <OtpInput
+              value={code}
+              onChange={setCode}
+              length={OTP_LENGTH}
               palette={palette}
-              value={email}
-              onChangeText={setEmail}
-              dir="ltr"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-              onSubmitEditing={() => void sendCode()}
+              label={t(channel === "email" ? "code" : "codePhone")}
+              invalid={!!error}
+              onComplete={(full) => void verify(full)}
             />
-          ) : (
-            <Field
-              label={t("phone")}
-              palette={palette}
-              value={phone}
-              onChangeText={setPhone}
-              dir="ltr"
-              keyboardType="phone-pad"
-              autoComplete="tel"
-              textContentType="telephoneNumber"
-              onSubmitEditing={() => void sendCode()}
-            />
-          )}
-          <ErrorText message={error} palette={palette} />
-          <Button label={t("sendCode")} palette={palette} busy={busy} onPress={() => void sendCode()} />
-        </>
-      )}
-    </Screen>
+            <ErrorText message={error} palette={palette} />
+            <Button label={t("verify")} palette={palette} busy={busy} disabled={code.length < OTP_LENGTH} onPress={() => void verify()} />
+            <Button label={tAuth("resend")} variant="secondary" palette={palette} disabled={busy} onPress={() => void sendCode()} />
+            <Button label={t(channel === "email" ? "changeEmail" : "changePhone")} variant="secondary" palette={palette} onPress={() => { setSentTo(null); setCode(""); setError(null); }} />
+          </>
+        ) : (
+          <>
+            {channels.length > 1 && (
+              <SegmentedControl
+                label={tAuth("channelLabel")}
+                value={channel}
+                options={channels.map((option) => ({ value: option, label: t(`channel.${option}`) }))}
+                onChange={(option) => {
+                  setChannel(option);
+                  setError(null);
+                }}
+              />
+            )}
+            {channel === "email" ? (
+              <Field
+                label={t("email")}
+                palette={palette}
+                value={email}
+                onChangeText={setEmail}
+                dir="ltr"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+                textContentType="emailAddress"
+                onSubmitEditing={() => void sendCode()}
+              />
+            ) : (
+              <Field
+                label={t("phone")}
+                palette={palette}
+                value={phone}
+                onChangeText={setPhone}
+                dir="ltr"
+                keyboardType="phone-pad"
+                autoComplete="tel"
+                textContentType="telephoneNumber"
+                onSubmitEditing={() => void sendCode()}
+              />
+            )}
+            <ErrorText message={error} palette={palette} />
+            <Button label={t("sendCode")} palette={palette} busy={busy} onPress={() => void sendCode()} />
+          </>
+        )}
+      </AuthCard>
+      <Text style={[styles.muted, { color: palette.muted, textAlign: "center", fontSize: 13 }]}>{tAuth("tagline")}</Text>
+    </AuthShell>
   );
 }

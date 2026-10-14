@@ -131,5 +131,6 @@ def build_welcome(details: WelcomeDetails) -> Email:
         preheader=t["preheader"],
         brand=layout.BRAND,
         footer=[(lang, layout.BRAND)],
+        kind="welcome",
     )
     return Email(to=details.to, subject=subject, text=text, html=body)

@@ -668,6 +668,25 @@ html[data-motion="reduce"] *::after {
   --page: var(--background);
 }
 
+/* Data tables in the business app and the console share one look: a quiet header row, a rule
+ * between rows and a soft hover. Heat maps and boards opt out with `data-plain`. */
+.app-shell main table:not([data-plain]) thead th {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: color-mix(in oklab, var(--surface) 94%, var(--foreground));
+  border-bottom: 1px solid var(--border);
+}
+.app-shell main table:not([data-plain]) tbody tr {
+  border-top: 1px solid var(--border);
+}
+.app-shell main table:not([data-plain]) tbody tr:first-child {
+  border-top: 0;
+}
+.app-shell main table:not([data-plain]) tbody tr:hover {
+  background: color-mix(in oklab, var(--surface) 96%, var(--foreground));
+}
+
 /* The navigation column: Midnight Navy in light and night mode. Its tokens are redefined so
  * everything inside (workspace switcher, menu, badges) reads correctly without its own colors;
  * a business's brand color is lightened toward white so it stays visible on navy. */
@@ -781,6 +800,45 @@ html[data-contrast="high"].dark .mk {
 @media (prefers-reduced-motion: no-preference) {
   .mk-float {
     animation: mk-float 6s ease-in-out infinite;
+  }
+}
+
+/* A slow soft ring on number and check badges, and a light sheen across a card on hover.
+ * Both only when motion is welcome. */
+@keyframes mk-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-primary, #2563eb) 35%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+.mk-shine {
+  position: relative;
+  overflow: hidden;
+}
+.mk-shine::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -60%;
+  inline-size: 40%;
+  background: linear-gradient(105deg, transparent, rgb(255 255 255 / 0.12), transparent);
+  transform: skewX(-18deg);
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mk-pulse {
+    animation: mk-pulse 3.2s ease-out infinite;
+  }
+  .mk-shine:hover::after {
+    inset-inline-start: 130%;
+    opacity: 1;
+    transition:
+      inset-inline-start 900ms var(--ease-out),
+      opacity 200ms;
   }
 }
 

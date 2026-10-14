@@ -117,8 +117,28 @@ export function EmptyState({ palette, message, loading }: { palette: Palette; me
   if (loading) return <SkeletonCard palette={palette} label={message} />;
   return (
     <Card palette={palette}>
-      <Text style={[styles.muted, { color: palette.muted }]}>{message}</Text>
+      <View style={{ alignItems: "center", gap: 12, paddingVertical: 10 }}>
+        <EmptyIllustration palette={palette} />
+        <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{message}</Text>
+      </View>
     </Card>
+  );
+}
+
+/** A small drawn picture for empty lists: soft rings around a tile with a few lines, so "nothing here" still looks designed. */
+function EmptyIllustration({ palette }: { palette: Palette }) {
+  return (
+    <View aria-hidden style={{ width: 96, height: 96, alignItems: "center", justifyContent: "center" }}>
+      <View style={{ position: "absolute", width: 96, height: 96, borderRadius: 48, backgroundColor: tint(palette.primary, 0.08) }} />
+      <View style={{ position: "absolute", width: 70, height: 70, borderRadius: 35, backgroundColor: tint(palette.accent, 0.12) }} />
+      <View style={{ width: 44, height: 52, borderRadius: 10, backgroundColor: palette.surface, borderWidth: 1, borderColor: palette.border, padding: 8, gap: 6, boxShadow: `0px 6px 14px ${tint(palette.primary, 0.2)}`, transform: [{ rotate: "-6deg" }] }}>
+        <View style={{ height: 5, borderRadius: 3, backgroundColor: palette.primary, width: "70%" }} />
+        <View style={{ height: 5, borderRadius: 3, backgroundColor: tint(palette.muted, 0.35) }} />
+        <View style={{ height: 5, borderRadius: 3, backgroundColor: tint(palette.muted, 0.35), width: "60%" }} />
+      </View>
+      <View style={{ position: "absolute", top: 8, end: 10, width: 10, height: 10, borderRadius: 5, backgroundColor: palette.ai, opacity: 0.8 }} />
+      <View style={{ position: "absolute", bottom: 10, start: 8, width: 7, height: 7, borderRadius: 4, backgroundColor: palette.accent }} />
+    </View>
   );
 }
 
