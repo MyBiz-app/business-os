@@ -6,9 +6,9 @@ import { safeNext } from "@/lib/navigation";
 
 import { supabaseConfig } from "./env";
 
-const PUBLIC_PAGES = new Set(["/", "/login", "/signup", "/check-email", "/forgot-password", "/start", "/getting-started", "/sitemap.xml", "/robots.txt", CSP_REPORT_PATH]);
+const PUBLIC_PAGES = new Set(["/", "/login", "/login/code", "/signup", "/check-email", "/forgot-password", "/start", "/getting-started", "/sitemap.xml", "/robots.txt", CSP_REPORT_PATH]);
 const PUBLIC_ASSETS = ["/opengraph-image", "/twitter-image"];
-const AUTH_PAGES = new Set(["/", "/login", "/signup"]);
+const AUTH_PAGES = new Set(["/", "/login", "/login/code", "/signup"]);
 
 // The marketing site and the public pages around sign-in and joining.
 const PUBLIC_PREFIXES = ["/auth/", "/invite/", "/join/", "/inquiry/", "/q/", "/features", "/industries", "/pricing", "/about", "/contact", "/legal/"];
