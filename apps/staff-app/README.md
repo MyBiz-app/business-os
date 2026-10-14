@@ -15,3 +15,7 @@ the API checks them again on every request.
 pnpm --filter staff-app exec expo start          # phone (Expo Go)
 pnpm --filter staff-app exec expo start --web    # browser, port 8083
 ```
+
+## Publishing an over-the-air update
+
+`eas update` bundles `EXPO_PUBLIC_*` at publish time and ignores `eas.json` build env. Publish with the **Publish Expo app updates (EAS Update)** GitHub workflow (needs the `EXPO_TOKEN` secret), or export `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_KEY` (see the workflow file) before running `eas update --branch preview`. Without them the app calls `http://<host>:8000` and sign-in fails with "(0)".

@@ -45,3 +45,7 @@ It is a static site (`expo export -p web`), deployed by a second Vercel project:
    `EXPO_PUBLIC_SUPABASE_KEY` (the staging values above) and `ENABLE_EXPERIMENTAL_COREPACK=1`.
 3. Deploy, then allow the app's address on the API: Render → service → Environment →
    `API_CORS_ORIGINS` = `["https://<the app's vercel address>"]`.
+
+## Publishing an over-the-air update
+
+`eas update` bundles `EXPO_PUBLIC_*` at publish time and ignores `eas.json` build env. Publish with the **Publish Expo app updates (EAS Update)** GitHub workflow (needs the `EXPO_TOKEN` secret), or export `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_KEY` (see the workflow file) before running `eas update --branch preview`. Without them the app calls `http://<host>:8000` and sign-in fails with "(0)".
