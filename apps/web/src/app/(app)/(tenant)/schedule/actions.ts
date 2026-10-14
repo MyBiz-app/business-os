@@ -206,6 +206,21 @@ export async function copyWeek(weekStart: string, _state: CopyWeekState, _formDa
   }
 }
 
+export type PublishWeekState = { error?: "generic"; published?: string; already?: boolean };
+
+/** Opens the next week of classes for clients ahead of the scheduled release. */
+export async function publishWeek(_state: PublishWeekState, _formData: FormData): Promise<PublishWeekState> {
+  const { api, scope } = await getTenant();
+  try {
+    const { published_until } = unwrap(await api.POST("/sessions/publish-week", { params: scope }));
+    revalidatePath("/schedule");
+    return { published: published_until };
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 409) return { already: true };
+    return { error: "generic" };
+  }
+}
+
 /** Records that a reservation was paid at the venue (cash, card at the desk…); issues a receipt. */
 export async function recordVenuePayment(sessionId: string, bookingId: string, formData: FormData): Promise<void> {
   const { api, scope } = await getTenant();

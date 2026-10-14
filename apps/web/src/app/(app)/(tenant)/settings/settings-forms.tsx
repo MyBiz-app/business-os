@@ -21,6 +21,7 @@ type Tenant = components["schemas"]["Tenant"];
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
 const DEFAULT_COLOR = "#2563eb";
 const CANCELLATION_WINDOWS = [0, 60, 120, 180, 360, 720, 1440, 2880];
+const HORIZON_DAYS = [3, 7, 10, 14, 21, 28];
 
 export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: string[] }) {
   const t = useTranslations();
@@ -28,7 +29,7 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
   return (
     <form action={action} className="flex flex-col gap-4">
       <FormFeedback state={state} />
-      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.resource_payment}`} className="grid gap-4 sm:grid-cols-2">
+      <div key={`${tenant.name}-${tenant.locale}-${tenant.time_zone}-${tenant.currency}-${tenant.cancellation_window_minutes}-${tenant.booking_requires_plan}-${tenant.requires_health_declaration}-${tenant.online_sales}-${tenant.resource_payment}-${tenant.booking_horizon_days}-${tenant.weekly_release_weekday}-${tenant.weekly_release_time}`} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Field label={t("onboarding.name")} name="name" required maxLength={120} defaultValue={tenant.name} />
         </div>
@@ -75,6 +76,33 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
             {t("settings.cancellationWindowHint")}
           </p>
         </div>
+        <div className="sm:col-span-2">
+          <h3 className="text-sm font-semibold">{t("settings.classRelease")}</h3>
+        </div>
+        <SelectField
+          label={t("settings.bookingHorizon")}
+          name="booking_horizon_days"
+          defaultValue={String(tenant.booking_horizon_days)}
+          options={[...new Set([...HORIZON_DAYS, tenant.booking_horizon_days])]
+            .sort((a, b) => a - b)
+            .map((days) => ({ value: String(days), label: t("settings.bookingHorizonDays", { days }) }))}
+        />
+        <SelectField
+          label={t("settings.releaseWeekday")}
+          name="weekly_release_weekday"
+          defaultValue={tenant.weekly_release_weekday == null ? "" : String(tenant.weekly_release_weekday)}
+          options={[
+            { value: "", label: t("settings.releaseRolling") },
+            ...((["0", "1", "2", "3", "4", "5", "6"]) as const).map((day) => ({ value: day, label: t(`settings.releaseWeekdays.${day}`) })),
+          ]}
+        />
+        <Field
+          label={t("settings.releaseTime")}
+          name="weekly_release_time"
+          type="time"
+          defaultValue={tenant.weekly_release_time?.slice(0, 5) ?? "20:00"}
+          hint={t("settings.classReleaseHint")}
+        />
         <div className="sm:col-span-2">
           <CheckboxField
             label={t("settings.requirePlan")}

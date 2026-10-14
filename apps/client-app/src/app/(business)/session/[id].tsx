@@ -115,6 +115,26 @@ export default function SessionScreen() {
     });
   };
 
+  // Cancelling or restoring the whole class: the API tells the registered clients.
+  const cancelSession = async () => {
+    const yes = await confirm(
+      tSession("cancelClass"),
+      tSession("cancelClassConfirm", { count: coming.length }),
+      tSession("yes"),
+      tSession("no"),
+    );
+    if (!yes) return;
+    await run("session", async () => {
+      unwrap(await api.PATCH("/sessions/{session_id}", { params: { ...scope, path: { session_id: id } }, body: { status: "cancelled" } }));
+    });
+  };
+
+  const restoreSession = () =>
+    run("session", async () => {
+      unwrap(await api.PATCH("/sessions/{session_id}", { params: { ...scope, path: { session_id: id } }, body: { status: "scheduled" } }));
+      setNotice(tSession("classRestored"));
+    });
+
   const find = async () => {
     setError(null);
     try {
@@ -333,6 +353,16 @@ export default function SessionScreen() {
             </View>
           )}
         </Card>
+      )}
+
+      {can("schedule.write") && isClass && session.starts_at > new Date().toISOString() && (
+        <Button
+          label={open ? tSession("cancelClass") : tSession("restoreClass")}
+          variant="secondary"
+          palette={palette}
+          busy={busy === "session"}
+          onPress={() => void (open ? cancelSession() : restoreSession())}
+        />
       )}
 
       {data?.session.job_status && (

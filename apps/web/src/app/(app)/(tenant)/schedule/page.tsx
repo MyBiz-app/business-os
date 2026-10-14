@@ -15,6 +15,7 @@ import { canManageSettings, canWriteSchedule } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { CopyWeek } from "./copy-week";
+import { PublishWeek } from "./publish-week";
 import { SaveDefault } from "./save-default";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -189,6 +190,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("closedDays")}
             </Link>
           )}
+          {canWriteSchedule(tenant) && <PublishWeek />}
           {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {tenant.permissions.includes("bookings.manage") && (
             <Link href={`/schedule/appointment?date=${start > today ? start : today}`} className="btn-secondary px-4 py-2.5 text-sm">
