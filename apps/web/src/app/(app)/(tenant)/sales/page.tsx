@@ -13,6 +13,7 @@ import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
 import { monthRange } from "./month";
+import { EmptyState } from "@/components/empty-state";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("sales");
@@ -103,7 +104,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
         </h2>
         {sales.simulated && <p className="rounded-xl bg-warning/10 px-3 py-2 text-sm">{t("simulated")}</p>}
         {sales.receipts.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("empty")}</p>
+          <EmptyState variant="chart">{t("empty")}</EmptyState>
         ) : (
           <ScrollRegion labelledBy="receipts-heading" className="rounded-2xl border border-border">
             <table className="w-full text-sm">

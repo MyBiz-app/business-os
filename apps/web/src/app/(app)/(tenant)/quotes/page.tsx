@@ -10,6 +10,7 @@ import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
 import { STATUS_TONE } from "./status";
+import { EmptyState } from "@/components/empty-state";
 
 const FILTERS = ["all", "draft", "sent", "accepted", "declined", "expired"] as const;
 
@@ -60,7 +61,7 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
         ))}
       </nav>
       {quotes.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("none")}</p>
+        <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (
         <ul className="flex flex-col divide-y divide-border card">
           {quotes.map((quote) => (

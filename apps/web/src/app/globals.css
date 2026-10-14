@@ -885,3 +885,97 @@ h1[tabindex="-1"]:focus {
     animation: none;
   }
 }
+
+/* ---- Illustrations: animated empty states and the looping mini visuals of the feature cards ---
+ * Decorative only (aria-hidden). Every loop stops for reduced motion by the rule above. */
+@keyframes es-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes es-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes es-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes loop-bars {
+  0%,
+  10% {
+    transform: scaleY(0.15);
+  }
+  40%,
+  80% {
+    transform: scaleY(1);
+  }
+  100% {
+    transform: scaleY(0.15);
+  }
+}
+@keyframes loop-slide {
+  0%,
+  8% {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  22%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes loop-dots {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+.es-bob {
+  animation: es-bob 4s ease-in-out infinite;
+}
+.es-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: es-draw 1.2s var(--ease-out) 0.2s forwards;
+}
+.es-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: es-pulse 2.4s ease-in-out infinite;
+}
+.loop-bar {
+  transform-origin: bottom;
+  animation: loop-bars 4.5s var(--ease-out) infinite;
+}
+.loop-slide {
+  animation: loop-slide 5s var(--ease-out) infinite;
+}
+.loop-dot {
+  animation: loop-dots 1.4s ease-in-out infinite;
+}

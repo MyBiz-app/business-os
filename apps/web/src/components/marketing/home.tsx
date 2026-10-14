@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { Section } from "@/components/layout/section";
 import { DemoStage } from "@/components/marketing/demo-stage";
+import { MiniLoop } from "@/components/marketing/mini-loops";
 import { Reveal } from "@/components/marketing/reveal";
 import { FEATURES, SectionHeading } from "@/components/marketing/sections";
 import { loadCatalog } from "@/lib/pricing";
@@ -69,6 +70,7 @@ export async function BentoFeatures() {
                   </span>
                   <h3 className="text-xl font-bold tracking-tight">{t(`items.${key}.title`)}</h3>
                   <p className="text-muted">{t(`items.${key}.text`)}</p>
+                  <MiniLoop kind={key} />
                 </article>
               </Reveal>
             </li>

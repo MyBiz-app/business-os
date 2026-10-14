@@ -9,6 +9,7 @@ import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
+import { EmptyState } from "@/components/empty-state";
 
 const STEP = 50;
 const MAX = 200; // the API's page size cap
@@ -32,7 +33,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader titleId="orders-heading" title={t("orders.title")} description={t("orders.subtitle")} />
       {items.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("orders.empty")}</p>
+        <EmptyState variant="list">{t("orders.empty")}</EmptyState>
       ) : (
         <>
           <ScrollRegion labelledBy="orders-heading" className="rounded-2xl border border-border">
