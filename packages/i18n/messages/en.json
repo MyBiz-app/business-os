@@ -1026,7 +1026,14 @@
       "empty": "Nothing on this day.",
       "closed": "Closed on this day.",
       "closedReason": "Closed on this day ({reason}).",
-      "closedShort": "Closed"
+      "closedShort": "Closed",
+      "allInstructors": "All coaches",
+      "allClasses": "All classes",
+      "noMatch": "No classes match this filter on this day.",
+      "releaseOpens": "The next week opens on {when}.",
+      "remindMe": "Remind me",
+      "reminderSet": "Reminder set",
+      "releaseReminderBody": "The schedule for the next week is open. Book your spot!"
     },
     "bookings": {
       "title": "My bookings",
@@ -2340,7 +2347,12 @@
       "accessibility": "Accessibility",
       "rights": "© {year} MyBiz. All rights reserved.",
       "status": "System status",
-      "social": "Social media"
+      "social": "Social media",
+      "appsTitle": "Get the app",
+      "appsText": "Manage your business from your phone, or clients book from theirs.",
+      "storeIos": "App Store",
+      "storeAndroid": "Google Play",
+      "comingSoon": "Coming soon"
     },
     "about": {
       "title": "Building the system small businesses deserve",
