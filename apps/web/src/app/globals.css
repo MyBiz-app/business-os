@@ -668,6 +668,25 @@ html[data-motion="reduce"] *::after {
   --page: var(--background);
 }
 
+/* Data tables in the business app and the console share one look: a quiet header row, a rule
+ * between rows and a soft hover. Heat maps and boards opt out with `data-plain`. */
+.app-shell main table:not([data-plain]) thead th {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: color-mix(in oklab, var(--surface) 94%, var(--foreground));
+  border-bottom: 1px solid var(--border);
+}
+.app-shell main table:not([data-plain]) tbody tr {
+  border-top: 1px solid var(--border);
+}
+.app-shell main table:not([data-plain]) tbody tr:first-child {
+  border-top: 0;
+}
+.app-shell main table:not([data-plain]) tbody tr:hover {
+  background: color-mix(in oklab, var(--surface) 96%, var(--foreground));
+}
+
 /* The navigation column: Midnight Navy in light and night mode. Its tokens are redefined so
  * everything inside (workspace switcher, menu, badges) reads correctly without its own colors;
  * a business's brand color is lightened toward white so it stays visible on navy. */

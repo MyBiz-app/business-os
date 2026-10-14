@@ -67,7 +67,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   return (
     <ScopedMessages scopes={["app", "tenant"]}>
     <div style={brandStyle(brandColor)} className="brand flex flex-1 flex-col md:flex-row">
-      <aside className="nav-dark print:hidden md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto">
+      <aside className="nav-dark print:hidden max-md:border-b max-md:border-border md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto">
         <WorkspaceSwitcher
           name={tenant.name}
           logo={brandLogo}
