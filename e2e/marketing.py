@@ -28,7 +28,7 @@ with sync_playwright() as p:
         page = b.new_context(locale=locale, color_scheme=scheme, viewport={"width": 1280, "height": 900}).new_page()
         page.goto(h.BASE); h.ready(page)
         if locale == "en-US":  # the site follows the language chosen in the header
-            page.locator("header select").first.select_option("en"); page.wait_for_timeout(1500); h.ready(page)
+            page.locator("header").get_by_role("button", name=re.compile("עברית|Language")).first.click(); page.get_by_role("menuitemradio", name="English").click(); page.wait_for_timeout(1500); h.ready(page)
         issues = {}
         for path in PAGES:
             page.goto(h.BASE + path); h.ready(page)
