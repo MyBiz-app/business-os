@@ -35,7 +35,7 @@ with sync_playwright() as p:
     # Register → verify → create business (questionnaire → plan).
     owner.goto(f"{h.BASE}/signup"); h.ready(owner)
     owner.get_by_label("אימייל").fill(owner_email)
-    owner.get_by_label("סיסמה").fill("Str0ng!Passw0rd")
+    owner.get_by_label("סיסמה", exact=True).fill("Str0ng!Passw0rd")
     owner.get_by_role("button", name="יצירת חשבון").click()
     owner.wait_for_url("**/check-email**")
     owner.goto(h.confirm_link(owner_email)); h.to_onboarding(owner)
@@ -74,7 +74,7 @@ with sync_playwright() as p:
     coach.goto(link); h.ready(coach)
     coach.get_by_role("link", name="יצירת חשבון").click(); coach.wait_for_url("**/signup?next=**"); h.ready(coach)
     coach.get_by_label("אימייל").fill(coach_email)
-    coach.get_by_label("סיסמה").fill("Str0ng!Passw0rd")
+    coach.get_by_label("סיסמה", exact=True).fill("Str0ng!Passw0rd")
     coach.get_by_role("button", name="יצירת חשבון").click(); coach.wait_for_url("**/check-email**")
     coach.goto(h.confirm_link(coach_email)); coach.wait_for_url("**/invite/**"); h.ready(coach)
     coach.get_by_role("button", name=re.compile("הצטרפות ל")).click(); coach.wait_for_url("**/dashboard")
