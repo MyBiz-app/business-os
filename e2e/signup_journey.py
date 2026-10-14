@@ -112,7 +112,7 @@ with sync_playwright() as p:
     page.wait_for_url("**/signup?next=**")
     email = f"journey{time.time_ns()}@example.com"
     page.get_by_label("אימייל").fill(email)
-    page.get_by_label("סיסמה").fill(h.PASSWORD)
+    page.get_by_label("סיסמה", exact=True).fill(h.PASSWORD)
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
     page.goto(h.confirm_link(email))
