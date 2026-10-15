@@ -1968,7 +1968,9 @@
       "health_approved": "Your health declaration was approved",
       "health_rejected": "About your health declaration",
       "session_reminder": "Today: {service} at {when}",
-      "plan_ending": "Your plan ends on {date}"
+      "plan_ending": "Your plan ends on {date}",
+      "friend_request": "{friend} wants to be your friend",
+      "class_invite": "{friend} invited you: {service} on {when}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -1980,7 +1982,9 @@
       "health_approved": "{business} approved your health declaration. You can book in the app.",
       "health_rejected": "{business} couldn't approve your health declaration. Please contact the business.",
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
-      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking."
+      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
+      "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -3081,7 +3085,12 @@
         "EUR": "€ Euro"
       },
       "yoursGeneric": "your business",
-      "exampleGeneric": "Dana's business"
+      "exampleGeneric": "Dana's business",
+      "number": "Company number (ח.פ. / ID)",
+      "numberOptional": "Company registration number (optional)",
+      "numberPlaceholder": "9 digits",
+      "numberHint": "Used for invoices. Companies use the ח.פ. number, sole traders their ID number.",
+      "numberInvalid": "Check the number: it should be up to 9 digits with a valid check digit."
     },
     "base": {
       "eyebrow": "Your base plan",
@@ -3355,7 +3364,7 @@
       }
     },
     "cart": {
-      "title": "Your plan",
+      "title": "My plan",
       "monthly": "Monthly after the trial",
       "today": "Due today",
       "free": "Free",

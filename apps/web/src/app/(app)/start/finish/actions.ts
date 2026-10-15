@@ -47,6 +47,9 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
 
   // The business exists from here on; a hiccup in the steps below must not block the owner.
   const scope = { header: { "X-Tenant-Id": tenant.id } };
+  if (plan.businessNumber) {
+    await api.PATCH("/tenants/current", { params: scope, body: { business_number: plan.businessNumber } }).catch(() => null);
+  }
   await api.POST("/billing/payment-method", { params: scope, body: { brand } }).catch(() => null);
   await api
     .POST("/tenants/current/welcome-email", { params: scope, body: { expected_active_clients: plan.clients } })
