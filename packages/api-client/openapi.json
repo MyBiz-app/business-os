@@ -22222,6 +22222,65 @@
         }
       }
     },
+    "/client/people/{client_id}/friend-request": {
+      "post": {
+        "tags": [
+          "friends"
+        ],
+        "summary": "Request Friendship With",
+        "description": "Asks a person met in a class to be friends (the \"add friend\" button on their profile).\nOnly people the profile endpoint would show me can be asked.",
+        "operationId": "request_friendship_with",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Person"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/client/friends/requests/{friendship_id}/accept": {
       "post": {
         "tags": [

@@ -11,7 +11,9 @@ import { Button, elevation } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { confirm } from "@business-os/app-kit/lib/confirm";
 import { InstructorAvatar } from "@/components/instructor-avatar";
+import { SessionFriends } from "@/components/session-friends";
 import { fillRatio } from "@/lib/class-filters";
+import { useFriendsEnabled } from "@/lib/use-friend-settings";
 import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];
@@ -51,6 +53,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
   const [error, setError] = useState<string | null>(null);
   const [needsHealth, setNeedsHealth] = useState(false);
   const [who, setWho] = useState<string | null>(null);
+  const friendsEnabled = useFriendsEnabled();
   if (!business) return null;
 
   const hours = `${formatTime(session.starts_at, locale, business.time_zone)}–${formatTime(session.ends_at, locale, business.time_zone)}`;
@@ -259,6 +262,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
             </View>
           );
         })}
+      {friendsEnabled && mine && mine.status === "booked" && !cancelled && <SessionFriends sessionId={session.id} />}
       {error && (
         <Text accessibilityRole="alert" style={[styles.meta, { color: palette.danger }]}>
           {error}
