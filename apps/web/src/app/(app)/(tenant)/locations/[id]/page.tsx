@@ -8,6 +8,7 @@ import { apiAssetUrl } from "@/lib/api";
 import { weekStartFor } from "@/lib/hours";
 import { canManageSettings, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { branchKindOptions, industryTexts } from "@/lib/verticals";
 
 import { saveOpeningHours, updateLocation } from "../actions";
 import { BranchBranding } from "../branch-branding";
@@ -37,6 +38,7 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
         location={location}
         submitLabel={t("common.save")}
         readOnly={readOnly}
+        kindOptions={branchKindOptions(tenant.vertical, industryTexts(t).text, t("locations.kindSame"))}
       />
       {canManageSettings(tenant) && <BranchBranding location={location} logo={apiAssetUrl(location.logo_url)} networkColor={tenant.primary_color} />}
       <section aria-labelledby="opening-heading" className="flex flex-col gap-4 card p-6">

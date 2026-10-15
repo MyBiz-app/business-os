@@ -45,6 +45,7 @@ export async function updateLocation(
           name: value(formData, "name"),
           address: value(formData, "address"),
           active: formData.get("active") === "on",
+          ...(formData.has("kind") ? { kind: value(formData, "kind") || null } : {}),
         },
       }),
     );
@@ -152,6 +153,7 @@ export async function addBranch(_state: FormState, formData: FormData): Promise<
         body: {
           name: value(formData, "name"),
           address: value(formData, "address"),
+          kind: value(formData, "kind") || null,
           copy_hours_from: copyFrom === "" ? null : copyFrom,
           staff_user_ids: formData.getAll("staff_user_ids").map(String),
           accept_extra_charge: formData.get("accept_extra_charge") === "on",
@@ -195,6 +197,23 @@ export async function updateBranchColor(locationId: string, _state: FormState, f
       await api.PATCH("/locations/{location_id}", {
         params: { ...scope, path: { location_id: locationId } },
         body: { primary_color: color },
+      }),
+    );
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+/** Whether clients and friends are shared by the whole network or kept per branch. */
+export async function updateNetworkScope(_state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  try {
+    unwrap(
+      await api.PATCH("/tenants/current", {
+        params: scope,
+        body: { network_scope: value(formData, "network_scope") === "branch" ? "branch" : "network" },
       }),
     );
   } catch (error) {

@@ -2,7 +2,7 @@
  * `verticals.<key>` and fall back to the parent category; words in `terms.<set>`; client-field
  * labels in `clientFields.<key>`. The casts name one real key so next-intl's typed keys accept
  * the dynamic ones, which packages/verticals' tests check exist for every entry. */
-import { categories, childrenOf, termsOf, textKey } from "@business-os/verticals";
+import { categories, childrenOf, termsOf, textKey, vertical } from "@business-os/verticals";
 
 import type { Messages } from "@business-os/i18n";
 
@@ -50,4 +50,18 @@ export function industryOptions(
       { value: category.key, label: otherKind(name), group: name },
     ];
   });
+}
+
+/** The types a branch may take: the sub-categories of the business's own category (the server
+ * enforces the same rule). Empty value: the branch is just like the business. */
+export function branchKindOptions(
+  businessVertical: string,
+  text: (key: string, name: "name") => string,
+  sameAsBusiness: string,
+): { value: string; label: string }[] {
+  const category = vertical(vertical(businessVertical)?.category);
+  return [
+    { value: "", label: sameAsBusiness },
+    ...(category?.branchKinds ?? []).map((key) => ({ value: key, label: text(key, "name") })),
+  ];
 }
