@@ -175,6 +175,7 @@ def render(
         "note": str(payload.get("note") or ""),
         "plan": str(payload.get("plan_name", "")),
         "date": _day(payload.get("ends_on")),
+        "friend": str(payload.get("from_name", "")),
     }
     subject = _fill(messages["subject"][kind], values)
     lines = [_fill(messages["greeting"], values), "", _fill(messages["body"][kind], values)]

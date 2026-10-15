@@ -1094,6 +1094,19 @@
     },
     "profile": {
       "title": "פרופיל",
+      "photoLabel": "תמונת פרופיל",
+      "takePhoto": "צילום תמונה",
+      "choosePhoto": "בחירה מהגלריה",
+      "removePhoto": "הסרת התמונה",
+      "photoSaved": "התמונה עודכנה",
+      "photoFailed": "לא הצלחנו לעדכן את התמונה",
+      "photoPermission": "אפשרו גישה בהגדרות הטלפון כדי להוסיף תמונה",
+      "status": "סטטוס",
+      "statusPlaceholder": "משפט קצר עליכם",
+      "statusCount": "{count}/{max}",
+      "saveStatus": "שמירת סטטוס",
+      "statusSaved": "הסטטוס נשמר",
+      "statusFailed": "לא הצלחנו לשמור את הסטטוס",
       "signedInAs": "מחובר/ת בתור {email}",
       "business": "עסק",
       "joinAnother": "הצטרפות לעסק נוסף",
@@ -1964,7 +1977,9 @@
       "health_approved": "הצהרת הבריאות שלך אושרה",
       "health_rejected": "לגבי הצהרת הבריאות שלך",
       "session_reminder": "היום: {service} ב-{when}",
-      "plan_ending": "המנוי שלך מסתיים ב-{date}"
+      "plan_ending": "המנוי שלך מסתיים ב-{date}",
+      "friend_request": "{friend} רוצה להיות חבר שלך",
+      "class_invite": "{friend} הזמין אותך: {service} ב-{when}"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -1976,7 +1991,9 @@
       "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם באפליקציה.",
       "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם העסק.",
       "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום.",
-      "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם."
+      "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם.",
+      "friend_request": "{friend} שלח לך בקשת חברות ב{business}. אפשר לאשר באפליקציה.",
+      "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר."
     },
     "welcome": {
       "subject": "ברוכים הבאים ל-MyBiz, {business}! 🎉",
@@ -3077,7 +3094,12 @@
         "EUR": "€ יורו"
       },
       "yoursGeneric": "העסק שלך",
-      "exampleGeneric": "העסק של דנה"
+      "exampleGeneric": "העסק של דנה",
+      "number": "ח.פ. / ת.ז. העסק",
+      "numberOptional": "מספר רישום החברה (לא חובה)",
+      "numberPlaceholder": "9 ספרות",
+      "numberHint": "לצורך חשבוניות. חברה מזינה ח.פ., עוסק מורשה או פטור מזין מספר זהות.",
+      "numberInvalid": "בדקו את המספר: עד 9 ספרות עם ספרת ביקורת תקינה."
     },
     "base": {
       "eyebrow": "חבילת הבסיס שלך",
@@ -3351,7 +3373,7 @@
       }
     },
     "cart": {
-      "title": "החבילה שלך",
+      "title": "החבילה שלי",
       "monthly": "לחודש אחרי הניסיון",
       "today": "לתשלום היום",
       "free": "חינם",

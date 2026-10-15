@@ -61,6 +61,8 @@ ICONS = {
     "health_approved": "✅",
     "health_rejected": "📋",
     "plan_ending": "💳",
+    "friend_request": "🤝",
+    "class_invite": "💌",
     "roster": "📅",
 }
 
