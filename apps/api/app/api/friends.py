@@ -448,6 +448,13 @@ INVITE_SELECT = """
 """
 
 
+INVITE_BY_ID = INVITE_SELECT + " WHERE i.id = :id"
+INVITES_HELD = (
+    INVITE_SELECT
+    + " WHERE i.status = 'pending' AND i.expires_at > now() ORDER BY s.starts_at, i.created_at"
+)
+
+
 def _invite(row: dict, me: UUID, names: dict[UUID, str]) -> Invite:
     received = row["invitee_id"] == me
     other = row["inviter_id"] if received else row["invitee_id"]
@@ -465,7 +472,7 @@ def _invite(row: dict, me: UUID, names: dict[UUID, str]) -> Invite:
 
 
 def _invite_by_id(db: Session, invite_id: UUID) -> Invite:
-    row = db.execute(text(f"{INVITE_SELECT} WHERE i.id = :id"), {"id": invite_id}).mappings().one()
+    row = db.execute(text(INVITE_BY_ID), {"id": invite_id}).mappings().one()
     me = db.execute(text("SELECT app.current_client_id()")).scalar_one()
     return _invite(dict(row), me, _names(db))
 
@@ -484,13 +491,7 @@ def my_invites(context: ClientDep) -> list[Invite]:
     """Invitations I received and sent that still hold a spot, soonest class first."""
     db = context.session
     _forbidden_unless_enabled(db)
-    rows = db.execute(
-        text(f"""
-            {INVITE_SELECT}
-            WHERE i.status = 'pending' AND i.expires_at > now()
-            ORDER BY s.starts_at, i.created_at
-        """)
-    ).mappings()
+    rows = db.execute(text(INVITES_HELD)).mappings()
     names = _names(db)
     return [_invite(dict(row), context.client_id, names) for row in rows]
 
@@ -631,22 +632,23 @@ def accept_invite(invite_id: UUID, context: ClientDep) -> ClientSession:
 
 @router.post("/invites/{invite_id}/decline", status_code=status.HTTP_204_NO_CONTENT)
 def decline_invite(invite_id: UUID, context: ClientDep) -> Response:
-    return _end_invite(context, invite_id, "declined", "invitee_id")
+    return _end_invite(context, invite_id, "declined", "invitee")
 
 
 @router.delete("/invites/{invite_id}", status_code=status.HTTP_204_NO_CONTENT)
 def cancel_invite(invite_id: UUID, context: ClientDep) -> Response:
     """The inviter takes the invitation back and frees the spot."""
-    return _end_invite(context, invite_id, "cancelled", "inviter_id")
+    return _end_invite(context, invite_id, "cancelled", "inviter")
 
 
 def _end_invite(context: ClientContext, invite_id: UUID, new_status: str, who: str) -> Response:
     changed = context.session.execute(
-        text(f"""
+        text("""
             UPDATE app.class_invites SET status = :status, responded_at = now()
-            WHERE id = :id AND {who} = :me AND status = 'pending'
+            WHERE id = :id AND status = 'pending'
+              AND CASE :who WHEN 'invitee' THEN invitee_id ELSE inviter_id END = :me
         """),
-        {"status": new_status, "id": invite_id, "me": context.client_id},
+        {"status": new_status, "id": invite_id, "me": context.client_id, "who": who},
     ).rowcount
     if not changed:
         raise not_found()
