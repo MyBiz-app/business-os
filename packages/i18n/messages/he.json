@@ -1950,7 +1950,9 @@
       "health_approved": "הצהרת הבריאות שלך אושרה",
       "health_rejected": "לגבי הצהרת הבריאות שלך",
       "session_reminder": "היום: {service} ב-{when}",
-      "plan_ending": "המנוי שלך מסתיים ב-{date}"
+      "plan_ending": "המנוי שלך מסתיים ב-{date}",
+      "friend_request": "{friend} רוצה להיות חבר שלך",
+      "class_invite": "{friend} הזמין אותך: {service} ב-{when}"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -1962,7 +1964,9 @@
       "health_approved": "{business} אישר את הצהרת הבריאות שלך. אפשר להירשם באפליקציה.",
       "health_rejected": "{business} לא יכול היה לאשר את הצהרת הבריאות שלך. כדאי ליצור קשר עם העסק.",
       "session_reminder": "תזכורת: נרשמת ל{service} היום ({when}). לא יתאפשר לך להגיע? כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לקבל את המקום.",
-      "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם."
+      "plan_ending": "ה{plan} שלך ב{business} מסתיים ב-{date}. כדאי לחדש כדי להמשיך להירשם.",
+      "friend_request": "{friend} שלח לך בקשת חברות ב{business}. אפשר לאשר באפליקציה.",
+      "class_invite": "{friend} שמר לך מקום ב{service} ב-{when} ב{business}. אפשר להצטרף באפליקציה; המקום שמור לזמן קצר."
     },
     "welcome": {
       "subject": "ברוכים הבאים ל-MyBiz, {business}! 🎉",
