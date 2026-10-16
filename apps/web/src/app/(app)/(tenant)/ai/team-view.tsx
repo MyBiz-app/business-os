@@ -2,7 +2,7 @@
 
 import { FlaskConical, LayoutGrid, Network } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   agentConversations,
@@ -31,9 +31,11 @@ type Props = {
   /** Whoever may change the plan sees "add to plan"; the others are told to ask the owner. */
   canAdd: boolean;
   timeZone: string;
+  /** An agent to open straight away (the floating bubble links here). */
+  initialAgent?: string | null;
 };
 
-export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone }: Props) {
+export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, initialAgent = null }: Props) {
   const t = useTranslations("aiTeam");
   const tAssistant = useTranslations("assistant");
   const locale = useLocale();
@@ -135,6 +137,15 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
     const target = team.agents.find((a) => a.key === agentKey);
     if (target) void open(target);
   }
+
+  // Arriving from the floating chat opens that agent's chat.
+  useEffect(() => {
+    const target = initialAgent ? team.agents.find((a) => a.key === initialAgent) : null;
+    if (!target) return;
+    const timer = window.setTimeout(() => void open(target), 0);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on arrival
+  }, []);
 
   const chatOpen = agent !== null;
 
