@@ -46,6 +46,7 @@ DOMAINS: tuple[str, ...] = (
     "content",
     "social",
     "routing",
+    "tasks",
 )
 
 SYSTEM_ROLES = ("owner", "manager", "branch_manager", "front_desk", "staff")
@@ -99,7 +100,7 @@ CATALOG: dict[str, AgentSpec] = {
             "Calendar, bookings, waiting lists, reminders, free slots and client messages.",
             "You are the personal secretary: calendar, bookings, waiting lists, free slots and "
             "wording messages to clients. Be quick and practical.",
-            frozenset({"schedule", "bookings", "clients", "messages", "routing"}),
+            frozenset({"schedule", "bookings", "clients", "messages", "routing", "tasks"}),
             _AI,
             _ALL_STAFF,
             routes=("/schedule", "/calendar", "/clients"),
@@ -112,7 +113,7 @@ CATALOG: dict[str, AgentSpec] = {
             "Lead pipeline, follow-ups, sources, winning back inactive clients, campaign drafts.",
             "You handle marketing and leads: the pipeline, follow-ups that are due, where clients "
             "come from and how to win back clients who went quiet. Draft wording, never send.",
-            frozenset({"leads", "clients", "messages", "sources", "routing"}),
+            frozenset({"leads", "clients", "messages", "sources", "routing", "tasks"}),
             ("agent_marketing",),
             frozenset({"owner", "manager", "branch_manager"}),
             routes=("/leads", "/marketing"),
@@ -125,7 +126,7 @@ CATALOG: dict[str, AgentSpec] = {
             "Revenue, plans sold, renewals, open quotes and upsell opportunities.",
             "You handle sales: revenue, plans sold and renewing, open quotes and where an upgrade "
             "fits. Back every claim with a number from get_metrics.",
-            frozenset({"sales", "plans", "quotes", "metrics", "clients", "routing"}),
+            frozenset({"sales", "plans", "quotes", "metrics", "clients", "routing", "tasks"}),
             _AI,
             _ALL_STAFF,
             routes=("/plans", "/sales"),
@@ -138,7 +139,7 @@ CATALOG: dict[str, AgentSpec] = {
             "Open balances, bills, receipts, cash-flow outlook and monthly billing.",
             "You handle finance: what clients still owe, bills and receipts, and monthly billing. "
             "Money is exact: never round or estimate a figure the tools did not give you.",
-            frozenset({"billing", "receipts", "balances", "quotes", "time", "routing"}),
+            frozenset({"billing", "receipts", "balances", "quotes", "time", "routing", "tasks"}),
             ("agent_finance",),
             frozenset({"owner", "manager", "branch_manager"}),
             routes=("/billing", "/finance"),
@@ -151,7 +152,7 @@ CATALOG: dict[str, AgentSpec] = {
             "Roster gaps, swaps, time off, hours for payroll and availability.",
             "You handle the team: roster gaps, swaps, time off, hours for payroll and staff "
             "availability. Be fair and specific about who and when.",
-            frozenset({"shifts", "staff", "time", "schedule", "routing"}),
+            frozenset({"shifts", "staff", "time", "schedule", "routing", "tasks"}),
             _AI,
             frozenset({"owner", "manager", "branch_manager"}),
             routes=("/shifts", "/staff", "/team"),
@@ -164,7 +165,7 @@ CATALOG: dict[str, AgentSpec] = {
             "The inbox, WhatsApp replies, reviews and clients at risk of leaving.",
             "You handle customer care: the inbox, replies, reviews and members at risk of "
             "leaving. Warm, short, and always offer a concrete next step.",
-            frozenset({"inbox", "reviews", "clients", "messages", "routing"}),
+            frozenset({"inbox", "reviews", "clients", "messages", "routing", "tasks"}),
             ("whatsapp_ai", "crm"),
             _ALL_STAFF,
             routes=("/inbox", "/messages", "/reviews"),
@@ -177,7 +178,7 @@ CATALOG: dict[str, AgentSpec] = {
             "Branch comparison, trends, anomalies and the weekly report.",
             "You are the data analyst: compare branches and periods, find trends and anomalies "
             "and say what changed and by how much. Use only numbers from your tools.",
-            frozenset({"metrics", "reports", "sources", "routing"}),
+            frozenset({"metrics", "reports", "sources", "routing", "tasks"}),
             ("analytics_pro",),
             frozenset({"owner", "manager", "branch_manager"}),
             routes=("/reports", "/analytics"),
@@ -194,7 +195,7 @@ CATALOG: dict[str, AgentSpec] = {
             "account is connected, say so and suggest connecting one in the content studio. Save "
             "post ideas as drafts. Publishing always goes through a confirmation card the owner "
             "taps; never say something is published before then.",
-            frozenset({"content", "social", "routing"}),
+            frozenset({"content", "social", "tasks", "routing"}),
             ("social_studio",),
             frozenset({"owner", "manager", "branch_manager"}),
             routes=("/content",),

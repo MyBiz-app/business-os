@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from sqlalchemy import text
 
+from app.ai import scheduled
 from app.ai.scope import CLIENT_IN_SCOPE, visible_clients
 from app.api import bookings as bookings_api
 from app.api import plans as plans_api
@@ -45,6 +46,9 @@ class ToolContext:
     # may be handed over to.
     agent_key: str = "chief"
     handoff_keys: frozenset[str] = frozenset()
+    # How long a card this conversation proposes stays open (a scheduled run nobody watches
+    # leaves its cards for days).
+    pending_ttl: dt.timedelta = PENDING_ACTION_TTL
 
 
 class ToolError(Exception):
@@ -520,7 +524,7 @@ def _propose(
             "payload": json.dumps(payload),
             "hash": payload_hash(tool_name, payload),
             "preview": json.dumps(preview),
-            "ttl": PENDING_ACTION_TTL,
+            "ttl": ctx.pending_ttl,
         },
     ).scalar_one()
     return {
@@ -660,6 +664,133 @@ def suggest_agent(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         "instruction": "The user sees a card offering the hand-over. Tell them in a sentence who "
         "can take it from here and why; do not claim anything was switched.",
     }
+
+
+def _dry_run(ctx: ToolContext, tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
+    """Runs a write tool only to learn what it would propose (payload, hash, preview), then
+    throws the proposed card away. The tool's own checks decide whether the request is valid."""
+    db = ctx.tenant.session
+    tool = TOOLS[tool_name]
+    if tool.permission not in ctx.tenant.permissions or (
+        tool.module is not None and tool.module not in ctx.modules
+    ):
+        raise ToolError("the user cannot run that action")
+    attempt = db.begin_nested()
+    try:
+        card = tool.run(ctx, args)
+        row = (
+            db.execute(
+                text(
+                    "SELECT payload, payload_hash, preview FROM app.pending_actions WHERE id = :id"
+                ),
+                {"id": card["pending_action_id"]},
+            )
+            .mappings()
+            .one()
+        )
+        return dict(row)
+    finally:
+        attempt.rollback()
+
+
+def schedule_task(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    kind = str(args["kind"])
+    if kind not in scheduled.KINDS:
+        raise ToolError("kind must be action or agent_run")
+    title = str(args["title"]).strip()[:120]
+    if not title:
+        raise ToolError("give the task a short title")
+    weekdays = args["weekdays"] if isinstance(args["weekdays"], list) else []
+    try:
+        schedule = scheduled.build_schedule(
+            str(args["frequency"]),
+            str(args["time"]),
+            str(args["date"]) or None,
+            weekdays,
+            args["day_of_month"] or None,
+        )
+        first = scheduled.next_run(schedule, ctx.time_zone, dt.datetime.now(dt.UTC))
+        if first is None:
+            raise scheduled.ScheduleError("that time has already passed")
+        scheduled.check_limit(ctx.tenant.session, ctx.modules)
+    except scheduled.ScheduleError as error:
+        raise ToolError(str(error)) from error
+    spec: dict[str, Any] = {"kind": kind, "title": title, "schedule": schedule}
+    preview: dict[str, Any] = {
+        "kind": "schedule_task",
+        "task_kind": kind,
+        "title": title,
+        "schedule": schedule,
+        "first_run": _local(first, ctx.time_zone),
+    }
+    if kind == "agent_run":
+        instruction = str(args["instruction"]).strip()[:2000]
+        if not instruction:
+            raise ToolError("say what the agent should do (instruction)")
+        spec["instruction"] = instruction
+        spec["max_credits"] = scheduled.DEFAULT_MAX_CREDITS
+        preview["instruction"] = instruction
+        preview["max_credits"] = scheduled.DEFAULT_MAX_CREDITS
+    else:
+        name = str(args["action_tool"])
+        if name not in scheduled.SCHEDULABLE_TOOLS:
+            raise ToolError(
+                "that action cannot be scheduled; " + ", ".join(sorted(scheduled.SCHEDULABLE_TOOLS))
+            )
+        try:
+            action_args = json.loads(str(args["action_args_json"]) or "{}")
+        except ValueError as error:
+            raise ToolError("action_args_json must be a JSON object") from error
+        if not isinstance(action_args, dict):
+            raise ToolError("action_args_json must be a JSON object")
+        proposed = _dry_run(ctx, name, action_args)
+        spec.update(
+            tool_name=name,
+            payload=proposed["payload"],
+            payload_hash=proposed["payload_hash"],
+            preview=proposed["preview"],
+        )
+        preview["action"] = proposed["preview"]
+    return _propose(ctx, "schedule_task", spec, preview)
+
+
+def list_scheduled_tasks(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
+    rows = ctx.tenant.session.execute(
+        text("""
+            SELECT id, title, kind, status, schedule, next_run_at FROM app.ai_scheduled_tasks
+            WHERE created_by = :user AND status IN ('active', 'paused')
+            ORDER BY next_run_at NULLS LAST LIMIT :limit
+        """),
+        {"user": ctx.user_id, "limit": MAX_ROWS},
+    ).mappings()
+    return {
+        "tasks": [
+            {
+                "id": str(r["id"]),
+                "title": r["title"],
+                "kind": r["kind"],
+                "status": r["status"],
+                "schedule": r["schedule"],
+                "next_run": _local(r["next_run_at"], ctx.time_zone) if r["next_run_at"] else None,
+            }
+            for r in rows
+        ]
+    }
+
+
+def cancel_scheduled_task(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    task_id = _uuid(args["task_id"], "task_id")
+    row = ctx.tenant.session.execute(
+        text("""
+            SELECT title FROM app.ai_scheduled_tasks
+            WHERE id = :id AND created_by = :user AND status IN ('active', 'paused')
+        """),
+        {"id": task_id, "user": ctx.user_id},
+    ).first()
+    if row is None:
+        raise ToolError("no scheduled task of the user with that id (see list_scheduled_tasks)")
+    preview = {"kind": "cancel_scheduled_task", "title": row.title}
+    return _propose(ctx, "cancel_scheduled_task", {"task_id": str(task_id)}, preview)
 
 
 def _network(args: dict[str, Any]) -> str:
@@ -1021,6 +1152,47 @@ TOOLS: dict[str, Tool] = {
             module="ai_pro",
         ),
         Tool(
+            "schedule_task",
+            "Propose a task for later: once or repeating (daily, weekly on weekdays "
+            "0=Monday..6=Sunday, monthly on a day 1-28), at a local HH:MM. "
+            "kind agent_run: an instruction you will carry out then (read-only; whatever it "
+            "proposes waits for approval). kind action: "
+            "run action_tool (book_client, cancel_booking or bill_month) with action_args_json, "
+            "the JSON arguments that tool takes, at that time. Use empty values for fields that "
+            "do not apply (date '' unless once, weekdays [], day_of_month 0, instruction '' for "
+            "an action, action_tool '' and action_args_json '' for agent_run). Creates a card "
+            "the user must confirm.",
+            {
+                "kind": {"type": "string", "enum": ["agent_run", "action"]},
+                "title": {"type": "string", "description": "Short name shown on the board"},
+                "frequency": {"type": "string", "enum": ["once", "daily", "weekly", "monthly"]},
+                "date": {"type": "string", "description": "YYYY-MM-DD for once, else empty"},
+                "time": {"type": "string", "description": "Local HH:MM"},
+                "weekdays": {"type": "array", "items": {"type": "integer"}},
+                "day_of_month": {"type": "integer"},
+                "instruction": {"type": "string"},
+                "action_tool": {"type": "string"},
+                "action_args_json": {"type": "string"},
+            },
+            Permission.AI_USE,
+            schedule_task,
+        ),
+        Tool(
+            "list_scheduled_tasks",
+            "The user's scheduled tasks (active or paused) with their next run time.",
+            {},
+            Permission.AI_USE,
+            list_scheduled_tasks,
+        ),
+        Tool(
+            "cancel_scheduled_task",
+            "Propose cancelling one of the user's scheduled tasks (id from list_scheduled_tasks). "
+            "Creates a card the user must confirm.",
+            {"task_id": ID},
+            Permission.AI_USE,
+            cancel_scheduled_task,
+        ),
+        Tool(
             "suggest_agent",
             "Offer the user a hand-over to a specialist on the team when their question is "
             "mostly that specialist's work. Only offers: the user decides.",
@@ -1061,6 +1233,9 @@ TOOL_DOMAINS: dict[str, str] = {
     "draft_post": "content",
     "publish_post": "social",
     "suggest_agent": "routing",
+    "schedule_task": "tasks",
+    "list_scheduled_tasks": "tasks",
+    "cancel_scheduled_task": "tasks",
 }
 
 # Tools whose data has no branch to filter by (leads, for now). Whenever the conversation is
