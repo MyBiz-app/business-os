@@ -82,8 +82,9 @@ with sync_playwright() as p:
     page.goto(h.APP); page.wait_for_url("**/sign-in", timeout=60000)
     page.get_by_label("אימייל").fill(CLIENT)
     page.get_by_role("button", name="שליחת קוד").click()
-    page.get_by_label("הקוד מהמייל").fill(h.otp(CLIENT))
-    page.get_by_role("button", name="כניסה").click(); page.wait_for_url("**/join")
+    page.get_by_label("הקוד בן 6 הספרות").fill(h.otp(CLIENT))
+    # Filling the last digit signs in on its own.
+    page.wait_for_url("**/join")
     page.get_by_label("קוד הצטרפות").fill(code)
     page.get_by_role("button", name="המשך").click()
     page.get_by_label("שם פרטי").fill("מיכל")

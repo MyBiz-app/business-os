@@ -13,11 +13,12 @@ import { ALL_BRANCHES, type BranchFilter, filterByBranch } from "@business-os/ap
 import { type CalendarView, stepDay } from "@business-os/app-kit/lib/calendar-range";
 import { PressableScale } from "@business-os/app-kit/components/motion";
 import { BranchBar } from "@/components/branch-bar";
+import { Availability } from "@/components/availability";
 import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Button, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
-import { termsFor } from "@business-os/app-kit/lib/vertical";
+import { scheduleViewFor, termsFor } from "@business-os/app-kit/lib/vertical";
 import { NO_FILTERS, applyFilters, filterOptions, upcomingRelease, type ClassFilters } from "@/lib/class-filters";
 import { useDependents } from "@/lib/use-dependents";
 import { useLocations } from "@/lib/use-locations";
@@ -60,6 +61,9 @@ export default function Schedule() {
   const [reminded, setReminded] = useState(false);
 
   if (!business) return null;
+  // Courts and appointments show free times (courts × hours, staff × times) instead of class blocks.
+  const mode = scheduleViewFor(business);
+  const availability = mode === "courts" || mode === "appointments" ? mode : null;
   const closedDays = new Map(win.closed.map((c) => [c.day, c]));
   const closed = closedDays.get(day);
   const allSessions = filterByBranch(
@@ -207,7 +211,7 @@ export default function Schedule() {
         </Text>
       )}
 
-      {options.instructors.length + options.services.length > 1 && (
+      {!availability && options.instructors.length + options.services.length > 1 && (
         <View style={local.filters}>
           {options.instructors.length > 1 && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
@@ -269,7 +273,16 @@ export default function Schedule() {
         </View>
       )}
 
-      {view === "week" ? (
+      {availability && view !== "month" ? (
+        closed ? null : (
+          <Availability
+            kind={availability}
+            days={view === "week" ? weekDays(day) : [day]}
+            courts={data?.courts ?? []}
+            visits={data?.appointments ?? []}
+          />
+        )
+      ) : view === "week" ? (
         <View style={local.list}>
           {weekDays(day).map((d) => {
             const daySessions = applyFilters(

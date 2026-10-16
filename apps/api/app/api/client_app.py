@@ -172,6 +172,7 @@ class ClientSession(BaseModel):
     instructor: Instructor | None = Field(default=None, description="Who teaches or serves")
     address: str | None = Field(default=None, description="My on-site job: where (#42)")
     job_status: JobStatus | None = Field(default=None, description="My on-site job's progress")
+    description: str | None = Field(default=None, description="What the class is, from the catalog")
     my_booking: MyBooking | None = Field(description="The client's first live booking")
     my_bookings: list[MyBooking] = Field(
         default_factory=list,
@@ -250,7 +251,7 @@ CLIENT_SESSION_SELECT = """
     SELECT s.id, s.starts_at, s.ends_at, s.status, s.capacity,
            s.location_id, l.name AS location_name, r.name AS room_name,
            greatest(s.capacity - bk.booked, 0) AS spots_left, bk.waitlisted,
-           sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
+           sv.id AS service_id, sv.name AS service_name, sv.color AS service_color, sv.description,
            ins.id AS instructor_id, ins.full_name AS instructor_name,
            CASE WHEN ins.avatar_updated_at IS NULL THEN NULL
                 ELSE '/client/instructors/' || ins.id || '/avatar?v='

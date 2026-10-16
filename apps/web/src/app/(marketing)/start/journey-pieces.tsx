@@ -8,7 +8,10 @@ import { BRAND } from "@business-os/i18n/brand";
 import { useTranslations } from "next-intl";
 import { type ReactNode, useId } from "react";
 
+import type { Icon } from "@business-os/verticals";
+
 import { ModuleIcon } from "@/components/modules/module-icon";
+import { VerticalIcon } from "@/components/vertical-icon";
 import { type ModuleKey, type Offer } from "@/lib/signup-plan";
 
 /** The icon of each add-on screen. */
@@ -104,19 +107,69 @@ export function TierCard({
   );
 }
 
-/** The plan as a boarding pass, in MyBiz's colors: from today, through the free trial, to the
- * business running. */
-export function BoardingPass({ title, name, vertical, from, via, to, date }: Record<"title" | "name" | "vertical" | "from" | "via" | "to" | "date", string>) {
+export type PassDetail = { label: string; value: string };
+
+// The floating object's motion follows the kind of work: spin (tools, machines), swing (hands-on
+// crafts) or bob (everything else). Still with reduced motion.
+const PASS_MOTION: Partial<Record<Icon, string>> = {
+  dumbbell: "spin",
+  wrench: "spin",
+  car: "spin",
+  trophy: "spin",
+  scissors: "swing",
+  stethoscope: "swing",
+  camera: "swing",
+  "paw-print": "swing",
+};
+
+/** The plan as a boarding pass, in MyBiz's colors: the business's details beside a floating 3D
+ * object that follows the chosen category (CSS 3D only), then from today, through the free
+ * trial, to the business running. */
+export function BoardingPass({
+  title,
+  name,
+  vertical,
+  from,
+  via,
+  to,
+  date,
+  icon,
+  details,
+}: Record<"title" | "name" | "vertical" | "from" | "via" | "to" | "date", string> & { icon: Icon; details: PassDetail[] }) {
   return (
     <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-strong-from to-brand-strong-to p-6 text-white shadow-xl">
       <div aria-hidden="true" className="absolute -end-10 -top-10 size-40 rounded-full bg-white/10" />
-      <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
-        <Ticket aria-hidden="true" className="size-4" /> {title}
-      </p>
-      <p className="mt-2 text-2xl font-extrabold">
-        <bdi>{name}</bdi>
-      </p>
-      <p className="text-sm font-medium">{vertical}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide">
+            <Ticket aria-hidden="true" className="size-4" /> {title}
+          </p>
+          <p className="mt-2 text-2xl font-extrabold">
+            <bdi>{name}</bdi>
+          </p>
+          <p className="text-sm font-medium">{vertical}</p>
+        </div>
+        <div aria-hidden="true" className="pass-stage shrink-0">
+          <div className={`pass-object pass-${PASS_MOTION[icon] ?? "bob"}`}>
+            <span className="pass-shadow" />
+            <span className="pass-tile">
+              <VerticalIcon icon={icon} className="size-9" />
+            </span>
+          </div>
+        </div>
+      </div>
+      {details.length > 0 && (
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+          {details.map((detail) => (
+            <div key={detail.label} className="flex min-w-0 flex-col">
+              <dt className="text-xs font-medium text-white/80">{detail.label}</dt>
+              <dd className="truncate font-semibold">
+                <bdi>{detail.value}</bdi>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
       <div className="mt-5 flex items-center gap-3 border-t border-dashed border-white/50 pt-5">
         <div className="flex flex-col">
           <span className="text-xs font-medium">{from}</span>

@@ -28422,6 +28422,18 @@
             "title": "Job Status",
             "description": "My on-site job's progress"
           },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description",
+            "description": "What the class is, from the catalog"
+          },
           "my_booking": {
             "anyOf": [
               {

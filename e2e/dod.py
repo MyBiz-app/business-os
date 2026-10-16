@@ -101,7 +101,8 @@ with sync_playwright() as p:
         owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$")); h.ready(owner)
     plans = owner.get_by_role("region", name="מנויים וכרטיסיות")
     plans.get_by_role("button", name="מכירה").click()
-    expect(plans.get_by_text("המסלול נמכר.")).to_be_visible()
+    # Confirmations are toasts (role=status) outside the page sections, not text inside the form.
+    expect(owner.get_by_role("status").filter(has_text="המסלול נמכר.")).to_be_visible()
     print("4. class, session, member with a membership: ok")
 
     # Member: branded mobile app (Expo web) → join → book.
@@ -115,8 +116,9 @@ with sync_playwright() as p:
     member.goto(APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
-    member.get_by_label("הקוד מהמייל").fill(otp(member_email))
-    member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join", timeout=90000)
+    member.get_by_label("הקוד בן 6 הספרות").fill(otp(member_email))
+    # Filling the last digit signs in on its own.
+    member.wait_for_url("**/join", timeout=90000)
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_label("שם פרטי").fill("נועה")

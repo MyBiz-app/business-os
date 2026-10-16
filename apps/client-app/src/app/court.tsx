@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { addDays, dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
@@ -33,10 +33,12 @@ export default function Court() {
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const today = business ? todayIn(business.time_zone) : "";
+  // The schedule's court table opens this screen on the tapped day and time.
+  const params = useLocalSearchParams<{ day?: string; at?: string; service?: string }>();
   const [service, setService] = useState<Service | null>(null);
   const [minutes, setMinutes] = useState<number | null>(null);
-  const [day, setDay] = useState(today);
-  const [at, setAt] = useState(() => defaultTime(business?.time_zone ?? "UTC"));
+  const [day, setDay] = useState(params.day || today);
+  const [at, setAt] = useState(() => params.at || defaultTime(business?.time_zone ?? "UTC"));
   const [found, setFound] = useState<Suggestions | null>(null);
   const [showGrid, setShowGrid] = useState(false);
   const [slot, setSlot] = useState<Slot | null>(null);
@@ -54,7 +56,10 @@ export default function Court() {
 
   // One kind of court: chosen for the client.
   useEffect(() => {
-    if (services?.length === 1 && !service) choose(services[0]!);
+    if (service || !services) return;
+    const wanted = services.find((x) => x.id === params.service);
+    if (wanted) choose(wanted);
+    else if (services.length === 1) choose(services[0]!);
   }, [services, service]);
 
   // "When suits you?": the exact slot, or the nearest free ones.

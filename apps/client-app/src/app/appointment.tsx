@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { addDays, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Linking, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
@@ -51,7 +51,8 @@ export default function Appointment() {
   const today = business ? todayIn(business.time_zone) : "";
   const [service, setService] = useState<Service | null>(null);
   const [staff, setStaff] = useState<string | null>(null);
-  const [day, setDay] = useState(today);
+  const params = useLocalSearchParams<{ day?: string }>();
+  const [day, setDay] = useState(params.day || today);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [busy, setBusy] = useState(false);
