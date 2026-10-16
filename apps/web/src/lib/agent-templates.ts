@@ -18,7 +18,7 @@ export const TEMPLATES = [
 
 export const COLORS = ["#7C3AED", "#2563EB", "#06B6D4", "#16A34A", "#F59E0B", "#EF4444", "#EC4899", "#6B7280"] as const;
 
-export const GALLERY = Array.from({ length: 16 }, (_, i) => `gallery-${String(i + 1).padStart(2, "0")}`);
+export const GALLERY = Array.from({ length: 25 }, (_, i) => `gallery-${String(i + 1).padStart(2, "0")}`);
 
 export const MAX_INSTRUCTIONS = 4000;
 

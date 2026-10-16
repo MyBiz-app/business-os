@@ -13,6 +13,7 @@ from app.api.deps import AnonymousSessionDep, TenantContext, TenantDep, require
 from app.api.routes import load_current_tenant
 from app.api.schemas import Tenant, TenantUpdate
 from app.core.identity import check_digit_valid
+from app.core.legal_readiness import Readiness, evaluate
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["settings"])
@@ -57,6 +58,11 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
             "primary_color",
             "legal_entity_type",
             "business_number",
+            "address_line",
+            "address_city",
+            "employer_file_number",
+            "business_license_number",
+            "business_license_expires_on",
             "shifts_default_range",
             "weekly_release_weekday",
             "weekly_release_time",
@@ -90,6 +96,35 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
         changes,
     )
     return load_current_tenant(context.session)
+
+
+@router.get("/tenants/current/readiness")
+def get_readiness(context: SettingsDep) -> Readiness:
+    """The legal-readiness card: what is filled in, what each missing piece would unlock."""
+    row = (
+        context.session.execute(
+            text("""
+                SELECT currency, legal_entity_type, business_number, address_line, address_city,
+                       employer_file_number, business_license_number,
+                       business_license_expires_on,
+                       (now() AT TIME ZONE time_zone)::date AS today
+                FROM app.tenants WHERE id = app.current_tenant_id()
+            """)
+        )
+        .mappings()
+        .one()
+    )
+    return evaluate(
+        currency=row["currency"],
+        entity_type=row["legal_entity_type"],
+        business_number=row["business_number"],
+        address_line=row["address_line"],
+        address_city=row["address_city"],
+        employer_file=row["employer_file_number"],
+        license_number=row["business_license_number"],
+        license_expires_on=row["business_license_expires_on"],
+        today=row["today"],
+    )
 
 
 @router.put("/tenants/current/logo")

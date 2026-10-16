@@ -209,6 +209,12 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Default: a business's message is a service message. "This is an advertisement" makes it marketing, which goes only to people with marketing consent, on every channel including WhatsApp and SMS.
 - Leads have no branch: a branch-aimed message cannot target them, and they are reached by phone only.
 
+### AI agent names and faces (2026-10-16, round 6 U2)
+
+- Built-in agent names are international and work in Hebrew and English: Adir, Shiri, Lia, Daniel, Adam, Emma, Noah, Ethan, Sophie. The chief defaults to the owner's own first name.
+- Built-in agents use realistic portraits that are AI-generated or supplied by the owner, never photos of real customers. The earlier illustrations live on as `gallery-17` to `gallery-25`.
+- A name or face the business changed is stored as an override and is never replaced by a default change.
+
 ## Open
 
 | # | Question |

@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 
 from app.api.deps import TenantDep, has_module
+from app.core.legal_readiness import LICENSE_REMINDER_DAYS
 from app.core.permissions import Permission
 from app.reports.metrics import members_at_risk
 
@@ -27,7 +28,7 @@ class AttentionItem(BaseModel):
 
 
 class AttentionList(BaseModel):
-    kind: Literal["inactive", "plan_ending", "leads_due", "health_review"]
+    kind: Literal["inactive", "plan_ending", "leads_due", "health_review", "license_expiring"]
     count: int
     items: list[AttentionItem]
 
@@ -96,6 +97,31 @@ def get_attention(context: TenantDep) -> list[AttentionList]:
             .all()
         )
         lists.append(_from_rows("health_review", rows))
+
+    if Permission.BUSINESS_SETTINGS in context.permissions:
+        # The business licence is optional; only an entered expiry date can ever remind.
+        row = (
+            db.execute(
+                text("""
+                SELECT id, name, business_license_expires_on AS date
+                FROM app.tenants
+                WHERE id = app.current_tenant_id()
+                  AND business_license_expires_on
+                      <= (now() AT TIME ZONE time_zone)::date + :days
+            """),
+                {"days": LICENSE_REMINDER_DAYS},
+            )
+            .mappings()
+            .first()
+        )
+        if row:
+            lists.append(
+                AttentionList(
+                    kind="license_expiring",
+                    count=1,
+                    items=[AttentionItem(id=row["id"], name=row["name"], date=row["date"])],
+                )
+            )
 
     return [entry for entry in lists if entry.count > 0]
 

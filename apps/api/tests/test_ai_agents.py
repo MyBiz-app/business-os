@@ -77,7 +77,7 @@ def test_team_states_follow_modules_and_roles(
     assert {a["key"]: a["state"] for a in team["agents"]} == dict.fromkeys(team_keys, "locked")
     assert {a["upsell_module"] for a in team["agents"]} == {"ai_basic"}
     assert team["can_manage"] is True
-    assert team["agents"][1]["name"] == "מאיה"  # the studio is Hebrew
+    assert team["agents"][1]["name"] == "שירי"  # the studio is Hebrew
 
     enable_ai_pro(client, studio)
     team = {a["key"]: a for a in client.get("/ai/team", headers=owner).json()["agents"]}
@@ -142,7 +142,7 @@ def test_managers_shape_the_team_and_front_desk_cannot(
 
     # Null goes back to the catalog default.
     reset = client.patch("/ai/agents/secretary", json={"name": None}, headers=manager)
-    assert reset.json()["name"] == "מאיה"
+    assert reset.json()["name"] == "שירי"
 
     for bad in (
         {"tool_domains": ["warp_drive"]},
