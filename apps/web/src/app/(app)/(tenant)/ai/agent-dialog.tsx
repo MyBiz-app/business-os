@@ -9,7 +9,7 @@ import { AgentAvatar } from "./agent-avatar";
 import type { Agent, Upsell } from "./types";
 
 /** What a closed agent says when it's clicked: a locked one makes the case for its module (in full color), the others say why they can't be opened. */
-export function AgentDialog({ agent, upsell, canAdd, onClose }: { agent: Agent; upsell: Upsell | null; canAdd: boolean; onClose: () => void }) {
+export function AgentDialog({ agent, upsell, canAdd, onEdit, onClose }: { agent: Agent; upsell: Upsell | null; canAdd: boolean; onEdit?: () => void; onClose: () => void }) {
   const t = useTranslations("aiTeam");
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -62,7 +62,14 @@ export function AgentDialog({ agent, upsell, canAdd, onClose }: { agent: Agent; 
             )}
           </>
         ) : (
-          <p className="text-muted">{t(`closed.${agent.state}` as "closed.disabled", { name: agent.name })}</p>
+          <>
+            <p className="text-muted">{t(`closed.${agent.state}` as "closed.disabled", { name: agent.name })}</p>
+            {onEdit && (
+              <button type="button" onClick={onEdit} className="btn-secondary px-4 py-2 text-sm">
+                {t("edit.open")}
+              </button>
+            )}
+          </>
         )}
       </div>
     </dialog>

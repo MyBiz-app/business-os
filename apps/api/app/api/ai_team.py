@@ -9,7 +9,7 @@ from typing import Annotated, Any, Literal
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, UploadFile, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -27,7 +27,8 @@ from app.ai.agents import (
 )
 from app.ai.agents import load_team as load_agents
 from app.api.common import check_columns, not_found
-from app.api.deps import TenantContext, UserDep, ensure_branch_allowed, require
+from app.api.deps import TenantContext, UserDep, ensure_branch_allowed, has_module, require
+from app.api.settings import IMAGE_RESPONSES, image_response, read_image
 from app.core.permissions import Permission
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -35,7 +36,10 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 UseDep = Annotated[TenantContext, Depends(require(Permission.AI_USE))]
 ManageDep = Annotated[TenantContext, Depends(require(Permission.AI_MANAGE))]
 
-MAX_CUSTOM_AGENTS = 20
+# Custom agents a business may have: 3 with AI Basic, 10 with AI Pro.
+CUSTOM_AGENTS_BASIC = 3
+CUSTOM_AGENTS_PRO = 10
+MAX_AVATAR_BYTES = 2 * 1024 * 1024
 COLOR = r"^#[0-9A-Fa-f]{6}$"
 ModelTier = Literal["fast", "standard", "strong"]
 Tone = Literal["friendly", "formal", "short"]
@@ -54,6 +58,8 @@ class AgentCard(BaseModel):
     enabled: bool
     avatar_preset: str | None
     avatar_key: str | None
+    # Where an uploaded picture is served from (versioned, so browsers may keep it).
+    avatar_url: str | None = None
     # active: usable now; locked: a module is missing (see upsell_module); disabled: switched
     # off by the owner; forbidden: this user's role may not use it.
     state: State
@@ -75,6 +81,8 @@ class Team(BaseModel):
     credits_included: int
     payg_enabled: bool = False
     can_manage: bool
+    custom_count: int = 0
+    custom_limit: int = CUSTOM_AGENTS_BASIC
 
 
 class AgentChange(BaseModel):
@@ -93,6 +101,7 @@ class AgentChange(BaseModel):
     allowed_roles: list[str] | None = None
     model_tier: ModelTier | None = None
     avatar_preset: str | None = Field(default=None, max_length=40)
+    draft: Literal[False] | None = None  # the wizard's last step: the draft joins the team
 
     @field_validator("name", "role_title", "topic", "instructions", mode="before")
     @classmethod
@@ -116,6 +125,7 @@ class CustomAgent(BaseModel):
     location_ids: list[UUID] = []
     model_tier: ModelTier = "fast"
     avatar_preset: str | None = Field(default=None, max_length=40)
+    draft: bool = False  # kept out of the team while the wizard tries it
 
     @field_validator("name", "role_title", "topic", "instructions", mode="before")
     @classmethod
@@ -179,6 +189,11 @@ def _card(
         enabled=agent.enabled,
         avatar_preset=agent.avatar_preset,
         avatar_key=agent.avatar_key,
+        avatar_url=(
+            f"/ai/agents/{agent.key}/avatar?v={agent.avatar_key}"
+            if agent.avatar_kind == "upload" and agent.avatar_key
+            else None
+        ),
         state=state,
         upsell_module=upsell,
         credits_used_month=round(used.get(agent.key, 0), 2),
@@ -201,19 +216,26 @@ def _team(context: TenantContext, user_id: UUID) -> Team:
     used = _used_by_agent(db)
     # Agents the user may not use are still listed (the map shows them locked), but not
     # for a role that has none of them: that is the card's "forbidden" state.
-    agents = [_card(db, a, role_keys, used, manage) for a in load_agents(db, tenant_locale(db))]
+    everyone = load_agents(db, tenant_locale(db))
+    agents = [_card(db, a, role_keys, used, manage) for a in everyone if not a.draft]
     return Team(
         agents=agents,
         credits_used=round(budget.credits_used(db, _month_start(db)), 2),
         credits_included=budget.credits_included(db),
         payg_enabled=budget.spend_settings(db).payg_enabled,
         can_manage=manage,
+        custom_count=sum(1 for a in everyone if not a.builtin),
+        custom_limit=_custom_limit(db),
     )
 
 
 @router.get("/team")
 def ai_team(context: UseDep, user: UserDep) -> Team:
     return _team(context, user.id)
+
+
+def _custom_limit(db: Session) -> int:
+    return CUSTOM_AGENTS_PRO if has_module(db, "ai_pro") else CUSTOM_AGENTS_BASIC
 
 
 def _agent_id(db: Session, key: str) -> UUID | None:
@@ -275,7 +297,7 @@ AGENT_COLUMNS = frozenset(
     {
         "tenant_id", "builtin_key", "name", "role_title", "color", "topic", "instructions", "tone",
         "tool_domains", "enabled", "location_scope", "location_ids", "allowed_roles",
-        "model_tier", "avatar_kind", "avatar_preset",
+        "model_tier", "avatar_kind", "avatar_preset", "avatar_key", "draft",
     }
 )  # fmt: skip
 
@@ -324,6 +346,7 @@ def update_agent(agent_key: str, body: AgentChange, context: ManageDep, user: Us
         change["location_ids"] = []
     if "avatar_preset" in change:
         change["avatar_kind"] = "preset" if change["avatar_preset"] else None
+        change["avatar_key"] = None
     if not change:
         return _card(db, agent, member_role_keys(db, context.role), _used_by_agent(db), True)
 
@@ -340,6 +363,10 @@ def update_agent(agent_key: str, body: AgentChange, context: ManageDep, user: Us
         )
     updated = find_agent(db, agent.key, locale)
     assert updated is not None
+    if "avatar_preset" in change and updated.id is not None:
+        db.execute(
+            text("DELETE FROM app.ai_agent_avatars WHERE agent_id = :id"), {"id": updated.id}
+        )
     return _card(db, updated, member_role_keys(db, context.role), _used_by_agent(db), True)
 
 
@@ -354,12 +381,9 @@ def create_agent(body: CustomAgent, context: ManageDep, user: UserDep) -> AgentC
     _checked(db, context, data, custom=True)
     if data["location_scope"] == "all":
         data["location_ids"] = []
-    if (
-        db.execute(
-            text("SELECT count(*) FROM app.ai_agents WHERE builtin_key IS NULL")
-        ).scalar_one()
-        >= MAX_CUSTOM_AGENTS
-    ):
+    if db.execute(
+        text("SELECT count(*) FROM app.ai_agents WHERE builtin_key IS NULL")
+    ).scalar_one() >= _custom_limit(db):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="agent_limit")
     avatar = data.pop("avatar_preset")
     agent_id = db.execute(
@@ -367,11 +391,11 @@ def create_agent(body: CustomAgent, context: ManageDep, user: UserDep) -> AgentC
             INSERT INTO app.ai_agents
                 (tenant_id, name, role_title, color, topic, instructions, tone, tool_domains,
                  allowed_roles, location_scope, location_ids, model_tier, avatar_kind,
-                 avatar_preset, created_by)
+                 avatar_preset, draft, created_by)
             VALUES (:tenant_id, :name, :role_title, :color, :topic, :instructions, :tone,
                     CAST(:tool_domains AS text[]), CAST(:allowed_roles AS text[]),
                     :location_scope, CAST(:location_ids AS uuid[]), :model_tier, :avatar_kind,
-                    :avatar_preset, :user_id)
+                    :avatar_preset, :draft, :user_id)
             RETURNING id
         """),
         {
@@ -397,6 +421,94 @@ def delete_agent(agent_key: str, context: ManageDep) -> None:
     if agent_id is None:
         raise not_found()
     context.session.execute(text("DELETE FROM app.ai_agents WHERE id = :id"), {"id": agent_id})
+
+
+def _manageable(db: Session, key: str) -> Agent:
+    agent = find_agent(db, key if key in CATALOG else _custom_key(key), tenant_locale(db))
+    if agent is None:
+        raise not_found()
+    return agent
+
+
+@router.put("/agents/{agent_key}/avatar")
+def upload_agent_avatar(
+    agent_key: str, file: UploadFile, context: ManageDep, user: UserDep
+) -> AgentCard:
+    """The agent's own picture (PNG, JPEG or WebP up to 2 MB) instead of a gallery face."""
+    db = context.session
+    data, content_type = read_image(file, MAX_AVATAR_BYTES)
+    agent = _manageable(db, agent_key)
+    version = str(int(dt.datetime.now(dt.UTC).timestamp() * 1000))
+    if agent.builtin:
+        _write(
+            db,
+            {
+                "tenant_id": context.tenant_id,
+                "builtin_key": agent.key,
+                "avatar_kind": "upload",
+                "avatar_preset": None,
+                "avatar_key": version,
+            },
+        )
+    else:
+        db.execute(
+            text("""
+                UPDATE app.ai_agents
+                SET avatar_kind = 'upload', avatar_preset = NULL, avatar_key = :v,
+                    updated_at = now()
+                WHERE id = :id
+            """),
+            {"v": version, "id": agent.id},
+        )
+    agent_id = _agent_id(db, agent.key)
+    db.execute(
+        text("""
+            INSERT INTO app.ai_agent_avatars (tenant_id, agent_id, content, content_type)
+            VALUES (:t, :id, :content, :type)
+            ON CONFLICT (tenant_id, agent_id)
+            DO UPDATE SET content = EXCLUDED.content, content_type = EXCLUDED.content_type,
+                          updated_at = now()
+        """),
+        {"t": context.tenant_id, "id": agent_id, "content": data, "type": content_type},
+    )
+    updated = _manageable(db, agent.key)
+    return _card(db, updated, member_role_keys(db, context.role), _used_by_agent(db), True)
+
+
+@router.delete("/agents/{agent_key}/avatar")
+def delete_agent_avatar(agent_key: str, context: ManageDep) -> AgentCard:
+    """Drops the uploaded picture; the agent goes back to its gallery face or default."""
+    db = context.session
+    agent = _manageable(db, agent_key)
+    if agent.id is not None:
+        db.execute(text("DELETE FROM app.ai_agent_avatars WHERE agent_id = :id"), {"id": agent.id})
+        db.execute(
+            text("""
+                UPDATE app.ai_agents
+                SET avatar_kind = CASE WHEN avatar_preset IS NULL THEN NULL ELSE 'preset' END,
+                    avatar_key = NULL, updated_at = now()
+                WHERE id = :id AND avatar_kind = 'upload'
+            """),
+            {"id": agent.id},
+        )
+    updated = _manageable(db, agent.key)
+    return _card(db, updated, member_role_keys(db, context.role), _used_by_agent(db), True)
+
+
+@router.get("/agents/{agent_key}/avatar", response_class=Response, responses=IMAGE_RESPONSES)
+def get_agent_avatar(agent_key: str, context: UseDep) -> Response:
+    agent_id = _agent_id(context.session, agent_key)
+    row = (
+        context.session.execute(
+            text("SELECT content, content_type FROM app.ai_agent_avatars WHERE agent_id = :id"),
+            {"id": agent_id},
+        ).first()
+        if agent_id
+        else None
+    )
+    if row is None:
+        raise not_found()
+    return image_response(bytes(row.content), row.content_type)
 
 
 USAGE_DIMENSIONS = {

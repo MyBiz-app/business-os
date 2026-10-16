@@ -3801,6 +3801,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/agents/{agent_key}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent Avatar */
+        get: operations["get_agent_avatar"];
+        /**
+         * Upload Agent Avatar
+         * @description The agent's own picture (PNG, JPEG or WebP up to 2 MB) instead of a gallery face.
+         */
+        put: operations["upload_agent_avatar"];
+        post?: never;
+        /**
+         * Delete Agent Avatar
+         * @description Drops the uploaded picture; the agent goes back to its gallery face or default.
+         */
+        delete: operations["delete_agent_avatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/usage": {
         parameters: {
             query?: never;
@@ -5605,6 +5630,8 @@ export interface components {
             avatar_preset: string | null;
             /** Avatar Key */
             avatar_key: string | null;
+            /** Avatar Url */
+            avatar_url?: string | null;
             /**
              * State
              * @enum {string}
@@ -5666,6 +5693,8 @@ export interface components {
             model_tier?: ("fast" | "standard" | "strong") | null;
             /** Avatar Preset */
             avatar_preset?: string | null;
+            /** Draft */
+            draft?: false | null;
         };
         /**
          * AgentSuggestion
@@ -6105,6 +6134,11 @@ export interface components {
             commit: boolean;
             /** Source */
             source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+        };
+        /** Body_upload_agent_avatar */
+        Body_upload_agent_avatar: {
+            /** File */
+            file: string;
         };
         /** Body_upload_avatar */
         Body_upload_avatar: {
@@ -7600,6 +7634,11 @@ export interface components {
             model_tier: "fast" | "standard" | "strong";
             /** Avatar Preset */
             avatar_preset?: string | null;
+            /**
+             * Draft
+             * @default false
+             */
+            draft: boolean;
         };
         /** CustomRole */
         CustomRole: {
@@ -12608,6 +12647,16 @@ export interface components {
             payg_enabled: boolean;
             /** Can Manage */
             can_manage: boolean;
+            /**
+             * Custom Count
+             * @default 0
+             */
+            custom_count: number;
+            /**
+             * Custom Limit
+             * @default 3
+             */
+            custom_limit: number;
         };
         /** Usage */
         app__api__ai_team__Usage: {
@@ -22291,6 +22340,117 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_agent_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_agent_avatar"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_agent_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
