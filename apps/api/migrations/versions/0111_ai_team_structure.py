@@ -50,9 +50,11 @@ def upgrade() -> None:
             ADD FOREIGN KEY (tenant_id, team_id) REFERENCES app.ai_agent_teams (tenant_id, id)
                 ON DELETE SET NULL (team_id)
     """)
+    op.execute("CREATE INDEX ai_agents_team_idx ON app.ai_agents (tenant_id, team_id)")
 
 
 def downgrade() -> None:
+    op.execute("DROP INDEX app.ai_agents_team_idx")
     op.execute("""
         ALTER TABLE app.ai_agents
             DROP COLUMN map_y, DROP COLUMN map_x, DROP COLUMN team_id, DROP COLUMN reports_to_key
