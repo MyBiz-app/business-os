@@ -78,7 +78,7 @@ with sync_playwright() as p:
     coach.get_by_role("button", name="יצירת חשבון").click(); coach.wait_for_url("**/check-email**")
     coach.goto(h.confirm_link(coach_email)); coach.wait_for_url("**/invite/**"); h.ready(coach)
     coach.get_by_role("button", name=re.compile("הצטרפות ל")).click(); coach.wait_for_url("**/dashboard")
-    expect(coach.get_by_role("navigation", name="ניווט ראשי").get_by_role("link", name="צוות")).to_have_count(0)
+    expect(coach.get_by_role("navigation", name="ניווט ראשי").get_by_role("link", name="צוות", exact=True)).to_have_count(0)
     print("3. employee joined with front-desk permissions: ok")
 
     # Service/class, session tomorrow, member with a plan.
