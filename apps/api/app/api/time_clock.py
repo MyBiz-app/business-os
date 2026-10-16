@@ -178,7 +178,7 @@ ENTRY_SELECT = """
 def _entry(session: Session, entry_id: UUID) -> Entry:
     row = (
         session.execute(
-            text(f"{ENTRY_SELECT} WHERE e.id = :id AND app.in_branch(e.location_id)"),
+            text(ENTRY_SELECT + " WHERE e.id = :id AND app.in_branch(e.location_id)"),
             {"id": entry_id},
         )
         .mappings()
@@ -295,11 +295,13 @@ def my_clock(user: UserDep, context: ReadDep) -> ClockState:
     now = dt.datetime.now(dt.UTC)
     rows = (
         db.execute(
-            text(f"""
-                {ENTRY_SELECT}
+            text(
+                ENTRY_SELECT
+                + """
                 WHERE e.user_id = :user_id AND e.clock_in >= :since
                 ORDER BY e.clock_in DESC LIMIT 20
-            """),
+            """
+            ),
             {"user_id": user.id, "since": now - dt.timedelta(days=8)},
         )
         .mappings()
@@ -520,12 +522,14 @@ def person_month(user_id: UUID, context: ApproveDep, month: MonthQuery = None) -
     entries = [
         Entry.model_validate(dict(r))
         for r in db.execute(
-            text(f"""
-                {ENTRY_SELECT}
+            text(
+                ENTRY_SELECT
+                + """
                 WHERE e.user_id = :user_id AND e.clock_in >= :start AND e.clock_in < :end
                   AND app.in_branch(e.location_id)
                 ORDER BY e.clock_in
-            """),
+            """
+            ),
             {"user_id": user_id, "start": start, "end": end},
         ).mappings()
     ]
