@@ -101,6 +101,100 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/ai/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tasks */
+        get: operations["list_tasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/{task_id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Task */
+        delete: operations["delete_task"];
+        options?: never;
+        head?: never;
+        /** Update Task */
+        patch: operations["update_task"];
+        trace?: never;
+    };
+    "/ai/tasks/{task_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run Task Now
+         * @description Runs the task right away, as its owner, without moving its schedule.
+         */
+        post: operations["run_task_now"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal/jobs/tick": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tick
+         * @description Runs the scheduled AI tasks that are due. Called every few minutes by the keep-awake
+         *     workflow (and, later, by a worker every minute). Answers at once; the work continues in the
+         *     background, so a slow model call never holds the caller.
+         */
+        post: operations["tick"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/businesses": {
         parameters: {
             query?: never;
@@ -10382,6 +10476,33 @@ export interface components {
             /** Bookable */
             bookable?: boolean | null;
         };
+        /** RunCard */
+        RunCard: {
+            /** Id */
+            id: number;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Finished At */
+            finished_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "ok" | "failed" | "skipped";
+            /** Credits */
+            credits: number;
+            /** Summary */
+            summary: string | null;
+            /** Error */
+            error: string | null;
+            /** Conversation Id */
+            conversation_id: string | null;
+            /** Pending Action Ids */
+            pending_action_ids: string[];
+        };
         /** Sale */
         Sale: {
             /**
@@ -10446,6 +10567,34 @@ export interface components {
         SampleCreated: {
             /** Tenant Id */
             tenant_id: string;
+        };
+        /** ScheduleBody */
+        ScheduleBody: {
+            /**
+             * Frequency
+             * @enum {string}
+             */
+            frequency: "once" | "daily" | "weekly" | "monthly";
+            /**
+             * Time
+             * @description Local HH:MM
+             */
+            time: string;
+            /**
+             * Date
+             * @description YYYY-MM-DD, for once
+             */
+            date?: string | null;
+            /**
+             * Weekdays
+             * @description 0 = Monday .. 6 = Sunday
+             */
+            weekdays?: number[] | null;
+            /**
+             * Day Of Month
+             * @description 1-28, for monthly
+             */
+            day_of_month?: number | null;
         };
         /** ScheduleOptions */
         ScheduleOptions: {
@@ -11384,6 +11533,80 @@ export interface components {
             /** Permissions */
             permissions: string[];
         };
+        /** TaskCard */
+        TaskCard: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "action" | "agent_run";
+            /** Agent Key */
+            agent_key: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "paused" | "done" | "failed";
+            /** Status Reason */
+            status_reason: string | null;
+            /** Schedule */
+            schedule: {
+                [key: string]: unknown;
+            };
+            /** Time Zone */
+            time_zone: string;
+            /** Next Run At */
+            next_run_at: string | null;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Max Credits */
+            max_credits: number;
+            /** Instruction */
+            instruction: string | null;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            } | null;
+            /** Mine */
+            mine: boolean;
+            /** Last Status */
+            last_status: ("running" | "ok" | "failed" | "skipped") | null;
+            /** Last Error */
+            last_error: string | null;
+            /** Waiting For Approval */
+            waiting_for_approval: number;
+        };
+        /** TaskUpdate */
+        TaskUpdate: {
+            /** Status */
+            status?: ("active" | "paused") | null;
+            /** Title */
+            title?: string | null;
+            /** Instruction */
+            instruction?: string | null;
+            schedule?: components["schemas"]["ScheduleBody"] | null;
+        };
+        /** Tasks */
+        Tasks: {
+            /** Tasks */
+            tasks: components["schemas"]["TaskCard"][];
+            /** Active */
+            active: number;
+            /** Limit */
+            limit: number;
+            /**
+             * Precise Timing
+             * @default false
+             */
+            precise_timing: boolean;
+        };
         /** Template */
         Template: {
             /**
@@ -11685,6 +11908,11 @@ export interface components {
              * @enum {string}
              */
             brand: "visa" | "mastercard" | "amex";
+        };
+        /** Tick */
+        Tick: {
+            /** Started */
+            started: boolean;
         };
         /** TimeEntry */
         TimeEntry: {
@@ -12432,6 +12660,212 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_tasks: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tasks"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunCard"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_task: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_task: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_task_now: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tick: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-internal-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tick"];
                 };
             };
             /** @description Validation Error */

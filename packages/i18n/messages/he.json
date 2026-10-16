@@ -1510,7 +1510,11 @@
     },
     "demoMode": "מצב הדגמה: העוזר עונה על שאלות נפוצות מהנתונים האמיתיים של העסק, בלי AI אמיתי (וללא עלות). כשיוגדר מפתח AI, הוא יענה על כל שאלה.",
     "logTimePreview": "רישום {hours} שע׳ ל{client}: {description}",
-    "billMonthPreview": "{count, plural, one {חיוב לקוח אחד} other {חיוב # לקוחות}} על {month}: {total} בסך הכול"
+    "billMonthPreview": "{count, plural, one {חיוב לקוח אחד} other {חיוב # לקוחות}} על {month}: {total} בסך הכול",
+    "scheduleTask": "תזמון: {title}",
+    "cancelTask": "לבטל את המשימה המתוזמנת \"{title}\"",
+    "firstRun": "הרצה ראשונה: {when}",
+    "upTo": "עד {credits} קרדיטים להרצה, לקריאה בלבד; כל מה שהסוכן מציע ימתין לאישורך."
   },
   "aiTeam": {
     "title": "צוות ה-AI",
@@ -1623,6 +1627,101 @@
     "closed": {
       "disabled": "{name} כבוי בעסק הזה.",
       "forbidden": "התפקיד שלכם לא יכול להשתמש ב-{name}. בקשו מבעל העסק לפתוח גישה."
+    },
+    "tasks": {
+      "title": "משימות מתוזמנות",
+      "subtitle": "מה הסוכנים שלכם יעשו בהמשך, לבד. מבקשים מסוכן בשיחה, למשל \"כל יום ראשון ב-8:00 שלח לי סיכום שבועי\".",
+      "usage": "{active} מתוך {limit} משימות בשימוש",
+      "empty": "עדיין אין משימות מתוזמנות. בקשו מכל סוכן לעשות משהו בשעה מסוימת ואשרו את הכרטיס שהוא מכין.",
+      "timing": "המשימה רצה בסביבות השעה שנקבעה (בטווח של כ-10 דקות). תזמון מדויק לדקה: בקרוב.",
+      "preciseSoon": "תזמון מדויק לדקה: בקרוב",
+      "kind": {
+        "agent_run": "הרצת סוכן",
+        "action": "פעולה מתוזמנת"
+      },
+      "status": {
+        "active": "פעילה",
+        "paused": "מושהית",
+        "done": "הושלמה",
+        "failed": "נכשלה"
+      },
+      "reason": {
+        "cancelled": "בוטלה",
+        "failed_3_times": "הושהתה אחרי 3 כשלונות",
+        "run_failed": "ההרצה נכשלה פעמיים",
+        "member_gone": "הושהתה: מי שיצר אותה כבר לא בעסק",
+        "permission_lost": "הושהתה: למי שיצר אותה אין יותר גישה ל-AI",
+        "module_disabled": "הושהתה: מודול ה-AI כבוי",
+        "business_closed": "הושהתה: העסק סגור",
+        "agent_unavailable": "הושהתה: הסוכן כבוי או נעול",
+        "over_credit_cap": "הושהתה: ההרצה האחרונה השתמשה ביותר קרדיטים מהמגבלה"
+      },
+      "next": "הבאה: {when}",
+      "last": "הרצה אחרונה: {when}",
+      "never": "עדיין לא רצה",
+      "agentLabel": "סוכן: {name}",
+      "creditsCap": "עד {credits} קרדיטים להרצה",
+      "waiting": "{count, plural, one {כרטיס אחד ממתין לאישורך} other {# כרטיסים ממתינים לאישורך}}",
+      "someoneElse": "נוצרה על ידי עמית",
+      "pause": "השהיה",
+      "resume": "חידוש",
+      "runNow": "הרצה עכשיו",
+      "running": "רצה…",
+      "edit": "שינוי שעה",
+      "delete": "מחיקה",
+      "confirmDelete": "למחוק את המשימה ואת ההיסטוריה שלה?",
+      "history": "היסטוריה",
+      "hideHistory": "הסתרת היסטוריה",
+      "noRuns": "עדיין אין הרצות.",
+      "openChat": "פתיחת השיחה",
+      "run": {
+        "running": "רצה",
+        "ok": "הושלמה",
+        "failed": "נכשלה",
+        "skipped": "דולגה"
+      },
+      "runError": {
+        "missed": "הוחמצה: השרת לא היה זמין יותר מיממה",
+        "ai_not_configured": "ה-AI עדיין לא מוגדר",
+        "ai_limit_reached": "הגעתם למגבלת ה-AI החודשית",
+        "ai_busy": "ה-AI היה עסוק",
+        "ai_unavailable": "ה-AI לא היה זמין",
+        "payload_changed": "הפעולה שאושרה השתנתה ולכן לא בוצעה",
+        "forbidden": "מי שיצר את המשימה כבר לא מורשה לכך",
+        "module_disabled": "המודול כבוי",
+        "member_gone": "מי שיצר את המשימה עזב",
+        "permission_lost": "מי שיצר את המשימה איבד גישה ל-AI",
+        "agent_unavailable": "הסוכן לא זמין",
+        "business_closed": "העסק סגור",
+        "generic": "משהו השתבש"
+      },
+      "credits": "{credits} קרדיטים",
+      "frequency": {
+        "once": "פעם אחת",
+        "daily": "כל יום",
+        "weekly": "כל שבוע",
+        "monthly": "כל חודש"
+      },
+      "when": {
+        "once": "{date} ב-{time}",
+        "daily": "כל יום ב-{time}",
+        "weekly": "כל {days} ב-{time}",
+        "monthly": "ב-{day} בכל חודש ב-{time}"
+      },
+      "form": {
+        "frequency": "באיזו תדירות",
+        "time": "שעה",
+        "date": "תאריך",
+        "weekdays": "ימים",
+        "day": "יום בחודש",
+        "title": "שם",
+        "instruction": "הוראה",
+        "save": "שמירה",
+        "cancel": "ביטול",
+        "timePassed": "השעה הזאת כבר עברה.",
+        "invalid": "בדקו את השעה והיום ונסו שוב.",
+        "failed": "השמירה נכשלה. נסו שוב."
+      }
     }
   },
   "modules": {

@@ -24,6 +24,7 @@ UNSEEDED: set[str] = set()
 # Values for columns a CHECK constraint pins down (a synthetic row can't guess them).
 OVERRIDES = {
     "ai_agents": {"builtin_key": "'x'"},
+    "ai_scheduled_tasks": {"kind": "'agent_run'", "instruction": "'x'"},
     "audit_log": {"actor_type": "'system'"},
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
     "checkouts": {"plan_id": "gen_random_uuid()"},

@@ -560,6 +560,13 @@ def move_files(conn: Connection, batch: int = MOVE_BATCH) -> dict[str, int] | st
     return {"moved": moved, "left": left}
 
 
+def run_ai_tasks(conn: Connection) -> dict[str, int]:
+    """Runs the scheduled AI agent tasks whose time has come (app/ai/task_runner.py)."""
+    from app.ai.task_runner import run_due_tasks
+
+    return run_due_tasks(conn)
+
+
 JOBS = {
     "extend-series": extend_series,
     "remind-sessions": remind_sessions,
@@ -576,6 +583,7 @@ JOBS = {
     "answer-whatsapp": answer_inbox,
     "issue-documents": issue_documents,
     "move-files": move_files,
+    "run-ai-tasks": run_ai_tasks,
 }
 
 # How often each scheduled job must succeed, in hours: the schedule plus slack for a delayed

@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 
 from app.api import (
+    ai_tasks,
     ai_team,
     appointments,
     assistant,
@@ -24,6 +25,7 @@ from app.api import (
     documents,
     friends,
     integrations,
+    internal,
     leads,
     location_groups,
     locations,
@@ -64,6 +66,8 @@ from app.api.routes import router
 
 ROUTERS: list[APIRouter] = [
     router,
+    ai_tasks.router,
+    internal.router,
     businesses.router,
     client_import.router,
     clients.router,

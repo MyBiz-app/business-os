@@ -1510,7 +1510,11 @@
     },
     "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything.",
     "logTimePreview": "Log {hours} h for {client}: {description}",
-    "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all"
+    "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all",
+    "scheduleTask": "Schedule: {title}",
+    "cancelTask": "Cancel the scheduled task \"{title}\"",
+    "firstRun": "First run: {when}",
+    "upTo": "Up to {credits} credits per run, read-only; anything it proposes waits for your approval."
   },
   "aiTeam": {
     "title": "AI team",
@@ -1623,6 +1627,101 @@
     "closed": {
       "disabled": "{name} is switched off for this business.",
       "forbidden": "Your role can't use {name}. Ask the business owner to open access."
+    },
+    "tasks": {
+      "title": "Scheduled tasks",
+      "subtitle": "What your agents will do later, by themselves. Ask an agent in a chat, for example \"every Sunday at 8:00 send me a weekly summary\".",
+      "usage": "{active} of {limit} tasks in use",
+      "empty": "No scheduled tasks yet. Ask any agent to do something at a set time and confirm the card it prepares.",
+      "timing": "Runs around the set time (within about 10 minutes). To-the-minute timing is coming soon.",
+      "preciseSoon": "To-the-minute timing: coming soon",
+      "kind": {
+        "agent_run": "Agent run",
+        "action": "Scheduled action"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "done": "Done",
+        "failed": "Failed"
+      },
+      "reason": {
+        "cancelled": "Cancelled",
+        "failed_3_times": "Paused after failing 3 times",
+        "run_failed": "The run failed twice",
+        "member_gone": "Paused: the person who created it is no longer in the business",
+        "permission_lost": "Paused: the person who created it no longer has AI access",
+        "module_disabled": "Paused: the AI module is off",
+        "business_closed": "Paused: the business is closed",
+        "agent_unavailable": "Paused: the agent is switched off or locked",
+        "over_credit_cap": "Paused: the last run used more credits than the limit"
+      },
+      "next": "Next: {when}",
+      "last": "Last run: {when}",
+      "never": "Not run yet",
+      "agentLabel": "Agent: {name}",
+      "creditsCap": "Up to {credits} credits per run",
+      "waiting": "{count, plural, one {# card waits for your approval} other {# cards wait for your approval}}",
+      "someoneElse": "Created by a colleague",
+      "pause": "Pause",
+      "resume": "Resume",
+      "runNow": "Run now",
+      "running": "Running…",
+      "edit": "Change time",
+      "delete": "Delete",
+      "confirmDelete": "Delete this task and its history?",
+      "history": "History",
+      "hideHistory": "Hide history",
+      "noRuns": "No runs yet.",
+      "openChat": "Open the chat",
+      "run": {
+        "running": "Running",
+        "ok": "Done",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      },
+      "runError": {
+        "missed": "Missed: the server was down more than a day",
+        "ai_not_configured": "The AI is not set up yet",
+        "ai_limit_reached": "The monthly AI limit was reached",
+        "ai_busy": "The AI was busy",
+        "ai_unavailable": "The AI was unavailable",
+        "payload_changed": "The approved action changed, so it was not run",
+        "forbidden": "No longer allowed for the person who created it",
+        "module_disabled": "The module is off",
+        "member_gone": "The person who created it left",
+        "permission_lost": "The person who created it lost AI access",
+        "agent_unavailable": "The agent is not available",
+        "business_closed": "The business is closed",
+        "generic": "Something went wrong"
+      },
+      "credits": "{credits} credits",
+      "frequency": {
+        "once": "Once",
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month"
+      },
+      "when": {
+        "once": "{date} at {time}",
+        "daily": "Every day at {time}",
+        "weekly": "Every {days} at {time}",
+        "monthly": "On day {day} of every month at {time}"
+      },
+      "form": {
+        "frequency": "How often",
+        "time": "Time",
+        "date": "Date",
+        "weekdays": "Days",
+        "day": "Day of the month",
+        "title": "Name",
+        "instruction": "Instruction",
+        "save": "Save",
+        "cancel": "Cancel",
+        "timePassed": "That time has already passed.",
+        "invalid": "Check the time and day and try again.",
+        "failed": "Could not save. Try again."
+      }
     }
   },
   "modules": {
