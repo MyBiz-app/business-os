@@ -292,10 +292,10 @@ STUDIO_BLOOM = BusinessSpec(
 # network: a gym network with a strength, a pilates and a crossfit branch, a padel network
 # with courts, and a beauty business with appointments.
 IRON_PULSE = BusinessSpec(
-    name="Iron & Flow",
+    name="Adir fitness",
     vertical="gym",
     color="#0f766e",
-    billing_name="איירון אנד פלואו בע״מ",
+    billing_name="אדיר פיטנס בע״מ",
     branches=(
         BranchSpec("תל אביב - כוח", "הברזל 3, תל אביב", kind="gym"),
         BranchSpec("רמת גן - פילאטיס", "ביאליק 22, רמת גן", kind="pilates"),
@@ -336,6 +336,8 @@ DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "networks": (URBAN_SLICE, PULSE_FITNESS, STUDIO_BLOOM),
     "categories": (IRON_PULSE, PADEL_NETWORK, BEAUTY_STUDIO),
+    # The owner's own demo account: three businesses, the gym with branches of different kinds.
+    "curated": (IRON_PULSE, STUDIO_BLOOM, URBAN_SLICE),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
 
