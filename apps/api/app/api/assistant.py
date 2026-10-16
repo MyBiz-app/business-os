@@ -248,6 +248,10 @@ def ensure_agent_usable(context: TenantContext, agent_key: str) -> None:
     if agent is None:
         raise not_found()
     state, _upsell = state_of(db, agent, member_role_keys(db, context.role))
+    # Whoever shapes the team may try a draft (the new-agent wizard's trial chat runs before the
+    # agent is saved); to everyone else a draft does not exist.
+    if agent.draft and Permission.AI_MANAGE in context.permissions:
+        return
     if state != "active":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"agent_{state}")
 

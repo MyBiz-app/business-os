@@ -1635,6 +1635,157 @@
     "closed": {
       "disabled": "{name} is switched off for this business.",
       "forbidden": "Your role can't use {name}. Ask the business owner to open access."
+    },
+    "wizard": {
+      "hire": "Hire an agent",
+      "hireNamed": "Hire {name}",
+      "title": "Hire a new agent",
+      "stepOf": "Step {step} of {total}: {name}",
+      "steps": {
+        "topic": "Topic",
+        "identity": "Identity",
+        "role": "Role",
+        "data": "Data access",
+        "access": "Who may use it",
+        "trial": "Try it"
+      },
+      "limitReached": "Your plan allows {limit} custom agents and all of them are in use. Remove one or move up to AI Pro for more.",
+      "topicHint": "What should the new agent help with? Pick a starting point; you can change everything next.",
+      "templates": {
+        "nutrition": {
+          "label": "Nutrition advisor",
+          "blurb": "Eating plans, follow-ups and answers for clients.",
+          "name": "Nina",
+          "role": "Nutrition advisor",
+          "does": "Answer clients' nutrition questions in plain words, suggest simple eating plans and remind them to check in."
+        },
+        "purchasing": {
+          "label": "Purchasing and inventory",
+          "blurb": "What to reorder, what is running low, supplier costs.",
+          "name": "Pavel",
+          "role": "Purchasing and inventory",
+          "does": "Watch what we spend and what is running low, and tell me what to reorder and when."
+        },
+        "social": {
+          "label": "Social media",
+          "blurb": "Post ideas, captions and replies to comments.",
+          "name": "Sasha",
+          "role": "Social media",
+          "does": "Come up with post ideas and captions in the business's voice and draft replies to comments and messages."
+        },
+        "hiring": {
+          "label": "Hiring",
+          "blurb": "Job posts, screening candidates, scheduling interviews.",
+          "name": "Hila",
+          "role": "Hiring",
+          "does": "Help write job posts, go over applicants and suggest interview times that fit the team's shifts."
+        },
+        "support": {
+          "label": "Customer care",
+          "blurb": "Questions, complaints and reviews.",
+          "name": "Carmel",
+          "role": "Customer care",
+          "does": "Answer clients' questions kindly, draft replies to complaints and reviews, and flag what needs a person."
+        },
+        "other": {
+          "label": "Something else",
+          "blurb": "Start from a blank page and describe the job yourself."
+        }
+      },
+      "name": "Name",
+      "roleTitle": "Job title",
+      "color": "Color",
+      "upload": "Upload a picture",
+      "uploadHint": "PNG, JPG or WebP up to 2 MB. You crop it to a circle next.",
+      "resetFace": "Use the default face",
+      "gallery": "Faces",
+      "does": "What does this agent do?",
+      "doesPlaceholder": "For example: answer clients' questions about their membership.",
+      "tone": "How does it speak?",
+      "tones": {
+        "friendly": "Warm and friendly",
+        "formal": "Formal and precise",
+        "short": "Short and to the point"
+      },
+      "never": "What must it never do?",
+      "neverPlaceholder": "For example: never promise discounts or give medical advice.",
+      "knowledge": "What should it know?",
+      "knowledgePlaceholder": "Questions and answers, policies, price list, opening hours.",
+      "counter": "{used} of {max} characters",
+      "labels": {
+        "does": "What the agent does:",
+        "never": "What the agent must never do:",
+        "knowledge": "What the agent knows about the business:"
+      },
+      "dataHint": "Tick the parts of the business this agent can look into. It still never sees more than the person talking to it is allowed to.",
+      "domainsLegend": "Access to data",
+      "branches": "Branches",
+      "domains": {
+        "schedule": "Schedule and classes",
+        "bookings": "Bookings",
+        "clients": "Clients",
+        "messages": "Messages to clients",
+        "leads": "Leads",
+        "sources": "Lead sources",
+        "sales": "Sales",
+        "plans": "Plans and memberships",
+        "quotes": "Quotes",
+        "metrics": "Business numbers",
+        "billing": "Billing",
+        "receipts": "Receipts",
+        "balances": "Open balances",
+        "shifts": "Shifts",
+        "staff": "Team",
+        "time": "Time and attendance",
+        "inbox": "Inbox",
+        "reviews": "Reviews",
+        "reports": "Reports",
+        "content": "Content",
+        "social": "Social media"
+      },
+      "accessHint": "Who on your team may talk to this agent? Owners always can.",
+      "rolesLegend": "Roles with access",
+      "trialHint": "Talk to the agent before you hire it. Nothing is saved to your team until you press the button below.",
+      "send": "Send",
+      "back": "Back",
+      "next": "Next",
+      "tryIt": "Try it out",
+      "preparing": "Getting it ready…",
+      "errors": {
+        "agent_limit": "Your plan allows {limit} custom agents. Remove one or move up to AI Pro.",
+        "unknown_tool_domain": "One of the data areas is not available.",
+        "unknown_role": "One of the roles no longer exists.",
+        "unknown_branch": "One of the branches no longer exists.",
+        "image_too_large": "The picture is too large (2 MB at most).",
+        "unsupported_image": "Use a PNG, JPG or WebP picture.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "edit": {
+      "open": "Edit",
+      "title": "{name}: settings",
+      "usage": "{used} credits used this month",
+      "enabled": "This agent is switched on",
+      "topic": "One line about what it does",
+      "instructions": "Role description",
+      "tier": "Model quality",
+      "tiers": {
+        "fast": "Fast and economical",
+        "standard": "Standard",
+        "strong": "Strongest, uses more credits"
+      },
+      "delete": "Remove this agent",
+      "deleteAsk": "Remove {name}? Past chats stay, but the agent is gone.",
+      "deleteYes": "Yes, remove",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "roles": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "branch_manager": "Branch manager",
+      "front_desk": "Front desk",
+      "staff": "Staff"
     }
   },
   "aiBubble": {
