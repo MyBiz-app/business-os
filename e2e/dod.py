@@ -143,8 +143,8 @@ with sync_playwright() as p:
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
-    owner.goto(f"{h.BASE}/ai"); h.ready(owner)
-    owner.get_by_role("button", name="אורי").first.click()
+    owner.goto(f"{h.BASE}/ai?agent=chief"); h.ready(owner)  # opens the chat with the chief agent
+    expect(owner.locator("#ai-question")).to_be_visible(timeout=20000)
     h.ready(owner)
     for _ in range(5):  # the chat re-renders when its history arrives and then drops what was typed
         owner.get_by_label("השאלה שלך").fill("איך היה החודש שעבר?")
