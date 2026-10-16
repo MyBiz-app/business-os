@@ -6,8 +6,8 @@ who manages it (`locations.manager_user_id`; the business's owner until someone 
 an invitation can carry the branches the new member will be kept to, so a branch manager can only
 invite people into their own branches.
 
-Revision ID: 0086
-Revises: 0085
+Revision ID: 0087
+Revises: 0086
 Create Date: 2026-10-16
 """
 
@@ -15,8 +15,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0086"
-down_revision: str | None = "0085"
+revision: str = "0087"
+down_revision: str | None = "0086"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -116,8 +116,7 @@ def upgrade() -> None:
         EXECUTE FUNCTION app.owner_manages_unmanaged_branches()
     """)
     op.execute("""
-        CREATE INDEX locations_manager ON app.locations (tenant_id, manager_user_id)
-        WHERE manager_user_id IS NOT NULL
+        CREATE INDEX locations_manager ON app.locations (manager_user_id)
     """)
 
 

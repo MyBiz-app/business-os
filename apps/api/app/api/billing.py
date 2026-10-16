@@ -86,6 +86,9 @@ class Usage(BaseModel):
     storage_included_bytes: int
     ai_credits: float = Field(description="AI credits used this month (1 credit = 1 US cent)")
     ai_credits_included: int = Field(description="0 when the business has no AI module")
+    ai_extra_minor: int = Field(
+        default=0, description="Pay-as-you-go: this month's extra AI use, minor units"
+    )
 
 
 class Billing(BaseModel):
@@ -211,6 +214,16 @@ def usage(db: Session, today: date) -> Usage:
         storage_included_bytes=allowed.storage_bytes,
         ai_credits=round(ai_budget.credits_used(db, month_start), 2),
         ai_credits_included=ai_budget.credits_included(db),
+        ai_extra_minor=_ai_extra(db, month_start),
+    )
+
+
+def _ai_extra(db: Session, month_start: date) -> int:
+    spend = ai_budget.spend_settings(db)
+    if not spend.payg_enabled:
+        return 0
+    return spend.extra_minor(
+        ai_budget.credits_used(db, month_start), ai_budget.credits_included(db)
     )
 
 

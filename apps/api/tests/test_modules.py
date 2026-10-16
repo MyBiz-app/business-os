@@ -21,10 +21,10 @@ def test_business_created_with_chosen_modules(client: TestClient, auth: AuthHead
     created = client.post("/tenants", json={**STUDIO, "modules": {}}, headers=auth(owner)).json()
     assert created["modules"] == []
     bad = client.post(
-        "/tenants", json={**STUDIO, "modules": {"agent_finance": 1}}, headers=auth(uuid4())
+        "/tenants", json={**STUDIO, "modules": {"nonsense": 1}}, headers=auth(uuid4())
     )
     assert bad.status_code == 422
-    assert bad.json()["detail"] == "module_not_available"
+    assert bad.json()["detail"] == "unknown_module"
 
 
 def test_recommend_and_quote(client: TestClient, auth: AuthHeaders) -> None:
@@ -55,10 +55,7 @@ def test_recommend_and_quote(client: TestClient, auth: AuthHeaders) -> None:
     )
     assert both.json()["detail"] == "choose_one_ai_tier"
     catalog = client.get("/modules/catalog", params={"currency": "USD"}, headers=headers).json()
-    assert {m["key"] for m in catalog["modules"] if not m["available"]} >= {
-        "analytics_pro",
-        "agent_finance",
-    }
+    assert all(m["available"] for m in catalog["modules"])  # no "coming soon" modules left
 
 
 def test_changing_modules_needs_settings_permission(
@@ -145,8 +142,10 @@ def test_adding_one_module_to_the_plan(client: TestClient, studio: dict, auth) -
     upgraded = client.post("/tenants/current/modules/ai_pro", headers=headers).json()
     assert upgraded["modules"] == {"ai_pro": 1, "crm": 1}
 
-    soon = client.post("/tenants/current/modules/analytics_pro", headers=headers)
-    assert soon.status_code == 422 and soon.json()["detail"] == "module_not_available"
+    # Agent modules need an AI tier (and the marketing one needs the CRM) to be switched on.
+    needs_ai = client.post("/tenants/current/modules/agent_finance", headers=headers)
+    assert needs_ai.status_code == 200, needs_ai.text
+    assert "agent_finance" in needs_ai.json()["modules"]
     staff = auth(studio["coach"], studio["tenant_id"])
     assert client.post("/tenants/current/modules/whatsapp", headers=staff).status_code == 403
 

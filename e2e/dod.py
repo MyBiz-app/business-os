@@ -143,8 +143,8 @@ with sync_playwright() as p:
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
-    owner.goto(f"{h.BASE}/assistant"); h.ready(owner)
-    owner.get_by_role("button", name="התחלת שיחה").click(); owner.wait_for_url("**/assistant?c=*"); h.ready(owner)
+    owner.goto(f"{h.BASE}/ai"); h.ready(owner)
+    owner.get_by_role("button", name="אורי").first.click()
     owner.get_by_role("button", name="איך היה החודש שעבר?").click()
     expect(owner.get_by_text("ב-30 הימים האחרונים")).to_be_visible(timeout=20000)
     owner.get_by_label("השאלה שלך").fill("תרשום את כהן לשיעור מחר")
@@ -172,7 +172,7 @@ with sync_playwright() as p:
     print("8. platform admin sees the business and AI usage:", credits)
 
     # Accessibility (axe) in Hebrew/light and English/dark.
-    pages = ["/dashboard", "/schedule", "/clients", "/plans", "/assistant", "/settings", "/settings/modules"]
+    pages = ["/dashboard", "/schedule", "/clients", "/plans", "/ai", "/settings", "/settings/modules"]
     for path in pages:
         owner.goto(f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
     en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 900})

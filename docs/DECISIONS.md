@@ -191,6 +191,9 @@ The branches a conversation sees are the user's branches âˆ© the agent's scope â
 - It is the manager bundle minus everything business-wide: `business.settings`, `ai.manage`, `catalog.write`, `catalog.delete` (and, as for managers, no `clients.privacy`). Custom roles, new branches and appointing a branch manager stay with owners and managers.
 - Branch scope is enforced on the server: a branch manager reaches only people kept to branches inside their own, only staff and front desk, and can name only their own branches. A branch manager with no branch is refused (`no_branches`), because an empty list means "all branches" for everyone else.
 - `locations.manager_user_id` records who manages a branch (the first owner by default, set by a trigger); appointing a staff member turns them into a branch manager at that branch, the previous manager steps down to staff there, and the branch's people get the new manager as suggested `reports_to`.
+### AI spend controls (2026-10-16, round 5 A2)
+
+Pay-as-you-go extra credits are off by default (`app.tenant_ai_settings`, migration 0086). When on, questions keep working after the included credits (400 / 1200 stay) and the extra use is a line on the account at 6.00 ILS / 1.70 USD / 1.60 EUR per 100 credits (`AI_EXTRA_PRICE_PER_100`); no payment is taken while payments (#46) are a disabled adapter. An optional monthly cap (minor units) sets where questions stop; no cap means no limit. Roles and people can have a lower monthly limit (`app.ai_credit_limits`; a role limit applies to each person). Alerts at 80, 100, 150 and 200% of the included credits are recorded once a month (`app.ai_credit_alerts`) and shown in the CRM; email alerts follow later. The three "coming soon" modules (`analytics_pro`, `agent_finance`, `agent_marketing`) are now selectable.
 
 ## Open
 
