@@ -38,6 +38,7 @@ from sqlalchemy import Connection, Engine, create_engine, text
 from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
+from app.files import purge_expired_files
 from app.messaging import outbox
 from app.messaging.announcements import send_announcements as run_announcements
 from app.messaging.email import (
@@ -371,7 +372,7 @@ RETENTION_MONTHS = {
 def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, int]:
     """Deletes what has passed its time: leads that never became clients and nobody touched,
     website and in-app requests, the AI's conversations (in the app and on WhatsApp) with the
-    WhatsApp messages they answered, and the message log."""
+    WhatsApp messages they answered, the message log and files past their expiry."""
     now = now or datetime.now(UTC)
 
     def before(kind: str) -> datetime:
@@ -392,10 +393,12 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
         "whatsapp_inbox": "DELETE FROM app.whatsapp_inbox WHERE received_at < :before",
         "messages": "DELETE FROM app.messages WHERE created_at < :before",
     }
-    return {
+    deleted = {
         kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
         for kind, sql in statements.items()
     }
+    deleted["files"] = purge_expired_files(conn)  # e.g. the imports folder keeps files 30 days
+    return deleted
 
 
 def delete_closed_businesses(

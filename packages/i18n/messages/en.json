@@ -377,7 +377,8 @@
       "money": "Money",
       "business": "Business"
     },
-    "content": "Content & creative"
+    "content": "Content & creative",
+    "files": "Files"
   },
   "terms": {
     "fitness": {
@@ -2535,7 +2536,11 @@
     "social_read": "View the content studio",
     "social_read_hint": "The social networks dashboard and its numbers",
     "social_manage": "Manage social accounts",
-    "social_manage_hint": "Connect and disconnect social networks"
+    "social_manage_hint": "Connect and disconnect social networks",
+    "files_read": "Open the files area",
+    "files_read_hint": "Business files; some folders also need their own permission",
+    "files_manage": "Manage files",
+    "files_manage_hint": "Add, archive and organize files and folders"
   },
   "health": {
     "title": "Health declaration",
@@ -5100,6 +5105,14 @@
       "noDrafts": "No drafts yet. Ask Shira for post ideas and she will save them here.",
       "discard": "Discard draft",
       "publishHint": "To publish a draft, ask Shira. She prepares it and you confirm before anything goes out."
+    },
+    "myDocuments": {
+      "open": "My documents",
+      "title": "My documents",
+      "hint": "Payslips and papers the business filed for you.",
+      "none": "Nothing here yet.",
+      "openFile": "Open",
+      "failed": "Couldn't open the file. Try again."
     }
   },
   "staffApp": {
@@ -6702,5 +6715,41 @@
     "badTitle": "This link is not valid",
     "badText": "It may have expired or the address was changed. Ask for a new confirmation email in the settings.",
     "home": "Back to MyBiz"
+  },
+  "files": {
+    "title": "Files",
+    "subtitle": "Your business's documents in one place. Payslips and employee papers are kept sealed and only the right people can open them.",
+    "folders": "Folders",
+    "system": {
+      "payroll": "Payslips",
+      "employees": "Employees",
+      "business_docs": "Business documents",
+      "imports": "Imports",
+      "general": "General"
+    },
+    "count": "{count, plural, =0 {No files} one {# file} other {# files}}",
+    "sealed": "Sealed",
+    "kept": "Kept, never deleted",
+    "showArchived": "Show archive",
+    "hideArchived": "Hide archive",
+    "zip": "Download as ZIP",
+    "importsHint": "Files uploaded when moving to MyBiz. They are deleted 30 days after they were added.",
+    "payrollHint": "Payslips appear here when payroll is approved. They are kept for 7 years and can be archived, not deleted.",
+    "none": "No files in this folder yet.",
+    "noneArchived": "Nothing in the archive.",
+    "noFolders": "You don't have access to any folder.",
+    "expires": "deleted on {date}",
+    "add": "Add a file",
+    "file": "File",
+    "fileHint": "PDF, image, Word or Excel, up to 10 MB.",
+    "name": "Name (optional)",
+    "upload": "Upload",
+    "archive": "Archive",
+    "restore": "Restore",
+    "delete": "Delete {name}",
+    "newFolder": "New folder here",
+    "folderName": "Folder name",
+    "createFolder": "Create folder",
+    "deleteFolder": "Delete this empty folder"
   }
 }

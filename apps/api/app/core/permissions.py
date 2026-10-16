@@ -25,6 +25,8 @@ class Permission(StrEnum):
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
+    FILES_READ = "files.read"  # open the business's files area (some folders need more)
+    FILES_MANAGE = "files.manage"  # add, archive and organize files and folders
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
@@ -48,6 +50,8 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
+            Permission.FILES_READ,
+            Permission.FILES_MANAGE,
         }
     ),
     # A manager at their own branches only (the API keeps them to `location_ids`): everything a

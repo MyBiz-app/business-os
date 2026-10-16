@@ -6,6 +6,7 @@ import {
   Inbox,
   Clock,
   FileSignature,
+  FolderOpen,
   Plug,
   ScrollText,
   Wallet,
@@ -59,6 +60,7 @@ const ICONS = {
   broadcasts: Megaphone,
   quotes: FileSignature,
   time: Clock,
+  files: FolderOpen,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;
