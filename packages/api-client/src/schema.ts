@@ -6125,6 +6125,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/readiness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Readiness
+         * @description The legal-readiness card: what is filled in, what each missing piece would unlock.
+         */
+        get: operations["get_readiness"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/tenants/current/logo": {
         parameters: {
             query?: never;
@@ -6725,7 +6745,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "inactive" | "plan_ending" | "leads_due" | "health_review";
+            kind: "inactive" | "plan_ending" | "leads_due" | "health_review" | "license_expiring";
             /** Count */
             count: number;
             /** Items */
@@ -11675,6 +11695,40 @@ export interface components {
             /** Count */
             count: number;
         };
+        /** Readiness */
+        Readiness: {
+            /** Items */
+            items: components["schemas"]["ReadinessItem"][];
+            /**
+             * License Status
+             * @enum {string}
+             */
+            license_status: "none" | "valid" | "expiring" | "expired";
+            /** License Days Left */
+            license_days_left: number | null;
+            /** Tax Invoice */
+            tax_invoice: boolean;
+            /** Receipts Only */
+            receipts_only: boolean;
+            /** Payroll */
+            payroll: boolean;
+        };
+        /** ReadinessItem */
+        ReadinessItem: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "entity_type" | "business_number" | "address" | "employer_file" | "license";
+            /** Done */
+            done: boolean;
+            /** Optional */
+            optional: boolean;
+            /** Unlocks */
+            unlocks: ("tax_invoice" | "payroll") | null;
+            /** Warning */
+            warning?: "company_prefix" | null;
+        };
         /** ReadyResponse */
         ReadyResponse: {
             /** Status */
@@ -13448,6 +13502,31 @@ export interface components {
              * @description Shown only to people who manage the business's settings
              */
             business_number?: string | null;
+            /**
+             * Address Line
+             * @description Settings managers only
+             */
+            address_line?: string | null;
+            /**
+             * Address City
+             * @description Settings managers only
+             */
+            address_city?: string | null;
+            /**
+             * Employer File Number
+             * @description Settings managers only
+             */
+            employer_file_number?: string | null;
+            /**
+             * Business License Number
+             * @description Settings managers only
+             */
+            business_license_number?: string | null;
+            /**
+             * Business License Expires On
+             * @description Settings managers only
+             */
+            business_license_expires_on?: string | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
@@ -13683,6 +13762,19 @@ export interface components {
              * @description Registration number (ח.פ., עוסק מורשה...)
              */
             business_number?: string | null;
+            /** Address Line */
+            address_line?: string | null;
+            /** Address City */
+            address_city?: string | null;
+            /**
+             * Employer File Number
+             * @description Deductions file (תיק ניכויים)
+             */
+            employer_file_number?: string | null;
+            /** Business License Number */
+            business_license_number?: string | null;
+            /** Business License Expires On */
+            business_license_expires_on?: string | null;
         };
         /** TestCardRequest */
         TestCardRequest: {
@@ -28759,6 +28851,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MyHealth"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_readiness: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Readiness"];
                 };
             };
             /** @description Validation Error */
