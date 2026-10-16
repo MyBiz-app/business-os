@@ -208,6 +208,14 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     const target = `/start/finish?p=${encodePlan(plan)}`;
     router.push(signedIn ? target : `/signup?next=${encodeURIComponent(target)}`);
   };
+  const chosenKind = findVertical(draft.vertical);
+  const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location").map((line) => label(line.key));
+  const passDetails = [
+    ...(draft.businessNumber ? [{ label: t("summary.passNumber"), value: draft.businessNumber }] : []),
+    ...(chosenKind ? [{ label: t("summary.passCategory"), value: text(chosenKind.category, "name") }] : []),
+    { label: t("summary.passSize"), value: t("summary.passSizeValue", { staff: draft.staff, locations: draft.locations }) },
+    { label: t("summary.passAddons"), value: addOnLabels.length > 0 ? addOnLabels.join(", ") : t("summary.passNoAddons") },
+  ];
   const loginHref = draft.vertical
     ? `/login?next=${encodeURIComponent(`/start/finish?p=${encodePlan({ ...draft, vertical: draft.vertical })}`)}`
     : "/login";
@@ -552,6 +560,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           via={t("summary.trial")}
           to={t("summary.to")}
           date={trialEnds}
+          icon={findVertical(draft.vertical)?.icon ?? "briefcase"}
+          details={passDetails}
         />
         <div className="card flex flex-col gap-5 p-6">
           <div className="flex items-center justify-between gap-3 border-b border-border pb-4">

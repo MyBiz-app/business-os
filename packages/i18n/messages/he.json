@@ -3418,7 +3418,13 @@
       "to": "העסק שלך באוויר",
       "trial": "14 יום חינם",
       "once": "חד-פעמי (עם החשבונית הראשונה)",
-      "celebrate": "איזו חבילה! עוד צעד אחד וממריאים"
+      "celebrate": "איזו חבילה! עוד צעד אחד וממריאים",
+      "passNumber": "ח.פ.",
+      "passCategory": "קטגוריה",
+      "passSize": "גודל",
+      "passSizeValue": "{staff, plural, one {עובד/ת אחד/ת} other {# עובדים}} · {locations, plural, one {סניף אחד} other {# סניפים}}",
+      "passAddons": "תוספות",
+      "passNoAddons": "הליבה בלבד"
     },
     "finish": {
       "title": "שלב אחרון: פרטי תשלום",
