@@ -25,7 +25,7 @@ class Network:
 NETWORKS: tuple[Network, ...] = (
     Network("facebook", "meta", ("followers", "reach", "videos", "engagement", "posts")),
     Network("instagram", "meta", ("followers", "reach", "videos", "engagement", "audience")),
-    Network("threads", "meta", ("followers", "views", "engagement")),
+    Network("threads", "threads", ("followers", "views", "engagement")),
     Network("youtube", "youtube", ("followers", "views", "watch_time", "videos")),
     Network("tiktok", "tiktok", ("followers", "views", "engagement", "videos")),
     Network("google_business", "google_business", ("reviews", "searches", "calls", "directions")),
@@ -89,6 +89,20 @@ class AudienceSlice:
     share_bp: int  # basis points: 10000 = 100%
 
 
+class NeedsReauth(Exception):
+    """The network refused the saved token: the owner has to connect the account again."""
+
+
+class NetworkError(Exception):
+    """The network could not be reached or refused the request."""
+
+
+@dataclass(frozen=True)
+class Published:
+    external_id: str
+    permalink: str | None = None
+
+
 class SocialProvider(Protocol):
     name: str
 
@@ -122,11 +136,15 @@ def social_provider(name: str) -> SocialProvider | None:
 
 def network_status(network: Network) -> str:
     """ "available" once the network's provider is registered, else "soon"."""
-    return "available" if network.provider in _PROVIDERS else "soon"
+    provider = _PROVIDERS.get(network.provider)
+    if provider is None:
+        return "soon"
+    configured = getattr(provider, "configured", None)
+    return "soon" if configured is not None and not configured() else "available"
 
 
 def _load_providers() -> None:
-    from app.social import demo  # noqa: F401  (registers itself)
+    from app.social import demo, meta  # noqa: F401  (each registers itself)
 
 
 _load_providers()

@@ -87,6 +87,15 @@ Tokens are stored encrypted (`app/providers/secrets.py`) and only summarized, pu
 the business's own accounts are kept. The `demo` provider gives believable numbers without any
 account.
 
+The Meta provider (`app/social/meta.py`, Facebook Pages + Instagram as `meta`, Threads as
+`threads`) is the first real one. It is configured by `API_META_APP_ID` / `API_META_APP_SECRET`
+(Threads: `API_META_THREADS_APP_ID` / `API_META_THREADS_APP_SECRET`, `API_META_GRAPH_VERSION`
+for the Graph API version); a provider with a `configured()` method stays "coming soon" until it
+returns true. Register `{API}/social/callback/meta` (and `/social/callback/threads` for Threads)
+as the OAuth redirect URI at the network. Optional `publish(account, text, image_url)` on a
+provider enables `POST /social/accounts/{id}/publish`; a provider raises `NeedsReauth` when a
+token is refused and the account is then marked "needs reconnect".
+
 ## Switching provider
 
 - **A business**: settings → Integrations → choose another provider and fill its settings.
