@@ -21,6 +21,7 @@ export type ModuleKey =
   | "crm_automation"
   | "whatsapp"
   | "whatsapp_ai"
+  | "social_studio"
   | "pack_plus"
   | "pack_max"
   | "support_priority"
@@ -182,6 +183,7 @@ const MODULE_KEYS: readonly ModuleKey[] = [
   "crm_automation",
   "whatsapp",
   "whatsapp_ai",
+  "social_studio",
   "pack_plus",
   "pack_max",
   "support_priority",

@@ -32,6 +32,7 @@ function partOfDay(timeZone: string): "morning" | "afternoon" | "evening" {
 export default function Today() {
   const t = useTranslations("business.today");
   const tTerms = useTranslations("terms");
+  const tAi = useTranslations("business.ai");
   const tAttention = useTranslations("dashboard.attention");
   const tUsage = useTranslations("billing.usage");
   const tReserve = useTranslations("business.reserve");
@@ -147,6 +148,10 @@ export default function Today() {
         <Heading palette={palette}>{tenant.name}</Heading>
         {branch && <Text style={[styles.muted, { color: palette.muted }]}>{branch.name}</Text>}
       </View>
+
+      {can("ai.use") && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro") && (
+        <Button label={tAi("open")} palette={palette} variant="secondary" onPress={() => router.push("/ai")} />
+      )}
 
       {data?.onSite && <Button label={tJobs("cta")} palette={palette} onPress={() => router.push("/jobs")} />}
 

@@ -346,7 +346,8 @@
       "catalog": "Catalog",
       "money": "Money",
       "business": "Business"
-    }
+    },
+    "content": "Content & creative"
   },
   "terms": {
     "fitness": {
@@ -1927,7 +1928,8 @@
       "setup_guided": "Guided setup",
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
-      "noPack": "Included amount"
+      "noPack": "Included amount",
+      "social_studio": "Content studio"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -1950,7 +1952,8 @@
       "setup_guided": "A setup session with the MyBiz team: services, prices and staff set up together.",
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
-      "noPack": "2 GB for files and 200 messages a month."
+      "noPack": "2 GB for files and 200 messages a month.",
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
@@ -2225,7 +2228,11 @@
     "business_settings": "Business settings",
     "business_settings_hint": "Details, branding, modules and plan",
     "clients_privacy": "Privacy requests",
-    "clients_privacy_hint": "Export or erase a client's personal data"
+    "clients_privacy_hint": "Export or erase a client's personal data",
+    "social_read": "View the content studio",
+    "social_read_hint": "The social networks dashboard and its numbers",
+    "social_manage": "Manage social accounts",
+    "social_manage_hint": "Connect and disconnect social networks"
   },
   "health": {
     "title": "Health declaration",
@@ -4103,6 +4110,21 @@
             ]
           }
         }
+      },
+      "social": {
+        "eyebrow": "Content & creative",
+        "title": "See all your social networks in one place?",
+        "text": "Connect Facebook, Instagram, TikTok, YouTube and Google Business. Follow your followers, views and top posts, and learn when your content works best.",
+        "points": [
+          "One dashboard for every network, or just the one you choose",
+          "Top posts and videos, audience and the best times to post",
+          "Google Business: reviews, searches, calls and directions"
+        ],
+        "picture": [
+          "Followers",
+          "Views",
+          "Engagement"
+        ]
       }
     },
     "cart": {
@@ -4683,6 +4705,13 @@
         "overlap": "Hours on the same day must not overlap.",
         "generic": "Something went wrong. Try again."
       }
+    },
+    "ai": {
+      "open": "Your AI team",
+      "back": "Back",
+      "bubble": "Ask the AI team",
+      "noAgents": "No AI agents are available to you yet.",
+      "genericAction": "The agent prepared an action for you to confirm."
     }
   },
   "staffApp": {
@@ -6084,6 +6113,142 @@
       "friends_disabled": "Friends are not available here.",
       "friends_rate_limited": "Too many searches. Try again later.",
       "not_found": "No one found. Check the code, phone or email."
+    }
+  },
+  "content": {
+    "title": "Content & creative",
+    "subtitle": "All your social networks in one dashboard.",
+    "demoBanner": "You are looking at demo numbers. Nothing here comes from your real accounts.",
+    "connect": {
+      "title": "Let's connect your networks",
+      "text": "Connect a network to see its followers, views and top posts. You can disconnect any time and we delete the numbers we kept.",
+      "button": "Connect",
+      "soon": "Coming soon",
+      "demo": "Show with demo data",
+      "demoNote": "See the dashboard with sample numbers before you connect anything.",
+      "connected": "Connected: {count}",
+      "noAccess": "Only the owner or a manager can connect networks.",
+      "privacy": "We only read summarized, public numbers of your own accounts. Never private messages."
+    },
+    "networks": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "threads": "Threads",
+      "youtube": "YouTube",
+      "tiktok": "TikTok",
+      "google_business": "Google Business",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "pinterest": "Pinterest",
+      "snapchat": "Snapchat"
+    },
+    "gives": {
+      "followers": "Followers",
+      "reach": "Reach",
+      "videos": "Video views",
+      "engagement": "Engagement",
+      "posts": "Top posts",
+      "audience": "Audience",
+      "views": "Views",
+      "watch_time": "Watch time",
+      "reviews": "Reviews",
+      "searches": "Searches",
+      "calls": "Calls",
+      "directions": "Directions"
+    },
+    "filters": {
+      "label": "Dashboard filters",
+      "networks": "Networks",
+      "allNetworks": "All networks",
+      "period": "Period",
+      "d7": "7 days",
+      "d30": "30 days",
+      "d90": "90 days",
+      "custom": "Custom",
+      "from": "From",
+      "to": "To",
+      "compare": "Compare to the previous period",
+      "apply": "Apply"
+    },
+    "kpi": {
+      "followers": "Followers",
+      "reach": "Reach",
+      "impressions": "Views",
+      "video_views": "Video views",
+      "engagements": "Engagement",
+      "engagement_rate_bp": "Engagement rate",
+      "link_clicks": "Link clicks",
+      "profile_views": "Profile views",
+      "growth": "{value} net this period",
+      "vsPrevious": "{value} vs the previous period",
+      "noChange": "No change"
+    },
+    "charts": {
+      "followersTitle": "Followers over time",
+      "followersTable": "Followers by day",
+      "videoViewsTitle": "Video views per week",
+      "videoViewsTable": "Video views by week",
+      "weekOf": "Week of",
+      "views": "Views",
+      "day": "Day",
+      "kindTitle": "Engagement by content type",
+      "heatmapTitle": "When your content works best",
+      "heatmapHint": "Average engagement per post, by day and hour. Darker is better.",
+      "noData": "No data for this period.",
+      "best": "Best slot so far: {day} at {hour}"
+    },
+    "kinds": {
+      "post": "Post",
+      "reel": "Reel",
+      "story": "Story",
+      "video": "Video"
+    },
+    "posts": {
+      "title": "Top posts and videos",
+      "empty": "No posts in this period.",
+      "sortViews": "By views",
+      "sortEngagement": "By engagement",
+      "views": "Views",
+      "engagement": "Engagement",
+      "watch": "Avg watch",
+      "seconds": "{n} sec",
+      "open": "Open post",
+      "untitled": "Post"
+    },
+    "audience": {
+      "title": "Your audience",
+      "age": "Age",
+      "gender": "Gender",
+      "city": "Cities",
+      "country": "Countries",
+      "female": "Women",
+      "male": "Men",
+      "other": "Other",
+      "empty": "Audience data appears after the first sync."
+    },
+    "google": {
+      "title": "Google Business",
+      "rating": "Average rating",
+      "reviews": "New reviews",
+      "searches": "Searches",
+      "profileViews": "Profile views",
+      "calls": "Calls",
+      "directions": "Directions"
+    },
+    "accounts": {
+      "title": "Connected accounts",
+      "demo": "Demo",
+      "lastSynced": "Updated {date}",
+      "never": "Not synced yet",
+      "disconnect": "Disconnect",
+      "confirm": "Disconnect this account? We delete the numbers we kept for it.",
+      "refresh": "Refresh now",
+      "refreshLimit": "You can refresh once an hour.",
+      "addMore": "Connect another network"
+    },
+    "export": {
+      "csv": "Download CSV",
+      "print": "Print or save as PDF"
     }
   }
 }
