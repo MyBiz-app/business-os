@@ -12,6 +12,7 @@ from app.api.common import not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, TenantDep, require
 from app.api.routes import load_current_tenant
 from app.api.schemas import Tenant, TenantUpdate
+from app.core.identity import check_digit_valid
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["settings"])
@@ -39,14 +40,8 @@ def _detect_type(data: bytes) -> str | None:
 
 def israeli_number_valid(number: str) -> bool:
     """The check digit shared by Israeli ID numbers (עוסק מורשה / פטור use the owner's ID) and
-    registered bodies (ח.פ., עמותה, שותפות): up to 9 digits, weights 1,2,1,2..., digit sums."""
-    if not number.isdigit() or len(number) > 9:
-        return False
-    total = 0
-    for index, digit in enumerate(number.zfill(9)):
-        value = int(digit) * (1 + index % 2)
-        total += value - 9 if value > 9 else value
-    return total % 10 == 0 and int(number) > 0
+    registered bodies (ח.פ., עמותה, שותפות)."""
+    return check_digit_valid(number)
 
 
 @router.patch("/tenants/current")

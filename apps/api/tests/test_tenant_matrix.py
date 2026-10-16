@@ -41,6 +41,7 @@ OVERRIDES = {
     "invitations": {"role": "'staff'"},
     "notifications": {"kind": "'session_cancelled'"},
     "pending_actions": {"risk_level": "'low'"},
+    "person_identities": {"user_id": "gen_random_uuid()", "id_type": "'il_id'", "country": "'IL'"},
     "promo_codes": {"amount_off": "1", "code": "'TESTCODE'"},
     "shift_templates": {"ends": "'17:00'", "starts": "'09:00'"},
     "support_grants": {"expires_at": "now() + interval '1 day'"},

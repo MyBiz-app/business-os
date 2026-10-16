@@ -120,6 +120,15 @@ export function DetailsForm({ tenant, timeZones }: { tenant: Tenant; timeZones: 
           <p className="mt-1.5 text-xs text-muted">{t("settings.requireHealthHint")}</p>
         </div>
         <div className="sm:col-span-2">
+          <SelectField
+            label={t("settings.clientIdNumber")}
+            name="client_id_number"
+            defaultValue={tenant.client_id_number}
+            options={(["off", "optional", "required"] as const).map((value) => ({ value, label: t(`settings.clientIdNumbers.${value}`) }))}
+          />
+          <p className="mt-1.5 text-xs text-muted">{t("settings.clientIdNumberHint")}</p>
+        </div>
+        <div className="sm:col-span-2">
           <CheckboxField label={t("settings.onlineSales")} name="online_sales" defaultChecked={tenant.online_sales} />
           <p className="mt-1.5 text-xs text-muted">{t("settings.onlineSalesHint")}</p>
         </div>

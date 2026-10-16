@@ -158,7 +158,14 @@
       "notSent": "Saved, but we could not send the confirmation email yet.",
       "saved": "Saved.",
       "invalid": "Enter a valid email address."
-    }
+    },
+    "clientIdNumber": "Ask clients for an ID number",
+    "clientIdNumbers": {
+      "off": "Don't ask",
+      "optional": "Ask, optional",
+      "required": "Ask, required"
+    },
+    "clientIdNumberHint": "Common for clinics, health declarations and insurance. The number is kept encrypted and shown masked."
   },
   "locales": {
     "he": "עברית",
@@ -2535,7 +2542,9 @@
     "social_read": "View the content studio",
     "social_read_hint": "The social networks dashboard and its numbers",
     "social_manage": "Manage social accounts",
-    "social_manage_hint": "Connect and disconnect social networks"
+    "social_manage_hint": "Connect and disconnect social networks",
+    "identity_read": "Reveal ID numbers",
+    "identity_read_hint": "See people's full ID numbers (every look is logged)"
   },
   "health": {
     "title": "Health declaration",
@@ -6702,5 +6711,44 @@
     "badTitle": "This link is not valid",
     "badText": "It may have expired or the address was changed. Ask for a new confirmation email in the settings.",
     "home": "Back to MyBiz"
+  },
+  "identity": {
+    "title": "ID number",
+    "loading": "Loading...",
+    "none": "No ID number saved",
+    "clientsOff": "This business does not ask its clients for an ID number. Turn it on in the business settings.",
+    "show": "Show",
+    "hide": "Hide",
+    "add": "Add an ID number",
+    "replace": "Replace",
+    "remove": "Remove",
+    "removeConfirm": "Remove this ID number?",
+    "type": "Type",
+    "number": "Number",
+    "country": "Country code",
+    "countryHint": "Two letters, for example US",
+    "save": "Save",
+    "cancel": "Cancel",
+    "types": {
+      "il_id": "Israeli ID",
+      "passport": "Passport",
+      "foreign": "Foreign ID"
+    },
+    "memberIntro": "ID number of {name}",
+    "clientIntro": "Kept encrypted and shown masked. Only people with the right permission can reveal it, and every reveal is logged.",
+    "errors": {
+      "invalid_id_number": "This number is not valid. Check the digits.",
+      "invalid_id_country": "Enter the two-letter country code.",
+      "id_number_in_use": "This number already belongs to someone else in this business.",
+      "client_id_off": "This business does not ask its clients for an ID number.",
+      "forbidden": "You don't have permission for this.",
+      "generic": "Something went wrong. Try again."
+    },
+    "mine": {
+      "title": "ID number",
+      "intro": "Needed for payroll and legal forms. It is kept encrypted and only shown to you and to people the business trusts with it.",
+      "optionalClient": "Optional: your business may ask for it for forms and insurance.",
+      "requiredClient": "This business asks for your ID number."
+    }
   }
 }

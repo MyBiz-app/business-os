@@ -593,6 +593,10 @@ def remove_member(user_id: UUID, user: UserDep, context: ManageDep) -> None:
     if current == "owner" and _owner_count(context.session) == 1:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_owner")
     forget_manager(context.session, user_id)
+    # Their ID number goes with them (payslips, once kept, have their own retention).
+    context.session.execute(
+        text("DELETE FROM app.person_identities WHERE user_id = :user_id"), {"user_id": user_id}
+    )
     context.session.execute(
         text("""
             DELETE FROM app.tenant_members
