@@ -203,7 +203,7 @@ whose sub-issues show its progress. ([עברית](STATUS.he.md))
 - Still queued: B5 calendar blocks (class invite entry), W6-W7 of the sign-up chain (W5 done), `EXPO_TOKEN` is not set so `eas update` cannot run (owner action), re-publish the web app (deploy-apps-web) after the app changes.
 - CI note: some runs fail only on the postgres image pull (ECR rate limit); re-run the failed jobs. Vercel previews can fail on the 100/day deploy limit; not a code problem.
 - Polishing the beta categories; go-live work (#34) when the owner chooses providers
-- Go-live readiness: work through [the 2026-10 readiness review](reviews/go-live-readiness-2026-10.md) one numbered item per thread (blockers B1-B6 first)
+- Go-live readiness: a full review and plan (2026-10-16, Hebrew, awaiting the owner's approval) in [proposals/go-live-readiness-2026-10.he.md](proposals/go-live-readiness-2026-10.he.md): 25 slices GL1-GL25, migrations 0112-0120, starting only after every round 6 thread is merged
 
 ## Planned
 
