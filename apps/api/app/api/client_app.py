@@ -91,7 +91,9 @@ class ClientLocation(BaseModel):
     id: UUID
     name: str
     address: str | None
-    kind: str | None = Field(default=None, description="The branch's own sub-category (a catalog key)")
+    kind: str | None = Field(
+        default=None, description="The branch's own sub-category (a catalog key)"
+    )
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
