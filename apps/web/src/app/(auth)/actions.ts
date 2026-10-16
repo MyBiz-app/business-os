@@ -105,7 +105,16 @@ export async function updatePassword(_state: FormState, formData: FormData): Pro
   redirect("/dashboard");
 }
 
+/** Signs out on purpose and lands on the marketing home page with a confirmation. An expired or
+ * revoked session is different: the proxy sends it to /login with `next` to come back. */
 export async function signOut(): Promise<void> {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/?signed_out=1");
+}
+
+/** Signs out to sign in again as someone else (wrong invited email, closed business). */
+export async function signOutToLogin(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
   redirect("/login");
