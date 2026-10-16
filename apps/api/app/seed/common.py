@@ -289,8 +289,8 @@ STUDIO_BLOOM = BusinessSpec(
     staff_per_branch=3,
 )
 # Round 4 (B9): one business per kind of calendar, with branches of different kinds in one
-# network: a gym network with a strength and a pilates branch, a padel network with courts, and
-# a beauty business with appointments.
+# network: a gym network with a strength, a pilates and a crossfit branch, a padel network
+# with courts, and a beauty business with appointments.
 IRON_PULSE = BusinessSpec(
     name="Iron & Flow",
     vertical="gym",
@@ -299,6 +299,7 @@ IRON_PULSE = BusinessSpec(
     branches=(
         BranchSpec("תל אביב - כוח", "הברזל 3, תל אביב", kind="gym"),
         BranchSpec("רמת גן - פילאטיס", "ביאליק 22, רמת גן", kind="pilates"),
+        BranchSpec("חיפה - קרוספיט", "הנמל 12, חיפה", kind="crossfit"),
     ),
     clients=260,
     staff_per_branch=3,
