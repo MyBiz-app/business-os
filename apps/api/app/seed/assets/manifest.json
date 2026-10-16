@@ -1,0 +1,284 @@
+{
+ "tenants": {
+  "סטודיו פלואו (דמו)": {
+   "file": "logos/b01.png",
+   "color": "#0f766e"
+  },
+  "פאדל פוינט (דמו)": {
+   "file": "logos/b02.png",
+   "color": "#4d7c0f"
+  },
+  "כפות שמחות (דמו)": {
+   "file": "logos/b03.png",
+   "color": "#c2410c"
+  },
+  "אוויר קריר (דמו)": {
+   "file": "logos/b04.png",
+   "color": "#0369a1"
+  },
+  "סטודיו שעת זהב (דמו)": {
+   "file": "logos/b05.png",
+   "color": "#a21caf"
+  },
+  "לוי ושות׳ רואי חשבון (דמו)": {
+   "file": "logos/b06.png",
+   "color": "#0e7490"
+  },
+  "פילאטיס פלוס": {
+   "file": "logos/b07.png",
+   "color": "#7c3aed"
+  },
+  "בלייד ברברס": {
+   "file": "logos/b08.png",
+   "color": "#b45309"
+  },
+  "Urban Slice": {
+   "file": "logos/b09.png",
+   "color": "#dc2626"
+  },
+  "Pulse Fitness": {
+   "file": "logos/b10.png",
+   "color": "#2563eb"
+  },
+  "Studio Bloom": {
+   "file": "logos/b11.png",
+   "color": "#db2777"
+  },
+  "Iron & Flow": {
+   "file": "logos/b12.png",
+   "color": "#0f766e"
+  },
+  "Padel Nation": {
+   "file": "logos/b13.png",
+   "color": "#4d7c0f"
+  },
+  "Glow Beauty": {
+   "file": "logos/b14.png",
+   "color": "#be185d"
+  },
+  "יוגה בגבעה": {
+   "file": "logos/b15.png",
+   "color": "#059669"
+  },
+  "קרוספיט צפון": {
+   "file": "logos/b16.png",
+   "color": "#dc2626"
+  },
+  "פיזיו פלוס": {
+   "file": "logos/b17.png",
+   "color": "#0284c7"
+  },
+  "סטודיו מחול רונה": {
+   "file": "logos/b18.png",
+   "color": "#db2777"
+  },
+  "מספרת הדר": {
+   "file": "logos/b19.png",
+   "color": "#a16207"
+  },
+  "מוסך המומחים": {
+   "file": "logos/b20.png",
+   "color": "#475569"
+  }
+ },
+ "branches": {
+  "סטודיו פלואו (דמו)/תל אביב - פלורנטין": {
+   "file": "logos/br01.png",
+   "color": "#0f766e"
+  },
+  "פאדל פוינט (דמו)/הרצליה": {
+   "file": "logos/br02.png",
+   "color": "#4d7c0f"
+  },
+  "כפות שמחות (דמו)/רמת השרון": {
+   "file": "logos/br03.png",
+   "color": "#c2410c"
+  },
+  "אוויר קריר (דמו)/מרכז": {
+   "file": "logos/br04.png",
+   "color": "#0369a1"
+  },
+  "סטודיו שעת זהב (דמו)/יפו": {
+   "file": "logos/br05.png",
+   "color": "#a21caf"
+  },
+  "לוי ושות׳ רואי חשבון (דמו)/רמת גן": {
+   "file": "logos/br06.png",
+   "color": "#0e7490"
+  },
+  "פילאטיס פלוס/תל אביב - רוטשילד": {
+   "file": "logos/br07.png",
+   "color": "#7c3aed"
+  },
+  "פילאטיס פלוס/רמת גן - הבורסה": {
+   "file": "logos/br08.png",
+   "color": "#7c3aed"
+  },
+  "פילאטיס פלוס/הרצליה פיתוח": {
+   "file": "logos/br09.png",
+   "color": "#7c3aed"
+  },
+  "פילאטיס פלוס/ירושלים - המושבה הגרמנית": {
+   "file": "logos/br10.png",
+   "color": "#7c3aed"
+  },
+  "פילאטיס פלוס/חיפה - כרמל": {
+   "file": "logos/br11.png",
+   "color": "#7c3aed"
+  },
+  "בלייד ברברס/תל אביב - דיזנגוף": {
+   "file": "logos/br12.png",
+   "color": "#b45309"
+  },
+  "בלייד ברברס/גבעתיים": {
+   "file": "logos/br13.png",
+   "color": "#b45309"
+  },
+  "בלייד ברברס/ראשון לציון": {
+   "file": "logos/br14.png",
+   "color": "#b45309"
+  },
+  "Urban Slice/תל אביב - פלורנטין": {
+   "file": "logos/br15.png",
+   "color": "#dc2626"
+  },
+  "Urban Slice/רמת גן - מרום נווה": {
+   "file": "logos/br16.png",
+   "color": "#dc2626"
+  },
+  "Urban Slice/חולון - קריית שרת": {
+   "file": "logos/br17.png",
+   "color": "#dc2626"
+  },
+  "Urban Slice/כפר סבא - הירוקה": {
+   "file": "logos/br18.png",
+   "color": "#dc2626"
+  },
+  "Pulse Fitness/ראשון לציון - מערב": {
+   "file": "logos/br19.png",
+   "color": "#c2410c"
+  },
+  "Pulse Fitness/נס ציונה": {
+   "file": "logos/br20.png",
+   "color": "#c2410c"
+  },
+  "Studio Bloom/תל אביב - בזל": {
+   "file": "logos/br21.png",
+   "color": "#be185d"
+  },
+  "Studio Bloom/הרצליה - מרכז": {
+   "file": "logos/br22.png",
+   "color": "#be185d"
+  },
+  "Studio Bloom/מודיעין": {
+   "file": "logos/br23.png",
+   "color": "#be185d"
+  },
+  "Iron & Flow/תל אביב - כוח": {
+   "file": "logos/br24.png",
+   "color": "#c2410c"
+  },
+  "Iron & Flow/רמת גן - פילאטיס": {
+   "file": "logos/br25.png",
+   "color": "#7c3aed"
+  },
+  "Padel Nation/הרצליה": {
+   "file": "logos/br26.png",
+   "color": "#4d7c0f"
+  },
+  "Padel Nation/ראשון לציון": {
+   "file": "logos/br27.png",
+   "color": "#4d7c0f"
+  },
+  "Padel Nation/רעננה": {
+   "file": "logos/br28.png",
+   "color": "#4d7c0f"
+  },
+  "Glow Beauty/תל אביב - שינקין": {
+   "file": "logos/br29.png",
+   "color": "#be185d"
+  },
+  "יוגה בגבעה/זכרון יעקב": {
+   "file": "logos/br30.png",
+   "color": "#059669"
+  },
+  "קרוספיט צפון/קריית ביאליק": {
+   "file": "logos/br31.png",
+   "color": "#b45309"
+  },
+  "פיזיו פלוס/פתח תקווה": {
+   "file": "logos/br32.png",
+   "color": "#0284c7"
+  },
+  "סטודיו מחול רונה/רחובות": {
+   "file": "logos/br33.png",
+   "color": "#db2777"
+  },
+  "מספרת הדר/באר שבע": {
+   "file": "logos/br34.png",
+   "color": "#be185d"
+  },
+  "מוסך המומחים/חולון": {
+   "file": "logos/br35.png",
+   "color": "#475569"
+  },
+  "kind:crossfit": {
+   "file": "logos/kind-crossfit.png",
+   "color": "#b45309"
+  }
+ },
+ "portraits": {
+  "f": [
+   "portraits/f01.jpg",
+   "portraits/f02.jpg",
+   "portraits/f03.jpg",
+   "portraits/f04.jpg",
+   "portraits/f05.jpg",
+   "portraits/f06.jpg",
+   "portraits/f07.jpg",
+   "portraits/f08.jpg",
+   "portraits/f09.jpg",
+   "portraits/f10.jpg",
+   "portraits/f11.jpg",
+   "portraits/f12.jpg",
+   "portraits/f13.jpg",
+   "portraits/f14.jpg",
+   "portraits/f15.jpg",
+   "portraits/f16.jpg",
+   "portraits/f17.jpg",
+   "portraits/f18.jpg",
+   "portraits/f19.jpg",
+   "portraits/f20.jpg",
+   "portraits/f21.jpg",
+   "portraits/f22.jpg",
+   "portraits/f23.jpg",
+   "portraits/f24.jpg"
+  ],
+  "m": [
+   "portraits/m01.jpg",
+   "portraits/m02.jpg",
+   "portraits/m03.jpg",
+   "portraits/m04.jpg",
+   "portraits/m05.jpg",
+   "portraits/m06.jpg",
+   "portraits/m07.jpg",
+   "portraits/m08.jpg",
+   "portraits/m09.jpg",
+   "portraits/m10.jpg",
+   "portraits/m11.jpg",
+   "portraits/m12.jpg",
+   "portraits/m13.jpg",
+   "portraits/m14.jpg",
+   "portraits/m15.jpg",
+   "portraits/m16.jpg",
+   "portraits/m17.jpg",
+   "portraits/m18.jpg",
+   "portraits/m19.jpg",
+   "portraits/m20.jpg",
+   "portraits/m21.jpg",
+   "portraits/m22.jpg",
+   "portraits/m23.jpg",
+   "portraits/m24.jpg"
+  ]
+ }
+}
