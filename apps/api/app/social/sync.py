@@ -10,7 +10,13 @@ from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.providers.secrets import decrypt, encrypt
-from app.social.providers import AccountInfo, SocialProvider, social_provider
+from app.social.providers import (
+    AccountInfo,
+    NeedsReauth,
+    NetworkError,
+    SocialProvider,
+    social_provider,
+)
 
 FIRST_SYNC_DAYS = 90
 RESYNC_OVERLAP_DAYS = 3  # recent days are revised by the networks, so they are read again
@@ -80,6 +86,41 @@ def sync_account(db: Db, tenant_id: UUID, account_id: UUID, today: date | None =
         name=row["name"],
         secrets=decrypt(row["secrets"]),
     )
+    try:
+        info = _renewed(db, tenant_id, account_id, provider, info)
+        _read_and_store(db, tenant_id, account_id, provider, info, today)
+    except NeedsReauth:
+        db.execute(
+            text("UPDATE app.social_accounts SET status = 'needs_reauth' WHERE id = :a"),
+            {"a": account_id},
+        )
+    except NetworkError:
+        pass  # the network is down or busy: the numbers are read again at the next sync
+
+
+def _renewed(
+    db: Db, tenant_id: UUID, account_id: UUID, provider: SocialProvider, info: AccountInfo
+) -> AccountInfo:
+    """Tokens that expire (Threads: 60 days) are renewed once they are close to it."""
+    expires = info.secrets.get("expires_at")
+    if not expires or datetime.fromisoformat(expires) > datetime.now(UTC) + timedelta(days=10):
+        return info
+    secrets = provider.refresh(info.secrets)
+    db.execute(
+        text("UPDATE app.social_accounts SET secrets = :s WHERE id = :a AND tenant_id = :t"),
+        {"s": encrypt(secrets), "a": account_id, "t": tenant_id},
+    )
+    return AccountInfo(info.network, info.external_id, info.name, secrets=secrets)
+
+
+def _read_and_store(
+    db: Db,
+    tenant_id: UUID,
+    account_id: UUID,
+    provider: SocialProvider,
+    info: AccountInfo,
+    today: date | None,
+) -> None:
     today = today or datetime.now(UTC).date()
     last = db.execute(
         text("SELECT max(day) FROM app.social_metrics_daily WHERE account_id = :a"),

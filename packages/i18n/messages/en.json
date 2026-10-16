@@ -6128,7 +6128,25 @@
       "demoNote": "See the dashboard with sample numbers before you connect anything.",
       "connected": "Connected: {count}",
       "noAccess": "Only the owner or a manager can connect networks.",
-      "privacy": "We only read summarized, public numbers of your own accounts. Never private messages."
+      "privacy": "We only read summarized, public numbers of your own accounts. Never private messages.",
+      "done": "Connected. We are reading your numbers now.",
+      "error": {
+        "state": "The connection expired or could not be verified. Please try again.",
+        "denied": "The connection was cancelled, nothing was connected.",
+        "network": "The network did not accept the connection. Please try again in a moment.",
+        "empty": "We found no pages or accounts to connect. Make sure you manage a Facebook page or an Instagram business account.",
+        "expired": "This choice has expired. Please connect again."
+      },
+      "choose": {
+        "title": "Which accounts to connect?",
+        "text": "Pick the accounts you want in your dashboard. You can disconnect any of them later.",
+        "submit": "Connect selected",
+        "network": {
+          "facebook": "Facebook page",
+          "instagram": "Instagram",
+          "threads": "Threads"
+        }
+      }
     },
     "networks": {
       "facebook": "Facebook",

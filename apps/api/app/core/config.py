@@ -77,6 +77,14 @@ class Settings(BaseSettings):
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
 
+    # Meta connector (content studio): the Meta app's id and secret, and the Threads app's own
+    # pair. While missing, the networks stay "coming soon" and nothing breaks.
+    meta_app_id: str | None = None
+    meta_app_secret: SecretStr | None = None
+    meta_threads_app_id: str | None = None
+    meta_threads_app_secret: SecretStr | None = None
+    meta_graph_version: str = "v26.0"
+
     # Connection pool, per API worker process. Keep workers * (pool_size + max_overflow) under the
     # database's (or pooler's) client limit. Prepared statements are off by default so the URL can
     # point at a transaction-mode pooler (Supavisor, port 6543); every transaction here is

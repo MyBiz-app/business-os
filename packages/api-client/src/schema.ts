@@ -2608,6 +2608,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/social/pending/{pending_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Pending Connection
+         * @description The accounts found after the owner agreed, to choose from (no tokens are returned).
+         */
+        get: operations["get_pending_connection"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/pending/{pending_id}/select": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Select Pending Accounts */
+        post: operations["select_pending_accounts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/accounts/{account_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Post
+         * @description Publishes a post now on a connected account (Instagram needs a picture).
+         */
+        post: operations["publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/social/accounts/{account_id}": {
         parameters: {
             query?: never;
@@ -6541,16 +6598,6 @@ export interface components {
              */
             preview: string | null;
         };
-        /** Candidate */
-        Candidate: {
-            /**
-             * User Id
-             * Format: uuid
-             */
-            user_id: string;
-            /** User Name */
-            user_name: string;
-        };
         /** Catalog */
         Catalog: {
             /** Currency */
@@ -7483,7 +7530,7 @@ export interface components {
              * Available
              * @description Managers only: people of the branch who said they can work the whole stretch (`/me/availability`), are not away and have no shift then
              */
-            available?: components["schemas"]["Candidate"][];
+            available?: components["schemas"]["app__api__availability__Candidate"][];
         };
         /** CoverageRule */
         CoverageRule: {
@@ -9628,6 +9675,18 @@ export interface components {
                 [key: string]: unknown;
             } | null;
         };
+        /** PendingConnection */
+        PendingConnection: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Provider */
+            provider: string;
+            /** Candidates */
+            candidates: components["schemas"]["app__api__social__Candidate"][];
+        };
         /** PendingReview */
         PendingReview: {
             /**
@@ -10117,6 +10176,20 @@ export interface components {
             time_zone: string;
             /** Client Name */
             client_name: string;
+        };
+        /** PublishRequest */
+        PublishRequest: {
+            /** Text */
+            text: string;
+            /** Image Url */
+            image_url?: string | null;
+        };
+        /** PublishResult */
+        PublishResult: {
+            /** External Id */
+            external_id: string;
+            /** Permalink */
+            permalink: string | null;
         };
         /** PublishShifts */
         PublishShifts: {
@@ -11177,6 +11250,11 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+        };
+        /** SelectAccounts */
+        SelectAccounts: {
+            /** External Ids */
+            external_ids: string[];
         };
         /** Selection */
         Selection: {
@@ -12901,6 +12979,16 @@ export interface components {
              */
             suggestions: components["schemas"]["AgentSuggestion"][];
         };
+        /** Candidate */
+        app__api__availability__Candidate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+        };
         /**
          * Usage
          * @description This calendar month's use against the business's bundle (space and messages).
@@ -12977,6 +13065,17 @@ export interface components {
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
+        };
+        /** Candidate */
+        app__api__social__Candidate: {
+            /** External Id */
+            external_id: string;
+            /** Network */
+            network: string;
+            /** Name */
+            name: string;
+            /** Avatar Url */
+            avatar_url: string | null;
         };
         /** Team */
         app__api__staff__Team: {
@@ -19734,6 +19833,119 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConnectResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pending_connection: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                pending_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingConnection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    select_pending_accounts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                pending_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelectAccounts"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialAccount"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                account_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishResult"];
                 };
             };
             /** @description Validation Error */

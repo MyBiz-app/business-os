@@ -13,6 +13,7 @@ import { addDays, formatDay, isDay, todayIn } from "@/lib/dates";
 
 import { disconnectAccount, refreshNow } from "./actions";
 import { ConnectCards } from "./connect-cards";
+import { ConnectNotice } from "./connect-notice";
 import { CsvButton } from "./csv-button";
 import { type Range, Filters } from "./filters";
 import { Heatmap } from "./heatmap";
@@ -42,11 +43,13 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
     api.GET("/social/accounts", { params: scope }).then(unwrap),
   ]);
 
+  const notice = <ConnectNotice query={query} canManage={canManage} />;
   const header = <PageHeader eyebrow={t("subtitle")} title={t("title")} />;
   if (accounts.length === 0) {
     return (
       <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
         {header}
+        {notice}
         <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} />
       </Container>
     );
@@ -133,6 +136,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           </>
         }
       />
+      {notice}
       {allDemo && (
         <p role="note" className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm font-medium">
           {t("demoBanner")}
