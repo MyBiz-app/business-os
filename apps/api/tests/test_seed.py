@@ -12,6 +12,7 @@ from app.seed import (
     PHOTO_STUDIO,
     seed,
     seed_demo,
+    seed_platform,
 )
 
 
@@ -387,3 +388,67 @@ def test_categories_demo_has_one_business_per_kind_of_calendar(engine: Engine) -
         ("hair_salon", "hair_salon"),
     }
     assert sessions > 0
+
+
+def test_networks_demo_has_the_round_5_features(engine: Engine) -> None:
+    owner = uuid4()
+    email = f"ai-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        tenants = seed_demo(connection, email, "networks", 1, random.Random(4))
+    with engine.connect() as connection:
+        for tenant in tenants:
+            counts = connection.execute(
+                text("""
+                    SELECT
+                      (SELECT count(*) FROM app.location_groups WHERE tenant_id = :t),
+                      (SELECT count(*) FROM app.tenant_members
+                         WHERE tenant_id = :t AND role = 'branch_manager'),
+                      (SELECT count(*) FROM app.ai_agents WHERE tenant_id = :t),
+                      (SELECT count(*) FROM app.ai_scheduled_tasks
+                         WHERE tenant_id = :t AND status = 'active'),
+                      (SELECT count(*) FROM app.ai_task_runs WHERE tenant_id = :t),
+                      (SELECT count(*) FROM app.social_accounts WHERE tenant_id = :t),
+                      (SELECT count(*) FROM app.social_posts WHERE tenant_id = :t),
+                      (SELECT count(*) FROM app.social_drafts WHERE tenant_id = :t),
+                      (SELECT count(*) FROM app.contact_emails WHERE tenant_id = :t),
+                      (SELECT sum(quantity) FROM app.usage_events
+                         WHERE tenant_id = :t AND meter = 'ai_credits')
+                """),
+                {"t": tenant},
+            ).one()
+            (
+                groups,
+                managers,
+                agents,
+                tasks,
+                runs,
+                accounts,
+                posts,
+                drafts,
+                emails,
+                credits,
+            ) = counts
+            assert groups == 2 and managers == 1  # every network has several branches
+            assert agents == 2 and tasks == 1 and runs == 3
+            assert accounts == 6 and posts > 0 and drafts == 3 and emails == 3
+            assert 0 < credits < 400  # inside the plan's monthly credits
+
+
+def test_platform_demo_has_broadcasts(engine: Engine) -> None:
+    staff = uuid4()
+    email = f"plat-{staff.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": staff, "email": email},
+        )
+        seed_platform(connection, email, 1, random.Random(2))
+    with engine.connect() as connection:
+        rows = connection.execute(
+            text("SELECT status FROM app.announcements WHERE created_by = 'demo generator'")
+        ).scalars().all()  # fmt: skip
+    assert sorted(rows) == ["draft", "sent"]
