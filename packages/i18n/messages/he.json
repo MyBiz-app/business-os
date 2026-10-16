@@ -6572,7 +6572,13 @@
       "from": "מתאריך",
       "to": "עד תאריך",
       "compare": "השווה לתקופה הקודמת",
-      "apply": "החל"
+      "selectAll": "בחר הכל",
+      "compareShort": "השוואה",
+      "reset": "איפוס",
+      "filtersButton": "סינון",
+      "remove": "הסר",
+      "month": "החודש",
+      "lastMonth": "החודש הקודם"
     },
     "kpi": {
       "followers": "עוקבים",

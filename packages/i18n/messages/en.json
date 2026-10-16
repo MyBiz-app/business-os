@@ -6572,7 +6572,13 @@
       "from": "From",
       "to": "To",
       "compare": "Compare to the previous period",
-      "apply": "Apply"
+      "selectAll": "Select all",
+      "compareShort": "Compare",
+      "reset": "Reset",
+      "filtersButton": "Filters",
+      "remove": "Remove",
+      "month": "This month",
+      "lastMonth": "Last month"
     },
     "kpi": {
       "followers": "Followers",
