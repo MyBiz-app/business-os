@@ -130,6 +130,7 @@ COLUMNS = """
     currency, lines, vat_rate_bp, net, vat, total, payment_method, due_date, valid_until,
     payment_terms, notes, reference_id, allocation_required, allocation_number, content_hash
 """
+SELECT_ROW = "SELECT" + COLUMNS + "FROM app.issued_documents"
 
 
 def _tenant(db: Session) -> dict[str, Any]:
@@ -299,7 +300,7 @@ def document_pdf(
 def _row(db: Session, document_id: UUID) -> dict[str, Any]:
     row = (
         db.execute(
-            text(f"SELECT {COLUMNS} FROM app.issued_documents WHERE id = :id"),
+            text(SELECT_ROW + " WHERE id = :id"),
             {"id": document_id},
         )
         .mappings()
@@ -419,13 +420,15 @@ def list_issued(
 ) -> list[IssuedDocument]:
     """Newest first."""
     rows = context.session.execute(
-        text(f"""
-            SELECT {COLUMNS} FROM app.issued_documents
+        text(
+            SELECT_ROW
+            + """
             WHERE (cast(:kind AS text) IS NULL OR kind = :kind)
               AND (cast(:client_id AS uuid) IS NULL OR client_id = :client_id)
             ORDER BY issued_at DESC, number DESC
             LIMIT :limit OFFSET :offset
-        """),
+        """
+        ),
         {"kind": kind, "client_id": client_id, "limit": page.limit, "offset": page.offset},
     ).mappings()
     return [IssuedDocument.model_validate(dict(row)) for row in rows]

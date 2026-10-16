@@ -103,6 +103,9 @@ def upgrade() -> None:
     op.execute(
         "CREATE INDEX issued_documents_list ON app.issued_documents (tenant_id, issued_at DESC)"
     )
+    op.execute(
+        "CREATE INDEX issued_documents_client ON app.issued_documents (tenant_id, client_id)"
+    )
     op.execute("CREATE INDEX issued_documents_reference ON app.issued_documents (reference_id)")
     # Insert and read only: an issued document is never edited or removed through the API.
     op.execute("GRANT SELECT, INSERT ON app.issued_documents TO app_api")
