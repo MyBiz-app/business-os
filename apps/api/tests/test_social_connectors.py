@@ -42,7 +42,11 @@ def fake_google(monkeypatch: pytest.MonkeyPatch, calls: list[str]) -> None:
         if url == google.TOKEN_URL:
             if kwargs["data"]["grant_type"] == "refresh_token":
                 return {"access_token": "fresh-access"}
-            return {"access_token": "a1", "refresh_token": "r1", "scope": "yt"}
+            return {
+                "access_token": "ACCESS-PLAIN-TOKEN",
+                "refresh_token": "REFRESH-PLAIN-TOKEN",
+                "scope": "yt",
+            }
         if url.endswith("/channels"):
             part = kwargs["params"]["part"]
             if part == "snippet":
@@ -136,7 +140,7 @@ def test_youtube_connects_stores_tokens_encrypted_and_fills_the_dashboard(
     assert accounts[0]["last_synced_at"] is not None
     with engine.connect() as connection:
         blob = connection.execute(text("SELECT secrets FROM app.social_accounts")).scalar_one()
-    assert b"r1" not in bytes(blob) and b"a1" not in bytes(blob)
+    assert b"PLAIN-TOKEN" not in bytes(blob)
 
     data = client.get("/social/dashboard", headers=headers).json()
     assert data["kpis"]["followers"]["value"] == 120
@@ -237,7 +241,11 @@ def test_google_business_with_several_locations_waits_for_the_owner_to_choose(
 
     def answer(method: str, url: str, **kwargs: Any) -> dict[str, Any]:
         if url == google.TOKEN_URL:
-            return {"access_token": "a1", "refresh_token": "r1", "scope": "bm"}
+            return {
+                "access_token": "ACCESS-PLAIN-TOKEN",
+                "refresh_token": "REFRESH-PLAIN-TOKEN",
+                "scope": "bm",
+            }
         if url == google.GBP_ACCOUNTS:
             return {"accounts": [{"name": "accounts/9"}]}
         if url.endswith("/locations"):
