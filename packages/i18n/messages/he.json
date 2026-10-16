@@ -1066,6 +1066,7 @@
       "viewMonth": "חודש",
       "previous": "הקודם",
       "next": "הבא",
+      "noFree": "אין שעות פנויות ביום הזה.",
       "closedShort": "סגור",
       "allInstructors": "כל המאמנים",
       "allClasses": "כל השיעורים",

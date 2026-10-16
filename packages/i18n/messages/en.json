@@ -1066,6 +1066,7 @@
       "viewMonth": "Month",
       "previous": "Previous",
       "next": "Next",
+      "noFree": "No free times on this day.",
       "closedShort": "Closed",
       "allInstructors": "All coaches",
       "allClasses": "All classes",
