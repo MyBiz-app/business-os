@@ -70,7 +70,8 @@ def _followers_at(db: Session, selection: Selection, day: date) -> int:
             SELECT coalesce(sum(latest.followers), 0)::int FROM app.social_accounts a
             JOIN LATERAL (
                 SELECT m.followers FROM app.social_metrics_daily m
-                WHERE m.account_id = a.id AND m.day <= :day ORDER BY m.day DESC LIMIT 1
+                WHERE m.account_id = a.id AND m.day <= :day AND m.followers > 0
+                ORDER BY m.day DESC LIMIT 1
             ) latest ON true
             WHERE @filter@
         """),
@@ -107,7 +108,7 @@ def dashboard(
         _sql("""
             SELECT a.network, m.day, sum(m.followers)::int AS followers
             FROM app.social_metrics_daily m JOIN app.social_accounts a ON a.id = m.account_id
-            WHERE m.day BETWEEN :start AND :end AND @filter@
+            WHERE m.day BETWEEN :start AND :end AND @filter@ AND m.followers > 0
               AND a.network <> 'google_business'
             GROUP BY a.network, m.day ORDER BY a.network, m.day
         """),

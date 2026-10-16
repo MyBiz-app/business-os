@@ -1,6 +1,6 @@
 # Staging deployment
 
-- Web: https://business-os-alpha-drab.vercel.app
+- Web: https://business-os-alpha-drab.vercel.app, also https://mybizapp.click (temporary domain bought 2026-10-16, no auto-renew; replaced by the brand domain at launch)
 - API: https://business-os-api-staging.onrender.com (`/health`, `/docs`)
 - Expo apps on the web: https://mybiz-client-app.vercel.app (published by hand with [`deploy-apps-web.yml`](../../.github/workflows/deploy-apps-web.yml); it is in the API's `API_CORS_ORIGINS`). The old mybiz-business-app and mybiz-staff-app addresses only redirect to it
 

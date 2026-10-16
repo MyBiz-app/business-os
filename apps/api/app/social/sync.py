@@ -142,7 +142,8 @@ def _read_and_store(
                         :engagements, :profile_views, :link_clicks, :calls, :directions,
                         :searches, :reviews_new, :rating)
                 ON CONFLICT (account_id, day) DO UPDATE SET
-                    followers = EXCLUDED.followers, reach = EXCLUDED.reach,
+                    followers = CASE WHEN EXCLUDED.followers = 0 THEN social_metrics_daily.followers
+                                     ELSE EXCLUDED.followers END, reach = EXCLUDED.reach,
                     impressions = EXCLUDED.impressions, video_views = EXCLUDED.video_views,
                     engagements = EXCLUDED.engagements, profile_views = EXCLUDED.profile_views,
                     link_clicks = EXCLUDED.link_clicks, calls = EXCLUDED.calls,

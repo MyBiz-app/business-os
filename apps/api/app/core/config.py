@@ -83,6 +83,12 @@ class Settings(BaseSettings):
     meta_app_secret: SecretStr | None = None
     meta_threads_app_id: str | None = None
     meta_threads_app_secret: SecretStr | None = None
+    # YouTube / Google Business Profile and TikTok connectors (content studio). Redirect URIs to
+    # register: {API_API_URL}/social/callback/youtube, .../google_business and .../tiktok.
+    google_oauth_client_id: str | None = None
+    google_oauth_client_secret: SecretStr | None = None
+    tiktok_client_key: str | None = None
+    tiktok_client_secret: SecretStr | None = None
     meta_graph_version: str = "v26.0"
 
     # Connection pool, per API worker process. Keep workers * (pool_size + max_overflow) under the
