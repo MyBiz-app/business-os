@@ -13705,6 +13705,807 @@
         }
       }
     },
+    "/social/providers": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "List Social Providers",
+        "description": "Every network the studio knows, and whether it can be connected yet or is \"soon\".",
+        "operationId": "list_social_providers",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialProviders"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/accounts": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "List Social Accounts",
+        "operationId": "list_social_accounts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SocialAccount"
+                  },
+                  "title": "Response List Social Accounts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/connect/{provider}": {
+      "post": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Connect Social",
+        "description": "Starts a connection. `demo` connects sample accounts with believable numbers; other\nproviders return the address where the owner agrees to share their numbers.",
+        "operationId": "connect_social",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/accounts/{account_id}": {
+      "delete": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Disconnect Social",
+        "description": "Removes the account and every number we kept for it. (The owner can also revoke access\non the network itself.)",
+        "operationId": "disconnect_social",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Account Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/sync": {
+      "post": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Sync Social Now",
+        "description": "\"Refresh now\": reads the latest numbers, at most once an hour.",
+        "operationId": "sync_social_now",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SocialAccount"
+                  },
+                  "title": "Response Sync Social Now"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/dashboard": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Social Dashboard",
+        "operationId": "get_social_dashboard",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accounts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these accounts",
+              "title": "Accounts"
+            },
+            "description": "Only these accounts"
+          },
+          {
+            "name": "networks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these networks",
+              "title": "Networks"
+            },
+            "description": "Only these networks"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "compare",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Compare"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialDashboard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/posts/top": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Social Top Posts",
+        "operationId": "get_social_top_posts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accounts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these accounts",
+              "title": "Accounts"
+            },
+            "description": "Only these accounts"
+          },
+          {
+            "name": "networks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these networks",
+              "title": "Networks"
+            },
+            "description": "Only these networks"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "views",
+                "engagement"
+              ],
+              "type": "string",
+              "default": "views",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TopPost"
+                  },
+                  "title": "Response Get Social Top Posts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/audience": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Social Audience",
+        "operationId": "get_social_audience",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accounts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these accounts",
+              "title": "Accounts"
+            },
+            "description": "Only these accounts"
+          },
+          {
+            "name": "networks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these networks",
+              "title": "Networks"
+            },
+            "description": "Only these networks"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AudienceShare"
+                  },
+                  "title": "Response Get Social Audience"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/sessions/options": {
       "get": {
         "tags": [
@@ -20798,6 +21599,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -27413,6 +28215,35 @@
         ],
         "title": "AudienceCount"
       },
+      "AudienceShare": {
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "age",
+              "gender",
+              "city",
+              "country"
+            ],
+            "title": "Dimension"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "share_bp": {
+            "type": "integer",
+            "title": "Share Bp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dimension",
+          "label",
+          "share_bp"
+        ],
+        "title": "AudienceShare"
+      },
       "AuditEntry": {
         "properties": {
           "occurred_at": {
@@ -28873,6 +29704,7 @@
                   "analytics_pro",
                   "agent_finance",
                   "agent_marketing",
+                  "social_studio",
                   "whatsapp",
                   "whatsapp_ai",
                   "pack_plus",
@@ -28920,6 +29752,7 @@
               "analytics_pro",
               "agent_finance",
               "agent_marketing",
+              "social_studio",
               "whatsapp",
               "whatsapp_ai",
               "pack_plus",
@@ -28958,6 +29791,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -28985,6 +29819,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -30873,6 +31708,33 @@
         ],
         "title": "ComplaintCreate"
       },
+      "ConnectResult": {
+        "properties": {
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/SocialAccount"
+            },
+            "type": "array",
+            "title": "Accounts"
+          },
+          "authorize_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Authorize Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accounts"
+        ],
+        "title": "ConnectResult"
+      },
       "ContactCreate": {
         "properties": {
           "name": {
@@ -32707,6 +33569,46 @@
         ],
         "title": "EraseResult"
       },
+      "FollowerPoint": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "followers": {
+            "type": "integer",
+            "title": "Followers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "followers"
+        ],
+        "title": "FollowerPoint"
+      },
+      "FollowerSeries": {
+        "properties": {
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/FollowerPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "network",
+          "points"
+        ],
+        "title": "FollowerSeries"
+      },
       "Form": {
         "properties": {
           "key": {
@@ -32952,6 +33854,51 @@
         ],
         "title": "GettingStarted"
       },
+      "GoogleBusiness": {
+        "properties": {
+          "searches": {
+            "type": "integer",
+            "title": "Searches"
+          },
+          "profile_views": {
+            "type": "integer",
+            "title": "Profile Views"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls"
+          },
+          "directions": {
+            "type": "integer",
+            "title": "Directions"
+          },
+          "reviews_new": {
+            "type": "integer",
+            "title": "Reviews New"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          }
+        },
+        "type": "object",
+        "required": [
+          "searches",
+          "profile_views",
+          "calls",
+          "directions",
+          "reviews_new",
+          "rating"
+        ],
+        "title": "GoogleBusiness"
+      },
       "Grant": {
         "properties": {
           "id": {
@@ -33084,6 +34031,29 @@
           "environment"
         ],
         "title": "HealthResponse"
+      },
+      "HeatCell": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "title": "Weekday"
+          },
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "value": {
+            "type": "integer",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "hour",
+          "value"
+        ],
+        "title": "HeatCell"
       },
       "HomeBranch": {
         "properties": {
@@ -34248,6 +35218,49 @@
           "code"
         ],
         "title": "JoinRequest"
+      },
+      "KindEngagement": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "engagements": {
+            "type": "integer",
+            "title": "Engagements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "engagements"
+        ],
+        "title": "KindEngagement"
+      },
+      "Kpi": {
+        "properties": {
+          "value": {
+            "type": "integer",
+            "title": "Value"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "previous"
+        ],
+        "title": "Kpi"
       },
       "Lead": {
         "properties": {
@@ -36192,6 +37205,46 @@
           "created_at"
         ],
         "title": "MyReview"
+      },
+      "NetworkOption": {
+        "properties": {
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "soon"
+            ],
+            "title": "Status"
+          },
+          "gives": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Gives"
+          },
+          "connected": {
+            "type": "integer",
+            "title": "Connected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "network",
+          "provider",
+          "status",
+          "gives",
+          "connected"
+        ],
+        "title": "NetworkOption"
       },
       "NewBranchPreview": {
         "properties": {
@@ -38588,6 +39641,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -38617,6 +39671,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -38965,6 +40020,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -39693,6 +40749,8 @@
                 "sales.manage",
                 "reports.read",
                 "ai.use",
+                "social.read",
+                "social.manage",
                 "ai.manage",
                 "staff.read",
                 "staff.manage",
@@ -39700,7 +40758,7 @@
               ]
             },
             "type": "array",
-            "maxItems": 16,
+            "maxItems": 18,
             "title": "Permissions"
           }
         },
@@ -39744,6 +40802,8 @@
                     "sales.manage",
                     "reports.read",
                     "ai.use",
+                    "social.read",
+                    "social.manage",
                     "ai.manage",
                     "staff.read",
                     "staff.manage",
@@ -40506,6 +41566,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -42056,6 +43117,193 @@
         ],
         "title": "Slot"
       },
+      "SocialAccount": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "needs_reauth"
+            ],
+            "title": "Status"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "last_synced_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Synced At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "network",
+          "name",
+          "provider",
+          "status",
+          "is_demo",
+          "location_id",
+          "last_synced_at"
+        ],
+        "title": "SocialAccount"
+      },
+      "SocialDashboard": {
+        "properties": {
+          "period_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Period From"
+          },
+          "period_to": {
+            "type": "string",
+            "format": "date",
+            "title": "Period To"
+          },
+          "previous_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous From"
+          },
+          "previous_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous To"
+          },
+          "kpis": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Kpi"
+            },
+            "type": "object",
+            "title": "Kpis"
+          },
+          "followers_series": {
+            "items": {
+              "$ref": "#/components/schemas/FollowerSeries"
+            },
+            "type": "array",
+            "title": "Followers Series"
+          },
+          "video_views_weekly": {
+            "items": {
+              "$ref": "#/components/schemas/WeeklyViews"
+            },
+            "type": "array",
+            "title": "Video Views Weekly"
+          },
+          "engagement_by_kind": {
+            "items": {
+              "$ref": "#/components/schemas/KindEngagement"
+            },
+            "type": "array",
+            "title": "Engagement By Kind"
+          },
+          "heatmap": {
+            "items": {
+              "$ref": "#/components/schemas/HeatCell"
+            },
+            "type": "array",
+            "title": "Heatmap"
+          },
+          "google_business": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GoogleBusiness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "period_from",
+          "period_to",
+          "previous_from",
+          "previous_to",
+          "kpis",
+          "followers_series",
+          "video_views_weekly",
+          "engagement_by_kind",
+          "heatmap",
+          "google_business"
+        ],
+        "title": "SocialDashboard"
+      },
+      "SocialProviders": {
+        "properties": {
+          "networks": {
+            "items": {
+              "$ref": "#/components/schemas/NetworkOption"
+            },
+            "type": "array",
+            "title": "Networks"
+          },
+          "demo_available": {
+            "type": "boolean",
+            "title": "Demo Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "networks",
+          "demo_available"
+        ],
+        "title": "SocialProviders"
+      },
       "SpendUpdate": {
         "properties": {
           "payg_enabled": {
@@ -43069,6 +44317,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -43871,6 +45120,99 @@
         ],
         "title": "TimeOffRequestCreate"
       },
+      "TopPost": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "account_name": {
+            "type": "string",
+            "title": "Account Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url"
+          },
+          "permalink": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permalink"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "engagements": {
+            "type": "integer",
+            "title": "Engagements"
+          },
+          "avg_watch_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Watch Sec"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "network",
+          "account_name",
+          "kind",
+          "published_at",
+          "thumbnail_url",
+          "permalink",
+          "caption",
+          "views",
+          "engagements",
+          "avg_watch_sec"
+        ],
+        "title": "TopPost"
+      },
       "Trial": {
         "properties": {
           "trial_ends_at": {
@@ -44103,6 +45445,25 @@
           "to_date"
         ],
         "title": "WeekCopy"
+      },
+      "WeeklyViews": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Week Start"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "views"
+        ],
+        "title": "WeeklyViews"
       },
       "WeeklyWindow": {
         "properties": {
