@@ -8923,6 +8923,170 @@
         }
       }
     },
+    "/locations/{location_id}/manager": {
+      "put": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Appoint Branch Manager",
+        "description": "Appoints a team member as the branch's manager. Staff become branch managers: manager\nrights at the branches they manage only. The previous manager steps down.",
+        "operationId": "appoint_branch_manager",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchManager"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Remove Branch Manager",
+        "description": "The branch has no appointed manager (its owner still reaches it).",
+        "operationId": "remove_branch_manager",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff": {
       "get": {
         "tags": [
@@ -28589,6 +28753,21 @@
         ],
         "title": "BookingUpdate"
       },
+      "BranchManager": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "The team member who will manage the branch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "BranchManager"
+      },
       "BranchMetric": {
         "properties": {
           "key": {
@@ -28979,6 +29158,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -31804,6 +31984,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -31828,6 +32009,15 @@
             "format": "date-time",
             "title": "Created At"
           },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "description": "Branches the new member will be kept to"
+          },
           "token": {
             "type": "string",
             "title": "Token"
@@ -31841,6 +32031,7 @@
           "status",
           "expires_at",
           "created_at",
+          "location_ids",
           "token"
         ],
         "title": "CreatedInvitation"
@@ -34082,6 +34273,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -34105,6 +34297,15 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "description": "Branches the new member will be kept to"
           }
         },
         "type": "object",
@@ -34114,7 +34315,8 @@
           "role",
           "status",
           "expires_at",
-          "created_at"
+          "created_at",
+          "location_ids"
         ],
         "title": "Invitation"
       },
@@ -34130,10 +34332,21 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
             "title": "Role"
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Location Ids",
+            "description": "Branches the new member is kept to (empty: all; a branch manager's own)"
           }
         },
         "type": "object",
@@ -34154,6 +34367,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -35422,6 +35636,19 @@
             "type": "array",
             "title": "Rooms"
           },
+          "manager_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manager User Id",
+            "description": "Who manages the branch (the owner until someone is appointed)"
+          },
           "kind": {
             "anyOf": [
               {
@@ -35507,6 +35734,7 @@
           "created_at",
           "updated_at",
           "rooms",
+          "manager_user_id",
           "kind",
           "effective_kind",
           "schedule_view",
@@ -35889,6 +36117,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -36159,6 +36388,7 @@
                 "enum": [
                   "owner",
                   "manager",
+                  "branch_manager",
                   "staff",
                   "front_desk"
                 ]
@@ -36202,6 +36432,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -43176,6 +43407,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -43547,6 +43779,7 @@
                 "enum": [
                   "owner",
                   "manager",
+                  "branch_manager",
                   "staff",
                   "front_desk"
                 ]

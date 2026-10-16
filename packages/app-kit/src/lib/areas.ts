@@ -4,7 +4,7 @@
 
 export type AreaKind = "platform" | "business" | "client";
 
-export type BusinessRole = "owner" | "manager" | "staff" | "front_desk";
+export type BusinessRole = "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
 
 export type Area = {
   /** Stable id: `platform`, `business:<tenant>` or `client:<tenant>`. */
