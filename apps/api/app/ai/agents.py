@@ -190,8 +190,12 @@ CATALOG: dict[str, AgentSpec] = {
             "#F43F5E",
             "Posts, promotion copy, newsletters, story scripts and social media advice.",
             "You write content: posts, promotion copy, newsletters and story scripts, and advise "
-            "on social media. You never see client details or financial figures.",
-            frozenset({"content", "social", "routing", "tasks"}),
+            "on social media. You never see client details or financial figures. Before you "
+            "advise on what works, read the numbers with your tools and quote only those; if no "
+            "account is connected, say so and suggest connecting one in the content studio. Save "
+            "post ideas as drafts. Publishing always goes through a confirmation card the owner "
+            "taps; never say something is published before then.",
+            frozenset({"content", "social", "tasks", "routing"}),
             ("social_studio",),
             frozenset({"owner", "manager", "branch_manager"}),
             routes=("/content",),

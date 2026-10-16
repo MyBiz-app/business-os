@@ -23,6 +23,9 @@ type Preview = {
   clients?: number;
   total?: number;
   currency?: string;
+  network?: string;
+  account?: string;
+  text?: string;
 };
 
 const TONE = { pending: "primary", executed: "success", rejected: "muted", expired: "muted", failed: "danger" } as const;
@@ -41,6 +44,7 @@ export function AiActionCard({
 }) {
   const t = useTranslations("assistant");
   const tAi = useTranslations("business.ai");
+  const tNetworks = useTranslations("content.networks");
   const locale = useLocale();
   const p = action.preview as Preview;
   const month = p.month
@@ -60,6 +64,8 @@ export function AiActionCard({
       month,
       total: formatMoney(p.total ?? 0, p.currency ?? "ILS", locale),
     });
+  } else if (p.kind === "publish_post") {
+    summary = t("publishPreview", { network: p.network ? tNetworks(p.network as never) : "", account: p.account ?? "", text: p.text ?? "" });
   } else if (p.kind === "cancel_booking") {
     summary = t("cancelPreview", { client: p.client ?? "", service: p.service ?? "" });
   } else if (p.kind === "book_client") {
