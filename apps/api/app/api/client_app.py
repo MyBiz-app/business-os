@@ -91,6 +91,7 @@ class ClientLocation(BaseModel):
     id: UUID
     name: str
     address: str | None
+    kind: str | None = Field(default=None, description="The branch's own sub-category (a catalog key)")
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -161,6 +162,7 @@ class ClientSession(BaseModel):
     room_name: str | None
     starts_at: datetime
     ends_at: datetime
+    location_id: UUID | None = Field(default=None, description="The branch the session is at")
     status: Literal["scheduled", "cancelled"]
     capacity: int
     spots_left: int
@@ -216,7 +218,7 @@ def my_businesses(session: SessionDep) -> list[ClientBusiness]:
 def business_locations(context: ClientDep) -> list[ClientLocation]:
     """The business's branches with their addresses (the home screen's business details)."""
     rows = context.session.execute(
-        text("SELECT id, name, address FROM app.locations WHERE active ORDER BY name, id")
+        text("SELECT id, name, address, kind FROM app.locations WHERE active ORDER BY name, id")
     ).mappings()
     return [ClientLocation.model_validate(dict(row)) for row in rows]
 
@@ -244,7 +246,7 @@ def join_business(body: JoinRequest, user: UserDep, session: SessionDep) -> Clie
 
 CLIENT_SESSION_SELECT = """
     SELECT s.id, s.starts_at, s.ends_at, s.status, s.capacity,
-           l.name AS location_name, r.name AS room_name,
+           s.location_id, l.name AS location_name, r.name AS room_name,
            greatest(s.capacity - bk.booked, 0) AS spots_left, bk.waitlisted,
            sv.id AS service_id, sv.name AS service_name, sv.color AS service_color,
            ins.id AS instructor_id, ins.full_name AS instructor_name,

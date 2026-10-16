@@ -2,15 +2,17 @@ import { dayOf, formatDay, todayIn } from "@business-os/i18n/dates";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import * as Notifications from "expo-notifications";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
 import { CalendarViewSwitch, DayStrip, MonthGrid, weekDays } from "@business-os/app-kit/components/calendar-strip";
 import { Chip } from "@business-os/app-kit/components/chip";
+import { ALL_BRANCHES, type BranchFilter, filterByBranch } from "@business-os/app-kit/lib/branch-filter";
 import { type CalendarView, stepDay } from "@business-os/app-kit/lib/calendar-range";
 import { PressableScale } from "@business-os/app-kit/components/motion";
+import { BranchBar } from "@/components/branch-bar";
 import { type ClientSession, SessionCard } from "@/components/session-card";
 import { Button, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
@@ -18,6 +20,7 @@ import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { termsFor } from "@business-os/app-kit/lib/vertical";
 import { NO_FILTERS, applyFilters, filterOptions, upcomingRelease, type ClassFilters } from "@/lib/class-filters";
 import { useDependents } from "@/lib/use-dependents";
+import { useLocations } from "@/lib/use-locations";
 import { useScheduleWindow } from "@/lib/use-schedule-window";
 import { useBusiness } from "@/providers/business-provider";
 
@@ -28,7 +31,8 @@ export default function Schedule() {
   const tCourt = useTranslations("client.court");
   const tTerms = useTranslations("terms");
   const locale = useLocale();
-  const { api, scope, business, palette } = useBusiness();
+  const { api, scope, business, businesses, select, palette } = useBusiness();
+  const branches = useLocations();
   const dependents = useDependents();
   const today = business ? todayIn(business.time_zone) : "";
   const [day, setDay] = useState(today);
@@ -47,13 +51,22 @@ export default function Schedule() {
   const { data, loading: loadingStatic } = useLoad(load);
   const loading = loadingStatic || win.loading;
   const [overrides, setOverrides] = useState<Record<string, ClientSession>>({});
+  const [branchFilter, setBranchFilter] = useState<BranchFilter>(ALL_BRANCHES);
+  // A different business has other branches: start from all of them.
+  useEffect(() => {
+    setBranchFilter(ALL_BRANCHES);
+  }, [business?.id]);
   const [filters, setFilters] = useState<ClassFilters>(NO_FILTERS);
   const [reminded, setReminded] = useState(false);
 
   if (!business) return null;
   const closedDays = new Map(win.closed.map((c) => [c.day, c]));
   const closed = closedDays.get(day);
-  const allSessions = win.sessions.map((s) => overrides[s.id] ?? s);
+  const allSessions = filterByBranch(
+    win.sessions.map((s) => overrides[s.id] ?? s),
+    branches,
+    branchFilter,
+  );
   const sessions = allSessions.filter((s) => dayOf(s.starts_at, business.time_zone) === day);
   const marked = new Set(allSessions.map((s) => dayOf(s.starts_at, business.time_zone)));
   const closedSet = new Set(closedDays.keys());
@@ -95,6 +108,22 @@ export default function Schedule() {
       }}
     >
       <Heading palette={palette}>{t("title")}</Heading>
+      {businesses && businesses.length > 1 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+          {businesses.map((b) => (
+            <Chip
+              key={b.id}
+              role="tab"
+              label={b.name}
+              accessibilityLabel={`${t("switchBusiness")}: ${b.name}`}
+              selected={b.id === business.id}
+              onPress={() => void select(b.id)}
+              palette={palette}
+            />
+          ))}
+        </ScrollView>
+      )}
+      <BranchBar branches={branches} filter={branchFilter} onChange={setBranchFilter} palette={palette} />
       {(data?.appointments.length ?? 0) > 0 && (
         <PressableScale
           accessibilityRole="button"
