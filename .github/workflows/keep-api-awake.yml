@@ -38,3 +38,20 @@ jobs:
 
       - name: Web app answers
         run: curl --silent --show-error --fail --max-time 60 --retry 2 --retry-delay 10 --output /dev/null "$WEB_URL/"
+
+      # Runs the AI agents' scheduled tasks that are due. The API answers at once and does the
+      # work in the background, so the time of a task is accurate to about these 10 minutes (and
+      # GitHub sometimes starts a run late). Needs the repository secret API_INTERNAL_TOKEN, the
+      # same value as the API's API_INTERNAL_TOKEN; without it this step does nothing. A worker
+      # that calls this every minute (a paid Render plan) makes the timing exact.
+      - name: Run due scheduled AI tasks
+        env:
+          INTERNAL_TOKEN: ${{ secrets.API_INTERNAL_TOKEN }}
+        run: |
+          if [ -z "$INTERNAL_TOKEN" ]; then
+            echo "API_INTERNAL_TOKEN is not set: scheduled AI tasks are not triggered from here."
+            exit 0
+          fi
+          curl --silent --show-error --max-time 60 --retry 2 --retry-delay 10 -X POST \
+            -H "X-Internal-Token: $INTERNAL_TOKEN" "$API_URL/internal/jobs/tick" \
+            || echo "::warning::Could not trigger the scheduled AI tasks"

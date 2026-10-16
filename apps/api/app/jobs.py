@@ -561,6 +561,13 @@ def move_files(conn: Connection, batch: int = MOVE_BATCH) -> dict[str, int] | st
     return {"moved": moved, "left": left}
 
 
+def run_ai_tasks(conn: Connection) -> dict[str, int]:
+    """Runs the scheduled AI agent tasks whose time has come (app/ai/task_runner.py)."""
+    from app.ai.task_runner import run_due_tasks
+
+    return run_due_tasks(conn)
+
+
 def sync_social(conn: Connection) -> dict[str, int]:
     """Reads the latest numbers of every connected social account (the content studio). One
     account failing (a network down, a token the owner revoked) does not stop the others."""
@@ -600,6 +607,7 @@ JOBS = {
     "answer-whatsapp": answer_inbox,
     "issue-documents": issue_documents,
     "move-files": move_files,
+    "run-ai-tasks": run_ai_tasks,
     "sync-social": sync_social,
 }
 

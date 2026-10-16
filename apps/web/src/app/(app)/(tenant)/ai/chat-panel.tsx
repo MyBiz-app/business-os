@@ -9,6 +9,7 @@ import { formatMoney } from "@/lib/money";
 
 import type { ChatError, Conversation, ConversationSummary } from "./actions";
 import { AgentAvatar } from "./agent-avatar";
+import { describeSchedule, type Schedule } from "./describe-schedule";
 import { type Branch, ScopePicker } from "./scope-picker";
 import type { Agent } from "./types";
 
@@ -24,6 +25,7 @@ const STATUS_TONE: Record<PendingAction["status"], string> = {
 
 export function ActionCard({ action, onDecide }: { action: PendingAction; onDecide: (id: string, decision: "confirm" | "reject") => void }) {
   const t = useTranslations("assistant");
+  const tTeam = useTranslations("aiTeam");
   const locale = useLocale();
   const preview = action.preview as {
     kind: string;
@@ -40,12 +42,49 @@ export function ActionCard({ action, onDecide }: { action: PendingAction; onDeci
     names?: string[];
     total?: number;
     currency?: string;
+    title?: string;
+    task_kind?: string;
+    schedule?: Schedule;
+    first_run?: string;
+    instruction?: string;
+    max_credits?: number;
+    action?: { kind: string; client?: string; service?: string; starts?: string; month?: string; clients?: number; total?: number; currency?: string };
   };
   const month = (value: string) => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${value}-15T12:00:00Z`));
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-primary/40 bg-background p-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted">{t("needsConfirmation")}</p>
-      {preview.kind === "log_time" ? (
+      {preview.kind === "schedule_task" ? (
+        <>
+          <p className="font-medium" dir="auto">
+            {t("scheduleTask", { title: isolate(preview.title ?? "") })}
+          </p>
+          <p className="text-sm" dir="auto">
+            {preview.schedule ? describeSchedule(preview.schedule, tTeam, locale) : ""}
+            {" · "}
+            {t("firstRun", { when: preview.first_run ?? "" })}
+          </p>
+          {preview.instruction && (
+            <p className="text-sm text-muted" dir="auto">
+              {preview.instruction}
+            </p>
+          )}
+          {preview.action && (
+            <p className="text-sm text-muted" dir="auto">
+              {preview.action.kind === "cancel_booking"
+                ? t("cancelPreview", { client: isolate(preview.action.client ?? ""), service: isolate(preview.action.service ?? "") })
+                : preview.action.kind === "bill_month"
+                  ? t("billMonthPreview", { count: preview.action.clients ?? 0, month: month(preview.action.month ?? ""), total: formatMoney(preview.action.total ?? 0, preview.action.currency ?? "ILS", locale) })
+                  : t("bookPreview", { client: isolate(preview.action.client ?? ""), service: isolate(preview.action.service ?? "") })}
+            </p>
+          )}
+          {preview.task_kind === "agent_run" && <p className="text-sm text-muted">{t("upTo", { credits: preview.max_credits ?? 20 })}</p>}
+        </>
+      ) : preview.kind === "cancel_scheduled_task" ? (
+        <p className="font-medium" dir="auto">
+          {t("cancelTask", { title: isolate(preview.title ?? "") })}
+        </p>
+      ) : preview.kind === "log_time" ? (
         <p className="font-medium" dir="auto">
           {t("logTimePreview", { hours: new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(preview.hours ?? 0), client: isolate(preview.client ?? ""), description: isolate(preview.description ?? "") })}
           {" · "}

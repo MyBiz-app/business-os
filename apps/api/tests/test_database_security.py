@@ -115,6 +115,7 @@ def test_api_sends_security_headers(client: TestClient) -> None:
 UNINDEXED_USER_KEYS = {
     ("ai_agents", "created_by"),
     ("ai_conversations", "user_id"),
+    ("ai_scheduled_tasks", "created_by"),
     ("bookings", "created_by"),
     ("campaigns", "created_by"),
     ("client_documents", "created_by"),
