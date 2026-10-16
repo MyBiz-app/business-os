@@ -44,6 +44,8 @@ _עודכן לאחרונה: 16.10.2026_ · מתעדכן עם כל מיזוג (Pu
 9. **להדליק ניטור שגיאות (10 דקות, לפני העלייה לאוויר).** פותחים חשבון [Sentry](https://sentry.io) חינמי ושלושה פרויקטים (Python, Next.js, React Native) ומגדירים את שלושת ה-DSN לפי `docs/monitoring.md`. אפשר להוסיף גם ניטור זמינות חיצוני חינמי על `/health/ready`.
 10. **משימות AI מתוזמנות, בדיקה כל 10 דקות (2 דקות, כשנוח).** ב-GitHub: Settings ← Secrets and variables ← Actions ← New repository secret, בשם `API_INTERNAL_TOKEN`, והדביקו את אותו ערך שמוגדר כ-`API_INTERNAL_TOKEN` ב-Render. עד אז משימות רצות רק בלחיצה על "הרצה עכשיו".
 
+12. **הדיפלוי היחיד ל-Vercel (כשהכול גמור).** מיזוג ל-main כבר לא מפרסם כלום (ב-Vercel Hobby יש מגבלה של 100 דיפלויים ביום). כשהעבודה גמורה: GitHub ← Actions ← להריץ **"Deploy web to Vercel"** (האתר וה-CRM, `business-os-alpha-drab.vercel.app`), ואחריו **"Deploy the Expo app to the web (Vercel)"** עם app = `all` (`mybiz-client-app.vercel.app`). שניהם ידניים בלבד. קודם להריץ מיגרציות עם "Migrate staging database". (העדכון של EAS אינו דיפלוי ל-Vercel ולא השתנה.)
+
 ## בעבודה
 
 - סבב 6, פרוסה T1 (מנוע PDF): קבלות וחשבוניות MyBiz יורדות כקובץ PDF אמיתי שנוצר בשרת (WeasyPrint, גופני Assistant ו-Plus Jakarta Sans מובנים, עברית מימין לשמאל ואנגלית משמאל לימין, לוגו וצבע המותג של העסק, שורת "הופק באמצעות MyBiz" בתחתית). בדפי הווב יש כפתור "הורדת PDF" ליד "הדפסה"; לקוחות יכולים להוריד מה-API את הקבלה שלהם. פרטי החברה של MyBiz (פרטים פיקטיביים) נמצאים ב-`packages/i18n/brand.json` תחת `legal`, ובסביבת הבדיקה יש סימן מים של מסמך לדוגמה. ספקי הקבלות והחשבוניות (#46, #47) נשארים מתאמים כבויים.
