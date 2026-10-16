@@ -9,6 +9,7 @@
     uv run python -m app.jobs notify-shifts    (emails staff new and edited published shifts)
     uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
+    uv run python -m app.jobs send-announcements (the broadcast center: email, push, pop-ups)
     uv run python -m app.jobs answer-whatsapp (AI replies to clients' WhatsApp messages; idle
                                                until a real WhatsApp provider fills the inbox)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
@@ -37,6 +38,7 @@ from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 from app.messaging import outbox
+from app.messaging.announcements import send_announcements as run_announcements
 from app.messaging.email import (
     MESSAGES_DIR,
     load_messages,
@@ -505,6 +507,10 @@ def send_messages(conn: Connection) -> dict[str, int]:
     return outbox.send_messages(conn)
 
 
+def send_announcements(conn: Connection) -> dict[str, int]:
+    return run_announcements(conn, sender_from_settings(), push_sender_from_settings())
+
+
 def issue_documents(conn: Connection) -> dict[str, int]:
     return outbox.issue_documents(conn)
 
@@ -573,6 +579,7 @@ JOBS = {
     "bill-businesses": bill_businesses,
     "publish-shifts": publish_shifts,
     "send-messages": send_messages,
+    "send-announcements": send_announcements,
     "answer-whatsapp": answer_inbox,
     "issue-documents": issue_documents,
     "move-files": move_files,
@@ -592,7 +599,7 @@ DAILY = [
     "send-messages",
     "issue-documents",
 ]
-HOURLY = ["publish-shifts", "send-emails", "notify-shifts"]
+HOURLY = ["publish-shifts", "send-emails", "notify-shifts", "send-announcements"]
 MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 3 for job in HOURLY}}
 # Jobs whose staging workflow runs only once an email provider is set: they count as late only
 # after they have run at least once.

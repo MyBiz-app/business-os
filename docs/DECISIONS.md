@@ -175,6 +175,10 @@ When a decision changes, update the row and note the date - do not delete histor
 
 Business code asks for a tier (`fast`, `standard`, `strong`), never a model name; the registry in `app/ai/models.py` holds vendor, tier, prices and context per model. OpenAI and Gemini adapters exist and are tested but stay disabled (`ENABLED_VENDORS`) until the business operates and has a key (paid-provider policy). The fallback provider moves to the next provider only when one is unavailable, not when it is rate limiting us. Long and medium dashes are stripped from all model text.
 
+### Broadcast center (2026-10-16, round 5 M1, migration 0088)
+
+One engine sends a message to a mix of audiences over several channels; the MyBiz console uses it now, and a business owner writing to their own clients (round 5, 2.7 and F4) will use the same tables (`announcements.issuer` is `platform` or `tenant`). A person in several audiences is counted and sent to once (key: email, else user, else client). Marketing messages go only to people who agreed (`marketing_consent_at` on users and on clients, turned on or off by the person with `PUT /me/marketing-consent`), carry "Ad" in the subject and a signed opt-out link (`GET /public/announcements/unsubscribe`, valid one year); service messages go to everyone in the audience. The audience is resolved by SECURITY DEFINER functions because the console reads across businesses; the raw resolver is not callable by the API. Pop-ups are delivery rows read by the person's own account, so nobody sees a message not meant for them. WhatsApp and SMS go through the businesses' existing outbox, for clients with a phone, and stay simulated until a paid provider is connected (project rule). Sending runs in the hourly `send-announcements` job, so "send now" means the next run. Email opens and clicks are not tracked.
+
 ## Open
 
 | # | Question |

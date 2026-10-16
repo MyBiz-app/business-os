@@ -89,6 +89,16 @@
       "arrow": "now",
       "more": "…and {count} more changes. See your roster in the app.",
       "footer": "You can turn these emails off under Personal settings."
+    },
+    "broadcast": {
+      "ad": "Ad",
+      "adSubject": "Ad: {subject}",
+      "footerMarketing": "You received this because you agreed to receive marketing messages.",
+      "footerService": "This is a service message from {brand}.",
+      "unsubscribedTitle": "You are unsubscribed",
+      "unsubscribedBody": "You will no longer receive marketing messages. Service messages about your account will still be sent.",
+      "unsubscribeFailed": "This link is not valid or has expired.",
+      "unsubscribe": "Unsubscribe"
     }
   },
   "modules": {

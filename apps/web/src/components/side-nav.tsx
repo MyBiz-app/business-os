@@ -18,6 +18,7 @@ import {
   LayoutGrid,
   Lock,
   MapPin,
+  Megaphone,
   Menu,
   Receipt,
   MessageCircle,
@@ -53,6 +54,7 @@ const ICONS = {
   billing: Wallet,
   audit: ScrollText,
   integrations: Plug,
+  broadcasts: Megaphone,
   quotes: FileSignature,
   time: Clock,
 } as const;

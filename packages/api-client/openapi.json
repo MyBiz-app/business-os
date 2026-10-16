@@ -9889,6 +9889,600 @@
         ]
       }
     },
+    "/platform/broadcasts": {
+      "get": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "List Broadcasts",
+        "operationId": "list_broadcasts",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Announcement"
+                  },
+                  "type": "array",
+                  "title": "Response List Broadcasts"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Create Broadcast",
+        "operationId": "create_broadcast",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/broadcasts/preview": {
+      "post": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Preview",
+        "description": "Who would get it right now: people counted once however many groups they are in.",
+        "operationId": "preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Preview"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/broadcasts/{announcement_id}": {
+      "get": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Get Broadcast",
+        "operationId": "get_broadcast",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Update Broadcast",
+        "description": "Only a draft or a scheduled message can still be changed; a scheduled one goes back to\na draft, so it is checked again before it is scheduled.",
+        "operationId": "update_broadcast",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnouncementBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Delete Broadcast",
+        "operationId": "delete_broadcast",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/broadcasts/{announcement_id}/schedule": {
+      "post": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Schedule Broadcast",
+        "operationId": "schedule_broadcast",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScheduleBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/broadcasts/{announcement_id}/cancel": {
+      "post": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Cancel Broadcast",
+        "operationId": "cancel_broadcast",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/broadcasts/{announcement_id}/test": {
+      "post": {
+        "tags": [
+          "broadcasts"
+        ],
+        "summary": "Send Test",
+        "description": "Sends the email version to the signed-in team member alone, to see how it looks.",
+        "operationId": "send_test",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/announcements": {
+      "get": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "My Announcements",
+        "description": "The pop-ups meant for the signed-in person, not yet dismissed, in their language.",
+        "operationId": "my_announcements",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MyAnnouncement"
+                  },
+                  "type": "array",
+                  "title": "Response My Announcements"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me/announcements/{announcement_id}/{event}": {
+      "post": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "Mark Announcement",
+        "operationId": "mark_announcement",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Announcement Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "viewed",
+                "dismissed",
+                "clicked"
+              ],
+              "type": "string",
+              "title": "Event"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/marketing-consent": {
+      "put": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "Set Marketing Consent",
+        "description": "Agree to (or stop) marketing messages; service messages are sent either way.",
+        "operationId": "set_marketing_consent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/public/announcements/unsubscribe": {
+      "get": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "Unsubscribe",
+        "description": "The opt-out link in a marketing email (the link is signed; no sign-in needed).",
+        "operationId": "unsubscribe",
+        "parameters": [
+          {
+            "name": "t",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 600,
+              "title": "T"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/locations/{location_id}/hours": {
       "get": {
         "tags": [
@@ -25174,6 +25768,178 @@
         "type": "object",
         "title": "AddressUpdate"
       },
+      "Announcement": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "marketing",
+              "service"
+            ],
+            "title": "Kind"
+          },
+          "channels": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "email",
+                "push",
+                "popup",
+                "whatsapp",
+                "sms"
+              ]
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/StoredAudience"
+          },
+          "content": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Texts"
+            },
+            "propertyNames": {
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "object",
+            "title": "Content"
+          },
+          "scheduled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled",
+              "sending",
+              "sent",
+              "cancelled"
+            ],
+            "title": "Status"
+          },
+          "recipient_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipient Count"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/DeliveryStats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "channels",
+          "audience",
+          "content",
+          "scheduled_at",
+          "status",
+          "recipient_count",
+          "created_by",
+          "created_at",
+          "sent_at",
+          "stats"
+        ],
+        "title": "Announcement"
+      },
+      "AnnouncementBody": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "marketing",
+              "service"
+            ],
+            "title": "Kind"
+          },
+          "channels": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "email",
+                "push",
+                "popup",
+                "whatsapp",
+                "sms"
+              ]
+            },
+            "type": "array",
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Channels"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          },
+          "content": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Texts"
+            },
+            "propertyNames": {
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "object",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "channels",
+          "audience"
+        ],
+        "title": "AnnouncementBody"
+      },
       "Answer-Input": {
         "properties": {
           "accept": {
@@ -25426,6 +26192,78 @@
           "items"
         ],
         "title": "AttentionList"
+      },
+      "Audience": {
+        "properties": {
+          "groups": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "team",
+                "owners",
+                "staff",
+                "clients"
+              ]
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Groups"
+          },
+          "verticals": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Verticals"
+          },
+          "locales": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "array",
+            "maxItems": 2,
+            "title": "Locales"
+          },
+          "business_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Business Ids"
+          },
+          "modules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Modules"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "trial",
+                  "active"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "title": "Audience"
       },
       "AudienceCount": {
         "properties": {
@@ -28883,6 +29721,19 @@
         ],
         "title": "ComplaintCreate"
       },
+      "ConsentBody": {
+        "properties": {
+          "consent": {
+            "type": "boolean",
+            "title": "Consent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "consent"
+        ],
+        "title": "ConsentBody"
+      },
       "ContactCreate": {
         "properties": {
           "name": {
@@ -29622,6 +30473,54 @@
           "accept"
         ],
         "title": "DeclarationCreate"
+      },
+      "DeliveryStats": {
+        "properties": {
+          "queued": {
+            "type": "integer",
+            "title": "Queued",
+            "default": 0
+          },
+          "sent": {
+            "type": "integer",
+            "title": "Sent",
+            "default": 0
+          },
+          "failed": {
+            "type": "integer",
+            "title": "Failed",
+            "default": 0
+          },
+          "skipped": {
+            "type": "integer",
+            "title": "Skipped",
+            "default": 0
+          },
+          "viewed": {
+            "type": "integer",
+            "title": "Viewed",
+            "default": 0
+          },
+          "clicked": {
+            "type": "integer",
+            "title": "Clicked",
+            "default": 0
+          },
+          "unsubscribed": {
+            "type": "integer",
+            "title": "Unsubscribed",
+            "default": 0
+          },
+          "sent_by_channel": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Sent By Channel"
+          }
+        },
+        "type": "object",
+        "title": "DeliveryStats"
       },
       "Dependent": {
         "properties": {
@@ -33691,6 +34590,46 @@
         ],
         "title": "ModulesChange"
       },
+      "MyAnnouncement": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "marketing",
+              "service"
+            ],
+            "title": "Kind"
+          },
+          "texts": {
+            "$ref": "#/components/schemas/Texts"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "texts",
+          "sent_at"
+        ],
+        "title": "MyAnnouncement"
+      },
       "MyBooking": {
         "properties": {
           "id": {
@@ -35048,7 +35987,8 @@
           "billing.manage",
           "inbox.manage",
           "usage.read",
-          "staff.manage"
+          "staff.manage",
+          "broadcasts.manage"
         ],
         "title": "PlatformPermission"
       },
@@ -35070,6 +36010,68 @@
           "value"
         ],
         "title": "Point"
+      },
+      "Preview": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "email": {
+            "type": "integer",
+            "title": "Email"
+          },
+          "push": {
+            "type": "integer",
+            "title": "Push"
+          },
+          "popup": {
+            "type": "integer",
+            "title": "Popup"
+          },
+          "phone": {
+            "type": "integer",
+            "title": "Phone"
+          },
+          "by_group": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Group"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "email",
+          "push",
+          "popup",
+          "phone",
+          "by_group"
+        ],
+        "title": "Preview"
+      },
+      "PreviewBody": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "marketing",
+              "service"
+            ],
+            "title": "Kind"
+          },
+          "audience": {
+            "$ref": "#/components/schemas/Audience"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "audience"
+        ],
+        "title": "PreviewBody"
       },
       "PromoCode": {
         "properties": {
@@ -37764,6 +38766,25 @@
         ],
         "title": "SampleCreated"
       },
+      "ScheduleBody": {
+        "properties": {
+          "scheduled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled At",
+            "description": "When to send; empty sends at the next job run"
+          }
+        },
+        "type": "object",
+        "title": "ScheduleBody"
+      },
       "ScheduleOptions": {
         "properties": {
           "services": {
@@ -40056,6 +41077,82 @@
         "type": "object",
         "title": "StationUpdate"
       },
+      "StoredAudience": {
+        "properties": {
+          "groups": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "team",
+                "owners",
+                "staff",
+                "clients"
+              ]
+            },
+            "type": "array",
+            "title": "Groups"
+          },
+          "verticals": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Verticals"
+          },
+          "locales": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "array",
+            "title": "Locales"
+          },
+          "business_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Business Ids"
+          },
+          "modules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modules"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "trial",
+                  "active"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "groups",
+          "verticals",
+          "locales",
+          "business_ids",
+          "modules",
+          "status"
+        ],
+        "title": "StoredAudience",
+        "description": "An audience as stored: every key is present."
+      },
       "SupportAccess": {
         "properties": {
           "tenant_id": {
@@ -41123,6 +42220,60 @@
         },
         "type": "object",
         "title": "TestCardRequest"
+      },
+      "TestResult": {
+        "properties": {
+          "sent_to": {
+            "type": "string",
+            "title": "Sent To"
+          },
+          "email": {
+            "type": "boolean",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sent_to",
+          "email"
+        ],
+        "title": "TestResult"
+      },
+      "Texts": {
+        "properties": {
+          "subject": {
+            "type": "string",
+            "maxLength": 150,
+            "title": "Subject",
+            "default": ""
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Body",
+            "default": ""
+          },
+          "cta_label": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Cta Label",
+            "default": ""
+          },
+          "cta_url": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Cta Url",
+            "default": ""
+          },
+          "image_url": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Image Url",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "Texts"
       },
       "TimeEntry": {
         "properties": {

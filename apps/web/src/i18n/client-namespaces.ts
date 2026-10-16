@@ -94,6 +94,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "app": [
     "accessibility",
     "account",
+    "app",
     "appearance",
     "auth",
     "clientFields",

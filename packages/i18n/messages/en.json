@@ -1,7 +1,11 @@
 {
   "app": {
     "name": "MyBiz",
-    "tagline": "Run your business in one place, with AI that works for you."
+    "tagline": "Run your business in one place, with AI that works for you.",
+    "announcements": {
+      "label": "Message from {brand}",
+      "close": "Close"
+    }
   },
   "errorPages": {
     "title": "Something went wrong",
@@ -1607,7 +1611,8 @@
       "billing": "Billing",
       "team": "MyBiz team",
       "audit": "Audit log",
-      "integrations": "Integrations"
+      "integrations": "Integrations",
+      "broadcasts": "Broadcasts"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -1645,6 +1650,10 @@
       "staff_manage": {
         "name": "Manage employees",
         "hint": "Add employees and give them permissions."
+      },
+      "broadcasts_manage": {
+        "name": "Broadcasts",
+        "hint": "Send messages and pop-ups to MyBiz users."
       }
     },
     "you": "You · {level}",
@@ -1792,6 +1801,160 @@
         "ai": "AI assistant",
         "storage": "File storage"
       }
+    },
+    "broadcasts": {
+      "title": "Broadcast center",
+      "subtitle": "Messages and pop-ups to the MyBiz team, business owners, their staff and their clients.",
+      "new": "New message",
+      "empty": "No messages yet. Write the first one.",
+      "back": "Back to broadcasts",
+      "columns": {
+        "message": "Message",
+        "audience": "Audience",
+        "channels": "Channels",
+        "status": "Status",
+        "results": "Results"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "scheduled": "Scheduled",
+        "sending": "Sending",
+        "sent": "Sent",
+        "cancelled": "Cancelled"
+      },
+      "kinds": {
+        "marketing": "Marketing",
+        "service": "Service"
+      },
+      "kindHints": {
+        "marketing": "Offers and news. Only people who agreed to receive them, marked as an ad, with an opt-out link.",
+        "service": "Maintenance, a new version, an account notice. Goes to everyone in the audience."
+      },
+      "kind": "Type of message",
+      "channelsTitle": "Channels",
+      "channels": {
+        "email": "Email",
+        "push": "Push",
+        "popup": "Pop-up",
+        "whatsapp": "WhatsApp",
+        "sms": "SMS"
+      },
+      "channelHints": {
+        "email": "Sent through the email provider.",
+        "push": "To the phones where the person uses the app.",
+        "popup": "Shown the next time the person opens the site or the app.",
+        "whatsapp": "Clients with a phone, through the business's outbox. Simulated until a provider is connected.",
+        "sms": "Clients with a phone, through the business's outbox. Simulated until a provider is connected."
+      },
+      "audienceTitle": "Audience",
+      "groups": {
+        "team": "MyBiz team",
+        "owners": "Business owners",
+        "staff": "Business staff",
+        "clients": "Clients of the businesses"
+      },
+      "filters": {
+        "title": "Narrow the businesses",
+        "status": "Business status",
+        "any": "Any",
+        "trial": "In trial",
+        "active": "Paying",
+        "locales": "Language",
+        "verticals": "Industries",
+        "modules": "Modules",
+        "businesses": "Specific businesses",
+        "allOf": "All",
+        "hint": "Leave a filter empty to include everything. Filters apply to owners, staff and clients, not to the MyBiz team."
+      },
+      "content": {
+        "title": "Content",
+        "language": {
+          "he": "Hebrew",
+          "en": "English"
+        },
+        "subject": "Subject",
+        "body": "Message",
+        "ctaLabel": "Button text",
+        "ctaUrl": "Button link",
+        "imageUrl": "Image link",
+        "fallback": "A person whose language is left empty gets the other one."
+      },
+      "templates": {
+        "label": "Start from a template",
+        "none": "No template",
+        "feature": {
+          "name": "New feature",
+          "subject": "New in MyBiz",
+          "body": "We added something new to MyBiz. Take a look and tell us what you think."
+        },
+        "promo": {
+          "name": "Offer",
+          "subject": "A special offer for you",
+          "body": "For a limited time, a special offer for MyBiz users."
+        },
+        "maintenance": {
+          "name": "Maintenance",
+          "subject": "Planned maintenance",
+          "body": "MyBiz will be briefly unavailable for maintenance. Thank you for your patience."
+        },
+        "version": {
+          "name": "New version",
+          "subject": "A new version of the app is ready",
+          "body": "Please update the MyBiz app to get the latest improvements."
+        }
+      },
+      "preview": {
+        "title": "Who gets it",
+        "total": "{count, plural, one {# person} other {# people}}",
+        "note": "A person who is in several groups is counted once.",
+        "email": "by email",
+        "push": "by push",
+        "popup": "by pop-up",
+        "phone": "by WhatsApp or SMS",
+        "none": "Nobody matches yet.",
+        "marketingNote": "Marketing reaches only people who agreed to receive it."
+      },
+      "when": {
+        "title": "When",
+        "now": "Send at the next run (within the hour)",
+        "later": "Schedule for"
+      },
+      "actions": {
+        "saveDraft": "Save draft",
+        "send": "Send",
+        "schedule": "Schedule",
+        "test": "Send a test to me",
+        "cancel": "Cancel sending",
+        "delete": "Delete",
+        "confirm": "Send to {count, plural, one {# person} other {# people}}?"
+      },
+      "notices": {
+        "saved": "Saved.",
+        "scheduled": "Scheduled. It goes out at the next run after the time you chose.",
+        "testSent": "A test was sent to {email}.",
+        "testNoProvider": "No email provider is set up, so nothing was sent.",
+        "cancelled": "Cancelled.",
+        "deleted": "Deleted."
+      },
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "audience_required": "Pick at least one audience.",
+        "content_required": "Write a subject and a message in at least one language.",
+        "already_sent": "This message was already sent and can't be changed.",
+        "forbidden": "You don't have permission for this."
+      },
+      "results": {
+        "title": "Results",
+        "recipients": "Recipients",
+        "sent": "Sent",
+        "failed": "Failed",
+        "skipped": "Not reachable",
+        "viewed": "Opened the pop-up",
+        "clicked": "Clicked the button",
+        "unsubscribed": "Opted out",
+        "note": "Email opens and clicks are not tracked."
+      },
+      "created": "Created by {name}"
     }
   },
   "permissions": {
@@ -2061,6 +2224,16 @@
       "arrow": "now",
       "more": "…and {count} more changes. See your roster in the app.",
       "footer": "You can turn these emails off under Personal settings."
+    },
+    "broadcast": {
+      "ad": "Ad",
+      "adSubject": "Ad: {subject}",
+      "footerMarketing": "You received this because you agreed to receive marketing messages.",
+      "footerService": "This is a service message from {brand}.",
+      "unsubscribedTitle": "You are unsubscribed",
+      "unsubscribedBody": "You will no longer receive marketing messages. Service messages about your account will still be sent.",
+      "unsubscribeFailed": "This link is not valid or has expired.",
+      "unsubscribe": "Unsubscribe"
     }
   },
   "support": {
