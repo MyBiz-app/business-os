@@ -3417,6 +3417,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/conversations/{conversation_id}/messages/stream": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Message Stream
+         * @description Like `send_message`, but answers as a Server-Sent Events stream: `text` events carry the
+         *     answer as it is written, `done` carries the whole conversation, `error` a failure code.
+         */
+        post: operations["send_message_stream"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/pending-actions/{action_id}/confirm": {
         parameters: {
             query?: never;
@@ -20364,6 +20385,45 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["app__api__assistant__Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_message_stream: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Question"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

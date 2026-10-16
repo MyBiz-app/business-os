@@ -5,12 +5,15 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./assets/*": "./assets/*"
+    "./assets/*": "./assets/*",
+    "./agents": "./src/agents.ts",
+    "./agents/*": "./agents/*"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.mjs",
-    "build:assets": "node --experimental-strip-types scripts/build-assets.mjs"
+    "build:assets": "node --experimental-strip-types scripts/build-assets.mjs",
+    "build:agents": "node --experimental-strip-types scripts/build-agents.mjs"
   },
   "devDependencies": {
     "typescript": "^5"

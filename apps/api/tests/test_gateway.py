@@ -72,10 +72,3 @@ def test_the_app_starts_without_loading_the_sdk() -> None:
 
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "False"
-
-
-def test_plain_dashes_replaces_long_dashes():
-    from app.ai.gateway import plain_dashes
-
-    em, en = chr(0x2014), chr(0x2013)
-    assert plain_dashes(f"a{em}b {en} c") == "a-b - c"

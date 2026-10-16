@@ -528,3 +528,29 @@ def test_model_prices_cover_the_configured_models() -> None:
     usage = Usage(input_tokens=10_000, output_tokens=1_000)
     assert credits(settings.ai_model, usage) < credits(settings.ai_strong_model, usage)
     assert credits(settings.ai_strong_model, usage) < credits("claude-opus-5-5", usage)
+
+
+def test_answer_streams_as_server_sent_events(
+    client: TestClient, studio: dict, use_provider
+) -> None:
+    use_provider(FakeProvider([says("Hello \u2014 there")]))
+    headers = studio["headers"]
+    conversation_id = conversation(client, headers)
+
+    response = client.post(
+        f"/ai/conversations/{conversation_id}/messages/stream",
+        json={"text": "hi"},
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+    events = [e for e in response.text.split("\n\n") if e]
+    assert events[0].startswith("event: text") and "Hello - there" in events[0]
+    assert events[-1].startswith("event: done")
+    assert (
+        client.get(f"/ai/conversations/{conversation_id}", headers=headers).json()["turns"][1][
+            "text"
+        ]
+        == "Hello - there"
+    )
