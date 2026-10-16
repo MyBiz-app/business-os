@@ -12,6 +12,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
+from app.messaging.contact_emails import resolve_email, sender_name
 from app.messaging.email import (
     EMAIL_DETAILS,
     MESSAGES_DIR,
@@ -73,8 +74,18 @@ def _deliver(
     if sender and person["email_roster"] and person["email"]:
         try:
             locale = person["locale"] if person["locale"] in ("he", "en") else "en"
+            # Replies go to the branch's (else the business's) address, under its name.
+            tenant_id, location_id = person["tenant_id"], person["location_id"]
             sender.send(
-                Email(to=person["email"], subject=subject, text=body, locale=locale, kind="roster")
+                Email(
+                    to=person["email"],
+                    subject=subject,
+                    text=body,
+                    locale=locale,
+                    kind="roster",
+                    reply_to=resolve_email(conn, tenant_id, "reply_to", location_id),
+                    from_name=sender_name(conn, tenant_id, location_id),
+                )
             )
         except Exception as error:  # a provider error must not stop the batch
             print(f"roster email to {person['user_id']} failed: {error}")
@@ -110,7 +121,8 @@ def notify_roster(
     rows = (
         conn.execute(
             text("""
-                SELECT s.id, s.tenant_id, s.user_id, s.starts_at, s.ends_at, s.position,
+                SELECT s.id, s.tenant_id, s.location_id, s.user_id, s.starts_at, s.ends_at,
+                       s.position,
                        l.name AS branch, t.name AS business, t.time_zone,
                        COALESCE(u.locale, t.locale) AS locale,
                        u.email, u.full_name, u.email_roster
@@ -292,7 +304,8 @@ def notify_roster_changes(
         person = (
             conn.execute(
                 text("""
-                    SELECT u.id AS user_id, t.name AS business, t.time_zone,
+                    SELECT u.id AS user_id, t.id AS tenant_id, NULL::uuid AS location_id,
+                           t.name AS business, t.time_zone,
                            COALESCE(u.locale, t.locale) AS locale,
                            u.email, u.full_name, u.email_roster
                     FROM app.tenants t, app.users u

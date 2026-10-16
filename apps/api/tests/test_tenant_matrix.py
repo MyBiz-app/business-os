@@ -30,6 +30,7 @@ OVERRIDES = {
     "audit_log": {"actor_type": "'system'"},
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
     "checkouts": {"plan_id": "gen_random_uuid()"},
+    "contact_emails": {"purpose": "'main'", "email": "'a@b.co'"},
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},
     "invitations": {"role": "'staff'"},
     "notifications": {"kind": "'session_cancelled'"},

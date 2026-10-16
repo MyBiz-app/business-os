@@ -128,6 +128,32 @@
       "4": "Friday",
       "5": "Saturday",
       "6": "Sunday"
+    },
+    "contactEmails": {
+      "title": "Business emails",
+      "hint": "The addresses customers see and where replies go. Anything you leave empty uses the next one, and finally the owner's email.",
+      "branchTitle": "Branch emails",
+      "branchHint": "Only for this branch. Anything left empty uses the business's email.",
+      "purposes": {
+        "main": "Main email",
+        "inbox": "Inquiries and leads",
+        "billing": "Invoices and receipts",
+        "reply_to": "Reply-to",
+        "notifications": "System notifications"
+      },
+      "emailLabel": "Email address",
+      "save": "Save",
+      "remove": "Remove",
+      "resend": "Resend confirmation",
+      "verified": "Confirmed",
+      "pending": "Waiting for confirmation: open the link we emailed to {email}",
+      "usedNow": "In use: {email}",
+      "fromBusiness": "Inherited from the business",
+      "fromOwner": "From the owner's account",
+      "sent": "We emailed a confirmation link.",
+      "notSent": "Saved, but we could not send the confirmation email yet.",
+      "saved": "Saved.",
+      "invalid": "Enter a valid email address."
     }
   },
   "locales": {
@@ -2500,6 +2526,19 @@
       "arrow": "now",
       "more": "…and {count} more changes. See your roster in the app.",
       "footer": "You can turn these emails off under Personal settings."
+    },
+    "contactConfirm": {
+      "subject": "Confirm this email address for {business}",
+      "intro": "This address was added to {business} as its {purpose}. Please confirm it so we can use it.",
+      "button": "Confirm the address",
+      "ignore": "If this is not you, ignore this email and nothing will change.",
+      "purposes": {
+        "main": "main email",
+        "inbox": "inquiries email",
+        "billing": "billing email",
+        "reply_to": "reply-to email",
+        "notifications": "notifications email"
+      }
     }
   },
   "support": {
@@ -6299,5 +6338,12 @@
       "csv": "Download CSV",
       "print": "Print or save as PDF"
     }
+  },
+  "emailConfirmed": {
+    "okTitle": "The email address is confirmed",
+    "okText": "It will now be used by the business.",
+    "badTitle": "This link is not valid",
+    "badText": "It may have expired or the address was changed. Ask for a new confirmation email in the settings.",
+    "home": "Back to MyBiz"
   }
 }

@@ -1622,6 +1622,62 @@ export interface paths {
         patch: operations["update_location_group"];
         trace?: never;
     };
+    "/contact-emails": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Contact Emails */
+        get: operations["get_contact_emails"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contact-emails/{purpose}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Contact Email
+         * @description Sets an address for one purpose. The owner's own sign-in email needs no confirmation;
+         *     any other waits for its link. Setting the same address again does not reset it.
+         */
+        put: operations["save_contact_email"];
+        post?: never;
+        /** Clear Contact Email */
+        delete: operations["clear_contact_email"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/contact-emails/{purpose}/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resend Confirmation */
+        post: operations["resend_confirmation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/locations": {
         parameters: {
             query?: never;
@@ -7091,6 +7147,11 @@ export interface components {
              * @description The branch's own sub-category (a catalog key)
              */
             kind?: string | null;
+            /**
+             * Contact Email
+             * @description The branch's confirmed main email, else the business's; none if neither set
+             */
+            contact_email?: string | null;
         };
         /** ClientNote */
         ClientNote: {
@@ -7408,6 +7469,26 @@ export interface components {
             locale: "he" | "en";
             /** Website */
             website?: string | null;
+        };
+        /** ContactEmailSave */
+        ContactEmailSave: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** ContactEmails */
+        ContactEmails: {
+            /** Location Id */
+            location_id: string | null;
+            /** Purposes */
+            purposes: components["schemas"]["PurposeState"][];
+            /**
+             * Email Sent
+             * @description Set after saving: whether a confirmation email went out
+             */
+            email_sent?: boolean | null;
         };
         /** ContactRequest */
         ContactRequest: {
@@ -10311,6 +10392,34 @@ export interface components {
              * @description Last local date clients can now book
              */
             published_until: string;
+        };
+        /** PurposeState */
+        PurposeState: {
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "main" | "inbox" | "billing" | "reply_to" | "notifications";
+            /**
+             * Email
+             * @description What is set here (this business or branch), if any
+             */
+            email: string | null;
+            /**
+             * Verified
+             * @description False while the confirmation link is still waiting
+             */
+            verified: boolean;
+            /**
+             * Effective Email
+             * @description The address used for this purpose here
+             */
+            effective_email: string | null;
+            /**
+             * Effective Source
+             * @enum {string}
+             */
+            effective_source: "branch" | "business" | "owner";
         };
         /** PushTokenBody */
         PushTokenBody: {
@@ -17317,6 +17426,158 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LocationGroup"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_contact_emails: {
+        parameters: {
+            query?: {
+                /** @description A branch; leave out for the business's own */
+                location_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactEmails"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_contact_email: {
+        parameters: {
+            query?: {
+                /** @description A branch; leave out for the business's own */
+                location_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                purpose: "main" | "inbox" | "billing" | "reply_to" | "notifications";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContactEmailSave"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactEmails"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_contact_email: {
+        parameters: {
+            query?: {
+                /** @description A branch; leave out for the business's own */
+                location_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                purpose: "main" | "inbox" | "billing" | "reply_to" | "notifications";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resend_confirmation: {
+        parameters: {
+            query?: {
+                /** @description A branch; leave out for the business's own */
+                location_id?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                purpose: "main" | "inbox" | "billing" | "reply_to" | "notifications";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContactEmails"];
                 };
             };
             /** @description Validation Error */
