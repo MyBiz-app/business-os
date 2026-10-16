@@ -89,7 +89,15 @@ class AudienceSlice:
     share_bp: int  # basis points: 10000 = 100%
 
 
+class ReauthNeeded(Exception):
+    """The network no longer accepts the saved access (revoked by the owner, or expired): the
+    account is marked "needs reconnecting" instead of failing every sync."""
+
+
 class SocialProvider(Protocol):
+    """A connector may also define `callback` (the family in /social/callback/{family}) and
+    `configured()` (False while the platform's developer keys are missing)."""
+
     name: str
 
     def authorize_url(self, state: str, redirect_uri: str) -> str: ...
@@ -120,13 +128,19 @@ def social_provider(name: str) -> SocialProvider | None:
     return _PROVIDERS.get(name)
 
 
+def network_ready(provider: SocialProvider) -> bool:
+    """A provider can be connected once its platform keys are set (it may have none to set)."""
+    return bool(getattr(provider, "configured", lambda: True)())
+
+
 def network_status(network: Network) -> str:
-    """ "available" once the network's provider is registered, else "soon"."""
-    return "available" if network.provider in _PROVIDERS else "soon"
+    """ "available" once the network's provider is registered and configured, else "soon"."""
+    provider = _PROVIDERS.get(network.provider)
+    return "available" if provider is not None and network_ready(provider) else "soon"
 
 
 def _load_providers() -> None:
-    from app.social import demo  # noqa: F401  (registers itself)
+    from app.social import demo, google, soon, tiktok  # noqa: F401  (each registers itself)
 
 
 _load_providers()

@@ -6028,7 +6028,13 @@
       "demoNote": "See the dashboard with sample numbers before you connect anything.",
       "connected": "Connected: {count}",
       "noAccess": "Only the owner or a manager can connect networks.",
-      "privacy": "We only read summarized, public numbers of your own accounts. Never private messages."
+      "privacy": "We only read summarized, public numbers of your own accounts. Never private messages.",
+      "justConnected": "Connected. We are reading your numbers now ({count} accounts).",
+      "errors": {
+        "denied": "The connection was cancelled, nothing was saved.",
+        "connect_failed": "We could not finish the connection. Try again in a minute.",
+        "invalid_state": "That connection link expired. Start again from the card."
+      }
     },
     "networks": {
       "facebook": "Facebook",

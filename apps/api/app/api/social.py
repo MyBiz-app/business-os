@@ -16,7 +16,14 @@ from app.api.deps import TenantContext, has_module, require
 from app.core.permissions import Permission
 from app.social import dashboard as stats
 from app.social.demo import DEMO
-from app.social.providers import NETWORK_KEYS, NETWORKS, network_status
+from app.social.oauth import callback_url, make_state
+from app.social.providers import (
+    NETWORK_KEYS,
+    NETWORKS,
+    network_ready,
+    network_status,
+    social_provider,
+)
 from app.social.sync import add_account, sync_account
 
 router = APIRouter(prefix="/social", tags=["social"])
@@ -211,8 +218,17 @@ def connect_social(provider: str, context: ManageDep) -> ConnectResult:
             )
             sync_account(context.session, context.tenant_id, account_id)
         return ConnectResult(accounts=list_social_accounts(context))
-    # The real connectors (Meta, YouTube, TikTok, Google) arrive with their own OAuth callback.
-    raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="coming_soon")
+    connector = social_provider(provider)
+    if connector is None or not network_ready(connector):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="coming_soon")
+    user_id = context.session.execute(text("SELECT app.current_user_id()")).scalar()
+    family = connector.callback  # type: ignore[attr-defined]
+    return ConnectResult(
+        accounts=list_social_accounts(context),
+        authorize_url=connector.authorize_url(
+            make_state(context.tenant_id, user_id, provider), callback_url(family)
+        ),
+    )
 
 
 @router.delete("/accounts/{account_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -236,7 +252,11 @@ def sync_social_now(context: ManageDep) -> list[SocialAccount]:
         raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="sync_too_soon")
     ids = context.session.execute(text("SELECT id FROM app.social_accounts")).scalars().all()
     for account_id in ids:
-        sync_account(context.session, context.tenant_id, account_id)
+        try:
+            with context.session.begin_nested():
+                sync_account(context.session, context.tenant_id, account_id)
+        except Exception:  # one network failing keeps the other accounts' numbers fresh
+            continue
     return list_social_accounts(context)
 
 

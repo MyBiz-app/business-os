@@ -77,6 +77,14 @@ class Settings(BaseSettings):
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
 
+    # Content studio connectors (round 5): the platform's own developer apps. A network whose
+    # keys are missing stays "coming soon" and cannot be connected. Redirect URIs to register:
+    # {API_API_URL}/social/callback/google and {API_API_URL}/social/callback/tiktok.
+    google_oauth_client_id: str | None = None
+    google_oauth_client_secret: SecretStr | None = None
+    tiktok_client_key: str | None = None
+    tiktok_client_secret: SecretStr | None = None
+
     # Connection pool, per API worker process. Keep workers * (pool_size + max_overflow) under the
     # database's (or pooler's) client limit. Prepared statements are off by default so the URL can
     # point at a transaction-mode pooler (Supavisor, port 6543); every transaction here is

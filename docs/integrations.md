@@ -87,6 +87,18 @@ Tokens are stored encrypted (`app/providers/secrets.py`) and only summarized, pu
 the business's own accounts are kept. The `demo` provider gives believable numbers without any
 account.
 
+Connectors in place: `youtube` and `google_business` (`app/social/google.py`, one Google OAuth
+client), `tiktok` (`app/social/tiktok.py`), and disabled adapters for `x`, `linkedin`,
+`pinterest` and `snapchat` (`app/social/soon.py`). A provider may define `callback` (its family in
+`/social/callback/{family}`, handled by `app/api/social_callback.py`) and `configured()`: while
+the platform keys are missing the network stays "coming soon". Environment:
+`API_GOOGLE_OAUTH_CLIENT_ID` / `API_GOOGLE_OAUTH_CLIENT_SECRET` and `API_TIKTOK_CLIENT_KEY` /
+`API_TIKTOK_CLIENT_SECRET`. Redirect URIs to register at the networks:
+`{API_API_URL}/social/callback/google` and `{API_API_URL}/social/callback/tiktok`. Google scopes:
+`youtube.readonly`, `yt-analytics.readonly`, `business.manage` (Business Profile APIs need Google's
+access approval). TikTok scopes: `user.info.basic`, `user.info.stats`, `video.list` (TikTok keeps
+no daily history, so followers build up from our own daily reads). Publishing is not built yet.
+
 ## Switching provider
 
 - **A business**: settings → Integrations → choose another provider and fill its settings.

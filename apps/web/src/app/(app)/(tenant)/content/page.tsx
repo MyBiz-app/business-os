@@ -42,12 +42,15 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
     api.GET("/social/accounts", { params: scope }).then(unwrap),
   ]);
 
+  const errorKey = typeof query.social_error === "string" && ["denied", "connect_failed", "invalid_state"].includes(query.social_error) ? query.social_error : undefined;
+  const justConnected = typeof query.social_connected === "string" ? Number.parseInt(query.social_connected, 10) : 0;
+
   const header = <PageHeader eyebrow={t("subtitle")} title={t("title")} />;
   if (accounts.length === 0) {
     return (
       <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
         {header}
-        <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} />
+        <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} error={errorKey} />
       </Container>
     );
   }
@@ -133,6 +136,11 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           </>
         }
       />
+      {justConnected > 0 && (
+        <p role="status" className="rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-sm font-medium">
+          {t("connect.justConnected", { count: justConnected })}
+        </p>
+      )}
       {allDemo && (
         <p role="note" className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm font-medium">
           {t("demoBanner")}

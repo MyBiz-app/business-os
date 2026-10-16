@@ -10,7 +10,17 @@ import { NetworkIcon } from "./network-icon";
 type Option = components["schemas"]["NetworkOption"];
 
 /** Every network as a card: connect it, or "coming soon" when its connector is not ready. */
-export async function ConnectCards({ networks, canManage, withDemo }: { networks: Option[]; canManage: boolean; withDemo: boolean }) {
+export async function ConnectCards({
+  networks,
+  canManage,
+  withDemo,
+  error,
+}: {
+  networks: Option[];
+  canManage: boolean;
+  withDemo: boolean;
+  error?: string;
+}) {
   const t = await getTranslations("content");
   return (
     <section aria-labelledby="connect-title" className="flex flex-col gap-5">
@@ -20,6 +30,11 @@ export async function ConnectCards({ networks, canManage, withDemo }: { networks
         </h2>
         <p className="max-w-[44rem] text-muted">{t("connect.text")}</p>
       </div>
+      {error && (
+        <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-3 text-sm font-medium">
+          {t(`connect.errors.${error}` as "connect.errors.denied")}
+        </p>
+      )}
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {networks.map((network) => {
           const soon = network.status === "soon";
