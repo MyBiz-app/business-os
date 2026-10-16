@@ -81,7 +81,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "chief",
             "Chief of staff",
-            {"he": "אורי", "en": "Ori"},
+            {"he": "אדיר", "en": "Adir"},
             "#7C3AED",
             "Cross-cutting questions, what is urgent today, and handing you to the right agent.",
             "You are the chief of staff. Answer cross-cutting questions yourself with your tools. "
@@ -95,7 +95,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "secretary",
             "Personal secretary",
-            {"he": "מאיה", "en": "Maya"},
+            {"he": "שירי", "en": "Shiri"},
             "#06B6D4",
             "Calendar, bookings, waiting lists, reminders, free slots and client messages.",
             "You are the personal secretary: calendar, bookings, waiting lists, free slots and "
@@ -134,7 +134,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "finance",
             "Finance",
-            {"he": "עומר", "en": "Omer"},
+            {"he": "אדם", "en": "Adam"},
             "#10B981",
             "Open balances, bills, receipts, cash-flow outlook and monthly billing.",
             "You handle finance: what clients still owe, bills and receipts, and monthly billing. "
@@ -147,7 +147,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "team",
             "Team and shifts",
-            {"he": "תמר", "en": "Tamar"},
+            {"he": "אמה", "en": "Emma"},
             "#F59E0B",
             "Roster gaps, swaps, time off, hours for payroll and availability.",
             "You handle the team: roster gaps, swaps, time off, hours for payroll and staff "
@@ -160,7 +160,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "care",
             "Customer care",
-            {"he": "נועם", "en": "Noam"},
+            {"he": "נוח", "en": "Noah"},
             "#14B8A6",
             "The inbox, WhatsApp replies, reviews and clients at risk of leaving.",
             "You handle customer care: the inbox, replies, reviews and members at risk of "
@@ -173,7 +173,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "analyst",
             "Data analyst",
-            {"he": "רון", "en": "Ron"},
+            {"he": "איתן", "en": "Ethan"},
             "#6366F1",
             "Branch comparison, trends, anomalies and the weekly report.",
             "You are the data analyst: compare branches and periods, find trends and anomalies "
@@ -186,7 +186,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "creative",
             "Content and creative",
-            {"he": "שירה", "en": "Shira"},
+            {"he": "סופי", "en": "Sophie"},
             "#F43F5E",
             "Posts, promotion copy, newsletters, story scripts and social media advice.",
             "You write content: posts, promotion copy, newsletters and story scripts, and advise "
@@ -232,6 +232,11 @@ class Agent:
     avatar_preset: str | None = None
     avatar_key: str | None = None
     draft: bool = False
+    # Where the agent sits in the team structure (see app/ai/structure.py).
+    reports_to_key: str | None = None
+    team_id: UUID | None = None
+    map_x: float | None = None
+    map_y: float | None = None
 
 
 def _row_overrides(row: Any | None) -> dict[str, Any]:
@@ -271,6 +276,10 @@ def resolve(spec: AgentSpec | None, row: Any | None, locale: str) -> Agent:
         avatar_preset=data.get("avatar_preset"),
         avatar_key=data.get("avatar_key"),
         draft=bool(data.get("draft")),
+        reports_to_key=data.get("reports_to_key"),
+        team_id=data.get("team_id"),
+        map_x=data.get("map_x"),
+        map_y=data.get("map_y"),
     )
 
 

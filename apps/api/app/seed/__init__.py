@@ -34,6 +34,7 @@ from app.seed.common import (
     BranchSpec,
     BusinessSpec,
 )
+from app.seed.curate import curate
 from app.seed.demos import seed_demo
 from app.seed.platform import seed_platform
 from app.seed.profiles import enrich_profiles
@@ -73,6 +74,9 @@ def main() -> None:
         "Studio Bloom (hair salon, three) for one owner; "
         "categories: a gym network with a strength and a pilates branch, a padel network "
         "(three courts branches) and a beauty business, one per kind of calendar; "
+        "curated: reduce the owner's account to three businesses (the Adir fitness gym with "
+        "strength, pilates and crossfit branches, Studio Bloom and Urban Slice), removing other "
+        "businesses the owner alone owns; "
         "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
         "businesses (adds only, deletes nothing); "
         "platform: the owner email becomes a MyBiz team owner and the "
@@ -91,6 +95,9 @@ def main() -> None:
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
+        if args.demo == "curated":
+            print(curate(conn, args.owner_email, args.months, random.Random(args.seed)))
+            return
         if args.demo == "profiles":
             print(enrich_profiles(conn, args.owner_email))
             return

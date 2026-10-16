@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.ai import budget
+from app.ai import budget, structure
 from app.ai.agents import (
     CATALOG,
     DOMAINS,
@@ -73,10 +73,24 @@ class AgentCard(BaseModel):
     location_scope: Scope | None = None
     location_ids: list[UUID] | None = None
     model_tier: ModelTier | None = None
+    # The structure: who the agent reports to (the chief unless set), its team and its manual
+    # place on the map in percent of the stage.
+    reports_to: str | None = None
+    team_id: UUID | None = None
+    map_x: float | None = None
+    map_y: float | None = None
+
+
+class TeamGroup(BaseModel):
+    id: UUID
+    name: str = Field(min_length=1, max_length=60)
+    color: str = Field(default="#6B7280", pattern=COLOR)
+    lead_key: str | None = None
 
 
 class Team(BaseModel):
     agents: list[AgentCard]
+    teams: list[TeamGroup] = []
     credits_used: float
     credits_included: int
     payg_enabled: bool = False
@@ -198,6 +212,10 @@ def _card(
         upsell_module=upsell,
         credits_used_month=round(used.get(agent.key, 0), 2),
         routes=list(spec.routes) if spec else [],
+        reports_to=structure.effective_parent(agent),
+        team_id=agent.team_id,
+        map_x=agent.map_x,
+        map_y=agent.map_y,
     )
     if manage:
         card.instructions = agent.instructions
@@ -220,6 +238,7 @@ def _team(context: TenantContext, user_id: UUID) -> Team:
     agents = [_card(db, a, role_keys, used, manage) for a in everyone if not a.draft]
     return Team(
         agents=agents,
+        teams=[TeamGroup(**vars(t)) for t in structure.load_teams(db)],
         credits_used=round(budget.credits_used(db, _month_start(db)), 2),
         credits_included=budget.credits_included(db),
         payg_enabled=budget.spend_settings(db).payg_enabled,
@@ -231,6 +250,103 @@ def _team(context: TenantContext, user_id: UUID) -> Team:
 
 @router.get("/team")
 def ai_team(context: UseDep, user: UserDep) -> Team:
+    return _team(context, user.id)
+
+
+class Placement(BaseModel):
+    key: str
+    reports_to: str | None = None
+    team_id: UUID | None = None
+    map_x: float | None = Field(default=None, ge=0, le=100)
+    map_y: float | None = Field(default=None, ge=0, le=100)
+
+
+class StructureUpdate(BaseModel):
+    """The whole structure at once: every team and where each agent stands. Agents left out keep
+    what they have."""
+
+    teams: list[TeamGroup] = Field(max_length=20)
+    agents: list[Placement]
+
+
+@router.put("/structure")
+def update_structure(body: StructureUpdate, context: ManageDep, user: UserDep) -> Team:
+    """Saves who reports to whom, the teams and the map positions. The chief stays on top, there
+    are no cycles, and an agent the business cannot use (locked) cannot be connected."""
+    db = context.session
+    everyone = load_agents(db, tenant_locale(db))
+    by_key = {a.key: a for a in everyone}
+    role_keys = member_role_keys(db, context.role)
+    places = {p.key: p for p in body.agents}
+    if len(places) != len(body.agents) or {t.id for t in body.teams}.__len__() != len(body.teams):
+        raise _bad("duplicate")
+    for key, place in places.items():
+        agent = by_key.get(key)
+        if agent is None or agent.draft:
+            raise _bad("unknown_agent")
+        wired = place.reports_to is not None or place.team_id is not None
+        if wired and key != structure.CHIEF and state_of(db, agent, role_keys)[0] == "locked":
+            raise _bad("locked_agent")
+        parent = by_key.get(place.reports_to or "")
+        if parent is not None and state_of(db, parent, role_keys)[0] == "locked":
+            raise _bad("locked_agent")
+    parents = {
+        a.key: (places[a.key].reports_to if a.key in places else a.reports_to_key)
+        for a in everyone
+        if not a.draft
+    }
+    kept = {t.id for t in body.teams}
+    members = {
+        a.key: (places[a.key].team_id if a.key in places else a.team_id)
+        for a in everyone
+        if not a.draft
+    }
+    # Agents left out of the request lose a team the request removes (the database frees them).
+    members = {
+        k: (v if v is None or v in kept or k in places else None) for k, v in members.items()
+    }
+    try:
+        structure.check_structure(
+            set(parents),
+            parents,
+            {t.id for t in body.teams},
+            members,
+            {t.id: t.lead_key for t in body.teams},
+        )
+    except structure.StructureError as error:
+        raise _bad(str(error)) from None
+
+    keep = [t.id for t in body.teams]
+    db.execute(text("DELETE FROM app.ai_agent_teams WHERE NOT (id = ANY(:keep))"), {"keep": keep})
+    for t in body.teams:
+        db.execute(
+            text("""
+                INSERT INTO app.ai_agent_teams (id, tenant_id, name, color, lead_key)
+                VALUES (:id, app.current_tenant_id(), :name, :color, :lead)
+                ON CONFLICT (tenant_id, id) DO UPDATE
+                SET name = EXCLUDED.name, color = EXCLUDED.color, lead_key = EXCLUDED.lead_key
+            """),
+            {"id": t.id, "name": t.name, "color": t.color, "lead": t.lead_key},
+        )
+    for key, place in places.items():
+        values = {
+            "reports_to_key": place.reports_to if key != structure.CHIEF else None,
+            "team_id": place.team_id,
+            "map_x": place.map_x,
+            "map_y": place.map_y,
+        }
+        agent = by_key[key]
+        if agent.id is None:  # a built-in agent nobody changed yet: its row appears now
+            _write(db, {"tenant_id": context.tenant_id, "builtin_key": key, **values})
+        else:
+            db.execute(
+                text(
+                    "UPDATE app.ai_agents SET reports_to_key = :reports_to_key, "
+                    "team_id = :team_id, map_x = :map_x, map_y = :map_y, updated_at = now() "
+                    "WHERE id = :id"
+                ),
+                {**values, "id": agent.id},
+            )
     return _team(context, user.id)
 
 
@@ -289,6 +405,7 @@ CASTS = {
     "allowed_roles": "text[]",
     "location_ids": "uuid[]",
     "location_group_ids": "uuid[]",
+    "team_id": "uuid",
 }
 NOT_NULL = {"enabled", "location_scope", "location_ids"}
 
@@ -297,7 +414,8 @@ AGENT_COLUMNS = frozenset(
     {
         "tenant_id", "builtin_key", "name", "role_title", "color", "topic", "instructions", "tone",
         "tool_domains", "enabled", "location_scope", "location_ids", "allowed_roles",
-        "model_tier", "avatar_kind", "avatar_preset", "avatar_key", "draft",
+        "model_tier", "avatar_kind", "avatar_preset", "avatar_key", "draft", "reports_to_key",
+        "team_id", "map_x", "map_y",
     }
 )  # fmt: skip
 
@@ -420,7 +538,13 @@ def delete_agent(agent_key: str, context: ManageDep) -> None:
     agent_id = _agent_id(context.session, agent_key)
     if agent_id is None:
         raise not_found()
-    context.session.execute(text("DELETE FROM app.ai_agents WHERE id = :id"), {"id": agent_id})
+    db = context.session
+    for statement in (
+        "UPDATE app.ai_agents SET reports_to_key = NULL WHERE reports_to_key = :key",
+        "UPDATE app.ai_agent_teams SET lead_key = NULL WHERE lead_key = :key",
+    ):
+        db.execute(text(statement), {"key": agent_key})
+    db.execute(text("DELETE FROM app.ai_agents WHERE id = :id"), {"id": agent_id})
 
 
 def _manageable(db: Session, key: str) -> Agent:

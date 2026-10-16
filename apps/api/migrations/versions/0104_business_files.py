@@ -12,7 +12,7 @@
 - The business's space allowance now counts these files too (`app.storage_used`).
 
 Revision ID: 0104
-Revises: 0103
+Revises: 0111
 Create Date: 2026-10-16
 """
 
@@ -21,7 +21,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0104"
-down_revision: str | None = "0103"
+down_revision: str | None = "0111"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

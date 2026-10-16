@@ -1678,6 +1678,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/messages/placeholders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Placeholders
+         * @description The variables a message may use, grouped, with sample values for the live preview.
+         */
+        get: operations["placeholders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/messages/audiences": {
         parameters: {
             query?: never;
@@ -4521,6 +4541,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/structure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Structure
+         * @description Saves who reports to whom, the teams and the map positions. The chief stays on top, there
+         *     are no cycles, and an agent the business cannot use (locked) cannot be connected.
+         */
+        put: operations["update_structure"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/agents/{agent_key}": {
         parameters: {
             query?: never;
@@ -6674,6 +6715,14 @@ export interface components {
             location_ids?: string[] | null;
             /** Model Tier */
             model_tier?: ("fast" | "standard" | "strong") | null;
+            /** Reports To */
+            reports_to?: string | null;
+            /** Team Id */
+            team_id?: string | null;
+            /** Map X */
+            map_x?: number | null;
+            /** Map Y */
+            map_y?: number | null;
         };
         /**
          * AgentChange
@@ -7656,6 +7705,11 @@ export interface components {
              * @description The text as the first recipient gets it
              */
             preview: string | null;
+            /**
+             * Warnings
+             * @description Variables some recipients have no value for (set a fallback with {name|text})
+             */
+            warnings?: components["schemas"]["PlaceholderWarning"][];
         };
         /** Catalog */
         Catalog: {
@@ -11162,6 +11216,48 @@ export interface components {
              */
             by_service: components["schemas"]["SharedByService"][];
         };
+        /** PlaceholderGroup */
+        PlaceholderGroup: {
+            /** Key */
+            key: string;
+            /** Variables */
+            variables: string[];
+        };
+        /** PlaceholderWarning */
+        PlaceholderWarning: {
+            /** Variable */
+            variable: string;
+            /**
+             * Recipients
+             * @description How many recipients have no value and no fallback
+             */
+            recipients: number;
+        };
+        /** Placeholders */
+        Placeholders: {
+            /** Groups */
+            groups: components["schemas"]["PlaceholderGroup"][];
+            /**
+             * Sample
+             * @description Values of a made-up client, for the preview
+             */
+            sample: {
+                [key: string]: string;
+            };
+        };
+        /** Placement */
+        Placement: {
+            /** Key */
+            key: string;
+            /** Reports To */
+            reports_to?: string | null;
+            /** Team Id */
+            team_id?: string | null;
+            /** Map X */
+            map_x?: number | null;
+            /** Map Y */
+            map_y?: number | null;
+        };
         /** Plan */
         Plan: {
             /**
@@ -13574,6 +13670,17 @@ export interface components {
             /** Status */
             status: ("trial" | "active") | null;
         };
+        /**
+         * StructureUpdate
+         * @description The whole structure at once: every team and where each agent stands. Agents left out keep
+         *     what they have.
+         */
+        StructureUpdate: {
+            /** Teams */
+            teams: components["schemas"]["TeamGroup"][];
+            /** Agents */
+            agents: components["schemas"]["Placement"][];
+        };
         /** SupportAccess */
         SupportAccess: {
             /**
@@ -13724,6 +13831,23 @@ export interface components {
              * @default false
              */
             precise_timing: boolean;
+        };
+        /** TeamGroup */
+        TeamGroup: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Color
+             * @default #6B7280
+             */
+            color: string;
+            /** Lead Key */
+            lead_key?: string | null;
         };
         /** Template */
         Template: {
@@ -14508,6 +14632,11 @@ export interface components {
         app__api__ai_team__Team: {
             /** Agents */
             agents: components["schemas"]["AgentCard"][];
+            /**
+             * Teams
+             * @default []
+             */
+            teams: components["schemas"]["TeamGroup"][];
             /** Credits Used */
             credits_used: number;
             /** Credits Included */
@@ -19107,6 +19236,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    placeholders: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Placeholders"];
                 };
             };
             /** @description Validation Error */
@@ -26039,6 +26201,43 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__ai_team__Team"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_structure: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StructureUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

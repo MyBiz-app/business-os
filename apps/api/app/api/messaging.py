@@ -2,8 +2,9 @@
 to a client or lead, and the message log. Needs the WhatsApp module; sending needs
 `clients.write`, reading the log `clients.read`.
 
-Texts may use {first_name} and {business}; each recipient gets the text with their own
-values, which is what the log stores. Each message counts as usage (meter "messages").
+Texts may use the variables of app/messaging/placeholders.py ({first_name}, {plan_name|fallback},
+...); each recipient gets the text with their own values, which is what the log stores. Each
+message counts as usage (meter "messages").
 
 A campaign can be aimed at some of the business's branches (round 5, F4): the clients who belong
 to them (their home branch or "my branches" list), or the staff who work in them. WhatsApp and SMS
@@ -23,6 +24,14 @@ from sqlalchemy.orm import Session
 from app.api.common import not_found
 from app.api.deps import TenantContext, ensure_branch_allowed, has_module, require
 from app.core.permissions import Permission
+from app.messaging.placeholders import (
+    GROUPS,
+    SAMPLE,
+    client_values,
+    lead_values,
+    missing_counts,
+    render_placeholders,
+)
 from app.providers.choice import choose
 from app.reports.metrics import members_at_risk
 
@@ -135,11 +144,30 @@ class CampaignCreate(BaseModel):
         return _body(value)
 
 
+class PlaceholderWarning(BaseModel):
+    variable: str
+    recipients: int = Field(description="How many recipients have no value and no fallback")
+
+
 class CampaignResult(BaseModel):
     id: UUID | None
     recipients: int
     by_channel: dict[str, int] = Field(default_factory=dict)
     preview: str | None = Field(description="The text as the first recipient gets it")
+    warnings: list[PlaceholderWarning] = Field(
+        default_factory=list,
+        description="Variables some recipients have no value for (set a fallback with {name|text})",
+    )
+
+
+class PlaceholderGroup(BaseModel):
+    key: str
+    variables: list[str]
+
+
+class Placeholders(BaseModel):
+    groups: list[PlaceholderGroup]
+    sample: dict[str, str] = Field(description="Values of a made-up client, for the preview")
 
 
 class Campaign(BaseModel):
@@ -327,6 +355,15 @@ def _by_channel(db: Session, people: list[Recipient], channels: list[Channel]) -
     return counts
 
 
+@router.get("/placeholders")
+def placeholders(context: ReadAnyDep) -> Placeholders:
+    """The variables a message may use, grouped, with sample values for the live preview."""
+    return Placeholders(
+        groups=[PlaceholderGroup(key=k, variables=list(v)) for k, v in GROUPS.items()],
+        sample={**SAMPLE, "business": _business(context.session)},
+    )
+
+
 @router.get("/audiences")
 def audiences(
     context: ReadAnyDep,
@@ -361,9 +398,21 @@ def _business(db: Session) -> str:
     ).scalar_one()
 
 
-def render(body: str, first_name: str, business: str) -> str:
-    """Fills {first_name} and {business}; other braces are left as typed."""
-    return body.replace("{first_name}", first_name).replace("{business}", business)
+def _values(
+    db: Session, tenant_id: UUID, people: list[Recipient], business: str
+) -> list[dict[str, str]]:
+    """The placeholder values of each recipient, in order."""
+    known = client_values(db, tenant_id, [p.client_id for p in people if p.client_id], business)
+    return [
+        known.get(p.client_id)
+        if p.client_id and p.client_id in known
+        else lead_values({"first_name": p.first_name, "phone": p.phone, "email": p.email}, business)
+        for p in people
+    ]
+
+
+def render(body: str, person: dict[str, str]) -> str:
+    return render_placeholders(body, person)
 
 
 def _send(
@@ -383,9 +432,11 @@ def _send(
             "lead_id": r.lead_id,
             "channel": channel,
             "to_phone": (r.phone or "").strip(),
-            "body": render(body, r.first_name, business),
+            "body": render(body, values),
         }
-        for r in recipients
+        for r, values in zip(
+            recipients, _values(db, context.tenant_id, recipients, business), strict=True
+        )
     ]
     if not rows:
         return
@@ -484,11 +535,20 @@ def send_campaign(body: CampaignCreate, context: SendAnyDep) -> CampaignResult:
     scope = _scope(context, body.location_ids)
     people = _people(db, body.audience, channels, scope, body.promotional)
     business = _business(db)
-    preview = render(body.body, people[0].first_name, business) if people else None
+    values = _values(db, context.tenant_id, people, business)
+    preview = render(body.body, values[0]) if people else None
+    warnings = [
+        PlaceholderWarning(variable=name, recipients=n)
+        for name, n in missing_counts(body.body, values).items()
+    ]
     by_channel = _by_channel(db, people, channels)
     if body.dry_run or not people:
         return CampaignResult(
-            id=None, recipients=len(people), by_channel=by_channel, preview=preview
+            id=None,
+            recipients=len(people),
+            by_channel=by_channel,
+            preview=preview,
+            warnings=warnings,
         )
     campaign_id = db.execute(
         text("""
@@ -514,7 +574,11 @@ def send_campaign(body: CampaignCreate, context: SendAnyDep) -> CampaignResult:
     if net:
         _announce(context, people, net, body, scope, business)
     return CampaignResult(
-        id=campaign_id, recipients=len(people), by_channel=by_channel, preview=preview
+        id=campaign_id,
+        recipients=len(people),
+        by_channel=by_channel,
+        preview=preview,
+        warnings=warnings,
     )
 
 

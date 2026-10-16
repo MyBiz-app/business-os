@@ -1,5 +1,5 @@
 # ruff: noqa: F811, F401
-"""Shira, the content agent: reads the studio's numbers, saves drafts and publishes only after
+"""Sophie, the content agent: reads the studio's numbers, saves drafts and publishes only after
 the owner confirms a card. Branch scope and permissions apply like for every other agent."""
 
 from types import SimpleNamespace

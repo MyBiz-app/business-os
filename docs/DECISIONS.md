@@ -214,6 +214,17 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Payslips and employee papers are sealed with `API_SECRETS_KEY` (Fernet) before they reach the database or the object store, so a signed storage link is never used for them: the API opens and serves them. Folders with `retain` never delete a file, only archive it.
 - A file filed for one employee (`owner_user_id`) is always open to that employee ("My documents"), whatever the folder's permission. `payroll.read` is named in the payslips folder before the payroll slice defines it; owners open every folder.
 - Files in the imports folder expire after 30 days and are removed by the daily `purge-expired` job.
+### AI agent names and faces (2026-10-16, round 6 U2)
+
+- Built-in agent names are international and work in Hebrew and English: Adir, Shiri, Lia, Daniel, Adam, Emma, Noah, Ethan, Sophie. The chief defaults to the owner's own first name.
+- Built-in agents use realistic portraits that are AI-generated or supplied by the owner, never photos of real customers. The earlier illustrations live on as `gallery-17` to `gallery-25`.
+- A name or face the business changed is stored as an override and is never replaced by a default change.
+
+### AI team structure (2026-10-16, round 6 U3, migration 0111)
+
+- Reporting lines are stored per agent (`reports_to_key`, default the chief); teams are a table with an optional lead. Built-in agents keep these on their override row.
+- Hand-overs go to a team's lead first (`handoff_target`); the morning briefing is not yet grouped by team.
+- A locked agent cannot be wired in; the chief cannot report to anyone; loops are refused by the API.
 
 ## Open
 

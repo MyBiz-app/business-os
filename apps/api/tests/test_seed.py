@@ -14,6 +14,7 @@ from app.seed import (
     seed_demo,
     seed_platform,
 )
+from app.seed.curate import curate
 from app.seed.profiles import _add_crossfit_branch, enrich_profiles
 
 
@@ -422,6 +423,48 @@ def test_profiles_add_logos_portraits_and_a_crossfit_branch_without_repeating(
             {"t": tenant},
         ).one()
     assert row.client_portraits == 40 and row.without_logo == 0
+
+
+def test_curate_reduces_an_account_to_three_businesses_and_leaves_others_alone(
+    engine: Engine,
+) -> None:
+    owner, other = uuid4(), uuid4()
+    email, other_email = f"cur-{owner.hex[:6]}@example.com", f"oth-{other.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        for user, address in ((owner, email), (other, other_email)):
+            connection.execute(
+                text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+                {"id": user, "email": address},
+            )
+        (foreign,) = seed_demo(connection, other_email, "club", 1, random.Random(5))
+        seed_demo(connection, email, "categories", 1, random.Random(4))
+        connection.execute(
+            text("UPDATE app.tenants t SET name = 'Iron & Flow' WHERE t.name = 'Adir fitness'")
+        )  # an account seeded before the rename
+    with engine.begin() as connection:  # a run of its own, as on staging
+        first = curate(connection, email, 1, random.Random(4))
+    with engine.begin() as connection:
+        again = curate(connection, email, 1, random.Random(4))
+    assert first["removed"] == 2 and first["created"] == 2  # Padel Nation, Glow Beauty out
+    assert again["removed"] == 0 and again["created"] == 0
+    with engine.connect() as connection:
+        rows = connection.execute(
+            text("""
+                SELECT t.name, array_agg(DISTINCT l.kind) FILTER (WHERE l.kind IS NOT NULL)
+                FROM app.tenants t
+                JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner'
+                JOIN app.users u ON u.id = m.user_id AND u.email = :email
+                LEFT JOIN app.locations l ON l.tenant_id = t.id GROUP BY t.name
+            """),
+            {"email": email},
+        ).all()
+        foreign_left = connection.execute(
+            text("SELECT count(*) FROM app.tenants WHERE id = :id"), {"id": foreign}
+        ).scalar_one()
+    kinds = dict(rows)
+    assert set(kinds) == {"Adir fitness", "Studio Bloom", "Urban Slice"}
+    assert {"gym", "pilates", "crossfit"} <= set(kinds["Adir fitness"])
+    assert foreign_left == 1
 
 
 def test_networks_demo_has_the_round_5_features(engine: Engine) -> None:
