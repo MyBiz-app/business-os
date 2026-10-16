@@ -96,10 +96,15 @@ def seed(
         branches.append(
             conn.execute(
                 text("""
-                    INSERT INTO app.locations (tenant_id, name, address, created_at)
-                    VALUES (:t, :name, :address, clock_timestamp()) RETURNING id
+                    INSERT INTO app.locations (tenant_id, name, address, kind, created_at)
+                    VALUES (:t, :name, :address, :kind, clock_timestamp()) RETURNING id
                 """),
-                {"t": tenant_id, "name": branch.name, "address": branch.address},
+                {
+                    "t": tenant_id,
+                    "name": branch.name,
+                    "address": branch.address,
+                    "kind": branch.kind,
+                },
             ).scalar_one()
         )
 
