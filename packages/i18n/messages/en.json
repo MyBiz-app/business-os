@@ -3417,7 +3417,13 @@
       "to": "Your business, live",
       "trial": "14 days free",
       "once": "One-time (with the first invoice)",
-      "celebrate": "What a plan! One more step and you're off"
+      "celebrate": "What a plan! One more step and you're off",
+      "passNumber": "Company no.",
+      "passCategory": "Category",
+      "passSize": "Size",
+      "passSizeValue": "{staff, plural, one {# employee} other {# employees}} · {locations, plural, one {# location} other {# locations}}",
+      "passAddons": "Add-ons",
+      "passNoAddons": "Core only"
     },
     "finish": {
       "title": "Last step: payment details",
