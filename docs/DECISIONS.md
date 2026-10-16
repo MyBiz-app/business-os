@@ -175,6 +175,12 @@ When a decision changes, update the row and note the date - do not delete histor
 
 Business code asks for a tier (`fast`, `standard`, `strong`), never a model name; the registry in `app/ai/models.py` holds vendor, tier, prices and context per model. OpenAI and Gemini adapters exist and are tested but stay disabled (`ENABLED_VENDORS`) until the business operates and has a key (paid-provider policy). The fallback provider moves to the next provider only when one is unavailable, not when it is rate limiting us. Long and medium dashes are stripped from all model text.
 
+### AI agents core (2026-10-16, round 5 A1)
+
+The nine built-in agents live in code (`app/ai/agents.py`); a database row (`app.ai_agents`, migration 0083) only holds the business's overrides, and custom agents are full rows. An agent is a persona, instructions, a toolbox of tool domains (`TOOL_DOMAINS` in `app/ai/tools.py`, a test fails for a tool without one), a branch scope, the roles that may use it and a model tier (`fast` starts cheap and escalates as before; `standard` and `strong` use the strong model from the first step). New permission `ai.manage` (owner and manager) shapes the team; `ai.use` still gates chatting.
+
+The branches a conversation sees are the user's branches ∩ the agent's scope ∩ the chat's scope, applied to the whole tool run (the `app.location_ids` setting and the `TenantContext`). Scope only narrows. Clients are filtered with the same rule as the client list. Tools whose data has no branch (leads) are not offered at all while the conversation is narrowed, which also applies to a branch-limited user (previously they saw the whole pipeline). A scope that names branch groups sees nothing until groups exist (G1). The chief gets a `suggest_agent` tool that only offers a hand-over card; the new chat carries a short summary of the last exchange. The owner's agent instructions sit below the fixed rules in the system prompt and cannot widen tools or data.
+
 ## Open
 
 | # | Question |

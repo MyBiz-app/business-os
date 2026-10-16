@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 
 from app.api import (
+    ai_team,
     appointments,
     assistant,
     attention,
@@ -108,6 +109,7 @@ ROUTERS: list[APIRouter] = [
     reviews.router,
     reviews.client_router,
     assistant.router,
+    ai_team.router,
     modules.router,
     billing.router,
     welcome.router,

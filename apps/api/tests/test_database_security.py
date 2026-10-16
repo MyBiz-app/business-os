@@ -113,6 +113,7 @@ def test_api_sends_security_headers(client: TestClient) -> None:
 # Foreign keys that only record who did something. Nothing filters on them and a person is
 # almost never deleted, so an index would only slow down inserts (migration 0071).
 UNINDEXED_USER_KEYS = {
+    ("ai_agents", "created_by"),
     ("ai_conversations", "user_id"),
     ("bookings", "created_by"),
     ("campaigns", "created_by"),
