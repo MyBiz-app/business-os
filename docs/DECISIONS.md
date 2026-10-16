@@ -185,6 +185,13 @@ The nine built-in agents live in code (`app/ai/agents.py`); a database row (`app
 
 The branches a conversation sees are the user's branches ∩ the agent's scope ∩ the chat's scope, applied to the whole tool run (the `app.location_ids` setting and the `TenantContext`). Scope only narrows. Clients are filtered with the same rule as the client list. Tools whose data has no branch (leads) are not offered at all while the conversation is narrowed, which also applies to a branch-limited user (previously they saw the whole pipeline). A scope that names branch groups sees nothing until groups exist (G1). The chief gets a `suggest_agent` tool that only offers a hand-over card; the new chat carries a short summary of the last exchange. The owner's agent instructions sit below the fixed rules in the system prompt and cannot widen tools or data.
 
+### Branch manager role (2026-10-16, round 5 G2)
+
+- One system role `branch_manager` plus a branch list (`tenant_members.location_ids`), not a different role per branch. Per-branch roles stay a later option if a business needs them.
+- It is the manager bundle minus everything business-wide: `business.settings`, `ai.manage`, `catalog.write`, `catalog.delete` (and, as for managers, no `clients.privacy`). Custom roles, new branches and appointing a branch manager stay with owners and managers.
+- Branch scope is enforced on the server: a branch manager reaches only people kept to branches inside their own, only staff and front desk, and can name only their own branches. A branch manager with no branch is refused (`no_branches`), because an empty list means "all branches" for everyone else.
+- `locations.manager_user_id` records who manages a branch (the first owner by default, set by a trigger); appointing a staff member turns them into a branch manager at that branch, the previous manager steps down to staff there, and the branch's people get the new manager as suggested `reports_to`.
+
 ## Open
 
 | # | Question |

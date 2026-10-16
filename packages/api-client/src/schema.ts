@@ -1601,6 +1601,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/locations/{location_id}/manager": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Appoint Branch Manager
+         * @description Appoints a team member as the branch's manager. Staff become branch managers: manager
+         *     rights at the branches they manage only. The previous manager steps down.
+         */
+        put: operations["appoint_branch_manager"];
+        post?: never;
+        /**
+         * Remove Branch Manager
+         * @description The branch has no appointed manager (its owner still reaches it).
+         */
+        delete: operations["remove_branch_manager"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -5853,6 +5878,15 @@ export interface components {
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
         };
+        /** BranchManager */
+        BranchManager: {
+            /**
+             * User Id
+             * Format: uuid
+             * @description The team member who will manage the branch
+             */
+            user_id: string;
+        };
         /** BranchMetric */
         BranchMetric: {
             /**
@@ -6035,7 +6069,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Logo Url */
             logo_url: string | null;
             /** Primary Color */
@@ -7101,7 +7135,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /**
              * Status
              * @enum {string}
@@ -7117,6 +7151,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Location Ids
+             * @description Branches the new member will be kept to
+             */
+            location_ids: string[];
             /** Token */
             token: string;
         };
@@ -7961,7 +8000,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /**
              * Status
              * @enum {string}
@@ -7977,6 +8016,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Location Ids
+             * @description Branches the new member will be kept to
+             */
+            location_ids: string[];
         };
         /** InvitationCreate */
         InvitationCreate: {
@@ -7989,7 +8033,12 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
+            /**
+             * Location Ids
+             * @description Branches the new member is kept to (empty: all; a branch manager's own)
+             */
+            location_ids?: string[];
         };
         /** InvitationPreview */
         InvitationPreview: {
@@ -7999,7 +8048,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Email */
             email: string;
             /**
@@ -8436,6 +8485,11 @@ export interface components {
             /** Rooms */
             rooms: components["schemas"]["Room"][];
             /**
+             * Manager User Id
+             * @description Who manages the branch (the owner until someone is appointed)
+             */
+            manager_user_id: string | null;
+            /**
              * Kind
              * @description The branch's own sub-category, if it set one
              */
@@ -8604,7 +8658,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Custom Role Id */
             custom_role_id: string | null;
             /** Custom Role Name */
@@ -8697,7 +8751,7 @@ export interface components {
          */
         MemberUpdate: {
             /** Role */
-            role?: ("owner" | "manager" | "staff" | "front_desk") | null;
+            role?: ("owner" | "manager" | "branch_manager" | "staff" | "front_desk") | null;
             /** Custom Role Id */
             custom_role_id?: string | null;
         };
@@ -8714,7 +8768,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
         };
         /** Message */
         Message: {
@@ -11380,7 +11434,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "owner" | "manager" | "staff" | "front_desk";
+            key: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Permissions */
             permissions: string[];
         };
@@ -11578,7 +11632,7 @@ export interface components {
              * Role
              * @description 'support': MyBiz support, read-only, while the owner's grant lasts. 'platform': MyBiz staff working in the business for its owner (audited).
              */
-            role: ("owner" | "manager" | "staff" | "front_desk") | ("support" | "platform");
+            role: ("owner" | "manager" | "branch_manager" | "staff" | "front_desk") | ("support" | "platform");
         };
         /** TenantCreate */
         TenantCreate: {
@@ -16392,6 +16446,80 @@ export interface operations {
         };
     };
     delete_location_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    appoint_branch_manager: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchManager"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_branch_manager: {
         parameters: {
             query?: never;
             header: {
