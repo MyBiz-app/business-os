@@ -2,7 +2,7 @@ import { MailPlus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 
-import { signOut } from "@/app/(auth)/actions";
+import { signOutToLogin } from "@/app/(auth)/actions";
 import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
 import { ScopedMessages } from "@/components/scoped-messages";
 import { getApi } from "@/lib/api";
@@ -48,7 +48,7 @@ export default async function InvitePage({ params }: PageProps<"/invite/[token]"
       content = (
         <>
           <p>{t("invite.wrongEmail", { invited: isolate(invite.email), current: isolate(email ?? "") })}</p>
-          <form action={signOut}>
+          <form action={signOutToLogin}>
             <button type="submit" className="btn-secondary w-full px-4 py-2.5">
               {t("auth.signOut")}
             </button>
