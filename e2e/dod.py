@@ -143,6 +143,8 @@ with sync_playwright() as p:
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
+    owner.on("pageerror", lambda e: print("pageerror:", e))
+    owner.on("console", lambda m: print("console:", m.text[:300]) if m.type == "error" else None)
     owner.goto(f"{h.BASE}/ai?agent=chief"); h.ready(owner)  # opens the chat with the chief agent
     expect(owner.locator("#ai-question")).to_be_visible(timeout=20000)
     h.ready(owner)
