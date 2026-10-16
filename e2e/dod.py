@@ -145,7 +145,14 @@ with sync_playwright() as p:
     # AI: question, then an action that needs confirmation.
     owner.goto(f"{h.BASE}/ai"); h.ready(owner)
     owner.get_by_role("button", name="אורי").first.click()
-    owner.get_by_label("השאלה שלך").fill("איך היה החודש שעבר?")
+    h.ready(owner)
+    for _ in range(5):  # the chat re-renders when its history arrives and then drops what was typed
+        owner.get_by_label("השאלה שלך").fill("איך היה החודש שעבר?")
+        try:
+            expect(owner.get_by_role("button", name="שליחה")).to_be_enabled(timeout=2000)
+            break
+        except AssertionError:
+            continue
     owner.get_by_role("button", name="שליחה").click()
     expect(owner.get_by_text("ב-30 הימים האחרונים")).to_be_visible(timeout=20000)
     owner.get_by_label("השאלה שלך").fill("תרשום את כהן לשיעור מחר")
