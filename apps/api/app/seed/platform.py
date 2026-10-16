@@ -136,7 +136,16 @@ def _seed_announcements(conn: Connection, owners: int) -> None:
             {
                 "kind": kind,
                 "channels": channels,
-                "audience": json.dumps({"groups": ["owners"]}),
+                "audience": json.dumps(
+                    {
+                        "groups": ["owners"],
+                        "verticals": [],
+                        "locales": [],
+                        "business_ids": [],
+                        "modules": [],
+                        "status": None,
+                    }
+                ),
                 "content": json.dumps(content),
                 "status": status,
                 "count": owners if status == "sent" else None,
