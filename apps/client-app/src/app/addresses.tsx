@@ -79,7 +79,7 @@ export default function Addresses() {
           palette={palette}
           title={line(address)}
           subtitle={address.notes ?? undefined}
-          accessibilityLabel={`${address.active ? tAddress("retire") : tAddress("restore")} – ${line(address)}`}
+          accessibilityLabel={`${address.active ? tAddress("retire") : tAddress("restore")} - ${line(address)}`}
           onPress={() => void retire(address)}
           trailing={<Badge label={address.active ? tAddress("retire") : tAddress("inactive")} palette={palette} />}
         />

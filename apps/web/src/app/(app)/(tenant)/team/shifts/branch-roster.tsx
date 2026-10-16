@@ -22,8 +22,8 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, st
         const branch = branchById.get(shift.locationId);
         return (
           <li key={shift.id} className="relative flex items-center gap-2.5 rounded-lg px-2 py-1.5 focus-within:ring-2 focus-within:ring-primary" style={{ background: `color-mix(in oklab, ${branch?.color ?? "var(--primary)"} ${shift.draft ? 4 : 10}%, var(--surface))`, outline: shift.draft ? "1px dashed var(--border)" : undefined }}>
-            {editHref && <Link href={editHref(shift.id)} scroll={false} aria-label={`${who?.name ?? ""}: ${shift.starts}–${shift.ends}`} className="absolute inset-0 rounded-lg outline-none" />}
-            <span dir="ltr" className="w-[6.5rem] shrink-0 text-sm font-semibold tabular-nums">{shift.starts}–{shift.ends}</span>
+            {editHref && <Link href={editHref(shift.id)} scroll={false} aria-label={`${who?.name ?? ""}: ${shift.starts}-${shift.ends}`} className="absolute inset-0 rounded-lg outline-none" />}
+            <span dir="ltr" className="w-[6.5rem] shrink-0 text-sm font-semibold tabular-nums">{shift.starts}-{shift.ends}</span>
             {who && <Avatar id={who.id} name={who.name} src={who.avatar} size="sm" />}
             <span className="flex min-w-0 flex-col">
               <span dir="auto" className="truncate text-sm font-medium">{who?.name}</span>
@@ -73,7 +73,7 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, st
                       .map((g) => (
                         <p key={`${g.starts}-${g.ends}`} className="flex items-center gap-1.5 rounded-lg bg-warning/10 px-2 py-1 text-xs">
                           <ShieldAlert aria-hidden="true" className="size-3.5 shrink-0 text-warning" />
-                          <span dir="ltr" className="tabular-nums">{g.starts}–{g.ends}</span>
+                          <span dir="ltr" className="tabular-nums">{g.starts}-{g.ends}</span>
                           <span>{t("coverage.gap", { have: g.have, needed: g.needed })}</span>
                         </p>
                       ))}

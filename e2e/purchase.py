@@ -65,7 +65,7 @@ with sync_playwright() as p:
     except AssertionError:
         member.screenshot(path=f"{h.OUT}/purchase-failed.png", full_page=True)
         raise
-    buy = member.get_by_role("button", name=re.compile("^רכישה – כרטיסייה"))
+    buy = member.get_by_role("button", name=re.compile("^רכישה - כרטיסייה"))
     expect(buy).to_be_visible()
     h.app_ready(member)
     serious = [v["id"] for v in Axe().run(member).response["violations"] if v["impact"] in ("serious", "critical")]

@@ -130,7 +130,7 @@ with sync_playwright() as p:
     expect(member.get_by_text("הצהרת בריאות בתוקף")).to_be_visible()
     member.goto(f"{APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
-    member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
+    member.get_by_role("button", name=re.compile("^הרשמה - פילאטיס")).click()
     expect(member.get_by_text("נרשמת")).to_be_visible()
     member.screenshot(path=f"{h.OUT}/dod-member.png")
     print("5. member sees branded app and books: ok")

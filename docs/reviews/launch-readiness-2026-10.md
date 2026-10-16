@@ -25,7 +25,7 @@ are stored inside Postgres. All of it is fixable in roughly two to three weeks o
 slices, in the order at the end.
 
 Severity: **P0** blocks taking paying customers · **P1** within the first month of operation ·
-**P2** hygiene, do when touching the area. Size: **S** ≤ half a day · **M** 1–2 days · **L** 3+ days.
+**P2** hygiene, do when touching the area. Size: **S** ≤ half a day · **M** 1-2 days · **L** 3+ days.
 
 ## What is sound (keep it)
 
@@ -75,7 +75,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
   staging-by-hand only (`workflow_dispatch`). Every job logs a start/end line and its counts, and
   a failed run alerts (P0-3). Delete `keep-api-awake.yml` once the API is on a paid plan.
 - **Done when:** a job's last successful run is visible and alerts fire when one is missed.
-- **Size:** S–M · **Model:** Sonnet.
+- **Size:** S-M · **Model:** Sonnet.
 
 ### P0-3 · No logging, error tracking or alerting anywhere
 - **Progress:** ✅ (1) API structured JSON logs, request ids, stable 500 body, slow-query log (this PR). Still open: (2) error tracker and (3) uptime monitor (need an account), (4) ✅ web error pages (error, global-error, not-found; PR 2).
@@ -122,7 +122,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
   `forwarded-allow-ips` to the proxy.
 - **Done when:** a test proves that a spoofed header from outside does not reset the count, and
   that the web server's forwarded address still counts per visitor.
-- **Size:** S–M · **Model:** Opus.
+- **Size:** S-M · **Model:** Opus.
 
 ### P0-6 · The AI assistant has no cost ceiling (before connecting the key, #50)
 - **Where:** `app/ai/gateway.py` (`max_tokens=16000`), `app/ai/assistant.py` (`MAX_STEPS = 8`),
@@ -166,7 +166,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** S · **Model:** Sonnet.
 
 ### P0-9 · Legal and account basics
-- **Where:** privacy review items 2–4; `app/jobs.py:339` (deletion of a departed business waits
+- **Where:** privacy review items 2-4; `app/jobs.py:339` (deletion of a departed business waits
   for an account-closing flow that does not exist).
 - **Fix:** a privacy notice and processing agreement for businesses, the sub-processor list, an
   account-closing flow (owner closes the business; data deleted after 90 days per X20), terms of
@@ -194,7 +194,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Why:** one Python process handles everything; the thread pool (40) can outrun the 15
   connections, and a slow AI call holds a thread. Supabase limits direct connections; moving to
   its pooler in transaction mode needs psycopg's prepared statements off.
-- **Fix:** run 2–4 workers (gunicorn with uvicorn workers, sized to the instance), set
+- **Fix:** run 2-4 workers (gunicorn with uvicorn workers, sized to the instance), set
   `pool_size`/`max_overflow`/`pool_timeout` from settings, connect through Supavisor with
   `prepare_threshold=None` (the per-transaction `SET LOCAL` context already works in transaction
   mode), and move the assistant's model calls off the request thread or give them their own limit.
@@ -259,9 +259,9 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
   `apps/web/src/components/live-refresh.tsx` (every 60 s, a full server re-render of the page with
   all of its API calls, per open tab).
 - **Fix:** one SQL function that sets the context and returns role, permissions and branches in
-  a single call; `LiveRefresh` at 3–5 minutes plus refresh on focus, or a cheap "changed since"
+  a single call; `LiveRefresh` at 3-5 minutes plus refresh on focus, or a cheap "changed since"
   endpoint the page polls before refreshing.
-- **Size:** S–M · **Model:** Opus for the context function (tenant isolation), Sonnet for the web.
+- **Size:** S-M · **Model:** Opus for the context function (tenant isolation), Sonnet for the web.
 
 ### P1-8 · Tenant and branch isolation need a test matrix, not examples
 - **Progress:** 🟡 Part 3 done (#187): branch matrix for a member kept to one branch across sessions, bookings, clients, series, shifts, stations, templates, hours and publish (`tests/test_branch_access.py`); it found and fixed a real hole: by-id reads and writes ignored the branch limit. Part 2 done in spirit (#187): `tests/test_critical_paths.py` calls every route without a login and fails unless it is on the public list. Part 1 done: `tests/test_tenant_matrix.py` seeds seven businesses and, for every table with a `tenant_id` (unseeded ones get a synthetic row), proves an outsider claiming the business sees, updates, deletes and inserts nothing, while its owner sees all rows; a new table is covered automatically, and disabling RLS on a table makes it fail. Still open: by-id branch checks on the client sub-resources (notes, documents, health declarations, dependents, receipts, quotes).
@@ -294,7 +294,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 - **Size:** L · **Model:** Sonnet. **Owner decision:** bundle ids and store accounts.
 
 ### P1-11 · Dependency and secret hygiene automation
-- **Progress:** ✅ Dependabot (weekly, grouped; PR 3). CodeQL and secret scanning with push protection are paid on a private repository (GitHub Advanced Security) — left for the owner's decision.
+- **Progress:** ✅ Dependabot (weekly, grouped; PR 3). CodeQL and secret scanning with push protection are paid on a private repository (GitHub Advanced Security) - left for the owner's decision.
 - **Where:** `.github/` has no `dependabot.yml`, no CodeQL, no secret-scanning config.
 - **Fix:** Dependabot (or Renovate) weekly for npm, uv, GitHub Actions and Docker with grouped
   updates; CodeQL for Python and TypeScript; enable GitHub secret scanning and push protection.
@@ -318,7 +318,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 | Item | Today | At launch |
 |---|---|---|
 | Database and auth (Supabase) | Free | Pro ≈ $25 (backups, no pausing, leaked-password check) |
-| API (Render) | Free (sleeps) | Starter ≈ $7, plus cron jobs ≈ $1–3 |
+| API (Render) | Free (sleeps) | Starter ≈ $7, plus cron jobs ≈ $1-3 |
 | Web (Vercel) | Hobby (non-commercial) | Pro ≈ $20, or another host |
 | Errors and uptime | none | free tiers (Sentry, an uptime monitor) |
 | Email | Gmail SMTP (personal, daily cap) | Resend free → ≈ $20 at volume, on the product's domain |
@@ -326,7 +326,7 @@ Severity: **P0** blocks taking paying customers · **P1** within the first month
 | Stores | none | Apple $99 per year, Google $25 once |
 | AI | demo | usage, capped per business (P0-6) |
 
-Roughly **$55–75 a month plus AI usage** before the first payment provider fees. GitHub Actions
+Roughly **$55-75 a month plus AI usage** before the first payment provider fees. GitHub Actions
 minutes stop mattering once jobs leave GitHub (P0-2).
 
 ## Order of work
@@ -335,8 +335,8 @@ Each line is one thread and one PR, short enough for a fresh thread (CLAUDE.md).
 
 | Wave | Items | Model | Depends on |
 |---|---|---|---|
-| 0 · Owner | Approve the production stack and its cost (P0-1), AI allowance per plan (P0-6), final bundle ids (P1-10), domain and email provider (#48) | — | — |
-| 1 · Security | P0-4 fail-closed config · P0-5 forwarded-address limits · P1-8 isolation matrix | Opus | — |
+| 0 · Owner | Approve the production stack and its cost (P0-1), AI allowance per plan (P0-6), final bundle ids (P1-10), domain and email provider (#48) | - | - |
+| 1 · Security | P0-4 fail-closed config · P0-5 forwarded-address limits · P1-8 isolation matrix | Opus | - |
 | 2 · Operations | P0-3 logging, errors, uptime, web error pages · P0-2 jobs on Render cron · P1-3 migrations pre-deploy + CI checks · P1-11 Dependabot/CodeQL | Sonnet | P0-2 needs the paid Render plan for cron |
 | 3 · Production | P0-1 production stack, backups and a restore drill · P0-8 auth settings from the repo | Sonnet (Opus reviews) | Wave 0 |
 | 4 · Data and speed | P1-1 async endpoints · P1-4 indexes, then merged policies · P1-2 workers and pooler · P1-5 bounded lists · P1-7 request context, LiveRefresh · P1-6 translation payload | Opus for P1-2/P1-4 policies/P1-7 context; Sonnet for the rest | Wave 1 for policy changes |

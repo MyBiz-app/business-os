@@ -1,7 +1,7 @@
 # MyBiz (codename business-os)
 
-An operating system for small and medium service businesses — studios and gyms, hair and beauty
-salons, clinics, garages and more — with a branded app for each business's clients and an AI
+An operating system for small and medium service businesses - studios and gyms, hair and beauty
+salons, clinics, garages and more - with a branded app for each business's clients and an AI
 assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first, then English.
 
 | Surface | Who uses it |
@@ -9,21 +9,21 @@ assistant. Multi-tenant, modular (businesses build their own plan), Hebrew first
 | Marketing website + sign-up journey | Business owners considering MyBiz |
 | Business web app (CRM) | The business: owner, managers, front desk, staff |
 | MyBiz console | MyBiz's own team: owners, managers, employees |
-| Client app (Expo; also in the browser) | The businesses' clients — they never use a website |
+| Client app (Expo; also in the browser) | The businesses' clients - they never use a website |
 | Business app (Expo) | Business owners and staff on the go: today, clients, numbers, check-in |
 | MyBiz team app (Expo) | MyBiz's own team on the go: what needs attention, businesses, inbox |
 
 ## Status and documents
 
-- **Start here:** [`docs/README.md`](docs/README.md) ([עברית](docs/README.he.md)) — where every document is, how the system is built, and the outside services today and at go-live.
+- **Start here:** [`docs/README.md`](docs/README.md) ([עברית](docs/README.he.md)) - where every document is, how the system is built, and the outside services today and at go-live.
 - **Product spec (v3):** [English](docs/spec/v3/spec.en.md) · [עברית](docs/spec/v3/spec.he.md) ·
   Word: [`docs/spec/MyBiz-Spec-en.docx`](docs/spec/MyBiz-Spec-en.docx),
   [`docs/spec/MyBiz-Spec-he.docx`](docs/spec/MyBiz-Spec-he.docx)
   (regenerate with `node scripts/spec-to-docx.cjs he|en`, needs the `docx` npm package).
-- **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) — every product and technical decision.
-- **Status:** [`docs/STATUS.md`](docs/STATUS.md) ([Hebrew](docs/STATUS.he.md)) — what is done, in progress and next; open work in GitHub issues.
+- **Decisions:** [`docs/DECISIONS.md`](docs/DECISIONS.md) - every product and technical decision.
+- **Status:** [`docs/STATUS.md`](docs/STATUS.md) ([Hebrew](docs/STATUS.he.md)) - what is done, in progress and next; open work in GitHub issues.
 - **Detailed v2 chapters:** [`docs/spec/v2/`](docs/spec/v2/README.md) (architecture, data model, AI).
-- **Where we are:** phases 1–3 and 5–7 are done and every category in the catalog is open; the
+- **Where we are:** phases 1-3 and 5-7 are done and every category in the catalog is open; the
   apps (phase 4) are in their last round; go-live (real payments, invoicing, email, WhatsApp,
   AI key) comes when the owner picks providers. See the status board.
 - Paid services run in clearly labeled demo / simulated modes until go-live.

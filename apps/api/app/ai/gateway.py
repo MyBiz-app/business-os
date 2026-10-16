@@ -26,6 +26,14 @@ class Usage:
     cache_write_tokens: int = 0
 
 
+_LONG_DASHES = str.maketrans({"\u2014": "-", "\u2013": "-"})
+
+
+def plain_dashes(text: str) -> str:
+    """The product never shows an em or en dash: model output is normalised to a hyphen."""
+    return text.translate(_LONG_DASHES)
+
+
 @dataclass(frozen=True)
 class LLMResponse:
     # Content blocks as plain JSON (Messages API shape), stored and sent back unchanged.
@@ -111,6 +119,9 @@ class AnthropicProvider:
             raise ProviderUnavailable from error
         usage = response.usage
         content = [block.model_dump(mode="json", exclude_none=True) for block in response.content]
+        for block in content:
+            if block.get("type") == "text":
+                block["text"] = plain_dashes(block["text"])
         return LLMResponse(
             content=content,
             stop_reason=response.stop_reason,

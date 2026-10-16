@@ -122,7 +122,7 @@ with sync_playwright() as p:
     page.goto(f"{h.APP}/home"); h.app_ready(page)
     page.get_by_role("button", name=re.compile(f"לחתום על „{CONTRACT}”")).click()
     page.wait_for_url("**/documents")
-    page.get_by_role("button", name=f"חתימה – {CONTRACT}").click()
+    page.get_by_role("button", name=f"חתימה - {CONTRACT}").click()
     page.get_by_label("השם המלא שלך").fill("מיכל כהן")
     page.get_by_role("button", name="חתימה", exact=True).click()
     expect(page.get_by_text(re.compile("מיכל כהן"))).to_be_visible(timeout=30000)

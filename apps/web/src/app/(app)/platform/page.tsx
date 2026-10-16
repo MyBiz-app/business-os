@@ -9,7 +9,7 @@ import { getPlatform } from "@/lib/platform";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
-/** The console's home: the platform in numbers, and what's new — each part for whoever may
+/** The console's home: the platform in numbers, and what's new - each part for whoever may
  * see it. */
 export default async function PlatformPage() {
   const t = await getTranslations();

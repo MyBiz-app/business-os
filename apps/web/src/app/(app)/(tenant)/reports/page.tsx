@@ -51,7 +51,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
   const tReviews = await getTranslations("reviews");
 
   const number = new Intl.NumberFormat(locale);
-  const percent = (value: number | null) => (value === null ? "—" : `${number.format(Math.round(value))}%`);
+  const percent = (value: number | null) => (value === null ? "-" : `${number.format(Math.round(value))}%`);
   const dateLabel = (day: string) => formatDay(day, locale, { day: "numeric", month: "short" });
 
   const memberRow = (member: (typeof atRisk)[number]) => (
@@ -146,7 +146,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
       {byBranch.length > 1 && table("by-branch", t("byBranch"), t("branch"), byBranch, (row) => row.label || t("noBranch"))}
       {/* Side by side on a wide screen; stacked on a laptop or phone. */}
       <div className="grid items-start gap-6 2xl:grid-cols-2">
-        {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "—")}
+        {table("by-service", t("byService"), t("service"), byService, (row) => row.label ?? "-")}
         {table("by-instructor", t("byInstructor"), t("instructor"), byInstructor, (row) => row.label ?? t("noInstructor"))}
       </div>
       {bySlot.length > 0 && <BusyHours rows={bySlot} locale={locale} />}

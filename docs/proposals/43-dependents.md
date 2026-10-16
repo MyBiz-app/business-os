@@ -39,4 +39,4 @@ must name one: true for pets). Words in the translations: "pet" / "child".
 1. DB + API: dependents, booking a dependent, the pack settings, tests.
 2. Business web: dependents on the client card, picking one when booking, rosters.
 3. Client app: my pets/children, booking for one; business app: rosters and the client card.
-4. Pet services opens (beta) — grooming, training, daycare — with its pack and a demo.
+4. Pet services opens (beta) - grooming, training, daycare - with its pack and a demo.

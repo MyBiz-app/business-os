@@ -42,7 +42,7 @@ A service with `"booking_mode": "resource"` is a court or room rented by the hou
 serving its resource services, so it can take reservations from the first minute.
 
 An appointment service with `"on_site": true` happens at the client's address (#42), with
-`travel_minutes` (0–240) that block the technician before each job; booking asks for one of the
+`travel_minutes` (0-240) that block the technician before each job; booking asks for one of the
 client's addresses.
 
 Prices are integer minor units per currency. `ILS` is required; `USD` and `EUR` default to rough

@@ -13,7 +13,7 @@ uses today and later. ([עברית](README.he.md))
 | The original vision (v1) | [`spec/v1/`](spec/v1/) | The owner's first spec, kept for history |
 | Decisions | [`DECISIONS.md`](DECISIONS.md) | Why something is the way it is (every decision has an id, e.g. X13) |
 | Status board | [`STATUS.md`](STATUS.md) · [עברית](STATUS.he.md) | What is done, in progress and next; what the owner needs to do |
-| Feature proposals | [`proposals/`](proposals/) | The design of a big feature before it was built (#41–#45, integrations) |
+| Feature proposals | [`proposals/`](proposals/) | The design of a big feature before it was built (#41-#45, integrations) |
 | Reviews | [`reviews/`](reviews/) | Architecture and security reviews and their follow-ups |
 | Industries | [`verticals.md`](verticals.md) | The category catalog and how to add a category |
 | Design system | [`design-system.md`](design-system.md) | Fonts, colors, buttons, texts, prices: where to change what |
@@ -80,7 +80,7 @@ flowchart LR
 | API | Render (Frankfurt, free plan: sleeps after 15 minutes idle) | `main` |
 | Database, sign-in, files | Supabase (Frankfurt) | migrations run on every API start and from GitHub Actions |
 | Scheduled work | GitHub Actions | background jobs, notification emails, demo data, migrations |
-| Code, issues, CI | GitHub (`MyBiz-app/business-os`) | — |
+| Code, issues, CI | GitHub (`MyBiz-app/business-os`) | - |
 
 ## Outside services: today and at go-live
 
@@ -93,6 +93,6 @@ flowchart LR
 | WhatsApp and SMS | Logged, not sent; free wa.me links | WhatsApp Business API and an SMS gateway (#49) |
 | File storage | Inside the database | Supabase Storage or another object store |
 | App stores | Not yet | Apple App Store and Google Play builds (Expo EAS) |
-| Sign-in with Google / Apple | Built; waits for the providers to be turned on in Supabase | — |
+| Sign-in with Google / Apple | Built; waits for the providers to be turned on in Supabase | - |
 
 Switching any of these is a provider choice, not a rewrite: see [`integrations.md`](integrations.md).
