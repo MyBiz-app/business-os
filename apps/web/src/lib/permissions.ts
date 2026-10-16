@@ -21,3 +21,6 @@ export const canManageAI = (tenant: Access) => has(tenant, "ai.manage");
 /** The team and its roles (viewing needs `staff.read`, changing needs `staff.manage`). */
 export const canManageTeam = (tenant: Access) => has(tenant, "staff.manage");
 export const canManageSettings = (tenant: Access) => has(tenant, "business.settings");
+/** Employment terms and Form 101 of the team (pay amounts need `payroll.manage` to change). */
+export const canReadPayroll = (tenant: Access) => has(tenant, "payroll.read");
+export const canManagePayroll = (tenant: Access) => has(tenant, "payroll.manage");

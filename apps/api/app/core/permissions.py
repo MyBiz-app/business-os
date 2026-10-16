@@ -26,12 +26,15 @@ class Permission(StrEnum):
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
     IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
+    PAYROLL_READ = "payroll.read"  # see employment terms and Form 101 of the team
+    PAYROLL_MANAGE = "payroll.manage"  # set employment terms, request and correct Form 101
+    PAYROLL_APPROVE = "payroll.approve"  # approve and lock pay runs; owners only
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
     "owner": frozenset(Permission),
     "manager": frozenset(
-        {  # everything except privacy requests
+        {  # everything except privacy requests, ID reveal, payroll approval
             Permission.CLIENTS_READ,
             Permission.CLIENTS_WRITE,
             Permission.CATALOG_READ,
@@ -49,6 +52,8 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
+            Permission.PAYROLL_READ,
+            Permission.PAYROLL_MANAGE,
         }
     ),
     # A manager at their own branches only (the API keeps them to `location_ids`): everything a
