@@ -23,7 +23,7 @@ const STATUS_TONE: Record<PendingAction["status"], string> = {
   failed: "text-danger",
 };
 
-function ActionCard({ action, onDecide }: { action: PendingAction; onDecide: (id: string, decision: "confirm" | "reject") => void }) {
+export function ActionCard({ action, onDecide }: { action: PendingAction; onDecide: (id: string, decision: "confirm" | "reject") => void }) {
   const t = useTranslations("assistant");
   const tTeam = useTranslations("aiTeam");
   const locale = useLocale();

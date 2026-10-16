@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AiScreen } from "../../ai-bubble/screen-context";
 import { Avatar } from "@/components/avatar";
 import { Pill, type Tone } from "@/components/pill";
 import { ReviewsSummary } from "@/components/reviews-summary";
@@ -51,6 +52,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   const t = await getTranslations("clients");
   const tBookings = await getTranslations("bookings");
   const tPrivacy = await getTranslations("privacy");
+  const tBubble = await getTranslations("aiBubble");
   const locale = await getLocale();
   const context = await getTenantFor("clients.read");
   const { tenant, api, scope } = context;
@@ -136,6 +138,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+      <AiScreen label={tBubble("screenClient", { name })} />
       <Link href="/clients" className="text-sm text-primary underline-offset-4 hover:underline">
         {t("back")}
       </Link>
