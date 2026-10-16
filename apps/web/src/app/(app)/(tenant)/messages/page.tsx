@@ -21,12 +21,13 @@ export default async function MessagesPage() {
   const { tenant, api, scope } = await getTenantFor("clients.read");
   if (!tenant.modules.includes("whatsapp")) redirect("/upgrade/whatsapp");
   const writable = canWriteClients(tenant);
-  const [audiences, templates, campaigns, branches, groups] = await Promise.all([
+  const [audiences, templates, campaigns, branches, groups, placeholders] = await Promise.all([
     api.GET("/messages/audiences", { params: scope }).then(unwrap),
     api.GET("/messages/templates", { params: scope }).then(unwrap),
     api.GET("/messages/campaigns", { params: scope }).then(unwrap),
     api.GET("/locations", { params: scope }).then(unwrap),
     api.GET("/location-groups", { params: scope }).then(unwrap),
+    api.GET("/messages/placeholders", { params: scope }).then(unwrap),
   ]);
   const branchName = new Map(branches.map((branch) => [branch.id, branch.name]));
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: tenant.time_zone });
@@ -58,7 +59,8 @@ export default async function MessagesPage() {
             templates={templates}
             suggestions={SUGGESTIONS.map((key) => ({ name: t(`suggestions.${key}.name`), body: t.raw(`suggestions.${key}.body`) as string }))}
             businessName={tenant.name}
-            sampleName={t("sampleName")}
+            sample={{ ...placeholders.sample, first_name: t("sampleName") }}
+            variableGroups={placeholders.groups}
             branches={branches.map((branch) => ({ id: branch.id, name: branch.name }))}
             groups={groups}
           />
