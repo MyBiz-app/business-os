@@ -26,6 +26,7 @@ class Permission(StrEnum):
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
     IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
+    TIME_APPROVE = "time.approve"  # correct clocked hours and approve a person's month
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
@@ -49,6 +50,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
+            Permission.TIME_APPROVE,
         }
     ),
     # A manager at their own branches only (the API keeps them to `location_ids`): everything a
@@ -67,6 +69,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.AI_USE,
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
+            Permission.TIME_APPROVE,
         }
     ),
     "front_desk": frozenset(

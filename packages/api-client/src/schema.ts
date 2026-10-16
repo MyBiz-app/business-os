@@ -2726,6 +2726,178 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/time-clock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Clock */
+        get: operations["my_clock"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/time-clock/clock-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clock In */
+        post: operations["clock_in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/time-clock/clock-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clock Out */
+        post: operations["clock_out"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/month": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Month Overview
+         * @description Everyone with shifts or clocked time in the month: planned against worked.
+         */
+        get: operations["month_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/people/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Person Month
+         * @description One person's month: totals, hours per day and every entry.
+         */
+        get: operations["person_month"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Entry
+         * @description A manager records time that was not clocked (forgot to clock in, no phone).
+         */
+        post: operations["add_entry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/entries/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Entry */
+        delete: operations["delete_entry"];
+        options?: never;
+        head?: never;
+        /**
+         * Correct Entry
+         * @description Changes the times of an entry (closing a forgotten clock-out is a correction too). The
+         *     reason is kept on the entry and the old and new times go to the audit log.
+         */
+        patch: operations["correct_entry"];
+        trace?: never;
+    };
+    "/time-clock/people/{user_id}/approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Approve Month
+         * @description Approves the person's month and locks it. A clock still running blocks it.
+         */
+        put: operations["approve_month"];
+        post?: never;
+        /** Reopen Month */
+        delete: operations["reopen_month"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Rules */
+        get: operations["get_rules"];
+        /** Set Rules */
+        put: operations["set_rules"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/time-off-requests": {
         parameters: {
             query?: never;
@@ -8177,6 +8349,25 @@ export interface components {
             /** Status */
             status?: ("active" | "inactive" | "lead") | null;
         };
+        /** ClockIn */
+        ClockIn: {
+            /**
+             * Location Id
+             * @description Defaults to the planned shift's branch, else the only branch
+             */
+            location_id?: string | null;
+        };
+        /**
+         * ClockState
+         * @description What the clock screen shows: the open entry (if clocked in), the shift planned around now
+         *     and this week's entries.
+         */
+        ClockState: {
+            open_entry: components["schemas"]["Entry"] | null;
+            planned_shift: components["schemas"]["PlannedShift"] | null;
+            /** Recent */
+            recent: components["schemas"]["Entry"][];
+        };
         /** CloseRequest */
         CloseRequest: {
             /**
@@ -9063,6 +9254,80 @@ export interface components {
             /** Receipt Number */
             receipt_number: number | null;
         };
+        /** Entry */
+        Entry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /** Shift Id */
+            shift_id: string | null;
+            /**
+             * Clock In
+             * Format: date-time
+             */
+            clock_in: string;
+            /** Clock Out */
+            clock_out: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "clock" | "manual";
+            /** Correction Reason */
+            correction_reason: string | null;
+            /** Corrected By Name */
+            corrected_by_name: string | null;
+        };
+        /** EntryCorrection */
+        EntryCorrection: {
+            /** Clock In */
+            clock_in?: string | null;
+            /** Clock Out */
+            clock_out?: string | null;
+            /** Reason */
+            reason: string;
+        };
+        /** EntryCreate */
+        EntryCreate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Clock In
+             * Format: date-time
+             */
+            clock_in: string;
+            /**
+             * Clock Out
+             * Format: date-time
+             */
+            clock_out: string;
+            /** Reason */
+            reason: string;
+        };
         /** EraseRequest */
         EraseRequest: {
             /**
@@ -9280,6 +9545,42 @@ export interface components {
              * @description None clears it
              */
             location_id: string | null;
+        };
+        /**
+         * Hours
+         * @description Hours worked, by pay rate (see `app.schedule.time_clock.Breakdown`).
+         */
+        Hours: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Regular
+             * @default 0
+             */
+            regular: number;
+            /**
+             * Tier1
+             * @default 0
+             */
+            tier1: number;
+            /**
+             * Tier2
+             * @default 0
+             */
+            tier2: number;
+            /**
+             * Rest Day
+             * @default 0
+             */
+            rest_day: number;
+            /**
+             * Weighted
+             * @default 0
+             */
+            weighted: number;
         };
         /** HoursBlock */
         HoursBlock: {
@@ -10408,6 +10709,16 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** Month */
+        Month: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** People */
+            people: components["schemas"]["PersonMonth"][];
+        };
         /** MyAnnouncement */
         MyAnnouncement: {
             /**
@@ -10809,6 +11120,58 @@ export interface components {
              */
             shared_classes: number;
         };
+        /** PersonDetail */
+        PersonDetail: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /** Approved */
+            approved: boolean;
+            /** Planned Hours */
+            planned_hours: number;
+            worked: components["schemas"]["Hours"];
+            /** Days */
+            days: {
+                [key: string]: number;
+            };
+            /** Entries */
+            entries: components["schemas"]["Entry"][];
+        };
+        /** PersonMonth */
+        PersonMonth: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /** Planned Hours */
+            planned_hours: number;
+            worked: components["schemas"]["Hours"];
+            /**
+             * Missing Shifts
+             * @description Past shifts with no clocked time
+             */
+            missing_shifts: number;
+            /** Open Entries */
+            open_entries: number;
+            /** Corrections */
+            corrections: number;
+            /** Approved */
+            approved: boolean;
+            /** Approved At */
+            approved_at: string | null;
+        };
         /** PersonProfile */
         PersonProfile: {
             /**
@@ -10986,6 +11349,33 @@ export interface components {
             validity_days?: number | null;
             /** Active */
             active?: boolean | null;
+        };
+        /** PlannedShift */
+        PlannedShift: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Position */
+            position: string | null;
         };
         /**
          * Planning
@@ -12074,14 +12464,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read" | "time.approve")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read" | "time.approve")[] | null;
         };
         /** Roles */
         Roles: {
@@ -12163,6 +12553,56 @@ export interface components {
             active?: boolean | null;
             /** Bookable */
             bookable?: boolean | null;
+        };
+        /** Rules */
+        Rules: {
+            /**
+             * Work Days Per Week
+             * @default 5
+             * @enum {integer}
+             */
+            work_days_per_week: 5 | 6;
+            /**
+             * Week Hours
+             * @default 42
+             */
+            week_hours: number;
+            /**
+             * Day Hours 5
+             * @default 8.6
+             */
+            day_hours_5: number;
+            /**
+             * Day Hours 6
+             * @default 8
+             */
+            day_hours_6: number;
+            /**
+             * Tier1 Hours
+             * @default 2
+             */
+            tier1_hours: number;
+            /**
+             * Tier1 Percent
+             * @default 125
+             */
+            tier1_percent: number;
+            /**
+             * Tier2 Percent
+             * @default 150
+             */
+            tier2_percent: number;
+            /**
+             * Rest Day Percent
+             * @default 150
+             */
+            rest_day_percent: number;
+            /**
+             * Rest Weekday
+             * @description 0 = Monday, 5 = Saturday
+             * @default 5
+             */
+            rest_weekday: number;
         };
         /** RunCard */
         RunCard: {
@@ -21436,6 +21876,436 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ShiftSwap"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_clock: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClockState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clock_in: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clock_out: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    month_overview: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Month"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_month: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_entry: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_entry: {
+        parameters: {
+            query: {
+                reason: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    correct_entry: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryCorrection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_month: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_month: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Rules"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rules"];
                 };
             };
             /** @description Validation Error */

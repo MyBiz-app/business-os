@@ -208,6 +208,12 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Default: a business's message is a service message. "This is an advertisement" makes it marketing, which goes only to people with marketing consent, on every channel including WhatsApp and SMS.
 - Leads have no branch: a branch-aimed message cannot target them, and they are reached by phone only.
 
+### Time clock (2026-10-16, round 6 P2, migration 0107)
+
+- Overtime rules are rows in `time_clock_rules` (defaults are the Israeli ones), never constants in code. Overtime is counted per local day first, then regular hours past the week limit; work on the weekly rest day is all paid at the rest-day rate.
+- Every manager change to clocked time needs a written reason, is stored on the entry and written to the audit log. An approved month is locked until the manager reopens it. Only people with `time.approve` (owners, managers, branch managers within their branches) change or approve hours.
+- Location-limited clock-in is left out until branches have coordinates; the clock stores the branch, not a position.
+
 ## Open
 
 | # | Question |
