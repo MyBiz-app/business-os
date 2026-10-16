@@ -5,18 +5,19 @@ comments and shares. TikTok keeps no daily history for us, so the followers coun
 the day we read it (the history builds up by itself) and a video's numbers count on the day it
 was published. Needs API_TIKTOK_CLIENT_KEY / API_TIKTOK_CLIENT_SECRET."""
 
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 from urllib.parse import urlencode
 
 from app.core.config import get_settings
-from app.social.oauth import ProviderUnavailable, request
+from app.social.net import request
 from app.social.providers import (
     AccountInfo,
     AudienceSlice,
     DayMetrics,
+    NeedsReauth,
+    NetworkError,
     PostData,
-    ReauthNeeded,
     register_social,
 )
 
@@ -33,19 +34,23 @@ def _credentials() -> tuple[str, str] | None:
     return settings.tiktok_client_key, settings.tiktok_client_secret.get_secret_value()
 
 
+def _expires(token: dict[str, Any]) -> str:
+    """When the access token stops working (a day); the sync renews it on every run."""
+    return (datetime.now(UTC) + timedelta(seconds=int(token.get("expires_in", 86400)))).isoformat()
+
+
 def _checked(data: dict[str, Any]) -> dict[str, Any]:
     """TikTok reports many failures inside a normal answer, as `error.code`."""
     code = (data.get("error") or {}).get("code", "ok")
     if code == "ok":
         return data
     if code in ("access_token_invalid", "access_token_expired", "invalid_grant"):
-        raise ReauthNeeded(code)
-    raise ProviderUnavailable(code)
+        raise NeedsReauth(code)
+    raise NetworkError(code)
 
 
 class TikTokProvider:
     name = "tiktok"
-    callback = "tiktok"
 
     def configured(self) -> bool:
         return _credentials() is not None
@@ -53,7 +58,7 @@ class TikTokProvider:
     def authorize_url(self, state: str, redirect_uri: str) -> str:
         credentials = _credentials()
         if credentials is None:
-            raise ProviderUnavailable("tiktok_not_configured")
+            raise NetworkError("tiktok_not_configured")
         return (
             AUTH_URL
             + "?"
@@ -71,16 +76,16 @@ class TikTokProvider:
     def _token(self, form: dict[str, str]) -> dict[str, Any]:
         credentials = _credentials()
         if credentials is None:
-            raise ProviderUnavailable("tiktok_not_configured")
+            raise NetworkError("tiktok_not_configured")
         try:
             data = request(
                 "POST",
                 f"{API}/oauth/token/",
                 data={"client_key": credentials[0], "client_secret": credentials[1], **form},
             )
-        except ProviderUnavailable as error:
+        except NetworkError as error:
             if form.get("grant_type") == "refresh_token" and "HTTP 4" in str(error):
-                raise ReauthNeeded("refresh_token_rejected") from error
+                raise NeedsReauth("refresh_token_rejected") from error
             raise
         if "access_token" not in data:
             _checked({"error": {"code": data.get("error", "no_token")}})
@@ -94,6 +99,7 @@ class TikTokProvider:
             "access_token": token["access_token"],
             "refresh_token": token["refresh_token"],
             "open_id": token["open_id"],
+            "expires_at": _expires(token),
         }
         user = self._user(secrets, "open_id,display_name,avatar_url")
         return [
@@ -117,6 +123,7 @@ class TikTokProvider:
             **secrets,
             "access_token": token["access_token"],
             "refresh_token": token.get("refresh_token", secrets["refresh_token"]),
+            "expires_at": _expires(token),
         }
 
     def _user(self, secrets: dict[str, str], fields: str) -> dict[str, Any]:

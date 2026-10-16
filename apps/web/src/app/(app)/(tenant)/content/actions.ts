@@ -35,3 +35,13 @@ export async function startConnect(provider: string): Promise<void> {
   if (result.authorize_url) redirect(result.authorize_url);
   revalidatePath("/content");
 }
+
+/** Connects the accounts the owner ticked after agreeing on the network's page. */
+export async function selectAccounts(pendingId: string, form: FormData): Promise<void> {
+  const ids = form.getAll("external_id").filter((v): v is string => typeof v === "string");
+  const { api, scope } = await getTenant();
+  if (ids.length > 0) {
+    unwrap(await api.POST("/social/pending/{pending_id}/select", { params: { ...scope, path: { pending_id: pendingId } }, body: { external_ids: ids } }));
+  }
+  redirect(ids.length > 0 ? "/content?connected=1" : "/content");
+}

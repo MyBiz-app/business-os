@@ -15,7 +15,7 @@ from sqlalchemy import Engine, text
 from app.core.config import get_settings
 from app.social import google, tiktok
 from app.social.oauth import make_state
-from app.social.providers import ReauthNeeded
+from app.social.providers import NeedsReauth
 from app.social.sync import sync_account
 from tests.test_social import with_studio
 
@@ -106,7 +106,7 @@ def test_with_keys_google_and_tiktok_can_be_connected_but_the_closed_ones_cannot
     url = client.post("/social/connect/youtube", headers=headers).json()["authorize_url"]
     query = parse_qs(urlparse(url).query)
     assert query["client_id"] == ["google-client"] and query["access_type"] == ["offline"]
-    assert query["redirect_uri"] == [f"{get_settings().api_url}/social/callback/google"]
+    assert query["redirect_uri"] == [f"{get_settings().api_url}/social/callback/youtube"]
     assert "yt-analytics.readonly" in query["scope"][0]
 
     url = client.post("/social/connect/tiktok", headers=headers).json()["authorize_url"]
@@ -125,9 +125,9 @@ def test_youtube_connects_stores_tokens_encrypted_and_fills_the_dashboard(
         ).query
     )["state"][0]
 
-    done = client.get(f"/social/callback/google?code=abc&state={state}", follow_redirects=False)
-    assert done.status_code == 302
-    assert "social_connected=1" in done.headers["location"]
+    done = client.get(f"/social/callback/youtube?code=abc&state={state}", follow_redirects=False)
+    assert done.status_code == 303
+    assert done.headers["location"].endswith("/content?connected=1")
 
     accounts = client.get("/social/accounts", headers=headers).json()
     assert [(a["network"], a["name"], a["status"]) for a in accounts] == [
@@ -150,17 +150,15 @@ def test_a_forged_or_wrong_callback_saves_nothing(
     client: TestClient, studio: dict, keys: None
 ) -> None:
     headers = with_studio(client, studio)
-    forged = client.get("/social/callback/google?code=abc&state=nope", follow_redirects=False)
-    assert "social_error=invalid_state" in forged.headers["location"]
+    forged = client.get("/social/callback/youtube?code=abc&state=nope", follow_redirects=False)
+    assert "connect_error=state" in forged.headers["location"]
     state = make_state(
         studio["tenant_id"], studio["owner"], "tiktok"
     )  # a TikTok state on Google's address
-    wrong = client.get(f"/social/callback/google?code=abc&state={state}", follow_redirects=False)
-    assert "social_error=invalid_state" in wrong.headers["location"]
-    denied = client.get(
-        f"/social/callback/tiktok?error=access_denied&state={state}", follow_redirects=False
-    )
-    assert "social_error=denied" in denied.headers["location"]
+    wrong = client.get(f"/social/callback/youtube?code=abc&state={state}", follow_redirects=False)
+    assert "connect_error=state" in wrong.headers["location"]
+    denied = client.get(f"/social/callback/tiktok?state={state}", follow_redirects=False)
+    assert "connect_error=denied" in denied.headers["location"]
     assert client.get("/social/accounts", headers=headers).json() == []
 
 
@@ -170,10 +168,10 @@ def test_a_revoked_google_access_marks_the_account_for_reconnecting(
     headers = with_studio(client, studio)
     fake_google(monkeypatch, [])
     state = make_state(studio["tenant_id"], studio["owner"], "youtube")
-    client.get(f"/social/callback/google?code=abc&state={state}", follow_redirects=False)
+    client.get(f"/social/callback/youtube?code=abc&state={state}", follow_redirects=False)
 
     def revoked(method: str, url: str, **kwargs: Any) -> dict[str, Any]:
-        raise ReauthNeeded("refresh_token_rejected")
+        raise NeedsReauth("refresh_token_rejected")
 
     monkeypatch.setattr(google, "request", revoked)
     account_id = client.get("/social/accounts", headers=headers).json()[0]["id"]
@@ -225,8 +223,36 @@ def test_tiktok_connects_and_reads_videos(
     monkeypatch.setattr(tiktok, "request", answer)
     state = make_state(studio["tenant_id"], studio["owner"], "tiktok")
     done = client.get(f"/social/callback/tiktok?code=abc&state={state}", follow_redirects=False)
-    assert "social_connected=1" in done.headers["location"]
+    assert done.headers["location"].endswith("/content?connected=1")
     data = client.get("/social/dashboard", headers=headers).json()
     assert data["kpis"]["followers"]["value"] == 900
     assert data["kpis"]["video_views"]["value"] == 300
     assert data["kpis"]["engagements"]["value"] == 35
+
+
+def test_google_business_with_several_locations_waits_for_the_owner_to_choose(
+    client: TestClient, studio: dict, keys: None, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    headers = with_studio(client, studio)
+
+    def answer(method: str, url: str, **kwargs: Any) -> dict[str, Any]:
+        if url == google.TOKEN_URL:
+            return {"access_token": "a1", "refresh_token": "r1", "scope": "bm"}
+        if url == google.GBP_ACCOUNTS:
+            return {"accounts": [{"name": "accounts/9"}]}
+        if url.endswith("/locations"):
+            return {
+                "locations": [
+                    {"name": "locations/1", "title": "Main branch"},
+                    {"name": "locations/2", "title": "Second branch"},
+                ]
+            }
+        raise AssertionError(url)
+
+    monkeypatch.setattr(google, "request", answer)
+    state = make_state(studio["tenant_id"], studio["owner"], "google_business")
+    done = client.get(
+        f"/social/callback/google_business?code=abc&state={state}", follow_redirects=False
+    )
+    assert "/content?connect=" in done.headers["location"]
+    assert client.get("/social/accounts", headers=headers).json() == []

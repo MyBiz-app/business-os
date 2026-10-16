@@ -87,17 +87,26 @@ Tokens are stored encrypted (`app/providers/secrets.py`) and only summarized, pu
 the business's own accounts are kept. The `demo` provider gives believable numbers without any
 account.
 
-Connectors in place: `youtube` and `google_business` (`app/social/google.py`, one Google OAuth
-client), `tiktok` (`app/social/tiktok.py`), and disabled adapters for `x`, `linkedin`,
-`pinterest` and `snapchat` (`app/social/soon.py`). A provider may define `callback` (its family in
-`/social/callback/{family}`, handled by `app/api/social_callback.py`) and `configured()`: while
-the platform keys are missing the network stays "coming soon". Environment:
-`API_GOOGLE_OAUTH_CLIENT_ID` / `API_GOOGLE_OAUTH_CLIENT_SECRET` and `API_TIKTOK_CLIENT_KEY` /
-`API_TIKTOK_CLIENT_SECRET`. Redirect URIs to register at the networks:
-`{API_API_URL}/social/callback/google` and `{API_API_URL}/social/callback/tiktok`. Google scopes:
-`youtube.readonly`, `yt-analytics.readonly`, `business.manage` (Business Profile APIs need Google's
-access approval). TikTok scopes: `user.info.basic`, `user.info.stats`, `video.list` (TikTok keeps
-no daily history, so followers build up from our own daily reads). Publishing is not built yet.
+The Meta provider (`app/social/meta.py`, Facebook Pages + Instagram as `meta`, Threads as
+`threads`) is the first real one. It is configured by `API_META_APP_ID` / `API_META_APP_SECRET`
+(Threads: `API_META_THREADS_APP_ID` / `API_META_THREADS_APP_SECRET`, `API_META_GRAPH_VERSION`
+for the Graph API version); a provider with a `configured()` method stays "coming soon" until it
+returns true. Register `{API}/social/callback/meta` (and `/social/callback/threads` for Threads)
+as the OAuth redirect URI at the network. Optional `publish(account, text, image_url)` on a
+provider enables `POST /social/accounts/{id}/publish`; a provider raises `NeedsReauth` when a
+token is refused and the account is then marked "needs reconnect".
+
+Google and TikTok connectors: `youtube` and `google_business` (`app/social/google.py`, one Google
+OAuth client) and `tiktok` (`app/social/tiktok.py`); `x`, `linkedin`, `pinterest` and `snapchat`
+are disabled adapters (`app/social/soon.py`). Environment: `API_GOOGLE_OAUTH_CLIENT_ID` /
+`API_GOOGLE_OAUTH_CLIENT_SECRET`, `API_TIKTOK_CLIENT_KEY` / `API_TIKTOK_CLIENT_SECRET`; without
+them the networks stay "coming soon". Redirect URIs to register: `{API_API_URL}/social/callback/youtube`
+and `/social/callback/google_business` (both in the same Google OAuth client) and
+`/social/callback/tiktok`. Google scopes: `youtube.readonly`, `yt-analytics.readonly`,
+`business.manage` (Business Profile APIs need Google's access approval). TikTok scopes:
+`user.info.basic`, `user.info.stats`, `video.list`; TikTok keeps no daily history, so followers
+build up from our own daily reads. These tokens expire within a day, so the sync renews them on
+every run. Publishing is not built for these networks yet.
 
 ## Switching provider
 

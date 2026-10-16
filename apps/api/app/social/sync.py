@@ -10,7 +10,13 @@ from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
 
 from app.providers.secrets import decrypt, encrypt
-from app.social.providers import AccountInfo, ReauthNeeded, SocialProvider, social_provider
+from app.social.providers import (
+    AccountInfo,
+    NeedsReauth,
+    NetworkError,
+    SocialProvider,
+    social_provider,
+)
 
 FIRST_SYNC_DAYS = 90
 RESYNC_OVERLAP_DAYS = 3  # recent days are revised by the networks, so they are read again
@@ -80,21 +86,41 @@ def sync_account(db: Db, tenant_id: UUID, account_id: UUID, today: date | None =
         name=row["name"],
         secrets=decrypt(row["secrets"]),
     )
-    if info.secrets:  # real connections: a fresh access token first (and keep a rotated one)
-        try:
-            renewed = provider.refresh(info.secrets)
-        except ReauthNeeded:
-            db.execute(
-                text("UPDATE app.social_accounts SET status = 'needs_reauth' WHERE id = :a"),
-                {"a": account_id},
-            )
-            return
-        if renewed != info.secrets:
-            db.execute(
-                text("UPDATE app.social_accounts SET secrets = :s WHERE id = :a"),
-                {"s": encrypt(renewed), "a": account_id},
-            )
-        info = AccountInfo(**{**info.__dict__, "secrets": renewed})
+    try:
+        info = _renewed(db, tenant_id, account_id, provider, info)
+        _read_and_store(db, tenant_id, account_id, provider, info, today)
+    except NeedsReauth:
+        db.execute(
+            text("UPDATE app.social_accounts SET status = 'needs_reauth' WHERE id = :a"),
+            {"a": account_id},
+        )
+    except NetworkError:
+        pass  # the network is down or busy: the numbers are read again at the next sync
+
+
+def _renewed(
+    db: Db, tenant_id: UUID, account_id: UUID, provider: SocialProvider, info: AccountInfo
+) -> AccountInfo:
+    """Tokens that expire (Threads: 60 days) are renewed once they are close to it."""
+    expires = info.secrets.get("expires_at")
+    if not expires or datetime.fromisoformat(expires) > datetime.now(UTC) + timedelta(days=10):
+        return info
+    secrets = provider.refresh(info.secrets)
+    db.execute(
+        text("UPDATE app.social_accounts SET secrets = :s WHERE id = :a AND tenant_id = :t"),
+        {"s": encrypt(secrets), "a": account_id, "t": tenant_id},
+    )
+    return AccountInfo(info.network, info.external_id, info.name, secrets=secrets)
+
+
+def _read_and_store(
+    db: Db,
+    tenant_id: UUID,
+    account_id: UUID,
+    provider: SocialProvider,
+    info: AccountInfo,
+    today: date | None,
+) -> None:
     today = today or datetime.now(UTC).date()
     last = db.execute(
         text("SELECT max(day) FROM app.social_metrics_daily WHERE account_id = :a"),
@@ -105,17 +131,7 @@ def sync_account(db: Db, tenant_id: UUID, account_id: UUID, today: date | None =
         if last
         else today - timedelta(days=FIRST_SYNC_DAYS)
     )
-    try:
-        metrics = provider.fetch_account_metrics(info, since, today)
-        posts = provider.fetch_posts(info, datetime.combine(since, datetime.min.time(), tzinfo=UTC))
-        audience = provider.fetch_audience(info)
-    except ReauthNeeded:
-        db.execute(
-            text("UPDATE app.social_accounts SET status = 'needs_reauth' WHERE id = :a"),
-            {"a": account_id},
-        )
-        return
-    for m in metrics:
+    for m in provider.fetch_account_metrics(info, since, today):
         db.execute(
             text("""
                 INSERT INTO app.social_metrics_daily
@@ -136,7 +152,8 @@ def sync_account(db: Db, tenant_id: UUID, account_id: UUID, today: date | None =
             """),
             {"t": tenant_id, "a": account_id, **m.__dict__},
         )
-    for p in posts:
+    posts_since = datetime.combine(since, datetime.min.time(), tzinfo=UTC)
+    for p in provider.fetch_posts(info, posts_since):
         post_id = db.execute(
             text("""
                 INSERT INTO app.social_posts
@@ -181,7 +198,7 @@ def sync_account(db: Db, tenant_id: UUID, account_id: UUID, today: date | None =
                 "watch": p.avg_watch_sec,
             },
         )
-    for s in audience:
+    for s in provider.fetch_audience(info):
         db.execute(
             text("""
                 INSERT INTO app.social_audience

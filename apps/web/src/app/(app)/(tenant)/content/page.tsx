@@ -13,6 +13,7 @@ import { addDays, formatDay, isDay, todayIn } from "@/lib/dates";
 
 import { disconnectAccount, refreshNow } from "./actions";
 import { ConnectCards } from "./connect-cards";
+import { ConnectNotice } from "./connect-notice";
 import { CsvButton } from "./csv-button";
 import { type Range, Filters } from "./filters";
 import { Heatmap } from "./heatmap";
@@ -42,15 +43,14 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
     api.GET("/social/accounts", { params: scope }).then(unwrap),
   ]);
 
-  const errorKey = typeof query.social_error === "string" && ["denied", "connect_failed", "invalid_state"].includes(query.social_error) ? query.social_error : undefined;
-  const justConnected = typeof query.social_connected === "string" ? Number.parseInt(query.social_connected, 10) : 0;
-
+  const notice = <ConnectNotice query={query} canManage={canManage} />;
   const header = <PageHeader eyebrow={t("subtitle")} title={t("title")} />;
   if (accounts.length === 0) {
     return (
       <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8">
         {header}
-        <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} error={errorKey} />
+        {notice}
+        <ConnectCards networks={providers.networks} canManage={canManage} withDemo={providers.demo_available} />
       </Container>
     );
   }
@@ -136,11 +136,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           </>
         }
       />
-      {justConnected > 0 && (
-        <p role="status" className="rounded-xl border border-success/40 bg-success/10 px-4 py-3 text-sm font-medium">
-          {t("connect.justConnected", { count: justConnected })}
-        </p>
-      )}
+      {notice}
       {allDemo && (
         <p role="note" className="rounded-xl border border-warning/40 bg-warning/10 px-4 py-3 text-sm font-medium">
           {t("demoBanner")}

@@ -12,8 +12,6 @@ from app.social.providers import AccountInfo, AudienceSlice, DayMetrics, PostDat
 class DisabledProvider:
     """A connector that is wired in but switched off."""
 
-    callback = "disabled"
-
     def __init__(self, name: str) -> None:
         self.name = name
 

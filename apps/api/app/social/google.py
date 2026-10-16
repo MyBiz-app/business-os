@@ -9,13 +9,14 @@ from typing import Any, ClassVar
 from urllib.parse import urlencode
 
 from app.core.config import get_settings
-from app.social.oauth import ProviderUnavailable, request
+from app.social.net import request
 from app.social.providers import (
     AccountInfo,
     AudienceSlice,
     DayMetrics,
+    NeedsReauth,
+    NetworkError,
     PostData,
-    ReauthNeeded,
     register_social,
 )
 
@@ -27,7 +28,7 @@ GBP_ACCOUNTS = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
 GBP_INFO = "https://mybusinessbusinessinformation.googleapis.com/v1"
 GBP_PERFORMANCE = "https://businessprofileperformance.googleapis.com/v1"
 GBP_REVIEWS = "https://mybusiness.googleapis.com/v4"
-MAX_LOCATIONS = 3  # the studio plan covers three accounts per network
+MAX_ACCOUNTS = 50  # the owner picks which ones to connect
 MAX_VIDEO_PAGES = 2
 
 
@@ -44,7 +45,6 @@ class GoogleProvider:
     name: str
     network: str
     scopes: tuple[str, ...]
-    callback = "google"
 
     def configured(self) -> bool:
         return _credentials() is not None
@@ -52,7 +52,7 @@ class GoogleProvider:
     def authorize_url(self, state: str, redirect_uri: str) -> str:
         credentials = _credentials()
         if credentials is None:
-            raise ProviderUnavailable("google_not_configured")
+            raise NetworkError("google_not_configured")
         return (
             AUTH_URL
             + "?"
@@ -72,16 +72,16 @@ class GoogleProvider:
     def _token(self, form: dict[str, str]) -> dict[str, Any]:
         credentials = _credentials()
         if credentials is None:
-            raise ProviderUnavailable("google_not_configured")
+            raise NetworkError("google_not_configured")
         try:
             return request(
                 "POST",
                 TOKEN_URL,
                 data={"client_id": credentials[0], "client_secret": credentials[1], **form},
             )
-        except ProviderUnavailable as error:
+        except NetworkError as error:
             if form.get("grant_type") == "refresh_token" and "HTTP 400" in str(error):
-                raise ReauthNeeded("refresh_token_rejected") from error  # invalid_grant
+                raise NeedsReauth("refresh_token_rejected") from error  # invalid_grant
             raise
 
     def exchange_code(self, code: str, redirect_uri: str) -> list[AccountInfo]:
@@ -89,8 +89,12 @@ class GoogleProvider:
             {"grant_type": "authorization_code", "code": code, "redirect_uri": redirect_uri}
         )
         if not token.get("refresh_token"):
-            raise ProviderUnavailable("no_refresh_token")
-        secrets = {"refresh_token": token["refresh_token"], "access_token": token["access_token"]}
+            raise NetworkError("no_refresh_token")
+        secrets = {
+            "refresh_token": token["refresh_token"],
+            "access_token": token["access_token"],
+            "expires_at": _expires(token),
+        }
         return self._accounts(secrets, scopes=tuple(token.get("scope", "").split()))
 
     def refresh(self, secrets: dict[str, str]) -> dict[str, str]:
@@ -98,13 +102,19 @@ class GoogleProvider:
         token = self._token(
             {"grant_type": "refresh_token", "refresh_token": secrets["refresh_token"]}
         )
-        return {**secrets, "access_token": token["access_token"]}
+        return {**secrets, "access_token": token["access_token"], "expires_at": _expires(token)}
 
     def _accounts(self, secrets: dict[str, str], scopes: tuple[str, ...]) -> list[AccountInfo]:
         raise NotImplementedError
 
     def _get(self, secrets: dict[str, str], url: str, **params: Any) -> dict[str, Any]:
         return request("GET", url, token=secrets["access_token"], params=params)
+
+
+def _expires(token: dict[str, Any]) -> str:
+    """When the access token stops working. The sync renews tokens that expire within days
+    (app/social/sync.py), so these short-lived ones are renewed on every run."""
+    return (datetime.now(UTC) + timedelta(seconds=int(token.get("expires_in", 3600)))).isoformat()
 
 
 def _day(value: date) -> str:
@@ -130,7 +140,7 @@ class YouTubeProvider(GoogleProvider):
                 scopes=scopes,
                 secrets=secrets,
             )
-            for item in data.get("items", [])[:MAX_LOCATIONS]
+            for item in data.get("items", [])[:MAX_ACCOUNTS]
         ]
 
     def _report(self, account: AccountInfo, **params: str) -> list[list[Any]]:
@@ -237,7 +247,7 @@ class YouTubeProvider(GoogleProvider):
             slices += [
                 AudienceSlice("country", r[0], round(int(r[1]) / total * 10000)) for r in countries
             ]
-        except ProviderUnavailable:
+        except NetworkError:
             pass  # channels with few viewers have no demographics; the rest of the sync stays
         return slices
 
@@ -275,7 +285,7 @@ class GoogleBusinessProvider(GoogleProvider):
                         secrets={**secrets, "account": account["name"]},  # accounts/456
                     )
                 )
-        return found[:MAX_LOCATIONS]
+        return found[:MAX_ACCOUNTS]
 
     def fetch_account_metrics(
         self, account: AccountInfo, since: date, until: date
