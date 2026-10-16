@@ -7055,6 +7055,52 @@
         ],
         "parameters": [
           {
+            "name": "location_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Location Ids"
+            }
+          },
+          {
+            "name": "channels",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "whatsapp",
+                      "sms",
+                      "email",
+                      "push",
+                      "popup"
+                    ],
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Channels"
+            }
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -7118,7 +7164,7 @@
           "messages"
         ],
         "summary": "Send Campaign",
-        "description": "Sends the text to everyone in the audience who has a phone number (or previews it).",
+        "description": "Sends the text to everyone in the audience (in the chosen branches) who can be reached on\nthe chosen channels (or previews it).",
         "operationId": "send_campaign",
         "security": [
           {
@@ -31006,14 +31052,23 @@
               "inactive",
               "plan_ending",
               "no_plan",
-              "open_leads"
+              "open_leads",
+              "staff"
             ],
             "title": "Audience"
           },
           "recipients": {
             "type": "integer",
             "title": "Recipients",
-            "description": "Who can be reached (has a phone number)"
+            "description": "Who can be reached on at least one of the channels"
+          },
+          "by_channel": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Channel",
+            "description": "How many can be reached on each channel"
           }
         },
         "type": "object",
@@ -32389,7 +32444,8 @@
               "inactive",
               "plan_ending",
               "no_plan",
-              "open_leads"
+              "open_leads",
+              "staff"
             ],
             "title": "Audience"
           },
@@ -32397,9 +32453,41 @@
             "type": "string",
             "enum": [
               "whatsapp",
-              "sms"
+              "sms",
+              "email",
+              "push",
+              "popup"
             ],
             "title": "Channel"
+          },
+          "channels": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "whatsapp",
+                "sms",
+                "email",
+                "push",
+                "popup"
+              ]
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids"
           },
           "body": {
             "type": "string",
@@ -32431,6 +32519,8 @@
           "id",
           "audience",
           "channel",
+          "channels",
+          "location_ids",
           "body",
           "recipients",
           "created_at",
@@ -32447,7 +32537,8 @@
               "inactive",
               "plan_ending",
               "no_plan",
-              "open_leads"
+              "open_leads",
+              "staff"
             ],
             "title": "Audience"
           },
@@ -32455,22 +32546,85 @@
             "type": "string",
             "enum": [
               "whatsapp",
-              "sms"
+              "sms",
+              "email",
+              "push",
+              "popup"
             ],
             "title": "Channel",
             "default": "whatsapp"
           },
-          "body": {
-            "type": "string",
-            "maxLength": 1000,
-            "minLength": 1,
-            "title": "Body"
+          "channels": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "whatsapp",
+                    "sms",
+                    "email",
+                    "push",
+                    "popup"
+                  ]
+                },
+                "type": "array",
+                "maxItems": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channels",
+            "description": "Several channels at once; overrides `channel`"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array",
+                "maxItems": 500,
+                "minItems": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids",
+            "description": "Only the clients (or staff) of these branches; null = the whole network"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 150
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject",
+            "description": "Email subject and push/pop-up title"
+          },
+          "promotional": {
+            "type": "boolean",
+            "title": "Promotional",
+            "description": "An advertisement: goes only to people who agreed to receive them",
+            "default": false
           },
           "dry_run": {
             "type": "boolean",
             "title": "Dry Run",
             "description": "Only count and preview; send nothing",
             "default": false
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Body"
           }
         },
         "type": "object",
@@ -32497,6 +32651,13 @@
           "recipients": {
             "type": "integer",
             "title": "Recipients"
+          },
+          "by_channel": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Channel"
           },
           "preview": {
             "anyOf": [

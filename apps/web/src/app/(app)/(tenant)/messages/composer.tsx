@@ -1,20 +1,25 @@
 "use client";
 
 import type { components } from "@business-os/api-client";
-import { MessageCircle, Send, Smartphone } from "lucide-react";
+import { Bell, Mail, MessageCircle, MessageSquare, Send, Smartphone } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
+import { BranchScopePicker, type ScopeBranch, type ScopeGroup } from "@/components/branch-scope-picker";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
-import { type SendState, sendCampaign } from "./actions";
+import { type Reach, type SendState, previewCampaign, sendCampaign } from "./actions";
 import { isolate } from "@/lib/bidi";
 
 type AudienceCount = components["schemas"]["AudienceCount"];
 type Template = components["schemas"]["Template"];
 
 const VARIABLES = ["first_name", "business"] as const;
+const PHONE = ["whatsapp", "sms"] as const;
+const NET = ["email", "push", "popup"] as const;
+type ChannelKey = (typeof PHONE)[number] | (typeof NET)[number];
+const ICONS = { whatsapp: MessageCircle, sms: Smartphone, email: Mail, push: Bell, popup: MessageSquare };
 
 type Props = {
   audiences: AudienceCount[];
@@ -22,17 +27,55 @@ type Props = {
   suggestions: { name: string; body: string }[];
   businessName: string;
   sampleName: string;
+  /** The branches this person may message (a single one hides the picker). */
+  branches: ScopeBranch[];
+  groups: ScopeGroup[];
 };
 
 /** Write a message, pick who gets it, and see it as they will. */
-export function Composer({ audiences, templates, suggestions, businessName, sampleName }: Props) {
+export function Composer({ audiences, templates, suggestions, businessName, sampleName, branches, groups }: Props) {
   const t = useTranslations("messaging");
   const [state, action] = useActionState<SendState, FormData>(sendCampaign, {});
   const [audience, setAudience] = useState(audiences[0]?.audience ?? "active");
-  const [channel, setChannel] = useState<"whatsapp" | "sms">("whatsapp");
+  const [channels, setChannels] = useState<ChannelKey[]>(["whatsapp"]);
+  const [scope, setScope] = useState<string[]>(branches.map((branch) => branch.id));
+  const [promotional, setPromotional] = useState(false);
   const [body, setBody] = useState("");
   const textArea = useRef<HTMLTextAreaElement>(null);
-  const count = audiences.find((a) => a.audience === audience)?.recipients ?? 0;
+  const staff = audience === "staff";
+  const allBranches = scope.length === branches.length;
+  const usable = staff ? channels.filter((c) => (NET as readonly string[]).includes(c)) : channels;
+  const needsSubject = usable.some((c) => (NET as readonly string[]).includes(c));
+  const [reach, setReach] = useState<Reach>(() => ({
+    recipients: audiences.find((a) => a.audience === audience)?.recipients ?? 0,
+    byChannel: audiences.find((a) => a.audience === audience)?.by_channel ?? {},
+  }));
+  const nobody = usable.length === 0 || scope.length === 0;
+  const count = nobody ? 0 : reach.recipients;
+
+  // The live count follows who, which branches and which channels.
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (usable.length === 0 || scope.length === 0) return;
+    let current = true;
+    const timer = setTimeout(() => {
+      previewCampaign({ audience, channels: usable, locationIds: allBranches ? null : scope, promotional }).then(
+        (result) => current && setReach(result),
+      );
+    }, 250);
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audience, usable.join(","), scope.join(","), promotional]);
+
+  const toggleChannel = (value: ChannelKey) =>
+    setChannels((current) => (current.includes(value) ? current.filter((c) => c !== value) : [...current, value]));
   const preview = body.replaceAll("{first_name}", sampleName).replaceAll("{business}", businessName);
 
   const insert = (variable: string) => {
@@ -63,36 +106,72 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
           >
             {audiences.map((a) => (
               <option key={a.audience} value={a.audience}>
-                {t(`audiences.${a.audience}`)} ({a.recipients})
+                {t(`audiences.${a.audience}`)}
               </option>
             ))}
           </select>
         </label>
 
+        {branches.length > 1 && audience !== "open_leads" && (
+          <>
+            <BranchScopePicker branches={branches} groups={groups} value={scope} onChange={setScope} legend={t("branches")} />
+            {!allBranches && scope.map((id) => <input key={id} type="hidden" name="location_ids" value={id} />)}
+          </>
+        )}
+
         <fieldset className="flex flex-col gap-1.5">
           <legend className="mb-1.5 text-sm font-medium">{t("channel")}</legend>
-          <div className="flex gap-2">
-            {(["whatsapp", "sms"] as const).map((value) => (
-              <label
-                key={value}
-                className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary ${
-                  channel === value ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-primary/50"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="channel"
-                  value={value}
-                  checked={channel === value}
-                  onChange={() => setChannel(value)}
-                  className="sr-only"
-                />
-                {value === "whatsapp" ? <MessageCircle aria-hidden="true" className="size-4" /> : <Smartphone aria-hidden="true" className="size-4" />}
-                {t(`channels.${value}`)}
-              </label>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            {[...PHONE, ...NET].map((value) => {
+              const Icon = ICONS[value];
+              const blocked = staff && (PHONE as readonly string[]).includes(value);
+              const on = channels.includes(value) && !blocked;
+              return (
+                <label
+                  key={value}
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary ${
+                    blocked ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+                  } ${on ? "border-primary bg-primary/10" : "border-border bg-surface hover:border-primary/50"}`}
+                >
+                  <input
+                    type="checkbox"
+                    name="channels"
+                    value={value}
+                    checked={on}
+                    disabled={blocked}
+                    onChange={() => toggleChannel(value)}
+                    className="sr-only"
+                  />
+                  <Icon aria-hidden="true" className="size-4" />
+                  {t(`channels.${value}`)}
+                  {on && reach.byChannel[value] !== undefined && (
+                    <span className="text-xs font-normal tabular-nums text-muted">{reach.byChannel[value]}</span>
+                  )}
+                </label>
+              );
+            })}
           </div>
+          <p className="text-xs text-muted">{staff ? t("staffChannelsHint") : t("channelsHint")}</p>
         </fieldset>
+
+        {needsSubject && (
+          <label className="flex flex-col gap-1.5 text-sm font-medium">
+            {t("subject")}
+            <input name="subject" maxLength={150} dir="auto" placeholder={businessName} className="control px-3 py-2 font-normal" />
+          </label>
+        )}
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            name="promotional"
+            checked={promotional}
+            onChange={(event) => setPromotional(event.target.checked)}
+          />
+          <span>
+            {t("promotional")} <span className="text-xs text-muted">{t("promotionalHint")}</span>
+          </span>
+        </label>
 
         {(templates.length > 0 || suggestions.length > 0) && (
           <label className="flex flex-col gap-1.5 text-sm font-medium">
@@ -159,7 +238,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <SubmitButton>
+          <SubmitButton disabled={count === 0}>
             <Send aria-hidden="true" className="size-4 rtl:-scale-x-100" />
             {t("sendTo", { count })}
           </SubmitButton>

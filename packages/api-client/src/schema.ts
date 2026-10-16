@@ -1384,7 +1384,8 @@ export interface paths {
         put?: never;
         /**
          * Send Campaign
-         * @description Sends the text to everyone in the audience who has a phone number (or previews it).
+         * @description Sends the text to everyone in the audience (in the chosen branches) who can be reached on
+         *     the chosen channels (or previews it).
          */
         post: operations["send_campaign"];
         delete?: never;
@@ -6556,12 +6557,19 @@ export interface components {
              * Audience
              * @enum {string}
              */
-            audience: "active" | "inactive" | "plan_ending" | "no_plan" | "open_leads";
+            audience: "active" | "inactive" | "plan_ending" | "no_plan" | "open_leads" | "staff";
             /**
              * Recipients
-             * @description Who can be reached (has a phone number)
+             * @description Who can be reached on at least one of the channels
              */
             recipients: number;
+            /**
+             * By Channel
+             * @description How many can be reached on each channel
+             */
+            by_channel?: {
+                [key: string]: number;
+            };
         };
         /** AudienceShare */
         AudienceShare: {
@@ -7158,12 +7166,16 @@ export interface components {
              * Audience
              * @enum {string}
              */
-            audience: "active" | "inactive" | "plan_ending" | "no_plan" | "open_leads";
+            audience: "active" | "inactive" | "plan_ending" | "no_plan" | "open_leads" | "staff";
             /**
              * Channel
              * @enum {string}
              */
-            channel: "whatsapp" | "sms";
+            channel: "whatsapp" | "sms" | "email" | "push" | "popup";
+            /** Channels */
+            channels: ("whatsapp" | "sms" | "email" | "push" | "popup")[];
+            /** Location Ids */
+            location_ids: string[] | null;
             /** Body */
             body: string;
             /** Recipients */
@@ -7182,21 +7194,42 @@ export interface components {
              * Audience
              * @enum {string}
              */
-            audience: "active" | "inactive" | "plan_ending" | "no_plan" | "open_leads";
+            audience: "active" | "inactive" | "plan_ending" | "no_plan" | "open_leads" | "staff";
             /**
              * Channel
              * @default whatsapp
              * @enum {string}
              */
-            channel: "whatsapp" | "sms";
-            /** Body */
-            body: string;
+            channel: "whatsapp" | "sms" | "email" | "push" | "popup";
+            /**
+             * Channels
+             * @description Several channels at once; overrides `channel`
+             */
+            channels?: ("whatsapp" | "sms" | "email" | "push" | "popup")[] | null;
+            /**
+             * Location Ids
+             * @description Only the clients (or staff) of these branches; null = the whole network
+             */
+            location_ids?: string[] | null;
+            /**
+             * Subject
+             * @description Email subject and push/pop-up title
+             */
+            subject?: string | null;
+            /**
+             * Promotional
+             * @description An advertisement: goes only to people who agreed to receive them
+             * @default false
+             */
+            promotional: boolean;
             /**
              * Dry Run
              * @description Only count and preview; send nothing
              * @default false
              */
             dry_run: boolean;
+            /** Body */
+            body: string;
         };
         /** CampaignResult */
         CampaignResult: {
@@ -7204,6 +7237,10 @@ export interface components {
             id: string | null;
             /** Recipients */
             recipients: number;
+            /** By Channel */
+            by_channel?: {
+                [key: string]: number;
+            };
             /**
              * Preview
              * @description The text as the first recipient gets it
@@ -17440,7 +17477,10 @@ export interface operations {
     };
     audiences: {
         parameters: {
-            query?: never;
+            query?: {
+                location_ids?: string[] | null;
+                channels?: ("whatsapp" | "sms" | "email" | "push" | "popup")[] | null;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */

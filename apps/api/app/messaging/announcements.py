@@ -21,6 +21,7 @@ from sqlalchemy import Connection, text
 from app.core.config import get_settings
 from app.core.signed_links import sign
 from app.messaging import email_layout as layout
+from app.messaging.contact_emails import resolve_email, sender_name
 from app.messaging.email import Email, Sender, load_messages
 from app.messaging.push import PushSender, push_to_user
 
@@ -49,8 +50,29 @@ def _lang(locale: str) -> str:
     return locale if locale in ("he", "en") else "he"
 
 
-def _email(row: dict[str, Any], texts: dict[str, str], messages: dict[str, Any]) -> Email:
+def personalize(
+    texts: dict[str, str], first_name: str | None, business: str | None
+) -> dict[str, str]:
+    """A business's message may say {first_name} and {business}; MyBiz's own never does."""
+    if business is None:
+        return texts
+    name = (first_name or "").strip()
+    return {
+        key: value.replace("{first_name}", name).replace("{business}", business)
+        for key, value in texts.items()
+    }
+
+
+def _email(
+    row: dict[str, Any],
+    texts: dict[str, str],
+    messages: dict[str, Any],
+    brand: str | None = None,
+    reply_to: str | None = None,
+) -> Email:
+    """`brand` is the issuing business, when it is not MyBiz itself."""
     broadcast = messages["broadcast"]
+    brand_name = brand or layout.BRAND
     marketing = row["kind"] == "marketing"
     lang = _lang(row["locale"])
     subject = texts["subject"]
@@ -63,7 +85,7 @@ def _email(row: dict[str, Any], texts: dict[str, str], messages: dict[str, Any])
     foot = (
         broadcast["footerMarketing"]
         if marketing
-        else broadcast["footerService"].replace("{brand}", layout.BRAND)
+        else broadcast["footerService"].replace("{brand}", brand_name)
     )
     if link:
         parts.append(f"{foot}\n{broadcast['unsubscribe']}: {link}")
@@ -92,8 +114,8 @@ def _email(row: dict[str, Any], texts: dict[str, str], messages: dict[str, Any])
         [layout.Section(lang, body)],
         subject=subject,
         preheader=texts["body"].split("\n")[0],
-        brand=layout.BRAND,
-        footer=[(lang, layout.BRAND)],
+        brand=brand_name,
+        footer=[(lang, brand_name)],
         kind="broadcast",
     )
     return Email(
@@ -103,20 +125,49 @@ def _email(row: dict[str, Any], texts: dict[str, str], messages: dict[str, Any])
         html=html,
         locale=lang,
         kind="broadcast",
+        reply_to=reply_to,
+        from_name=brand,
     )
+
+
+def _location(announcement: dict[str, Any]) -> UUID | None:
+    value = (announcement["audience"] or {}).get("location_id")
+    return UUID(value) if value else None
+
+
+def sender_name_for(conn: Connection, announcement: dict[str, Any]) -> str:
+    """The issuing business's name as the sender (its branch when it has a contact of its own)."""
+    return sender_name(conn, announcement["tenant_id"], _location(announcement)) or layout.BRAND
 
 
 def _queue_deliveries(conn: Connection, announcement: dict[str, Any]) -> int:
     """One row per person and channel they can be reached on. Idempotent: a run that stopped
     half-way is simply run again (the unique key skips what exists)."""
-    people = (
-        conn.execute(
-            text("SELECT * FROM app.announcement_recipients(CAST(:a AS jsonb), :kind)"),
-            {"a": json.dumps(announcement["audience"]), "kind": announcement["kind"]},
+    if announcement["issuer"] == "tenant":
+        people = (
+            conn.execute(
+                text(
+                    "SELECT * FROM app.tenant_announcement_recipients("
+                    "CAST(:t AS uuid), CAST(:a AS jsonb), :kind)"
+                ),
+                {
+                    "t": announcement["tenant_id"],
+                    "a": json.dumps(announcement["audience"]),
+                    "kind": announcement["kind"],
+                },
+            )
+            .mappings()
+            .all()
         )
-        .mappings()
-        .all()
-    )
+    else:
+        people = (
+            conn.execute(
+                text("SELECT * FROM app.announcement_recipients(CAST(:a AS jsonb), :kind)"),
+                {"a": json.dumps(announcement["audience"]), "kind": announcement["kind"]},
+            )
+            .mappings()
+            .all()
+        )
     for person in people:
         for channel in announcement["channels"]:
             reachable = {
@@ -130,9 +181,9 @@ def _queue_deliveries(conn: Connection, announcement: dict[str, Any]) -> int:
                 text("""
                     INSERT INTO app.announcement_deliveries
                         (announcement_id, channel, person_key, user_id, client_id, tenant_id,
-                         email, phone, locale, status)
+                         email, phone, locale, status, first_name)
                     VALUES (:a, :channel, :key, :user, :client, :tenant, :email, :phone,
-                            :locale, :status)
+                            :locale, :status, :first_name)
                     ON CONFLICT (announcement_id, channel, person_key) DO NOTHING
                 """),
                 {
@@ -146,6 +197,7 @@ def _queue_deliveries(conn: Connection, announcement: dict[str, Any]) -> int:
                     "phone": person["phone"],
                     "locale": _lang(person["locale"] or "he"),
                     "status": "queued" if reachable else "skipped",
+                    "first_name": person.get("first_name"),
                 },
             )
     conn.execute(
@@ -182,7 +234,8 @@ def _send_batch(
         conn.execute(
             text("""
                 SELECT d.id, d.announcement_id, d.channel, d.user_id, d.client_id, d.tenant_id,
-                       d.email, d.phone, d.locale, d.attempts, a.kind
+                       d.email, d.phone, d.locale, d.attempts, d.first_name, a.kind, a.issuer,
+                       a.audience
                 FROM app.announcement_deliveries d
                 JOIN app.announcements a ON a.id = d.announcement_id
                 WHERE d.announcement_id = :a AND d.status = 'queued'
@@ -195,9 +248,14 @@ def _send_batch(
         .all()
     )
     mailbox: dict[str, dict[str, Any]] = {}
+    business = None
+    location_id = None
+    if announcement["issuer"] == "tenant":
+        business = sender_name_for(conn, announcement)
+        location_id = _location(announcement)
     for row in rows:
         lang = _lang(row["locale"])
-        texts = content_for(announcement["content"], lang)
+        texts = personalize(content_for(announcement["content"], lang), row["first_name"], business)
         channel = row["channel"]
         try:
             if channel == "popup":
@@ -215,7 +273,12 @@ def _send_batch(
                     continue
                 if lang not in mailbox:
                     mailbox[lang] = load_messages(lang)
-                sender.send(_email(dict(row), texts, mailbox[lang]))
+                reply_to = (
+                    resolve_email(conn, announcement["tenant_id"], "reply_to", location_id)
+                    if business
+                    else None
+                )
+                sender.send(_email(dict(row), texts, mailbox[lang], business, reply_to))
                 _finish_delivery(conn, row["id"], "sent")
             elif channel == "push":
                 if push is None or not push_to_user(
