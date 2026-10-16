@@ -218,7 +218,7 @@ def build() -> dict[str, tuple[str, str]]:
         out[name] = (
             subject,
             layout.shell(
-                [he, en], subject=subject, preheader=preheader, brand=BRAND, footer=FOOTER
+                [he, en], subject=subject, preheader=preheader, brand=BRAND, footer=FOOTER, kind=name
             ),
         )
     return out

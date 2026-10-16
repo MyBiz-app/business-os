@@ -77,6 +77,8 @@ class VerticalPack:
     default_preset: str  # modules a new business starts with (app/commerce/modules.py PRESETS)
     health_form: str | None = None  # app/catalog/health.py FORMS key clients sign before booking
     recommended_modules: tuple[str, ...] = ()
+    # The client app's home cards, top to bottom (CLIENT_HOME_CARDS in packages/verticals).
+    client_home: tuple[str, ...] = ("next_booking", "shortcuts", "updates", "business_info")
     default_plans: tuple[DefaultPlan, ...] = field(default_factory=tuple)
     default_services: tuple[DefaultService, ...] = field(default_factory=tuple)
     default_rooms: tuple[DefaultRoom, ...] = field(default_factory=tuple)
@@ -86,6 +88,12 @@ class VerticalPack:
     dependent_fields: tuple[ClientField, ...] = field(default_factory=tuple)
     dependent_required: bool = False
     time_billing: bool = False  # time entries, retainers and monthly bills (#45)
+    # The schedule a client sees by default: "class_blocks" | "appointments" | "courts".
+    schedule_view: str = "appointments"
+    # Friends and participant lists: "on" | "off" | "default_off" (a category-wide decision).
+    social: str = "off"
+    # The sub-categories a branch of a business in this category may be (empty on a sub-category).
+    branch_kinds: tuple[str, ...] = ()
     client_fields: tuple[ClientField, ...] = field(default_factory=tuple)
 
     @property
@@ -176,6 +184,7 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
         default_preset=get("default_preset", "starter"),
         health_form=get("health_form"),
         recommended_modules=tuple(get("recommended_modules", ())),
+        client_home=tuple(get("client_home", VerticalPack.client_home)),
         default_plans=(
             tuple(_plan(p) for p in raw["default_plans"])
             if "default_plans" in raw
@@ -194,6 +203,13 @@ def _resolve(raw: dict[str, Any], parent: VerticalPack | None) -> VerticalPack:
         ),
         dependent_required=get("dependent_required", False),
         time_billing=get("time_billing", False),
+        schedule_view=get("schedule_view", "appointments"),
+        social=get("social", "off"),
+        branch_kinds=(
+            tuple(raw["branch_kinds"])
+            if "branch_kinds" in raw
+            else (() if parent else tuple(child["key"] for child in raw.get("children", ())))
+        ),
         default_rooms=(
             tuple(_room(r) for r in raw["default_rooms"])
             if "default_rooms" in raw

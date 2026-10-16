@@ -42,7 +42,7 @@ def sign_in(page, email_label: str, send: str, code_label: str, enter: str) -> N
     page.get_by_label(code_label).wait_for(timeout=30000)
     page.wait_for_timeout(2000)  # let the new code's email arrive (older ones are still there)
     page.get_by_label(code_label).fill(h.otp(OWNER))
-    page.get_by_role("button", name=enter).click()
+    # Filling the last digit signs in on its own.
 
 
 def tab(page, name: str) -> None:
@@ -68,7 +68,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
     page = b.new_context(locale="he-IL", viewport={"width": 390, "height": 844}, is_mobile=True).new_page()
     page.on("pageerror", lambda e: errors.append(str(e)))
-    sign_in(page, "אימייל", "שליחת קוד", "הקוד מהמייל", "כניסה")
+    sign_in(page, "אימייל", "שליחת קוד", "הקוד בן 6 הספרות", "כניסה")
     page.wait_for_timeout(3000)
     page.evaluate("id => localStorage.setItem('business.tenant', id)", str(tenant_id))
     page.goto(APP)

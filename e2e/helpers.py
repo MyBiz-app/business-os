@@ -63,7 +63,7 @@ def confirm_link(email: str) -> str:
 
 
 def otp(email: str) -> str:
-    return re.search(r"\b(\d{6,10})\b", _message(email)["Text"]).group(1)
+    return re.search(r"\b(\d{6})\b", _message(email)["Text"]).group(1)
 
 
 def login(page, email: str) -> None:

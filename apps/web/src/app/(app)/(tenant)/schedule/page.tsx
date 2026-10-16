@@ -15,6 +15,7 @@ import { canManageSettings, canWriteSchedule } from "@/lib/permissions";
 import { getBranches, getTenantFor } from "@/lib/tenant";
 
 import { CopyWeek } from "./copy-week";
+import { PublishWeek } from "./publish-week";
 import { SaveDefault } from "./save-default";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -189,6 +190,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
               {t("closedDays")}
             </Link>
           )}
+          {canWriteSchedule(tenant) && <PublishWeek />}
           {canWriteSchedule(tenant) && view === "week" && <CopyWeek key={start} weekStart={start} nextWeek={addDays(start, 7)} />}
           {tenant.permissions.includes("bookings.manage") && (
             <Link href={`/schedule/appointment?date=${start > today ? start : today}`} className="btn-secondary px-4 py-2.5 text-sm">
@@ -238,13 +240,13 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             </Link>
           )}
           <DateJump value={anchor} href={link({ date: "__day__" })} label={t("goToDate")} />
-          <div role="group" aria-label={t("view")} className="ms-1 flex rounded-xl border border-border bg-surface p-0.5 text-sm">
+          <div role="group" aria-label={t("view")} className="order-last flex w-full rounded-xl border border-border bg-surface p-0.5 text-sm sm:order-none sm:ms-1 sm:w-auto">
             {(["day", "week", "month"] as const).map((option) => (
               <Link
                 key={option}
                 href={viewLink(option)}
                 aria-current={view === option ? "page" : undefined}
-                className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${view === option ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"}`}
+                className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors sm:flex-none ${view === option ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"}`}
               >
                 {t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView")}
               </Link>

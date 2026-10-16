@@ -9,6 +9,7 @@ import { getPlatformFor } from "@/lib/platform";
 import { RequestCard } from "./request-card";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/empty-state";
 
 const FILTERS = ["open", "all", "business", "site"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -54,7 +55,7 @@ export default async function PlatformInboxPage({ searchParams }: PageProps<"/pl
       </nav>
       <p className="text-sm text-muted">{t("count", { count: requests.length })}</p>
       {requests.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("empty")}</p>
+        <EmptyState variant="inbox">{t("empty")}</EmptyState>
       ) : (
         <ul className="enter-items flex flex-col gap-3">
           {requests.map((request) => (

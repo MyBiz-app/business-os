@@ -17,6 +17,7 @@ import { VerticalIcon } from "@/components/vertical-icon";
 import type { ProviderButton } from "@/lib/auth-providers";
 import { formatMoney } from "@/lib/money";
 import {
+  businessNumberOk,
   chooseTier,
   CLIENT_SIZES,
   coreTier,
@@ -61,6 +62,19 @@ const GROUPS = [
   { key: "summary", steps: ["summary"] },
 ] as const;
 
+/** The numbered dot of a step in the progress column (a tick once the step is done). */
+function StepDot({ done, current, index }: { done: boolean; current: boolean; index: number }) {
+  return (
+    <span
+      className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+        done ? "bg-primary text-on-primary" : current ? "bg-primary/10 text-primary ring-2 ring-primary" : "bg-foreground/8 text-muted"
+      }`}
+    >
+      {done ? <Check aria-hidden="true" className="size-4" /> : index + 1}
+    </span>
+  );
+}
+
 type Draft = Omit<SignupPlan, "vertical"> & { vertical: string | null };
 
 type Props = {
@@ -94,6 +108,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const [draft, setDraft] = useState<Draft>(initial);
   const [notice, setNotice] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
+  const [numberTouched, setNumberTouched] = useState(false);
   const [terms, setTerms] = useState(false);
   const [termsError, setTermsError] = useState(false);
   // Add-ons the person said "no thanks" to, so Continue reads as a choice, not a skip.
@@ -193,6 +208,14 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     const target = `/start/finish?p=${encodePlan(plan)}`;
     router.push(signedIn ? target : `/signup?next=${encodeURIComponent(target)}`);
   };
+  const chosenKind = findVertical(draft.vertical);
+  const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location").map((line) => label(line.key));
+  const passDetails = [
+    ...(draft.businessNumber ? [{ label: t("summary.passNumber"), value: draft.businessNumber }] : []),
+    ...(chosenKind ? [{ label: t("summary.passCategory"), value: text(chosenKind.category, "name") }] : []),
+    { label: t("summary.passSize"), value: t("summary.passSizeValue", { staff: draft.staff, locations: draft.locations }) },
+    { label: t("summary.passAddons"), value: addOnLabels.length > 0 ? addOnLabels.join(", ") : t("summary.passNoAddons") },
+  ];
   const loginHref = draft.vertical
     ? `/login?next=${encodeURIComponent(`/start/finish?p=${encodePlan({ ...draft, vertical: draft.vertical })}`)}`
     : "/login";
@@ -329,7 +352,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           className="flex flex-col gap-6"
           onSubmit={(event) => {
             event.preventDefault();
-            if (draft.name.trim()) next();
+            setNumberTouched(true);
+            if (draft.name.trim() && businessNumberOk(draft.currency, draft.businessNumber ?? "")) next();
           }}
         >
           <TextInput
@@ -337,6 +361,16 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             value={draft.name}
             placeholder={t("business.namePlaceholder", { example: draft.vertical ? text(draft.vertical, "example") : t("business.exampleGeneric") })}
             onChange={(name) => update({ name })}
+          />
+          <TextInput
+            label={draft.currency === "ILS" ? t("business.number") : t("business.numberOptional")}
+            value={draft.businessNumber ?? ""}
+            placeholder={t("business.numberPlaceholder")}
+            onChange={(businessNumber) => update({ businessNumber })}
+            inputMode="numeric"
+            required={draft.currency === "ILS"}
+            error={numberTouched && !businessNumberOk(draft.currency, draft.businessNumber ?? "") ? t("business.numberInvalid") : undefined}
+            hint={draft.currency === "ILS" ? t("business.numberHint") : undefined}
           />
           <ChoiceGroup
             legend={t("business.size")}
@@ -526,6 +560,8 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           via={t("summary.trial")}
           to={t("summary.to")}
           date={trialEnds}
+          icon={findVertical(draft.vertical)?.icon ?? "briefcase"}
+          details={passDetails}
         />
         <div className="card flex flex-col gap-5 p-6">
           <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
@@ -640,22 +676,16 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   ) : null;
 
   return (
-    <Container size="default" className="grid grid-cols-1 gap-8 pb-36 pt-6 lg:grid-cols-[1fr_22rem] lg:gap-12 lg:pb-16 lg:pt-10">
+    <Container size="default" className="grid grid-cols-1 gap-8 pb-36 pt-6 lg:grid-cols-[17rem_1fr] lg:gap-10 lg:pb-16 lg:pt-10">
       <div className="flex min-w-0 flex-col gap-6 lg:short:gap-4">
-        <nav aria-label={t("progress.label")} className="flex flex-col gap-2">
+        <nav aria-label={t("progress.label")} className="flex flex-col gap-2 lg:hidden">
           <ol className="flex items-center">
             {GROUPS.map((group, index) => {
               const done = index < groupIndex;
               const current = index === groupIndex;
               return (
                 <li key={group.key} aria-current={current ? "step" : undefined} className="flex flex-1 items-center gap-2 last:flex-none">
-                  <span
-                    className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors ${
-                      done ? "bg-primary text-on-primary" : current ? "bg-primary/10 text-primary ring-2 ring-primary" : "bg-foreground/8 text-muted"
-                    }`}
-                  >
-                    {done ? <Check aria-hidden="true" className="size-4" /> : index + 1}
-                  </span>
+                  <StepDot done={done} current={current} index={index} />
                   <span className={`truncate text-sm font-semibold max-sm:sr-only ${current ? "text-foreground" : "text-muted"}`}>{t(`progress.${group.key}`)}</span>
                   {index < GROUPS.length - 1 && <span aria-hidden="true" className={`h-0.5 min-w-3 flex-1 rounded-full ${done ? "bg-primary" : "bg-foreground/10"}`} />}
                 </li>
@@ -722,6 +752,25 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         onToggle={() => setCartOpen((value) => !value)}
         onRemove={removeModule}
         t={t}
+        steps={
+          <nav aria-label={t("progress.label")} className="card p-5">
+            <ol className="flex flex-col">
+              {GROUPS.map((group, index) => {
+                const done = index < groupIndex;
+                const current = index === groupIndex;
+                return (
+                  <li key={group.key} aria-current={current ? "step" : undefined} className="flex flex-col">
+                    <span className="flex items-center gap-3">
+                      <StepDot done={done} current={current} index={index} />
+                      <span className={`text-sm font-semibold ${current ? "text-foreground" : "text-muted"}`}>{t(`progress.${group.key}`)}</span>
+                    </span>
+                    {index < GROUPS.length - 1 && <span aria-hidden="true" className={`ms-4 h-5 w-0.5 rounded-full ${done ? "bg-primary" : "bg-foreground/10"}`} />}
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
+        }
         actions={
           backButton || forwardButton ? (
             <>

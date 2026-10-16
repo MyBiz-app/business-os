@@ -1,7 +1,7 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { addDays, dayOf, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
@@ -15,11 +15,13 @@ import { tint } from "@business-os/app-kit/lib/brand";
 import { newIdempotencyKey } from "@business-os/app-kit/lib/idempotency";
 import { formatMoney } from "@business-os/app-kit/lib/money";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { defaultTime, groupByCourt, rentalLengths, splitOffset, timeOptions } from "@/lib/court-search";
 import { useBusiness } from "@/providers/business-provider";
 
 type Service = components["schemas"]["ResourceService"];
 type Slot = components["schemas"]["ResourceSlot"];
 type Reservation = components["schemas"]["ClientReservation"];
+type Suggestions = components["schemas"]["ResourceSuggestions"];
 
 const DAYS = 14;
 const KNOWN = ["slot_taken", "outside_hours", "length_not_offered", "health_declaration_required", "health_declaration_review"] as const;
@@ -31,10 +33,14 @@ export default function Court() {
   const locale = useLocale();
   const { api, scope, business, palette } = useBusiness();
   const today = business ? todayIn(business.time_zone) : "";
+  // The schedule's court table opens this screen on the tapped day and time.
+  const params = useLocalSearchParams<{ day?: string; at?: string; service?: string }>();
   const [service, setService] = useState<Service | null>(null);
   const [minutes, setMinutes] = useState<number | null>(null);
-  const [room, setRoom] = useState<string | null>(null);
-  const [day, setDay] = useState(today);
+  const [day, setDay] = useState(params.day || today);
+  const [at, setAt] = useState(() => params.at || defaultTime(business?.time_zone ?? "UTC"));
+  const [found, setFound] = useState<Suggestions | null>(null);
+  const [showGrid, setShowGrid] = useState(false);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [key, setKey] = useState(newIdempotencyKey);
@@ -50,37 +56,60 @@ export default function Court() {
 
   // One kind of court: chosen for the client.
   useEffect(() => {
-    if (services?.length === 1 && !service) choose(services[0]!);
+    if (service || !services) return;
+    const wanted = services.find((x) => x.id === params.service);
+    if (wanted) choose(wanted);
+    else if (services.length === 1) choose(services[0]!);
   }, [services, service]);
 
+  // "When suits you?": the exact slot, or the nearest free ones.
   useEffect(() => {
     if (!service || !minutes || !day) return;
     let stale = false;
-    setSlots(null);
+    setFound(null);
     setSlot(null);
     void api
-      .GET("/client/resources/slots", {
-        params: { ...scope, query: { service_id: service.id, date: day, minutes, ...(room ? { room_id: room } : {}) } },
+      .GET("/client/resources/suggestions", {
+        params: { ...scope, query: { service_id: service.id, date: day, time: at, minutes, limit: 5 } },
       })
+      .then((result) => {
+        if (!stale) setFound(result.data ?? { requested_starts_at: "", exact: [], suggestions: [] });
+      });
+    return () => {
+      stale = true;
+    };
+  }, [api, scope, service, minutes, day, at]);
+
+  // The optional courts-by-hours grid for the chosen day.
+  useEffect(() => {
+    if (!showGrid || !service || !minutes || !day) return;
+    let stale = false;
+    setSlots(null);
+    void api
+      .GET("/client/resources/slots", { params: { ...scope, query: { service_id: service.id, date: day, minutes } } })
       .then((result) => {
         if (!stale) setSlots(result.data ?? []);
       });
     return () => {
       stale = true;
     };
-  }, [api, scope, service, minutes, room, day]);
+  }, [api, scope, service, minutes, day, showGrid]);
 
   if (!business) return null;
   const time = (iso: string) => formatTime(iso, locale, business.time_zone);
   const inApp = business.resource_payment === "app";
-  const lengths = service
-    ? Array.from({ length: (service.max_minutes - service.min_minutes) / service.step_minutes + 1 }, (_, i) => service.min_minutes + i * service.step_minutes)
-    : [];
+  const lengths = service ? rentalLengths(service) : [];
+  const zone = business.time_zone;
+  const sameSlot = (a: Slot | null, b: Slot) => a?.starts_at === b.starts_at && a.room_id === b.room_id;
+  const distance = (offset: number) => {
+    const { hours, minutes: mins, later } = splitOffset(offset);
+    const amount = hours > 0 && mins > 0 ? t("hoursMinutes", { hours, minutes: mins }) : hours > 0 ? t("hours", { count: hours }) : t("minutes", { count: mins });
+    return t(later ? "later" : "earlier", { amount });
+  };
 
   function choose(next: Service) {
     setService(next);
-    setMinutes(next.min_minutes);
-    setRoom(null);
+    setMinutes(rentalLengths(next)[0] ?? next.min_minutes);
   }
 
   const reserve = async () => {
@@ -208,19 +237,8 @@ export default function Court() {
             ))}
           </View>
 
-          {service.rooms.length > 1 && (
-            <>
-              <Text style={[local.step, { color: palette.foreground }]}>{t("where")}</Text>
-              <ScrollView horizontal role="radiogroup" aria-label={t("where")} showsHorizontalScrollIndicator={false} contentContainerStyle={local.row}>
-                <Chip label={t("anyCourt")} selected={room === null} onPress={() => setRoom(null)} palette={palette} />
-                {service.rooms.map((item) => (
-                  <Chip key={item.id} label={item.name} selected={room === item.id} onPress={() => setRoom(item.id)} palette={palette} />
-                ))}
-              </ScrollView>
-            </>
-          )}
-
-          <Text style={[local.step, { color: palette.foreground }]}>{tAppointment("day")}</Text>
+          <Text style={[local.step, { color: palette.foreground }]}>{t("whenSuits")}</Text>
+          <Text style={[local.label, { color: palette.muted }]}>{tAppointment("day")}</Text>
           <ScrollView horizontal role="tablist" aria-label={tAppointment("day")} showsHorizontalScrollIndicator={false} contentContainerStyle={local.row}>
             {Array.from({ length: DAYS }, (_, i) => addDays(today, i)).map((value) => (
               <Chip
@@ -235,29 +253,109 @@ export default function Court() {
               />
             ))}
           </ScrollView>
+          <Text style={[local.label, { color: palette.muted }]}>{tAppointment("time")}</Text>
+          <ScrollView horizontal role="radiogroup" aria-label={tAppointment("time")} showsHorizontalScrollIndicator={false} contentContainerStyle={local.row}>
+            {timeOptions().map((value) => (
+              <Chip key={value} label={value} selected={at === value} onPress={() => setAt(value)} palette={palette} />
+            ))}
+          </ScrollView>
 
-          <Text style={[local.step, { color: palette.foreground }]}>{tAppointment("time")}</Text>
           <Card palette={palette}>
-            {slots === null ? (
+            {found === null ? (
               <ActivityIndicator color={palette.primary} />
-            ) : slots.length === 0 ? (
+            ) : found.exact.length > 0 ? (
+              <>
+                <Text style={[local.serviceName, { color: palette.success }]}>{t("exactFree", { time: at })}</Text>
+                <View role="radiogroup" aria-label={t("where")} style={local.grid}>
+                  {found.exact.map((item) => (
+                    <Chip
+                      key={item.room_id}
+                      label={item.room_name}
+                      sublabel={`${time(item.starts_at)}–${time(item.ends_at)}`}
+                      selected={sameSlot(slot, item)}
+                      onPress={() => setSlot(item)}
+                      palette={palette}
+                    />
+                  ))}
+                </View>
+              </>
+            ) : found.suggestions.length === 0 ? (
               <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
             ) : (
-              <View role="radiogroup" aria-label={tAppointment("time")} style={local.grid}>
-                {slots.map((item) => (
-                  <Chip
-                    key={`${item.room_id}-${item.starts_at}`}
-                    label={time(item.starts_at)}
-                    sublabel={room === null && service.rooms.length > 1 ? item.room_name : undefined}
-                    accessibilityLabel={`${time(item.starts_at)}, ${item.room_name}`}
-                    selected={slot?.starts_at === item.starts_at && slot.room_id === item.room_id}
-                    onPress={() => setSlot(item)}
-                    palette={palette}
-                  />
-                ))}
-              </View>
+              <>
+                <Text style={[local.serviceName, { color: palette.foreground }]}>{t("taken", { time: at })}</Text>
+                <View role="radiogroup" aria-label={t("nearby")} style={local.list}>
+                  {found.suggestions.map((item) => {
+                    const selected = sameSlot(slot, item);
+                    const otherDay = dayOf(item.starts_at, zone) !== day;
+                    return (
+                      <PressableScale
+                        key={`${item.room_id}-${item.starts_at}`}
+                        role="radio"
+                        aria-checked={selected}
+                        accessibilityLabel={`${time(item.starts_at)}, ${item.room_name}, ${distance(item.offset_minutes)}`}
+                        onPress={() => setSlot(item)}
+                        style={[
+                          local.service,
+                          elevation.card,
+                          { backgroundColor: selected ? tint(palette.primary, 0.12) : palette.surface, borderColor: selected ? palette.primary : palette.border },
+                        ]}
+                      >
+                        <View style={local.serviceInfo}>
+                          <Text style={[local.serviceName, { color: palette.foreground }]}>
+                            {otherDay ? `${formatDay(dayOf(item.starts_at, zone), locale, { weekday: "short", day: "numeric" })} · ` : ""}
+                            {time(item.starts_at)}–{time(item.ends_at)}
+                          </Text>
+                          <Text style={[styles.muted, { color: palette.muted }]}>
+                            {item.room_name} · {distance(item.offset_minutes)}
+                          </Text>
+                        </View>
+                        {selected && <Ionicons name="checkmark-circle" size={24} color={palette.primary} />}
+                      </PressableScale>
+                    );
+                  })}
+                </View>
+              </>
             )}
           </Card>
+
+          <PressableScale
+            role="button"
+            aria-expanded={showGrid}
+            accessibilityLabel={t("gridToggle")}
+            onPress={() => setShowGrid((value) => !value)}
+            style={local.toggle}
+          >
+            <Ionicons name={showGrid ? "chevron-up" : "grid-outline"} size={18} color={palette.primary} />
+            <Text style={[local.toggleText, { color: palette.primary }]}>{showGrid ? t("gridHide") : t("gridToggle")}</Text>
+          </PressableScale>
+          {showGrid && (
+            <Card palette={palette}>
+              {slots === null ? (
+                <ActivityIndicator color={palette.primary} />
+              ) : slots.length === 0 ? (
+                <Text style={[styles.muted, { color: palette.muted }]}>{t("noSlots")}</Text>
+              ) : (
+                groupByCourt(slots).map((court) => (
+                  <View key={court.roomId} style={local.court}>
+                    <Text style={[local.serviceName, { color: palette.foreground }]}>{court.name}</Text>
+                    <View role="radiogroup" aria-label={court.name} style={local.grid}>
+                      {court.slots.map((item) => (
+                        <Chip
+                          key={item.starts_at}
+                          label={time(item.starts_at)}
+                          accessibilityLabel={`${court.name}, ${time(item.starts_at)}`}
+                          selected={sameSlot(slot, item)}
+                          onPress={() => setSlot(item)}
+                          palette={palette}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                ))
+              )}
+            </Card>
+          )}
 
           <ErrorText message={error} palette={palette} />
           {slot && (
@@ -297,6 +395,10 @@ const local = StyleSheet.create({
   serviceInfo: { flex: 1, gap: 2 },
   serviceName: { fontSize: 16, fontWeight: "700", textAlign: "left" },
   row: { gap: 8, paddingVertical: 2 },
+  label: { fontSize: 13, fontWeight: "600", textAlign: "left" },
+  toggle: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 8, minHeight: 44 },
+  toggleText: { fontSize: 15, fontWeight: "700" },
+  court: { gap: 8, paddingVertical: 6 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   done: { alignItems: "center", gap: 12, paddingVertical: 32 },
   check: { width: 92, height: 92, borderRadius: 999, alignItems: "center", justifyContent: "center" },

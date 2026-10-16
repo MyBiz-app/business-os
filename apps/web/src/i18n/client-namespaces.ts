@@ -70,9 +70,11 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "start",
     "support",
     "team",
+    "terms",
     "time",
     "timeOff",
     "timeOffQueue",
+    "verticals",
     "visitNotes"
   ],
   "platform": [

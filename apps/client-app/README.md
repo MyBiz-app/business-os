@@ -29,10 +29,10 @@ The staging Supabase project's "Magic link" and "Confirm signup" email templates
 
 ## Publish as a web app (staging)
 
-Quickest way: GitHub → Actions → *Deploy the Expo apps to the web (Vercel)* → *Run workflow*.
-It builds the web export on the runner and uploads it to Vercel (one project per app,
-`mybiz-client-app`, `mybiz-business-app`, `mybiz-staff-app`; uses the `VERCEL_TOKEN` secret).
-Afterwards add each printed address to the API's `API_CORS_ORIGINS` (see below).
+Quickest way: GitHub → Actions → *Deploy the Expo app to the web (Vercel)* → *Run workflow*.
+It builds the web export on the runner and uploads it to Vercel (project `mybiz-client-app`; uses the `VERCEL_TOKEN` secret). The retired
+`mybiz-business-app` and `mybiz-staff-app` projects only redirect to it (run with *legacy-redirects*).
+Afterwards add the printed address to the API's `API_CORS_ORIGINS` (see below).
 
 Manual alternative (a Vercel project with a Git connection):
 
@@ -45,3 +45,7 @@ It is a static site (`expo export -p web`), deployed by a second Vercel project:
    `EXPO_PUBLIC_SUPABASE_KEY` (the staging values above) and `ENABLE_EXPERIMENTAL_COREPACK=1`.
 3. Deploy, then allow the app's address on the API: Render → service → Environment →
    `API_CORS_ORIGINS` = `["https://<the app's vercel address>"]`.
+
+## Publishing an over-the-air update
+
+`eas update` bundles `EXPO_PUBLIC_*` at publish time and ignores `eas.json` build env. Publish with the **Publish Expo app updates (EAS Update)** GitHub workflow (needs the `EXPO_TOKEN` secret), or export `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_KEY` (see the workflow file) before running `eas update --branch preview --environment preview`. Without them the app calls `http://<host>:8000` and sign-in fails with "(0)".

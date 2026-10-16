@@ -5,9 +5,18 @@
   "icon": "camera",
   "color": "from-fuchsia-500 to-purple-600",
   "terms": "events",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"
+  ],
+  "client_home": [
+    "next_booking",
+    "quotes",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 2880,
   "booking_requires_plan": false,

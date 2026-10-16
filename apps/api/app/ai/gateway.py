@@ -4,9 +4,11 @@ Business code depends on `LLMProvider`, never on a provider SDK, so providers ca
 (and faked in tests). Every call reports token usage, which the assistant records as
 `ai_credits` usage events."""
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
+from app.ai.models import MODELS, clean_text, prices_of
 from app.core.config import get_settings
 
 
@@ -50,19 +52,56 @@ class LLMProvider(Protocol):
         ...
 
 
-# USD per million tokens: input, output, cache read, cache write (5-minute TTL).
-# Haiku prices are for prompts up to 100K tokens; unknown models are priced as the dearest.
-PRICES: dict[str, tuple[float, float, float, float]] = {
-    "claude-opus-5-5": (4.0, 20.0, 0.20, 5.0),
-    "claude-sonnet-5-5": (2.0, 10.0, 0.20, 2.5),
-    "claude-haiku-5-5": (0.10, 0.50, 0.01, 0.125),
-}
+# USD per million tokens: input, output, cache read, cache write (5-minute TTL), from the model
+# registry (app/ai/models.py). Unknown models are priced as the dearest.
+PRICES: dict[str, tuple[float, float, float, float]] = {m.id: m.prices for m in MODELS.values()}
+
+
+def clean_response(response: LLMResponse) -> LLMResponse:
+    """The response with long dashes removed from its text blocks (no long dash in anything the
+    user reads, whatever the vendor wrote)."""
+    content = [
+        {**block, "text": clean_text(block["text"])}
+        if block.get("type") == "text" and isinstance(block.get("text"), str)
+        else block
+        for block in response.content
+    ]
+    return LLMResponse(content, response.stop_reason, response.model, response.usage)
+
+
+@dataclass(frozen=True)
+class StreamEvent:
+    """One piece of a streamed answer: `text` carries a text delta, `done` the final response."""
+
+    kind: str  # "text" | "done"
+    text: str = ""
+    response: LLMResponse | None = None
+
+
+def stream_response(
+    provider: Any,
+    system: str,
+    messages: list[dict[str, Any]],
+    tools: list[dict[str, Any]],
+    strong: bool = False,
+) -> Iterator[StreamEvent]:
+    """Streams one model call. Providers with `create_stream` stream natively; the others
+    (demo, test fakes) answer in one piece, so callers need no special case."""
+    native = getattr(provider, "create_stream", None)
+    if native is not None:
+        yield from native(system, messages, tools, strong)
+        return
+    response = clean_response(provider.create(system, messages, tools, strong))
+    for block in response.content:
+        if block.get("type") == "text" and block.get("text"):
+            yield StreamEvent("text", block["text"])
+    yield StreamEvent("done", response=response)
 
 
 def credits(model: str, usage: Usage) -> float:
     """AI credits for a call: one credit is one US cent of model cost. Owners see credits,
     never tokens (spec 03, usage meters)."""
-    price_in, price_out, price_read, price_write = PRICES.get(model, PRICES["claude-opus-5-5"])
+    price_in, price_out, price_read, price_write = prices_of(model)
     dollars = (
         usage.input_tokens * price_in
         + usage.output_tokens * price_out
@@ -109,6 +148,10 @@ class AnthropicProvider:
             raise ProviderBusy from error
         except anthropic.APIError as error:
             raise ProviderUnavailable from error
+        return clean_response(self._to_response(response))
+
+    @staticmethod
+    def _to_response(response: Any) -> LLMResponse:
         usage = response.usage
         content = [block.model_dump(mode="json", exclude_none=True) for block in response.content]
         return LLMResponse(
@@ -123,15 +166,43 @@ class AnthropicProvider:
             ),
         )
 
+    def create_stream(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        strong: bool = False,
+    ) -> Iterator[StreamEvent]:
+        """Like `create`, but yields text deltas as they arrive, then the final response."""
+        import anthropic
+
+        model = self.strong_model if strong else self.model
+        try:
+            with self._call(system, messages, tools, model, stream=True) as stream:
+                for delta in stream.text_stream:
+                    yield StreamEvent("text", clean_text(delta))
+                final = stream.get_final_message()
+        except anthropic.RateLimitError as error:
+            raise ProviderBusy from error
+        except anthropic.APIError as error:
+            raise ProviderUnavailable from error
+        yield StreamEvent("done", response=clean_response(self._to_response(final)))
+
     def _call(
-        self, system: str, messages: list[dict[str, Any]], tools: list[dict[str, Any]], model: str
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        model: str,
+        stream: bool = False,
     ) -> Any:
         extra: dict[str, Any] = {}
         if not model.startswith("claude-haiku"):
             # On a safety decline, the API retries on Anthropic's recommended model (Haiku has
             # no server-side fallback).
             extra = {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
-        return self.client.beta.messages.create(
+        call = self.client.beta.messages.stream if stream else self.client.beta.messages.create
+        return call(
             model=model,
             max_tokens=self.max_tokens,
             system=system,
@@ -162,3 +233,30 @@ def get_provider() -> LLMProvider | None:
         settings.ai_max_tokens,
         settings.ai_timeout_seconds,
     )
+
+
+class FallbackProvider:
+    """Tries each provider in order when one is unavailable (not when it is merely busy: a busy
+    provider is a rate limit on us, and trying another vendor would hide it). The first provider
+    names the model for budget checks."""
+
+    def __init__(self, providers: list[LLMProvider]) -> None:
+        if not providers:
+            raise ValueError("at least one provider")
+        self.providers = providers
+        self.model = providers[0].model
+
+    def create(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        strong: bool = False,
+    ) -> LLMResponse:
+        last: ProviderUnavailable | None = None
+        for provider in self.providers:
+            try:
+                return provider.create(system, messages, tools, strong)
+            except ProviderUnavailable as error:
+                last = error
+        raise ProviderUnavailable from last

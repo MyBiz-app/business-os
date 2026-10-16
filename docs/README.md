@@ -53,10 +53,8 @@ flowchart LR
   |---|---|
   | `apps/web` | Next.js: the marketing site and sign-up journey, the business web app (CRM), the MyBiz console |
   | `apps/api` | FastAPI: every endpoint (`app/api/`), the domain logic grouped by area (`app/schedule`, `commerce`, `messaging`, `catalog`, `reports`), database migrations (Alembic), background jobs, the AI assistant, tests |
-  | `apps/client-app` | The clients' app (Expo, also runs in the browser) |
-  | `apps/business-app` | The business app for owners and staff on the go (Expo) |
-  | `apps/staff-app` | The MyBiz team app (Expo) |
-  | `packages/app-kit` | What the three Expo apps share: screens, components, session, theme |
+  | `apps/client-app` | The one app: clients, business and MyBiz team areas (Expo, also runs in the browser) |
+  | `packages/app-kit` | What the Expo app is built from: screens, components, session, theme |
   | `packages/i18n` | Hebrew and English texts, and money and date formatting |
   | `packages/verticals` | The industry catalog (categories → sub-categories → packs) |
   | `packages/api-client` | The typed API client, generated from the API's schema |

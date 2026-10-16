@@ -123,3 +123,15 @@ def test_text_emails_use_the_designed_layout_in_their_language() -> None:
     assert 'dir="rtl"' in he and "&lt;חדש&gt;" in he and "<חדש>" not in he and "MyBiz" in he
     en = _html(Email(to="a@b.c", subject="Booked", text="Hi Dana\n\nConfirmed", locale="en"))
     assert 'lang="en"' in en and 'dir="ltr"' in en and "prefers-color-scheme" in en
+
+
+def test_email_preview_page_is_up_to_date() -> None:
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    script = Path(__file__).resolve().parents[3] / "docs/email-preview/build.py"
+    result = subprocess.run(
+        [sys.executable, str(script), "--check"], capture_output=True, text=True
+    )
+    assert result.returncode == 0, result.stderr

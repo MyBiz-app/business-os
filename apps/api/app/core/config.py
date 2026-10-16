@@ -36,6 +36,8 @@ class Settings(BaseSettings):
     # the stronger one (P0-6). Prices live in app/ai/gateway.py.
     ai_model: str = "claude-haiku-5-5"
     ai_strong_model: str = "claude-sonnet-5-5"
+    # The top tier, used only when the console or the owner asks for it (never automatically).
+    ai_top_model: str = "claude-opus-5-5"
     ai_escalate_after_steps: int = (
         3  # model calls in one message before switching to the strong model
     )

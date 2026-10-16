@@ -9,10 +9,20 @@ export const CATALOG: Entry[] = [
     "icon": "dumbbell",
     "color": "from-indigo-500 to-violet-500",
     "terms": "fitness",
+    "schedule_view": "class_blocks",
+    "social": "on",
     "client_term": "member",
     "booking_modes": [
       "class",
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "membership",
+      "shortcuts",
+      "health",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 120,
     "booking_requires_plan": true,
@@ -331,9 +341,18 @@ export const CATALOG: Entry[] = [
     "icon": "scissors",
     "color": "from-pink-500 to-rose-500",
     "terms": "beauty",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "rebook",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 180,
     "booking_requires_plan": false,
@@ -835,9 +854,19 @@ export const CATALOG: Entry[] = [
     "icon": "stethoscope",
     "color": "from-teal-500 to-emerald-500",
     "terms": "clinic",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "patient",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "health",
+      "documents",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -1221,10 +1250,20 @@ export const CATALOG: Entry[] = [
     "icon": "graduation-cap",
     "color": "from-sky-500 to-blue-600",
     "terms": "classes",
+    "schedule_view": "class_blocks",
+    "social": "on",
     "client_term": "student",
     "booking_modes": [
       "class",
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "dependents",
+      "membership",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 720,
     "booking_requires_plan": true,
@@ -1537,6 +1576,7 @@ export const CATALOG: Entry[] = [
       },
       {
         "key": "kids_activities",
+        "social": "default_off",
         "status": "live",
         "dependents": "child",
         "dependent_fields": [
@@ -1591,9 +1631,18 @@ export const CATALOG: Entry[] = [
     "icon": "car",
     "color": "from-amber-500 to-orange-500",
     "terms": "automotive",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "customer",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "rebook",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -1841,10 +1890,20 @@ export const CATALOG: Entry[] = [
     "icon": "trophy",
     "color": "from-lime-500 to-green-600",
     "terms": "sports",
+    "schedule_view": "courts",
+    "social": "on",
     "client_term": "player",
     "booking_modes": [
       "resource",
       "class"
+    ],
+    "client_home": [
+      "next_booking",
+      "rebook",
+      "membership",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -2105,9 +2164,18 @@ export const CATALOG: Entry[] = [
     "icon": "wrench",
     "color": "from-slate-500 to-zinc-700",
     "terms": "home_services",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "addresses",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -2370,10 +2438,20 @@ export const CATALOG: Entry[] = [
     "icon": "paw-print",
     "color": "from-orange-400 to-amber-600",
     "terms": "pets",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "owner",
     "booking_modes": [
       "appointment",
       "class"
+    ],
+    "client_home": [
+      "next_booking",
+      "dependents",
+      "rebook",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -2568,9 +2646,18 @@ export const CATALOG: Entry[] = [
     "icon": "camera",
     "color": "from-fuchsia-500 to-purple-600",
     "terms": "events",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "quotes",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 2880,
     "booking_requires_plan": false,
@@ -2801,9 +2888,19 @@ export const CATALOG: Entry[] = [
     "icon": "briefcase",
     "color": "from-cyan-600 to-sky-700",
     "terms": "professional",
+    "schedule_view": "appointments",
+    "social": "off",
     "client_term": "client",
     "booking_modes": [
       "appointment"
+    ],
+    "client_home": [
+      "next_booking",
+      "documents",
+      "quotes",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,
@@ -3015,10 +3112,18 @@ export const CATALOG: Entry[] = [
     "icon": "utensils",
     "color": "from-red-500 to-orange-600",
     "terms": "food",
+    "schedule_view": "class_blocks",
+    "social": "off",
     "client_term": "guest",
     "booking_modes": [
       "appointment",
       "class"
+    ],
+    "client_home": [
+      "next_booking",
+      "shortcuts",
+      "updates",
+      "business_info"
     ],
     "cancellation_window_minutes": 1440,
     "booking_requires_plan": false,

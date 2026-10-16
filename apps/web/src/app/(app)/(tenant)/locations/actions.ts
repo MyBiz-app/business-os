@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { unwrap } from "@/lib/api";
+import { apiUpload, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
 import type { Block, HoursState } from "@/lib/hours";
 import { getTenant, getTenantFor } from "@/lib/tenant";
@@ -45,6 +45,7 @@ export async function updateLocation(
           name: value(formData, "name"),
           address: value(formData, "address"),
           active: formData.get("active") === "on",
+          ...(formData.has("kind") ? { kind: value(formData, "kind") || null } : {}),
         },
       }),
     );
@@ -152,6 +153,7 @@ export async function addBranch(_state: FormState, formData: FormData): Promise<
         body: {
           name: value(formData, "name"),
           address: value(formData, "address"),
+          kind: value(formData, "kind") || null,
           copy_hours_from: copyFrom === "" ? null : copyFrom,
           staff_user_ids: formData.getAll("staff_user_ids").map(String),
           accept_extra_charge: formData.get("accept_extra_charge") === "on",
@@ -164,4 +166,59 @@ export async function addBranch(_state: FormState, formData: FormData): Promise<
   revalidatePath("/locations");
   revalidatePath("/team");
   redirect(`/locations/${id}`);
+}
+
+export type BrandingState = { error?: "logo_too_large" | "unsupported_image" | "generic"; saved?: boolean };
+
+/** A branch's own logo (the business's logo shows until one is set). */
+export async function uploadBranchLogo(locationId: string, _state: BrandingState, formData: FormData): Promise<BrandingState> {
+  const file = formData.get("logo");
+  if (!(file instanceof File) || file.size === 0) return { error: "unsupported_image" };
+  const { tenant } = await getTenant();
+  const response = await apiUpload(`/locations/${locationId}/logo`, file, tenant.id);
+  if (response.status === 413) return { error: "logo_too_large" };
+  if (response.status === 415) return { error: "unsupported_image" };
+  if (!response.ok) return { error: "generic" };
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+export async function removeBranchLogo(locationId: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  await api.DELETE("/locations/{location_id}/logo", { params: { ...scope, path: { location_id: locationId } } });
+  revalidatePath("/", "layout");
+}
+
+export async function updateBranchColor(locationId: string, _state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenant();
+  const color = formData.get("use_network") === "on" ? null : String(formData.get("primary_color"));
+  try {
+    unwrap(
+      await api.PATCH("/locations/{location_id}", {
+        params: { ...scope, path: { location_id: locationId } },
+        body: { primary_color: color },
+      }),
+    );
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}
+
+/** Whether clients and friends are shared by the whole network or kept per branch. */
+export async function updateNetworkScope(_state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  try {
+    unwrap(
+      await api.PATCH("/tenants/current", {
+        params: scope,
+        body: { network_scope: value(formData, "network_scope") === "branch" ? "branch" : "network" },
+      }),
+    );
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
 }

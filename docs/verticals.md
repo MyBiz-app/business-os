@@ -24,7 +24,8 @@ A **category** sets everything. A **sub-category** lists only what differs and i
 from its parent (sub-categories can have sub-categories of their own):
 
 - Settings (`terms`, `client_term`, `booking_modes`, `cancellation_window_minutes`,
-  `booking_requires_plan`, `health_form`, `default_preset`, `recommended_modules`, `icon`,
+  `booking_requires_plan`, `client_home` (the cards of the client app's home, in order: see
+  `CLIENT_HOME_CARDS` in `packages/verticals/src/index.ts`), `health_form`, `default_preset`, `recommended_modules`, `icon`,
   `color`): the entry's own value, else the parent's.
 - `default_services`, `default_plans`, `default_rooms`: the entry's own list replaces the parent's.
 - `client_fields` replaces the parent's fields; `extra_client_fields` adds to them.

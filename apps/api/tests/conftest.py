@@ -165,6 +165,9 @@ def studio(client: TestClient, auth: AuthHeaders, engine: Engine) -> dict:
         json={"name": "Pilates", "duration_minutes": 55, "capacity": 12},
         headers=headers,
     ).json()
+    # Tests book sessions weeks ahead; a new business only releases a week (tests of the release
+    # itself set the horizon back).
+    client.patch("/tenants/current", json={"booking_horizon_days": 60}, headers=headers)
     # Every business starts with its main branch.
     main = client.get("/locations", headers=headers).json()[0]
     location = client.patch(

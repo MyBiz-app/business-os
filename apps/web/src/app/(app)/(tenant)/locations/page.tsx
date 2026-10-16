@@ -5,12 +5,19 @@ import Link from "next/link";
 import { unwrap } from "@/lib/api";
 import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { industryTexts } from "@/lib/verticals";
+import { canManageSettings } from "@/lib/permissions";
+
+import { updateNetworkScope } from "./actions";
+import { NetworkPolicy } from "./network-policy";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/empty-state";
 
 export default async function LocationsPage() {
   const t = await getTranslations();
   const { tenant, api, scope } = await getTenantFor("catalog.read");
+  const { text } = industryTexts(t);
   const locations = unwrap(await api.GET("/locations", { params: scope }));
 
   return (
@@ -27,8 +34,12 @@ export default async function LocationsPage() {
         }
       />
 
+      {canManageSettings(tenant) && (
+        <NetworkPolicy action={updateNetworkScope} scope={tenant.network_scope} multiBranch={locations.length > 1} />
+      )}
+
       {locations.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("locations.empty")}</p>
+        <EmptyState variant="list">{t("locations.empty")}</EmptyState>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
           {locations.map((location) => (
@@ -43,6 +54,7 @@ export default async function LocationsPage() {
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span dir="auto" className="font-semibold">{location.name}</span>
                   {location.address && <span dir="auto" className="text-sm text-muted">{location.address}</span>}
+                  {location.kind && <span className="w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{text(location.kind, "name")}</span>}
                   <span className="inline-flex items-center gap-1.5 text-sm text-muted">
                     <DoorOpen aria-hidden="true" className="size-4" />
                     {t("locations.roomsCount", { count: location.rooms.length })}

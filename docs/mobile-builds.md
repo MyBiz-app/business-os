@@ -1,6 +1,6 @@
 # Building the phone apps (EAS)
 
-Each app (`apps/client-app`, `apps/business-app`, `apps/staff-app`) is its own Expo project with an
+The one app (`apps/client-app`) is an Expo project with an
 `eas.json`:
 
 | Profile | For | Result |

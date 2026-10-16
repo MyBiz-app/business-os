@@ -8,6 +8,7 @@ import { Section } from "@/components/layout/section";
 import { CtaBand, SectionHeading } from "@/components/marketing/sections";
 import { SubpageHero } from "@/components/marketing/subpage";
 import { VerticalIcon } from "@/components/vertical-icon";
+import { IndustryPicker } from "./industry-picker";
 import { industryTexts } from "@/lib/verticals";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,10 +26,14 @@ export default async function IndustriesPage() {
   return (
     <main className="enter flex flex-col">
       <SubpageHero title={t("title")} description={t("subtitle")} />
-      <Section spacing="compact">
+      <Section spacing="compact" innerClassName="flex flex-col gap-10">
+      <IndustryPicker
+        label={t("pick")}
+        items={open.map(({ key, icon, color }) => ({ key, icon, color, name: text(key, "name") }))}
+      />
       <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {open.map(({ key, icon, color }) => (
-          <li key={key} className="card flex flex-col gap-4 p-6">
+          <li key={key} id={`industry-${key}`} tabIndex={-1} className="card flex scroll-mt-24 flex-col gap-4 p-6 outline-none focus-visible:ring-2 focus-visible:ring-primary">
             <Link href={`/industries/${key}`} className="group flex items-center gap-4">
               <span aria-hidden="true" className={`flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${color} text-white shadow-lg`}>
                 <VerticalIcon icon={icon} className="size-6" />

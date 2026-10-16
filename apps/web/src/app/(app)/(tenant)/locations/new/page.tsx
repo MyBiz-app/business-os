@@ -5,6 +5,7 @@ import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { canManageTeam } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { branchKindOptions, industryTexts } from "@/lib/verticals";
 
 import { addBranch } from "../actions";
 import { NewBranchForm } from "./new-branch-form";
@@ -21,6 +22,7 @@ export default async function NewLocationPage() {
     canManageTeam(tenant) ? api.GET("/staff", { params: scope }).then(unwrap) : Promise.resolve(null),
   ]);
 
+  const { text } = industryTexts(t);
   const money = (amount: number) => formatMoney(amount, preview.currency, locale);
   // Members with no branches already work everywhere, so only the narrowed ones are offered.
   const people = (team?.members ?? [])
@@ -51,6 +53,7 @@ export default async function NewLocationPage() {
         chargeable={preview.chargeable}
         branches={locations.filter((l) => l.active).map((l) => ({ id: l.id, name: l.name }))}
         people={people}
+        kindOptions={branchKindOptions(tenant.vertical, text, t("locations.kindSame"))}
       />
     </Container>
   );

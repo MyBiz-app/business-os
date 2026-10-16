@@ -4,12 +4,13 @@ import { Menu, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { Container } from "@/components/layout/container";
 import { BrandMark } from "@/components/brand-mark";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { moveFocus, useDismiss } from "@/components/use-dismiss";
 
 const LINKS = [
   { href: "/features", key: "features" },
@@ -25,6 +26,10 @@ export function MarketingHeader() {
   const tApp = useTranslations("app");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const root = useRef<HTMLDivElement>(null);
+  const button = useRef<HTMLButtonElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(open, close, root, button);
 
   const links = LINKS.map((link) => {
     const active = pathname.startsWith("match" in link ? link.match : link.href);
@@ -34,7 +39,7 @@ export function MarketingHeader() {
         href={link.href}
         aria-current={active ? "page" : undefined}
         onClick={() => setOpen(false)}
-        className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+        className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
           active ? "text-primary" : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
         }`}
       >
@@ -66,37 +71,42 @@ export function MarketingHeader() {
           </Link>
         </div>
 
-        <button
-          type="button"
-          className="flex size-10 items-center justify-center rounded-xl border border-border lg:hidden"
-          aria-expanded={open}
-          aria-controls="marketing-menu"
-          aria-label={open ? t("close") : t("menu")}
-          onClick={() => setOpen((value) => !value)}
-        >
-          {open ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
-        </button>
-      </Container>
-
-      {open && (
-        <div id="marketing-menu" className="page-gutter border-t border-border bg-background py-4 lg:hidden">
-          <nav aria-label={t("menu")} className="flex flex-col gap-1">
-            {links}
-          </nav>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <LocaleSwitcher />
-            <ThemeToggle />
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <Link href="/login" className="btn-secondary px-4 py-2.5">
-              {t("login")}
-            </Link>
-            <Link href="/start" className="btn-primary px-4 py-2.5">
-              {t("start")}
-            </Link>
+        <div ref={root} className="relative lg:hidden">
+          <button
+            ref={button}
+            type="button"
+            className="flex size-10 items-center justify-center rounded-xl border border-border transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
+            aria-expanded={open}
+            aria-controls="marketing-menu"
+            aria-label={open ? t("close") : t("menu")}
+            onClick={() => setOpen((value) => !value)}
+          >
+            {open ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
+          </button>
+          <div
+            id="marketing-menu"
+            data-open={open}
+            onKeyDown={(event) => moveFocus(event)}
+            className="popover absolute end-0 top-full z-40 mt-2 w-[min(20rem,calc(100vw-2rem))] origin-top-right p-2 rtl:origin-top-left"
+          >
+            <nav aria-label={t("menu")} className="flex flex-col gap-0.5">
+              {links}
+            </nav>
+            <div className="mt-2 flex items-center justify-between gap-3 border-t border-border px-1 pt-3">
+              <LocaleSwitcher />
+              <ThemeToggle />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2 px-1 pb-1">
+              <Link href="/login" onClick={close} className="btn-secondary px-4 py-2.5">
+                {t("login")}
+              </Link>
+              <Link href="/start" onClick={close} className="btn-primary px-4 py-2.5">
+                {t("start")}
+              </Link>
+            </div>
           </div>
         </div>
-      )}
+      </Container>
     </header>
   );
 }

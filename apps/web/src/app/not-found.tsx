@@ -1,17 +1,16 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
-import { Container } from "@/components/layout/container";
+
+import { StatusPage } from "@/components/layout/status-page";
 
 export default async function NotFound() {
   const t = await getTranslations("errorPages");
 
   return (
-    <Container as="main" size="prose" className="flex max-w-md flex-1 flex-col items-center justify-center gap-4 py-16 text-center">
-      <h1 className="text-2xl font-semibold">{t("notFoundTitle")}</h1>
-      <p className="text-muted">{t("notFoundText")}</p>
-      <Link href="/" className="btn-primary px-4 py-2">
+    <StatusPage title={t("notFoundTitle")} text={t("notFoundText")}>
+      <Link href="/" className="btn-primary rounded-full px-6 py-2.5">
         {t("home")}
       </Link>
-    </Container>
+    </StatusPage>
   );
 }

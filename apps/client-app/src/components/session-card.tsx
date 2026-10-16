@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import { formatTime } from "@business-os/i18n/dates";
 import { router } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -10,6 +10,12 @@ import { Chip } from "@business-os/app-kit/components/chip";
 import { Button, elevation } from "@business-os/app-kit/components/ui";
 import { tint } from "@business-os/app-kit/lib/brand";
 import { confirm } from "@business-os/app-kit/lib/confirm";
+import { InstructorAvatar } from "@/components/instructor-avatar";
+import { AttendeeStack } from "@/components/attendee-stack";
+import { SessionSheet } from "@/components/session-sheet";
+import { forgetSessionPeople, useSessionPeople } from "@/lib/session-people";
+import { fillRatio } from "@/lib/class-filters";
+import { useFriendsEnabled } from "@/lib/use-friend-settings";
 import { useBusiness } from "@/providers/business-provider";
 
 export type ClientSession = components["schemas"]["ClientSession"];
@@ -49,6 +55,11 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
   const [error, setError] = useState<string | null>(null);
   const [needsHealth, setNeedsHealth] = useState(false);
   const [who, setWho] = useState<string | null>(null);
+  const [sheet, setSheet] = useState(false);
+  const tFriends = useTranslations("friends");
+  const friendsEnabled = useFriendsEnabled();
+  const group = session.capacity > 1 && session.status !== "cancelled";
+  const people = useSessionPeople(session.id, friendsEnabled && group, session.spots_left);
   if (!business) return null;
 
   const hours = `${formatTime(session.starts_at, locale, business.time_zone)}–${formatTime(session.ends_at, locale, business.time_zone)}`;
@@ -82,7 +93,10 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
     setNeedsHealth(false);
     const result = await action().catch(() => null);
     setBusy(false);
-    if (result?.data) return onChange(result.data);
+    if (result?.data) {
+      forgetSessionPeople(session.id);
+      return onChange(result.data);
+    }
     const detail = (result?.error as { detail?: string } | undefined)?.detail;
     setNeedsHealth(detail === "health_declaration_required");
     setError(
@@ -129,8 +143,53 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
 
   const place = [session.location_name, session.room_name].filter(Boolean).join(" · ");
   const color = session.service.color ?? palette.primary;
-  const fill = session.capacity ? Math.min((session.capacity - session.spots_left) / session.capacity, 1) : 0;
+  const fill = fillRatio(session.capacity, session.spots_left);
   const label = `${session.service.name}, ${day ? `${day} ` : ""}${time}`;
+
+  const actionButton = (
+    <>
+      {kind ? (
+        choices.length > 0 ? (
+          <Button
+            label={full ? t("joinWaitlist") : t("book")}
+            accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}${chosen ? ` – ${chosen.name}` : ""}`}
+            variant={full ? "secondary" : "primary"}
+            palette={palette}
+            busy={busy}
+            onPress={() => void book()}
+          />
+        ) : !mine ? (
+          <Button
+            label={tDependents(`add.${kind}`)}
+            variant="secondary"
+            palette={palette}
+            onPress={() => router.push("/dependents")}
+          />
+        ) : null
+      ) : mine ? (
+        <Button
+          label={mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")}
+          accessibilityLabel={`${mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")} – ${label}`}
+          variant="danger"
+          palette={palette}
+          busy={busy}
+          onPress={() => void cancel()}
+        />
+      ) : (
+        <Button
+          label={full ? t("joinWaitlist") : t("book")}
+          accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}`}
+          variant={full ? "secondary" : "primary"}
+          palette={palette}
+          busy={busy}
+          onPress={() => void book()}
+        />
+      )}
+    </>
+  );
+
+  const friendsIn = people.filter((p) => p.friendship === "friends");
+  const friendNames = friendsIn.map((p) => p.first_name).join(", ");
 
   return (
     <View
@@ -142,7 +201,12 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
     >
       <View style={styles.row}>
         <View aria-hidden style={[styles.accent, { backgroundColor: color }]} />
-        <View style={styles.info}>
+        <Pressable
+          style={styles.info}
+          accessibilityRole="button"
+          accessibilityLabel={`${tFriends("details")} – ${label}`}
+          onPress={() => setSheet(true)}
+        >
           <View style={styles.when}>
             {day && <Text style={[styles.day, { color: palette.foreground }]}>{day}</Text>}
             <View style={[styles.timeChip, { backgroundColor: tint(color, 0.14) }]}>
@@ -152,11 +216,20 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
           <Text style={[styles.name, { color: palette.foreground }, cancelled && styles.strike]}>
             {session.service.name}
           </Text>
+          {session.instructor?.name ? (
+            <View style={styles.coach}>
+              <InstructorAvatar name={session.instructor.name} path={session.instructor.avatar_url} palette={palette} />
+              <Text style={[styles.meta, { color: palette.foreground }]}>{session.instructor.name}</Text>
+            </View>
+          ) : null}
           {place ? <Text style={[styles.meta, { color: palette.muted }]}>{place}</Text> : null}
           {/* An on-site job (#42): where the technician comes. */}
           {session.address ? <Text style={[styles.meta, { color: palette.muted }]}>{session.address}</Text> : null}
           {/* Spots matter for group sessions; a 1:1 appointment has none to show. */}
-          {!cancelled && session.capacity > 1 && (
+          {group && (
+            <AttendeeStack people={people} booked={session.capacity - session.spots_left} capacity={session.capacity} palette={palette} />
+          )}
+          {group && (
             <View aria-hidden style={[styles.bar, { backgroundColor: tint(palette.muted, 0.18) }]}>
               <View style={[styles.barFill, { width: `${fill * 100}%`, backgroundColor: color }]} />
             </View>
@@ -167,48 +240,13 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
           >
             {status}
           </Text>
-        </View>
-        {!cancelled && (
-          <View style={styles.action}>
-            {kind ? (
-              choices.length > 0 ? (
-                <Button
-                  label={full ? t("joinWaitlist") : t("book")}
-                  accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}${chosen ? ` – ${chosen.name}` : ""}`}
-                  variant={full ? "secondary" : "primary"}
-                  palette={palette}
-                  busy={busy}
-                  onPress={() => void book()}
-                />
-              ) : !mine ? (
-                <Button
-                  label={tDependents(`add.${kind}`)}
-                  variant="secondary"
-                  palette={palette}
-                  onPress={() => router.push("/dependents")}
-                />
-              ) : null
-            ) : mine ? (
-              <Button
-                label={mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")}
-                accessibilityLabel={`${mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")} – ${label}`}
-                variant="danger"
-                palette={palette}
-                busy={busy}
-                onPress={() => void cancel()}
-              />
-            ) : (
-              <Button
-                label={full ? t("joinWaitlist") : t("book")}
-                accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}`}
-                variant={full ? "secondary" : "primary"}
-                palette={palette}
-                busy={busy}
-                onPress={() => void book()}
-              />
-            )}
-          </View>
-        )}
+          {friendsIn.length > 0 && (
+            <Text style={[styles.meta, styles.bold, { color: palette.primary }]}>
+              {tFriends("friendsComing", { count: friendsIn.length, names: friendNames })}
+            </Text>
+          )}
+        </Pressable>
+        {!cancelled && <View style={styles.action}>{actionButton}</View>}
       </View>
       {kind && !cancelled && choices.length > 1 && (
         <View role="radiogroup" aria-label={tDependents("who")} style={styles.who}>
@@ -251,6 +289,20 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
             </View>
           );
         })}
+      <SessionSheet
+        visible={sheet}
+        onClose={() => setSheet(false)}
+        sessionId={session.id}
+        title={session.service.name}
+        when={`${day ? `${day} ` : ""}${time}`}
+        description={session.description ?? null}
+        coach={session.instructor?.name ?? null}
+        place={place}
+        booked={mine?.status === "booked"}
+        social={friendsEnabled && group}
+        action={cancelled ? null : actionButton}
+        palette={palette}
+      />
       {error && (
         <Text accessibilityRole="alert" style={[styles.meta, { color: palette.danger }]}>
           {error}
@@ -278,6 +330,7 @@ const styles = StyleSheet.create({
   name: { fontSize: 17, fontWeight: "700", textAlign: "left" },
   meta: { fontSize: 14, textAlign: "left" },
   bold: { fontWeight: "600" },
+  coach: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 2 },
   who: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: 8 },
   mineRow: { flexDirection: "row", alignItems: "center", gap: 12 },
   strike: { textDecorationLine: "line-through" },

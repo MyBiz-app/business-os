@@ -23,7 +23,7 @@ with sync_playwright() as p:
     page = b.new_context(locale="he-IL", viewport={"width": 1280, "height": 900}).new_page()
     page.goto(f"{h.BASE}/signup"); h.ready(page)
     page.get_by_label("אימייל").fill(email)
-    page.get_by_label("סיסמה").fill(h.PASSWORD)
+    page.get_by_label("סיסמה", exact=True).fill(h.PASSWORD)
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
     page.goto(h.confirm_link(email)); h.to_onboarding(page)
