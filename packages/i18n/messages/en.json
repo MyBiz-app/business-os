@@ -4605,6 +4605,13 @@
         "overlap": "Hours on the same day must not overlap.",
         "generic": "Something went wrong. Try again."
       }
+    },
+    "ai": {
+      "open": "Your AI team",
+      "back": "Back",
+      "bubble": "Ask the AI team",
+      "noAgents": "No AI agents are available to you yet.",
+      "genericAction": "The agent prepared an action for you to confirm."
     }
   },
   "staffApp": {
