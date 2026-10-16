@@ -86,7 +86,7 @@ function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string;
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="font-semibold" dir="auto">
-            {task.title}
+            {task.system_key ? t(`tasks.proactive.taskTitle.${task.system_key}`) : task.title}
           </p>
           <p className="text-sm text-muted">
             <span dir="auto">{describeSchedule(schedule, t, locale)}</span>
@@ -95,7 +95,7 @@ function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string;
             {" · "}
             <span dir="auto">{t("tasks.agentLabel", { name: isolate(agentName) })}</span>
           </p>
-          {task.instruction && (
+          {task.instruction && !task.system_key && (
             <p className="text-sm" dir="auto">
               {task.instruction}
             </p>

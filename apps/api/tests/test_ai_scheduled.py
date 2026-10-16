@@ -407,3 +407,83 @@ def test_other_businesses_never_see_a_task(
                headers=other_headers)  # fmt: skip
     assert client.get("/ai/tasks", headers=other_headers).json()["tasks"] == []
     assert client.delete(f"/ai/tasks/{task['id']}", headers=other_headers).status_code == 404
+
+
+def test_the_morning_briefing_is_off_until_switched_on_and_runs_read_only(
+    client: TestClient, studio: dict, engine: Engine
+) -> None:
+    headers = studio["headers"]
+    off = client.get("/ai/tasks/proactive", headers=headers).json()
+    assert off["can_manage"] is True
+    assert [(s["key"], s["enabled"]) for s in off["settings"]] == [
+        ("morning_briefing", False),
+        ("suggestions", False),
+    ]
+    assert client.get("/ai/tasks", headers=headers).json()["tasks"] == []
+
+    on = client.put(
+        "/ai/tasks/proactive/morning_briefing",
+        json={"enabled": True, "time": "06:45"},
+        headers=headers,
+    )
+    assert on.status_code == 200
+    [briefing, _] = on.json()["settings"]
+    assert briefing["enabled"] and briefing["time"] == "06:45" and briefing["next_run_at"]
+    [task] = client.get("/ai/tasks", headers=headers).json()["tasks"]
+    assert (task["system_key"], task["kind"], task["agent_key"]) == (
+        "morning_briefing",
+        "agent_run",
+        "chief",
+    )
+    assert task["schedule"] == {"type": "daily", "time": "06:45"}
+
+    # Moving the time keeps the same task; switching off pauses it and keeps the history.
+    client.put(
+        "/ai/tasks/proactive/morning_briefing",
+        json={"enabled": True, "time": "08:00"},
+        headers=headers,
+    )
+    assert len(client.get("/ai/tasks", headers=headers).json()["tasks"]) == 1
+    provider = FakeProvider([says("Two sessions today. Start with the 09:00 class.")])
+    make_due(engine, task["id"])
+    assert run_due(engine, provider) == {"ok": 1, "failed": 0, "skipped": 0}
+    [run] = client.get(f"/ai/tasks/{task['id']}/runs", headers=headers).json()
+    assert run["status"] == "ok" and "Two sessions today" in run["summary"]
+    assert "Morning briefing" in provider.calls[0]["messages"][0]["content"][1]["text"]
+
+    off_again = client.put(
+        "/ai/tasks/proactive/morning_briefing", json={"enabled": False}, headers=headers
+    ).json()
+    assert off_again["settings"][0]["enabled"] is False
+    [paused] = client.get("/ai/tasks", headers=headers).json()["tasks"]
+    assert paused["status"] == "paused" and paused["last_run_at"] is not None
+
+
+def test_suggestions_repeat_weekly_and_only_managers_switch_them_on(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
+) -> None:
+    headers = studio["headers"]
+    response = client.put(
+        "/ai/tasks/proactive/suggestions",
+        json={"enabled": True, "time": "09:00", "weekday": 0},
+        headers=headers,
+    )
+    suggestions = response.json()["settings"][1]
+    assert suggestions["enabled"] and suggestions["weekday"] == 0
+    [task] = client.get("/ai/tasks", headers=headers).json()["tasks"]
+    assert task["schedule"]["weekdays"] == [0] and task["max_credits"] == 15
+
+    bad = client.put(
+        "/ai/tasks/proactive/suggestions", json={"enabled": True, "time": "9am"}, headers=headers
+    )
+    assert bad.status_code == 422
+
+    staff_id = uuid4()
+    add_member(engine, studio["tenant_id"], staff_id, "front_desk")
+    staff = auth(staff_id, studio["tenant_id"])
+    assert (
+        client.put(
+            "/ai/tasks/proactive/morning_briefing", json={"enabled": True}, headers=staff
+        ).status_code
+        == 403
+    )

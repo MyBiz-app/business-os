@@ -698,6 +698,165 @@
         }
       }
     },
+    "/ai/tasks/proactive": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Get Proactive",
+        "description": "The person's own proactive behaviours: what is on and at what time.",
+        "operationId": "get_proactive",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Proactive"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/tasks/proactive/{key}": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Set Proactive",
+        "description": "Switches the morning briefing or the weekly suggestions on or off, or moves the time. They\nrun as the person who switches them on, so they never see more than that person can.",
+        "operationId": "set_proactive",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "morning_briefing",
+                "suggestions"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProactiveBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Proactive"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/internal/jobs/tick": {
       "post": {
         "tags": [
@@ -39167,6 +39326,148 @@
         ],
         "title": "Point"
       },
+      "Proactive": {
+        "properties": {
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/ProactiveSetting"
+            },
+            "type": "array",
+            "title": "Settings"
+          },
+          "can_manage": {
+            "type": "boolean",
+            "title": "Can Manage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "settings",
+          "can_manage"
+        ],
+        "title": "Proactive"
+      },
+      "ProactiveBody": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time",
+            "description": "Local HH:MM"
+          },
+          "weekday": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 6.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekday"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "ProactiveBody"
+      },
+      "ProactiveSetting": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "morning_briefing",
+              "suggestions"
+            ],
+            "title": "Key"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "time": {
+            "type": "string",
+            "title": "Time"
+          },
+          "weekday": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekday",
+            "description": "Suggestions only: 0 = Monday .. 6 = Sunday"
+          },
+          "paused_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused Reason"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "enabled",
+          "time",
+          "weekday",
+          "paused_reason",
+          "next_run_at",
+          "last_run_at",
+          "agent_key"
+        ],
+        "title": "ProactiveSetting"
+      },
       "PromoCode": {
         "properties": {
           "id": {
@@ -44888,6 +45189,21 @@
             "type": "boolean",
             "title": "Mine"
           },
+          "system_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "morning_briefing",
+                  "suggestions"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Key"
+          },
           "last_status": {
             "anyOf": [
               {
@@ -44937,6 +45253,7 @@
           "instruction",
           "preview",
           "mine",
+          "system_key",
           "last_status",
           "last_error",
           "waiting_for_approval"

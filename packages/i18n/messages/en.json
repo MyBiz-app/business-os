@@ -1735,6 +1735,37 @@
         "timePassed": "That time has already passed.",
         "invalid": "Check the time and day and try again.",
         "failed": "Could not save. Try again."
+      },
+      "proactive": {
+        "title": "Proactive team",
+        "subtitle": "Let your team come to you. Both are off until you switch them on, they read your data with your permissions only, and anything they suggest waits for your approval.",
+        "onAt": "On, every day at {time}",
+        "onWeekly": "On, every {day} at {time}",
+        "off": "Off",
+        "briefing": {
+          "name": "Morning briefing",
+          "description": "Every morning Ori sums up today's appointments, new leads and what needs your attention."
+        },
+        "suggestions": {
+          "name": "Weekly suggestions",
+          "description": "Once a week Ori looks for chances (clients who stopped coming, empty sessions, leads nobody answered) and prepares up to three suggestions as cards."
+        },
+        "enable": "Switch on",
+        "disable": "Switch off",
+        "time": "Time",
+        "weekday": "Day",
+        "save": "Save time",
+        "saved": "Saved.",
+        "failed": "Saving failed. Try again.",
+        "limit": "The business already has the most scheduled tasks its plan allows.",
+        "managersOnly": "Only people who manage the AI team can change this.",
+        "next": "Next: {when}",
+        "pausedBy": "Paused by the system: {reason}",
+        "cost": "Each run uses up to {credits} credits from your monthly AI allowance.",
+        "taskTitle": {
+          "morning_briefing": "Morning briefing",
+          "suggestions": "Weekly suggestions"
+        }
       }
     },
     "wizard": {

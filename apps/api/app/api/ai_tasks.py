@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
-from app.ai import scheduled, task_runner
+from app.ai import proactive, scheduled, task_runner
 from app.api.assistant import ProviderDep, _check_budget, _check_user_rate, require_ai
 from app.api.common import not_found
 from app.api.deps import TenantContext, UserDep
@@ -50,6 +50,8 @@ class TaskCard(BaseModel):
     instruction: str | None
     preview: dict[str, Any] | None
     mine: bool
+    # Set for the morning briefing and the suggestions, which the system files (A8).
+    system_key: Literal["morning_briefing", "suggestions"] | None
     # The last run's outcome, and how many of its cards still wait for approval.
     last_status: Literal["running", "ok", "failed", "skipped"] | None
     last_error: str | None
@@ -242,3 +244,87 @@ def run_task_now(
     if not latest:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="busy")
     return latest[0]
+
+
+ProactiveKey = Literal["morning_briefing", "suggestions"]
+
+
+class ProactiveSetting(BaseModel):
+    key: ProactiveKey
+    enabled: bool
+    time: str
+    weekday: int | None = Field(description="Suggestions only: 0 = Monday .. 6 = Sunday")
+    # Why the system paused it (e.g. permission_lost); None when it was switched off by the person.
+    paused_reason: str | None
+    next_run_at: dt.datetime | None
+    last_run_at: dt.datetime | None
+    agent_key: str
+
+
+class Proactive(BaseModel):
+    settings: list[ProactiveSetting]
+    can_manage: bool
+
+
+class ProactiveBody(BaseModel):
+    enabled: bool
+    time: str | None = Field(default=None, description="Local HH:MM")
+    weekday: int | None = Field(default=None, ge=0, le=6)
+
+
+def _setting(db: Any, user_id: UUID, key: str) -> ProactiveSetting:
+    row = proactive.get(db, user_id, key)
+    schedule = row["schedule"] if row else None
+    return ProactiveSetting(
+        key=key,  # type: ignore[arg-type]
+        enabled=bool(row and row["status"] == "active"),
+        time=schedule["time"] if schedule else proactive.DEFAULT_TIME[key],
+        weekday=((schedule or {}).get("weekdays") or [proactive.SUNDAY])[0]
+        if key == proactive.SUGGESTIONS
+        else None,
+        paused_reason=row["status_reason"] if row and row["status"] == "paused" else None,
+        next_run_at=row["next_run_at"] if row and row["status"] == "active" else None,
+        last_run_at=row["last_run_at"] if row else None,
+        agent_key=proactive.AGENT,
+    )
+
+
+@router.get("/proactive")
+def get_proactive(context: AIDep, user: UserDep) -> Proactive:
+    """The person's own proactive behaviours: what is on and at what time."""
+    return Proactive(
+        settings=[_setting(context.session, user.id, key) for key in proactive.KEYS],
+        can_manage=_can_manage(context),
+    )
+
+
+@router.put("/proactive/{key}")
+def set_proactive(
+    key: ProactiveKey, body: ProactiveBody, context: AIDep, user: UserDep
+) -> Proactive:
+    """Switches the morning briefing or the weekly suggestions on or off, or moves the time. They
+    run as the person who switches them on, so they never see more than that person can."""
+    if not _can_manage(context):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
+    db = context.session
+    if body.enabled:
+        existing = proactive.get(db, user.id, key)
+        time = body.time or (existing["schedule"]["time"] if existing else None)
+        weekday = body.weekday
+        if weekday is None and existing and key == proactive.SUGGESTIONS:
+            weekday = existing["schedule"]["weekdays"][0]
+        try:
+            proactive.enable(
+                db,
+                context.tenant_id,
+                user.id,
+                key,
+                time or proactive.DEFAULT_TIME[key],
+                weekday,
+                _modules(context),
+            )
+        except scheduled.ScheduleError as error:
+            raise _bad(str(error)) from error
+    else:
+        proactive.disable(db, user.id, key)
+    return get_proactive(context, user)
