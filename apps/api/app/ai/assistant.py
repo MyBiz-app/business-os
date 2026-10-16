@@ -3,13 +3,22 @@ to confirm. The conversation transcript is stored append-only, in Messages API f
 
 import datetime as dt
 import json
+from collections.abc import Callable
 from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 
-from app.ai.gateway import LLMProvider, LLMResponse, ProviderBusy, ProviderUnavailable, credits
+from app.ai.gateway import (
+    LLMProvider,
+    LLMResponse,
+    ProviderBusy,
+    ProviderUnavailable,
+    clean_response,
+    credits,
+    stream_response,
+)
 from app.ai.tools import ToolContext, run_tool, tools_for
 from app.api.deps import TenantContext, has_module
 from app.catalog.verticals import CATALOG
@@ -78,12 +87,35 @@ def _record_usage(tenant: TenantContext, conversation_id: UUID, response: LLMRes
     )
 
 
+def _call(
+    provider: LLMProvider,
+    messages: list[dict[str, Any]],
+    definitions: list[dict[str, Any]],
+    strong: bool,
+    on_text: Callable[[str], None] | None,
+) -> LLMResponse:
+    """One model call, with long dashes cleaned out of the text. With `on_text`, the answer
+    streams and each text delta is passed on as it arrives."""
+    if on_text is None:
+        return clean_response(provider.create(SYSTEM_PROMPT, messages, definitions, strong))
+    final: LLMResponse | None = None
+    for event in stream_response(provider, SYSTEM_PROMPT, messages, definitions, strong):
+        if event.kind == "text":
+            on_text(event.text)
+        elif event.response is not None:
+            final = event.response
+    if final is None:
+        raise ProviderUnavailable
+    return final
+
+
 def ask(
     provider: LLMProvider,
     tenant: TenantContext,
     user_id: UUID,
     conversation_id: UUID,
     question: str,
+    on_text: Callable[[str], None] | None = None,
 ) -> None:
     """Adds the user's question and the assistant's answer (with any tool calls) to the
     conversation. Errors from the provider propagate; nothing partial is stored then, except
@@ -125,9 +157,7 @@ def ask(
     try:
         for step in range(MAX_STEPS):
             # Everyday questions stay on the cheap model; long tool chains move to the strong one.
-            response = provider.create(
-                SYSTEM_PROMPT, messages, definitions, strong=step >= escalate_after
-            )
+            response = _call(provider, messages, definitions, step >= escalate_after, on_text)
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
             if response.stop_reason != "tool_use":
@@ -159,7 +189,7 @@ def ask(
                     ],
                 }
             )
-            response = provider.create(SYSTEM_PROMPT, messages, definitions, strong=True)
+            response = _call(provider, messages, definitions, True, on_text)
             spent.append(response)
             messages.append({"role": "assistant", "content": response.content})
 

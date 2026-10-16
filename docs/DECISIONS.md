@@ -171,6 +171,10 @@ When a decision changes, update the row and note the date — do not delete hist
 - The Expo apps' shared preferences card offers text size (1 / 1.125 / 1.25, same steps as the web), a reduce-motion switch (in addition to the system setting) and high contrast. All are stored on the device.
 - Bold English text uses Plus Jakarta Sans (as on the web); Hebrew and regular text stay in Assistant (round 2, 2026-10-13).
 
+### Model layer: tiers, registry, disabled vendors (2026-10-16, round 5 A0)
+
+Business code asks for a tier (`fast`, `standard`, `strong`), never a model name; the registry in `app/ai/models.py` holds vendor, tier, prices and context per model. OpenAI and Gemini adapters exist and are tested but stay disabled (`ENABLED_VENDORS`) until the business operates and has a key (paid-provider policy). The fallback provider moves to the next provider only when one is unavailable, not when it is rate limiting us. Long and medium dashes are stripped from all model text.
+
 ## Open
 
 | # | Question |

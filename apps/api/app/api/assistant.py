@@ -3,6 +3,7 @@
 import datetime as dt
 import json
 import math
+import queue
 import threading
 import time
 from typing import Annotated, Any, Literal
@@ -10,6 +11,7 @@ from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -246,6 +248,63 @@ def send_message(
     finally:
         _model_calls.release()
     return _load(context.session, conversation_id)
+
+
+def _sse(event: str, data: Any) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False, default=str)}\n\n"
+
+
+@router.post("/conversations/{conversation_id}/messages/stream")
+def send_message_stream(
+    conversation_id: UUID,
+    body: Question,
+    context: AIDep,
+    user: UserDep,
+    provider: ProviderDep,
+) -> StreamingResponse:
+    """Like `send_message`, but answers as a Server-Sent Events stream: `text` events carry the
+    answer as it is written, `done` carries the whole conversation, `error` a failure code."""
+    if provider is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="ai_not_configured"
+        )
+    _load(context.session, conversation_id)
+    _check_budget(context.session, provider)
+    _check_user_rate(user.id, provider)
+    if not _model_calls.acquire(blocking=False):
+        raise HTTPException(status_code=429, detail="ai_busy")
+
+    events: queue.Queue[tuple[str, Any] | None] = queue.Queue()
+
+    def work() -> None:
+        try:
+            assistant.ask(
+                provider,
+                context,
+                user.id,
+                conversation_id,
+                body.text,
+                on_text=lambda chunk: events.put(("text", {"text": chunk})),
+            )
+            context.session.commit()  # the client may read the conversation right after `done`
+            events.put(("done", _load(context.session, conversation_id).model_dump(mode="json")))
+        except ProviderBusy:
+            events.put(("error", {"detail": "ai_busy"}))
+        except ProviderUnavailable:
+            events.put(("error", {"detail": "ai_unavailable"}))
+        finally:
+            _model_calls.release()
+            events.put(None)
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def stream():
+        while (item := events.get()) is not None:
+            yield _sse(*item)
+
+    return StreamingResponse(
+        stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
+    )
 
 
 @router.post("/pending-actions/{action_id}/confirm")
