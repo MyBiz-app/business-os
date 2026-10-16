@@ -8,7 +8,7 @@ import datetime as dt
 import hashlib
 import json
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -46,6 +46,8 @@ class ToolContext:
     # may be handed over to.
     agent_key: str = "chief"
     handoff_keys: frozenset[str] = frozenset()
+    # Where a hand-over to a key really goes (a team's lead stands in for its members).
+    handoff_via: dict[str, str] = field(default_factory=dict)
     # How long a card this conversation proposes stays open (a scheduled run nobody watches
     # leaves its cards for days).
     pending_ttl: dt.timedelta = PENDING_ACTION_TTL
@@ -659,6 +661,7 @@ def suggest_agent(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     reason = str(args["reason"]).strip()[:300]
     if not reason:
         raise ToolError("say in a sentence why that agent fits")
+    key = ctx.handoff_via.get(key, key)
     return {
         "agent_suggestion": {"agent_key": key, "reason": reason},
         "instruction": "The user sees a card offering the hand-over. Tell them in a sentence who "

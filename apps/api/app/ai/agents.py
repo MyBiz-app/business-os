@@ -232,6 +232,11 @@ class Agent:
     avatar_preset: str | None = None
     avatar_key: str | None = None
     draft: bool = False
+    # Where the agent sits in the team structure (see app/ai/structure.py).
+    reports_to_key: str | None = None
+    team_id: UUID | None = None
+    map_x: float | None = None
+    map_y: float | None = None
 
 
 def _row_overrides(row: Any | None) -> dict[str, Any]:
@@ -271,6 +276,10 @@ def resolve(spec: AgentSpec | None, row: Any | None, locale: str) -> Agent:
         avatar_preset=data.get("avatar_preset"),
         avatar_key=data.get("avatar_key"),
         draft=bool(data.get("draft")),
+        reports_to_key=data.get("reports_to_key"),
+        team_id=data.get("team_id"),
+        map_x=data.get("map_x"),
+        map_y=data.get("map_y"),
     )
 
 
