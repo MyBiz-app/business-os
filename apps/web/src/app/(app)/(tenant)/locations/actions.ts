@@ -257,3 +257,25 @@ export async function deleteLocationGroup(groupId: string): Promise<void> {
   await api.DELETE("/location-groups/{group_id}", { params: { ...scope, path: { group_id: groupId } } });
   revalidatePath("/locations");
 }
+
+/** Appoints a team member as the branch's manager, or (empty) leaves it to the owner. */
+export async function setBranchManager(locationId: string, _state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenantFor("business.settings");
+  const userId = String(formData.get("user_id") ?? "");
+  try {
+    if (userId) {
+      unwrap(
+        await api.PUT("/locations/{location_id}/manager", {
+          params: { ...scope, path: { location_id: locationId } },
+          body: { user_id: userId },
+        }),
+      );
+    } else {
+      unwrap(await api.DELETE("/locations/{location_id}/manager", { params: { ...scope, path: { location_id: locationId } } }));
+    }
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/", "layout");
+  return { saved: true };
+}

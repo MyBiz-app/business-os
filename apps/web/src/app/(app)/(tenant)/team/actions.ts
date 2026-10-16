@@ -6,7 +6,7 @@ import { ApiError, unwrap } from "@/lib/api";
 import { siteOrigin } from "@/lib/origin";
 import { getTenant } from "@/lib/tenant";
 
-type Role = "owner" | "manager" | "staff" | "front_desk";
+type Role = "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
 const TEAM_ERRORS = [
   "already_member",
   "last_owner",
@@ -14,6 +14,8 @@ const TEAM_ERRORS = [
   "cannot_remove_self",
   "cannot_change_own_role",
   "exceeds_own_permissions",
+  "exceeds_own_level",
+  "branch_manager_needs_branch",
   "name_taken",
   "role_in_use",
 ] as const;

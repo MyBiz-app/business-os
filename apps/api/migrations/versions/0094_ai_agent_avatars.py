@@ -8,7 +8,7 @@ A draft agent is one the new-agent wizard is still testing: only those who manag
 talk to it, and it is not part of the team until the wizard saves it.
 
 Revision ID: 0094
-Revises: 0086
+Revises: 0087
 Create Date: 2026-10-16
 """
 
@@ -17,7 +17,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0094"
-down_revision: str | None = "0086"
+down_revision: str | None = "0087"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

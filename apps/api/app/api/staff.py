@@ -14,10 +14,16 @@ from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
 from app.core.permissions import ROLE_PERMISSIONS, Permission, effective_permissions
+from app.schedule.branch_managers import (
+    TEAM_ROLES,
+    forget_manager,
+    member_row,
+    suggest_reports_to,
+)
 
 router = APIRouter(tags=["staff"])
 
-Role = Literal["owner", "manager", "staff", "front_desk"]
+Role = Literal["owner", "manager", "branch_manager", "staff", "front_desk"]
 InvitationStatus = Literal["pending", "expired", "accepted"]
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.STAFF_READ))]
@@ -35,9 +41,47 @@ def _forbidden(detail: str) -> HTTPException:
 
 
 def _check_can_grant(context: TenantContext, role: str) -> None:
-    """Only owners can create, change or remove owners."""
+    """Only owners can create, change or remove owners; someone kept to some branches (a branch
+    manager) works with staff and front desk only, never at or above their own level."""
     if role == "owner" and context.role != "owner":
         raise _forbidden("only_owners_manage_owners")
+    if context.branches is not None and role not in TEAM_ROLES:
+        raise _forbidden("exceeds_own_level")
+
+
+def _ensure_branches_within(context: TenantContext, location_ids: list[UUID]) -> None:
+    """A person kept to some branches can only name those branches."""
+    if context.branches is not None and not set(location_ids) <= context.branches:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="unknown_branch"
+        )
+
+
+def _ensure_member_in_reach(context: TenantContext, user_id: UUID) -> str:
+    """The member's role, for a request that reads or changes them. Someone kept to some branches
+    reaches only people kept to branches of their own: everyone else is "not found"."""
+    row = member_row(context.session, user_id)
+    if row is None:
+        raise not_found()
+    role, location_ids = row
+    if context.branches is not None and not (
+        location_ids and set(location_ids) <= context.branches
+    ):
+        raise not_found()
+    return role
+
+
+def _ensure_unscoped(context: TenantContext) -> None:
+    """Business-wide things (custom roles) are not for people kept to some branches."""
+    if context.branches is not None:
+        raise _forbidden("forbidden")
+
+
+def _ensure_branch_bound_has_branches(role: str, location_ids: list[UUID]) -> None:
+    if role == "branch_manager" and not location_ids:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="branch_manager_needs_branch"
+        )
 
 
 class Member(BaseModel):
@@ -77,6 +121,7 @@ class Invitation(BaseModel):
     status: InvitationStatus
     expires_at: datetime
     created_at: datetime
+    location_ids: list[UUID] = Field(description="Branches the new member will be kept to")
 
 
 class Team(BaseModel):
@@ -87,6 +132,11 @@ class Team(BaseModel):
 class InvitationCreate(BaseModel):
     email: EmailStr
     role: Role
+    location_ids: list[UUID] = Field(
+        default_factory=list,
+        max_length=200,
+        description="Branches the new member is kept to (empty: all; a branch manager's own)",
+    )
 
     @field_validator("email")
     @classmethod
@@ -178,7 +228,7 @@ MEMBER_SELECT = """
 """
 
 INVITATION_SELECT = """
-    SELECT id, email, role, expires_at, created_at,
+    SELECT id, email, role, expires_at, created_at, location_ids,
            CASE WHEN accepted_at IS NOT NULL THEN 'accepted'
                 WHEN expires_at < now() THEN 'expired' ELSE 'pending' END AS status
     FROM app.invitations
@@ -205,15 +255,26 @@ def _owner_count(session: Session) -> int:
 
 
 @router.get("/staff")
-def get_team(context: ReadDep) -> Team:
+def get_team(user: UserDep, context: ReadDep) -> Team:
     members = context.session.execute(text(f"{MEMBER_SELECT} ORDER BY m.created_at")).mappings()
     invitations = context.session.execute(
         text(f"{INVITATION_SELECT} WHERE accepted_at IS NULL ORDER BY created_at DESC")
     ).mappings()
-    return Team(
+    team = Team(
         members=[Member.model_validate(dict(row)) for row in members],
         invitations=[Invitation.model_validate(dict(row)) for row in invitations],
     )
+    if context.branches is not None:  # a branch manager sees their own branches' people
+        branches = context.branches
+        team.members = [
+            m
+            for m in team.members
+            if m.user_id == user.id or (m.location_ids and set(m.location_ids) & branches)
+        ]
+        team.invitations = [
+            i for i in team.invitations if i.location_ids and set(i.location_ids) <= branches
+        ]
+    return team
 
 
 @router.post("/staff/invitations", status_code=status.HTTP_201_CREATED)
@@ -221,6 +282,16 @@ def create_invitation(
     body: InvitationCreate, user: UserDep, context: ManageDep
 ) -> CreatedInvitation:
     _check_can_grant(context, body.role)
+    location_ids = sorted(set(body.location_ids))
+    if not location_ids and context.branches is not None:
+        location_ids = sorted(context.branches)  # a branch manager invites into their branches
+    _ensure_branches_within(context, location_ids)
+    _ensure_branch_bound_has_branches(body.role, location_ids)
+    if location_ids and context.session.execute(
+        text("SELECT count(*) FROM app.locations WHERE id = ANY(CAST(:ids AS uuid[]))"),
+        {"ids": [str(i) for i in location_ids]},
+    ).scalar_one() != len(location_ids):
+        raise HTTPException(status_code=422, detail="unknown_branch")
     already_member = context.session.execute(
         text("""
             SELECT 1 FROM app.tenant_members m JOIN app.users u ON u.id = m.user_id
@@ -237,8 +308,9 @@ def create_invitation(
             text(f"""
                 WITH created AS (
                     INSERT INTO app.invitations
-                        (tenant_id, email, role, token_hash, invited_by, expires_at)
-                    VALUES (:tenant_id, :email, :role, :token_hash, :invited_by, :expires_at)
+                        (tenant_id, email, role, token_hash, invited_by, expires_at, location_ids)
+                    VALUES (:tenant_id, :email, :role, :token_hash, :invited_by, :expires_at,
+                            CAST(:location_ids AS uuid[]))
                     RETURNING *
                 )
                 {INVITATION_SELECT.replace("FROM app.invitations", "FROM created")}
@@ -250,6 +322,7 @@ def create_invitation(
                 "token_hash": _hash(token),
                 "invited_by": user.id,
                 "expires_at": datetime.now(UTC) + INVITATION_TTL,
+                "location_ids": [str(i) for i in location_ids],
             },
         )
         .mappings()
@@ -260,10 +333,15 @@ def create_invitation(
 
 @router.delete("/staff/invitations/{invitation_id}", status_code=status.HTTP_204_NO_CONTENT)
 def revoke_invitation(invitation_id: UUID, context: ManageDep) -> None:
-    role = context.session.execute(
-        text("SELECT role FROM app.invitations WHERE id = :id"), {"id": invitation_id}
-    ).scalar()
-    if role is None:
+    invitation = context.session.execute(
+        text("SELECT role, location_ids FROM app.invitations WHERE id = :id"), {"id": invitation_id}
+    ).first()
+    if invitation is None:
+        raise not_found()
+    role = invitation.role
+    if context.branches is not None and not (
+        invitation.location_ids and set(invitation.location_ids) <= context.branches
+    ):
         raise not_found()
     _check_can_grant(context, role)
     context.session.execute(
@@ -291,15 +369,18 @@ def _check_within_own(context: TenantContext, permissions: list[str]) -> None:
 
 @router.patch("/staff/{user_id}")
 def update_member(user_id: UUID, body: MemberUpdate, user: UserDep, context: ManageDep) -> Member:
-    current = _member_role(context.session, user_id)
-    if current is None:
-        raise not_found()
+    current = _ensure_member_in_reach(context, user_id)
     # Owners may step down (if another owner remains); nobody else changes their own role.
     if user_id == user.id and context.role != "owner":
         raise _forbidden("cannot_change_own_role")
     _check_can_grant(context, current)
     new_role = body.role or "staff"
     _check_can_grant(context, new_role)
+    if new_role == "branch_manager":
+        # Appointing goes through the branch (PUT /locations/{id}/manager); here only a member
+        # who is already kept to branches can be given the role.
+        row = member_row(context.session, user_id)
+        _ensure_branch_bound_has_branches(new_role, row[1] if row else [])
     if current == "owner" and new_role != "owner" and _owner_count(context.session) == 1:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_owner")
     if body.custom_role_id is not None:
@@ -317,6 +398,8 @@ def update_member(user_id: UUID, body: MemberUpdate, user: UserDep, context: Man
         """),
         {"role": new_role, "custom_role_id": body.custom_role_id, "user_id": user_id},
     )
+    if current == "branch_manager" and new_role != "branch_manager":
+        forget_manager(context.session, user_id)
     return _load_member(context.session, user_id)
 
 
@@ -327,9 +410,12 @@ class MemberBranches(BaseModel):
 @router.put("/staff/{user_id}/branches")
 def set_member_branches(user_id: UUID, body: MemberBranches, context: ManageDep) -> Member:
     """The branches a team member works at (they see these first); none means all."""
-    if _member_role(context.session, user_id) is None:
-        raise not_found()
+    role = _ensure_member_in_reach(context, user_id)
     ids = sorted(set(body.location_ids))
+    _ensure_branches_within(context, ids)
+    if context.branches is not None and not ids:
+        raise HTTPException(status_code=422, detail="unknown_branch")  # empty would mean all
+    _ensure_branch_bound_has_branches(role, ids)
     known = context.session.execute(
         text("SELECT count(*) FROM app.locations WHERE id = ANY(CAST(:ids AS uuid[]))"),
         {"ids": [str(i) for i in ids]},
@@ -343,6 +429,9 @@ def set_member_branches(user_id: UUID, body: MemberBranches, context: ManageDep)
         """),
         {"ids": [str(i) for i in ids], "user_id": user_id},
     )
+    if role == "branch_manager":  # they manage only the branches they still have
+        forget_manager(context.session, user_id, kept=ids)
+    suggest_reports_to(context.session, user_id)
     return _load_member(context.session, user_id)
 
 
@@ -354,9 +443,9 @@ class HomeBranch(BaseModel):
 def set_home_branch(user_id: UUID, body: HomeBranch, context: ManageDep) -> Member:
     """Where a member normally works. It never limits where a shift can be placed: a shift at
     another branch is simply shown as cover."""
-    if _member_role(context.session, user_id) is None:
-        raise not_found()
+    _ensure_member_in_reach(context, user_id)
     if body.location_id is not None:
+        _ensure_branches_within(context, [body.location_id])
         known = context.session.execute(
             text("SELECT 1 FROM app.locations WHERE id = :id"), {"id": body.location_id}
         ).first()
@@ -369,6 +458,7 @@ def set_home_branch(user_id: UUID, body: HomeBranch, context: ManageDep) -> Memb
         """),
         {"location": body.location_id, "user_id": user_id},
     )
+    suggest_reports_to(context.session, user_id)
     return _load_member(context.session, user_id)
 
 
@@ -387,8 +477,7 @@ class MemberOrganization(BaseModel):
 
 @router.patch("/staff/{user_id}/organization")
 def set_member_organization(user_id: UUID, body: MemberOrganization, context: ManageDep) -> Member:
-    if _member_role(context.session, user_id) is None:
-        raise not_found()
+    _ensure_member_in_reach(context, user_id)
     changes = body.model_dump(exclude_unset=True)
     if not changes:
         return _load_member(context.session, user_id)
@@ -397,6 +486,10 @@ def set_member_organization(user_id: UUID, body: MemberOrganization, context: Ma
             raise HTTPException(status_code=422, detail="reporting_cycle")
         if _member_role(context.session, changes["reports_to"]) is None:
             raise HTTPException(status_code=422, detail="invalid_reference")
+        if context.branches is not None:  # only within their own branches' people (or themselves)
+            boss = member_row(context.session, changes["reports_to"])
+            if boss is None or not (boss[1] and set(boss[1]) & context.branches):
+                raise HTTPException(status_code=422, detail="invalid_reference")
     assignments = set_clause(changes, MemberOrganization.model_fields, touch=False)
     try:
         with context.session.begin_nested():
@@ -448,6 +541,7 @@ def list_roles(context: ReadDep) -> Roles:
 
 @router.post("/roles", status_code=status.HTTP_201_CREATED)
 def create_role(body: RoleFields, context: ManageDep) -> CustomRole:
+    _ensure_unscoped(context)
     _check_within_own(context, body.permissions)
     try:
         role_id = context.session.execute(
@@ -464,6 +558,7 @@ def create_role(body: RoleFields, context: ManageDep) -> CustomRole:
 
 @router.patch("/roles/{role_id}")
 def update_role(role_id: UUID, body: RoleUpdate, context: ManageDep) -> CustomRole:
+    _ensure_unscoped(context)
     _load_role(context.session, role_id)
     changes = body.model_dump(exclude_unset=True, exclude_none=True)
     if "permissions" in changes:
@@ -482,6 +577,7 @@ def update_role(role_id: UUID, body: RoleUpdate, context: ManageDep) -> CustomRo
 
 @router.delete("/roles/{role_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_role(role_id: UUID, context: ManageDep) -> None:
+    _ensure_unscoped(context)
     role = _load_role(context.session, role_id)
     if role.members:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role_in_use")
@@ -490,14 +586,13 @@ def delete_role(role_id: UUID, context: ManageDep) -> None:
 
 @router.delete("/staff/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_member(user_id: UUID, user: UserDep, context: ManageDep) -> None:
-    current = _member_role(context.session, user_id)
-    if current is None:
-        raise not_found()
+    current = _ensure_member_in_reach(context, user_id)
     if user_id == user.id:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="cannot_remove_self")
     _check_can_grant(context, current)
     if current == "owner" and _owner_count(context.session) == 1:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_owner")
+    forget_manager(context.session, user_id)
     context.session.execute(
         text("""
             DELETE FROM app.tenant_members
