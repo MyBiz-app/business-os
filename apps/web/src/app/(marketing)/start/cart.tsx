@@ -67,26 +67,33 @@ export function AddOnRail({
   navLabel: string;
 }) {
   return (
-    <nav aria-label={navLabel} className="relative -mx-1 overflow-x-auto px-1 pb-1">
-      <ol className="flex min-w-max gap-2">
+    <nav aria-label={navLabel}>
+      {/* One strip that always fits the screen: the open add-on grows to show its name and the
+          others shrink to their icon (phones stack them, each with its name). */}
+      <ol className="flex flex-col gap-2 sm:flex-row">
         {OFFERS.map((offer) => {
           const isCurrent = offer === current;
+          const isAdded = added(offer);
           return (
-            <li key={offer}>
+            <li
+              key={offer}
+              className={`min-w-0 transition-[flex-grow] duration-300 motion-reduce:transition-none sm:basis-0 ${isCurrent ? "sm:grow-[4]" : "sm:grow"}`}
+            >
               <button
                 type="button"
                 onClick={() => onPick(offer)}
                 aria-current={isCurrent ? "step" : undefined}
-                className={`flex items-center gap-2 rounded-full border py-1.5 ps-1.5 pe-3 text-sm font-semibold transition-colors ${
-                  isCurrent ? "border-primary bg-primary/10 text-primary" : "border-border bg-surface hover:border-primary/50"
+                aria-label={isAdded ? `${label(offer)} · ${addedLabel}` : label(offer)}
+                title={label(offer)}
+                className={`flex w-full items-center gap-2 rounded-2xl border py-1.5 ps-1.5 pe-3 text-sm font-semibold transition-colors sm:justify-center sm:pe-1.5 ${
+                  isCurrent ? "border-primary bg-primary/10 text-primary sm:justify-start sm:pe-3" : "border-border bg-surface hover:border-primary/50"
                 }`}
               >
                 <ModuleIcon module={OFFER_ICON[offer]} size="sm" />
-                {label(offer)}
-                {added(offer) && (
-                  <span className="flex size-5 items-center justify-center rounded-full bg-success text-white">
-                    <Check aria-hidden="true" className="size-3" />
-                    <span className="sr-only">{addedLabel}</span>
+                <span className={`min-w-0 flex-1 truncate text-start ${isCurrent ? "" : "sm:hidden"}`}>{label(offer)}</span>
+                {isAdded && (
+                  <span aria-hidden="true" className="flex size-5 shrink-0 items-center justify-center rounded-full bg-success text-white">
+                    <Check className="size-3" />
                   </span>
                 )}
               </button>
@@ -112,6 +119,7 @@ export function Cart({
   onToggle,
   onRemove,
   t,
+  steps,
   actions,
 }: {
   lines: CartLine[];
@@ -123,6 +131,8 @@ export function Cart({
   onToggle: () => void;
   onRemove: (key: ModuleKey) => void;
   t: T;
+  /** The steps column shown above the plan on wide screens. */
+  steps?: ReactNode;
   actions: ReactNode;
 }) {
   const list = (items: CartLine[]) => (
@@ -183,8 +193,9 @@ export function Cart({
 
   return (
     <>
-      <aside aria-label={t("cart.title")} className="hidden lg:block">
-        <div className="card sticky top-24 flex flex-col gap-4 p-5">
+      <aside aria-label={t("cart.title")} className="sticky top-24 hidden flex-col gap-4 self-start lg:order-first lg:flex">
+        {steps}
+        <div className="card flex flex-col gap-4 p-5">
           <h2 className="flex items-center gap-2 font-bold">
             <ShoppingBag aria-hidden="true" className="size-5 text-primary" />
             {t("cart.title")}

@@ -1,9 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { components } from "@business-os/api-client";
 import { addDays, formatDay, formatTime, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Linking, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
 
@@ -12,7 +12,9 @@ import { PressableScale } from "@business-os/app-kit/components/motion";
 import { Button, Card, ErrorText, Heading, Screen, elevation, styles } from "@business-os/app-kit/components/ui";
 import { unwrap } from "@business-os/app-kit/lib/api";
 import { tint } from "@business-os/app-kit/lib/brand";
+import { calendarLink } from "@business-os/app-kit/lib/client-home";
 import { formatMoney } from "@business-os/app-kit/lib/money";
+import type { Palette } from "@business-os/app-kit/lib/theme";
 import { useLoad } from "@business-os/app-kit/lib/use-load";
 import { useAddresses } from "@/lib/use-addresses";
 import { useDependents } from "@/lib/use-dependents";
@@ -39,6 +41,7 @@ export default function Appointment() {
   const t = useTranslations("client.appointment");
   const tDependents = useTranslations("dependents");
   const tJobs = useTranslations("jobs");
+  const tHome = useTranslations("client.homeCards");
   const dependents = useDependents();
   const [who, setWho] = useState<string | null>(null);
   const [where, setWhere] = useState<string | null>(null);
@@ -48,7 +51,8 @@ export default function Appointment() {
   const today = business ? todayIn(business.time_zone) : "";
   const [service, setService] = useState<Service | null>(null);
   const [staff, setStaff] = useState<string | null>(null);
-  const [day, setDay] = useState(today);
+  const params = useLocalSearchParams<{ day?: string }>();
+  const [day, setDay] = useState(params.day || today);
   const [slot, setSlot] = useState<Slot | null>(null);
   const [slots, setSlots] = useState<Slot[] | null>(null);
   const [busy, setBusy] = useState(false);
@@ -140,6 +144,22 @@ export default function Appointment() {
         </View>
         <Button label={t("toBookings")} palette={palette} onPress={() => router.replace("/bookings")} />
         <Button
+          label={tHome("addToCalendar")}
+          variant="secondary"
+          palette={palette}
+          onPress={() =>
+            void Linking.openURL(
+              calendarLink({
+                title: `${service.name} · ${business.name}`,
+                startsAt: booked.starts_at,
+                endsAt: booked.ends_at,
+                details: booked.staff_name,
+                location: place ? [place.street, place.city].join(", ") : null,
+              }),
+            )
+          }
+        />
+        <Button
           label={t("another")}
           variant="secondary"
           palette={palette}
@@ -158,7 +178,7 @@ export default function Appointment() {
     <Screen palette={palette}>
       <Heading palette={palette}>{t("title")}</Heading>
 
-      <Text style={[local.step, { color: palette.foreground }]}>{t("service")}</Text>
+      <StepTitle palette={palette} n={1} label={t("service")} />
       {!data ? (
         <ActivityIndicator color={palette.primary} />
       ) : (
@@ -197,7 +217,7 @@ export default function Appointment() {
         <>
           {data.team.length > 1 && (
             <>
-              <Text style={[local.step, { color: palette.foreground }]}>{t("staff")}</Text>
+              <StepTitle palette={palette} n={2} label={t("staff")} />
               <ScrollView
                 horizontal
                 role="radiogroup"
@@ -213,7 +233,7 @@ export default function Appointment() {
             </>
           )}
 
-          <Text style={[local.step, { color: palette.foreground }]}>{t("day")}</Text>
+          <StepTitle palette={palette} n={data.team.length > 1 ? 3 : 2} label={t("day")} />
           <ScrollView
             horizontal
             role="tablist"
@@ -235,7 +255,7 @@ export default function Appointment() {
             ))}
           </ScrollView>
 
-          <Text style={[local.step, { color: palette.foreground }]}>{t("time")}</Text>
+          <StepTitle palette={palette} n={data.team.length > 1 ? 4 : 3} label={t("time")} />
           <Card palette={palette}>
             {slots === null ? (
               <ActivityIndicator color={palette.primary} />
@@ -306,6 +326,17 @@ export default function Appointment() {
             </>
           )}
           <ErrorText message={error} palette={palette} />
+          {slot && service && (
+            <Card palette={palette}>
+              <Text style={[local.summaryTitle, { color: palette.foreground }]}>{service.name}</Text>
+              <Text style={[styles.muted, { color: palette.muted }]}>
+                {formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })} · {time(slot.starts_at)} · {slot.staff_name}
+              </Text>
+              {service.price_amount > 0 && (
+                <Text style={[styles.muted, { color: palette.muted }]}>{formatMoney(service.price_amount, service.price_currency, locale)}</Text>
+              )}
+            </Card>
+          )}
           {slot && (!kind || choices.length > 0) && (!onSite || place) && <Button label={t("confirm", { time: time(slot.starts_at) })} palette={palette} busy={busy} onPress={() => void book()} />}
         </>
       )}
@@ -313,9 +344,26 @@ export default function Appointment() {
   );
 }
 
+/** A numbered step heading: the booking reads as a short path, service to time. */
+function StepTitle({ n, label, palette }: { n: number; label: string; palette: Palette }) {
+  return (
+    <View style={local.stepRow}>
+      <View aria-hidden style={[local.stepNo, { backgroundColor: tint(palette.primary, 0.14) }]}>
+        <Text style={[local.stepNoText, { color: palette.primary }]}>{n}</Text>
+      </View>
+      <Text accessibilityRole="header" style={[local.step, { color: palette.foreground }]}>
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 const local = StyleSheet.create({
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   step: { fontSize: 17, fontWeight: "700", textAlign: "left" },
+  stepRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  stepNo: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  stepNoText: { fontSize: 14, fontWeight: "800" },
   list: { gap: 10 },
   service: { flexDirection: "row", alignItems: "center", gap: 12, borderWidth: 1, borderRadius: 18, padding: 14 },
   accent: { width: 4, alignSelf: "stretch", borderRadius: 2 },
@@ -327,4 +375,5 @@ const local = StyleSheet.create({
   check: { width: 92, height: 92, borderRadius: 999, alignItems: "center", justifyContent: "center" },
   doneTitle: { fontSize: 26, fontWeight: "800" },
   center: { textAlign: "center" },
+  summaryTitle: { fontSize: 17, fontWeight: "700", textAlign: "left" },
 });

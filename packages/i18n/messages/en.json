@@ -112,7 +112,23 @@
     "uploadCover": "Upload cover",
     "removeCover": "Remove cover",
     "noCover": "No cover yet: the dashboard uses your brand color.",
-    "coverTooLarge": "The image is larger than 1.5 MB. Choose a smaller one."
+    "coverTooLarge": "The image is larger than 1.5 MB. Choose a smaller one.",
+    "classRelease": "Opening classes for booking",
+    "bookingHorizon": "Classes open for booking",
+    "bookingHorizonDays": "{days, plural, one {# day} other {# days}} ahead",
+    "releaseWeekday": "Weekly release",
+    "releaseRolling": "Rolling: always the next few days",
+    "releaseTime": "Release time",
+    "classReleaseHint": "With a weekly release, the next week opens for clients on the chosen day and time. You can also publish earlier from the schedule.",
+    "releaseWeekdays": {
+      "0": "Monday",
+      "1": "Tuesday",
+      "2": "Wednesday",
+      "3": "Thursday",
+      "4": "Friday",
+      "5": "Saturday",
+      "6": "Sunday"
+    }
   },
   "locales": {
     "he": "עברית",
@@ -166,7 +182,12 @@
       "over_email_send_rate_limit": "Too many emails were sent. Please wait a minute and try again.",
       "link_invalid": "This link is invalid or has expired. Please try again.",
       "generic": "Something went wrong. Please try again.",
-      "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us."
+      "email_send_failed": "We couldn't send a confirmation email to this address, so the account wasn't created. Please try again later or contact us.",
+      "invalid_phone": "Enter a valid mobile number, for example 050-123-4567.",
+      "unknown_phone": "We don't know this number. Sign in with your email first and add the number to your account.",
+      "invalid_code": "That code is wrong or has expired.",
+      "over_sms_send_rate_limit": "Too many codes were sent. Please wait a minute and try again.",
+      "invalid_email": "Enter a valid email address."
     },
     "oauth": {
       "google": "Continue with Google",
@@ -182,10 +203,34 @@
         "An AI assistant that prepares actions for your approval",
         "Full Hebrew and English, and your business data stays protected"
       ],
-      "back": "Back to the site"
+      "back": "Back to the site",
+      "scene": {
+        "today": "Today",
+        "newClient": "New client joined",
+        "revenue": "This week"
+      }
     },
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "codeLogin": {
+      "title": "Sign in with a code",
+      "subtitle": "We'll send you a one-time 6-digit code. No password needed.",
+      "channel": "Send the code by",
+      "email": "Email",
+      "phone": "Mobile number",
+      "send": "Send code",
+      "codeSent": "We sent a code to {target}. It's valid for one hour.",
+      "code": "6-digit code",
+      "verify": "Sign in",
+      "change": "Use a different email or number",
+      "usePassword": "Sign in with a password",
+      "useCode": "Sign in with a one-time code",
+      "channels": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp"
+      }
+    }
   },
   "onboarding": {
     "title": "Create your business",
@@ -659,6 +704,20 @@
     "address": "Address",
     "active": "Open",
     "rooms": "Rooms",
+    "kind": "Branch type",
+    "kindSame": "Same as the business",
+    "kindHint": "Choose from your business category only. It sets how clients see this branch's schedule.",
+    "network": {
+      "title": "Clients and friends policy",
+      "hint": "Choose whether clients, memberships and friends are shared across the whole network or kept separately for each branch.",
+      "network": "Whole network",
+      "networkHint": "One client list; a client can use any branch.",
+      "branch": "Each branch separately",
+      "branchHint": "Each branch has its own clients; a client picks the branches they belong to.",
+      "warning": "You already have more than one branch. Switching the policy changes who sees which clients and friends: existing clients are not deleted, but with a per-branch policy each client must be linked to their branches.",
+      "confirm": "I understand and want to switch",
+      "save": "Save policy"
+    },
     "roomsCount": "{count, plural, =0 {No rooms} one {1 room} other {# rooms}}",
     "roomName": "Room name",
     "roomCapacity": "Capacity",
@@ -680,7 +739,16 @@
       "staffHint": "Team members kept to specific branches. Everyone else already works at all branches.",
       "accept": "I understand the monthly charge for the new branch",
       "submit": "Add branch"
-    }
+    },
+    "brandingTitle": "Branch branding",
+    "brandingHint": "Unless set here, the branch shows the network's logo and color. Each branch can have its own.",
+    "logo": "Branch logo",
+    "logoHint": "PNG, JPG or WebP, up to 512 KB. A square image works best.",
+    "logoNetwork": "This branch uses the network's logo",
+    "logoUpload": "Upload logo",
+    "logoRemove": "Back to the network's logo",
+    "color": "Branch color",
+    "colorNetwork": "Use the network's color"
   },
   "team": {
     "title": "Team",
@@ -853,7 +921,12 @@
     "saveDefaultHint": "The schedule will open with this range and these branches for everyone in the business.",
     "defaultSaved": "Saved.",
     "defaultError": "Could not save. Try again.",
-    "resetView": "Back to the default view"
+    "resetView": "Back to the default view",
+    "publishWeek": "Publish next week",
+    "publishWeekHint": "Opens the next week of classes for clients now, ahead of the scheduled release.",
+    "publishWeekDone": "The schedule is open for clients until {date}.",
+    "publishWeekAlready": "The next week is already published.",
+    "publishWeekError": "Couldn't publish the week. Try again."
   },
   "bookings": {
     "title": "Bookings",
@@ -900,6 +973,22 @@
     "noPlan": "No plan",
     "showAll": "Show the whole history ({count})"
   },
+  "areas": {
+    "switch": "Switch area",
+    "current": "Current",
+    "client": "Member",
+    "platform": "MyBiz team",
+    "role": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "staff": "Staff",
+      "front_desk": "Front desk"
+    },
+    "soon": {
+      "business": "The business tools are moving into this app. Until then, use the MyBiz Business app, or switch to another area below.",
+      "platform": "The MyBiz team tools are moving into this app. Until then, use the MyBiz Team app, or switch to another area below."
+    }
+  },
   "client": {
     "tabs": {
       "home": "Home",
@@ -911,17 +1000,31 @@
     },
     "signIn": {
       "title": "Sign in",
-      "subtitle": "Enter your email and we'll send you a one-time code. No password needed.",
+      "subtitle": "Choose where to get a one-time 6-digit code. No password needed.",
       "email": "Email",
       "sendCode": "Send code",
-      "codeSent": "We sent a code to {email}. It's valid for one hour.",
-      "code": "Code from the email",
+      "codeSent": "We sent a code to {target}. It's valid for one hour.",
+      "code": "The 6-digit code",
       "verify": "Sign in",
       "changeEmail": "Use a different email",
       "invalidEmail": "Enter a valid email address.",
       "invalidCode": "That code is wrong or has expired.",
       "tooMany": "Too many attempts. Wait a minute and try again.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "codeSentPhone": "We sent a code to {target}. It's valid for one hour.",
+      "codePhone": "The 6-digit code",
+      "changePhone": "Use a different number",
+      "phone": "Mobile number",
+      "invalidPhone": "Enter a valid mobile number, for example 050-123-4567.",
+      "unknownPhone": "We don't know this number. Sign in with your email first and add the number to your account.",
+      "channel": {
+        "email": "Email",
+        "sms": "SMS",
+        "whatsapp": "WhatsApp"
+      },
+      "unknownEmail": "We don't recognise this email address. Check it, or ask the business to add you.",
+      "emailNotAllowed": "We can't send email to this address yet. Try another address or contact support.",
+      "genericWithCode": "Something went wrong sending the code ({code}). Try again."
     },
     "join": {
       "title": "Join a business",
@@ -958,7 +1061,20 @@
       "empty": "Nothing on this day.",
       "closed": "Closed on this day.",
       "closedReason": "Closed on this day ({reason}).",
-      "closedShort": "Closed"
+      "viewDay": "Day",
+      "viewWeek": "Week",
+      "viewMonth": "Month",
+      "previous": "Previous",
+      "next": "Next",
+      "noFree": "No free times on this day.",
+      "closedShort": "Closed",
+      "allInstructors": "All coaches",
+      "allClasses": "All classes",
+      "noMatch": "No classes match this filter on this day.",
+      "releaseOpens": "The next week opens on {when}.",
+      "remindMe": "Remind me",
+      "reminderSet": "Reminder set",
+      "releaseReminderBody": "The schedule for the next week is open. Book your spot!"
     },
     "bookings": {
       "title": "My bookings",
@@ -984,6 +1100,19 @@
     },
     "profile": {
       "title": "Profile",
+      "photoLabel": "Profile picture",
+      "takePhoto": "Take a photo",
+      "choosePhoto": "Choose a photo",
+      "removePhoto": "Remove photo",
+      "photoSaved": "Picture updated",
+      "photoFailed": "Could not update the picture",
+      "photoPermission": "Allow access in your phone settings to add a picture",
+      "status": "Status",
+      "statusPlaceholder": "A short line about you",
+      "statusCount": "{count}/{max}",
+      "saveStatus": "Save status",
+      "statusSaved": "Status saved",
+      "statusFailed": "Could not save the status",
       "signedInAs": "Signed in as {email}",
       "business": "Business",
       "joinAnother": "Join another business",
@@ -1170,6 +1299,17 @@
       "paid": "Paid {price}.",
       "payAtVenue": "{price}, paid at the venue.",
       "receipt": "The receipt",
+      "whenSuits": "When suits you?",
+      "exactFree": "{time} is free",
+      "taken": "{time} is taken. Closest times:",
+      "nearby": "Closest free times",
+      "earlier": "{amount} earlier",
+      "later": "{amount} later",
+      "minutes": "{count} min",
+      "hours": "{count} h",
+      "hoursMinutes": "{hours} h {minutes} min",
+      "gridToggle": "All courts by the hour",
+      "gridHide": "Hide the hours grid",
       "errors": {
         "slot_taken": "Someone just booked this time. Pick another.",
         "outside_hours": "That's outside the opening hours.",
@@ -1177,6 +1317,40 @@
         "health_declaration_required": "Fill in the health declaration first.",
         "health_declaration_review": "Your health declaration is waiting for the business.",
         "generic": "Something went wrong. Try again."
+      }
+    },
+    "homeCards": {
+      "nothingBooked": "Nothing booked yet.",
+      "bookNow": "Book now",
+      "navigate": "Navigate",
+      "addToCalendar": "Add to calendar",
+      "cancelFailed": "The cancellation didn't go through. Try again.",
+      "membership": "Your plan",
+      "noPlan": "No active plan",
+      "noPlanHint": "See the plans and cards on offer",
+      "bookTitle": "Book",
+      "rebook": "Book again",
+      "rebookTitle": "Book {service} again",
+      "rebookHint": "Your last visit was on {date}",
+      "manage": "Manage",
+      "health": "Health declaration",
+      "healthOk": "Signed and up to date",
+      "healthUntil": "Valid until {date}",
+      "documents": "Documents",
+      "documentsCount": "{count, plural, =0 {Nothing shared yet} one {# document} other {# documents}}",
+      "quotes": "Quotes and bills",
+      "quotesCount": "{count, plural, =0 {Nothing yet} one {# quote or bill} other {# quotes and bills}}",
+      "addresses": "My addresses",
+      "addressesHint": "Where we come to you",
+      "updates": "Latest updates",
+      "seeAll": "See all",
+      "noUpdates": "Nothing new right now.",
+      "businessInfo": "Find us",
+      "noAddress": "No address set yet",
+      "groups": {
+        "today": "Today",
+        "week": "This week",
+        "earlier": "Earlier"
       }
     }
   },
@@ -1795,6 +1969,10 @@
     }
   },
   "email": {
+    "details": {
+      "service": "Class",
+      "when": "When"
+    },
     "greeting": "Hi {name},",
     "note": "Note from the business: {note}",
     "footer": "This message was sent by {business}. You can see all updates in the app.",
@@ -1808,7 +1986,9 @@
       "health_approved": "Your health declaration was approved",
       "health_rejected": "About your health declaration",
       "session_reminder": "Today: {service} at {when}",
-      "plan_ending": "Your plan ends on {date}"
+      "plan_ending": "Your plan ends on {date}",
+      "friend_request": "{friend} wants to be your friend",
+      "class_invite": "{friend} invited you: {service} on {when}"
     },
     "body": {
       "waitlist_promoted": "A spot opened up and you're now booked into {service} on {when}. If you can't make it, please cancel in the app so someone else can come.",
@@ -1820,7 +2000,9 @@
       "health_approved": "{business} approved your health declaration. You can book in the app.",
       "health_rejected": "{business} couldn't approve your health declaration. Please contact the business.",
       "session_reminder": "A reminder that you're booked into {service} today ({when}). Can't make it? Please cancel in the app so someone else can take your spot.",
-      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking."
+      "plan_ending": "Your {plan} at {business} ends on {date}. Renew it to keep booking.",
+      "friend_request": "{friend} sent you a friend request at {business}. Open the app to accept.",
+      "class_invite": "{friend} saved you a spot in {service} on {when} at {business}. Open the app to join; the spot is held for a short time."
     },
     "welcome": {
       "subject": "Welcome to MyBiz, {business}! 🎉",
@@ -1944,6 +2126,40 @@
       "dashboard": "Go to dashboard",
       "guide": "Getting started guide"
     },
+    "intro": {
+      "eyebrow": "Everything in one place",
+      "title": "Calendar, clients, payments and messages.",
+      "titleAccent": "One system.",
+      "text": "The pieces of your business, scattered across apps and notebooks, snap together here.",
+      "scroll": "Continue to the page",
+      "sceneLabel": "Animation: calendar, clients, payments, messages, team and reports connect into one system",
+      "tiles": [
+        {
+          "title": "Calendar",
+          "meta": "8 today"
+        },
+        {
+          "title": "Clients",
+          "meta": "129 active"
+        },
+        {
+          "title": "Payments",
+          "meta": "+18%"
+        },
+        {
+          "title": "Messages",
+          "meta": "24 sent"
+        },
+        {
+          "title": "Team",
+          "meta": "6 on shift"
+        },
+        {
+          "title": "Reports",
+          "meta": "Live"
+        }
+      ]
+    },
     "hero": {
       "eyebrow": "Business management + an AI workforce for small businesses",
       "title": "Your business, organized.",
@@ -2053,6 +2269,7 @@
       "subtitle": "The same powerful system, with each industry's terms, forms and settings.",
       "more": "Learn more",
       "soon": "Coming soon",
+      "pick": "Pick your industry",
       "soonTitle": "More industries coming soon",
       "soonText": "Sports and facility booking, home services, pet services, events and professional services are on the way.",
       "all": "All industries",
@@ -2093,7 +2310,35 @@
       ],
       "phoneTitle": "Schedule",
       "book": "Book",
-      "booked": "Booked ✓"
+      "booked": "Booked ✓",
+      "phone": {
+        "title": "Schedule",
+        "days": [
+          "Sun",
+          "Mon",
+          "Tue",
+          "Wed",
+          "Thu"
+        ],
+        "classes": [
+          "Spinning",
+          "Yoga flow",
+          "HIIT"
+        ],
+        "friendsTitle": "Friends",
+        "friends": [
+          "Maya",
+          "Noam",
+          "Dana",
+          "Eli"
+        ],
+        "friendsNote": "3 friends are in tonight's class",
+        "inviteTitle": "Invite a friend",
+        "inviteClass": "HIIT · 18:00",
+        "inviteFriend": "Maya",
+        "inviteCta": "Send invite",
+        "inviteSent": "Spot held for Maya"
+      }
     },
     "pricing": {
       "title": "Pay only for what you need",
@@ -2140,6 +2385,12 @@
         "more": "One more location",
         "total": "Total per month",
         "daily": "That's about {price} a day"
+      },
+      "groups": {
+        "run": "Run the business (every plan)",
+        "clients": "Your clients' experience",
+        "ai": "AI assistant and agents",
+        "growth": "Growth and sales"
       }
     },
     "faq": {
@@ -2187,7 +2438,12 @@
       "accessibility": "Accessibility",
       "rights": "© {year} MyBiz. All rights reserved.",
       "status": "System status",
-      "social": "Social media"
+      "social": "Social media",
+      "appsTitle": "Get the app",
+      "appsText": "Manage your business from your phone, or clients book from theirs.",
+      "storeIos": "App Store",
+      "storeAndroid": "Google Play",
+      "comingSoon": "Coming soon"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -2447,6 +2703,9 @@
     "cancel": "Cancel",
     "search": "Search",
     "filter": "Filter",
+    "stageFilter": "Stages",
+    "allStages": "All stages",
+    "stagesShown": "{shown} of {total} stages",
     "allSources": "All sources",
     "emptyStage": "No leads here",
     "due": "Follow up today",
@@ -2845,7 +3104,12 @@
         "EUR": "€ Euro"
       },
       "yoursGeneric": "your business",
-      "exampleGeneric": "Dana's business"
+      "exampleGeneric": "Dana's business",
+      "number": "Company number (ח.פ. / ID)",
+      "numberOptional": "Company registration number (optional)",
+      "numberPlaceholder": "9 digits",
+      "numberHint": "Used for invoices. Companies use the ח.פ. number, sole traders their ID number.",
+      "numberInvalid": "Check the number: it should be up to 9 digits with a valid check digit."
     },
     "base": {
       "eyebrow": "Your base plan",
@@ -3119,7 +3383,7 @@
       }
     },
     "cart": {
-      "title": "Your plan",
+      "title": "My plan",
       "monthly": "Monthly after the trial",
       "today": "Due today",
       "free": "Free",
@@ -3155,7 +3419,13 @@
       "to": "Your business, live",
       "trial": "14 days free",
       "once": "One-time (with the first invoice)",
-      "celebrate": "What a plan! One more step and you're off"
+      "celebrate": "What a plan! One more step and you're off",
+      "passNumber": "Company no.",
+      "passCategory": "Category",
+      "passSize": "Size",
+      "passSizeValue": "{staff, plural, one {# employee} other {# employees}} · {locations, plural, one {# location} other {# locations}}",
+      "passAddons": "Add-ons",
+      "passNoAddons": "Core only"
     },
     "finish": {
       "title": "Last step: payment details",
@@ -3353,7 +3623,18 @@
     "addressHint": "Your home address. Only you see it.",
     "notificationsTitle": "Email notifications",
     "rosterEmails": "Email me when my roster is published",
-    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed."
+    "rosterEmailsHint": "One email with your new shifts when the business publishes the roster, and one when a shift of yours changes or is removed.",
+    "phoneLogin": {
+      "title": "Sign in with your phone",
+      "hint": "Verify your mobile number to sign in with a code by SMS or WhatsApp.",
+      "phone": "Mobile number",
+      "send": "Send code",
+      "code": "6-digit code",
+      "verify": "Verify number",
+      "verified": "Verified number: {phone}",
+      "sent": "We sent a code to {target}.",
+      "done": "Your number is verified."
+    }
   },
   "sales": {
     "title": "Sales",
@@ -3624,7 +3905,11 @@
       "no": "Keep it",
       "note": "Note",
       "noteFor": "A note about {name}'s visit",
-      "noteSaved": "Note saved on {name}'s card."
+      "noteSaved": "Note saved on {name}'s card.",
+      "cancelClass": "Cancel class",
+      "cancelClassConfirm": "Cancel this class? {count, plural, =0 {Nobody is booked.} one {# booked client will be told.} other {# booked clients will be told.}}",
+      "restoreClass": "Restore class",
+      "classRestored": "The class is back on the schedule."
     },
     "leads": {
       "open": "Open",
@@ -4947,6 +5232,9 @@
     "motionReduced": "Reduced",
     "widgetOpen": "Open the accessibility menu",
     "widgetClose": "Close",
+    "widgetDrag": "Drag to move, click to open",
+    "widgetHide": "Hide the accessibility button",
+    "widgetShow": "Show the accessibility button",
     "widgetTitle": "Accessibility and display",
     "reset": "Reset settings",
     "statement": "Accessibility statement"
@@ -4977,5 +5265,102 @@
     "expired": "That offer has expired. Ask again and I'll check what's free.",
     "failed": "Sorry, I couldn't book that one. Ask again and I'll check what's free.",
     "unavailable": "I can't answer right now. The team will get back to you soon."
+  },
+  "appLock": {
+    "title": "MyBiz is locked",
+    "subtitle": "Verify it's you to continue.",
+    "failed": "Couldn't verify you. Try again.",
+    "unlock": "Unlock",
+    "signOut": "Sign out",
+    "prompt": "Unlock MyBiz",
+    "cancel": "Cancel",
+    "setting": "Unlock with Face ID or fingerprint",
+    "on": "On",
+    "off": "Off",
+    "retry": "Try again",
+    "timeout": "Lock the app after",
+    "timeouts": {
+      "immediate": "Right away",
+      "30s": "30 seconds",
+      "5m": "5 minutes"
+    },
+    "offerTitle": "Open with Face ID or fingerprint next time?",
+    "offerBody": "Skip the code: confirm with your face or fingerprint when you open the app. You can change this any time in Settings.",
+    "offerYes": "Turn on",
+    "offerLater": "Not now"
+  },
+  "authUi": {
+    "tagline": "Your business, organised, in your pocket.",
+    "resend": "Send the code again",
+    "channelLabel": "Get the code by"
+  },
+  "friends": {
+    "title": "Friends",
+    "hint": "Friends in this business, requests and class invitations",
+    "disabled": "This business does not offer friends.",
+    "myCode": "My friend code",
+    "myCodeLabel": "My friend code: {code}",
+    "share": "Share my code",
+    "shareMessage": "Add me as a friend at {business} on MyBiz. My friend code: {code}",
+    "add": "Add a friend",
+    "addLabel": "Friend code, phone or email",
+    "addHint": "Enter their exact code, phone number or email.",
+    "sendRequest": "Send request",
+    "requestSent": "Request sent",
+    "requests": "Friend requests",
+    "accept": "Accept",
+    "decline": "Decline",
+    "pending": "Waiting",
+    "nowFriends": "You and {name} are friends now",
+    "mine": "My friends ({count})",
+    "none": "No friends yet. Share your code or add someone.",
+    "since": "Friends since {date}",
+    "together": "{count, plural, one {1 class together} other {# classes together}}",
+    "noneTogether": "No classes together yet.",
+    "togetherTitle": "Together",
+    "byService": "By class type",
+    "addFriend": "Add friend",
+    "remove": "Remove friend",
+    "keep": "Keep",
+    "removeTitle": "Remove friend?",
+    "removeMessage": "{name} will no longer be your friend.",
+    "privacy": "Privacy",
+    "visibleOn": "Other clients can see you in class participant lists.",
+    "visibleOff": "You are hidden from class participant lists (friends still see you).",
+    "hideMe": "Hide me from participant lists",
+    "showMe": "Show me in participant lists",
+    "invites": "Class invitations",
+    "invitedBy": "{name} invited you. A spot is held for you.",
+    "youInvited": "You invited {name}.",
+    "acceptInvite": "Join the class",
+    "declineInvite": "Not this time",
+    "cancelInvite": "Cancel invitation",
+    "inviteAccepted": "You are booked",
+    "inviteSent": "{name} was invited. A spot is held for them.",
+    "friendsInClass": "Who is coming / invite a friend",
+    "hideFriends": "Hide",
+    "details": "Class details",
+    "aboutClass": "About the class",
+    "close": "Close",
+    "spotsFilled": "{booked}/{capacity}",
+    "friendsComing": "{count, plural, one {Your friend {names} is coming} other {Your friends {names} are coming}}",
+    "whosComing": "Who is coming",
+    "noParticipants": "No one else yet.",
+    "inviteFriend": "Invite a friend",
+    "invite": "Invite",
+    "errors": {
+      "generic": "Something went wrong. Try again.",
+      "already_friends": "You are already friends.",
+      "already_invited": "This friend is already invited.",
+      "already_requested": "You already sent a request.",
+      "invite_expired": "This invitation has expired.",
+      "invite_window_closed": "It is too late to invite someone to this class.",
+      "not_booked": "Book the class first.",
+      "session_cancelled": "This class was cancelled.",
+      "session_full": "The class is full.",
+      "friends_disabled": "Friends are not available here.",
+      "friends_rate_limited": "Too many searches. Try again later.",
+      "not_found": "No one found. Check the code, phone or email."
+    }
   }
 }

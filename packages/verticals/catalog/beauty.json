@@ -5,9 +5,18 @@
   "icon": "scissors",
   "color": "from-pink-500 to-rose-500",
   "terms": "beauty",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"
+  ],
+  "client_home": [
+    "next_booking",
+    "rebook",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 180,
   "booking_requires_plan": false,

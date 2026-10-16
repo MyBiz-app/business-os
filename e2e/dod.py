@@ -35,7 +35,7 @@ with sync_playwright() as p:
     # Register → verify → create business (questionnaire → plan).
     owner.goto(f"{h.BASE}/signup"); h.ready(owner)
     owner.get_by_label("אימייל").fill(owner_email)
-    owner.get_by_label("סיסמה").fill("Str0ng!Passw0rd")
+    owner.get_by_label("סיסמה", exact=True).fill("Str0ng!Passw0rd")
     owner.get_by_role("button", name="יצירת חשבון").click()
     owner.wait_for_url("**/check-email**")
     owner.goto(h.confirm_link(owner_email)); h.to_onboarding(owner)
@@ -74,7 +74,7 @@ with sync_playwright() as p:
     coach.goto(link); h.ready(coach)
     coach.get_by_role("link", name="יצירת חשבון").click(); coach.wait_for_url("**/signup?next=**"); h.ready(coach)
     coach.get_by_label("אימייל").fill(coach_email)
-    coach.get_by_label("סיסמה").fill("Str0ng!Passw0rd")
+    coach.get_by_label("סיסמה", exact=True).fill("Str0ng!Passw0rd")
     coach.get_by_role("button", name="יצירת חשבון").click(); coach.wait_for_url("**/check-email**")
     coach.goto(h.confirm_link(coach_email)); coach.wait_for_url("**/invite/**"); h.ready(coach)
     coach.get_by_role("button", name=re.compile("הצטרפות ל")).click(); coach.wait_for_url("**/dashboard")
@@ -101,7 +101,8 @@ with sync_playwright() as p:
         owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$")); h.ready(owner)
     plans = owner.get_by_role("region", name="מנויים וכרטיסיות")
     plans.get_by_role("button", name="מכירה").click()
-    expect(plans.get_by_text("המסלול נמכר.")).to_be_visible()
+    # Confirmations are toasts (role=status) outside the page sections, not text inside the form.
+    expect(owner.get_by_role("status").filter(has_text="המסלול נמכר.")).to_be_visible()
     print("4. class, session, member with a membership: ok")
 
     # Member: branded mobile app (Expo web) → join → book.
@@ -115,8 +116,9 @@ with sync_playwright() as p:
     member.goto(APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
-    member.get_by_label("הקוד מהמייל").fill(otp(member_email))
-    member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join", timeout=90000)
+    member.get_by_label("הקוד בן 6 הספרות").fill(otp(member_email))
+    # Filling the last digit signs in on its own.
+    member.wait_for_url("**/join", timeout=90000)
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
     member.get_by_label("שם פרטי").fill("נועה")

@@ -18,7 +18,7 @@ with sync_playwright() as p:
     page.goto(f"{h.BASE}/signup")
     h.ready(page)
     page.get_by_label("אימייל").fill(email)
-    page.get_by_label("סיסמה").fill(h.PASSWORD)
+    page.get_by_label("סיסמה", exact=True).fill(h.PASSWORD)
     page.get_by_role("button", name="יצירת חשבון").click()
     page.wait_for_url("**/check-email**")
     page.goto(h.confirm_link(email))

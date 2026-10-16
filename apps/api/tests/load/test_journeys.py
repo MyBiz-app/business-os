@@ -4,8 +4,8 @@ Skipped unless LOAD_TEST=1 (it seeds thousands of rows). CI runs it in its own j
 
     LOAD_TEST=1 LOAD_REPORT=load-report.md uv run pytest tests/load -s
 
-Each journey is the set of requests one screen of the business app makes when it opens
-(see apps/business-app/src/app/(tabs)). Requests run in-process, one after another, so the
+Each journey is the set of requests one screen of the business area of the app makes when it opens
+(see apps/client-app/src/app/(business)/(tabs)). Requests run in-process, one after another, so the
 numbers measure the API and the database, not the network, and are a little pessimistic for
 screens that fetch in parallel. The same journeys run on the standard demo (1x) for comparison.
 The budgets are loose on purpose: they catch a missing index or an N+1, not a slow runner.

@@ -23,6 +23,8 @@ NotificationKind = Literal[
     "health_rejected",
     "session_reminder",
     "plan_ending",
+    "friend_request",
+    "class_invite",
 ]
 
 
@@ -31,7 +33,8 @@ class Notification(BaseModel):
     kind: NotificationKind
     payload: dict[str, Any] = Field(
         description="session_id, service_name, starts_at (and previous_starts_at, status or "
-        "note, by kind); plan_ending: plan_name, ends_on"
+        "note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; "
+        "class_invite: from_name, invite_id, session_id, service_name, starts_at"
     )
     created_at: datetime
     read_at: datetime | None

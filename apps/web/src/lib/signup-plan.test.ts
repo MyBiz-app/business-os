@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
+import { businessNumberOk, chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
 
 const catalog = {
   core: [
@@ -84,4 +84,13 @@ test("tiers: choosing one replaces the others and brings what it needs", () => {
 
 test("removing a module removes what depends on it", () => {
   assert.deepEqual(withoutOrphans({ client_app_branded: 1, whatsapp: 1, whatsapp_ai: 1 }, catalog), { whatsapp: 1 });
+});
+
+test("an Israeli business number needs a valid check digit; abroad it is optional", () => {
+  assert.equal(businessNumberOk("ILS", "000000018"), true);
+  assert.equal(businessNumberOk("ILS", "000-000-018"), true);
+  assert.equal(businessNumberOk("ILS", "123456789"), false);
+  assert.equal(businessNumberOk("ILS", ""), false);
+  assert.equal(businessNumberOk("USD", ""), true);
+  assert.equal(decodePlan(encodePlan({ ...plan, businessNumber: "000 000 018" }))?.businessNumber, "000000018");
 });

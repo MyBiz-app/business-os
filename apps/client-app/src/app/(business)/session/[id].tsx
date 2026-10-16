@@ -1,0 +1,543 @@
+import type { components } from "@business-os/api-client";
+import { dayOf, formatDay, formatTime } from "@business-os/i18n/dates";
+import { router, useLocalSearchParams } from "expo-router";
+import { useCallback, useState } from "react";
+import { Linking, View } from "react-native";
+import { Text } from "@business-os/app-kit/components/text";
+import { useLocale, useTranslations } from "use-intl";
+
+import { Avatar, BackBar, Badge, ListRow, PillRow, SectionTitle } from "@business-os/app-kit/components/rows";
+import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
+import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
+import { confirm } from "@business-os/app-kit/lib/confirm";
+import { formatMoney } from "@business-os/app-kit/lib/money";
+import { useLoad } from "@business-os/app-kit/lib/use-load";
+import { googleMapsLink, wazeLink } from "@business-os/app-kit/lib/maps";
+import { dependentsFor } from "@business-os/app-kit/lib/vertical";
+import { useStaff } from "@/providers/staff-provider";
+
+type Booking = components["schemas"]["Booking"];
+type ClientListItem = components["schemas"]["ClientListItem"];
+
+const TONE = { checked_in: "success", no_show: "danger", waitlisted: "primary" } as const;
+const METHODS = ["cash", "card", "transfer", "other"] as const;
+type Method = (typeof METHODS)[number];
+const BOOKING_ERRORS = [
+  "already_booked",
+  "session_cancelled",
+  "invalid_transition",
+  "invalid_reference",
+  "not_found",
+  "dependent_required",
+  "unknown_dependent",
+];
+const WITHOUT = "without";
+
+/** One session: who's coming, check-in, booking someone in and a note about a visit. */
+export default function SessionScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const t = useTranslations("business.today");
+  const tSession = useTranslations("business.session");
+  const tBookings = useTranslations("bookings");
+  const tNotes = useTranslations("visitNotes");
+  const locale = useLocale();
+  const { api, scope, tenant, palette, can } = useStaff();
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [search, setSearch] = useState("");
+  const [matches, setMatches] = useState<ClientListItem[] | null>(null);
+  const [noteFor, setNoteFor] = useState<Booking | null>(null);
+  // Industries that keep pets / children: tapping a client then asks which one comes.
+  const [picking, setPicking] = useState<{ client: ClientListItem; choices: { id: string; name: string }[] } | null>(null);
+  const tDependents = useTranslations("dependents");
+  const tJobs = useTranslations("jobs");
+  const dependents = dependentsFor(tenant);
+  const [method, setMethod] = useState<Method>("cash");
+  const tResources = useTranslations("resources");
+  const [note, setNote] = useState("");
+  const timeZone = tenant?.time_zone ?? "UTC";
+  const manage = can("bookings.manage");
+
+  const tenantId = tenant?.id;
+  const load = useCallback(async () => {
+    if (!tenantId) return null; // a link opened before the business is known
+    const [session, bookings] = await Promise.all([
+      api.GET("/sessions/{session_id}", { params: { ...scope, path: { session_id: id } } }).then(unwrap),
+      api.GET("/sessions/{session_id}/bookings", { params: { ...scope, path: { session_id: id } } }).then(unwrap),
+    ]);
+    return { session, bookings };
+  }, [api, scope, id, tenantId]);
+  const { data, loading, reload } = useLoad(load);
+
+  const fail = (caught: unknown) => {
+    const code = caught instanceof ApiError ? caught.detail : undefined;
+    setError(code && BOOKING_ERRORS.includes(code) ? tBookings(`errors.${code}`) : tBookings("errors.generic"));
+  };
+
+  const run = async (key: string, action: () => Promise<void>) => {
+    setBusy(key);
+    setError(null);
+    setNotice(null);
+    try {
+      await action();
+      await reload();
+    } catch (caught) {
+      fail(caught);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const setStatus = (booking: Booking, status: "checked_in" | "no_show" | "booked") =>
+    run(booking.id, async () => {
+      unwrap(
+        await api.PATCH("/bookings/{booking_id}", { params: { ...scope, path: { booking_id: booking.id } }, body: { status } }),
+      );
+    });
+
+  const cancel = async (booking: Booking) => {
+    const yes = await confirm(
+      tSession("cancel"),
+      tSession("cancelConfirm", { name: booking.client_name }),
+      tSession("yes"),
+      tSession("no"),
+    );
+    if (!yes) return;
+    await run(booking.id, async () => {
+      unwrap(
+        await api.PATCH("/bookings/{booking_id}", {
+          params: { ...scope, path: { booking_id: booking.id } },
+          body: { status: "cancelled" },
+        }),
+      );
+    });
+  };
+
+  // Cancelling or restoring the whole class: the API tells the registered clients.
+  const cancelSession = async () => {
+    const yes = await confirm(
+      tSession("cancelClass"),
+      tSession("cancelClassConfirm", { count: coming.length }),
+      tSession("yes"),
+      tSession("no"),
+    );
+    if (!yes) return;
+    await run("session", async () => {
+      unwrap(await api.PATCH("/sessions/{session_id}", { params: { ...scope, path: { session_id: id } }, body: { status: "cancelled" } }));
+    });
+  };
+
+  const restoreSession = () =>
+    run("session", async () => {
+      unwrap(await api.PATCH("/sessions/{session_id}", { params: { ...scope, path: { session_id: id } }, body: { status: "scheduled" } }));
+      setNotice(tSession("classRestored"));
+    });
+
+  const find = async () => {
+    setError(null);
+    try {
+      const page = unwrap(
+        await api.GET("/clients", { params: { ...scope, query: { search: search.trim() || undefined, status: "active", limit: 20 } } }),
+      );
+      setMatches(page.items);
+    } catch (caught) {
+      fail(caught);
+    }
+  };
+
+  const choose = (client: ClientListItem) =>
+    run(`book-${client.id}`, async () => {
+      const theirs = unwrap(
+        await api.GET("/clients/{client_id}/dependents", { params: { ...scope, path: { client_id: client.id } } }),
+      ).filter((d) => d.active && !bookedPairs.has(`${client.id}:${d.id}`));
+      const choices = [
+        ...theirs.map((d) => ({ id: d.id, name: d.name })),
+        ...(dependents.required || bookedPairs.has(`${client.id}:`) ? [] : [{ id: WITHOUT, name: tDependents("withoutDependent") }]),
+      ];
+      setPicking({ client, choices });
+    });
+
+  const book = (client: ClientListItem, dependentId?: string) =>
+    run(`book-${client.id}`, async () => {
+      const booking = unwrap(
+        await api.POST("/sessions/{session_id}/bookings", {
+          params: { ...scope, path: { session_id: id } },
+          body: { client_id: client.id, dependent_id: dependentId && dependentId !== WITHOUT ? dependentId : null },
+        }),
+      );
+      setPicking(null);
+      const name = booking.dependent_name ?? [client.first_name, client.last_name].filter(Boolean).join(" ");
+      setNotice(booking.status === "waitlisted" ? tSession("waitlisted", { name }) : tSession("booked", { name }));
+      setAdding(false);
+      setMatches(null);
+      setSearch("");
+    });
+
+  const saveNote = (booking: Booking) =>
+    run(`note-${booking.id}`, async () => {
+      unwrap(
+        await api.POST("/clients/{client_id}/notes", {
+          params: { ...scope, path: { client_id: booking.client_id } },
+          body: { body: note, booking_id: booking.id },
+        }),
+      );
+      setNotice(tSession("noteSaved", { name: booking.client_name }));
+      setNoteFor(null);
+      setNote("");
+    });
+
+  if (!data) {
+    return (
+      <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+        <BackBar label={t("backToDay")} palette={palette} onPress={() => router.back()} />
+      </Screen>
+    );
+  }
+  const { session, bookings } = data;
+  const coming = bookings.filter((b) => b.status !== "cancelled");
+  // An on-site job (#42): the next step of its progress.
+  const JOB_STEPS = ["scheduled", "on_the_way", "in_progress", "done"] as const;
+  const jobStep = data?.session.job_status ? JOB_STEPS.indexOf(data.session.job_status) : -1;
+  const nextJob = jobStep >= 0 ? (JOB_STEPS[jobStep + 1] as Exclude<(typeof JOB_STEPS)[number], "scheduled"> | undefined) : undefined;
+  const bookedIds = dependents.kind ? new Set<string>() : new Set(coming.map((b) => b.client_id));
+  const bookedPairs = new Set(coming.map((b) => `${b.client_id}:${b.dependent_id ?? ""}`));
+  const isClass = session.booking_mode === "class";
+  const open = session.status !== "cancelled";
+
+  return (
+    <Screen palette={palette} refreshing={loading} onRefresh={() => void reload()}>
+      <BackBar label={t("backToDay")} palette={palette} onPress={() => router.back()} />
+      <View style={{ gap: 6 }}>
+        <Heading palette={palette}>{session.service.name}</Heading>
+        <Text style={[styles.muted, { color: palette.muted }]}>
+          {formatDay(dayOf(session.starts_at, timeZone), locale, { weekday: "long", day: "numeric", month: "long" })} ·{" "}
+          {formatTime(session.starts_at, locale, timeZone)}–{formatTime(session.ends_at, locale, timeZone)}
+        </Text>
+        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+          {open ? (
+            <Badge
+              label={t("spots", { booked: session.booked, capacity: session.capacity })}
+              tone={session.booked >= session.capacity ? "primary" : "muted"}
+              palette={palette}
+            />
+          ) : (
+            <Badge label={t("cancelled")} tone="danger" palette={palette} />
+          )}
+          {session.waitlisted > 0 && <Badge label={t("waitlist", { count: session.waitlisted })} palette={palette} />}
+          {session.room_name && <Badge label={session.room_name} palette={palette} />}
+          {session.location_name && <Badge label={session.location_name} palette={palette} />}
+        </View>
+      </View>
+
+      {session.booking_mode === "resource" && session.price_amount != null && (
+        <Card palette={palette}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <Text style={{ color: palette.foreground, fontWeight: "700", fontSize: 18 }}>
+              {formatMoney(session.price_amount, session.price_currency ?? tenant!.currency, locale)}
+            </Text>
+            <Badge label={session.paid ? tResources("paid") : tResources("notPaid")} tone={session.paid ? "success" : "danger"} palette={palette} />
+          </View>
+          {!session.paid && can("sales.manage") && coming[0] && (
+            <>
+              <PillRow<Method>
+                label={tResources("method")}
+                palette={palette}
+                value={method}
+                onChange={setMethod}
+                options={METHODS.map((value) => ({ value, label: tResources(`methods.${value}`) }))}
+              />
+              <Button
+                label={tResources("recordPayment")}
+                palette={palette}
+                busy={busy === "pay"}
+                onPress={() =>
+                  void run("pay", async () => {
+                    unwrap(
+                      await api.POST("/resources/reservations/{booking_id}/payment", {
+                        params: { ...scope, path: { booking_id: coming[0]!.id } },
+                        body: { method },
+                      }),
+                    );
+                  })
+                }
+              />
+            </>
+          )}
+        </Card>
+      )}
+
+      <View accessibilityLiveRegion="polite">
+        {notice && <Text style={{ color: palette.success, fontWeight: "600" }}>{notice}</Text>}
+        <ErrorText message={error} palette={palette} />
+      </View>
+
+      {manage && open && isClass && (
+        <Card palette={palette}>
+          {!adding ? (
+            <Button label={tSession("book")} palette={palette} onPress={() => setAdding(true)} />
+          ) : (
+            <View style={{ gap: 10 }}>
+              <Field
+                label={tBookings("searchLabel")}
+                placeholder={tBookings("searchPlaceholder")}
+                palette={palette}
+                value={search}
+                onChangeText={setSearch}
+                onSubmitEditing={() => void find()}
+                returnKeyType="search"
+                autoFocus
+              />
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                <View style={{ flex: 1 }}>
+                  <Button label={tBookings("search")} palette={palette} onPress={() => void find()} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Button
+                    label={tSession("close")}
+                    variant="secondary"
+                    palette={palette}
+                    onPress={() => {
+                      setAdding(false);
+                      setMatches(null);
+                      setPicking(null);
+                    }}
+                  />
+                </View>
+              </View>
+              {picking && (
+                <View style={{ gap: 8 }}>
+                  <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>
+                    {tDependents("who")} · {[picking.client.first_name, picking.client.last_name].filter(Boolean).join(" ")}
+                  </Text>
+                  {picking.choices.length === 0 ? (
+                    <Text style={[styles.muted, { color: palette.muted }]}>{tDependents(`none.${dependents.kind ?? "pet"}`)}</Text>
+                  ) : (
+                    picking.choices.map((choice) => (
+                      <Button
+                        key={choice.id}
+                        label={choice.name}
+                        variant="secondary"
+                        palette={palette}
+                        busy={busy === `book-${picking.client.id}`}
+                        onPress={() => void book(picking.client, choice.id)}
+                      />
+                    ))
+                  )}
+                </View>
+              )}
+              {matches !== null &&
+                !picking &&
+                (matches.filter((c) => !bookedIds.has(c.id)).length === 0 ? (
+                  <Text style={[styles.muted, { color: palette.muted }]}>{tBookings("noMatches")}</Text>
+                ) : (
+                  matches
+                    .filter((c) => !bookedIds.has(c.id))
+                    .map((client) => {
+                      const name = [client.first_name, client.last_name].filter(Boolean).join(" ");
+                      return (
+                        <ListRow
+                          key={client.id}
+                          palette={palette}
+                          leading={<Avatar name={name} palette={palette} size={36} />}
+                          title={name}
+                          subtitle={client.plan_name ?? tBookings("noPlan")}
+                          accessibilityLabel={`${tBookings("book")}: ${name}`}
+                          onPress={() => void (dependents.kind ? choose(client) : book(client))}
+                          trailing={busy === `book-${client.id}` ? <Text style={{ color: palette.muted }}>…</Text> : undefined}
+                        />
+                      );
+                    })
+                ))}
+            </View>
+          )}
+        </Card>
+      )}
+
+      {can("schedule.write") && isClass && session.starts_at > new Date().toISOString() && (
+        <Button
+          label={open ? tSession("cancelClass") : tSession("restoreClass")}
+          variant="secondary"
+          palette={palette}
+          busy={busy === "session"}
+          onPress={() => void (open ? cancelSession() : restoreSession())}
+        />
+      )}
+
+      {data?.session.job_status && (
+        <Card palette={palette}>
+          <SectionTitle title={tJobs("title")} palette={palette} />
+          <Badge label={tJobs(`statuses.${data.session.job_status}`)} tone="primary" palette={palette} />
+          {data.session.address ? (
+            <Text style={{ color: palette.foreground, textAlign: "left" }}>{data.session.address}</Text>
+          ) : null}
+          {data.session.address_notes ? (
+            <Text style={[styles.muted, { color: palette.muted }]}>{data.session.address_notes}</Text>
+          ) : null}
+          {data.session.address && (
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              <View style={{ flex: 1 }}>
+                <Button label="Waze" variant="secondary" palette={palette} onPress={() => void Linking.openURL(wazeLink(data.session.address!))} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Button
+                  label="Google Maps"
+                  variant="secondary"
+                  palette={palette}
+                  onPress={() => void Linking.openURL(googleMapsLink(data.session.address!))}
+                />
+              </View>
+            </View>
+          )}
+          {manage && nextJob && (
+            <Button
+              label={tJobs(`actions.${nextJob}`)}
+              palette={palette}
+              busy={busy === "job"}
+              onPress={() =>
+                void run("job", async () => {
+                  unwrap(
+                    await api.POST("/jobs/{session_id}/status", {
+                      params: { ...scope, path: { session_id: id } },
+                      body: { status: nextJob },
+                    }),
+                  );
+                })
+              }
+            />
+          )}
+        </Card>
+      )}
+
+      <SectionTitle title={t("roster")} palette={palette} />
+      {coming.length === 0 ? (
+        <Card palette={palette}>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("empty")}</Text>
+        </Card>
+      ) : (
+        coming.map((booking) => {
+          const tone = TONE[booking.status as keyof typeof TONE] ?? "muted";
+          const writing = noteFor?.id === booking.id;
+          return (
+            <Card key={booking.id} palette={palette}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+                <Avatar name={booking.dependent_name ?? booking.client_name} palette={palette} />
+                <View style={{ flex: 1, gap: 4 }}>
+                  <Text
+                    accessibilityRole="link"
+                    onPress={() => router.push(`/client/${booking.client_id}`)}
+                    style={{ color: palette.foreground, fontWeight: "700", fontSize: 16 }}
+                  >
+                    {booking.dependent_name ? `${booking.dependent_name} · ${booking.client_name}` : booking.client_name}
+                  </Text>
+                  <Text style={{ color: palette.muted, fontSize: 13 }}>{booking.plan_name ?? tBookings("noPlan")}</Text>
+                </View>
+                <Badge label={t(`statuses.${booking.status}`)} tone={tone} palette={palette} />
+              </View>
+              {manage && (
+                <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+                  {open && (booking.status === "booked" || booking.status === "waitlisted") ? (
+                    <>
+                      {booking.status === "booked" && (
+                        <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                          <Button
+                            label={t("checkIn")}
+                            accessibilityLabel={`${t("checkIn")}: ${booking.client_name}`}
+                            palette={palette}
+                            busy={busy === booking.id}
+                            onPress={() => void setStatus(booking, "checked_in")}
+                          />
+                        </View>
+                      )}
+                      {booking.status === "booked" && (
+                        <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                          <Button
+                            label={t("noShow")}
+                            accessibilityLabel={`${t("noShow")}: ${booking.client_name}`}
+                            variant="secondary"
+                            palette={palette}
+                            busy={busy === booking.id}
+                            onPress={() => void setStatus(booking, "no_show")}
+                          />
+                        </View>
+                      )}
+                      <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                        <Button
+                          label={tSession("note")}
+                          accessibilityLabel={tSession("noteFor", { name: booking.client_name })}
+                          variant="secondary"
+                          palette={palette}
+                          onPress={() => {
+                            setNoteFor(writing ? null : booking);
+                            setNote("");
+                          }}
+                        />
+                      </View>
+                      <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                        <Button
+                          label={tSession("cancel")}
+                          accessibilityLabel={`${tSession("cancel")}: ${booking.client_name}`}
+                          variant="danger"
+                          palette={palette}
+                          onPress={() => void cancel(booking)}
+                        />
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      {open && (
+                        <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                          <Button
+                            label={t("undo")}
+                            accessibilityLabel={`${t("undo")}: ${booking.client_name}`}
+                            variant="secondary"
+                            palette={palette}
+                            busy={busy === booking.id}
+                            onPress={() => void setStatus(booking, "booked")}
+                          />
+                        </View>
+                      )}
+                      <View style={{ flexGrow: 1, flexBasis: "45%" }}>
+                        <Button
+                          label={tSession("note")}
+                          accessibilityLabel={tSession("noteFor", { name: booking.client_name })}
+                          variant="secondary"
+                          palette={palette}
+                          onPress={() => {
+                            setNoteFor(writing ? null : booking);
+                            setNote("");
+                          }}
+                        />
+                      </View>
+                    </>
+                  )}
+                </View>
+              )}
+              {writing && (
+                <View style={{ gap: 8 }}>
+                  <Field
+                    label={tSession("noteFor", { name: booking.client_name })}
+                    placeholder={tNotes("body")}
+                    palette={palette}
+                    value={note}
+                    onChangeText={setNote}
+                    multiline
+                    style={{ minHeight: 88, paddingTop: 12, textAlignVertical: "top" }}
+                  />
+                  <Button
+                    label={tNotes("add")}
+                    palette={palette}
+                    busy={busy === `note-${booking.id}`}
+                    disabled={!note.trim()}
+                    onPress={() => void saveNote(booking)}
+                  />
+                </View>
+              )}
+            </Card>
+          );
+        })
+      )}
+    </Screen>
+  );
+}

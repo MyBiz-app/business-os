@@ -2,7 +2,7 @@
 
 - Web: https://business-os-alpha-drab.vercel.app
 - API: https://business-os-api-staging.onrender.com (`/health`, `/docs`)
-- Expo apps on the web: https://mybiz-client-app.vercel.app, https://mybiz-business-app.vercel.app, https://mybiz-staff-app.vercel.app (published by hand with [`deploy-apps-web.yml`](../../.github/workflows/deploy-apps-web.yml); all three are in the API's `API_CORS_ORIGINS`)
+- Expo apps on the web: https://mybiz-client-app.vercel.app (published by hand with [`deploy-apps-web.yml`](../../.github/workflows/deploy-apps-web.yml); it is in the API's `API_CORS_ORIGINS`). The old mybiz-business-app and mybiz-staff-app addresses only redirect to it
 
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|

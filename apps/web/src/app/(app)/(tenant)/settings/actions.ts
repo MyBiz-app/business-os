@@ -11,11 +11,17 @@ export type LogoState = { error?: "logo_too_large" | "unsupported_image" | "gene
 export async function updateDetails(_state: FormState, formData: FormData): Promise<FormState> {
   const { api, scope } = await getTenant();
   const value = (name: string) => String(formData.get(name) ?? "");
+  // The weekly release is a weekday and a time together; "rolling" switches it off.
+  const releaseWeekday = value("weekly_release_weekday");
+  const weekly = releaseWeekday !== "" && value("weekly_release_time") !== "";
   try {
     unwrap(
       await api.PATCH("/tenants/current", {
         params: scope,
         body: {
+          booking_horizon_days: Number(value("booking_horizon_days")) || 7,
+          weekly_release_weekday: weekly ? Number(releaseWeekday) : null,
+          weekly_release_time: weekly ? value("weekly_release_time") : null,
           name: value("name"),
           locale: value("locale") === "en" ? "en" : "he",
           time_zone: value("time_zone"),

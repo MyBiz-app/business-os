@@ -4,7 +4,7 @@ from typing import Literal
 from uuid import UUID
 from zoneinfo import available_timezones
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.catalog.verticals import VERTICAL_PACKS
 
@@ -64,6 +64,9 @@ class Me(BaseModel):
     avatar_url: str | None = Field(
         default=None, description="Path of the person's own picture on this API, if any"
     )
+    status_text: str | None = Field(
+        default=None, description="A short free-text status shown on the profile (up to 80)"
+    )
     memberships: list[Membership]
     support_access: list[SupportAccess] = Field(
         description="Businesses that let MyBiz support in (the MyBiz team only)"
@@ -110,6 +113,9 @@ class TenantUpdate(BaseModel):
     currency: str | None = Field(default=None, pattern=r"^[A-Z]{3}$")
     primary_color: str | None = Field(default=None, pattern=r"^#[0-9a-fA-F]{6}$")
     cancellation_window_minutes: int | None = Field(default=None, ge=0, le=10080)
+    booking_horizon_days: int | None = Field(default=None, ge=1, le=60)
+    weekly_release_weekday: int | None = Field(default=None, ge=0, le=6)
+    weekly_release_time: dt.time | None = None
     booking_requires_plan: bool | None = None
     requires_health_declaration: bool | None = None
     online_sales: bool | None = None
@@ -127,6 +133,7 @@ class TenantUpdate(BaseModel):
         max_length=3,
         description="Branches the shifts board opens with; empty means all of them",
     )
+    network_scope: Literal["network", "branch"] | None = None
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
@@ -136,6 +143,13 @@ class TenantUpdate(BaseModel):
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
     )
+
+    @model_validator(mode="after")
+    def release_is_complete(self) -> "TenantUpdate":
+        # The weekly release is a weekday and a time together; both null switches it off.
+        if (self.weekly_release_weekday is None) != (self.weekly_release_time is None):
+            raise ValueError("the weekly release needs both a weekday and a time (or neither)")
+        return self
 
     @field_validator("business_number", mode="before")
     @classmethod
@@ -180,11 +194,24 @@ class Tenant(BaseModel):
         default=None, description="Shown only to people who manage the business's settings"
     )
     cancellation_window_minutes: int
+    booking_horizon_days: int = Field(
+        default=7, description="Without a weekly release: how many days ahead classes open"
+    )
+    weekly_release_weekday: int | None = Field(
+        default=None, description="Weekly release: 0 = Monday, 6 = Sunday; none: rolling horizon"
+    )
+    weekly_release_time: dt.time | None = Field(
+        default=None, description="Weekly release: local time the next week opens"
+    )
     booking_requires_plan: bool = Field(description="Clients need a valid plan to book in the app")
     requires_health_declaration: bool = Field(
         description="Clients need a valid health declaration to book in the app"
     )
     online_sales: bool = Field(description="Clients can buy plans in the app")
+    network_scope: Literal["network", "branch"] = Field(
+        default="network",
+        description="network: clients shared by all branches; branch: each branch keeps its own",
+    )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",
         description="Reservations of courts and rooms: paid in the app or at the venue",

@@ -20,6 +20,9 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   // The branch picker appears once the business has more than one active branch.
   const [branches, rents] = await Promise.all([getBranches(), hasBookableRooms()]);
   const currentBranch = branches.find((b) => b.id === branch) ?? null;
+  // A selected branch shows its own logo and color, else the network's.
+  const brandColor = currentBranch ? currentBranch.color : tenant.primary_color;
+  const brandLogo = currentBranch ? currentBranch.logo : logo;
 
   // Only what the user's permissions let them open.
   const allowed = (permission: string) => tenant.permissions.includes(permission);
@@ -63,14 +66,15 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   // The business's brand color replaces the product color inside its own area.
   return (
     <ScopedMessages scopes={["app", "tenant"]}>
-    <div style={brandStyle(tenant.primary_color)} className="brand flex flex-1 flex-col md:flex-row">
-      <aside className="nav-dark print:hidden md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto">
+    <div style={brandStyle(brandColor)} className="brand flex flex-1 flex-col md:flex-row">
+      <aside className="nav-dark print:hidden max-md:border-b max-md:border-border md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto">
         <WorkspaceSwitcher
           name={tenant.name}
-          logo={logo}
+          logo={brandLogo}
+          initial={tenant.name.slice(0, 1)}
           current={tenant.id}
           memberships={me.memberships}
-          branches={branches.map(({ id, name }) => ({ id, name }))}
+          branches={branches.map(({ id, name, ownLogo }) => ({ id, name, logo: ownLogo }))}
           branch={currentBranch?.id ?? null}
         />
         <SideNav items={items} />

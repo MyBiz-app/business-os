@@ -36,6 +36,8 @@ class Email:
     text: str
     html: str | None = None  # a designed version; otherwise the text is put in the MyBiz layout
     locale: str = "he"
+    details: tuple[tuple[str, str], ...] = ()  # label/value lines shown in a card (class, time)
+    kind: str | None = None  # picks the icon in the layout (a notification kind, "roster", ...)
 
 
 def _html(email: Email) -> str:
@@ -43,8 +45,11 @@ def _html(email: Email) -> str:
         return email.html
     lang = email.locale if email.locale in ("he", "en") else "he"
     greeting, _, rest = email.text.partition("\n\n")
-    body = layout.text_block(greeting, lang) + "".join(
-        layout.text_block(block, lang) for block in rest.split("\n\n") if block.strip()
+    card = layout.detail_card(list(email.details), lang) if email.details else ""
+    body = (
+        layout.text_block(greeting, lang)
+        + card
+        + "".join(layout.text_block(block, lang) for block in rest.split("\n\n") if block.strip())
     )
     footer = (
         "הודעה אוטומטית, אין צורך להשיב."
@@ -57,6 +62,7 @@ def _html(email: Email) -> str:
         preheader=greeting.split("\n")[0],
         brand=layout.BRAND,
         footer=[(lang, f"{layout.BRAND} · {footer}")],
+        kind=email.kind,
     )
 
 
@@ -169,6 +175,7 @@ def render(
         "note": str(payload.get("note") or ""),
         "plan": str(payload.get("plan_name", "")),
         "date": _day(payload.get("ends_on")),
+        "friend": str(payload.get("from_name", "")),
     }
     subject = _fill(messages["subject"][kind], values)
     lines = [_fill(messages["greeting"], values), "", _fill(messages["body"][kind], values)]
@@ -176,6 +183,15 @@ def render(
         lines.append(_fill(messages["note"], values))
     lines += ["", _fill(messages["footer"], values)]
     return subject, "\n".join(lines)
+
+
+def details_of(messages: dict[str, Any], payload: dict[str, Any], row: dict[str, Any]) -> tuple:
+    """The class and time of a booking-style notification, for the email's detail card."""
+    service, when = payload.get("service_name"), _when(payload.get("starts_at"), row["time_zone"])
+    if not (service and when):
+        return ()
+    labels = messages.get("details", {})
+    return ((labels.get("service", "Class"), str(service)), (labels.get("when", "When"), when))
 
 
 EMAIL_DETAILS = json.dumps({"channel": "email", "automated": True})
@@ -249,7 +265,16 @@ def send_emails(
             )
             continue
         try:
-            sender.send(Email(to=row["email"], subject=subject, text=body, locale=locale))
+            sender.send(
+                Email(
+                    to=row["email"],
+                    subject=subject,
+                    text=body,
+                    locale=locale,
+                    details=details_of(messages[locale], row["payload"], row),
+                    kind=row["kind"],
+                )
+            )
         except Exception as error:  # a provider error must not stop the batch
             failed += 1
             print(f"email {row['id']} failed: {error}")

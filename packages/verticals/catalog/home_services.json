@@ -5,9 +5,18 @@
   "icon": "wrench",
   "color": "from-slate-500 to-zinc-700",
   "terms": "home_services",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "client",
   "booking_modes": [
     "appointment"
+  ],
+  "client_home": [
+    "next_booking",
+    "addresses",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 1440,
   "booking_requires_plan": false,

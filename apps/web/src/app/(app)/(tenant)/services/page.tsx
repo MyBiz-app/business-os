@@ -11,6 +11,7 @@ import { canReadReports, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/empty-state";
 
 export default async function ServicesPage({ searchParams }: PageProps<"/services">) {
   const { removed } = await searchParams;
@@ -50,7 +51,7 @@ export default async function ServicesPage({ searchParams }: PageProps<"/service
       />
 
       {services.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-10 text-center text-muted">{t("services.empty")}</p>
+        <EmptyState variant="list">{t("services.empty")}</EmptyState>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {services.map((service) => (

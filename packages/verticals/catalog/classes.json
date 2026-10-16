@@ -5,10 +5,20 @@
   "icon": "graduation-cap",
   "color": "from-sky-500 to-blue-600",
   "terms": "classes",
+  "schedule_view": "class_blocks",
+  "social": "on",
   "client_term": "student",
   "booking_modes": [
     "class",
     "appointment"
+  ],
+  "client_home": [
+    "next_booking",
+    "dependents",
+    "membership",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 720,
   "booking_requires_plan": true,
@@ -321,6 +331,7 @@
     },
     {
       "key": "kids_activities",
+      "social": "default_off",
       "status": "live",
       "dependents": "child",
       "dependent_fields": [

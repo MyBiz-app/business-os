@@ -4,11 +4,14 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/back-link";
 import { HoursForm } from "@/components/form/hours-form";
 import { OpeningHoursList } from "@/components/opening-hours";
+import { apiAssetUrl } from "@/lib/api";
 import { weekStartFor } from "@/lib/hours";
-import { canWriteCatalog } from "@/lib/permissions";
+import { canManageSettings, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
+import { branchKindOptions, industryTexts } from "@/lib/verticals";
 
 import { saveOpeningHours, updateLocation } from "../actions";
+import { BranchBranding } from "../branch-branding";
 import { LocationForm } from "../location-form";
 import { Rooms } from "../rooms";
 import { UserText } from "@/components/bidi";
@@ -35,7 +38,9 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
         location={location}
         submitLabel={t("common.save")}
         readOnly={readOnly}
+        kindOptions={branchKindOptions(tenant.vertical, industryTexts(t).text, t("locations.kindSame"))}
       />
+      {canManageSettings(tenant) && <BranchBranding location={location} logo={apiAssetUrl(location.logo_url)} networkColor={tenant.primary_color} />}
       <section aria-labelledby="opening-heading" className="flex flex-col gap-4 card p-6">
         <div className="flex flex-col gap-1">
           <h2 id="opening-heading" className="text-lg font-semibold">

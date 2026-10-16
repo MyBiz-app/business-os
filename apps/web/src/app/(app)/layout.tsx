@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <ScopedMessages scopes={["app"]}>
-    <div className="flex flex-1 flex-col">
+    <div className="app-shell flex flex-1 flex-col">
       <PaletteSync palette={me.palette ?? null} colors={me.palette_colors ?? null} />
       <AppHeader>
         <ThemeToggle />

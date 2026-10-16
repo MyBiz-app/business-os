@@ -5,9 +5,19 @@
   "icon": "stethoscope",
   "color": "from-teal-500 to-emerald-500",
   "terms": "clinic",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "patient",
   "booking_modes": [
     "appointment"
+  ],
+  "client_home": [
+    "next_booking",
+    "health",
+    "documents",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 1440,
   "booking_requires_plan": false,

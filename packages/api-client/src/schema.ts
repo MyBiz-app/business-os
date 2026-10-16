@@ -173,6 +173,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/clients/{client_id}/branches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Branches
+         * @description The branches on the client's "my branches" list.
+         */
+        get: operations["client_branches"];
+        /**
+         * Set Client Branches
+         * @description Replaces the client's "my branches" list. A member kept to some branches may only
+         *     change the list within them.
+         */
+        put: operations["set_client_branches"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/clients/{client_id}": {
         parameters: {
             query?: never;
@@ -1519,6 +1544,24 @@ export interface paths {
         patch: operations["update_room"];
         trace?: never;
     };
+    "/locations/{location_id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Upload Location Logo */
+        put: operations["upload_location_logo"];
+        post?: never;
+        /** Delete Location Logo */
+        delete: operations["delete_location_logo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -2473,6 +2516,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/sessions/publish-week": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Week
+         * @description Opens the next week for clients ahead of the scheduled release (or the rolling horizon).
+         */
+        post: operations["publish_week"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/closed-days": {
         parameters: {
             query?: never;
@@ -2935,6 +2998,26 @@ export interface paths {
         };
         /** My Resource Free Times */
         get: operations["my_resource_free_times"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/resources/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Resource Suggestions
+         * @description The exact slot if free, else the nearest free ones ("When suits you?").
+         */
+        get: operations["my_resource_suggestions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4010,6 +4093,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Business Locations
+         * @description The business's branches with their addresses (the home screen's business details).
+         */
+        get: operations["business_locations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/profile": {
         parameters: {
             query?: never;
@@ -4039,9 +4142,50 @@ export interface paths {
         };
         /**
          * Client Sessions
-         * @description Upcoming sessions in the window (past ones are left out).
+         * @description Upcoming sessions in the window (past ones are left out). Classes the business has not
+         *     released yet are left out too, unless the client already holds a booking in them.
          */
         get: operations["client_sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/schedule-release": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Schedule Release
+         * @description How far ahead classes can be booked and when the next week opens.
+         */
+        get: operations["client_schedule_release"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/instructors/{user_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Instructor Avatar
+         * @description The picture of someone who works in the client's business.
+         */
+        get: operations["instructor_avatar"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4160,6 +4304,296 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/friends/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Friend Settings */
+        get: operations["friend_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Friend Settings */
+        patch: operations["update_friend_settings"];
+        trace?: never;
+    };
+    "/client/friends": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Friends */
+        get: operations["my_friends"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/friends/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Friend Requests */
+        get: operations["friend_requests"];
+        put?: never;
+        /**
+         * Send Friend Request
+         * @description Asks someone to be friends. They are found by their personal code or exact phone / email;
+         *     if they already asked me, the two requests become a friendship.
+         */
+        post: operations["send_friend_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/people/{client_id}/friend-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request Friendship With
+         * @description Asks a person met in a class to be friends (the "add friend" button on their profile).
+         *     Only people the profile endpoint would show me can be asked.
+         */
+        post: operations["request_friendship_with"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/friends/requests/{friendship_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept Friend Request */
+        post: operations["accept_friend_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/friends/requests/{friendship_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Drop Friend Request
+         * @description Declines a request I received, or withdraws one I sent.
+         */
+        delete: operations["drop_friend_request"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/friends/{client_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Friend */
+        delete: operations["remove_friend"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/people/{client_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Person Profile
+         * @description A friend, a pending request, or someone from a class I am in: the few things shown about
+         *     them. Others see no phone, email or history.
+         */
+        get: operations["person_profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/people/{client_id}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Person Avatar */
+        get: operations["person_avatar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/sessions/{session_id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Session Participants
+         * @description Who else is booked into a class (first name, picture, status), for the class block.
+         *     Empty where the category has no participant lists; people who hid themselves are left out,
+         *     except friends.
+         */
+        get: operations["session_participants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Invites
+         * @description Invitations I received and sent that still hold a spot, soonest class first.
+         */
+        get: operations["my_invites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/sessions/{session_id}/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Invite Friend
+         * @description Holds a spot in a class I am booked into for a friend, for two hours (never past the
+         *     class's cancellation deadline). The friend gets a notification and a push.
+         */
+        post: operations["invite_friend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/invites/{invite_id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Invite
+         * @description Takes the held spot: books the class (the same rules as booking it myself).
+         */
+        post: operations["accept_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/invites/{invite_id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline Invite */
+        post: operations["decline_invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/invites/{invite_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Cancel Invite
+         * @description The inviter takes the invitation back and frees the spot.
+         */
+        delete: operations["cancel_invite"];
         options?: never;
         head?: never;
         patch?: never;
@@ -4554,6 +4988,23 @@ export interface paths {
         };
         /** Get Logo */
         get: operations["get_logo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/locations/{location_id}/logo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Location Logo */
+        get: operations["get_location_logo"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5056,6 +5507,11 @@ export interface components {
              */
             sign_requested: boolean;
         };
+        /** Body_upload_location_logo */
+        Body_upload_location_logo: {
+            /** File */
+            file: string;
+        };
         /** Body_upload_logo */
         Body_upload_logo: {
             /** File */
@@ -5196,6 +5652,11 @@ export interface components {
             name: string;
             /** Address */
             address?: string | null;
+            /**
+             * Kind
+             * @description The branch's sub-category (a catalog key); null: as the business
+             */
+            kind?: string | null;
             /**
              * Copy Hours From
              * @description Start with another branch's opening hours
@@ -5657,6 +6118,11 @@ export interface components {
              */
             dependent_id?: string | null;
         };
+        /** ClientBranches */
+        ClientBranches: {
+            /** Location Ids */
+            location_ids: string[];
+        };
         /** ClientBusiness */
         ClientBusiness: {
             /**
@@ -5709,6 +6175,11 @@ export interface components {
              * @default false
              */
             dependent_required: boolean;
+            /**
+             * Home Cards
+             * @description The cards of the client's home screen, top to bottom (from the industry)
+             */
+            home_cards?: string[];
             /**
              * Client Id
              * Format: uuid
@@ -5845,6 +6316,18 @@ export interface components {
              * @description Last check-in, in the business's time zone
              */
             last_visit: string | null;
+        };
+        /** ClientLocation */
+        ClientLocation: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Address */
+            address: string | null;
         };
         /** ClientNote */
         ClientNote: {
@@ -5991,6 +6474,8 @@ export interface components {
             spots_left: number;
             /** Waitlisted */
             waitlisted: number;
+            /** @description Who teaches or serves */
+            instructor?: components["schemas"]["Instructor"] | null;
             /**
              * Address
              * @description My on-site job: where (#42)
@@ -6001,6 +6486,11 @@ export interface components {
              * @description My on-site job's progress
              */
             job_status?: ("scheduled" | "on_the_way" | "in_progress" | "done") | null;
+            /**
+             * Description
+             * @description What the class is, from the catalog
+             */
+            description?: string | null;
             /** @description The client's first live booking */
             my_booking: components["schemas"]["MyBooking"] | null;
             /**
@@ -6802,6 +7292,45 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** FriendRequestCreate */
+        FriendRequestCreate: {
+            /** Code */
+            code?: string | null;
+            /** Phone */
+            phone?: string | null;
+            /** Email */
+            email?: string | null;
+        };
+        /** FriendRequests */
+        FriendRequests: {
+            /** Incoming */
+            incoming: components["schemas"]["Person"][];
+            /** Outgoing */
+            outgoing: components["schemas"]["Person"][];
+        };
+        /** FriendSettings */
+        FriendSettings: {
+            /**
+             * Enabled
+             * @description The business offers friends (catalog `social` flag)
+             */
+            enabled: boolean;
+            /**
+             * Friend Code
+             * @description Personal code: share it as a link or a QR
+             */
+            friend_code: string;
+            /**
+             * Visible
+             * @description Show me in participant lists of classes
+             */
+            visible: boolean;
+        };
+        /** FriendSettingsUpdate */
+        FriendSettingsUpdate: {
+            /** Visible */
+            visible: boolean;
+        };
         /** GettingStarted */
         GettingStarted: {
             /** Steps */
@@ -6979,6 +7508,24 @@ export interface components {
             /** Website */
             website?: string | null;
         };
+        /** Instructor */
+        Instructor: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Name
+             * @description Their name, if they set one
+             */
+            name: string | null;
+            /**
+             * Avatar Url
+             * @description Path of their picture on this API (members of the business only), if any
+             */
+            avatar_url: string | null;
+        };
         /** InstructorOption */
         InstructorOption: {
             /**
@@ -7097,6 +7644,60 @@ export interface components {
              * @enum {string}
              */
             status: "pending" | "expired" | "accepted";
+        };
+        /** Invite */
+        Invite: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Direction
+             * @enum {string}
+             */
+            direction: "received" | "sent";
+            /**
+             * Session Id
+             * Format: uuid
+             */
+            session_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             * @description The spot is held for the friend until then
+             */
+            expires_at: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "accepted" | "declined" | "cancelled" | "expired";
+            /**
+             * Other Client Id
+             * Format: uuid
+             */
+            other_client_id: string;
+            /**
+             * Other First Name
+             * @description Who invited me / whom I invited
+             */
+            other_first_name: string | null;
+        };
+        /** InviteCreate */
+        InviteCreate: {
+            /**
+             * Friend Id
+             * Format: uuid
+             */
+            friend_id: string;
         };
         /** Invoice */
         Invoice: {
@@ -7471,6 +8072,46 @@ export interface components {
             updated_at: string;
             /** Rooms */
             rooms: components["schemas"]["Room"][];
+            /**
+             * Kind
+             * @description The branch's own sub-category, if it set one
+             */
+            kind: string | null;
+            /**
+             * Effective Kind
+             * @description The branch's kind, else the business's industry
+             */
+            effective_kind: string;
+            /**
+             * Schedule View
+             * @description class_blocks | appointments | courts: how clients see this branch's schedule
+             */
+            schedule_view: string;
+            /**
+             * Social
+             * @description on | off | default_off: friends and participant lists
+             */
+            social: string;
+            /**
+             * Primary Color
+             * @description The branch's own color, if it set one
+             */
+            primary_color: string | null;
+            /**
+             * Logo Url
+             * @description The branch's own logo (public path), if it set one
+             */
+            logo_url: string | null;
+            /**
+             * Effective Primary Color
+             * @description The branch's color, else the network's
+             */
+            effective_primary_color: string | null;
+            /**
+             * Effective Logo Url
+             * @description The branch's logo, else the network's logo, else none (show initials)
+             */
+            effective_logo_url: string | null;
         };
         /** LocationCreate */
         LocationCreate: {
@@ -7478,6 +8119,11 @@ export interface components {
             name: string;
             /** Address */
             address?: string | null;
+            /**
+             * Kind
+             * @description The branch's sub-category (a catalog key); null: as the business
+             */
+            kind?: string | null;
         };
         /** LocationUpdate */
         LocationUpdate: {
@@ -7487,6 +8133,16 @@ export interface components {
             address?: string | null;
             /** Active */
             active?: boolean | null;
+            /**
+             * Kind
+             * @description The branch's sub-category (a catalog key); null: as the business
+             */
+            kind?: string | null;
+            /**
+             * Primary Color
+             * @description The branch's own accent color; null falls back to the network's
+             */
+            primary_color?: string | null;
         };
         /** MarkRead */
         MarkRead: {
@@ -7542,6 +8198,11 @@ export interface components {
              * @description Path of the person's own picture on this API, if any
              */
             avatar_url?: string | null;
+            /**
+             * Status Text
+             * @description A short free-text status shown on the profile (up to 80)
+             */
+            status_text?: string | null;
             /** Memberships */
             memberships: components["schemas"]["Membership"][];
             /**
@@ -7863,10 +8524,10 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending";
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite";
             /**
              * Payload
-             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at
              */
             payload: {
                 [key: string]: unknown;
@@ -8062,6 +8723,92 @@ export interface components {
              * Format: date-time
              */
             starts_at: string;
+        };
+        /**
+         * Person
+         * @description What a client may see of another: friends see the full name, others the first name.
+         */
+        Person: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** First Name */
+            first_name: string;
+            /**
+             * Last Name
+             * @description Friends only
+             */
+            last_name: string | null;
+            /**
+             * Status Text
+             * @description The status they wrote in their profile
+             */
+            status_text: string | null;
+            /** Avatar Url */
+            avatar_url: string | null;
+            /**
+             * Friendship
+             * @enum {string}
+             */
+            friendship: "none" | "friends" | "request_sent" | "request_received";
+            /**
+             * Friendship Id
+             * @description Accept or cancel the request with this id
+             */
+            friendship_id: string | null;
+            /** Friends Since */
+            friends_since: string | null;
+            /**
+             * Shared Classes
+             * @description Classes the two of us did together
+             */
+            shared_classes: number;
+        };
+        /** PersonProfile */
+        PersonProfile: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** First Name */
+            first_name: string;
+            /**
+             * Last Name
+             * @description Friends only
+             */
+            last_name: string | null;
+            /**
+             * Status Text
+             * @description The status they wrote in their profile
+             */
+            status_text: string | null;
+            /** Avatar Url */
+            avatar_url: string | null;
+            /**
+             * Friendship
+             * @enum {string}
+             */
+            friendship: "none" | "friends" | "request_sent" | "request_received";
+            /**
+             * Friendship Id
+             * @description Accept or cancel the request with this id
+             */
+            friendship_id: string | null;
+            /** Friends Since */
+            friends_since: string | null;
+            /**
+             * Shared Classes
+             * @description Classes the two of us did together
+             */
+            shared_classes: number;
+            /**
+             * By Service
+             * @description Shared classes per class type (friends only)
+             */
+            by_service: components["schemas"]["SharedByService"][];
         };
         /** Plan */
         Plan: {
@@ -8478,6 +9225,15 @@ export interface components {
              * @description Draft shifts that became visible to the team
              */
             published: number;
+        };
+        /** PublishedWeek */
+        PublishedWeek: {
+            /**
+             * Published Until
+             * Format: date
+             * @description Last local date clients can now book
+             */
+            published_until: string;
         };
         /** PushTokenBody */
         PushTokenBody: {
@@ -8975,6 +9731,53 @@ export interface components {
             /** Price Currency */
             price_currency: string;
         };
+        /** ResourceSuggestion */
+        ResourceSuggestion: {
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Room Id
+             * Format: uuid
+             */
+            room_id: string;
+            /** Room Name */
+            room_name: string;
+            /** Price Amount */
+            price_amount: number;
+            /** Price Currency */
+            price_currency: string;
+            /**
+             * Offset Minutes
+             * @description Minutes from the requested time; negative means earlier
+             */
+            offset_minutes: number;
+        };
+        /** ResourceSuggestions */
+        ResourceSuggestions: {
+            /**
+             * Requested Starts At
+             * Format: date-time
+             */
+            requested_starts_at: string;
+            /**
+             * Exact
+             * @description Rooms free at exactly the requested time (empty when none)
+             */
+            exact: components["schemas"]["ResourceSlot"][];
+            /**
+             * Suggestions
+             * @description Other free starts, nearest to the requested time first, one room per start
+             */
+            suggestions: components["schemas"]["ResourceSuggestion"][];
+        };
         /** ResourceUsageRow */
         ResourceUsageRow: {
             /**
@@ -9276,6 +10079,35 @@ export interface components {
             rooms: components["schemas"]["RoomOption"][];
             /** Instructors */
             instructors: components["schemas"]["InstructorOption"][];
+        };
+        /** ScheduleRelease */
+        ScheduleRelease: {
+            /**
+             * Published Until
+             * Format: date
+             * @description Last local date classes can be booked
+             */
+            published_until: string;
+            /**
+             * Next Release At
+             * @description When the next week opens by itself (weekly release only)
+             */
+            next_release_at: string | null;
+            /**
+             * Weekly Release Weekday
+             * @description 0 = Monday, 6 = Sunday
+             */
+            weekly_release_weekday: number | null;
+            /**
+             * Weekly Release Time
+             * @description Local time the next week opens
+             */
+            weekly_release_time: string | null;
+            /**
+             * Booking Horizon Days
+             * @description Days ahead classes open without a weekly release
+             */
+            booking_horizon_days: number;
         };
         /** ScheduledSession */
         ScheduledSession: {
@@ -9682,6 +10514,18 @@ export interface components {
             key: "branding" | "services" | "schedule" | "team" | "clients" | "card";
             /** Done */
             done: boolean;
+        };
+        /** SharedByService */
+        SharedByService: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Service Name */
+            service_name: string;
+            /** Shared Classes */
+            shared_classes: number;
         };
         /** Shift */
         Shift: {
@@ -10238,6 +11082,22 @@ export interface components {
             /** Cancellation Window Minutes */
             cancellation_window_minutes: number;
             /**
+             * Booking Horizon Days
+             * @description Without a weekly release: how many days ahead classes open
+             * @default 7
+             */
+            booking_horizon_days: number;
+            /**
+             * Weekly Release Weekday
+             * @description Weekly release: 0 = Monday, 6 = Sunday; none: rolling horizon
+             */
+            weekly_release_weekday?: number | null;
+            /**
+             * Weekly Release Time
+             * @description Weekly release: local time the next week opens
+             */
+            weekly_release_time?: string | null;
+            /**
              * Booking Requires Plan
              * @description Clients need a valid plan to book in the app
              */
@@ -10252,6 +11112,13 @@ export interface components {
              * @description Clients can buy plans in the app
              */
             online_sales: boolean;
+            /**
+             * Network Scope
+             * @description network: clients shared by all branches; branch: each branch keeps its own
+             * @default network
+             * @enum {string}
+             */
+            network_scope: "network" | "branch";
             /**
              * Resource Payment
              * @description Reservations of courts and rooms: paid in the app or at the venue
@@ -10389,6 +11256,12 @@ export interface components {
             primary_color?: string | null;
             /** Cancellation Window Minutes */
             cancellation_window_minutes?: number | null;
+            /** Booking Horizon Days */
+            booking_horizon_days?: number | null;
+            /** Weekly Release Weekday */
+            weekly_release_weekday?: number | null;
+            /** Weekly Release Time */
+            weekly_release_time?: string | null;
             /** Booking Requires Plan */
             booking_requires_plan?: boolean | null;
             /** Requires Health Declaration */
@@ -10413,6 +11286,8 @@ export interface components {
              * @description Branches the shifts board opens with; empty means all of them
              */
             shifts_default_branches?: string[] | null;
+            /** Network Scope */
+            network_scope?: ("network" | "branch") | null;
             /** Shifts Publish Auto */
             shifts_publish_auto?: boolean | null;
             /** Shifts Publish Cadence */
@@ -10864,6 +11739,8 @@ export interface components {
             postal_code?: string | null;
             /** Email Roster */
             email_roster?: boolean | null;
+            /** Status Text */
+            status_text?: string | null;
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
@@ -11292,6 +12169,80 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_branches: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_client_branches: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientBranches"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
                 };
             };
             /** @description Validation Error */
@@ -14825,6 +15776,80 @@ export interface operations {
             };
         };
     };
+    upload_location_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_location_logo"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_location_logo: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_team: {
         parameters: {
             query?: never;
@@ -17259,6 +18284,39 @@ export interface operations {
             };
         };
     };
+    publish_week: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishedWeek"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_closed_days: {
         parameters: {
             query?: {
@@ -18293,6 +19351,44 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResourceSlot"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_resource_suggestions: {
+        parameters: {
+            query: {
+                service_id: string;
+                date: string;
+                /** @description Local time, HH:MM */
+                time: string;
+                minutes: number;
+                limit?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResourceSuggestions"];
                 };
             };
             /** @description Validation Error */
@@ -20611,6 +21707,37 @@ export interface operations {
             };
         };
     };
+    business_locations: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientLocation"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_profile: {
         parameters: {
             query?: never;
@@ -20652,6 +21779,8 @@ export interface operations {
                 /** @description First local date (business time zone) */
                 start: string;
                 days?: number;
+                /** @description Only this instructor's */
+                instructor_id?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -20668,6 +21797,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ClientSession"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_schedule_release: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScheduleRelease"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    instructor_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
                 };
             };
             /** @description Validation Error */
@@ -20867,6 +22062,561 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Entitlement"][];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    friend_settings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FriendSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_friend_settings: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FriendSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FriendSettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_friends: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    friend_requests: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FriendRequests"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_friend_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FriendRequestCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_friendship_with: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_friend_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                friendship_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    drop_friend_request: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                friendship_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_friend: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_profile: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonProfile"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    session_participants: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_invites: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invite"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    invite_friend: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invite"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    accept_invite: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                invite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientSession"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decline_invite: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                invite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_invite: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                invite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
@@ -21723,6 +23473,39 @@ export interface operations {
             header?: never;
             path: {
                 tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_location_logo: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
             };
             cookie?: never;
         };

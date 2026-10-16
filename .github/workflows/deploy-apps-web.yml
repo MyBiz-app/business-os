@@ -1,7 +1,7 @@
-name: Deploy the Expo apps to the web (Vercel)
+name: Deploy the Expo app to the web (Vercel)
 
-# Builds the three Expo apps as static web apps on the runner and uploads the finished files
-# to Vercel (one Vercel project per app, created on the first run). Started by hand from the
+# Builds the Expo app as a static web app on the runner and uploads the finished files
+# to Vercel (project mybiz-client-app). The retired business and staff web addresses only redirect to it. Started by hand from the
 # Actions tab, so nothing is published until the owner asks for it.
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
         description: "Which app"
         type: choice
         default: all
-        options: [all, client-app, business-app, staff-app]
+        options: [all, client-app, legacy-redirects]
 
 env:
   # Not a secret: names the Vercel team. Passed as --scope (VERCEL_ORG_ID alone is rejected by the CLI).
@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [client-app, business-app, staff-app]
+        app: [client-app]
     steps:
       - name: Skip apps that were not asked for
         id: pick
@@ -70,3 +70,32 @@ jobs:
           test -n "$VERCEL_TOKEN" || { echo "::error::VERCEL_TOKEN is not set"; exit 1; }
           npx --yes "$VERCEL_CLI" deploy --prod --yes --name "mybiz-${{ matrix.app }}" --scope "$VERCEL_SCOPE" --token="$VERCEL_TOKEN" | tee url.txt
           echo "### ${{ matrix.app }}: $(tail -n1 url.txt)" >> "$GITHUB_STEP_SUMMARY"
+
+  # The business and MyBiz team apps are part of the one app now. Their old Vercel projects stay
+  # (nothing is deleted) but only redirect to it.
+  legacy-redirects:
+    name: Redirect ${{ matrix.project }}
+    if: inputs.app == 'all' || inputs.app == 'legacy-redirects'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [mybiz-business-app, mybiz-staff-app]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Upload the redirect to Vercel
+        working-directory: infra/legacy-redirects
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -o pipefail
+          test -n "$VERCEL_TOKEN" || { echo "::error::VERCEL_TOKEN is not set"; exit 1; }
+          npx --yes "$VERCEL_CLI" deploy --prod --yes --name "${{ matrix.project }}" --scope "$VERCEL_SCOPE" --token="$VERCEL_TOKEN" | tee url.txt
+          echo "### ${{ matrix.project }}: $(tail -n1 url.txt)" >> "$GITHUB_STEP_SUMMARY"

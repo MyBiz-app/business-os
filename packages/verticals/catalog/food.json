@@ -5,10 +5,18 @@
   "icon": "utensils",
   "color": "from-red-500 to-orange-600",
   "terms": "food",
+  "schedule_view": "class_blocks",
+  "social": "off",
   "client_term": "guest",
   "booking_modes": [
     "appointment",
     "class"
+  ],
+  "client_home": [
+    "next_booking",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 1440,
   "booking_requires_plan": false,

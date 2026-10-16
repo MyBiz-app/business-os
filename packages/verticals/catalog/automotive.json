@@ -5,9 +5,18 @@
   "icon": "car",
   "color": "from-amber-500 to-orange-500",
   "terms": "automotive",
+  "schedule_view": "appointments",
+  "social": "off",
   "client_term": "customer",
   "booking_modes": [
     "appointment"
+  ],
+  "client_home": [
+    "next_booking",
+    "rebook",
+    "shortcuts",
+    "updates",
+    "business_info"
   ],
   "cancellation_window_minutes": 1440,
   "booking_requires_plan": false,
