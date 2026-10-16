@@ -2,11 +2,12 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { test } from "node:test";
 
-import { ALL_AVATARS, DEFAULT_AGENTS, GALLERY_AVATARS } from "../src/agents.ts";
+import { ALL_AVATARS, DEFAULT_AGENTS, GALLERY_AVATARS, ILLUSTRATED_DEFAULTS } from "../src/agents.ts";
 
-test("nine default agents and sixteen gallery faces, with distinct keys", () => {
+test("nine default agents, sixteen new gallery faces and the nine original illustrations, with distinct keys", () => {
   assert.equal(DEFAULT_AGENTS.length, 9);
   assert.equal(GALLERY_AVATARS.length, 16);
+  assert.equal(ILLUSTRATED_DEFAULTS.length, 9);
   assert.equal(new Set(ALL_AVATARS.map((a) => a.key)).size, 25);
 });
 

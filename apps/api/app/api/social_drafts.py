@@ -1,4 +1,4 @@
-"""The post drafts Shira (the content agent) prepares, for the owner to look at (migration 0096).
+"""The post drafts Sophie (the content agent) prepares, for the owner to look at (migration 0096).
 
 Publishing goes through the AI confirmation card, never from here."""
 
