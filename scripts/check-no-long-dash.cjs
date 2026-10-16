@@ -1,9 +1,9 @@
 // Fails when an em dash or en dash appears in tracked text files (product rule: plain "-" only).
-// Escapes keep this file free of the characters it forbids. Run: node scripts/check-no-long-dash.cjs
+// Built from char codes so this file stays free of the characters it forbids. Run: node scripts/check-no-long-dash.cjs
 const { execFileSync } = require("node:child_process");
 const { readFileSync } = require("node:fs");
 
-const FORBIDDEN = /[—–]/;
+const FORBIDDEN = new RegExp("[" + String.fromCharCode(0x2014, 0x2013) + "]");
 // Generated, vendored or binary-ish files and the original owner spec are exempt.
 const SKIP = [/^pnpm-lock\.yaml$/, /^docs\/spec\//, /^packages\/api-client\/(openapi\.json|src\/schema\.ts)$/];
 
