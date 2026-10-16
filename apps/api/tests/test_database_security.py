@@ -9,12 +9,14 @@ GLOBAL_TABLES = {
     "users",
     "platform_staff",
     "platform_audit",
+    "platform_ai_settings",
+    "platform_ai_conversations",
     "push_tokens",
     "job_runs",
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
 # API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.
-PLATFORM_TABLES = {"contact_requests", "platform_audit"}
+PLATFORM_TABLES = {"contact_requests", "platform_audit", "platform_ai_pauses"}
 
 
 def _query(engine: Engine, sql: str) -> list:

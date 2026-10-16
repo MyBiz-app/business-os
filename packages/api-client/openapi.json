@@ -24577,6 +24577,374 @@
         }
       }
     },
+    "/platform/ai/costs": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Ai Costs",
+        "description": "AI cost per business against what its AI modules earn (the margin), biggest users first.",
+        "operationId": "ai_costs",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AICostBoard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/settings": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Ai Settings",
+        "operationId": "ai_settings",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AISettings"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Change Ai Settings",
+        "description": "Chooses the model for each tier (empty: the default) and flips the emergency stop that\nhalts AI for every business at once. Both are written to the console audit log.",
+        "operationId": "change_ai_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AISettingsChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AISettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/businesses/{tenant_id}/pause": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Pause Business Ai",
+        "description": "Stops (or resumes) AI for one business, with the reason in both audit logs.",
+        "operationId": "pause_business_ai",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PauseChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AISettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/assistant/conversations": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Console List Chats",
+        "operationId": "console_list_chats",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ChatSummary"
+                  },
+                  "type": "array",
+                  "title": "Response Console List Chats"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Console Start Chat",
+        "operationId": "console_start_chat",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ChatStart"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chat"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/ai/assistant/conversations/{chat_id}": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Console Get Chat",
+        "operationId": "console_get_chat",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Chat Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chat"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/ai/assistant/conversations/{chat_id}/messages": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Console Send Message",
+        "operationId": "console_send_message",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Chat Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Question"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Chat"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/support-access": {
       "get": {
         "tags": [
@@ -28389,6 +28757,225 @@
   },
   "components": {
     "schemas": {
+      "AICostBoard": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "total_credits": {
+            "type": "number",
+            "title": "Total Credits"
+          },
+          "previous_total_credits": {
+            "type": "number",
+            "title": "Previous Total Credits"
+          },
+          "revenue": {
+            "items": {
+              "$ref": "#/components/schemas/CurrencyRevenue"
+            },
+            "type": "array",
+            "title": "Revenue"
+          },
+          "businesses": {
+            "items": {
+              "$ref": "#/components/schemas/BusinessAICost"
+            },
+            "type": "array",
+            "title": "Businesses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days",
+          "total_credits",
+          "previous_total_credits",
+          "revenue",
+          "businesses"
+        ],
+        "title": "AICostBoard"
+      },
+      "AIPause": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "paused_by": {
+            "type": "string",
+            "title": "Paused By"
+          },
+          "paused_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Paused At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "reason",
+          "paused_by",
+          "paused_at"
+        ],
+        "title": "AIPause"
+      },
+      "AISettings": {
+        "properties": {
+          "kill_all": {
+            "type": "boolean",
+            "title": "Kill All"
+          },
+          "model_fast": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Fast"
+          },
+          "model_standard": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Standard"
+          },
+          "model_strong": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Strong"
+          },
+          "defaults": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Defaults",
+            "description": "The model each tier uses when none is chosen"
+          },
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/ModelChoice"
+            },
+            "type": "array",
+            "title": "Choices"
+          },
+          "pauses": {
+            "items": {
+              "$ref": "#/components/schemas/AIPause"
+            },
+            "type": "array",
+            "title": "Pauses"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kill_all",
+          "model_fast",
+          "model_standard",
+          "model_strong",
+          "defaults",
+          "choices",
+          "pauses",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "AISettings"
+      },
+      "AISettingsChange": {
+        "properties": {
+          "kill_all": {
+            "type": "boolean",
+            "title": "Kill All"
+          },
+          "model_fast": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Fast"
+          },
+          "model_standard": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Standard"
+          },
+          "model_strong": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Strong"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kill_all"
+        ],
+        "title": "AISettingsChange"
+      },
       "AISpend": {
         "properties": {
           "today": {
@@ -30662,6 +31249,66 @@
         ],
         "title": "BreakdownItem"
       },
+      "BusinessAICost": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits",
+            "description": "AI credits (US cents of model cost) in the window"
+          },
+          "previous_credits": {
+            "type": "number",
+            "title": "Previous Credits",
+            "description": "Credits in the window before, for the trend"
+          },
+          "revenue_monthly_minor": {
+            "type": "integer",
+            "title": "Revenue Monthly Minor",
+            "description": "Monthly price of its AI modules, minor units"
+          },
+          "margin_usd_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Usd Minor",
+            "description": "Revenue minus cost in US cents, scaled to a month; only for USD businesses"
+          },
+          "paused": {
+            "type": "boolean",
+            "title": "Paused"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "currency",
+          "credits",
+          "previous_credits",
+          "revenue_monthly_minor",
+          "margin_usd_minor",
+          "paused"
+        ],
+        "title": "BusinessAICost"
+      },
       "BusinessInvoice": {
         "properties": {
           "id": {
@@ -31232,6 +31879,118 @@
           "billing"
         ],
         "title": "CatalogModule"
+      },
+      "Chat": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth"
+            ],
+            "title": "Role"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "turns": {
+            "items": {
+              "$ref": "#/components/schemas/app__api__platform_ai__Turn"
+            },
+            "type": "array",
+            "title": "Turns"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "title",
+          "turns",
+          "credits",
+          "updated_at"
+        ],
+        "title": "Chat"
+      },
+      "ChatStart": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "manager",
+              "support",
+              "health",
+              "billing",
+              "growth"
+            ],
+            "title": "Role",
+            "default": "manager"
+          }
+        },
+        "type": "object",
+        "title": "ChatStart"
+      },
+      "ChatSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "title",
+          "updated_at"
+        ],
+        "title": "ChatSummary"
       },
       "Checkout": {
         "properties": {
@@ -33810,6 +34569,24 @@
           "monthly_credits"
         ],
         "title": "CreditLimit"
+      },
+      "CurrencyRevenue": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "revenue_monthly_minor": {
+            "type": "integer",
+            "title": "Revenue Monthly Minor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "revenue_monthly_minor"
+        ],
+        "title": "CurrencyRevenue"
       },
       "CustomAgent": {
         "properties": {
@@ -38465,6 +39242,39 @@
         ],
         "title": "MetricValue"
       },
+      "ModelChoice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "fast",
+              "standard",
+              "strong"
+            ],
+            "title": "Tier"
+          },
+          "vendor": {
+            "type": "string",
+            "title": "Vendor"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tier",
+          "vendor",
+          "enabled"
+        ],
+        "title": "ModelChoice"
+      },
       "ModulesChange": {
         "properties": {
           "modules": {
@@ -39046,6 +39856,31 @@
         ],
         "title": "PaletteColors",
         "description": "The three colors a person picks for \"my own colors\" (`#rrggbb`). The app derives every\nother color from them, so any combination is safe to store."
+      },
+      "PauseChange": {
+        "properties": {
+          "paused": {
+            "type": "boolean",
+            "title": "Paused"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "paused"
+        ],
+        "title": "PauseChange"
       },
       "PaymentMethod": {
         "properties": {
@@ -48145,6 +48980,28 @@
           "first_name"
         ],
         "title": "ProfileUpdate"
+      },
+      "app__api__platform_ai__Turn": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "Turn"
       },
       "app__api__routes__ProfileUpdate": {
         "properties": {
