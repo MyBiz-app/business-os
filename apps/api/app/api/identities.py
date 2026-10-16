@@ -81,12 +81,13 @@ def _summary(row: Any, can_reveal: bool = False) -> IdentitySummary:
 
 
 def _row(session: Session, column: str, subject_id: UUID) -> Any:
+    # Member and client ids are UUIDs of different tables, so one id never matches both columns.
     return (
         session.execute(
-            text(
-                f"SELECT id_type, country, id_last4, id_number_encrypted"
-                f" FROM app.person_identities WHERE {column} = :id"
-            ),
+            text("""
+                SELECT id_type, country, id_last4, id_number_encrypted
+                FROM app.person_identities WHERE user_id = :id OR client_id = :id
+            """),
             {"id": subject_id},
         )
         .mappings()
@@ -114,6 +115,29 @@ def _audit(
     )
 
 
+_UPSERT_TAIL = """
+    SET id_type = excluded.id_type, country = excluded.country,
+        id_number_encrypted = excluded.id_number_encrypted,
+        id_hash = excluded.id_hash, id_last4 = excluded.id_last4, updated_at = now()
+"""
+_INSERT_MEMBER = (
+    """
+    INSERT INTO app.person_identities
+        (tenant_id, user_id, id_type, country, id_number_encrypted, id_hash, id_last4)
+    VALUES (:tenant_id, :subject, :id_type, :country, :encrypted, :hash, :last4)
+    ON CONFLICT (tenant_id, user_id) WHERE user_id IS NOT NULL DO UPDATE"""
+    + _UPSERT_TAIL
+)
+_INSERT_CLIENT = (
+    """
+    INSERT INTO app.person_identities
+        (tenant_id, client_id, id_type, country, id_number_encrypted, id_hash, id_last4)
+    VALUES (:tenant_id, :subject, :id_type, :country, :encrypted, :hash, :last4)
+    ON CONFLICT (tenant_id, client_id) WHERE client_id IS NOT NULL DO UPDATE"""
+    + _UPSERT_TAIL
+)
+
+
 def _store(
     session: Session, tenant_id: UUID, column: str, subject_id: UUID, body: IdentityBody
 ) -> IdentitySummary:
@@ -123,18 +147,10 @@ def _store(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=f"invalid_id_{error}"
         ) from error
+    insert = _INSERT_MEMBER if column == "user_id" else _INSERT_CLIENT
     try:
         session.execute(
-            text(f"""
-                INSERT INTO app.person_identities
-                    (tenant_id, {column}, id_type, country, id_number_encrypted, id_hash,
-                     id_last4)
-                VALUES (:tenant_id, :subject, :id_type, :country, :encrypted, :hash, :last4)
-                ON CONFLICT (tenant_id, {column}) WHERE {column} IS NOT NULL DO UPDATE
-                SET id_type = excluded.id_type, country = excluded.country,
-                    id_number_encrypted = excluded.id_number_encrypted,
-                    id_hash = excluded.id_hash, id_last4 = excluded.id_last4, updated_at = now()
-            """),
+            text(insert),
             {
                 "tenant_id": tenant_id,
                 "subject": subject_id,
@@ -164,7 +180,7 @@ def _reveal(
 
 def _remove(session: Session, tenant_id: UUID, column: str, subject_id: UUID, kind: str) -> None:
     removed = session.execute(
-        text(f"DELETE FROM app.person_identities WHERE {column} = :id"),
+        text("DELETE FROM app.person_identities WHERE user_id = :id OR client_id = :id"),
         {"id": subject_id},
     ).rowcount
     if removed:
@@ -248,10 +264,12 @@ def _client_in_reach(context: TenantContext, client_id: UUID) -> None:
     ensure_branch_visible(context, row["home_location_id"])
 
 
-def _mode(session: Session, tenant_column: str) -> str:
-    return session.execute(
-        text(f"SELECT client_id_number FROM app.tenants WHERE id = {tenant_column}")
-    ).scalar_one()
+def _mode(session: Session, acting_as_client: bool = False) -> str:
+    if acting_as_client:
+        sql = "SELECT client_id_number FROM app.tenants WHERE id = app.client_tenant_id()"
+    else:
+        sql = "SELECT client_id_number FROM app.tenants WHERE id = app.current_tenant_id()"
+    return session.execute(text(sql)).scalar_one()
 
 
 def _client_summary(row: Any, mode: str, can_reveal: bool) -> ClientIdentity:
@@ -263,7 +281,7 @@ def get_client_identity(client_id: UUID, context: ClientsReadDep) -> ClientIdent
     _client_in_reach(context, client_id)
     return _client_summary(
         _row(context.session, "client_id", client_id),
-        _mode(context.session, "app.current_tenant_id()"),
+        _mode(context.session),
         Permission.IDENTITY_READ in context.permissions,
     )
 
@@ -273,7 +291,7 @@ def set_client_identity(
     client_id: UUID, body: IdentityBody, context: ClientsWriteDep
 ) -> ClientIdentity:
     _client_in_reach(context, client_id)
-    mode = _mode(context.session, "app.current_tenant_id()")
+    mode = _mode(context.session)
     if mode == "off":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="client_id_off")
     summary = _store(context.session, context.tenant_id, "client_id", client_id, body)
@@ -304,14 +322,14 @@ def reveal_client_identity(client_id: UUID, context: RevealDep) -> Revealed:
 def get_own_client_identity(context: ClientDep) -> ClientIdentity:
     return _client_summary(
         _row(context.session, "client_id", context.client_id),
-        _mode(context.session, "app.client_tenant_id()"),
+        _mode(context.session, acting_as_client=True),
         can_reveal=True,
     )
 
 
 @router.put("/client/identity")
 def set_own_client_identity(body: IdentityBody, context: ClientDep) -> ClientIdentity:
-    mode = _mode(context.session, "app.client_tenant_id()")
+    mode = _mode(context.session, acting_as_client=True)
     if mode == "off":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="client_id_off")
     summary = _store(context.session, context.tenant_id, "client_id", context.client_id, body)
