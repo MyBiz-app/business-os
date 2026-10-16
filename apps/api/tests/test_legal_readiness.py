@@ -87,7 +87,8 @@ def test_the_licence_is_optional_and_reminded_sixty_days_ahead(
 ) -> None:
     headers = studio["headers"]
     assert readiness(client, headers)["license_status"] == "none"
-    assert "license_expiring" not in {e["kind"] for e in client.get("/attention", headers=headers).json()}
+    before = {e["kind"] for e in client.get("/attention", headers=headers).json()}
+    assert "license_expiring" not in before
 
     def set_expiry(days: int) -> None:
         client.patch(
@@ -120,9 +121,7 @@ def test_the_licence_is_optional_and_reminded_sixty_days_ahead(
 def test_only_settings_managers_see_these_details(
     client: TestClient, auth: AuthHeaders, studio: dict
 ) -> None:
-    client.patch(
-        "/tenants/current", json={"address_line": "1 Main St"}, headers=studio["headers"]
-    )
+    client.patch("/tenants/current", json={"address_line": "1 Main St"}, headers=studio["headers"])
     coach = auth(studio["coach"], studio["tenant_id"])
     assert client.get("/tenants/current", headers=coach).json()["address_line"] is None
     assert client.get("/tenants/current/readiness", headers=coach).status_code == 403
