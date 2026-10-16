@@ -319,7 +319,7 @@ def test_client_home_cards_and_branches_follow_the_business(
     headers = auth(user, studio["tenant_id"])
     branches = client.get("/client/locations", headers=headers)
     assert branches.status_code == 200, branches.text
-    assert all({"id", "name", "address"} <= set(b) for b in branches.json())
+    assert all({"id", "name", "address", "kind"} <= set(b) for b in branches.json())
 
     # A client who never joined this business sees none of its branches.
     stranger = client.get("/client/locations", headers=auth(uuid4(), studio["tenant_id"]))
