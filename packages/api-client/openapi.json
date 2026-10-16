@@ -8113,6 +8113,74 @@
         }
       }
     },
+    "/messages/placeholders": {
+      "get": {
+        "tags": [
+          "messages"
+        ],
+        "summary": "Placeholders",
+        "description": "The variables a message may use, grouped, with sample values for the live preview.",
+        "operationId": "placeholders",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Placeholders"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/messages/audiences": {
       "get": {
         "tags": [
@@ -34134,6 +34202,14 @@
             ],
             "title": "Preview",
             "description": "The text as the first recipient gets it"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceholderWarning"
+            },
+            "type": "array",
+            "title": "Warnings",
+            "description": "Variables some recipients have no value for (set a fallback with {name|text})"
           }
         },
         "type": "object",
@@ -42956,6 +43032,71 @@
           "by_service"
         ],
         "title": "PersonProfile"
+      },
+      "PlaceholderGroup": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Variables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "variables"
+        ],
+        "title": "PlaceholderGroup"
+      },
+      "PlaceholderWarning": {
+        "properties": {
+          "variable": {
+            "type": "string",
+            "title": "Variable"
+          },
+          "recipients": {
+            "type": "integer",
+            "title": "Recipients",
+            "description": "How many recipients have no value and no fallback"
+          }
+        },
+        "type": "object",
+        "required": [
+          "variable",
+          "recipients"
+        ],
+        "title": "PlaceholderWarning"
+      },
+      "Placeholders": {
+        "properties": {
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceholderGroup"
+            },
+            "type": "array",
+            "title": "Groups"
+          },
+          "sample": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Sample",
+            "description": "Values of a made-up client, for the preview"
+          }
+        },
+        "type": "object",
+        "required": [
+          "groups",
+          "sample"
+        ],
+        "title": "Placeholders"
       },
       "Placement": {
         "properties": {

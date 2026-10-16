@@ -1499,6 +1499,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/messages/placeholders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Placeholders
+         * @description The variables a message may use, grouped, with sample values for the live preview.
+         */
+        get: operations["placeholders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/messages/audiences": {
         parameters: {
             query?: never;
@@ -7490,6 +7510,11 @@ export interface components {
              * @description The text as the first recipient gets it
              */
             preview: string | null;
+            /**
+             * Warnings
+             * @description Variables some recipients have no value for (set a fallback with {name|text})
+             */
+            warnings?: components["schemas"]["PlaceholderWarning"][];
         };
         /** Catalog */
         Catalog: {
@@ -10901,6 +10926,35 @@ export interface components {
              * @description Shared classes per class type (friends only)
              */
             by_service: components["schemas"]["SharedByService"][];
+        };
+        /** PlaceholderGroup */
+        PlaceholderGroup: {
+            /** Key */
+            key: string;
+            /** Variables */
+            variables: string[];
+        };
+        /** PlaceholderWarning */
+        PlaceholderWarning: {
+            /** Variable */
+            variable: string;
+            /**
+             * Recipients
+             * @description How many recipients have no value and no fallback
+             */
+            recipients: number;
+        };
+        /** Placeholders */
+        Placeholders: {
+            /** Groups */
+            groups: components["schemas"]["PlaceholderGroup"][];
+            /**
+             * Sample
+             * @description Values of a made-up client, for the preview
+             */
+            sample: {
+                [key: string]: string;
+            };
         };
         /** Placement */
         Placement: {
@@ -18437,6 +18491,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    placeholders: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Placeholders"];
                 };
             };
             /** @description Validation Error */

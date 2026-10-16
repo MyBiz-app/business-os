@@ -4090,10 +4090,26 @@
     "myTemplates": "My templates",
     "suggested": "Suggestions",
     "text": "Message",
-    "insert": "Insert:",
     "variables": {
       "first_name": "First name",
-      "business": "Business name"
+      "last_name": "Last name",
+      "full_name": "Full name",
+      "phone": "Phone",
+      "email": "Email",
+      "birthday": "Birthday",
+      "id_last4": "ID number (last 4 digits)",
+      "plan_name": "Plan name",
+      "plan_expires": "Plan ends on",
+      "sessions_left": "Sessions left",
+      "next_booking": "Next booking (date and time)",
+      "next_service": "Next booking (service)",
+      "staff_name": "Next booking (instructor)",
+      "business": "Business name",
+      "branch": "Branch",
+      "branch_address": "Branch address",
+      "app_link": "App link",
+      "join_code": "Join code",
+      "booking_link": "Booking link"
     },
     "sendTo": "{count, plural, =0 {No recipients} one {Send to 1 recipient} other {Send to # recipients}}",
     "sentTo": "{count, plural, =0 {Sent to nobody} one {Sent to 1 recipient} other {Sent to # recipients}}",
@@ -4145,7 +4161,18 @@
     "promotional": "This is an advertisement",
     "promotionalHint": "Goes only to people who agreed to receive offers.",
     "channelsHint": "Pick one or more. Email, app notification and pop-up reach people with an email or an app account.",
-    "staffChannelsHint": "Staff are reached by email, app notification or pop-up."
+    "staffChannelsHint": "Staff are reached by email, app notification or pop-up.",
+    "variableGroups": {
+      "client": "Client",
+      "plan": "Plan",
+      "booking": "Appointments",
+      "business": "Business and branch"
+    },
+    "addVariable": "Add variable",
+    "fallbackLabel": "If the person has no value",
+    "fallbackPlaceholder": "e.g. dear member",
+    "fallbackHint": "Optional. Written after the variable as '{'name|text'}'.",
+    "missingValue": "{count, plural, one {1 recipient has} other {# recipients have}} no \"{variable}\" and the text has no fallback. Use '{'name|text'}' to set one."
   },
   "reviews": {
     "title": "Satisfaction ({count} days)",
