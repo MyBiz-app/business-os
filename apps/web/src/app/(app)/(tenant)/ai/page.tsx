@@ -26,11 +26,13 @@ export default async function AiTeamPage() {
   if (!canUseAssistant(tenant)) redirect("/dashboard");
   if (!tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro")) redirect("/upgrade/ai");
 
-  const [team, status, catalog, branches, tasks] = await Promise.all([
+  const [team, status, catalog, branches, roles, tasks] = await Promise.all([
     api.GET("/ai/team", { params: scope }).then(unwrap),
     api.GET("/ai/status", { params: scope }).then(unwrap),
     api.GET("/modules/catalog", { params: { query: { currency: tenant.currency } } }).then(unwrap),
     getBranches(),
+    // Choosing who may use an agent lists the business's own roles; without access to them the built-in ones remain.
+    api.GET("/roles", { params: scope }).then((r) => r.data?.custom.map(({ id, name }) => ({ id, name })) ?? []),
     api.GET("/ai/tasks", { params: scope }).then(unwrap),
   ]);
 
@@ -43,8 +45,7 @@ export default async function AiTeamPage() {
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
-      <TeamView team={team} branches={branches.map(({ id, name }) => ({ id, name }))} enabled={status.enabled} demo={status.demo} upsells={upsells} canAdd={canManageSettings(tenant)} timeZone={tenant.time_zone} />
-      <TasksBoard board={tasks} agents={Object.fromEntries(team.agents.map((a) => [a.key, a.name]))} timeZone={tenant.time_zone} />
-    </Container>
+      <TeamView team={team} branches={branches.map(({ id, name }) => ({ id, name }))} enabled={status.enabled} demo={status.demo} upsells={upsells} canAdd={canManageSettings(tenant)} timeZone={tenant.time_zone} roles={roles} />
+      <TasksBoard board={tasks} agents={Object.fromEntries(team.agents.map((a) => [a.key, a.name]))} timeZone={tenant.time_zone} />    </Container>
   );
 }

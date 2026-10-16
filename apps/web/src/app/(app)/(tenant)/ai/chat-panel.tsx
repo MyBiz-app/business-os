@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, History, Plus, SendHorizontal } from "lucide-react";
+import { ArrowLeft, History, Plus, SendHorizontal, Settings } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
@@ -150,9 +150,11 @@ type Props = {
   onHandoff: (agentKey: string) => void;
   onDecide: (actionId: string, decision: "confirm" | "reject") => void;
   onBack: () => void;
+  /** Opens the agent's card for those who may change it. */
+  onEdit?: () => void;
 };
 
-export function ChatPanel({ agent, agents, conversation, waitingFor, error, enabled, branches, scope, history, timeZone, onScope, onSend, onSwitch, onNew, onOpen, onHandoff, onDecide, onBack }: Props) {
+export function ChatPanel({ agent, agents, conversation, waitingFor, error, enabled, branches, scope, history, timeZone, onScope, onSend, onSwitch, onNew, onOpen, onHandoff, onDecide, onBack, onEdit }: Props) {
   const t = useTranslations("aiTeam");
   const tAssistant = useTranslations("assistant");
   const locale = useLocale();
@@ -189,6 +191,12 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
           </p>
         </div>
         <ScopePicker branches={branches} value={scope} onChange={onScope} />
+        {onEdit && (
+          <button type="button" onClick={onEdit} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+            <Settings aria-hidden="true" className="size-4" />
+            <span className="sr-only sm:not-sr-only">{t("edit.open")}</span>
+          </button>
+        )}
         <details className="relative">
           <summary className="btn-secondary inline-flex cursor-pointer list-none items-center gap-2 px-3 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
             <History aria-hidden="true" className="size-4" />

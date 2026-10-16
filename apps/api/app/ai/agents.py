@@ -227,6 +227,7 @@ class Agent:
     avatar_kind: str | None = None
     avatar_preset: str | None = None
     avatar_key: str | None = None
+    draft: bool = False
 
 
 def _row_overrides(row: Any | None) -> dict[str, Any]:
@@ -265,6 +266,7 @@ def resolve(spec: AgentSpec | None, row: Any | None, locale: str) -> Agent:
         avatar_kind=data.get("avatar_kind"),
         avatar_preset=data.get("avatar_preset"),
         avatar_key=data.get("avatar_key"),
+        draft=bool(data.get("draft")),
     )
 
 
@@ -301,7 +303,7 @@ def state_of(db: Session, agent: Agent, role_keys: frozenset[str]) -> tuple[Stat
 
     Order: switched off by the owner, then the business lacks a module, then the user's role.
     Every agent needs an AI module (AI Basic or AI Pro) on top of its own."""
-    if not agent.enabled:
+    if not agent.enabled or agent.draft:
         return "disabled", None
     if not has_module(db, *_AI):
         return "locked", "ai_basic"

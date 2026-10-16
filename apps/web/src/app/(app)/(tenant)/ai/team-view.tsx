@@ -1,7 +1,8 @@
 "use client";
 
-import { FlaskConical, LayoutGrid, Network } from "lucide-react";
+import { FlaskConical, LayoutGrid, Network, UserPlus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 import {
@@ -15,6 +16,9 @@ import {
   startConversation,
 } from "./actions";
 import { AgentDialog } from "./agent-dialog";
+import { AgentEditor } from "./agent-editor";
+import type { RoleOption } from "./agent-fields";
+import { AgentWizard } from "./agent-wizard";
 import { ChatPanel } from "./chat-panel";
 import { type Branch } from "./scope-picker";
 import { TeamList } from "./team-list";
@@ -31,9 +35,11 @@ type Props = {
   /** Whoever may change the plan sees "add to plan"; the others are told to ask the owner. */
   canAdd: boolean;
   timeZone: string;
+  /** The business's own roles, for choosing who may use an agent. */
+  roles: RoleOption[];
 };
 
-export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone }: Props) {
+export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZone, roles }: Props) {
   const t = useTranslations("aiTeam");
   const tAssistant = useTranslations("assistant");
   const locale = useLocale();
@@ -43,6 +49,9 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [scope, setScope] = useState<string[] | null>(null);
   const [view, setView] = useState<"map" | "list">("map");
   const [closedAgent, setClosedAgent] = useState<Agent | null>(null);
+  const router = useRouter();
+  const [wizard, setWizard] = useState(false);
+  const [editing, setEditing] = useState<Agent | null>(null);
   const [waitingFor, setWaitingFor] = useState<string | null>(null);
   const [error, setError] = useState<ChatError | null>(null);
   // The chat whose last exchange the next new chat carries over (switching agent or branches).
@@ -154,6 +163,12 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
+        {team.can_manage && (
+          <button type="button" onClick={() => setWizard(true)} className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+            <UserPlus aria-hidden="true" className="size-4" />
+            {t("wizard.hire")}
+          </button>
+        )}
         <div role="group" aria-label={t("view")} className="hidden items-center gap-1 rounded-full border border-border p-1 md:flex">
           {(["map", "list"] as const).map((mode) => {
             const Icon = mode === "map" ? Network : LayoutGrid;
@@ -206,6 +221,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
             onOpen={openChat}
             onHandoff={handoff}
             onDecide={decide}
+            onEdit={team.can_manage ? () => setEditing(agent) : undefined}
             onBack={() => {
               setSelected(null);
               setConversation(null);
@@ -214,7 +230,49 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         )}
       </div>
 
-      {closedAgent && <AgentDialog agent={closedAgent} upsell={closedAgent.upsell_module ? (upsells[closedAgent.upsell_module] ?? null) : null} canAdd={canAdd} onClose={() => setClosedAgent(null)} />}
+      {closedAgent && (
+        <AgentDialog
+          agent={closedAgent}
+          upsell={closedAgent.upsell_module ? (upsells[closedAgent.upsell_module] ?? null) : null}
+          canAdd={canAdd}
+          onEdit={team.can_manage && closedAgent.state === "disabled" ? () => {
+            setEditing(closedAgent);
+            setClosedAgent(null);
+          } : undefined}
+          onClose={() => setClosedAgent(null)}
+        />
+      )}
+      {wizard && (
+        <AgentWizard
+          branches={branches}
+          roles={roles}
+          limit={team.custom_limit}
+          count={team.custom_count}
+          onClose={() => setWizard(false)}
+          onDone={() => {
+            setWizard(false);
+            router.refresh();
+          }}
+        />
+      )}
+      {editing && (
+        <AgentEditor
+          key={editing.key}
+          agent={editing}
+          branches={branches}
+          roles={roles}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+          onDeleted={(key) => {
+            setEditing(null);
+            if (selected === key) setSelected(null);
+            router.refresh();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -4,8 +4,10 @@ import { revalidatePath } from "next/cache";
 
 import type { components } from "@business-os/api-client";
 
-import { ApiError, unwrap } from "@/lib/api";
+import { ApiError, apiUpload, unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
+
+import type { Agent } from "./types";
 
 export type Conversation = components["schemas"]["app__api__assistant__Conversation"];
 export type ConversationSummary = components["schemas"]["app__api__assistant__ConversationSummary"];
@@ -87,4 +89,68 @@ export async function decideAction(conversationId: string, actionId: string, dec
   }
   revalidatePath("/schedule");
   return openConversation(conversationId);
+}
+
+export type AgentError = "agent_limit" | "unknown_tool_domain" | "unknown_role" | "unknown_branch" | "image_too_large" | "unsupported_image" | "generic";
+export type AgentResult = { agent?: Agent; error?: AgentError };
+
+const AGENT_ERRORS: readonly string[] = ["agent_limit", "unknown_tool_domain", "unknown_role", "unknown_branch"];
+
+function agentError(error: unknown): AgentError {
+  const detail = error instanceof ApiError ? (error.body as { detail?: unknown } | null)?.detail : null;
+  return typeof detail === "string" && AGENT_ERRORS.includes(detail) ? (detail as AgentError) : "generic";
+}
+
+export type NewAgent = components["schemas"]["CustomAgent"];
+export type AgentChange = components["schemas"]["AgentChange"];
+
+/** The wizard's draft: a custom agent that only managers can try until it is saved into the team. */
+export async function createAgentDraft(body: Omit<NewAgent, "draft" | "model_tier">): Promise<AgentResult> {
+  const { api, scope } = await getTenant();
+  try {
+    return { agent: unwrap(await api.POST("/ai/agents", { params: scope, body: { ...body, model_tier: "fast", draft: true } })) };
+  } catch (error) {
+    return { error: agentError(error) };
+  }
+}
+
+export async function saveAgent(agentKey: string, body: AgentChange): Promise<AgentResult> {
+  const { api, scope } = await getTenant();
+  try {
+    const agent = unwrap(await api.PATCH("/ai/agents/{agent_key}", { params: { ...scope, path: { agent_key: agentKey } }, body }));
+    revalidatePath("/ai");
+    return { agent };
+  } catch (error) {
+    return { error: agentError(error) };
+  }
+}
+
+export async function deleteAgent(agentKey: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  await api.DELETE("/ai/agents/{agent_key}", { params: { ...scope, path: { agent_key: agentKey } } });
+  revalidatePath("/ai");
+}
+
+/** An uploaded face (already cropped in the browser) for a built-in or custom agent. */
+export async function uploadAgentAvatar(agentKey: string, formData: FormData): Promise<AgentResult> {
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) return { error: "unsupported_image" };
+  const { tenant } = await getTenant();
+  const response = await apiUpload(`/ai/agents/${encodeURIComponent(agentKey)}/avatar`, file, tenant.id);
+  if (response.status === 413) return { error: "image_too_large" };
+  if (response.status === 415) return { error: "unsupported_image" };
+  if (!response.ok) return { error: "generic" };
+  revalidatePath("/ai");
+  return { agent: (await response.json()) as Agent };
+}
+
+export async function removeAgentAvatar(agentKey: string): Promise<AgentResult> {
+  const { api, scope } = await getTenant();
+  try {
+    const agent = unwrap(await api.DELETE("/ai/agents/{agent_key}/avatar", { params: { ...scope, path: { agent_key: agentKey } } }));
+    revalidatePath("/ai");
+    return { agent };
+  } catch (error) {
+    return { error: agentError(error) };
+  }
 }
