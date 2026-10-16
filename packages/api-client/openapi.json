@@ -31195,6 +31195,74 @@
         }
       }
     },
+    "/tenants/current/readiness": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Get Readiness",
+        "description": "The legal-readiness card: what is filled in, what each missing piece would unlock.",
+        "operationId": "get_readiness",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/tenants/current/logo": {
       "put": {
         "tags": [
@@ -33178,7 +33246,8 @@
               "inactive",
               "plan_ending",
               "leads_due",
-              "health_review"
+              "health_review",
+              "license_expiring"
             ],
             "title": "Kind"
           },
@@ -46422,6 +46491,118 @@
         ],
         "title": "RatingGroup"
       },
+      "Readiness": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReadinessItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "license_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "valid",
+              "expiring",
+              "expired"
+            ],
+            "title": "License Status"
+          },
+          "license_days_left": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "License Days Left"
+          },
+          "tax_invoice": {
+            "type": "boolean",
+            "title": "Tax Invoice"
+          },
+          "receipts_only": {
+            "type": "boolean",
+            "title": "Receipts Only"
+          },
+          "payroll": {
+            "type": "boolean",
+            "title": "Payroll"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "license_status",
+          "license_days_left",
+          "tax_invoice",
+          "receipts_only",
+          "payroll"
+        ],
+        "title": "Readiness"
+      },
+      "ReadinessItem": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "entity_type",
+              "business_number",
+              "address",
+              "employer_file",
+              "license"
+            ],
+            "title": "Key"
+          },
+          "done": {
+            "type": "boolean",
+            "title": "Done"
+          },
+          "optional": {
+            "type": "boolean",
+            "title": "Optional"
+          },
+          "unlocks": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "tax_invoice",
+                  "payroll"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unlocks"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "company_prefix"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "done",
+          "optional",
+          "unlocks"
+        ],
+        "title": "ReadinessItem"
+      },
       "ReadyResponse": {
         "properties": {
           "status": {
@@ -51176,6 +51357,67 @@
             "title": "Business Number",
             "description": "Shown only to people who manage the business's settings"
           },
+          "address_line": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line",
+            "description": "Settings managers only"
+          },
+          "address_city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address City",
+            "description": "Settings managers only"
+          },
+          "employer_file_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employer File Number",
+            "description": "Settings managers only"
+          },
+          "business_license_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business License Number",
+            "description": "Settings managers only"
+          },
+          "business_license_expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business License Expires On",
+            "description": "Settings managers only"
+          },
           "cancellation_window_minutes": {
             "type": "integer",
             "title": "Cancellation Window Minutes"
@@ -51903,6 +52145,67 @@
             ],
             "title": "Business Number",
             "description": "Registration number (ח.פ., עוסק מורשה...)"
+          },
+          "address_line": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Line"
+          },
+          "address_city": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address City"
+          },
+          "employer_file_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[0-9A-Za-z/-]{2,20}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Employer File Number",
+            "description": "Deductions file (תיק ניכויים)"
+          },
+          "business_license_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business License Number"
+          },
+          "business_license_expires_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business License Expires On"
           }
         },
         "type": "object",

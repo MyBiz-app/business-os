@@ -1,8 +1,10 @@
 /**
- * The AI team's faces: nine default agents and a gallery of sixteen more for custom agents, all in
- * one soft 3D illustration style. Each is a parametric character drawn by `scripts/build-agents.mjs`
- * into `agents/<key>.svg` (the fallback) and `agents/<key>.webp`. Names and colors of the nine
- * agents follow the round 5 plan (section 1.2); change a look here, then run
+ * The AI team's faces. The gallery for custom agents has 25 soft 3D illustrations: sixteen varied
+ * faces plus the nine original default-agent illustrations (`gallery-17` to `gallery-25`). Each is a
+ * parametric character drawn by `scripts/build-agents.mjs` into `agents/<key>.svg` (the fallback)
+ * and `agents/<key>.webp`. The nine default agents themselves use realistic AI-generated portraits
+ * (`agents/<key>.webp`, round 6 slice U2) that the script does not draw; `DEFAULT_AGENTS` keeps
+ * their accent colors and the original illustrations' looks. Change a look here, then run
  * `pnpm --filter @business-os/brand build:agents`.
  */
 
@@ -53,7 +55,11 @@ export const GALLERY_AVATARS: readonly AvatarSpec[] = Array.from({ length: 16 },
   accessory: ACCESSORIES[(i * 5 + 2) % ACCESSORIES.length],
 }));
 
-export const ALL_AVATARS: readonly AvatarSpec[] = [...DEFAULT_AGENTS, ...GALLERY_AVATARS];
+/** The original nine illustrations, kept in the gallery as `gallery-17` to `gallery-25`. */
+export const ILLUSTRATED_DEFAULTS: readonly AvatarSpec[] = DEFAULT_AGENTS.map((a, i) => ({ ...a, key: `gallery-${17 + i}` }));
+
+/** Every drawn avatar (the 25 gallery faces); the nine default portraits are plain files. */
+export const ALL_AVATARS: readonly AvatarSpec[] = [...GALLERY_AVATARS, ...ILLUSTRATED_DEFAULTS];
 
 /** Relative path (inside `@business-os/brand`) of an avatar file; webp is primary, svg the fallback. */
 export function avatarPath(key: string, format: "webp" | "svg" = "webp"): string {

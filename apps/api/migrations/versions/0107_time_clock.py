@@ -10,7 +10,7 @@
   columns), so the numbers live in data and not in code.
 
 Revision ID: 0107
-Revises: 0102
+Revises: 0103
 Create Date: 2026-10-16
 """
 
@@ -19,7 +19,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0107"
-down_revision: str | None = "0102"
+down_revision: str | None = "0103"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
