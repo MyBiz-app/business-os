@@ -2043,7 +2043,8 @@
       "billing": "Billing",
       "team": "MyBiz team",
       "audit": "Audit log",
-      "integrations": "Integrations"
+      "integrations": "Integrations",
+      "ai": "AI"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2227,6 +2228,80 @@
         "email": "Email",
         "ai": "AI assistant",
         "storage": "File storage"
+      }
+    },
+    "ai": {
+      "title": "AI in the platform",
+      "hint": "What AI costs per business, which models run, the emergency stop, and MyBiz's own AI helpers.",
+      "costs": "AI cost board",
+      "costsHint": "Credits are US cents of model cost over the last 30 days. Revenue is the monthly price of the business's AI modules. Margin is shown for businesses billed in US dollars.",
+      "totalCredits": "AI credits (30 days)",
+      "previousCredits": "Credits in the 30 days before",
+      "revenue": "AI module revenue per month",
+      "columns": {
+        "business": "Business",
+        "credits": "Credits",
+        "trend": "Trend",
+        "revenue": "Revenue / month",
+        "margin": "Margin / month",
+        "control": "AI for this business"
+      },
+      "trendLabel": "Before: {before} credits",
+      "paused": "AI paused",
+      "pause": "Pause AI",
+      "pauseFor": "Pause AI for {name}",
+      "resume": "Resume AI",
+      "reason": "Reason",
+      "cancel": "Cancel",
+      "models": "Models and emergency stop",
+      "tiers": {
+        "fast": "Everyday questions",
+        "standard": "Longer tasks",
+        "strong": "Hardest tasks"
+      },
+      "tierHints": {
+        "fast": "The cheap, quick model.",
+        "standard": "Used after a few tool steps.",
+        "strong": "For the most demanding agents."
+      },
+      "defaultModel": "Default ({model})",
+      "killAll": "Stop AI for every business",
+      "killAllHint": "Questions to the assistant, the agents and WhatsApp AI stop at once, everywhere. Use it if AI costs run away.",
+      "killAllOn": "AI is stopped for every business.",
+      "save": "Save",
+      "saved": "Saved",
+      "readOnly": "You can look but not change: this needs the billing permission.",
+      "team": "MyBiz AI team",
+      "teamHint": "Helpers for the MyBiz team. They read across businesses with your permissions, write drafts for you to review and send, and every lookup is written to the audit log.",
+      "assistantRole": "Helper",
+      "roles": {
+        "manager": "Manager",
+        "support": "Support",
+        "health": "Business health",
+        "billing": "Billing",
+        "growth": "Growth"
+      },
+      "roleHints": {
+        "manager": "The whole picture, every tool you may use.",
+        "support": "Drafts replies to the inbox.",
+        "health": "Who is at risk of leaving, who has not started.",
+        "billing": "Invoices, overdue amounts, unusual AI use.",
+        "growth": "Follow-ups to leads and announcements, as drafts."
+      },
+      "question": "Ask a question",
+      "send": "Send",
+      "thinking": "Thinking...",
+      "errors": {
+        "generic": "Something went wrong. Try again.",
+        "forbidden": "You don't have permission for this.",
+        "model_not_available": "That model is not available.",
+        "model_wrong_tier": "That model belongs to another tier.",
+        "reason_required": "Write a reason.",
+        "ai_paused": "AI is stopped right now.",
+        "conversation_limit": "This conversation reached its limit. Start a new one.",
+        "ai_busy": "The AI is busy. Try again in a moment.",
+        "ai_unavailable": "The AI is not answering right now.",
+        "ai_not_configured": "AI is not set up on this server."
       }
     }
   },

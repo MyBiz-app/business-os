@@ -32,6 +32,8 @@ def require_ai(context: Annotated[TenantContext, Depends(require(Permission.AI_U
     """The assistant needs an AI module (AI Basic: questions; AI Pro: also actions)."""
     if not has_module(context.session, "ai_basic", "ai_pro"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+    if budget.platform_paused(context.session):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="ai_paused")
     return context
 
 

@@ -4640,6 +4640,120 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/costs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Costs
+         * @description AI cost per business against what its AI modules earn (the margin), biggest users first.
+         */
+        get: operations["ai_costs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Settings */
+        get: operations["ai_settings"];
+        /**
+         * Change Ai Settings
+         * @description Chooses the model for each tier (empty: the default) and flips the emergency stop that
+         *     halts AI for every business at once. Both are written to the console audit log.
+         */
+        put: operations["change_ai_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/businesses/{tenant_id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pause Business Ai
+         * @description Stops (or resumes) AI for one business, with the reason in both audit logs.
+         */
+        post: operations["pause_business_ai"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/assistant/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Console List Chats */
+        get: operations["console_list_chats"];
+        put?: never;
+        /** Console Start Chat */
+        post: operations["console_start_chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/assistant/conversations/{chat_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Console Get Chat */
+        get: operations["console_get_chat"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/ai/assistant/conversations/{chat_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Console Send Message */
+        post: operations["console_send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/support-access": {
         parameters: {
             query?: never;
@@ -5645,6 +5759,75 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AICostBoard */
+        AICostBoard: {
+            /** Days */
+            days: number;
+            /** Total Credits */
+            total_credits: number;
+            /** Previous Total Credits */
+            previous_total_credits: number;
+            /** Revenue */
+            revenue: components["schemas"]["CurrencyRevenue"][];
+            /** Businesses */
+            businesses: components["schemas"]["BusinessAICost"][];
+        };
+        /** AIPause */
+        AIPause: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Reason */
+            reason: string;
+            /** Paused By */
+            paused_by: string;
+            /**
+             * Paused At
+             * Format: date-time
+             */
+            paused_at: string;
+        };
+        /** AISettings */
+        AISettings: {
+            /** Kill All */
+            kill_all: boolean;
+            /** Model Fast */
+            model_fast: string | null;
+            /** Model Standard */
+            model_standard: string | null;
+            /** Model Strong */
+            model_strong: string | null;
+            /**
+             * Defaults
+             * @description The model each tier uses when none is chosen
+             */
+            defaults: {
+                [key: string]: string;
+            };
+            /** Choices */
+            choices: components["schemas"]["ModelChoice"][];
+            /** Pauses */
+            pauses: components["schemas"]["AIPause"][];
+            /** Updated By */
+            updated_by: string | null;
+            /** Updated At */
+            updated_at: string | null;
+        };
+        /** AISettingsChange */
+        AISettingsChange: {
+            /** Kill All */
+            kill_all: boolean;
+            /** Model Fast */
+            model_fast?: string | null;
+            /** Model Standard */
+            model_standard?: string | null;
+            /** Model Strong */
+            model_strong?: string | null;
+        };
         /** AISpend */
         AISpend: {
             /**
@@ -6503,6 +6686,40 @@ export interface components {
              */
             no_show_rate: number | null;
         };
+        /** BusinessAICost */
+        BusinessAICost: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Credits
+             * @description AI credits (US cents of model cost) in the window
+             */
+            credits: number;
+            /**
+             * Previous Credits
+             * @description Credits in the window before, for the trend
+             */
+            previous_credits: number;
+            /**
+             * Revenue Monthly Minor
+             * @description Monthly price of its AI modules, minor units
+             */
+            revenue_monthly_minor: number;
+            /**
+             * Margin Usd Minor
+             * @description Revenue minus cost in US cents, scaled to a month; only for USD businesses
+             */
+            margin_usd_minor: number | null;
+            /** Paused */
+            paused: boolean;
+        };
         /** BusinessInvoice */
         BusinessInvoice: {
             /**
@@ -6720,6 +6937,56 @@ export interface components {
              * @enum {string}
              */
             billing: "monthly" | "once";
+        };
+        /** Chat */
+        Chat: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "manager" | "support" | "health" | "billing" | "growth";
+            /** Title */
+            title: string | null;
+            /** Turns */
+            turns: components["schemas"]["app__api__platform_ai__Turn"][];
+            /** Credits */
+            credits: number;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ChatStart */
+        ChatStart: {
+            /**
+             * Role
+             * @default manager
+             * @enum {string}
+             */
+            role: "manager" | "support" | "health" | "billing" | "growth";
+        };
+        /** ChatSummary */
+        ChatSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Role */
+            role: string;
+            /** Title */
+            title: string | null;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** Checkout */
         Checkout: {
@@ -7696,6 +7963,13 @@ export interface components {
             key: string;
             /** Monthly Credits */
             monthly_credits: number;
+        };
+        /** CurrencyRevenue */
+        CurrencyRevenue: {
+            /** Currency */
+            currency: string;
+            /** Revenue Monthly Minor */
+            revenue_monthly_minor: number;
         };
         /** CustomAgent */
         CustomAgent: {
@@ -9434,6 +9708,20 @@ export interface components {
             /** Higher Is Better */
             higher_is_better: boolean;
         };
+        /** ModelChoice */
+        ModelChoice: {
+            /** Id */
+            id: string;
+            /**
+             * Tier
+             * @enum {string}
+             */
+            tier: "fast" | "standard" | "strong";
+            /** Vendor */
+            vendor: string;
+            /** Enabled */
+            enabled: boolean;
+        };
         /** ModulesChange */
         ModulesChange: {
             /**
@@ -9707,6 +9995,13 @@ export interface components {
             text: string;
             /** Accent */
             accent: string;
+        };
+        /** PauseChange */
+        PauseChange: {
+            /** Paused */
+            paused: boolean;
+            /** Reason */
+            reason?: string | null;
         };
         /** PaymentMethod */
         PaymentMethod: {
@@ -13188,6 +13483,16 @@ export interface components {
             last_name?: string | null;
             /** Phone */
             phone?: string | null;
+        };
+        /** Turn */
+        app__api__platform_ai__Turn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /** Text */
+            text: string;
         };
         /** ProfileUpdate */
         app__api__routes__ProfileUpdate: {
@@ -24394,6 +24699,244 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BillingMonth"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_costs: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AICostBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettings"];
+                };
+            };
+        };
+    };
+    change_ai_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AISettingsChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    pause_business_ai: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PauseChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettings"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    console_list_chats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChatSummary"][];
+                };
+            };
+        };
+    };
+    console_start_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ChatStart"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Chat"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    console_get_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Chat"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    console_send_message: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Question"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Chat"];
                 };
             };
             /** @description Validation Error */

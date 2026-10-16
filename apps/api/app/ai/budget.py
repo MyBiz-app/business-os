@@ -12,6 +12,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.ai import models
 from app.commerce.modules import ai_credits_allowed, ai_extra_price
 
 # Used / included, in percent: each is raised once a month as an alert in the CRM.
@@ -144,3 +145,11 @@ def raise_alerts(db: Session, month_start: dt.date) -> list[int]:
         if inserted is not None:
             new.append(threshold)
     return new
+
+
+def platform_paused(db: Session) -> bool:
+    """Has MyBiz stopped AI for this business (or for everyone)? Also refreshes the models the
+    console chose for each tier. Called inside a business's own session."""
+    row = db.execute(text("SELECT * FROM app.ai_platform_state()")).one()
+    models.set_overrides(row.model_fast, row.model_standard, row.model_strong)
+    return bool(row.paused)
