@@ -35,6 +35,7 @@ OVERRIDES = {
     "ai_credit_limits": {"subject_kind": "'role'"},
     "audit_log": {"actor_type": "'system'"},
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
+    "business_files": {"content": "'\\x00'", "size": "1"},
     "checkouts": {"plan_id": "gen_random_uuid()"},
     "contact_emails": {"purpose": "'main'", "email": "'a@b.co'"},
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},

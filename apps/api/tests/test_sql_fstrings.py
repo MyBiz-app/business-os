@@ -29,6 +29,7 @@ ALLOWED = {
     "api/common.py": 2,
     "api/dependents.py": 4,
     "api/documents.py": 4,
+    "api/files.py": 5,
     "api/health.py": 4,
     "api/leads.py": 4,
     "api/locations.py": 4,
@@ -53,6 +54,7 @@ ALLOWED = {
     "api/stations.py": 2,
     "api/time_billing.py": 4,
     "api/time_off_requests.py": 2,
+    "files/__init__.py": 1,
     "reports/metrics.py": 1,
 }
 
