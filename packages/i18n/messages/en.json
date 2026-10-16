@@ -2496,32 +2496,338 @@
       ]
     },
     "legal": {
-      "draft": "Draft – this document is in progress and will be finalized before launch.",
+      "draft": "Draft for review by a lawyer before launch.",
+      "navLabel": "Legal documents",
+      "updated": "Last updated: {date}",
+      "toc": "Contents",
+      "print": "Print",
       "terms": {
         "title": "Terms of use",
-        "body": [
-          "Use of MyBiz is subject to these terms. The business owner is responsible for the information they enter about their clients and for obtaining consent as required by law.",
-          "The service is a monthly subscription and can be cancelled at any time. Launch prices are temporary.",
-          "AI features provide answers and suggestions only; any action is carried out only after the user approves it."
+        "intro": "These terms govern your use of MyBiz, a business management system with an AI workforce for small and medium businesses. By creating an account or using the service you agree to them.",
+        "sections": [
+          {
+            "id": "definitions",
+            "title": "Definitions",
+            "p": [
+              "\"MyBiz\", \"we\" and \"us\" mean the operator of the service. \"Business\" means the business that opens an account, and \"Owner\" means the person who manages it. \"Client\" means a person who is a customer of a Business. \"User\" means anyone who signs in, whether an Owner, a team member or a Client."
+            ]
+          },
+          {
+            "id": "account",
+            "title": "Your account",
+            "p": [
+              "You must give accurate details and keep your sign-in secure. You are responsible for activity under your account, including that of team members you invite.",
+              "You must be at least 18 years old to open a Business account. Tell us promptly if you suspect unauthorized access."
+            ]
+          },
+          {
+            "id": "plans",
+            "title": "Plans and billing",
+            "p": [
+              "MyBiz is offered as a monthly subscription by plan. Prices, plan limits and what each plan includes are shown on the pricing page and may change for future periods with advance notice. Launch prices are temporary.",
+              "Some plans include a monthly allowance of AI usage. Where pay-as-you-go AI usage is enabled, usage beyond the allowance is charged at the rate shown in the product before you opt in. We alert you as you approach your allowance, and we never charge for extra usage you did not enable.",
+              "Prices are shown with or without VAT as stated. Payments are processed by a payment provider; we do not store full card details."
+            ]
+          },
+          {
+            "id": "trial",
+            "title": "Trial and cancellation",
+            "p": [
+              "A free trial, when offered, ends on the date shown. You can cancel at any time from the account settings; cancellation takes effect at the end of the paid period and no partial refunds are given unless the law requires them.",
+              "Plans already sold keep the terms they were sold under."
+            ]
+          },
+          {
+            "id": "content",
+            "title": "Your content",
+            "p": [
+              "You own the information you enter, including your Clients' details, schedules and messages (\"Your Content\"). You grant us the limited right to host, process and display it solely to provide the service to you.",
+              "You may export Your Content at any time."
+            ]
+          },
+          {
+            "id": "business-duties",
+            "title": "Your responsibility toward your Clients",
+            "p": [
+              "As the Business, you decide why and how your Clients' personal data is used. You are responsible for having a lawful basis and any required consent, for informing your Clients, for the accuracy of what you enter, and for messages you send through the service, including marketing messages and the right to opt out.",
+              "You are responsible for complying with the laws that apply to your industry, such as health, education or consumer protection rules. MyBiz is a tool and does not provide professional, medical, legal or tax advice."
+            ]
+          },
+          {
+            "id": "acceptable-use",
+            "title": "Acceptable use",
+            "p": [
+              "You agree not to:"
+            ],
+            "items": [
+              "break the law or infringe anyone's rights;",
+              "send spam or unsolicited messages, or message people who opted out;",
+              "upload malware, or try to probe, disrupt or bypass the security of the service;",
+              "access data of another Business, or use the service to build a competing product by copying it;",
+              "resell or share access except as the plan allows."
+            ]
+          },
+          {
+            "id": "ai",
+            "title": "AI features",
+            "p": [
+              "The service includes AI assistants. AI answers and suggestions may be incomplete or wrong, so please review them before relying on them.",
+              "AI acts only through approved tools. Any sensitive action, such as sending messages, changing bookings or touching money, is prepared as a pending action and is carried out only after a person approves it. You remain responsible for what you approve.",
+              "AI usage is metered and limited by your plan. We may use a third-party AI provider to process the content of your requests; see the privacy policy."
+            ]
+          },
+          {
+            "id": "availability",
+            "title": "Availability and support",
+            "p": [
+              "We work to keep the service available but do not promise uninterrupted operation. We may carry out maintenance and will try to announce planned downtime in advance. Support is provided through the contact page."
+            ]
+          },
+          {
+            "id": "ip",
+            "title": "Intellectual property",
+            "p": [
+              "The service, its software, design and brand are owned by MyBiz or its licensors. You receive a limited, non-exclusive, non-transferable right to use the service during your subscription. Feedback you send may be used by us without obligation."
+            ]
+          },
+          {
+            "id": "third-parties",
+            "title": "Third-party services",
+            "p": [
+              "The service relies on and may link to third-party providers (for example hosting, email, payments and AI). Their own terms apply to their services, and we are not responsible for them beyond what the law requires."
+            ]
+          },
+          {
+            "id": "liability",
+            "title": "Limitation of liability",
+            "p": [
+              "The service is provided \"as is\". To the extent the law allows, MyBiz is not liable for indirect or consequential loss, loss of profit or data, or for decisions you make based on AI output. Our total liability for any claim is limited to the fees you paid in the 12 months before the claim.",
+              "Nothing in these terms limits liability that cannot be limited by law."
+            ]
+          },
+          {
+            "id": "termination",
+            "title": "Termination and closing a business",
+            "p": [
+              "You may close your Business at any time. We may suspend or end access for a breach of these terms, non-payment or risk to the service, with notice where practical.",
+              "After a Business closes, its data is kept for 90 days so it can be recovered or exported, and is then deleted, except for what we must keep by law."
+            ]
+          },
+          {
+            "id": "changes",
+            "title": "Changes to these terms",
+            "p": [
+              "We may update these terms. For material changes we will notify Owners in the product or by email in advance. Continued use after the change takes effect means you accept it."
+            ]
+          },
+          {
+            "id": "law",
+            "title": "Governing law and disputes",
+            "p": [
+              "These terms are governed by the laws of the State of Israel. The competent courts in Israel have exclusive jurisdiction, subject to any mandatory consumer rights you have where you live."
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "Contact",
+            "p": [
+              "Questions about these terms? Write to us through the contact page."
+            ]
+          }
         ]
       },
       "privacy": {
         "title": "Privacy policy",
-        "body": [
-          "We keep only the information needed to run the service. Every business's data is separated and protected at the database level.",
-          "The business owner can export or erase any client's data on request, and every support access is logged and requires the owner's approval.",
-          "Servers are located in the European Union (Frankfurt), whose data protection Israel and the EU mutually recognize."
+        "intro": "This policy explains what personal information MyBiz collects, why, who sees it, and the rights you have. It is written for Business Owners, their team members and their Clients.",
+        "sections": [
+          {
+            "id": "roles",
+            "title": "Who is responsible for what",
+            "p": [
+              "For information about Owners and team members who sign up (name, email, phone, billing details, usage), MyBiz is the controller (database owner).",
+              "For information a Business keeps about its Clients (contact details, bookings, memberships, messages, notes), the Business is the controller and MyBiz is the processor acting on the Business's instructions. A Client who wants to exercise a right should first contact the Business they deal with; we will help the Business respond."
+            ]
+          },
+          {
+            "id": "collect",
+            "title": "What we collect",
+            "p": [
+              "We collect only what is needed to run the service:"
+            ],
+            "items": [
+              "account details: name, email, phone, language and role;",
+              "business data you enter: Clients, schedules, bookings, products, invoices, messages and files;",
+              "usage and technical data: sign-in events, device and browser type, IP address, errors and measured usage such as AI use, messages and storage;",
+              "content of conversations with the AI assistants, to answer you and to keep a history you can review;",
+              "support requests and access logs when our team helps with your account."
+            ]
+          },
+          {
+            "id": "why",
+            "title": "Why we use it",
+            "p": [
+              "We use information to provide and secure the service, send the messages you ask for, bill you, provide support, measure usage against plan limits, improve the product, and meet legal duties. We do not sell personal information and we do not use your Clients' data to advertise to others."
+            ]
+          },
+          {
+            "id": "security",
+            "title": "Security",
+            "p": [
+              "Each Business's data is separated from others and enforced at the database level. Data is encrypted in transit, secrets are stored encrypted, access is role based, and every support access is logged and needs the Owner's approval. No system is perfectly secure; we will notify those affected of a breach as the law requires."
+            ]
+          },
+          {
+            "id": "processors",
+            "title": "Service providers (sub-processors)",
+            "p": [
+              "We use these providers to run the service, each only for its purpose:"
+            ],
+            "items": [
+              "Supabase - database and sign-in;",
+              "Render - application servers;",
+              "Vercel - website hosting;",
+              "Anthropic - AI processing of requests you make;",
+              "Resend - sending email;",
+              "Expo - delivering app updates and notifications."
+            ]
+          },
+          {
+            "id": "transfer",
+            "title": "Where data is stored and transfers abroad",
+            "p": [
+              "Our main data is hosted in the European Union (Frankfurt), whose level of data protection Israel recognizes. Some providers, such as the AI provider, may process data in other countries. Where data leaves Israel or the EEA we rely on lawful transfer mechanisms and contracts that require comparable protection."
+            ]
+          },
+          {
+            "id": "retention",
+            "title": "How long we keep information",
+            "p": [
+              "We keep information only as long as it is needed:"
+            ],
+            "items": [
+              "leads and AI conversations: 12 months;",
+              "enquiries: 12 months;",
+              "message log: 24 months;",
+              "a closed Business: deleted 90 days after closing;",
+              "billing records: as long as tax law requires."
+            ]
+          },
+          {
+            "id": "rights",
+            "title": "Your rights",
+            "p": [
+              "Under the Israeli Protection of Privacy Law (including Amendment 13) and, where it applies, the GDPR, you may ask to see, correct or delete your information, restrict or object to its use, and receive a copy. Owners can export or erase any Client's data from the product. We reply within the period set by law, and you may complain to the Privacy Protection Authority or your local authority."
+            ]
+          },
+          {
+            "id": "cookies",
+            "title": "Cookies and similar technologies",
+            "p": [
+              "We use cookies and local storage that are necessary to sign you in and remember preferences such as language, theme and accessibility settings. We do not use advertising cookies."
+            ]
+          },
+          {
+            "id": "marketing",
+            "title": "Email and messages",
+            "p": [
+              "We send service messages (invitations, receipts, security and schedule notices). Marketing messages are sent only with consent, each one includes a way to unsubscribe, and Owners are responsible for the consent of their Clients."
+            ]
+          },
+          {
+            "id": "ai-privacy",
+            "title": "AI and your data",
+            "p": [
+              "AI requests are sent to our AI provider only to produce your answer, under terms that do not allow it to train models on your content. AI works only with data the signed-in person is allowed to see, and sensitive actions need a person's approval."
+            ]
+          },
+          {
+            "id": "children",
+            "title": "Children",
+            "p": [
+              "The service is for businesses and is not directed to children. A Business that records details of minors is responsible for the required parental consent."
+            ]
+          },
+          {
+            "id": "changes",
+            "title": "Changes",
+            "p": [
+              "We will update this policy when our practices change and show the new date at the top. For material changes we will notify you in advance."
+            ]
+          },
+          {
+            "id": "contact",
+            "title": "Contact",
+            "p": [
+              "For privacy questions or requests, write to us through the contact page and mark it \"privacy\"."
+            ]
+          }
         ]
       },
       "accessibility": {
         "title": "Accessibility statement",
-        "body": [
-          "We work to make the site and the system accessible according to Israeli Standard 5568 and WCAG 2.2 level AA.",
-          "The site supports keyboard navigation, screen readers, text zoom and dark mode, and respects the reduced-motion setting.",
-          "Ran into a problem? Write to us through the contact page and we will fix it soon."
+        "intro": "We want everyone to be able to use MyBiz, including people with disabilities, and we work to meet Israeli Standard 5568 and WCAG 2.1 level AA.",
+        "sections": [
+          {
+            "id": "commitment",
+            "title": "Our commitment",
+            "p": [
+              "Accessibility is part of how we build every screen in the website and the app, not an add-on."
+            ]
+          },
+          {
+            "id": "done",
+            "title": "What we have adapted",
+            "p": [
+              "The site and the app include:"
+            ],
+            "items": [
+              "full right-to-left (RTL) support and Hebrew and English;",
+              "color contrast that meets AA, in light and dark mode;",
+              "complete keyboard navigation with a visible focus indicator;",
+              "labels and roles for screen readers (NVDA, VoiceOver, TalkBack);",
+              "text that scales up with the browser or device settings;",
+              "reduced-motion setting respected;",
+              "an accessibility button for text size, contrast and highlighting links, which you can hide;",
+              "forms with clear labels and error messages."
+            ]
+          },
+          {
+            "id": "standard",
+            "title": "Standard and testing",
+            "p": [
+              "The site is built to Israeli Standard 5568 (based on WCAG 2.1 level AA). We test with automated tools and manually with a keyboard and screen readers. This statement was last reviewed in October 2026."
+            ]
+          },
+          {
+            "id": "limits",
+            "title": "Known limitations",
+            "p": [
+              "Some areas may not yet be fully accessible: certain complex charts, the calendar drag-and-drop (a keyboard alternative exists), and content uploaded by Businesses such as images without descriptions or PDF files. We are working on these."
+            ]
+          },
+          {
+            "id": "exceptions",
+            "title": "Third-party content",
+            "p": [
+              "Content and tools supplied by third parties, such as payment pages or embedded maps, follow their provider's accessibility."
+            ]
+          },
+          {
+            "id": "coordinator",
+            "title": "Accessibility coordinator and how to reach us",
+            "p": [
+              "If you ran into a barrier or need information in another form, contact our accessibility coordinator through the contact page and choose \"accessibility\". Please describe the page, your device and the problem. We aim to reply within 14 days and fix the issue as soon as we can."
+            ]
+          },
+          {
+            "id": "updated",
+            "title": "Updates",
+            "p": [
+              "We review this statement after significant changes and at least once a year."
+            ]
+          }
         ]
-      },
-      "navLabel": "Legal documents"
+      }
     },
     "meta": {
       "home": "MyBiz – Business management and an AI workforce for small businesses",
