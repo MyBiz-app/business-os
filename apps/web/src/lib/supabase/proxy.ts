@@ -6,7 +6,7 @@ import { safeNext } from "@/lib/navigation";
 
 import { supabaseConfig } from "./env";
 
-const PUBLIC_PAGES = new Set(["/", "/login", "/login/code", "/signup", "/check-email", "/forgot-password", "/start", "/getting-started", "/sitemap.xml", "/robots.txt", CSP_REPORT_PATH]);
+const PUBLIC_PAGES = new Set(["/", "/login", "/login/code", "/signup", "/check-email", "/email-confirmed", "/forgot-password", "/start", "/getting-started", "/sitemap.xml", "/robots.txt", CSP_REPORT_PATH]);
 const PUBLIC_ASSETS = ["/opengraph-image", "/twitter-image"];
 const AUTH_PAGES = new Set(["/", "/login", "/login/code", "/signup"]);
 

@@ -9,6 +9,7 @@ import { coverSrc } from "@/lib/workspace";
 import { getTenant } from "@/lib/tenant";
 
 import { CloseSection } from "./close-section";
+import { ContactEmails } from "./contact-emails";
 import { removeCover, removeLogo } from "./actions";
 import { BrandColorForm, CoverForm, DetailsForm, IdentityForm, LogoForm } from "./settings-forms";
 import { Container } from "@/components/layout/container";
@@ -23,6 +24,7 @@ export default async function SettingsPage() {
   const { tenant } = context;
   if (!canManageSettings(tenant)) redirect("/dashboard");
   const logo = apiAssetUrl(tenant.logo_url);
+  const emails = (await context.api.GET("/contact-emails", { params: context.scope })).data;
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
@@ -50,6 +52,8 @@ export default async function SettingsPage() {
         </h2>
         <DetailsForm tenant={tenant} timeZones={Intl.supportedValuesOf("timeZone")} />
       </section>
+
+      {emails && <ContactEmails data={emails} locationId={null} />}
 
       <section aria-labelledby="identity-heading" className="flex flex-col gap-4 card p-6">
         <div className="flex flex-col gap-1">

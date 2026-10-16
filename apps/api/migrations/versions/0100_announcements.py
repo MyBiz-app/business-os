@@ -11,8 +11,8 @@ businesses. The raw resolver is not callable by the API; every console function 
 caller, and the tables themselves have no API access. A new console permission, `broadcasts.manage`,
 guards the whole feature.
 
-Revision ID: 0088
-Revises: 0097
+Revision ID: 0100
+Revises: 0099
 Create Date: 2026-10-16
 """
 
@@ -20,8 +20,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0088"
-down_revision: str | None = "0097"
+revision: str = "0100"
+down_revision: str | None = "0099"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

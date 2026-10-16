@@ -20,6 +20,7 @@ SPECS = (STUDIO, GROOMING_SALON, AC_COMPANY, PHOTO_STUDIO, ACCOUNTING_FIRM, PADE
 PLATFORM_TABLES = {
     "contact_requests",
     "platform_audit",
+    "platform_ai_pauses",
     "announcements",
     "announcement_deliveries",
 }
@@ -35,6 +36,7 @@ OVERRIDES = {
     "audit_log": {"actor_type": "'system'"},
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
     "checkouts": {"plan_id": "gen_random_uuid()"},
+    "contact_emails": {"purpose": "'main'", "email": "'a@b.co'"},
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},
     "invitations": {"role": "'staff'"},
     "notifications": {"kind": "'session_cancelled'"},

@@ -13,7 +13,7 @@ import urllib.request
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from email.message import EmailMessage
-from email.utils import parseaddr
+from email.utils import formataddr, parseaddr
 from pathlib import Path
 from typing import Any, Protocol
 from zoneinfo import ZoneInfo
@@ -38,6 +38,8 @@ class Email:
     locale: str = "he"
     details: tuple[tuple[str, str], ...] = ()  # label/value lines shown in a card (class, time)
     kind: str | None = None  # picks the icon in the layout (a notification kind, "roster", ...)
+    reply_to: str | None = None  # where replies go (the business's or branch's own address)
+    from_name: str | None = None  # the business or branch shown as the sender's name
 
 
 def _html(email: Email) -> str:
@@ -81,6 +83,14 @@ class LogSender:
         print(f"email to {email.to}: {email.subject}")
 
 
+def _from_header(default: str, name: str | None) -> str:
+    """The configured sender address with the business's name as the display name."""
+    if not name:
+        return default
+    address = parseaddr(default)[1]
+    return formataddr((name.replace('"', "").replace("\n", " ")[:80], address))
+
+
 class ResendSender:
     """Resend's HTTP API (https://resend.com/docs/api-reference/emails/send-email)."""
 
@@ -89,15 +99,16 @@ class ResendSender:
         self.sender = sender
 
     def send(self, email: Email) -> None:
-        body = json.dumps(
-            {
-                "from": self.sender,
-                "to": [email.to],
-                "subject": email.subject,
-                "text": email.text,
-                "html": _html(email),
-            }
-        ).encode()
+        payload: dict[str, Any] = {
+            "from": _from_header(self.sender, email.from_name),
+            "to": [email.to],
+            "subject": email.subject,
+            "text": email.text,
+            "html": _html(email),
+        }
+        if email.reply_to:
+            payload["reply_to"] = email.reply_to
+        body = json.dumps(payload).encode()
         request = urllib.request.Request(
             "https://api.resend.com/emails",
             data=body,
@@ -122,8 +133,10 @@ class SmtpSender:
 
     def message(self, email: Email) -> EmailMessage:
         message = EmailMessage()
-        message["From"] = self.sender
+        message["From"] = _from_header(self.sender, email.from_name)
         message["To"] = email.to
+        if email.reply_to:
+            message["Reply-To"] = email.reply_to
         message["Subject"] = email.subject
         message.set_content(email.text)
         message.add_alternative(_html(email), subtype="html")
@@ -197,6 +210,15 @@ def details_of(messages: dict[str, Any], payload: dict[str, Any], row: dict[str,
 EMAIL_DETAILS = json.dumps({"channel": "email", "automated": True})
 
 
+def _reply_to(conn: Connection, tenant_id: Any, cache: dict[Any, str | None]) -> str | None:
+    """Replies to a business's emails go to its reply-to address (the owner's by default)."""
+    if tenant_id not in cache:
+        from app.messaging.contact_emails import resolve_email
+
+        cache[tenant_id] = resolve_email(conn, tenant_id, "reply_to")
+    return cache[tenant_id]
+
+
 def send_emails(
     conn: Connection,
     sender: Sender | None,
@@ -236,6 +258,7 @@ def send_emails(
         .all()
     )
     messages: dict[str, dict[str, Any]] = {}
+    reply_cache: dict[Any, str | None] = {}
     sent = failed = pushed = 0
     per_tenant: dict[Any, int] = {}
     for row in rows:
@@ -273,6 +296,8 @@ def send_emails(
                     locale=locale,
                     details=details_of(messages[locale], row["payload"], row),
                     kind=row["kind"],
+                    reply_to=_reply_to(conn, row["tenant_id"], reply_cache),
+                    from_name=row["business"],
                 )
             )
         except Exception as error:  # a provider error must not stop the batch

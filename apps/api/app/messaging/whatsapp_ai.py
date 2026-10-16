@@ -770,6 +770,9 @@ def _answer_one(db: Session, inbox_id: int, provider: LLMProvider) -> str:
     if not has_module(db, "whatsapp_ai"):
         _mark(db, inbox_id, "skipped", "module_disabled")
         return "skipped"
+    if budget.platform_paused(db):  # MyBiz stopped AI for this business, or for everyone
+        _mark(db, inbox_id, "skipped", "ai_paused")
+        return "skipped"
     reply = handle(db, row.tenant_id, row.from_phone, row.body, provider)
     if reply is None:
         _mark(db, inbox_id, "skipped", "unknown_number")

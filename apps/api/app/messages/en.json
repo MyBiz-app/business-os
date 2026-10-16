@@ -99,6 +99,19 @@
       "unsubscribedBody": "You will no longer receive marketing messages. Service messages about your account will still be sent.",
       "unsubscribeFailed": "This link is not valid or has expired.",
       "unsubscribe": "Unsubscribe"
+    },
+    "contactConfirm": {
+      "subject": "Confirm this email address for {business}",
+      "intro": "This address was added to {business} as its {purpose}. Please confirm it so we can use it.",
+      "button": "Confirm the address",
+      "ignore": "If this is not you, ignore this email and nothing will change.",
+      "purposes": {
+        "main": "main email",
+        "inbox": "inquiries email",
+        "billing": "billing email",
+        "reply_to": "reply-to email",
+        "notifications": "notifications email"
+      }
     }
   },
   "modules": {

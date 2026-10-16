@@ -9,6 +9,8 @@ GLOBAL_TABLES = {
     "users",
     "platform_staff",
     "platform_audit",
+    "platform_ai_settings",
+    "platform_ai_conversations",
     "push_tokens",
     "job_runs",
     "announcement_views",
@@ -18,6 +20,7 @@ GLOBAL_TABLES = {
 PLATFORM_TABLES = {
     "contact_requests",
     "platform_audit",
+    "platform_ai_pauses",
     "announcements",
     "announcement_deliveries",
 }

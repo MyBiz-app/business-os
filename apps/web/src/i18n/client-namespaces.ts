@@ -91,6 +91,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "nav",
     "permissions",
     "platform",
+    "roles",
     "team",
     "terms",
     "verticals"

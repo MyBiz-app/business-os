@@ -1,4 +1,4 @@
-"""The broadcast center (round 5, M1; migration 0088): the MyBiz console composes a message for a
+"""The broadcast center (round 5, M1; migration 0100): the MyBiz console composes a message for a
 mix of audiences and channels, previews who gets it, schedules it and reads the results. People
 see the pop-ups meant for them and can opt out of marketing messages. The sending itself is the
 send-announcements job (app/messaging/announcements.py)."""
