@@ -31,6 +31,10 @@ export type ModuleKey =
   | "extra_location";
 export type Modules = Partial<Record<ModuleKey, number>>;
 
+/** The legal form of the business, asked in the journey (the API's `legal_entity_type`). */
+export const ENTITY_TYPES = ["company", "licensed_dealer", "exempt_dealer", "nonprofit", "partnership", "other"] as const;
+export type EntityType = (typeof ENTITY_TYPES)[number];
+
 export type SignupPlan = {
   /** A catalog industry open for sign-up (category or sub-category). */
   vertical: string;
@@ -42,6 +46,8 @@ export type SignupPlan = {
   modules: Modules;
   /** Company registration number (ח.פ.): required for Israeli (ILS) businesses, optional elsewhere. */
   businessNumber?: string;
+  /** Legal form: required in Israel (ILS), where it decides which documents the business issues. */
+  entityType?: EntityType;
 };
 
 /** The Israeli ID / company number check digit (the same rule as the API): up to 9 digits. */
@@ -64,6 +70,13 @@ export function businessNumberOk(currency: Currency, value: string): boolean {
   const number = cleanBusinessNumber(value);
   if (currency === "ILS") return israeliNumberValid(number);
   return number.length <= 20;
+}
+
+/** Israeli companies (ח.פ.) are registered under numbers starting with 51; anything else is
+ * only a soft warning, never a block. */
+export function companyPrefixWarning(currency: Currency, entityType: EntityType | undefined, value: string): boolean {
+  const number = cleanBusinessNumber(value);
+  return currency === "ILS" && entityType === "company" && israeliNumberValid(number) && !number.padStart(9, "0").startsWith("51");
 }
 
 /** The choices on each add-on screen, from the basic one up (2-4 per screen, decision X16).
@@ -273,6 +286,7 @@ export function decodePlan(value: unknown): SignupPlan | null {
     modules[key as ModuleKey] = quantity as number;
   }
   const number = typeof raw.businessNumber === "string" ? cleanBusinessNumber(raw.businessNumber) : "";
+  const entityType = (ENTITY_TYPES as readonly unknown[]).includes(raw.entityType) ? (raw.entityType as EntityType) : undefined;
   return {
     vertical: raw.vertical,
     name,
@@ -282,5 +296,6 @@ export function decodePlan(value: unknown): SignupPlan | null {
     currency: raw.currency as Currency,
     modules,
     ...(number && number.length <= 20 ? { businessNumber: number } : {}),
+    ...(entityType ? { entityType } : {}),
   };
 }

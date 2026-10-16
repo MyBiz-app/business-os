@@ -69,7 +69,9 @@ def load_current_tenant(session: Session) -> Tenant:
                        CASE WHEN t.cover IS NULL THEN NULL
                             ELSE '/tenants/current/cover?v='
                                  || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
-                       t.legal_entity_type, t.business_number
+                       t.legal_entity_type, t.business_number,
+                       t.address_line, t.address_city, t.employer_file_number,
+                       t.business_license_number, t.business_license_expires_on
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m
                     ON m.tenant_id = t.id AND m.user_id = app.current_user_id()
@@ -86,7 +88,16 @@ def load_current_tenant(session: Session) -> Tenant:
     )
     # The registration number is for the people who manage the business, not the whole team.
     if Permission.BUSINESS_SETTINGS.value not in data["permissions"]:
-        data["legal_entity_type"] = data["business_number"] = None
+        for hidden in (
+            "legal_entity_type",
+            "business_number",
+            "address_line",
+            "address_city",
+            "employer_file_number",
+            "business_license_number",
+            "business_license_expires_on",
+        ):
+            data[hidden] = None
     return Tenant.model_validate(data)
 
 

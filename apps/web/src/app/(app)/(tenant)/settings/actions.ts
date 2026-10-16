@@ -109,3 +109,28 @@ export async function removeCover(): Promise<void> {
   await api.DELETE("/tenants/current/cover", { params: scope });
   revalidatePath("/", "layout");
 }
+
+/** Address, employer file and the optional business licence (the legal-readiness card). */
+export async function updateLegalDetails(_state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenant();
+  const value = (name: string) => String(formData.get(name) ?? "").trim();
+  try {
+    unwrap(
+      await api.PATCH("/tenants/current", {
+        params: scope,
+        body: {
+          address_line: value("address_line"),
+          address_city: value("address_city"),
+          employer_file_number: value("employer_file_number"),
+          business_license_number: value("business_license_number"),
+          business_license_expires_on: value("business_license_expires_on") || null,
+        },
+      }),
+    );
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
+  return { saved: true };
+}

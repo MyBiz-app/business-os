@@ -18,6 +18,9 @@ import type { ProviderButton } from "@/lib/auth-providers";
 import { formatMoney } from "@/lib/money";
 import {
   businessNumberOk,
+  companyPrefixWarning,
+  ENTITY_TYPES,
+  type EntityType,
   chooseTier,
   CLIENT_SIZES,
   coreTier,
@@ -211,6 +214,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   const chosenKind = findVertical(draft.vertical);
   const addOnLabels = lines.filter((line) => line.key !== "core" && line.key !== "extra_location").map((line) => label(line.key));
   const passDetails = [
+    ...(draft.entityType ? [{ label: t("summary.passEntity"), value: t(`business.entity.types.${draft.entityType}`) }] : []),
     ...(draft.businessNumber ? [{ label: t("summary.passNumber"), value: draft.businessNumber }] : []),
     ...(chosenKind ? [{ label: t("summary.passCategory"), value: text(chosenKind.category, "name") }] : []),
     { label: t("summary.passSize"), value: t("summary.passSizeValue", { staff: draft.staff, locations: draft.locations }) },
@@ -353,7 +357,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           onSubmit={(event) => {
             event.preventDefault();
             setNumberTouched(true);
-            if (draft.name.trim() && businessNumberOk(draft.currency, draft.businessNumber ?? "")) next();
+            if (draft.name.trim() && businessNumberOk(draft.currency, draft.businessNumber ?? "") && (draft.currency !== "ILS" || draft.entityType)) next();
           }}
         >
           <TextInput
@@ -362,6 +366,19 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             placeholder={t("business.namePlaceholder", { example: draft.vertical ? text(draft.vertical, "example") : t("business.exampleGeneric") })}
             onChange={(name) => update({ name })}
           />
+          <ChoiceGroup
+            legend={draft.currency === "ILS" ? t("business.entity.legend") : t("business.entity.legendOptional")}
+            hint={draft.entityType ? t(`business.entity.hints.${draft.entityType}`) : t("business.entity.hint")}
+            options={ENTITY_TYPES.map((value) => ({ value, label: t(`business.entity.types.${value}`) }))}
+            value={draft.entityType ?? ""}
+            onChange={(entityType) => update({ entityType: entityType as EntityType })}
+            columns="grid-cols-2 sm:grid-cols-3"
+          />
+          {numberTouched && draft.currency === "ILS" && !draft.entityType && (
+            <p role="alert" className="text-sm text-danger">
+              {t("business.entity.required")}
+            </p>
+          )}
           <TextInput
             label={draft.currency === "ILS" ? t("business.number") : t("business.numberOptional")}
             value={draft.businessNumber ?? ""}
@@ -372,6 +389,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             error={numberTouched && !businessNumberOk(draft.currency, draft.businessNumber ?? "") ? t("business.numberInvalid") : undefined}
             hint={draft.currency === "ILS" ? t("business.numberHint") : undefined}
           />
+          {companyPrefixWarning(draft.currency, draft.entityType, draft.businessNumber ?? "") && (
+            <p role="status" className="rounded-xl bg-warning/10 px-4 py-3 text-sm">
+              {t("business.entity.prefixWarning")}
+            </p>
+          )}
           <ChoiceGroup
             legend={t("business.size")}
             hint={t("business.sizeHint")}

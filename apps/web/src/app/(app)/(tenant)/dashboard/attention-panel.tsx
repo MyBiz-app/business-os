@@ -1,5 +1,5 @@
 import type { components } from "@business-os/api-client";
-import { ArrowRight, CalendarX, FileHeart, PhoneCall, UserMinus } from "lucide-react";
+import { ArrowRight, BadgeCheck, CalendarX, FileHeart, PhoneCall, UserMinus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
@@ -14,6 +14,7 @@ const KINDS: Record<Kind, { Icon: typeof UserMinus; item: (id: string) => string
   inactive: { Icon: UserMinus, item: (id) => `/clients/${id}`, all: "/reports#at-risk-heading" },
   leads_due: { Icon: PhoneCall, item: (id) => `/leads/${id}`, all: "/leads" },
   health_review: { Icon: FileHeart, item: (id) => `/clients/${id}`, all: "/clients" },
+  license_expiring: { Icon: BadgeCheck, item: () => "/settings#readiness-heading", all: "/settings#readiness-heading" },
 };
 
 /** What needs attention today (GET /attention): only the lists this person may see and that

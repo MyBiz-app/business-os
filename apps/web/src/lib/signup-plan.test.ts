@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { businessNumberOk, chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
+import { businessNumberOk, chooseTier, companyPrefixWarning, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
 
 const catalog = {
   core: [
@@ -93,4 +93,14 @@ test("an Israeli business number needs a valid check digit; abroad it is optiona
   assert.equal(businessNumberOk("ILS", ""), false);
   assert.equal(businessNumberOk("USD", ""), true);
   assert.equal(decodePlan(encodePlan({ ...plan, businessNumber: "000 000 018" }))?.businessNumber, "000000018");
+});
+
+test("the company prefix warning is soft and only for Israeli companies", () => {
+  assert.equal(companyPrefixWarning("ILS", "company", "000000018"), true);
+  assert.equal(companyPrefixWarning("ILS", "company", "515555555"), false);
+  assert.equal(companyPrefixWarning("ILS", "licensed_dealer", "000000018"), false);
+  assert.equal(companyPrefixWarning("USD", "company", "000000018"), false);
+  assert.equal(companyPrefixWarning("ILS", "company", "123456789"), false); // invalid digit: the other error shows
+  assert.equal(decodePlan(encodePlan({ ...plan, entityType: "exempt_dealer" }))?.entityType, "exempt_dealer");
+  assert.equal(decodePlan(encodePlan({ ...plan, entityType: "bogus" as never }))?.entityType, undefined);
 });
