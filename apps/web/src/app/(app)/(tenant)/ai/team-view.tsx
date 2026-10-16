@@ -1,9 +1,11 @@
 "use client";
 
-import { FlaskConical, LayoutGrid, MessageCircle, Maximize2, Minimize2, Network, UserPlus } from "lucide-react";
+import { FlaskConical, GitBranch, LayoutGrid, MessageCircle, Maximize2, Minimize2, Network, UserPlus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { type Draft, draftOf, payloadOf } from "@/lib/ai-structure";
 
 import {
   agentConversations,
@@ -12,6 +14,7 @@ import {
   type ConversationSummary,
   decideAction,
   openConversation,
+  saveStructure,
   sendMessage,
   startConversation,
 } from "./actions";
@@ -22,6 +25,7 @@ import type { RoleOption } from "./agent-fields";
 import { AgentWizard } from "./agent-wizard";
 import { ChatPanel } from "./chat-panel";
 import { type Branch } from "./scope-picker";
+import { StructurePanel } from "./structure-panel";
 import { TeamList } from "./team-list";
 import { TeamMap } from "./team-map";
 import type { Agent, Team, Upsell } from "./types";
@@ -63,6 +67,35 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [error, setError] = useState<ChatError | null>(null);
   // The chat whose last exchange the next new chat carries over (switching agent or branches).
   const carry = useRef<string | null>(null);
+
+  // Structure editing: a working copy of the lines, teams and places, saved in one go.
+  const saved = useMemo(() => draftOf(team.agents, team.teams ?? []), [team]);
+  const [draft, setDraft] = useState<Draft | null>(null);
+  const [savingStructure, setSavingStructure] = useState(false);
+  const [structureError, setStructureError] = useState<string | null>(null);
+  const structuring = draft !== null;
+
+  function startEditing() {
+    setSelected(null);
+    setConversation(null);
+    setView("map");
+    setStructureError(null);
+    setDraft(saved);
+  }
+
+  async function commitStructure() {
+    if (!draft) return;
+    setSavingStructure(true);
+    setStructureError(null);
+    const result = await saveStructure(payloadOf(draft, team.agents));
+    setSavingStructure(false);
+    if (result.error) {
+      setStructureError(result.error);
+      return;
+    }
+    setDraft(null);
+    router.refresh();
+  }
 
   const agent = team.agents.find((a) => a.key === selected) ?? null;
   const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
@@ -214,6 +247,12 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
+        {team.can_manage && !structuring && (
+          <button type="button" onClick={startEditing} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
+            <GitBranch aria-hidden="true" className="size-4" />
+            {t("structure.edit")}
+          </button>
+        )}
         {team.can_manage && (
           <button type="button" onClick={() => setWizard(true)} className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
             <UserPlus aria-hidden="true" className="size-4" />
@@ -251,7 +290,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
           {view === "map" ? (
             <>
               <div className="hidden md:block">
-                <TeamMap agents={team.agents} selected={selected} compact={chatOpen && !wide} onPick={open} />
+                <TeamMap agents={team.agents} selected={selected} compact={chatOpen && !wide} onPick={open} draft={draft ?? saved} editing={structuring} onDraft={setDraft} />
               </div>
               <div className="md:hidden">
                 <TeamList agents={team.agents} selected={selected} onPick={open} />
@@ -295,6 +334,19 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
           </div>
         )}
       </div>
+
+      {draft && (
+        <StructurePanel
+          agents={team.agents}
+          draft={draft}
+          saving={savingStructure}
+          error={structureError}
+          onChange={setDraft}
+          onRelayout={() => setDraft({ ...draft, pos: {} })}
+          onSave={() => void commitStructure()}
+          onCancel={() => setDraft(null)}
+        />
+      )}
 
       {agent && wide && (
         <button

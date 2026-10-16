@@ -23650,6 +23650,84 @@
         }
       }
     },
+    "/ai/structure": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Structure",
+        "description": "Saves who reports to whom, the teams and the map positions. The chief stays on top, there\nare no cycles, and an agent the business cannot use (locked) cannot be connected.",
+        "operationId": "update_structure",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StructureUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__api__ai_team__Team"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/ai/agents/{agent_key}": {
       "patch": {
         "tags": [
@@ -32078,6 +32156,51 @@
               }
             ],
             "title": "Model Tier"
+          },
+          "reports_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reports To"
+          },
+          "team_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Id"
+          },
+          "map_x": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Map X"
+          },
+          "map_y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Map Y"
           }
         },
         "type": "object",
@@ -43880,6 +44003,68 @@
         ],
         "title": "Placeholders"
       },
+      "Placement": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "reports_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reports To"
+          },
+          "team_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Id"
+          },
+          "map_x": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Map X"
+          },
+          "map_y": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Map Y"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "title": "Placement"
+      },
       "Plan": {
         "properties": {
           "id": {
@@ -50337,6 +50522,32 @@
         "title": "StoredAudience",
         "description": "An audience as stored: every key is present."
       },
+      "StructureUpdate": {
+        "properties": {
+          "teams": {
+            "items": {
+              "$ref": "#/components/schemas/TeamGroup"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Teams"
+          },
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/Placement"
+            },
+            "type": "array",
+            "title": "Agents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "teams",
+          "agents"
+        ],
+        "title": "StructureUpdate",
+        "description": "The whole structure at once: every team and where each agent stands. Agents left out keep\nwhat they have."
+      },
       "SupportAccess": {
         "properties": {
           "tenant_id": {
@@ -50779,6 +50990,44 @@
           "limit"
         ],
         "title": "Tasks"
+      },
+      "TeamGroup": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "title": "Color",
+            "default": "#6B7280"
+          },
+          "lead_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "TeamGroup"
       },
       "Template": {
         "properties": {
@@ -52756,6 +53005,14 @@
             },
             "type": "array",
             "title": "Agents"
+          },
+          "teams": {
+            "items": {
+              "$ref": "#/components/schemas/TeamGroup"
+            },
+            "type": "array",
+            "title": "Teams",
+            "default": []
           },
           "credits_used": {
             "type": "number",
