@@ -23,6 +23,7 @@ PLATFORM_TABLES = {"contact_requests", "platform_audit"}
 UNSEEDED: set[str] = set()
 # Values for columns a CHECK constraint pins down (a synthetic row can't guess them).
 OVERRIDES = {
+    "ai_agents": {"builtin_key": "'x'"},
     "audit_log": {"actor_type": "'system'"},
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
     "checkouts": {"plan_id": "gen_random_uuid()"},

@@ -83,10 +83,10 @@ export function ShiftBoard(props: {
       onClick={() => setEditing({ shift, userId: person.id, day })}
       className={`flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default ${shift.draft ? "border border-dashed border-border" : ""}`}
       style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} ${shift.draft ? 5 : 12}%, var(--surface))` }}
-      aria-label={`${person.name}: ${shift.starts}–${shift.ends} ${shift.locationName}${shift.stationName ? `, ${shift.stationName}` : ""}${shift.position ? `, ${shift.position}` : ""}`}
+      aria-label={`${person.name}: ${shift.starts}-${shift.ends} ${shift.locationName}${shift.stationName ? `, ${shift.stationName}` : ""}${shift.position ? `, ${shift.position}` : ""}`}
     >
       <span className="flex w-full items-center gap-1 font-semibold tabular-nums" dir="ltr">
-        {shift.starts}–{shift.ends}
+        {shift.starts}-{shift.ends}
         {shift.warning && <AlertTriangle aria-label={t(`warnings.${shift.warning}`)} className="ms-auto size-3.5 text-warning" />}
       </span>
       {(shift.stationName || shift.position || branches.length > 1) && (
@@ -244,7 +244,7 @@ export function ShiftBoard(props: {
                 <p key={`${g.locationId}-${g.starts}`} className="flex flex-wrap items-center gap-x-2 border-b border-border bg-warning/10 px-4 py-2 text-xs font-medium text-warning">
                   <ShieldAlert aria-hidden="true" className="size-3.5 shrink-0" />
                   {branches.length > 1 && <span dir="auto">{g.locationName}</span>}
-                  <span dir="ltr" className="tabular-nums">{g.starts}–{g.ends}</span>
+                  <span dir="ltr" className="tabular-nums">{g.starts}-{g.ends}</span>
                   <span>{t("coverage.gap", { have: g.have, needed: g.needed })}</span>
                 </p>
               ))}
@@ -426,7 +426,7 @@ function TemplatePicker({ templates, onApply }: { templates: BoardTemplate[]; on
         {templates.map((tpl) => (
           <li key={tpl.id} className="flex items-center rounded-full border border-border bg-surface-2 text-sm">
             <button type="button" onClick={() => onApply(tpl)} className="rounded-s-full px-3 py-1 font-medium transition-colors hover:text-primary">
-              <span dir="auto">{tpl.name}</span> <span dir="ltr" className="tabular-nums text-muted">{tpl.starts}–{tpl.ends}</span>
+              <span dir="auto">{tpl.name}</span> <span dir="ltr" className="tabular-nums text-muted">{tpl.starts}-{tpl.ends}</span>
             </button>
             <button type="button" onClick={() => startDelete(() => deleteTemplate(tpl.id))} aria-label={t("templates.remove", { name: tpl.name })} className="rounded-e-full px-2 py-1 text-muted transition-colors hover:text-danger">
               <X aria-hidden="true" className="size-3.5" />
@@ -470,7 +470,7 @@ function SaveAsTemplate({ locationId, starts, ends, position }: { locationId: st
           <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40} placeholder={t("templates.namePlaceholder")} dir="auto" className="control px-3 py-1.5 font-normal" />
         </label>
         <button type="button" disabled={saving || name.trim() === ""} aria-busy={saving} onClick={save} className="btn-primary px-3 py-1.5 text-sm">
-          {t("templates.saveDo", { times: `${starts}–${ends}` })}
+          {t("templates.saveDo", { times: `${starts}-${ends}` })}
         </button>
         <button type="button" onClick={() => setOpen(false)} className="btn-ghost px-3 py-1.5 text-sm">
           {t("templates.cancel")}

@@ -354,7 +354,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                               >
                                 {block > 30 && <Users aria-hidden="true" className="size-3 opacity-70" />}
                                 <span aria-hidden="true">{segment.count}</span>
-                                <span className="sr-only">{`${segment.count} ${labels.onShift}, ${clock(segment.start)}–${clock(segment.end)}`}</span>
+                                <span className="sr-only">{`${segment.count} ${labels.onShift}, ${clock(segment.start)}-${clock(segment.end)}`}</span>
                               </button>
                             );
                           })

@@ -6,7 +6,7 @@ branches of its own business (the membership carries the tenant), and deleting a
 only removes the membership.
 
 Revision ID: 0085
-Revises: 0082
+Revises: 0083
 Create Date: 2026-10-16
 """
 
@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0085"
-down_revision: str | None = "0082"
+down_revision: str | None = "0083"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

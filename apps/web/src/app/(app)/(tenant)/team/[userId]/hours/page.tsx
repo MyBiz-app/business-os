@@ -51,7 +51,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
               <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
                 <span>
                   <span className="font-medium">
-                    {entry.starts_on === entry.ends_on ? day(entry.starts_on) : `${day(entry.starts_on)} – ${day(entry.ends_on)}`}
+                    {entry.starts_on === entry.ends_on ? day(entry.starts_on) : `${day(entry.starts_on)} - ${day(entry.ends_on)}`}
                   </span>
                   {entry.reason && <span dir="auto" className="text-muted"> · {entry.reason}</span>}
                 </span>

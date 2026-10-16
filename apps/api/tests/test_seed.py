@@ -353,3 +353,37 @@ def test_networks_demo_has_three_networks_with_their_workspace(engine: Engine) -
         assert row["unplaced"] == 0 and row["overlaps"] == 0
         # Shifts are planned into rooms, and on busy stretches two people share one.
         assert row["stations_used"] >= 2 and row["shared_stations"] > 0
+
+
+def test_categories_demo_has_one_business_per_kind_of_calendar(engine: Engine) -> None:
+    owner = uuid4()
+    email = f"cats-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        tenants = seed_demo(connection, email, "categories", 1, random.Random(4))
+    assert len(tenants) == 3
+    with engine.connect() as connection:
+        kinds = {
+            (vertical, kind)
+            for vertical, kind in connection.execute(
+                text("""
+                    SELECT t.vertical, l.kind FROM app.locations l
+                    JOIN app.tenants t ON t.id = l.tenant_id WHERE t.id = ANY(:ids)
+                """),
+                {"ids": tenants},
+            )
+        }
+        sessions = connection.execute(
+            text("SELECT count(*) FROM app.sessions WHERE tenant_id = ANY(:ids)"),
+            {"ids": tenants},
+        ).scalar_one()
+    assert kinds == {
+        ("gym", "gym"),
+        ("gym", "pilates"),
+        ("padel_tennis", "padel_tennis"),
+        ("hair_salon", "hair_salon"),
+    }
+    assert sessions > 0

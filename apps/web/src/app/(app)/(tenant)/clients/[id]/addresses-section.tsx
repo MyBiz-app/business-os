@@ -46,7 +46,7 @@ export async function AddressesSection({ clientId, context, locked }: { clientId
                 <a href={googleMapsLink(line(address))} target="_blank" rel="noreferrer" className="btn-secondary px-2.5 py-1 text-xs">Google Maps</a>
                 {writable && (
                   <form action={setAddressActive.bind(null, clientId, address.id, !address.active)}>
-                    <button type="submit" aria-label={`${address.active ? t("retire") : t("restore")} – ${line(address)}`} className="btn-secondary px-2.5 py-1 text-xs">
+                    <button type="submit" aria-label={`${address.active ? t("retire") : t("restore")} - ${line(address)}`} className="btn-secondary px-2.5 py-1 text-xs">
                       {address.active ? t("retire") : t("restore")}
                     </button>
                   </form>

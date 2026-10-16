@@ -62,7 +62,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
   const people = useSessionPeople(session.id, friendsEnabled && group, session.spots_left);
   if (!business) return null;
 
-  const hours = `${formatTime(session.starts_at, locale, business.time_zone)}–${formatTime(session.ends_at, locale, business.time_zone)}`;
+  const hours = `${formatTime(session.starts_at, locale, business.time_zone)}-${formatTime(session.ends_at, locale, business.time_zone)}`;
   const day = showDay
     ? new Intl.DateTimeFormat(locale, {
         weekday: "short",
@@ -152,7 +152,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
         choices.length > 0 ? (
           <Button
             label={full ? t("joinWaitlist") : t("book")}
-            accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}${chosen ? ` – ${chosen.name}` : ""}`}
+            accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} - ${label}${chosen ? ` - ${chosen.name}` : ""}`}
             variant={full ? "secondary" : "primary"}
             palette={palette}
             busy={busy}
@@ -169,7 +169,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
       ) : mine ? (
         <Button
           label={mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")}
-          accessibilityLabel={`${mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")} – ${label}`}
+          accessibilityLabel={`${mine.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking")} - ${label}`}
           variant="danger"
           palette={palette}
           busy={busy}
@@ -178,7 +178,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
       ) : (
         <Button
           label={full ? t("joinWaitlist") : t("book")}
-          accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} – ${label}`}
+          accessibilityLabel={`${full ? t("joinWaitlist") : t("book")} - ${label}`}
           variant={full ? "secondary" : "primary"}
           palette={palette}
           busy={busy}
@@ -204,7 +204,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
         <Pressable
           style={styles.info}
           accessibilityRole="button"
-          accessibilityLabel={`${tFriends("details")} – ${label}`}
+          accessibilityLabel={`${tFriends("details")} - ${label}`}
           onPress={() => setSheet(true)}
         >
           <View style={styles.when}>
@@ -279,7 +279,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
               <View style={styles.action}>
                 <Button
                   label={action}
-                  accessibilityLabel={`${action} – ${label} – ${name}`}
+                  accessibilityLabel={`${action} - ${label} - ${name}`}
                   variant="danger"
                   palette={palette}
                   busy={busy}

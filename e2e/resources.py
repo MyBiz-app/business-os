@@ -48,7 +48,7 @@ with sync_playwright() as p:
     add.get_by_role("button", name="הוספת חדר").click()
     page.get_by_role("link", name=f"שעות פתיחה: {COURT}").click()
     page.wait_for_url("**/rooms/**"); h.ready(page)
-    for button in page.get_by_role("button", name="הוספת טווח –").all():
+    for button in page.get_by_role("button", name="הוספת טווח -").all():
         button.click()
     page.get_by_role("button", name="שמירה").click()
     expect(page.get_by_text("נשמר", exact=False).first).to_be_visible(timeout=20000)

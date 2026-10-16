@@ -19,7 +19,7 @@ const [medium, extraBold] = await Promise.all([
   readFile(join(FONTS, "Assistant-ExtraBold.ttf")),
 ]);
 
-export const alt = `${BRAND.name} – ${messages.app.tagline}`;
+export const alt = `${BRAND.name} - ${messages.app.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

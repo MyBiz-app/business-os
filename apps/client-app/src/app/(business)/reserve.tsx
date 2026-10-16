@@ -168,7 +168,7 @@ export default function Reserve() {
             {slot && (
               <Card palette={palette}>
                 <Text style={{ color: palette.foreground, fontWeight: "700", textAlign: "left" }}>
-                  {slot.room_name} · {time(slot.starts_at)}–{time(slot.ends_at)} · {formatMoney(slot.price_amount, slot.price_currency, locale)}
+                  {slot.room_name} · {time(slot.starts_at)}-{time(slot.ends_at)} · {formatMoney(slot.price_amount, slot.price_currency, locale)}
                 </Text>
                 <Field
                   label={tBookings("searchLabel")}

@@ -7,7 +7,7 @@
 /* Short screens (a laptop with its browser bars): tighter vertical spacing. */
 @custom-variant short (@media (max-height: 50rem));
 
-/* Design tokens. Use logical utilities (ms-*, ps-*, start-*, text-start) — never left/right.
+/* Design tokens. Use logical utilities (ms-*, ps-*, start-*, text-start) - never left/right.
  * Surfaces: `background` is the page canvas, `surface` the raised cards on it. Accents are
  * mixed from `primary`, so a business's brand color carries through the whole UI. */
 :root {
@@ -31,7 +31,7 @@
     0 2px 4px hsl(var(--shadow-color) / 0.06),
     0 10px 24px -6px hsl(var(--shadow-color) / 0.14);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  /* MyBiz's own brand (logo tile, accents, the call-to-action band) — not a business's color. */
+  /* MyBiz's own brand (logo tile, accents, the call-to-action band) - not a business's color. */
   --brand-from: #2563eb;
   --brand-via: #7c3aed;
   --brand-to: #06b6d4;

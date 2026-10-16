@@ -55,7 +55,7 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
             <dt className="text-muted">{t("issuedAt")}</dt>
             <dd>{day(invoice.issued_at.slice(0, 10))}</dd>
             <dt className="text-muted">{t("period")}</dt>
-            <dd>{day(invoice.period_start)} – {day(invoice.period_end)}</dd>
+            <dd>{day(invoice.period_start)} - {day(invoice.period_end)}</dd>
             <dt className="text-muted">{t("to")}</dt>
             <dd dir="auto">{invoice.billing.billing_name ?? invoice.business_name}</dd>
             {invoice.billing.tax_id && (

@@ -50,6 +50,9 @@ jobs:
         working-directory: apps/api
         run: uv sync --locked
 
+      - name: Check no em or en dashes are used
+        run: node scripts/check-no-long-dash.cjs
+
       - name: Check the generated API client is up to date
         run: |
           pnpm api:generate

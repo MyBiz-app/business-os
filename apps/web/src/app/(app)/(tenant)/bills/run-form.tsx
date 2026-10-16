@@ -92,9 +92,9 @@ export function RunForm({ month, rows }: { month: string; rows: Row[] }) {
                     </Link>
                     {row.billed && <span className="ms-2 rounded-full border border-border px-2 py-0.5 text-xs text-muted">{t("billed")}</span>}
                   </th>
-                  <td className="p-3 tabular-nums">{row.fee ?? "—"}</td>
+                  <td className="p-3 tabular-nums">{row.fee ?? "-"}</td>
                   <td className="p-3 tabular-nums">{row.hours}</td>
-                  <td className="p-3 tabular-nums">{row.extra ?? "—"}</td>
+                  <td className="p-3 tabular-nums">{row.extra ?? "-"}</td>
                   <td className="p-3 text-end font-semibold tabular-nums">{row.total}</td>
                 </tr>
               );

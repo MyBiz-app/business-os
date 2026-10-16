@@ -43,31 +43,31 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `appointments.py`, `leads.py`, `messaging.py`, `billing.py`, `marketing.py`, `reviews.py`, `client_profile.py`: one flow each, run like `roles.py`.
 
-`signup_journey.py`: the whole sign-up journey — the plan builder with its live cart, the account, the email confirmation, the simulated payment, and the dashboard with its first-steps checklist — on a phone in Hebrew and on a wide screen in English with dark mode.
+`signup_journey.py`: the whole sign-up journey - the plan builder with its live cart, the account, the email confirmation, the simulated payment, and the dashboard with its first-steps checklist - on a phone in Hebrew and on a wide screen in English with dark mode.
 
 `welcome.py`: a new account lands on the welcome page and explores a sample business with fictitious data.
 
-`branches.py`: one owner with two businesses and several branches — the business menu, "My businesses", the branch picker and a new client filed under the current branch.
+`branches.py`: one owner with two businesses and several branches - the business menu, "My businesses", the branch picker and a new client filed under the current branch.
 
 `upgrade.py`: a module the business doesn't have stays in the menu, locked; its preview shows what changes on the invoice, and "add to plan" turns it on.
 
 `sales.py <owner email with data>`: the sales page for a month, its totals and the CSV export.
 
-`console.py <team email of an owner>`: the MyBiz console — an owner builds the team (manager, employee), each level sees only its own parts, a business writes in and the inbox handles it, an owner enters a business and fixes something, extends a trial and changes a plan, and the audit log has it all.
+`console.py <team email of an owner>`: the MyBiz console - an owner builds the team (manager, employee), each level sees only its own parts, a business writes in and the inbox handles it, an owner enters a business and fixes something, extends a trial and changes a plan, and the audit log has it all.
 
 `crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
 
 `client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.
 
-`resources.py <owner email with data>`: courts and rooms by the hour (#41) — a room becomes a court for rent with opening hours, a service by the hour gets its court, and the front desk reserves it from the day grid; then the grid in English/dark on a phone.
+`resources.py <owner email with data>`: courts and rooms by the hour (#41) - a room becomes a court for rent with opening hours, a service by the hour gets its court, and the front desk reserves it from the day grid; then the grid in English/dark on a phone.
 
-`court_app.py <owner email>` (needs `pnpm dev:app`; run `resources.py` first): a new client books a court in the app — length, day, time — pays (simulated) and opens the receipt.
+`court_app.py <owner email>` (needs `pnpm dev:app`; run `resources.py` first): a new client books a court in the app - length, day, time - pays (simulated) and opens the receipt.
 
-`pets.py <owner email>` (on the pet grooming demo, `--demo pets`): pets under their owners (#43) — the owner's card lists their pets and a new one is added with its details; an appointment is booked for the pet and the roster shows "pet · owner"; then the card in English/dark on a phone.
+`pets.py <owner email>` (on the pet grooming demo, `--demo pets`): pets under their owners (#43) - the owner's card lists their pets and a new one is added with its details; an appointment is booked for the pet and the roster shows "pet · owner"; then the card in English/dark on a phone.
 
 `pets_app.py <owner email>` (needs `pnpm dev:app`, the pet grooming demo): a new owner adds their dog under "My pets" in the client app and books a grooming appointment for it.
 
-`onsite_jobs.py <owner email>` (on the air-conditioning demo, `--demo jobs`): on-site jobs (#42) — a client's addresses and a new one; a job booked at that address; the job's page with the address, navigation links and on the way → in progress → done (checks the client in); then the job in English/dark on a phone.
+`onsite_jobs.py <owner email>` (on the air-conditioning demo, `--demo jobs`): on-site jobs (#42) - a client's addresses and a new one; a job booked at that address; the job's page with the address, navigation links and on the way → in progress → done (checks the client in); then the job in English/dark on a phone.
 
 `onsite_app.py <owner email>` (needs `pnpm dev:app`, the demo): a new client adds their home under "My addresses" and books an AC service there.
 
@@ -75,8 +75,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `integrations.py <owner email> <MyBiz team owner email>`: settings → Integrations lists the payments, invoicing and messaging providers; connecting one and going back to the default; the console lists every service with its default (English/dark on a phone).
 
-`quotes.py <owner email>` (on the photography demo, `--demo events`): quotes (#44) — a new quote with lines and an event saved as a draft and sent; the client opens the private link with no sign-in (English/dark phone), accepts with their name and pays the deposit; the business sees it paid and the event listed.
+`quotes.py <owner email>` (on the photography demo, `--demo events`): quotes (#44) - a new quote with lines and an event saved as a draft and sent; the client opens the private link with no sign-in (English/dark phone), accepts with their name and pays the deposit; the business sees it paid and the event listed.
 
-`practice.py <owner email>` (on the accounting demo, `--demo office`): documents, time and bills (#45) — log time, set the retainer, upload a contract shared and asking to sign, bill the month and open the bill's link to pay (English/dark phone), and My time.
+`practice.py <owner email>` (on the accounting demo, `--demo office`): documents, time and bills (#45) - log time, set the retainer, upload a contract shared and asking to sign, bill the month and open the bill's link to pay (English/dark phone), and My time.
 
-`client_account.py <owner email>` (on the accounting demo, `--demo office`): the client app's account round (#98) — a new client sees a bill to pay, a quote to answer and a contract to sign on the home screen and in "In my account", signs the contract, and home stops asking (Hebrew/light, profile in dark).
+`client_account.py <owner email>` (on the accounting demo, `--demo office`): the client app's account round (#98) - a new client sees a bill to pay, a quote to answer and a contract to sign on the home screen and in "In my account", signs the contract, and home stops asking (Hebrew/light, profile in dark).
