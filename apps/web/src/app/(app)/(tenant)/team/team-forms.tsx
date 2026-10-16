@@ -13,13 +13,16 @@ import { SubmitButton } from "@/components/form/submit-button";
 import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
 
 const ROLES = ["owner", "manager", "front_desk", "staff"] as const;
+// A branch manager is appointed from the branch's page; here it only shows for someone who is one.
+type TeamRole = (typeof ROLES)[number] | "branch_manager";
 
 export type CustomRoleOption = { id: string; name: string };
 
-function useRoleOptions(allowOwner: boolean, custom: CustomRoleOption[] = []) {
+function useRoleOptions(allowOwner: boolean, custom: CustomRoleOption[] = [], branchManager = false) {
   const t = useTranslations("roles");
   return [
     ...ROLES.filter((role) => allowOwner || role !== "owner").map((value) => ({ value: value as string, label: t(value) })),
+    ...(branchManager ? [{ value: "branch_manager", label: t("branch_manager") }] : []),
     ...custom.map((role) => ({ value: `custom:${role.id}`, label: role.name })),
   ];
 }
@@ -75,7 +78,7 @@ type MemberRowProps = {
   permissions: string[];
   email: string;
   name: string | null;
-  role: (typeof ROLES)[number];
+  role: TeamRole;
   customRoleId: string | null;
   isSelf: boolean;
   allowOwner: boolean;
@@ -96,7 +99,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
   const locked = role === "owner" && !allowOwner;
   // Only owners may change their own role (to step down); nobody else can.
   const roleLocked = locked || (isSelf && !allowOwner);
-  const roleOptions = useRoleOptions(allowOwner || role === "owner", role === "owner" ? [] : customRoles);
+  const roleOptions = useRoleOptions(allowOwner || role === "owner", role === "owner" ? [] : customRoles, role === "branch_manager");
   const current = customRoleId ? `custom:${customRoleId}` : role;
 
   return (

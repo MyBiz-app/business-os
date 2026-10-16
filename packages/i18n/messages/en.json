@@ -311,6 +311,7 @@
   "roles": {
     "owner": "Owner",
     "manager": "Manager",
+    "branch_manager": "Branch manager",
     "staff": "Staff",
     "front_desk": "Front desk",
     "support": "Platform support (read-only)",
@@ -695,6 +696,14 @@
     }
   },
   "locations": {
+    "manager": {
+      "title": "Branch manager",
+      "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
+      "none": "No one is appointed (the owner manages it)",
+      "label": "Manager",
+      "save": "Save manager",
+      "clear": "Remove manager"
+    },
     "title": "Locations",
     "subtitle": "Where your business operates, and the rooms in each place.",
     "add": "Add location",
@@ -796,6 +805,8 @@
       "generic": "Something went wrong. Please try again.",
       "cannot_change_own_role": "You can't change your own role.",
       "exceeds_own_permissions": "You can't grant permissions you don't have yourself.",
+      "exceeds_own_level": "A branch manager works with staff and front desk only.",
+      "branch_manager_needs_branch": "A branch manager needs at least one branch.",
       "name_taken": "A role with that name already exists.",
       "role_in_use": "This role is still assigned to team members. Change their role first.",
       "reporting_cycle": "That would make a loop: this person already manages them."
@@ -998,6 +1009,7 @@
     "role": {
       "owner": "Owner",
       "manager": "Manager",
+      "branch_manager": "Branch manager",
       "staff": "Staff",
       "front_desk": "Front desk"
     },

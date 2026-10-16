@@ -12,6 +12,7 @@ import { branchKindOptions, industryTexts } from "@/lib/verticals";
 
 import { saveOpeningHours, updateLocation } from "../actions";
 import { BranchBranding } from "../branch-branding";
+import { BranchManager } from "../branch-manager";
 import { LocationForm } from "../location-form";
 import { Rooms } from "../rooms";
 import { UserText } from "@/components/bidi";
@@ -27,6 +28,9 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
   });
   if (!location) notFound();
   const readOnly = !canWriteCatalog(tenant);
+  // Appointing a manager is for those who reach every branch (owner, manager).
+  const team = canManageSettings(tenant) ? (await api.GET("/staff", { params: scope })).data : undefined;
+  const managers = (team?.members ?? []).map((m) => ({ id: m.user_id, label: m.full_name ?? m.email }));
   const hours = (await api.GET("/locations/{location_id}/hours", { params: { ...scope, path: { location_id: id } } })).data;
 
   return (
@@ -40,6 +44,7 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
         readOnly={readOnly}
         kindOptions={branchKindOptions(tenant.vertical, industryTexts(t).text, t("locations.kindSame"))}
       />
+      {team && <BranchManager location={location} members={managers} />}
       {canManageSettings(tenant) && <BranchBranding location={location} logo={apiAssetUrl(location.logo_url)} networkColor={tenant.primary_color} />}
       <section aria-labelledby="opening-heading" className="flex flex-col gap-4 card p-6">
         <div className="flex flex-col gap-1">

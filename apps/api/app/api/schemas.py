@@ -13,7 +13,7 @@ LegalEntityType = Literal[
 ]
 
 Locale = Literal["he", "en"]
-Role = Literal["owner", "manager", "staff", "front_desk"]
+Role = Literal["owner", "manager", "branch_manager", "staff", "front_desk"]
 
 
 class Membership(BaseModel):
