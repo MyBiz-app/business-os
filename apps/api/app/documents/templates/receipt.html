@@ -1,0 +1,17 @@
+{% extends "_frame.html" %}
+{% block title %}{{ doc_title }} {{ doc_number }}{% endblock %}
+{% block stamp %}<div class="stamp">{{ t.paid }}</div>{% endblock %}
+{% block body %}
+<table class="meta">
+  <tr><th>{{ t.issuedAt }}</th><td>{{ issued }}</td></tr>
+  <tr><th>{{ t.to }}</th><td>{{ client_name }}</td></tr>
+  {% if client_email %}<tr><th></th><td class="ltr">{{ client_email }}</td></tr>{% endif %}
+  <tr><th>{{ t.method }}</th><td>{{ method }}</td></tr>
+</table>
+<table class="lines">
+  <thead><tr><th>{{ t.item }}</th><th class="num">{{ t.amount }}</th></tr></thead>
+  <tbody><tr><td style="unicode-bidi: plaintext">{{ description }}</td><td class="num"><bdi>{{ amount }}</bdi></td></tr></tbody>
+</table>
+<div class="total-row"><span class="label">{{ t.total }}</span><span class="total"><bdi>{{ amount }}</bdi></span></div>
+<p class="note">{{ t.thanks }}</p>
+{% endblock %}

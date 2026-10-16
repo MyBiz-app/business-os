@@ -2847,7 +2847,8 @@
     "thanks": "Thank you!",
     "email": "Email",
     "legalDocument": "Tax document no. {number} was issued by your invoicing provider",
-    "openDocument": "Open the document"
+    "openDocument": "Open the document",
+    "download": "Download PDF"
   },
   "marketing": {
     "signedOut": "You signed out successfully. See you soon.",
@@ -3963,7 +3964,8 @@
       "extraSoFar": "Extra this month: {credits} credits, {amount}",
       "alerts": "You passed {percent}% of this month's AI credits.",
       "needModule": "Choose an AI plan to use extra credits."
-    }
+    },
+    "download": "Download PDF"
   },
   "visitNotes": {
     "body": "What was done / worth remembering?",
@@ -6054,6 +6056,39 @@
     "signName": "Your full name",
     "signHint": "Writing your name signs the document.",
     "signFailed": "Couldn't sign. Try again."
+  },
+  "pdfDocuments": {
+    "receipt": "Receipt",
+    "receiptNumber": "Receipt no. {number}",
+    "invoice": "Invoice",
+    "invoiceNumber": "Invoice no. {number}",
+    "paid": "PAID",
+    "original": "Original",
+    "issuedAt": "Date",
+    "to": "Billed to",
+    "item": "Item",
+    "amount": "Amount",
+    "total": "Total",
+    "method": "Payment method",
+    "period": "Period",
+    "taxId": "Tax ID",
+    "companyNumber": "Company no.",
+    "vatNumber": "VAT no.",
+    "activeClients": "{count} active clients at the end of the period",
+    "core": "Core",
+    "quantity": "Qty",
+    "paidWith": "Paid with the card ending {last4} on {date}",
+    "status": {
+      "open": "Due",
+      "paid": "Paid",
+      "void": "Void"
+    },
+    "sampleReceipt": "Sample document - test payment, not a tax document",
+    "sampleInvoice": "Sample invoice - simulated charge in the prototype",
+    "stagingMark": "Sample document",
+    "issuedWith": "Issued with {brand}",
+    "thanks": "Thank you!",
+    "page": "Page {page} of {pages}"
   },
   "time": {
     "title": "Time and billing",

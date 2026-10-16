@@ -2847,7 +2847,8 @@
     "thanks": "תודה!",
     "email": "אימייל",
     "legalDocument": "המסמך החשבונאי מס' {number} הופק אצל ספק החשבוניות",
-    "openDocument": "לפתיחת המסמך"
+    "openDocument": "לפתיחת המסמך",
+    "download": "הורדת PDF"
   },
   "marketing": {
     "signedOut": "התנתקת בהצלחה. נתראה בקרוב.",
@@ -3963,7 +3964,8 @@
       "extraSoFar": "תוספת החודש: {credits} קרדיטים, {amount}",
       "alerts": "עברתם {percent}% מקרדיטי ה-AI של החודש.",
       "needModule": "בחרו תוכנית AI כדי להשתמש בקרדיטים נוספים."
-    }
+    },
+    "download": "הורדת PDF"
   },
   "visitNotes": {
     "body": "מה נעשה / מה חשוב לזכור?",
@@ -6054,6 +6056,39 @@
     "signName": "השם המלא שלך",
     "signHint": "כתיבת השם היא החתימה על המסמך.",
     "signFailed": "החתימה נכשלה. נסו שוב."
+  },
+  "pdfDocuments": {
+    "receipt": "קבלה",
+    "receiptNumber": "קבלה מס׳ {number}",
+    "invoice": "חשבונית",
+    "invoiceNumber": "חשבונית מס׳ {number}",
+    "paid": "שולם",
+    "original": "מקור",
+    "issuedAt": "תאריך",
+    "to": "לכבוד",
+    "item": "פריט",
+    "amount": "סכום",
+    "total": "סה״כ",
+    "method": "אמצעי תשלום",
+    "period": "תקופה",
+    "taxId": "ח.פ. / ע.מ.",
+    "companyNumber": "ח.פ.",
+    "vatNumber": "עוסק מורשה",
+    "activeClients": "{count} לקוחות פעילים בסוף התקופה",
+    "core": "מערכת הליבה",
+    "quantity": "כמות",
+    "paidWith": "שולם בכרטיס שמסתיים ב-{last4} ב-{date}",
+    "status": {
+      "open": "לתשלום",
+      "paid": "שולמה",
+      "void": "בוטלה"
+    },
+    "sampleReceipt": "מסמך לדוגמה - תשלום בדיקה, לא מסמך חשבונאי",
+    "sampleInvoice": "חשבונית לדוגמה - חיוב מדומה באב-טיפוס",
+    "stagingMark": "מסמך לדוגמה",
+    "issuedWith": "הופק באמצעות {brand}",
+    "thanks": "תודה!",
+    "page": "עמוד {page} מתוך {pages}"
   },
   "time": {
     "title": "שעות וחיוב",

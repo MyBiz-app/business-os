@@ -114,6 +114,45 @@
       }
     }
   },
+  "pdfDocuments": {
+    "receipt": "קבלה",
+    "receiptNumber": "קבלה מס׳ {number}",
+    "invoice": "חשבונית",
+    "invoiceNumber": "חשבונית מס׳ {number}",
+    "paid": "שולם",
+    "original": "מקור",
+    "issuedAt": "תאריך",
+    "to": "לכבוד",
+    "item": "פריט",
+    "amount": "סכום",
+    "total": "סה״כ",
+    "method": "אמצעי תשלום",
+    "period": "תקופה",
+    "taxId": "ח.פ. / ע.מ.",
+    "companyNumber": "ח.פ.",
+    "vatNumber": "עוסק מורשה",
+    "activeClients": "{count} לקוחות פעילים בסוף התקופה",
+    "core": "מערכת הליבה",
+    "quantity": "כמות",
+    "paidWith": "שולם בכרטיס שמסתיים ב-{last4} ב-{date}",
+    "status": {
+      "open": "לתשלום",
+      "paid": "שולמה",
+      "void": "בוטלה"
+    },
+    "sampleReceipt": "מסמך לדוגמה - תשלום בדיקה, לא מסמך חשבונאי",
+    "sampleInvoice": "חשבונית לדוגמה - חיוב מדומה באב-טיפוס",
+    "stagingMark": "מסמך לדוגמה",
+    "issuedWith": "הופק באמצעות {brand}",
+    "thanks": "תודה!",
+    "page": "עמוד {page} מתוך {pages}",
+    "methods": {
+      "card": "כרטיס אשראי",
+      "cash": "מזומן",
+      "transfer": "העברה בנקאית",
+      "other": "אחר"
+    }
+  },
   "modules": {
     "names": {
       "none": "בלי AI",

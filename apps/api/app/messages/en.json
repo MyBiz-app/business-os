@@ -114,6 +114,45 @@
       }
     }
   },
+  "pdfDocuments": {
+    "receipt": "Receipt",
+    "receiptNumber": "Receipt no. {number}",
+    "invoice": "Invoice",
+    "invoiceNumber": "Invoice no. {number}",
+    "paid": "PAID",
+    "original": "Original",
+    "issuedAt": "Date",
+    "to": "Billed to",
+    "item": "Item",
+    "amount": "Amount",
+    "total": "Total",
+    "method": "Payment method",
+    "period": "Period",
+    "taxId": "Tax ID",
+    "companyNumber": "Company no.",
+    "vatNumber": "VAT no.",
+    "activeClients": "{count} active clients at the end of the period",
+    "core": "Core",
+    "quantity": "Qty",
+    "paidWith": "Paid with the card ending {last4} on {date}",
+    "status": {
+      "open": "Due",
+      "paid": "Paid",
+      "void": "Void"
+    },
+    "sampleReceipt": "Sample document - test payment, not a tax document",
+    "sampleInvoice": "Sample invoice - simulated charge in the prototype",
+    "stagingMark": "Sample document",
+    "issuedWith": "Issued with {brand}",
+    "thanks": "Thank you!",
+    "page": "Page {page} of {pages}",
+    "methods": {
+      "card": "Credit card",
+      "cash": "Cash",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    }
+  },
   "modules": {
     "names": {
       "none": "No AI",

@@ -1,3 +1,18 @@
 {
-  "name": "MyBiz"
+  "name": "MyBiz",
+  "legal": {
+    "companyName": {
+      "he": "מייביז טכנולוגיות בע\"מ",
+      "en": "MyBiz Technologies Ltd."
+    },
+    "companyNumber": "516000106",
+    "vatNumber": "516000106",
+    "address": {
+      "he": "רחוב הדוגמה 1, תל אביב-יפו 6100001",
+      "en": "1 Hadugma St., Tel Aviv-Yafo 6100001"
+    },
+    "email": "billing@mybizapp.click",
+    "website": "mybizapp.click",
+    "fictitious": true
+  }
 }
