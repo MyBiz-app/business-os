@@ -14,9 +14,10 @@ type Props = {
   chargeable: boolean;
   branches: { id: string; name: string }[];
   people: { id: string; name: string }[];
+  kindOptions: { value: string; label: string }[];
 };
 
-export function NewBranchForm({ action, chargeable, branches, people }: Props) {
+export function NewBranchForm({ action, chargeable, branches, people, kindOptions }: Props) {
   const t = useTranslations();
   const [state, formAction] = useActionState(action, {});
 
@@ -27,6 +28,10 @@ export function NewBranchForm({ action, chargeable, branches, people }: Props) {
         <legend className="sr-only">{t("locations.addBranch.details")}</legend>
         <Field label={t("locations.name")} name="name" required maxLength={120} />
         <Field label={t("locations.address")} name="address" maxLength={300} />
+        {kindOptions.length > 1 && (
+          <SelectField label={t("locations.kind")} name="kind" defaultValue="" options={kindOptions} />
+        )}
+        {kindOptions.length > 1 && <p className="text-xs text-muted sm:col-span-2">{t("locations.kindHint")}</p>}
         <SelectField
           label={t("locations.addBranch.copyHours")}
           name="copy_hours_from"

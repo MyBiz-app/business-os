@@ -367,6 +367,29 @@ def test_participants_profiles_and_privacy(
     )
 
 
+def test_friend_request_from_a_class_participant_profile(
+    client: TestClient, studio: dict, auth: AuthHeaders
+) -> None:
+    dana = person(client, auth, studio, "Dana")
+    noa = person(client, auth, studio, "Noa")
+    ron = person(client, auth, studio, "Ron")
+    session_id = new_session(client, studio, capacity=5)
+    for who in (dana, noa):
+        book(client, who, session_id)
+
+    asked = client.post(f"/client/people/{noa['id']}/friend-request", headers=dana["headers"])
+    assert asked.status_code == 201, asked.text
+    assert asked.json()["friendship"] == "request_sent"
+    again = client.post(f"/client/people/{noa['id']}/friend-request", headers=dana["headers"])
+    assert again.status_code == 409 and again.json()["detail"] == "already_requested"
+    [incoming] = client.get("/client/friends/requests", headers=noa["headers"]).json()["incoming"]
+    assert incoming["client_id"] == dana["id"]
+
+    # Someone I never met in a class cannot be asked.
+    stranger = client.post(f"/client/people/{ron['id']}/friend-request", headers=dana["headers"])
+    assert stranger.status_code == 404
+
+
 def test_shared_classes_are_counted_per_class_type(
     client: TestClient, studio: dict, auth: AuthHeaders
 ) -> None:
