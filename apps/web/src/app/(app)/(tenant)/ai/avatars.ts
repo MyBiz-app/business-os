@@ -26,6 +26,15 @@ import a_gallery_13 from "@business-os/brand/agents/gallery-13.webp";
 import a_gallery_14 from "@business-os/brand/agents/gallery-14.webp";
 import a_gallery_15 from "@business-os/brand/agents/gallery-15.webp";
 import a_gallery_16 from "@business-os/brand/agents/gallery-16.webp";
+import a_gallery_17 from "@business-os/brand/agents/gallery-17.webp";
+import a_gallery_18 from "@business-os/brand/agents/gallery-18.webp";
+import a_gallery_19 from "@business-os/brand/agents/gallery-19.webp";
+import a_gallery_20 from "@business-os/brand/agents/gallery-20.webp";
+import a_gallery_21 from "@business-os/brand/agents/gallery-21.webp";
+import a_gallery_22 from "@business-os/brand/agents/gallery-22.webp";
+import a_gallery_23 from "@business-os/brand/agents/gallery-23.webp";
+import a_gallery_24 from "@business-os/brand/agents/gallery-24.webp";
+import a_gallery_25 from "@business-os/brand/agents/gallery-25.webp";
 
 const AVATARS: Record<string, StaticImageData> = {
   "chief": a_chief,
@@ -53,6 +62,15 @@ const AVATARS: Record<string, StaticImageData> = {
   "gallery-14": a_gallery_14,
   "gallery-15": a_gallery_15,
   "gallery-16": a_gallery_16,
+  "gallery-17": a_gallery_17,
+  "gallery-18": a_gallery_18,
+  "gallery-19": a_gallery_19,
+  "gallery-20": a_gallery_20,
+  "gallery-21": a_gallery_21,
+  "gallery-22": a_gallery_22,
+  "gallery-23": a_gallery_23,
+  "gallery-24": a_gallery_24,
+  "gallery-25": a_gallery_25,
 };
 
 /** The picture for an agent: its chosen preset, else its own key (the nine defaults); null for a custom agent without one. */
