@@ -25,6 +25,7 @@ class Permission(StrEnum):
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
+    IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
