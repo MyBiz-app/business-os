@@ -181,6 +181,10 @@ The nine built-in agents live in code (`app/ai/agents.py`); a database row (`app
 
 The branches a conversation sees are the user's branches ∩ the agent's scope ∩ the chat's scope, applied to the whole tool run (the `app.location_ids` setting and the `TenantContext`). Scope only narrows. Clients are filtered with the same rule as the client list. Tools whose data has no branch (leads) are not offered at all while the conversation is narrowed, which also applies to a branch-limited user (previously they saw the whole pipeline). A scope that names branch groups sees nothing until groups exist (G1). The chief gets a `suggest_agent` tool that only offers a hand-over card; the new chat carries a short summary of the last exchange. The owner's agent instructions sit below the fixed rules in the system prompt and cannot widen tools or data.
 
+### AI spend controls (2026-10-16, round 5 A2)
+
+Pay-as-you-go extra credits are off by default (`app.tenant_ai_settings`, migration 0084). When on, questions keep working after the included credits (400 / 1200 stay) and the extra use is a line on the account at 6.00 ILS / 1.70 USD / 1.60 EUR per 100 credits (`AI_EXTRA_PRICE_PER_100`); no payment is taken while payments (#46) are a disabled adapter. An optional monthly cap (minor units) sets where questions stop; no cap means no limit. Roles and people can have a lower monthly limit (`app.ai_credit_limits`; a role limit applies to each person). Alerts at 80, 100, 150 and 200% of the included credits are recorded once a month (`app.ai_credit_alerts`) and shown in the CRM; email alerts follow later. The three "coming soon" modules (`analytics_pro`, `agent_finance`, `agent_marketing`) are now selectable.
+
 ## Open
 
 | # | Question |

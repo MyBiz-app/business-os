@@ -19538,6 +19538,228 @@
         }
       }
     },
+    "/ai/spend": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Spend Status",
+        "description": "The month's AI spend: included credits, pay-as-you-go settings, extra cost, alerts and the\nlimits per role and person.",
+        "operationId": "ai_spend_status",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSpend"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Ai Spend",
+        "description": "Turns pay-as-you-go extra credits on or off and sets the monthly cap (no cap: no limit).",
+        "operationId": "update_ai_spend",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpendUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSpend"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/spend/limits": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Ai Limits",
+        "description": "Replaces the monthly credit limits per role and per person (each person gets the limit,\nnot the role as a whole).",
+        "operationId": "update_ai_limits",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LimitsUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSpend"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/modules/catalog": {
       "get": {
         "tags": [
@@ -26094,6 +26316,101 @@
         "title": "AgentSuggestion",
         "description": "A card offering to hand the user over to a specialist agent."
       },
+      "AiSpend": {
+        "properties": {
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "credits_included": {
+            "type": "integer",
+            "title": "Credits Included"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "payg_enabled": {
+            "type": "boolean",
+            "title": "Payg Enabled"
+          },
+          "payg_cap_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payg Cap Minor",
+            "description": "Most extra spend per month; null: no cap"
+          },
+          "price_per_100_minor": {
+            "type": "integer",
+            "title": "Price Per 100 Minor",
+            "description": "Price of 100 extra credits, minor units"
+          },
+          "extra_credits": {
+            "type": "number",
+            "title": "Extra Credits",
+            "description": "Credits used above the included ones"
+          },
+          "extra_minor": {
+            "type": "integer",
+            "title": "Extra Minor",
+            "description": "What that costs this month, minor units"
+          },
+          "credits_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits Limit",
+            "description": "Where questions stop; null: no limit"
+          },
+          "alerts": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Alerts",
+            "description": "Thresholds (%) passed this month"
+          },
+          "limits": {
+            "items": {
+              "$ref": "#/components/schemas/CreditLimit"
+            },
+            "type": "array",
+            "title": "Limits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month_start",
+          "currency",
+          "credits_included",
+          "credits_used",
+          "payg_enabled",
+          "payg_cap_minor",
+          "price_per_100_minor",
+          "extra_credits",
+          "extra_minor",
+          "credits_limit",
+          "alerts",
+          "limits"
+        ],
+        "title": "AiSpend"
+      },
       "Answer-Input": {
         "properties": {
           "accept": {
@@ -30405,6 +30722,38 @@
         ],
         "title": "CreatedSessions"
       },
+      "CreditLimit": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "role",
+              "user"
+            ],
+            "title": "Kind"
+          },
+          "key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Key",
+            "description": "A role key, or a user id"
+          },
+          "monthly_credits": {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Monthly Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "key",
+          "monthly_credits"
+        ],
+        "title": "CreditLimit"
+      },
       "CustomAgent": {
         "properties": {
           "name": {
@@ -33751,6 +34100,23 @@
         },
         "type": "object",
         "title": "LeadUpdate"
+      },
+      "LimitsUpdate": {
+        "properties": {
+          "limits": {
+            "items": {
+              "$ref": "#/components/schemas/CreditLimit"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Limits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "limits"
+        ],
+        "title": "LimitsUpdate"
       },
       "Location": {
         "properties": {
@@ -40792,6 +41158,32 @@
         ],
         "title": "Slot"
       },
+      "SpendUpdate": {
+        "properties": {
+          "payg_enabled": {
+            "type": "boolean",
+            "title": "Payg Enabled"
+          },
+          "payg_cap_minor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payg Cap Minor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payg_enabled"
+        ],
+        "title": "SpendUpdate"
+      },
       "StaffHours": {
         "properties": {
           "user_id": {
@@ -42907,6 +43299,11 @@
             "type": "integer",
             "title": "Credits Included"
           },
+          "payg_enabled": {
+            "type": "boolean",
+            "title": "Payg Enabled",
+            "default": false
+          },
           "can_manage": {
             "type": "boolean",
             "title": "Can Manage"
@@ -43166,6 +43563,12 @@
             "type": "integer",
             "title": "Ai Credits Included",
             "description": "0 when the business has no AI module"
+          },
+          "ai_extra_minor": {
+            "type": "integer",
+            "title": "Ai Extra Minor",
+            "description": "Pay-as-you-go: this month's extra AI use, minor units",
+            "default": 0
           }
         },
         "type": "object",

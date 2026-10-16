@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 
+from app.ai import budget
 from app.ai import scope as branch_scope
 from app.ai.agents import Agent, load_team, member_role_keys, state_of, system_part
 from app.ai.gateway import (
@@ -109,6 +110,10 @@ def _record_usage(
             "ref": f"ai_conversation:{conversation_id}",
         },
     )
+    time_zone = tenant.session.execute(
+        text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+    budget.raise_alerts(tenant.session, dt.datetime.now(ZoneInfo(time_zone)).date().replace(day=1))
 
 
 def _call(

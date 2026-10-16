@@ -3180,6 +3180,18 @@
       "overAi": "You've used this month's AI allowance, so the assistant is paused until next month. Everything else keeps working; a bigger AI module raises the allowance.",
       "nearStorage": "Your files take {percent}% of your space.",
       "overStorage": "Your space for files is full: new files can't be added. Delete some or choose a bigger bundle."
+    },
+    "aiSpend": {
+      "title": "Extra AI credits",
+      "intro": "Your plan includes {included} AI credits a month. With pay-as-you-go on, the AI keeps working after that and the extra is added to your invoice at {price} per 100 credits. It is off by default.",
+      "toggle": "Keep the AI working after the included credits",
+      "cap": "Monthly cap on extra credits ({currency})",
+      "capHint": "Leave empty for no cap.",
+      "save": "Save",
+      "saved": "Saved",
+      "extraSoFar": "Extra this month: {credits} credits, {amount}",
+      "alerts": "You passed {percent}% of this month's AI credits.",
+      "needModule": "Choose an AI plan to use extra credits."
     }
   },
   "visitNotes": {

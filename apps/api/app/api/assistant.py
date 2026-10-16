@@ -320,17 +320,25 @@ def get_conversation(conversation_id: UUID, context: AIDep) -> Conversation:
     return _load(context.session, conversation_id)
 
 
-def _check_budget(db: Session, provider: LLMProvider) -> None:
-    """Soft monthly limit: from 100% of the AI module's allowance, new questions wait for next
-    month or a bigger module (demo answers cost nothing and are never limited)."""
-    if getattr(provider, "model", None) == "demo":
-        return
+def _month_start(db: Session) -> dt.date:
     time_zone = db.execute(
         text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
     ).scalar_one()
-    month_start = dt.datetime.now(ZoneInfo(time_zone)).date().replace(day=1)
-    if budget.credits_used(db, month_start) >= budget.credits_included(db):
+    return dt.datetime.now(ZoneInfo(time_zone)).date().replace(day=1)
+
+
+def _check_budget(context: TenantContext, user_id: UUID, provider: LLMProvider) -> None:
+    """Soft monthly limit: at the business's limit (its included credits, plus the extra it
+    agreed to pay for), new questions wait for next month or a bigger module. A role or a person
+    can have a lower limit. Demo answers cost nothing and are never limited."""
+    if getattr(provider, "model", None) == "demo":
+        return
+    db = context.session
+    month_start = _month_start(db)
+    if budget.over_limit(db, month_start):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_limit_reached")
+    if budget.over_person_limit(db, user_id, member_role_keys(db, context.role), month_start):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_user_limit_reached")
 
 
 # Concurrent model calls in this worker (a call holds a request thread and a connection).
@@ -376,7 +384,7 @@ def send_message(
         )
     chat = _load(context.session, conversation_id)  # 404 unless it is the user's conversation
     ensure_agent_usable(context, chat.agent_key)
-    _check_budget(context.session, provider)
+    _check_budget(context, user.id, provider)
     _check_user_rate(user.id, provider)
     if not _model_calls.acquire(blocking=False):
         raise HTTPException(status_code=429, detail="ai_busy")
@@ -411,7 +419,7 @@ def send_message_stream(
         )
     chat = _load(context.session, conversation_id)
     ensure_agent_usable(context, chat.agent_key)
-    _check_budget(context.session, provider)
+    _check_budget(context, user.id, provider)
     _check_user_rate(user.id, provider)
     if not _model_calls.acquire(blocking=False):
         raise HTTPException(status_code=429, detail="ai_busy")
