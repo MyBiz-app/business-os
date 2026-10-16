@@ -8725,6 +8725,400 @@
         }
       }
     },
+    "/contact-emails": {
+      "get": {
+        "tags": [
+          "contact-emails"
+        ],
+        "summary": "Get Contact Emails",
+        "operationId": "get_contact_emails",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A branch; leave out for the business's own",
+              "title": "Location Id"
+            },
+            "description": "A branch; leave out for the business's own"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactEmails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contact-emails/{purpose}": {
+      "put": {
+        "tags": [
+          "contact-emails"
+        ],
+        "summary": "Save Contact Email",
+        "description": "Sets an address for one purpose. The owner's own sign-in email needs no confirmation;\nany other waits for its link. Setting the same address again does not reset it.",
+        "operationId": "save_contact_email",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "purpose",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "main",
+                "inbox",
+                "billing",
+                "reply_to",
+                "notifications"
+              ],
+              "type": "string",
+              "title": "Purpose"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A branch; leave out for the business's own",
+              "title": "Location Id"
+            },
+            "description": "A branch; leave out for the business's own"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactEmailSave"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactEmails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "contact-emails"
+        ],
+        "summary": "Clear Contact Email",
+        "operationId": "clear_contact_email",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "purpose",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "main",
+                "inbox",
+                "billing",
+                "reply_to",
+                "notifications"
+              ],
+              "type": "string",
+              "title": "Purpose"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A branch; leave out for the business's own",
+              "title": "Location Id"
+            },
+            "description": "A branch; leave out for the business's own"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/contact-emails/{purpose}/resend": {
+      "post": {
+        "tags": [
+          "contact-emails"
+        ],
+        "summary": "Resend Confirmation",
+        "operationId": "resend_confirmation",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "purpose",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "main",
+                "inbox",
+                "billing",
+                "reply_to",
+                "notifications"
+              ],
+              "type": "string",
+              "title": "Purpose"
+            }
+          },
+          {
+            "name": "location_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A branch; leave out for the business's own",
+              "title": "Location Id"
+            },
+            "description": "A branch; leave out for the business's own"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactEmails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/locations": {
       "get": {
         "tags": [
@@ -32670,6 +33064,18 @@
             ],
             "title": "Kind",
             "description": "The branch's own sub-category (a catalog key)"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email",
+            "description": "The branch's confirmed main email, else the business's; none if neither set"
           }
         },
         "type": "object",
@@ -33554,6 +33960,61 @@
           "email"
         ],
         "title": "ContactCreate"
+      },
+      "ContactEmailSave": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "ContactEmailSave"
+      },
+      "ContactEmails": {
+        "properties": {
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "purposes": {
+            "items": {
+              "$ref": "#/components/schemas/PurposeState"
+            },
+            "type": "array",
+            "title": "Purposes"
+          },
+          "email_sent": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Sent",
+            "description": "Set after saving: whether a confirmation email went out"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location_id",
+          "purposes"
+        ],
+        "title": "ContactEmails"
       },
       "ContactRequest": {
         "properties": {
@@ -41087,6 +41548,68 @@
           "published_until"
         ],
         "title": "PublishedWeek"
+      },
+      "PurposeState": {
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "main",
+              "inbox",
+              "billing",
+              "reply_to",
+              "notifications"
+            ],
+            "title": "Purpose"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email",
+            "description": "What is set here (this business or branch), if any"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified",
+            "description": "False while the confirmation link is still waiting"
+          },
+          "effective_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Email",
+            "description": "The address used for this purpose here"
+          },
+          "effective_source": {
+            "type": "string",
+            "enum": [
+              "branch",
+              "business",
+              "owner"
+            ],
+            "title": "Effective Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "purpose",
+          "email",
+          "verified",
+          "effective_email",
+          "effective_source"
+        ],
+        "title": "PurposeState"
       },
       "PushTokenBody": {
         "properties": {

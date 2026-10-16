@@ -94,6 +94,10 @@ class ClientLocation(BaseModel):
     kind: str | None = Field(
         default=None, description="The branch's own sub-category (a catalog key)"
     )
+    contact_email: str | None = Field(
+        default=None,
+        description="The branch's confirmed main email, else the business's; none if neither set",
+    )
 
 
 def _business(row: Mapping[str, object]) -> ClientBusiness:
@@ -221,7 +225,18 @@ def my_businesses(session: SessionDep) -> list[ClientBusiness]:
 def business_locations(context: ClientDep) -> list[ClientLocation]:
     """The business's branches with their addresses (the home screen's business details)."""
     rows = context.session.execute(
-        text("SELECT id, name, address, kind FROM app.locations WHERE active ORDER BY name, id")
+        text("""
+            SELECT l.id, l.name, l.address, l.kind,
+                   coalesce(
+                       (SELECT c.email FROM app.contact_emails c
+                        WHERE c.tenant_id = l.tenant_id AND c.location_id = l.id
+                          AND c.purpose = 'main' AND c.verified_at IS NOT NULL),
+                       (SELECT c.email FROM app.contact_emails c
+                        WHERE c.tenant_id = l.tenant_id AND c.location_id IS NULL
+                          AND c.purpose = 'main' AND c.verified_at IS NOT NULL)
+                   ) AS contact_email
+            FROM app.locations l WHERE l.active ORDER BY l.name, l.id
+        """)
     ).mappings()
     return [ClientLocation.model_validate(dict(row)) for row in rows]
 

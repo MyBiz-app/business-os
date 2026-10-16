@@ -89,6 +89,19 @@
       "arrow": "now",
       "more": "…and {count} more changes. See your roster in the app.",
       "footer": "You can turn these emails off under Personal settings."
+    },
+    "contactConfirm": {
+      "subject": "Confirm this email address for {business}",
+      "intro": "This address was added to {business} as its {purpose}. Please confirm it so we can use it.",
+      "button": "Confirm the address",
+      "ignore": "If this is not you, ignore this email and nothing will change.",
+      "purposes": {
+        "main": "main email",
+        "inbox": "inquiries email",
+        "billing": "billing email",
+        "reply_to": "reply-to email",
+        "notifications": "notifications email"
+      }
     }
   },
   "modules": {

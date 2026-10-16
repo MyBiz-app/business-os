@@ -10,6 +10,7 @@ import { canManageSettings, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 import { branchKindOptions, industryTexts } from "@/lib/verticals";
 
+import { ContactEmails } from "../../settings/contact-emails";
 import { saveOpeningHours, updateLocation } from "../actions";
 import { BranchBranding } from "../branch-branding";
 import { BranchManager } from "../branch-manager";
@@ -31,6 +32,9 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
   // Appointing a manager is for those who reach every branch (owner, manager).
   const team = canManageSettings(tenant) ? (await api.GET("/staff", { params: scope })).data : undefined;
   const managers = (team?.members ?? []).map((m) => ({ id: m.user_id, label: m.full_name ?? m.email }));
+  const emails = canManageSettings(tenant)
+    ? (await api.GET("/contact-emails", { params: { ...scope, query: { location_id: id } } })).data
+    : undefined;
   const hours = (await api.GET("/locations/{location_id}/hours", { params: { ...scope, path: { location_id: id } } })).data;
 
   return (
@@ -46,6 +50,7 @@ export default async function LocationPage({ params }: PageProps<"/locations/[id
       />
       {team && <BranchManager location={location} members={managers} />}
       {canManageSettings(tenant) && <BranchBranding location={location} logo={apiAssetUrl(location.logo_url)} networkColor={tenant.primary_color} />}
+      {emails && <ContactEmails data={emails} locationId={location.id} />}
       <section aria-labelledby="opening-heading" className="flex flex-col gap-4 card p-6">
         <div className="flex flex-col gap-1">
           <h2 id="opening-heading" className="text-lg font-semibold">
