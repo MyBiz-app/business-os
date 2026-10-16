@@ -16,6 +16,6 @@
     "build:agents": "node --experimental-strip-types scripts/build-agents.mjs"
   },
   "devDependencies": {
-    "typescript": "^5"
+    "typescript": "^7"
   }
 }
