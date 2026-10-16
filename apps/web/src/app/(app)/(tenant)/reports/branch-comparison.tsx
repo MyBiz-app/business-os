@@ -14,7 +14,7 @@ export async function BranchComparison({ rows, currency, locale }: { rows: Branc
   const number = new Intl.NumberFormat(locale);
   const keys = rows[0]?.metrics.map((m) => m.key) ?? [];
   const show = (unit: string, value: number | null) =>
-    value === null ? "—" : unit === "money" ? formatMoney(Math.round(value), currency, locale) : unit === "percent" ? `${number.format(Math.round(value))}%` : number.format(value);
+    value === null ? "-" : unit === "money" ? formatMoney(Math.round(value), currency, locale) : unit === "percent" ? `${number.format(Math.round(value))}%` : number.format(value);
 
   return (
     <section aria-labelledby="compare-heading" className="card flex flex-col gap-5 p-6">

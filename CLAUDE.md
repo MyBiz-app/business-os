@@ -1,4 +1,4 @@
-# CLAUDE.md — Business OS (codename)
+# CLAUDE.md - Business OS (codename)
 
 Modular, multi-tenant Business OS + AI Workforce for small and medium businesses.
 Israel first (Hebrew), then US/EU (American English). Industries are categories and sub-categories on equal footing (the fitness studio was the prototype).

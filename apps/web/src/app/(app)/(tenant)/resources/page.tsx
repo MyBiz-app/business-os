@@ -172,7 +172,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/resour
                               {label}
                             </span>
                             <span className="tabular-nums text-muted" dir="ltr">
-                              {formatTime(s.starts_at, locale, zone)}–{formatTime(s.ends_at, locale, zone)}
+                              {formatTime(s.starts_at, locale, zone)}-{formatTime(s.ends_at, locale, zone)}
                             </span>
                           </Link>
                         </li>

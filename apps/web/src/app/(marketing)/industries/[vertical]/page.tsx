@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps<"/industries/[verti
   return { title: `${text(vertical, "name")} · ${BRAND.name}`, description: text(vertical, "heroText") };
 }
 
-/** One industry — a category, a sub-category or one coming soon: how MyBiz fits it. */
+/** One industry - a category, a sub-category or one coming soon: how MyBiz fits it. */
 export default async function IndustryPage({ params }: PageProps<"/industries/[vertical]">) {
   const { vertical } = await params;
   const match = findVertical(vertical);

@@ -18,7 +18,7 @@ function useFeedback() {
   return (state: ActionState) => (state.error ? t(`errors.${state.error as "generic"}`) : undefined);
 }
 
-/** Extend the trial, change the plan, credit an invoice — each one audited for the owner. */
+/** Extend the trial, change the plan, credit an invoice - each one audited for the owner. */
 export function BusinessActions({
   tenantId,
   catalog,

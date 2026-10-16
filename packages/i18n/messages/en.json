@@ -332,7 +332,7 @@
     "menu": "Menu",
     "clientApp": "Client app",
     "locked": "Not in your plan",
-    "lockedItem": "{name} — not in your plan",
+    "lockedItem": "{name} - not in your plan",
     "sales": "Sales",
     "resources": "Courts & rooms",
     "quotes": "Quotes",
@@ -685,8 +685,8 @@
     "free": "Free",
     "bookingMode": "How it is booked",
     "modes": {
-      "class": "Group session – at set times on the schedule",
-      "appointment": "Personal appointment – the client picks a free time",
+      "class": "Group session - at set times on the schedule",
+      "appointment": "Personal appointment - the client picks a free time",
       "resource": "A court or room by the hour"
     },
     "appointmentLabel": "Appointment",
@@ -763,7 +763,7 @@
     "removeConfirm": "Remove {email} from the business?",
     "invite": "Invite someone",
     "inviteSubmit": "Create invite link",
-    "inviteCreated": "Invite link created. Send it to {email} — it works once and expires in 7 days.",
+    "inviteCreated": "Invite link created. Send it to {email} - it works once and expires in 7 days.",
     "copy": "Copy link",
     "copied": "Copied",
     "pending": "Pending invitations",
@@ -844,7 +844,7 @@
     "location": "Location",
     "room": "Room",
     "instructor": "Instructor",
-    "none": "—",
+    "none": "-",
     "notes": "Notes",
     "repeat": "Repeat weekly",
     "repeatOn": "On",
@@ -1208,7 +1208,7 @@
     },
     "pay": {
       "title": "Payment",
-      "testMode": "Test mode: no money is charged. No card needed – this is a test card.",
+      "testMode": "Test mode: no money is charged. No card needed - this is a test card.",
       "testCard": "Test card",
       "cardHolder": "Card holder",
       "plan": "Plan",
@@ -1258,7 +1258,7 @@
     },
     "review": {
       "cardTitle": "How was {service}?",
-      "cardText": "Rate your visit — it helps us get better.",
+      "cardText": "Rate your visit - it helps us get better.",
       "rate": "Rate",
       "title": "Rate your visit",
       "question": "How was it?",
@@ -1299,7 +1299,7 @@
       "payAndReserve": "Pay {price} and book",
       "reserve": "Book for {time}",
       "booked": "Booked!",
-      "bookedBody": "{service}, {room}, {date}, {from}–{to}.",
+      "bookedBody": "{service}, {room}, {date}, {from}-{to}.",
       "paid": "Paid {price}.",
       "payAtVenue": "{price}, paid at the venue.",
       "receipt": "The receipt",
@@ -1412,7 +1412,7 @@
     },
     "creditsLeft": "{left} of {total} entries left",
     "unlimitedUsed": "Unlimited · {used} used",
-    "frozenRange": "Frozen {from} – {to}",
+    "frozenRange": "Frozen {from} - {to}",
     "freeze": "Freeze",
     "freezeFrom": "From",
     "freezeTo": "Until",
@@ -1432,7 +1432,7 @@
       "outside_validity": "The freeze must start while the plan is valid.",
       "overlapping_freeze": "That overlaps an existing freeze."
     },
-    "validityRange": "Valid {from} – {to}",
+    "validityRange": "Valid {from} - {to}",
     "paymentMethod": "Payment method",
     "stats": {
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
@@ -1676,7 +1676,7 @@
         "primary_owner_protected": "The primary owner can't be changed or removed.",
         "not_yourself": "You can't change your own entry.",
         "cannot_grant_more_than_you_hold": "You can only give permissions you hold yourself.",
-        "employees_do_not_manage_staff": "Employees can't manage the team — make them a manager.",
+        "employees_do_not_manage_staff": "Employees can't manage the team - make them a manager.",
         "forbidden": "Your level can't make this change.",
         "generic": "Something went wrong. Please try again."
       }
@@ -2047,7 +2047,7 @@
     "roster": {
       "subject": "Your new shifts at {business}",
       "intro": "Your roster at {business} was published. Your shifts:",
-      "line": "{day} {from}–{to} · {branch}{position}",
+      "line": "{day} {from}-{to} · {branch}{position}",
       "more": "…and {count} more. See them all in the app.",
       "weekdays": [
         "Mon",
@@ -2090,7 +2090,7 @@
     "visitsTitle": "What MyBiz opened here",
     "changed": "Changed something",
     "writeTitle": "Write to MyBiz",
-    "writeIntro": "A question, a problem or a complaint — the MyBiz team will get back to you by email.",
+    "writeIntro": "A question, a problem or a complaint - the MyBiz team will get back to you by email.",
     "writeLabel": "What's going on?",
     "writeSend": "Send to MyBiz",
     "writeSent": "Sent. We'll get back to you by email.",
@@ -2102,7 +2102,7 @@
   "receipts": {
     "title": "Receipt no. {number}",
     "short": "Receipt {number}",
-    "sample": "Sample document – test payment, not a tax document",
+    "sample": "Sample document - test payment, not a tax document",
     "issuedAt": "Date",
     "to": "To",
     "item": "Item",
@@ -2175,7 +2175,7 @@
       "eyebrow": "Business management + an AI workforce for small businesses",
       "title": "Your business, organized.",
       "titleAccent": "Finally.",
-      "subtitle": "Calendar, clients, memberships, payments and a branded client app – all in one place, with an AI assistant that answers questions and prepares actions for your approval.",
+      "subtitle": "Calendar, clients, memberships, payments and a branded client app - all in one place, with an AI assistant that answers questions and prepares actions for your approval.",
       "ctaPrimary": "Start free",
       "ctaSecondary": "See how it works",
       "note": "No credit card · Set up in minutes · Hebrew and English"
@@ -2208,7 +2208,7 @@
       "items": {
         "schedule": {
           "title": "Calendar & bookings",
-          "text": "Group classes, recurring series, waitlists, closed days and holidays – no spreadsheets."
+          "text": "Group classes, recurring series, waitlists, closed days and holidays - no spreadsheets."
         },
         "clients": {
           "title": "Clients in one place",
@@ -2216,7 +2216,7 @@
         },
         "plans": {
           "title": "Memberships & passes",
-          "text": "Monthly memberships, class passes, freezes and renewals – counted for you."
+          "text": "Monthly memberships, class passes, freezes and renewals - counted for you."
         },
         "app": {
           "title": "Branded client app",
@@ -2228,7 +2228,7 @@
         },
         "reports": {
           "title": "Reports that make sense",
-          "text": "Revenue, occupancy, no-shows and who to reach out to – at a glance."
+          "text": "Revenue, occupancy, no-shows and who to reach out to - at a glance."
         },
         "team": {
           "title": "Team & permissions",
@@ -2240,7 +2240,7 @@
         },
         "appointments": {
           "title": "Online appointments",
-          "text": "Clients pick a service, a staff member and a free time — within the hours you set."
+          "text": "Clients pick a service, a staff member and a free time - within the hours you set."
         },
         "crm": {
           "title": "Leads and sales",
@@ -2252,7 +2252,7 @@
         },
         "records": {
           "title": "Professional records",
-          "text": "The car at a garage, treatment notes at a clinic, coach notes at a gym — by business type."
+          "text": "The car at a garage, treatment notes at a clinic, coach notes at a gym - by business type."
         }
       },
       "gridTitle": "All in one place",
@@ -2301,7 +2301,7 @@
     "ai": {
       "eyebrow": "AI workforce",
       "title": "An assistant that knows your business",
-      "text": "Ask the way you talk – \"How much did we make this month?\", \"Who hasn't come in for two weeks?\" – and get answers from your real data. When something needs doing, the assistant prepares it and you approve with one click.",
+      "text": "Ask the way you talk - \"How much did we make this month?\", \"Who hasn't come in for two weeks?\" - and get answers from your real data. When something needs doing, the assistant prepares it and you approve with one click.",
       "points": [
         "Answers from your data, not guesses",
         "Nothing happens without your approval",
@@ -2313,7 +2313,7 @@
     "app": {
       "eyebrow": "Client app",
       "title": "Your app, with your logo",
-      "text": "Clients join with a code or QR, see the schedule, book, cancel, buy a plan and get updates – no phone calls.",
+      "text": "Clients join with a code or QR, see the schedule, book, cancel, buy a plan and get updates - no phone calls.",
       "points": [
         "Book and cancel in one tap",
         "Waitlist with automatic promotion",
@@ -2458,7 +2458,7 @@
     },
     "about": {
       "title": "Building the system small businesses deserve",
-      "intro": "Small businesses run their days between a phone calendar, spreadsheets, WhatsApp and a notebook. MyBiz brings it all into one place – and adds an AI workforce that does the busywork.",
+      "intro": "Small businesses run their days between a phone calendar, spreadsheets, WhatsApp and a notebook. MyBiz brings it all into one place - and adds an AI workforce that does the busywork.",
       "valuesTitle": "What guides us",
       "values": [
         {
@@ -2475,7 +2475,7 @@
         },
         {
           "title": "Built for real markets",
-          "text": "Hebrew and English, local currencies, holidays and taxes – from the ground up, not as a translation."
+          "text": "Hebrew and English, local currencies, holidays and taxes - from the ground up, not as a translation."
         }
       ]
     },
@@ -2841,7 +2841,7 @@
       }
     },
     "meta": {
-      "home": "MyBiz – Business management and an AI workforce for small businesses",
+      "home": "MyBiz - Business management and an AI workforce for small businesses",
       "features": "Features",
       "pricing": "Pricing",
       "about": "About",
@@ -3099,7 +3099,7 @@
     "lastName": "Last name",
     "phone": "Phone",
     "email": "Email",
-    "contactHint": "Phone or email — at least one of them.",
+    "contactHint": "Phone or email - at least one of them.",
     "interest": "What are you interested in?",
     "website": "Website",
     "send": "Send",
@@ -3158,7 +3158,7 @@
     },
     "back": "Back to billing",
     "print": "Print",
-    "sample": "Sample invoice — simulated charge in the prototype",
+    "sample": "Sample invoice - simulated charge in the prototype",
     "invoiceTitle": "Invoice {number}",
     "issuedAt": "Date",
     "to": "Billed to",
@@ -3327,7 +3327,7 @@
   },
   "timeOff": {
     "title": "Time off",
-    "hint": "No appointments are offered with this staff member on these days. Appointments already booked stay — handle them separately.",
+    "hint": "No appointments are offered with this staff member on these days. Appointments already booked stay - handle them separately.",
     "from": "From",
     "to": "To",
     "toHint": "Empty = one day",
@@ -3339,7 +3339,7 @@
     "title": "Promo codes",
     "subtitle": "Codes clients enter when they buy a plan in the app.",
     "code": "Code",
-    "codeHint": "Letters and digits, 3–20 characters",
+    "codeHint": "Letters and digits, 3-20 characters",
     "kind": "Discount type",
     "percent": "Percent",
     "amount": "Fixed amount",
@@ -3406,8 +3406,8 @@
       "sizeHint": "Clients who came at least once in the last three months.",
       "sizes": {
         "100": "Up to 100",
-        "300": "101–300",
-        "1000": "301–1,000",
+        "300": "101-300",
+        "1000": "301-1,000",
         "1500": "1,000+"
       },
       "staff": "Team members",
@@ -3495,7 +3495,7 @@
         "title": "Want an assistant that answers in seconds?",
         "text": "Ask in plain words, like you'd ask a manager, and get an answer from your real data. With Pro it also prepares the work for you to approve.",
         "question": "Who hasn't come in for a month?",
-        "answer": "8 clients. 3 of them have a membership that ends this week — want me to prepare a message?",
+        "answer": "8 clients. 3 of them have a membership that ends this week - want me to prepare a message?",
         "tiers": {
           "ai_basic": {
             "title": "AI Basic",
@@ -3532,7 +3532,7 @@
       "crm": {
         "eyebrow": "CRM & leads",
         "title": "Turn more inquiries into clients?",
-        "text": "Every inquiry from your website, Instagram or a phone call lands on one board, with reminders to follow up — so nobody falls through the cracks.",
+        "text": "Every inquiry from your website, Instagram or a phone call lands on one board, with reminders to follow up - so nobody falls through the cracks.",
         "points": [
           "An inquiry form for your website and social",
           "A board from new inquiry to paying client",
@@ -3769,13 +3769,13 @@
       "simulated": "Test mode: the card is filled in for you and nothing is charged.",
       "secure": "Secure, encrypted payment",
       "submit": "Start my free trial",
-      "invalid": "We couldn't read your plan. Please build it again — it takes a minute.",
+      "invalid": "We couldn't read your plan. Please build it again - it takes a minute.",
       "rebuild": "Build my plan",
       "errors": {
         "invalid": "Some details are missing or incorrect. Please check and try again.",
         "generic": "Something went wrong. Please try again in a moment."
       },
-      "later": "Not now – explore a sample business first"
+      "later": "Not now - explore a sample business first"
     },
     "presets": {
       "starter": "Starter",
@@ -3786,7 +3786,7 @@
       "eyebrow": "Before take-off",
       "title": "Let's save your plan",
       "subtitle": "Sign up in one tap and nothing you choose gets lost. Or carry on and create your account at the end.",
-      "email": "Continue – I'll sign up with email at the end",
+      "email": "Continue - I'll sign up with email at the end",
       "haveAccount": "Already have an account?",
       "login": "Log in"
     },
@@ -3851,7 +3851,7 @@
           "minutes": 2,
           "tips": [
             "Upload a square logo (PNG or JPG).",
-            "Pick a main color — the client app and emails use it.",
+            "Pick a main color - the client app and emails use it.",
             "Check your business details, address and time zone."
           ]
         },
@@ -3859,7 +3859,7 @@
           "key": "services",
           "minutes": 4,
           "tips": [
-            "We added starter services for your industry — rename or delete them.",
+            "We added starter services for your industry - rename or delete them.",
             "Set the length, price and number of spots for each service.",
             "Create plans: memberships, punch cards or single visits."
           ]
@@ -3878,7 +3878,7 @@
           "minutes": 3,
           "tips": [
             "Invite by email; they choose their own password.",
-            "Pick a role: manager, front desk or staff — or build your own.",
+            "Pick a role: manager, front desk or staff - or build your own.",
             "Staff see their own schedule and can check clients in."
           ]
         },
@@ -3887,7 +3887,7 @@
           "minutes": 4,
           "tips": [
             "Import from Excel or CSV in one go.",
-            "Share your join code or QR — clients join the app on their own.",
+            "Share your join code or QR - clients join the app on their own.",
             "Every client card keeps history, plans and notes."
           ]
         },
@@ -3918,7 +3918,7 @@
     "inTrial": "You're in your free trial: nothing is charged until {date}.",
     "afterTrial": "Added to your next monthly invoice. You can remove it any time in Settings → Modules.",
     "add": "Add to my plan · +{price} / month",
-    "noPermission": "Only the owner or a manager can add modules. Ask them — it takes one click.",
+    "noPermission": "Only the owner or a manager can add modules. Ask them - it takes one click.",
     "chooseTier": "Choose a level",
     "manage": "All modules and prices",
     "unknown": "This module isn't available."
@@ -3985,7 +3985,7 @@
     "amount": "Amount",
     "empty": "No sales this month yet.",
     "export": "Export for the accountant (CSV)",
-    "simulated": "Includes sample receipts from test payments — they aren't tax documents.",
+    "simulated": "Includes sample receipts from test payments - they aren't tax documents.",
     "csvHeader": [
       "Receipt",
       "Date",
@@ -4357,7 +4357,7 @@
         "paid": "Paid",
         "void": "Credited"
       },
-      "period": "{from} – {to}"
+      "period": "{from} - {to}"
     },
     "request": {
       "back": "Requests",

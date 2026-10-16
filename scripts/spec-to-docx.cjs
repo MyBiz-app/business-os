@@ -128,7 +128,7 @@ for (let i = 0; i < lines.length; i++) {
 const indent = (level) => ({ indent: { left: 540 + level * 360, hanging: 300 } });
 const doc = new Document({
   creator: "MyBiz",
-  title: locale === "he" ? "MyBiz — אפיון מוצר" : "MyBiz — Product Specification",
+  title: locale === "he" ? "MyBiz - אפיון מוצר" : "MyBiz - Product Specification",
   styles: {
     default: { document: { run: { font: FONT, size: 22 } } },
     paragraphStyles: [

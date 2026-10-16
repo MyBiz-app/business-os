@@ -39,8 +39,8 @@ with sync_playwright() as p:
     owner.wait_for_url("**/dashboard"); h.ready(owner)
 
     nav = owner.get_by_role("navigation", name="ניווט ראשי")
-    expect(nav.get_by_role("link", name="לידים — לא בחבילה שלך")).to_be_visible()
-    expect(nav.get_by_role("link", name="הודעות — לא בחבילה שלך")).to_be_visible()
+    expect(nav.get_by_role("link", name="לידים - לא בחבילה שלך")).to_be_visible()
+    expect(nav.get_by_role("link", name="הודעות - לא בחבילה שלך")).to_be_visible()
     expect(nav.get_by_role("link", name="אפליקציה ללקוחות", exact=True)).to_be_visible()
 
     owner.goto(f"{h.BASE}/leads"); owner.wait_for_url("**/upgrade/crm")

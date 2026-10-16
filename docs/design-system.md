@@ -33,7 +33,7 @@ same value in several files, it should become a token here first.
 
 1. **Tokens, not values.** Colors, fonts, shadows and radii are CSS variables (web) or theme
    constants (apps). A component never contains a hex color or a font name.
-2. **Logical direction.** `ms-*`, `ps-*`, `start-*`, `text-start` — never left/right — so
+2. **Logical direction.** `ms-*`, `ps-*`, `start-*`, `text-start` - never left/right - so
    Hebrew (RTL) and English (LTR) share the same code.
 3. **Both themes.** Every token has a light and a dark value; check both before merging.
 4. **Shared building blocks.** A pattern used twice becomes a component or a `@utility`

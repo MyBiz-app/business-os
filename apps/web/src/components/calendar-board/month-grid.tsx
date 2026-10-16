@@ -71,7 +71,7 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
                       style={{ borderInlineStartColor: event.color, background: `color-mix(in oklab, ${event.color} 14%, var(--surface))` }}
                     >
                       <span className="hidden shrink-0 font-semibold tabular-nums sm:inline" dir="ltr">
-                        {event.time.split("–")[0]}
+                        {event.time.split("-")[0]}
                       </span>
                       <span className="truncate" dir="auto">
                         {event.title}

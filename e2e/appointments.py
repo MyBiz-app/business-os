@@ -39,7 +39,7 @@ with sync_playwright() as p:
     expect(owner.get_by_text("תספורת גברים")).to_be_visible()
     print("1. beauty business with its default services: ok")
 
-    # Working hours: every day 09:00–17:00.
+    # Working hours: every day 09:00-17:00.
     owner.goto(f"{h.BASE}/team"); h.ready(owner)
     owner.get_by_role("link", name="שעות עבודה").first.click()
     owner.wait_for_url("**/hours"); h.ready(owner)

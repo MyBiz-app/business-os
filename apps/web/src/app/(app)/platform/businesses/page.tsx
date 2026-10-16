@@ -93,7 +93,7 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
                   <div className="text-xs text-muted">{isVertical(business.vertical) ? text(business.vertical, "name") : business.vertical}</div>
                 </td>
                 <td className="max-w-56 truncate px-3 py-2" dir="ltr" title={business.owner_email ?? undefined}>
-                  {business.owner_email ?? "—"}
+                  {business.owner_email ?? "-"}
                 </td>
                 <td className="whitespace-nowrap px-3 py-2">
                   {business.modules.length === 0 ? (

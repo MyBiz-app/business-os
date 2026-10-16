@@ -92,7 +92,7 @@ type Props = {
 };
 
 /** The sign-up journey: like booking a low-cost flight. The business and its size, then one
- * add-on per screen, each with a basic and a pro choice (2–4 per screen, decision X16) and a
+ * add-on per screen, each with a basic and a pro choice (2-4 per screen, decision X16) and a
  * live cart, the extras (bundle, support, setup) and a boarding pass; then the payment step. */
 export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, providers, signedIn, returnTo }: Props) {
   const t = useTranslations("start");

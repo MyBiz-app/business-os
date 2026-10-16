@@ -68,7 +68,7 @@
     "roster": {
       "subject": "המשמרות החדשות שלך ב{business}",
       "intro": "סידור העבודה שלך ב{business} פורסם. המשמרות שלך:",
-      "line": "{day} {from}–{to} · {branch}{position}",
+      "line": "{day} {from}-{to} · {branch}{position}",
       "more": "…ועוד {count}. את כולן אפשר לראות באפליקציה.",
       "weekdays": [
         "ב׳",

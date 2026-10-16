@@ -68,7 +68,7 @@
     "roster": {
       "subject": "Your new shifts at {business}",
       "intro": "Your roster at {business} was published. Your shifts:",
-      "line": "{day} {from}–{to} · {branch}{position}",
+      "line": "{day} {from}-{to} · {branch}{position}",
       "more": "…and {count} more. See them all in the app.",
       "weekdays": [
         "Mon",

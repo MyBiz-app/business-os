@@ -138,6 +138,8 @@ CLASS_HOURS = ("07:00", "08:30", "09:30", "12:00", "17:30", "18:30", "19:30", "2
 class BranchSpec:
     name: str
     address: str
+    # A catalog key (a sub-category of the business's category); None means the business's own.
+    kind: str | None = None
 
 
 @dataclass(frozen=True)
@@ -286,6 +288,43 @@ STUDIO_BLOOM = BusinessSpec(
     clients=300,
     staff_per_branch=3,
 )
+# Round 4 (B9): one business per kind of calendar, with branches of different kinds in one
+# network: a gym network with a strength and a pilates branch, a padel network with courts, and
+# a beauty business with appointments.
+IRON_PULSE = BusinessSpec(
+    name="Iron & Flow",
+    vertical="gym",
+    color="#0f766e",
+    billing_name="איירון אנד פלואו בע״מ",
+    branches=(
+        BranchSpec("תל אביב - כוח", "הברזל 3, תל אביב", kind="gym"),
+        BranchSpec("רמת גן - פילאטיס", "ביאליק 22, רמת גן", kind="pilates"),
+    ),
+    clients=260,
+    staff_per_branch=3,
+)
+PADEL_NETWORK = BusinessSpec(
+    name="Padel Nation",
+    vertical="padel_tennis",
+    color="#4d7c0f",
+    billing_name="פאדל נאשן בע״מ",
+    branches=(
+        BranchSpec("הרצליה", "הנדיב 71, הרצליה", kind="padel_tennis"),
+        BranchSpec("ראשון לציון", "הכרמל 9, ראשון לציון", kind="padel_tennis"),
+        BranchSpec("רעננה", "אחוזה 120, רעננה", kind="padel_tennis"),
+    ),
+    clients=200,
+    staff_per_branch=2,
+)
+BEAUTY_STUDIO = BusinessSpec(
+    name="Glow Beauty",
+    vertical="hair_salon",
+    color="#be185d",
+    billing_name="גלואו ביוטי בע״מ",
+    branches=(BranchSpec("תל אביב - שינקין", "שינקין 40, תל אביב", kind="hair_salon"),),
+    clients=150,
+    staff_per_branch=3,
+)
 DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "studio": (STUDIO,),
     "club": (PADEL_CLUB,),
@@ -295,6 +334,7 @@ DEMOS: dict[str, tuple[BusinessSpec, ...]] = {
     "office": (ACCOUNTING_FIRM,),
     "owner": (PILATES_CHAIN, BARBERSHOP),
     "networks": (URBAN_SLICE, PULSE_FITNESS, STUDIO_BLOOM),
+    "categories": (IRON_PULSE, PADEL_NETWORK, BEAUTY_STUDIO),
     "platform": (),  # MyBiz's own view: many small businesses (PLATFORM_BUSINESSES)
 }
 

@@ -271,7 +271,7 @@ export default function Court() {
                     <Chip
                       key={item.room_id}
                       label={item.room_name}
-                      sublabel={`${time(item.starts_at)}–${time(item.ends_at)}`}
+                      sublabel={`${time(item.starts_at)}-${time(item.ends_at)}`}
                       selected={sameSlot(slot, item)}
                       onPress={() => setSlot(item)}
                       palette={palette}
@@ -304,7 +304,7 @@ export default function Court() {
                         <View style={local.serviceInfo}>
                           <Text style={[local.serviceName, { color: palette.foreground }]}>
                             {otherDay ? `${formatDay(dayOf(item.starts_at, zone), locale, { weekday: "short", day: "numeric" })} · ` : ""}
-                            {time(item.starts_at)}–{time(item.ends_at)}
+                            {time(item.starts_at)}-{time(item.ends_at)}
                           </Text>
                           <Text style={[styles.muted, { color: palette.muted }]}>
                             {item.room_name} · {distance(item.offset_minutes)}
@@ -362,7 +362,7 @@ export default function Court() {
             <>
               <Card palette={palette}>
                 <Text style={[local.serviceName, { color: palette.foreground }]}>
-                  {slot.room_name} · {time(slot.starts_at)}–{time(slot.ends_at)}
+                  {slot.room_name} · {time(slot.starts_at)}-{time(slot.ends_at)}
                 </Text>
                 <Text style={{ color: palette.foreground, fontSize: 24, fontWeight: "800", textAlign: "left" }}>
                   {formatMoney(slot.price_amount, slot.price_currency, locale)}
