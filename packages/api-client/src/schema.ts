@@ -6486,6 +6486,11 @@ export interface components {
              * @description My on-site job's progress
              */
             job_status?: ("scheduled" | "on_the_way" | "in_progress" | "done") | null;
+            /**
+             * Description
+             * @description What the class is, from the catalog
+             */
+            description?: string | null;
             /** @description The client's first live booking */
             my_booking: components["schemas"]["MyBooking"] | null;
             /**
