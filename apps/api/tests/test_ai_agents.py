@@ -1,3 +1,4 @@
+# ruff: noqa: F811, F401
 """The AI team (round 5, A1): the agent catalog and its overrides, who may use which agent, the
 branch scope that every tool honours, hand-offs and the usage per agent."""
 
@@ -13,9 +14,9 @@ from sqlalchemy import Engine, text
 from app.ai import agents as agent_catalog
 from app.ai.tools import BRANCH_BLIND, TOOL_DOMAINS, TOOLS
 from tests.conftest import AuthHeaders, add_member, local_today
-from tests.test_assistant import FakeProvider, calls, enable_ai_pro, says, use_provider  # noqa: F401
+from tests.test_assistant import FakeProvider, calls, enable_ai_pro, says, use_provider
 from tests.test_bookings import new_client, new_session
-from tests.test_branch_access import branches, member_at_north  # noqa: F401
+from tests.test_branch_access import branches, member_at_north
 
 
 def tool_names(provider: FakeProvider, call: int = 0) -> set[str]:
@@ -54,7 +55,7 @@ def manager_headers(
 def test_every_tool_belongs_to_a_domain_and_agents_use_known_domains() -> None:
     assert set(TOOL_DOMAINS) == set(TOOLS)
     assert set(TOOL_DOMAINS.values()) <= set(agent_catalog.DOMAINS)
-    assert BRANCH_BLIND <= set(TOOLS)
+    assert set(TOOLS) >= BRANCH_BLIND
     for spec in agent_catalog.CATALOG.values():
         assert spec.domains <= set(agent_catalog.DOMAINS), spec.key
         assert {"he", "en"} <= set(spec.name), spec.key
@@ -388,7 +389,7 @@ def test_an_agent_scoped_to_one_branch_sees_only_that_branch(
     client: TestClient,
     studio: dict,
     branches: dict,
-    use_provider,  # noqa: F811
+    use_provider,
 ) -> None:
     enable_ai_pro(client, studio)
     owner = branches["owner"]
@@ -432,7 +433,7 @@ def test_an_agent_scoped_to_one_branch_sees_only_that_branch(
 def test_the_scope_is_the_overlap_of_user_agent_and_chat(
     client: TestClient,
     studio: dict,
-    branches: dict,  # noqa: F811
+    branches: dict,
     auth: AuthHeaders,
     engine: Engine,
     use_provider,
@@ -474,7 +475,7 @@ def test_tools_that_cannot_filter_by_branch_are_withheld_when_narrowed(
     client: TestClient,
     studio: dict,
     branches: dict,
-    use_provider,  # noqa: F811
+    use_provider,
 ) -> None:
     enable_ai_pro(client, studio)
     owner = branches["owner"]
