@@ -6,7 +6,7 @@ approved on a card, run at the set time after the server checks everything again
 proposes). Every run is recorded in `ai_task_runs`.
 
 Revision ID: 0092
-Revises: 0085
+Revises: 0086
 Create Date: 2026-10-16
 """
 
@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0092"
-down_revision: str | None = "0085"
+down_revision: str | None = "0086"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

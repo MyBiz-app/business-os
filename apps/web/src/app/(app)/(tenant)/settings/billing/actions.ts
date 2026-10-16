@@ -45,3 +45,19 @@ export async function payInvoice(invoiceId: string): Promise<void> {
   revalidatePath("/settings/billing");
   revalidatePath(`/settings/billing/invoices/${invoiceId}`);
 }
+
+export async function saveAiSpend(formData: FormData): Promise<void> {
+  const { api, scope } = await getTenant();
+  const cap = String(formData.get("cap") ?? "").trim();
+  const major = cap === "" ? null : Number(cap);
+  unwrap(
+    await api.PUT("/ai/spend", {
+      params: scope,
+      body: {
+        payg_enabled: formData.get("payg") === "on",
+        payg_cap_minor: major === null || Number.isNaN(major) || major < 0 ? null : Math.round(major * 100),
+      },
+    }),
+  );
+  revalidatePath("/settings/billing");
+}

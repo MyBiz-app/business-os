@@ -73,6 +73,7 @@ class Team(BaseModel):
     agents: list[AgentCard]
     credits_used: float
     credits_included: int
+    payg_enabled: bool = False
     can_manage: bool
 
 
@@ -205,6 +206,7 @@ def _team(context: TenantContext, user_id: UUID) -> Team:
         agents=agents,
         credits_used=round(budget.credits_used(db, _month_start(db)), 2),
         credits_included=budget.credits_included(db),
+        payg_enabled=budget.spend_settings(db).payg_enabled,
         can_manage=manage,
     )
 
@@ -456,3 +458,120 @@ def ai_usage(
             key=lambda r: r.key,
         ),
     )
+
+
+# --- spend: pay-as-you-go, limits and alerts ------------------------------------------------
+
+
+class CreditLimit(BaseModel):
+    kind: Literal["role", "user"]
+    key: str = Field(min_length=1, max_length=64, description="A role key, or a user id")
+    monthly_credits: int = Field(ge=0, le=1_000_000)
+
+
+class AiSpend(BaseModel):
+    month_start: dt.date
+    currency: str
+    credits_included: int
+    credits_used: float
+    payg_enabled: bool
+    payg_cap_minor: int | None = Field(description="Most extra spend per month; null: no cap")
+    price_per_100_minor: int = Field(description="Price of 100 extra credits, minor units")
+    extra_credits: float = Field(description="Credits used above the included ones")
+    extra_minor: int = Field(description="What that costs this month, minor units")
+    credits_limit: int | None = Field(description="Where questions stop; null: no limit")
+    alerts: list[int] = Field(description="Thresholds (%) passed this month")
+    limits: list[CreditLimit]
+
+
+def _spend(db: Session) -> AiSpend:
+    start = _month_start(db)
+    settings = budget.spend_settings(db)
+    included, used = budget.credits_included(db), budget.credits_used(db, start)
+    alerts = db.execute(
+        text("SELECT threshold FROM app.ai_credit_alerts WHERE month_start = :m ORDER BY 1"),
+        {"m": start},
+    ).scalars()
+    limits = db.execute(
+        text(
+            "SELECT subject_kind, subject_key, monthly_credits FROM app.ai_credit_limits "
+            "ORDER BY 1, 2"
+        )
+    )
+    return AiSpend(
+        month_start=start,
+        currency=settings.currency,
+        credits_included=included,
+        credits_used=round(used, 2),
+        payg_enabled=settings.payg_enabled,
+        payg_cap_minor=settings.payg_cap_minor,
+        price_per_100_minor=settings.price_per_100,
+        extra_credits=round(max(used - included, 0), 2),
+        extra_minor=settings.extra_minor(used, included) if settings.payg_enabled else 0,
+        credits_limit=budget.credits_limit(db),
+        alerts=list(alerts),
+        limits=[CreditLimit(kind=r[0], key=r[1], monthly_credits=r[2]) for r in limits],
+    )
+
+
+@router.get("/spend")
+def ai_spend_status(context: ManageDep) -> AiSpend:
+    """The month's AI spend: included credits, pay-as-you-go settings, extra cost, alerts and the
+    limits per role and person."""
+    return _spend(context.session)
+
+
+class SpendUpdate(BaseModel):
+    payg_enabled: bool
+    payg_cap_minor: int | None = Field(default=None, ge=0, le=100_000_000)
+
+
+@router.put("/spend")
+def update_ai_spend(body: SpendUpdate, context: ManageDep) -> AiSpend:
+    """Turns pay-as-you-go extra credits on or off and sets the monthly cap (no cap: no limit)."""
+    db = context.session
+    if body.payg_enabled and budget.credits_included(db) == 0:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail="ai_module_required")
+    db.execute(
+        text("""
+            INSERT INTO app.tenant_ai_settings (tenant_id, payg_enabled, payg_cap_minor)
+            VALUES (app.current_tenant_id(), :enabled, :cap)
+            ON CONFLICT (tenant_id) DO UPDATE
+               SET payg_enabled = :enabled, payg_cap_minor = :cap, updated_at = now()
+        """),
+        {"enabled": body.payg_enabled, "cap": body.payg_cap_minor},
+    )
+    return _spend(db)
+
+
+class LimitsUpdate(BaseModel):
+    limits: list[CreditLimit] = Field(max_length=200)
+
+
+@router.put("/spend/limits")
+def update_ai_limits(body: LimitsUpdate, context: ManageDep) -> AiSpend:
+    """Replaces the monthly credit limits per role and per person (each person gets the limit,
+    not the role as a whole)."""
+    db = context.session
+    seen = {(item.kind, item.key) for item in body.limits}
+    if len(seen) != len(body.limits):
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, detail="duplicate_limit")
+    for item in body.limits:
+        if item.kind == "user":
+            try:
+                UUID(item.key)
+            except ValueError as error:
+                raise HTTPException(
+                    status.HTTP_422_UNPROCESSABLE_ENTITY, detail="invalid_limit_subject"
+                ) from error
+    db.execute(text("DELETE FROM app.ai_credit_limits"))
+    for item in body.limits:
+        db.execute(
+            text("""
+                INSERT INTO app.ai_credit_limits
+                    (tenant_id, subject_kind, subject_key, monthly_credits)
+                VALUES (app.current_tenant_id(), :kind, :key, :credits)
+            """),
+            {"kind": item.kind, "key": item.key, "credits": item.monthly_credits},
+        )
+    return _spend(db)

@@ -3698,6 +3698,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/spend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Spend Status
+         * @description The month's AI spend: included credits, pay-as-you-go settings, extra cost, alerts and the
+         *     limits per role and person.
+         */
+        get: operations["ai_spend_status"];
+        /**
+         * Update Ai Spend
+         * @description Turns pay-as-you-go extra credits on or off and sets the monthly cap (no cap: no limit).
+         */
+        put: operations["update_ai_spend"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/spend/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Ai Limits
+         * @description Replaces the monthly credit limits per role and per person (each person gets the limit,
+         *     not the role as a whole).
+         */
+        put: operations["update_ai_limits"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/modules/catalog": {
         parameters: {
             query?: never;
@@ -5508,6 +5554,54 @@ export interface components {
             /** Reason */
             reason: string;
         };
+        /** AiSpend */
+        AiSpend: {
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /** Currency */
+            currency: string;
+            /** Credits Included */
+            credits_included: number;
+            /** Credits Used */
+            credits_used: number;
+            /** Payg Enabled */
+            payg_enabled: boolean;
+            /**
+             * Payg Cap Minor
+             * @description Most extra spend per month; null: no cap
+             */
+            payg_cap_minor: number | null;
+            /**
+             * Price Per 100 Minor
+             * @description Price of 100 extra credits, minor units
+             */
+            price_per_100_minor: number;
+            /**
+             * Extra Credits
+             * @description Credits used above the included ones
+             */
+            extra_credits: number;
+            /**
+             * Extra Minor
+             * @description What that costs this month, minor units
+             */
+            extra_minor: number;
+            /**
+             * Credits Limit
+             * @description Where questions stop; null: no limit
+             */
+            credits_limit: number | null;
+            /**
+             * Alerts
+             * @description Thresholds (%) passed this month
+             */
+            alerts: number[];
+            /** Limits */
+            limits: components["schemas"]["CreditLimit"][];
+        };
         /** Answer */
         "Answer-Input": {
             /** Accept */
@@ -7221,6 +7315,21 @@ export interface components {
             /** Session Ids */
             session_ids: string[];
         };
+        /** CreditLimit */
+        CreditLimit: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "role" | "user";
+            /**
+             * Key
+             * @description A role key, or a user id
+             */
+            key: string;
+            /** Monthly Credits */
+            monthly_credits: number;
+        };
         /** CustomAgent */
         CustomAgent: {
             /** Name */
@@ -8503,6 +8612,11 @@ export interface components {
             first_name?: string | null;
             /** Source */
             source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
+        };
+        /** LimitsUpdate */
+        LimitsUpdate: {
+            /** Limits */
+            limits: components["schemas"]["CreditLimit"][];
         };
         /** Location */
         Location: {
@@ -11312,6 +11426,13 @@ export interface components {
             /** Staff Name */
             staff_name: string;
         };
+        /** SpendUpdate */
+        SpendUpdate: {
+            /** Payg Enabled */
+            payg_enabled: boolean;
+            /** Payg Cap Minor */
+            payg_cap_minor?: number | null;
+        };
         /** StaffHours */
         StaffHours: {
             /**
@@ -12243,6 +12364,11 @@ export interface components {
             credits_used: number;
             /** Credits Included */
             credits_included: number;
+            /**
+             * Payg Enabled
+             * @default false
+             */
+            payg_enabled: boolean;
             /** Can Manage */
             can_manage: boolean;
         };
@@ -12368,6 +12494,12 @@ export interface components {
              * @description 0 when the business has no AI module
              */
             ai_credits_included: number;
+            /**
+             * Ai Extra Minor
+             * @description Pay-as-you-go: this month's extra AI use, minor units
+             * @default 0
+             */
+            ai_extra_minor: number;
         };
         /** ProfileUpdate */
         app__api__client_app__ProfileUpdate: {
@@ -21705,6 +21837,113 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["app__api__ai_team__Usage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_spend_status: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ai_spend: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpendUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ai_limits: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LimitsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSpend"];
                 };
             };
             /** @description Validation Error */

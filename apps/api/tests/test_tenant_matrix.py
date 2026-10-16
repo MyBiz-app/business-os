@@ -25,6 +25,8 @@ UNSEEDED: set[str] = set()
 OVERRIDES = {
     "ai_agents": {"builtin_key": "'x'"},
     "ai_scheduled_tasks": {"kind": "'agent_run'", "instruction": "'x'"},
+    "ai_credit_alerts": {"threshold": "80"},
+    "ai_credit_limits": {"subject_kind": "'role'"},
     "audit_log": {"actor_type": "'system'"},
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
     "checkouts": {"plan_id": "gen_random_uuid()"},

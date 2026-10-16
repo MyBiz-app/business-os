@@ -458,7 +458,7 @@ def _record_usage(ctx: BotContext, response: LLMResponse) -> None:
 
 def _over_budget(db: Session, business: Business) -> bool:
     month_start = dt.datetime.now(ZoneInfo(business.time_zone)).date().replace(day=1)
-    return budget.credits_used(db, month_start) >= budget.credits_included(db)
+    return budget.over_limit(db, month_start)
 
 
 def _save(db: Session, conversation_id: UUID, messages: list[dict[str, Any]]) -> None:
