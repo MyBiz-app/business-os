@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 
 from sqlalchemy import text
 
-from app.ai import budget
+from app.ai import budget, structure
 from app.ai import scope as branch_scope
 from app.ai.agents import Agent, load_team, member_role_keys, state_of, system_part
 from app.ai.gateway import (
@@ -174,6 +174,7 @@ def ask(
     )
     locale = row["locale"] or "en"
     team = {a.key: a for a in load_team(db, locale)}
+    teams = structure.load_teams(db)
     agent: Agent = team.get(row["agent_key"]) or team["chief"]
     role_keys = member_role_keys(db, tenant.role)
 
@@ -240,9 +241,16 @@ def ask(
             modules,
             agent_key=agent.key,
             handoff_keys=handoff_keys,
+            handoff_via={
+                k: structure.handoff_target(list(team.values()), teams, k, handoff_keys)
+                for k in handoff_keys
+            },
             **({"pending_ttl": pending_ttl} if pending_ttl else {}),
         )
         system = SYSTEM_PROMPT + "\n\n" + system_part(agent)
+        shape = structure.prompt_part(agent, list(team.values()), teams)
+        if shape:
+            system += "\n\n" + shape
         # Everyday questions stay on the cheap model unless the agent asks for a better one.
         always_strong = agent.tier != "fast"
 
