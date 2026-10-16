@@ -3109,13 +3109,50 @@
       "calc": {
         "title": "What will it cost your business",
         "subtitle": "Pick a size and add-ons and watch the monthly price update.",
-        "size": "How many active clients do you have",
+        "size": "How many active clients",
         "none": "None",
         "locations": "Extra locations",
         "fewer": "Fewer locations",
         "more": "One more location",
         "total": "Total per month",
-        "daily": "That's about {price} a day"
+        "daily": "about {price} a day",
+        "industry": "What kind of business",
+        "sizeNumber": "Number of active clients",
+        "sliderValue": "{clients} clients → {tier}",
+        "addons": "What to add",
+        "recommended": "Recommended for you",
+        "perMonthShort": "/month",
+        "receiptTitle": "Your receipt",
+        "coreLine": "Core ({tier})",
+        "onceTitle": "One-time charge",
+        "onceNote": "Charged once with the first invoice after the trial: {price}",
+        "perClient": "about {price} per client a month",
+        "startWithThis": "Start with this",
+        "fullCalc": "Full calculator",
+        "showDetails": "Show details",
+        "hideDetails": "Hide details",
+        "todayTitle": "How much do I pay today? (optional)",
+        "todayHint": "Enter what you pay each month now. It stays on this page and is only used for this comparison.",
+        "todayCompare": "Today {today}, with MyBiz {mybiz}",
+        "todaySave": "That is {amount} less each month.",
+        "todayMore": "MyBiz costs {amount} more each month, for the same list.",
+        "tier": {
+          "basic": "Basic",
+          "pro": "Pro"
+        },
+        "offers": {
+          "client_app": "Your clients book, pay and follow their plans from an app.",
+          "ai": "An AI team that answers, follows up and drafts for you. Monthly credits included.",
+          "crm": "Leads, follow-ups and campaigns in one place.",
+          "whatsapp": "Message clients on WhatsApp from the same screen."
+        },
+        "today": {
+          "scheduling": "Management / scheduling system",
+          "clientApp": "App for clients",
+          "whatsapp": "WhatsApp tools",
+          "crm": "CRM",
+          "other": "Other"
+        }
       },
       "groups": {
         "run": "Run the business (every plan)",

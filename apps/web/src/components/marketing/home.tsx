@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Section } from "@/components/layout/section";
 import { DemoStage } from "@/components/marketing/demo-stage";
 import { MiniLoop } from "@/components/marketing/mini-loops";
+import { PricingCalculator } from "@/components/marketing/pricing-calculator";
 import { Reveal } from "@/components/marketing/reveal";
 import { FEATURES, SectionHeading } from "@/components/marketing/sections";
 import { loadCatalog } from "@/lib/pricing";
@@ -162,6 +163,11 @@ export async function PricingTeaser() {
               );
             })}
           </ul>
+        )}
+        {catalog && (
+          <Reveal>
+            <PricingCalculator catalog={catalog} compact />
+          </Reveal>
         )}
         <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary">
           {t("seeAll")}
