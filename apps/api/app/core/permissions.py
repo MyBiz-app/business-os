@@ -46,6 +46,24 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.BUSINESS_SETTINGS,
         }
     ),
+    # A manager at their own branches only (the API keeps them to `location_ids`): everything a
+    # manager does for running a branch, but nothing that reaches across the business (catalog,
+    # settings, AI budget). They manage staff within their branches, never above their own level.
+    "branch_manager": frozenset(
+        {
+            Permission.CLIENTS_READ,
+            Permission.CLIENTS_WRITE,
+            Permission.CATALOG_READ,
+            Permission.SCHEDULE_READ,
+            Permission.SCHEDULE_WRITE,
+            Permission.BOOKINGS_MANAGE,
+            Permission.SALES_MANAGE,
+            Permission.REPORTS_READ,
+            Permission.AI_USE,
+            Permission.STAFF_READ,
+            Permission.STAFF_MANAGE,
+        }
+    ),
     "front_desk": frozenset(
         {
             Permission.CLIENTS_READ,

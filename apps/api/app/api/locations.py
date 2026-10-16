@@ -8,11 +8,12 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, not_found, set_clause
-from app.api.deps import TenantContext, require
+from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.settings import MAX_LOGO_BYTES, read_image
 from app.catalog.verticals import CATALOG, VerticalPack
 from app.commerce.modules import MODULES
 from app.core.permissions import Permission
+from app.schedule.branch_managers import appoint, step_down
 
 router = APIRouter(tags=["locations"])
 
@@ -23,7 +24,7 @@ SettingsDep = Annotated[TenantContext, Depends(require(Permission.BUSINESS_SETTI
 # A branch shows its own logo and color, else the network's (the business's own).
 LOCATION_COLUMNS = """
     l.id, l.name, l.address, l.active, l.created_at, l.updated_at,
-    l.kind, t.vertical AS tenant_vertical,
+    l.kind, l.manager_user_id, t.vertical AS tenant_vertical,
     l.primary_color,
     CASE WHEN l.logo IS NULL THEN NULL
          ELSE '/public/locations/' || l.id || '/logo?v='
@@ -123,6 +124,9 @@ class Location(BaseModel):
     created_at: datetime
     updated_at: datetime
     rooms: list[Room]
+    manager_user_id: UUID | None = Field(
+        description="Who manages the branch (the owner until someone is appointed)"
+    )
     kind: str | None = Field(description="The branch's own sub-category, if it set one")
     effective_kind: str = Field(description="The branch's kind, else the business's industry")
     schedule_view: str = Field(
@@ -211,6 +215,8 @@ def list_locations(context: ReadDep) -> list[Location]:
 
 @router.post("/locations", status_code=status.HTTP_201_CREATED)
 def create_location(body: LocationCreate, context: WriteDep) -> Location:
+    if context.branches is not None:  # new branches are for people who reach every branch
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
     ensure_branch_kind(context.session, body.kind)
     location_id = context.session.execute(
         text("""
@@ -341,6 +347,7 @@ def get_location(location_id: UUID, context: ReadDep) -> Location:
 
 @router.patch("/locations/{location_id}")
 def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) -> Location:
+    ensure_branch_visible(context, location_id)
     changes = {
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()
@@ -369,6 +376,7 @@ def update_location(location_id: UUID, body: LocationUpdate, context: WriteDep) 
 
 @router.post("/locations/{location_id}/rooms", status_code=status.HTTP_201_CREATED)
 def create_room(location_id: UUID, body: RoomCreate, context: WriteDep) -> Room:
+    ensure_branch_visible(context, location_id)
     # The location must be visible to this tenant (RLS); otherwise it does not exist for us.
     row = (
         context.session.execute(
@@ -395,6 +403,13 @@ def update_room(room_id: UUID, body: RoomUpdate, context: WriteDep) -> Room:
         for key, value in body.model_dump(exclude_unset=True).items()
         if not (key in {"name", "active", "bookable"} and value is None)
     }
+    if context.branches is not None:
+        ensure_branch_visible(
+            context,
+            context.session.execute(
+                text("SELECT location_id FROM app.rooms WHERE id = :id"), {"id": room_id}
+            ).scalar(),
+        )
     assignments = set_clause(changes, RoomUpdate.model_fields)
     sql = f"UPDATE app.rooms SET {assignments} WHERE id = :id RETURNING {ROOM_COLUMNS}"
     row = (
@@ -439,4 +454,32 @@ def delete_location_logo(location_id: UUID, context: SettingsDep) -> Location:
     ).first()
     if updated is None:
         raise not_found()
+    return _one_location(context.session, location_id)
+
+
+class BranchManager(BaseModel):
+    user_id: UUID = Field(description="The team member who will manage the branch")
+
+
+@router.put("/locations/{location_id}/manager")
+def appoint_branch_manager(
+    location_id: UUID, body: BranchManager, context: SettingsDep
+) -> Location:
+    """Appoints a team member as the branch's manager. Staff become branch managers: manager
+    rights at the branches they manage only. The previous manager steps down."""
+    ensure_branch_visible(context, location_id)
+    _one_location(context.session, location_id)
+    try:
+        appoint(context.session, location_id, body.user_id)
+    except LookupError:
+        raise HTTPException(status_code=422, detail="invalid_reference") from None
+    return _one_location(context.session, location_id)
+
+
+@router.delete("/locations/{location_id}/manager")
+def remove_branch_manager(location_id: UUID, context: SettingsDep) -> Location:
+    """The branch has no appointed manager (its owner still reaches it)."""
+    ensure_branch_visible(context, location_id)
+    _one_location(context.session, location_id)
+    step_down(context.session, location_id)
     return _one_location(context.session, location_id)

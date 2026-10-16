@@ -123,6 +123,8 @@ def _platform_context(session: Session, tenant_id: UUID, request: Request) -> Te
 
 # Roles that always work across every branch; others with branches assigned are kept to them.
 ALL_BRANCH_ROLES = frozenset({"owner", "manager"})
+# Roles that exist only inside their branches: none assigned means no access, never "all".
+BRANCH_BOUND_ROLES = frozenset({"branch_manager"})
 
 
 def set_branch(
@@ -187,9 +189,12 @@ def get_tenant_context(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
     allowed = (
         frozenset(member.location_ids)
-        if member.location_ids and member.role not in ALL_BRANCH_ROLES
+        if (member.location_ids or member.role in BRANCH_BOUND_ROLES)
+        and member.role not in ALL_BRANCH_ROLES
         else None
     )
+    if allowed is not None and not allowed:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="no_branches")
     if (
         not request.url.path.startswith("/tenants/current/closure")
         and session.execute(
