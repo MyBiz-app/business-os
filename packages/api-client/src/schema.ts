@@ -4366,6 +4366,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/client/people/{client_id}/friend-request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Request Friendship With
+         * @description Asks a person met in a class to be friends (the "add friend" button on their profile).
+         *     Only people the profile endpoint would show me can be asked.
+         */
+        post: operations["request_friendship_with"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/friends/requests/{friendship_id}/accept": {
         parameters: {
             query?: never;
@@ -22190,6 +22211,39 @@ export interface operations {
                 "application/json": components["schemas"]["FriendRequestCreate"];
             };
         };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Person"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_friendship_with: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             201: {

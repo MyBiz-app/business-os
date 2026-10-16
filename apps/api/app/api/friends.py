@@ -306,6 +306,21 @@ def send_friend_request(body: FriendRequestCreate, context: ClientDep) -> Person
     ).scalar()
     if target is None:
         raise not_found()
+    return _request_friendship(context, target)
+
+
+@router.post("/people/{client_id}/friend-request", status_code=status.HTTP_201_CREATED)
+def request_friendship_with(client_id: UUID, context: ClientDep) -> Person:
+    """Asks a person met in a class to be friends (the "add friend" button on their profile).
+    Only people the profile endpoint would show me can be asked."""
+    _forbidden_unless_enabled(context.session)
+    _check_lookup_rate(context.client_id)
+    person_profile(client_id, context)  # 404 unless I may see them
+    return _request_friendship(context, client_id)
+
+
+def _request_friendship(context: ClientDep, target: UUID) -> Person:
+    db = context.session
     existing = _pair(db, context.client_id, target)
     if existing is not None:
         if existing["status"] == "accepted":

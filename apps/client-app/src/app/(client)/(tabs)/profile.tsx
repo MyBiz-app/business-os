@@ -10,6 +10,7 @@ import { SegmentedControl } from "@business-os/app-kit/components/segmented-cont
 import { Button, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
 import { PreferencesCard } from "@business-os/app-kit/components/preferences-card";
 import { useAccount } from "@/lib/use-account";
+import { useFriendSettings } from "@/lib/use-friend-settings";
 import { useHealth } from "@/lib/use-health";
 import { useBusiness } from "@/providers/business-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
@@ -21,6 +22,7 @@ export default function Profile() {
   // Quotes and bills (#44, #45), documents (#45) and addresses for on-site services (#42).
   const account = useAccount();
   const health = useHealth();
+  const friends = useFriendSettings().data;
   const hasBills = account.quotes.some((q) => q.kind === "bill");
   const quotesTitle = hasBills ? t("client.profile.quotesAndBills") : t("quotes.title");
   const quotesBadge =
@@ -40,6 +42,15 @@ export default function Profile() {
       <Text style={[styles.muted, { color: palette.muted }]}>
         {t("client.profile.signedInAs", { email: session?.user.email ?? "" })}
       </Text>
+
+      {friends?.enabled && (
+        <ListRow
+          palette={palette}
+          title={t("friends.title")}
+          subtitle={t("friends.hint")}
+          onPress={() => router.push("/friends")}
+        />
+      )}
 
       {hasAccountRows && <SectionTitle title={t("client.profile.account")} palette={palette} />}
       {account.documents.length > 0 && (
