@@ -76,8 +76,9 @@ with sync_playwright() as p:
 
     # Branch groups on the branches page.
     page.goto(f"{h.BASE}/locations"); h.ready(page)
-    expect(page.get_by_text("מרכז").first).to_be_visible()
-    expect(page.get_by_text("צפון").first).to_be_visible()
+    names = page.get_by_role("textbox", name="שם הקבוצה")  # each group is an editable form
+    expect(names.nth(0)).to_have_value("מרכז")
+    expect(names.nth(1)).to_have_value("צפון")
     check(page, "branches")
     print("5. branch groups: ok")
 
