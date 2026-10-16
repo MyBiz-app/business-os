@@ -18,6 +18,6 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except static files and images.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
+  // Everything except static files, images and the TikTok site-verification file (public/).
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|tiktok[A-Za-z0-9]+\\.txt$|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"],
 };

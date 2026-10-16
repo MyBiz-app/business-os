@@ -101,6 +101,141 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/ai/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tasks */
+        get: operations["list_tasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/{task_id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/{task_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Task */
+        delete: operations["delete_task"];
+        options?: never;
+        head?: never;
+        /** Update Task */
+        patch: operations["update_task"];
+        trace?: never;
+    };
+    "/ai/tasks/{task_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run Task Now
+         * @description Runs the task right away, as its owner, without moving its schedule.
+         */
+        post: operations["run_task_now"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/proactive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Proactive
+         * @description The person's own proactive behaviours: what is on and at what time.
+         */
+        get: operations["get_proactive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/proactive/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Proactive
+         * @description Switches the morning briefing or the weekly suggestions on or off, or moves the time. They
+         *     run as the person who switches them on, so they never see more than that person can.
+         */
+        put: operations["set_proactive"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/internal/jobs/tick": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Tick
+         * @description Runs the scheduled AI tasks that are due. Called every few minutes by the keep-awake
+         *     workflow (and, later, by a worker every minute). Answers at once; the work continues in the
+         *     background, so a slow model call never holds the caller.
+         */
+        post: operations["tick"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/businesses": {
         parameters: {
             query?: never;
@@ -2454,6 +2589,250 @@ export interface paths {
         head?: never;
         /** Update Station */
         patch: operations["update_station"];
+        trace?: never;
+    };
+    "/social/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Social Providers
+         * @description Every network the studio knows, and whether it can be connected yet or is "soon".
+         */
+        get: operations["list_social_providers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Social Accounts */
+        get: operations["list_social_accounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/connect/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Connect Social
+         * @description Starts a connection. `demo` connects sample accounts with believable numbers; other
+         *     providers return the address where the owner agrees to share their numbers.
+         */
+        post: operations["connect_social"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/pending/{pending_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Pending Connection
+         * @description The accounts found after the owner agreed, to choose from (no tokens are returned).
+         */
+        get: operations["get_pending_connection"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/pending/{pending_id}/select": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Select Pending Accounts */
+        post: operations["select_pending_accounts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/accounts/{account_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Post
+         * @description Publishes a post now on a connected account (Instagram needs a picture).
+         */
+        post: operations["publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/accounts/{account_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Disconnect Social
+         * @description Removes the account and every number we kept for it. (The owner can also revoke access
+         *     on the network itself.)
+         */
+        delete: operations["disconnect_social"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sync Social Now
+         * @description "Refresh now": reads the latest numbers, at most once an hour.
+         */
+        post: operations["sync_social_now"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Social Dashboard */
+        get: operations["get_social_dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/posts/top": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Social Top Posts */
+        get: operations["get_social_top_posts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Social Audience */
+        get: operations["get_social_audience"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Social Drafts
+         * @description The open drafts, newest first.
+         */
+        get: operations["list_social_drafts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/drafts/{draft_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Discard Social Draft */
+        delete: operations["discard_social_draft"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/sessions/options": {
@@ -5867,6 +6246,18 @@ export interface components {
              */
             recipients: number;
         };
+        /** AudienceShare */
+        AudienceShare: {
+            /**
+             * Dimension
+             * @enum {string}
+             */
+            dimension: "age" | "gender" | "city" | "country";
+            /** Label */
+            label: string;
+            /** Share Bp */
+            share_bp: number;
+        };
         /** AuditEntry */
         AuditEntry: {
             /**
@@ -6502,16 +6893,6 @@ export interface components {
              */
             preview: string | null;
         };
-        /** Candidate */
-        Candidate: {
-            /**
-             * User Id
-             * Format: uuid
-             */
-            user_id: string;
-            /** User Name */
-            user_name: string;
-        };
         /** Catalog */
         Catalog: {
             /** Currency */
@@ -6522,7 +6903,7 @@ export interface components {
             modules: components["schemas"]["CatalogModule"][];
             /** Presets */
             presets: {
-                [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+                [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             };
         };
         /** CatalogModule */
@@ -6531,7 +6912,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
+            key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
             /**
              * Price
              * @description Monthly, minor units (per unit when per_unit)
@@ -6542,9 +6923,9 @@ export interface components {
             /** Per Unit */
             per_unit: boolean;
             /** Requires Any */
-            requires_any: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+            requires_any: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             /** Requires All */
-            requires_all: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+            requires_all: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             /**
              * Group
              * @description Tiers of one thing: at most one per group
@@ -7296,6 +7677,13 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ConnectResult */
+        ConnectResult: {
+            /** Accounts */
+            accounts: components["schemas"]["SocialAccount"][];
+            /** Authorize Url */
+            authorize_url?: string | null;
+        };
         /** ContactCreate */
         ContactCreate: {
             /** Name */
@@ -7487,7 +7875,7 @@ export interface components {
              * Available
              * @description Managers only: people of the branch who said they can work the whole stretch (`/me/availability`), are not away and have no shift then
              */
-            available?: components["schemas"]["Candidate"][];
+            available?: components["schemas"]["app__api__availability__Candidate"][];
         };
         /** CoverageRule */
         CoverageRule: {
@@ -8048,6 +8436,23 @@ export interface components {
             /** Removed Health Declarations */
             removed_health_declarations: number;
         };
+        /** FollowerPoint */
+        FollowerPoint: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Followers */
+            followers: number;
+        };
+        /** FollowerSeries */
+        FollowerSeries: {
+            /** Network */
+            network: string;
+            /** Points */
+            points: components["schemas"]["FollowerPoint"][];
+        };
         /** Form */
         Form: {
             /** Key */
@@ -8147,6 +8552,21 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** GoogleBusiness */
+        GoogleBusiness: {
+            /** Searches */
+            searches: number;
+            /** Profile Views */
+            profile_views: number;
+            /** Calls */
+            calls: number;
+            /** Directions */
+            directions: number;
+            /** Reviews New */
+            reviews_new: number;
+            /** Rating */
+            rating: number | null;
+        };
         /** Grant */
         Grant: {
             /**
@@ -8201,6 +8621,15 @@ export interface components {
             status: string;
             /** Environment */
             environment: string;
+        };
+        /** HeatCell */
+        HeatCell: {
+            /** Weekday */
+            weekday: number;
+            /** Hour */
+            hour: number;
+            /** Value */
+            value: number;
         };
         /** HomeBranch */
         HomeBranch: {
@@ -8686,6 +9115,20 @@ export interface components {
         JoinRequest: {
             /** Code */
             code: string;
+        };
+        /** KindEngagement */
+        KindEngagement: {
+            /** Kind */
+            kind: string;
+            /** Engagements */
+            engagements: number;
+        };
+        /** Kpi */
+        Kpi: {
+            /** Value */
+            value: number;
+            /** Previous */
+            previous: number | null;
         };
         /** Lead */
         Lead: {
@@ -9349,6 +9792,22 @@ export interface components {
              */
             created_at: string;
         };
+        /** NetworkOption */
+        NetworkOption: {
+            /** Network */
+            network: string;
+            /** Provider */
+            provider: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "soon";
+            /** Gives */
+            gives: string[];
+            /** Connected */
+            connected: number;
+        };
         /**
          * NewBranchPreview
          * @description What adding one more branch costs, shown before the form is filled in.
@@ -9588,6 +10047,18 @@ export interface components {
             result: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** PendingConnection */
+        PendingConnection: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Provider */
+            provider: string;
+            /** Candidates */
+            candidates: components["schemas"]["app__api__social__Candidate"][];
         };
         /** PendingReview */
         PendingReview: {
@@ -9913,6 +10384,50 @@ export interface components {
             /** Value */
             value: number;
         };
+        /** Proactive */
+        Proactive: {
+            /** Settings */
+            settings: components["schemas"]["ProactiveSetting"][];
+            /** Can Manage */
+            can_manage: boolean;
+        };
+        /** ProactiveBody */
+        ProactiveBody: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Time
+             * @description Local HH:MM
+             */
+            time?: string | null;
+            /** Weekday */
+            weekday?: number | null;
+        };
+        /** ProactiveSetting */
+        ProactiveSetting: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "morning_briefing" | "suggestions";
+            /** Enabled */
+            enabled: boolean;
+            /** Time */
+            time: string;
+            /**
+             * Weekday
+             * @description Suggestions only: 0 = Monday .. 6 = Sunday
+             */
+            weekday: number | null;
+            /** Paused Reason */
+            paused_reason: string | null;
+            /** Next Run At */
+            next_run_at: string | null;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Agent Key */
+            agent_key: string;
+        };
         /** PromoCode */
         PromoCode: {
             /**
@@ -10078,6 +10593,20 @@ export interface components {
             time_zone: string;
             /** Client Name */
             client_name: string;
+        };
+        /** PublishRequest */
+        PublishRequest: {
+            /** Text */
+            text: string;
+            /** Image Url */
+            image_url?: string | null;
+        };
+        /** PublishResult */
+        PublishResult: {
+            /** External Id */
+            external_id: string;
+            /** Permalink */
+            permalink: string | null;
         };
         /** PublishShifts */
         PublishShifts: {
@@ -10794,14 +11323,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings")[] | null;
         };
         /** Roles */
         Roles: {
@@ -10884,6 +11413,33 @@ export interface components {
             /** Bookable */
             bookable?: boolean | null;
         };
+        /** RunCard */
+        RunCard: {
+            /** Id */
+            id: number;
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Finished At */
+            finished_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "ok" | "failed" | "skipped";
+            /** Credits */
+            credits: number;
+            /** Summary */
+            summary: string | null;
+            /** Error */
+            error: string | null;
+            /** Conversation Id */
+            conversation_id: string | null;
+            /** Pending Action Ids */
+            pending_action_ids: string[];
+        };
         /** Sale */
         Sale: {
             /**
@@ -10948,6 +11504,34 @@ export interface components {
         SampleCreated: {
             /** Tenant Id */
             tenant_id: string;
+        };
+        /** ScheduleBody */
+        ScheduleBody: {
+            /**
+             * Frequency
+             * @enum {string}
+             */
+            frequency: "once" | "daily" | "weekly" | "monthly";
+            /**
+             * Time
+             * @description Local HH:MM
+             */
+            time: string;
+            /**
+             * Date
+             * @description YYYY-MM-DD, for once
+             */
+            date?: string | null;
+            /**
+             * Weekdays
+             * @description 0 = Monday .. 6 = Sunday
+             */
+            weekdays?: number[] | null;
+            /**
+             * Day Of Month
+             * @description 1-28, for monthly
+             */
+            day_of_month?: number | null;
         };
         /** ScheduleOptions */
         ScheduleOptions: {
@@ -11083,6 +11667,11 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+        };
+        /** SelectAccounts */
+        SelectAccounts: {
+            /** External Ids */
+            external_ids: string[];
         };
         /** Selection */
         Selection: {
@@ -11665,6 +12254,89 @@ export interface components {
             /** Staff Name */
             staff_name: string;
         };
+        /** SocialAccount */
+        SocialAccount: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Network */
+            network: string;
+            /** Name */
+            name: string;
+            /** Provider */
+            provider: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "connected" | "needs_reauth";
+            /** Is Demo */
+            is_demo: boolean;
+            /** Location Id */
+            location_id: string | null;
+            /** Last Synced At */
+            last_synced_at: string | null;
+        };
+        /** SocialDashboard */
+        SocialDashboard: {
+            /**
+             * Period From
+             * Format: date
+             */
+            period_from: string;
+            /**
+             * Period To
+             * Format: date
+             */
+            period_to: string;
+            /** Previous From */
+            previous_from: string | null;
+            /** Previous To */
+            previous_to: string | null;
+            /** Kpis */
+            kpis: {
+                [key: string]: components["schemas"]["Kpi"];
+            };
+            /** Followers Series */
+            followers_series: components["schemas"]["FollowerSeries"][];
+            /** Video Views Weekly */
+            video_views_weekly: components["schemas"]["WeeklyViews"][];
+            /** Engagement By Kind */
+            engagement_by_kind: components["schemas"]["KindEngagement"][];
+            /** Heatmap */
+            heatmap: components["schemas"]["HeatCell"][];
+            google_business: components["schemas"]["GoogleBusiness"] | null;
+        };
+        /** SocialDraft */
+        SocialDraft: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Network */
+            network: string | null;
+            /** Body */
+            body: string;
+            /** Image Url */
+            image_url: string | null;
+            /** Idea */
+            idea: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** SocialProviders */
+        SocialProviders: {
+            /** Networks */
+            networks: components["schemas"]["NetworkOption"][];
+            /** Demo Available */
+            demo_available: boolean;
+        };
         /** SpendUpdate */
         SpendUpdate: {
             /** Payg Enabled */
@@ -11892,6 +12564,82 @@ export interface components {
             key: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Permissions */
             permissions: string[];
+        };
+        /** TaskCard */
+        TaskCard: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Title */
+            title: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "action" | "agent_run";
+            /** Agent Key */
+            agent_key: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "paused" | "done" | "failed";
+            /** Status Reason */
+            status_reason: string | null;
+            /** Schedule */
+            schedule: {
+                [key: string]: unknown;
+            };
+            /** Time Zone */
+            time_zone: string;
+            /** Next Run At */
+            next_run_at: string | null;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Max Credits */
+            max_credits: number;
+            /** Instruction */
+            instruction: string | null;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            } | null;
+            /** Mine */
+            mine: boolean;
+            /** System Key */
+            system_key: ("morning_briefing" | "suggestions") | null;
+            /** Last Status */
+            last_status: ("running" | "ok" | "failed" | "skipped") | null;
+            /** Last Error */
+            last_error: string | null;
+            /** Waiting For Approval */
+            waiting_for_approval: number;
+        };
+        /** TaskUpdate */
+        TaskUpdate: {
+            /** Status */
+            status?: ("active" | "paused") | null;
+            /** Title */
+            title?: string | null;
+            /** Instruction */
+            instruction?: string | null;
+            schedule?: components["schemas"]["ScheduleBody"] | null;
+        };
+        /** Tasks */
+        Tasks: {
+            /** Tasks */
+            tasks: components["schemas"]["TaskCard"][];
+            /** Active */
+            active: number;
+            /** Limit */
+            limit: number;
+            /**
+             * Precise Timing
+             * @default false
+             */
+            precise_timing: boolean;
         };
         /** Template */
         Template: {
@@ -12195,6 +12943,11 @@ export interface components {
              */
             brand: "visa" | "mastercard" | "amex";
         };
+        /** Tick */
+        Tick: {
+            /** Started */
+            started: boolean;
+        };
         /** TimeEntry */
         TimeEntry: {
             /**
@@ -12371,6 +13124,37 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** TopPost */
+        TopPost: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Network */
+            network: string;
+            /** Account Name */
+            account_name: string;
+            /** Kind */
+            kind: string;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Thumbnail Url */
+            thumbnail_url: string | null;
+            /** Permalink */
+            permalink: string | null;
+            /** Caption */
+            caption: string | null;
+            /** Views */
+            views: number;
+            /** Engagements */
+            engagements: number;
+            /** Avg Watch Sec */
+            avg_watch_sec: number | null;
+        };
         /** Trial */
         Trial: {
             /**
@@ -12471,6 +13255,16 @@ export interface components {
              * @description First local date of the target week
              */
             to_date: string;
+        };
+        /** WeeklyViews */
+        WeeklyViews: {
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
+            /** Views */
+            views: number;
         };
         /** WeeklyWindow */
         WeeklyWindow: {
@@ -12625,6 +13419,16 @@ export interface components {
              */
             suggestions: components["schemas"]["AgentSuggestion"][];
         };
+        /** Candidate */
+        app__api__availability__Candidate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+        };
         /**
          * Usage
          * @description This calendar month's use against the business's bundle (space and messages).
@@ -12711,6 +13515,17 @@ export interface components {
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
+        };
+        /** Candidate */
+        app__api__social__Candidate: {
+            /** External Id */
+            external_id: string;
+            /** Network */
+            network: string;
+            /** Name */
+            name: string;
+            /** Avatar Url */
+            avatar_url: string | null;
         };
         /** Team */
         app__api__staff__Team: {
@@ -12972,6 +13787,284 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Tenant"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_tasks: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tasks"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_runs: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunCard"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_task: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_task: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TaskUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_task_now: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                task_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_proactive: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Proactive"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_proactive: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                key: "morning_briefing" | "suggestions";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProactiveBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Proactive"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    tick: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-internal-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Tick"];
                 };
             };
             /** @description Validation Error */
@@ -19174,6 +20267,473 @@ export interface operations {
             };
         };
     };
+    list_social_providers: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialProviders"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_social_accounts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialAccount"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_social: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_pending_connection: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                pending_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingConnection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    select_pending_accounts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                pending_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SelectAccounts"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialAccount"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_post: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                account_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disconnect_social: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                account_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sync_social_now: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialAccount"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_social_dashboard: {
+        parameters: {
+            query?: {
+                /** @description Only these accounts */
+                accounts?: string[] | null;
+                /** @description Only these networks */
+                networks?: string[] | null;
+                from?: string | null;
+                to?: string | null;
+                compare?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialDashboard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_social_top_posts: {
+        parameters: {
+            query?: {
+                /** @description Only these accounts */
+                accounts?: string[] | null;
+                /** @description Only these networks */
+                networks?: string[] | null;
+                from?: string | null;
+                to?: string | null;
+                sort?: "views" | "engagement";
+                limit?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopPost"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_social_audience: {
+        parameters: {
+            query?: {
+                /** @description Only these accounts */
+                accounts?: string[] | null;
+                /** @description Only these networks */
+                networks?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudienceShare"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_social_drafts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialDraft"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_social_draft: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     schedule_options: {
         parameters: {
             query?: never;
@@ -22295,7 +23855,7 @@ export interface operations {
                 "X-Location-Id"?: string | null;
             };
             path: {
-                key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
+                key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
             };
             cookie?: never;
         };

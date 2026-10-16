@@ -96,3 +96,11 @@ jobs:
           API_ENVIRONMENT: staging
           API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
         run: uv run python -m app.jobs issue-documents
+
+      - name: Read the latest numbers of connected social accounts (content studio)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+          API_SECRETS_KEY: ${{ secrets.STAGING_SECRETS_KEY }}
+        run: uv run python -m app.jobs sync-social

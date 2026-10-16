@@ -346,7 +346,8 @@
       "catalog": "Catalog",
       "money": "Money",
       "business": "Business"
-    }
+    },
+    "content": "Content & creative"
   },
   "terms": {
     "fitness": {
@@ -1501,6 +1502,7 @@
     "suggestion3": "Which classes have a waitlist this week?",
     "needsConfirmation": "Needs your confirmation",
     "bookPreview": "Book {client} into {service}",
+    "publishPreview": "Publish on {network} ({account}): {text}",
     "cancelPreview": "Cancel {client}'s booking for {service}",
     "fullWaitlist": "It's full, so this will add them to the waitlist.",
     "confirm": "Confirm",
@@ -1522,7 +1524,11 @@
     },
     "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything.",
     "logTimePreview": "Log {hours} h for {client}: {description}",
-    "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all"
+    "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all",
+    "scheduleTask": "Schedule: {title}",
+    "cancelTask": "Cancel the scheduled task \"{title}\"",
+    "firstRun": "First run: {when}",
+    "upTo": "Up to {credits} credits per run, read-only; anything it proposes waits for your approval."
   },
   "aiTeam": {
     "title": "AI team",
@@ -1635,6 +1641,133 @@
     "closed": {
       "disabled": "{name} is switched off for this business.",
       "forbidden": "Your role can't use {name}. Ask the business owner to open access."
+    },
+    "tasks": {
+      "title": "Scheduled tasks",
+      "subtitle": "What your agents will do later, by themselves. Ask an agent in a chat, for example \"every Sunday at 8:00 send me a weekly summary\".",
+      "usage": "{active} of {limit} tasks in use",
+      "empty": "No scheduled tasks yet. Ask any agent to do something at a set time and confirm the card it prepares.",
+      "timing": "Runs around the set time (within about 10 minutes). To-the-minute timing is coming soon.",
+      "preciseSoon": "To-the-minute timing: coming soon",
+      "kind": {
+        "agent_run": "Agent run",
+        "action": "Scheduled action"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "done": "Done",
+        "failed": "Failed"
+      },
+      "reason": {
+        "cancelled": "Cancelled",
+        "failed_3_times": "Paused after failing 3 times",
+        "run_failed": "The run failed twice",
+        "member_gone": "Paused: the person who created it is no longer in the business",
+        "permission_lost": "Paused: the person who created it no longer has AI access",
+        "module_disabled": "Paused: the AI module is off",
+        "business_closed": "Paused: the business is closed",
+        "agent_unavailable": "Paused: the agent is switched off or locked",
+        "over_credit_cap": "Paused: the last run used more credits than the limit"
+      },
+      "next": "Next: {when}",
+      "last": "Last run: {when}",
+      "never": "Not run yet",
+      "agentLabel": "Agent: {name}",
+      "creditsCap": "Up to {credits} credits per run",
+      "waiting": "{count, plural, one {# card waits for your approval} other {# cards wait for your approval}}",
+      "someoneElse": "Created by a colleague",
+      "pause": "Pause",
+      "resume": "Resume",
+      "runNow": "Run now",
+      "running": "Running…",
+      "edit": "Change time",
+      "delete": "Delete",
+      "confirmDelete": "Delete this task and its history?",
+      "history": "History",
+      "hideHistory": "Hide history",
+      "noRuns": "No runs yet.",
+      "openChat": "Open the chat",
+      "run": {
+        "running": "Running",
+        "ok": "Done",
+        "failed": "Failed",
+        "skipped": "Skipped"
+      },
+      "runError": {
+        "missed": "Missed: the server was down more than a day",
+        "ai_not_configured": "The AI is not set up yet",
+        "ai_limit_reached": "The monthly AI limit was reached",
+        "ai_busy": "The AI was busy",
+        "ai_unavailable": "The AI was unavailable",
+        "payload_changed": "The approved action changed, so it was not run",
+        "forbidden": "No longer allowed for the person who created it",
+        "module_disabled": "The module is off",
+        "member_gone": "The person who created it left",
+        "permission_lost": "The person who created it lost AI access",
+        "agent_unavailable": "The agent is not available",
+        "business_closed": "The business is closed",
+        "generic": "Something went wrong",
+        "ai_user_limit_reached": "The AI limit set for this person was reached"
+      },
+      "credits": "{credits} credits",
+      "frequency": {
+        "once": "Once",
+        "daily": "Every day",
+        "weekly": "Every week",
+        "monthly": "Every month"
+      },
+      "when": {
+        "once": "{date} at {time}",
+        "daily": "Every day at {time}",
+        "weekly": "Every {days} at {time}",
+        "monthly": "On day {day} of every month at {time}"
+      },
+      "form": {
+        "frequency": "How often",
+        "time": "Time",
+        "date": "Date",
+        "weekdays": "Days",
+        "day": "Day of the month",
+        "title": "Name",
+        "instruction": "Instruction",
+        "save": "Save",
+        "cancel": "Cancel",
+        "timePassed": "That time has already passed.",
+        "invalid": "Check the time and day and try again.",
+        "failed": "Could not save. Try again."
+      },
+      "proactive": {
+        "title": "Proactive team",
+        "subtitle": "Let your team come to you. Both are off until you switch them on, they read your data with your permissions only, and anything they suggest waits for your approval.",
+        "onAt": "On, every day at {time}",
+        "onWeekly": "On, every {day} at {time}",
+        "off": "Off",
+        "briefing": {
+          "name": "Morning briefing",
+          "description": "Every morning Ori sums up today's appointments, new leads and what needs your attention."
+        },
+        "suggestions": {
+          "name": "Weekly suggestions",
+          "description": "Once a week Ori looks for chances (clients who stopped coming, empty sessions, leads nobody answered) and prepares up to three suggestions as cards."
+        },
+        "enable": "Switch on",
+        "disable": "Switch off",
+        "time": "Time",
+        "weekday": "Day",
+        "save": "Save time",
+        "saved": "Saved.",
+        "failed": "Saving failed. Try again.",
+        "limit": "The business already has the most scheduled tasks its plan allows.",
+        "managersOnly": "Only people who manage the AI team can change this.",
+        "next": "Next: {when}",
+        "pausedBy": "Paused by the system: {reason}",
+        "cost": "Each run uses up to {credits} credits from your monthly AI allowance.",
+        "taskTitle": {
+          "morning_briefing": "Morning briefing",
+          "suggestions": "Weekly suggestions"
+        }
+      }
     },
     "wizard": {
       "hire": "Hire an agent",
@@ -1827,7 +1960,8 @@
       "setup_guided": "Guided setup",
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
-      "noPack": "Included amount"
+      "noPack": "Included amount",
+      "social_studio": "Content studio"
     },
     "descriptions": {
       "none": "You can add it any time.",
@@ -1850,7 +1984,8 @@
       "setup_guided": "A setup session with the MyBiz team: services, prices and staff set up together.",
       "setup_full": "We set the business up for you: services, prices, staff and your client list imported.",
       "noSupport": "Email and help center, an answer by the next business day.",
-      "noPack": "2 GB for files and 200 messages a month."
+      "noPack": "2 GB for files and 200 messages a month.",
+      "social_studio": "Connect your social networks and see one dashboard: followers, views, top posts and the best times to post."
     },
     "followsBranches": "Follows your active branches",
     "supportTier": "Support",
@@ -2200,7 +2335,11 @@
     "business_settings": "Business settings",
     "business_settings_hint": "Details, branding, modules and plan",
     "clients_privacy": "Privacy requests",
-    "clients_privacy_hint": "Export or erase a client's personal data"
+    "clients_privacy_hint": "Export or erase a client's personal data",
+    "social_read": "View the content studio",
+    "social_read_hint": "The social networks dashboard and its numbers",
+    "social_manage": "Manage social accounts",
+    "social_manage_hint": "Connect and disconnect social networks"
   },
   "health": {
     "title": "Health declaration",
@@ -4078,6 +4217,21 @@
             ]
           }
         }
+      },
+      "social": {
+        "eyebrow": "Content & creative",
+        "title": "See all your social networks in one place?",
+        "text": "Connect Facebook, Instagram, TikTok, YouTube and Google Business. Follow your followers, views and top posts, and learn when your content works best.",
+        "points": [
+          "One dashboard for every network, or just the one you choose",
+          "Top posts and videos, audience and the best times to post",
+          "Google Business: reviews, searches, calls and directions"
+        ],
+        "picture": [
+          "Followers",
+          "Views",
+          "Engagement"
+        ]
       }
     },
     "cart": {
@@ -4658,6 +4812,26 @@
         "overlap": "Hours on the same day must not overlap.",
         "generic": "Something went wrong. Try again."
       }
+    },
+    "ai": {
+      "open": "Your AI team",
+      "back": "Back",
+      "bubble": "Ask the AI team",
+      "noAgents": "No AI agents are available to you yet.",
+      "genericAction": "The agent prepared an action for you to confirm."
+    },
+    "content": {
+      "back": "Back",
+      "open": "Content & creative",
+      "askShira": "Ask Shira",
+      "noAccounts": "No social network is connected yet. Connect Facebook, Instagram, TikTok and more from the content tab in the web CRM, and the numbers will show here.",
+      "networks": "Connected networks",
+      "needsReconnect": "Reconnect",
+      "demo": "Demo",
+      "drafts": "Drafts from Shira",
+      "noDrafts": "No drafts yet. Ask Shira for post ideas and she will save them here.",
+      "discard": "Discard draft",
+      "publishHint": "To publish a draft, ask Shira. She prepares it and you confirm before anything goes out."
     }
   },
   "staffApp": {
@@ -6059,6 +6233,160 @@
       "friends_disabled": "Friends are not available here.",
       "friends_rate_limited": "Too many searches. Try again later.",
       "not_found": "No one found. Check the code, phone or email."
+    }
+  },
+  "content": {
+    "title": "Content & creative",
+    "subtitle": "All your social networks in one dashboard.",
+    "demoBanner": "You are looking at demo numbers. Nothing here comes from your real accounts.",
+    "connect": {
+      "title": "Let's connect your networks",
+      "text": "Connect a network to see its followers, views and top posts. You can disconnect any time and we delete the numbers we kept.",
+      "button": "Connect",
+      "soon": "Coming soon",
+      "demo": "Show with demo data",
+      "demoNote": "See the dashboard with sample numbers before you connect anything.",
+      "connected": "Connected: {count}",
+      "noAccess": "Only the owner or a manager can connect networks.",
+      "privacy": "We only read summarized, public numbers of your own accounts. Never private messages.",
+      "done": "Connected. We are reading your numbers now.",
+      "error": {
+        "state": "The connection expired or could not be verified. Please try again.",
+        "denied": "The connection was cancelled, nothing was connected.",
+        "network": "The network did not accept the connection. Please try again in a moment.",
+        "empty": "We found no pages or accounts to connect. Make sure you manage a Facebook page or an Instagram business account.",
+        "expired": "This choice has expired. Please connect again."
+      },
+      "choose": {
+        "title": "Which accounts to connect?",
+        "text": "Pick the accounts you want in your dashboard. You can disconnect any of them later.",
+        "submit": "Connect selected",
+        "network": {
+          "facebook": "Facebook page",
+          "instagram": "Instagram",
+          "threads": "Threads"
+        }
+      }
+    },
+    "networks": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "threads": "Threads",
+      "youtube": "YouTube",
+      "tiktok": "TikTok",
+      "google_business": "Google Business",
+      "x": "X",
+      "linkedin": "LinkedIn",
+      "pinterest": "Pinterest",
+      "snapchat": "Snapchat"
+    },
+    "gives": {
+      "followers": "Followers",
+      "reach": "Reach",
+      "videos": "Video views",
+      "engagement": "Engagement",
+      "posts": "Top posts",
+      "audience": "Audience",
+      "views": "Views",
+      "watch_time": "Watch time",
+      "reviews": "Reviews",
+      "searches": "Searches",
+      "calls": "Calls",
+      "directions": "Directions"
+    },
+    "filters": {
+      "label": "Dashboard filters",
+      "networks": "Networks",
+      "allNetworks": "All networks",
+      "period": "Period",
+      "d7": "7 days",
+      "d30": "30 days",
+      "d90": "90 days",
+      "custom": "Custom",
+      "from": "From",
+      "to": "To",
+      "compare": "Compare to the previous period",
+      "apply": "Apply"
+    },
+    "kpi": {
+      "followers": "Followers",
+      "reach": "Reach",
+      "impressions": "Views",
+      "video_views": "Video views",
+      "engagements": "Engagement",
+      "engagement_rate_bp": "Engagement rate",
+      "link_clicks": "Link clicks",
+      "profile_views": "Profile views",
+      "growth": "{value} net this period",
+      "vsPrevious": "{value} vs the previous period",
+      "noChange": "No change"
+    },
+    "charts": {
+      "followersTitle": "Followers over time",
+      "followersTable": "Followers by day",
+      "videoViewsTitle": "Video views per week",
+      "videoViewsTable": "Video views by week",
+      "weekOf": "Week of",
+      "views": "Views",
+      "day": "Day",
+      "kindTitle": "Engagement by content type",
+      "heatmapTitle": "When your content works best",
+      "heatmapHint": "Average engagement per post, by day and hour. Darker is better.",
+      "noData": "No data for this period.",
+      "best": "Best slot so far: {day} at {hour}"
+    },
+    "kinds": {
+      "post": "Post",
+      "reel": "Reel",
+      "story": "Story",
+      "video": "Video"
+    },
+    "posts": {
+      "title": "Top posts and videos",
+      "empty": "No posts in this period.",
+      "sortViews": "By views",
+      "sortEngagement": "By engagement",
+      "views": "Views",
+      "engagement": "Engagement",
+      "watch": "Avg watch",
+      "seconds": "{n} sec",
+      "open": "Open post",
+      "untitled": "Post"
+    },
+    "audience": {
+      "title": "Your audience",
+      "age": "Age",
+      "gender": "Gender",
+      "city": "Cities",
+      "country": "Countries",
+      "female": "Women",
+      "male": "Men",
+      "other": "Other",
+      "empty": "Audience data appears after the first sync."
+    },
+    "google": {
+      "title": "Google Business",
+      "rating": "Average rating",
+      "reviews": "New reviews",
+      "searches": "Searches",
+      "profileViews": "Profile views",
+      "calls": "Calls",
+      "directions": "Directions"
+    },
+    "accounts": {
+      "title": "Connected accounts",
+      "demo": "Demo",
+      "lastSynced": "Updated {date}",
+      "never": "Not synced yet",
+      "disconnect": "Disconnect",
+      "confirm": "Disconnect this account? We delete the numbers we kept for it.",
+      "refresh": "Refresh now",
+      "refreshLimit": "You can refresh once an hour.",
+      "addMore": "Connect another network"
+    },
+    "export": {
+      "csv": "Download CSV",
+      "print": "Print or save as PDF"
     }
   }
 }

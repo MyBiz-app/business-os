@@ -6,8 +6,8 @@ them, and those check the console permission. Businesses learn only whether AI i
 them (`ai_platform_state`). Console conversations are private to the team member who started
 them.
 
-Revision ID: 0095
-Revises: 0094
+Revision ID: 0098
+Revises: 0097
 Create Date: 2026-10-16
 """
 
@@ -15,8 +15,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0095"
-down_revision: str | None = "0094"
+revision: str = "0098"
+down_revision: str | None = "0097"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
