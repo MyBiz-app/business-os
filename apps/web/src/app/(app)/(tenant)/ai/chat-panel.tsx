@@ -25,10 +25,14 @@ const STATUS_TONE: Record<PendingAction["status"], string> = {
 
 export function ActionCard({ action, onDecide }: { action: PendingAction; onDecide: (id: string, decision: "confirm" | "reject") => void }) {
   const t = useTranslations("assistant");
+  const tNetworks = useTranslations("content.networks");
   const tTeam = useTranslations("aiTeam");
   const locale = useLocale();
   const preview = action.preview as {
     kind: string;
+    network?: string;
+    account?: string;
+    text?: string;
     client?: string;
     service?: string;
     starts?: string;
@@ -89,6 +93,10 @@ export function ActionCard({ action, onDecide }: { action: PendingAction; onDeci
           {t("logTimePreview", { hours: new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }).format(preview.hours ?? 0), client: isolate(preview.client ?? ""), description: isolate(preview.description ?? "") })}
           {" · "}
           <span dir="ltr">{preview.date}</span>
+        </p>
+      ) : preview.kind === "publish_post" ? (
+        <p className="font-medium" dir="auto">
+          {t("publishPreview", { network: preview.network ? tNetworks(preview.network as never) : "", account: isolate(preview.account ?? ""), text: isolate(preview.text ?? "") })}
         </p>
       ) : preview.kind === "bill_month" ? (
         <>
