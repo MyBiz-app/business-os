@@ -600,7 +600,9 @@ DAILY = [
     "issue-documents",
 ]
 HOURLY = ["publish-shifts", "send-emails", "notify-shifts", "send-announcements"]
-MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 3 for job in HOURLY}}
+# GitHub's free scheduler throttles "hourly" crons on staging to a run every 1-6 hours (observed
+# gaps up to ~6h), so an hourly job is late only after 8 hours without a success.
+MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 8 for job in HOURLY}}
 # Jobs whose staging workflow runs only once an email provider is set: they count as late only
 # after they have run at least once.
 OPTIONAL = {"send-emails", "notify-shifts"}

@@ -28,6 +28,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "settings"
   ],
   "tenant": [
+    "aiTeam",
     "appointments",
     "assistant",
     "auth",
@@ -124,6 +125,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "imageCrop",
     "inquiry",
     "locales",
+    "locations",
     "marketing",
     "modules",
     "nav",

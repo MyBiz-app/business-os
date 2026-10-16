@@ -82,13 +82,13 @@ def test_late_jobs(engine: Engine) -> None:
             INSERT INTO app.job_runs (job, finished_at, ok) VALUES ('extend-series', now(), false)
         """)
         )
-        # Hourly jobs four hours behind are late too, optional ones included once they ran.
+        # Hourly jobs nine hours behind are late too, optional ones included once they ran.
         conn.execute(
             text("""
             UPDATE app.job_runs SET finished_at = :at
             WHERE job IN ('publish-shifts', 'notify-shifts')
         """),
-            {"at": now - timedelta(hours=4)},
+            {"at": now - timedelta(hours=9)},
         )
         assert [item["job"] for item in late_jobs(conn, now)] == [
             "extend-series",

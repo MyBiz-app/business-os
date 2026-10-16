@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 
 from app.api import (
+    ai_team,
     appointments,
     assistant,
     attention,
@@ -25,6 +26,7 @@ from app.api import (
     friends,
     integrations,
     leads,
+    location_groups,
     locations,
     marketing,
     messaging,
@@ -87,6 +89,7 @@ ROUTERS: list[APIRouter] = [
     whatsapp_ai.router,
     leads.public_router,
     services.router,
+    location_groups.router,
     locations.router,
     staff.router,
     people.router,
@@ -110,6 +113,7 @@ ROUTERS: list[APIRouter] = [
     reviews.router,
     reviews.client_router,
     assistant.router,
+    ai_team.router,
     modules.router,
     billing.router,
     welcome.router,

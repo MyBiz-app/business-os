@@ -6,6 +6,15 @@ name: Publish Expo app updates (EAS Update)
 # from a computer without them makes the app fall back to http://<host>:8000 and every request
 # fails with "(0)". Needs the EXPO_TOKEN secret in the "staging" environment.
 on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/client-app/**"
+      - "packages/app-kit/**"
+      - "packages/i18n/**"
+      - "packages/brand/**"
+      - "packages/api-client/**"
+      - "pnpm-lock.yaml"
   workflow_dispatch:
     inputs:
       app:
@@ -37,7 +46,7 @@ jobs:
       - name: Skip apps that were not asked for
         id: pick
         run: |
-          if [ "${{ inputs.app }}" = "all" ] || [ "${{ inputs.app }}" = "${{ matrix.app }}" ]; then
+          if [ -z "${{ inputs.app }}" ] || [ "${{ inputs.app }}" = "all" ] || [ "${{ inputs.app }}" = "${{ matrix.app }}" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           fi
 
@@ -57,7 +66,8 @@ jobs:
         if: steps.pick.outputs.run == 'true'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          MESSAGE: ${{ inputs.message || github.event.head_commit.message }}
         working-directory: apps/${{ matrix.app }}
         run: |
           pnpm install --frozen-lockfile --dir ../..
-          npx --yes eas-cli@latest update --branch preview --environment preview --platform all --non-interactive --message "${{ inputs.message }}"
+          npx --yes eas-cli@latest update --branch preview --environment preview --platform all --non-interactive --message "$(echo "$MESSAGE" | head -n 1)"

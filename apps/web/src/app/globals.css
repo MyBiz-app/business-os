@@ -1421,3 +1421,72 @@ h1[tabindex="-1"]:focus {
     animation: pass-bob 5s ease-in-out infinite;
   }
 }
+
+/* ---- AI team page ------------------------------------------------------------------------ */
+
+@keyframes ai-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.14);
+  }
+}
+
+@keyframes ai-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Slides in from the side the chat sits on: the inline-end edge, so right-to-left flips it. */
+@keyframes ai-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--ai-dir, 1) * 28px));
+  }
+}
+
+.ai-halo {
+  animation: ai-breathe 3.6s ease-in-out infinite;
+}
+
+.ai-bob {
+  animation: ai-bob 5s ease-in-out infinite;
+}
+
+.ai-panel-in {
+  animation: ai-panel-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:dir(rtl) .ai-panel-in {
+  --ai-dir: -1;
+}
+
+.ai-stage {
+  background-image:
+    radial-gradient(circle at 50% 50%, color-mix(in oklab, #7c3aed 16%, transparent), transparent 55%),
+    radial-gradient(circle at 12% 12%, color-mix(in oklab, #06b6d4 12%, transparent), transparent 40%),
+    radial-gradient(circle at 90% 92%, color-mix(in oklab, #2563eb 14%, transparent), transparent 42%),
+    radial-gradient(circle, color-mix(in oklab, var(--foreground) 14%, transparent) 1px, transparent 1.6px);
+  background-size:
+    auto,
+    auto,
+    auto,
+    24px 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-halo,
+  .ai-bob,
+  .ai-panel-in {
+    animation: none;
+  }
+}
