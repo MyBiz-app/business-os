@@ -162,8 +162,10 @@ def _agent_run(
         raise RunFailed("ai_not_configured")
     time_zone = task["time_zone"]
     month_start = dt.datetime.now(dt.UTC).astimezone(ZoneInfo(time_zone)).date().replace(day=1)
-    if budget.credits_used(db, month_start) >= budget.credits_included(db):
+    if budget.over_limit(db, month_start):
         raise RunFailed("ai_limit_reached")
+    if budget.over_person_limit(db, user_id, member_role_keys(db, ctx.role), month_start):
+        raise RunFailed("ai_user_limit_reached")
     agent_id = None
     if task["agent_key"] not in CATALOG:
         agent_id = db.execute(

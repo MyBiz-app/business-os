@@ -1693,7 +1693,8 @@
         "permission_lost": "The person who created it lost AI access",
         "agent_unavailable": "The agent is not available",
         "business_closed": "The business is closed",
-        "generic": "Something went wrong"
+        "generic": "Something went wrong",
+        "ai_user_limit_reached": "The AI limit set for this person was reached"
       },
       "credits": "{credits} credits",
       "frequency": {

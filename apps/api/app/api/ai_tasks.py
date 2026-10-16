@@ -234,7 +234,7 @@ def run_task_now(
     if task["kind"] == "agent_run":
         if provider is None:
             raise HTTPException(status_code=503, detail="ai_not_configured")
-        _check_budget(context.session, provider)
+        _check_budget(context, user.id, provider)
         _check_user_rate(user.id, provider)
     context.session.commit()  # release the row lock: the runner works in its own transaction
     task_runner.run_now(engine, context.tenant_id, task_id, provider)

@@ -1693,7 +1693,8 @@
         "permission_lost": "מי שיצר את המשימה איבד גישה ל-AI",
         "agent_unavailable": "הסוכן לא זמין",
         "business_closed": "העסק סגור",
-        "generic": "משהו השתבש"
+        "generic": "משהו השתבש",
+        "ai_user_limit_reached": "הגעתם למגבלת ה-AI שנקבעה למשתמש הזה"
       },
       "credits": "{credits} קרדיטים",
       "frequency": {
