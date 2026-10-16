@@ -18,7 +18,7 @@ const KPIS = ["followers", "reach", "impressions", "video_views", "engagements",
 const TOP_SHOWN = 5;
 
 /** The content studio in the business app: connected networks, the main numbers, the best posts,
- * the drafts Shira prepared, and a way to ask her. The full dashboard stays in the web CRM. */
+ * the drafts Sophie prepared, and a way to ask her. The full dashboard stays in the web CRM. */
 export default function Content() {
   const t = useTranslations("business.content");
   const tc = useTranslations("content");
@@ -95,7 +95,7 @@ export default function Content() {
         <Text style={[styles.muted, { color: palette.muted }]}>{tc("subtitle")}</Text>
       </View>
 
-      {canAsk && <Button label={t("askShira")} palette={palette} onPress={() => router.push({ pathname: "/ai-chat", params: { agent: "creative", context: "content" } })} />}
+      {canAsk && <Button label={t("askCreative")} palette={palette} onPress={() => router.push({ pathname: "/ai-chat", params: { agent: "creative", context: "content" } })} />}
 
       {base.error ? (
         <LoadError palette={palette} onRetry={() => void base.reload()} />

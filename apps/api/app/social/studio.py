@@ -1,4 +1,4 @@
-"""What the content agent (Shira) reads and does in the content studio.
+"""What the content agent (Sophie) reads and does in the content studio.
 
 Everything takes the request's session, so row level security keeps it to one business. A
 conversation kept to some branches only sees the accounts of those branches (a business-wide

@@ -1828,11 +1828,11 @@
         "off": "Off",
         "briefing": {
           "name": "Morning briefing",
-          "description": "Every morning Ori sums up today's appointments, new leads and what needs your attention."
+          "description": "Every morning Adir sums up today's appointments, new leads and what needs your attention."
         },
         "suggestions": {
           "name": "Weekly suggestions",
-          "description": "Once a week Ori looks for chances (clients who stopped coming, empty sessions, leads nobody answered) and prepares up to three suggestions as cards."
+          "description": "Once a week Adir looks for chances (clients who stopped coming, empty sessions, leads nobody answered) and prepares up to three suggestions as cards."
         },
         "enable": "Switch on",
         "disable": "Switch off",
@@ -5170,15 +5170,15 @@
     "content": {
       "back": "Back",
       "open": "Content & creative",
-      "askShira": "Ask Shira",
+      "askCreative": "Ask Sophie",
       "noAccounts": "No social network is connected yet. Connect Facebook, Instagram, TikTok and more from the content tab in the web CRM, and the numbers will show here.",
       "networks": "Connected networks",
       "needsReconnect": "Reconnect",
       "demo": "Demo",
-      "drafts": "Drafts from Shira",
-      "noDrafts": "No drafts yet. Ask Shira for post ideas and she will save them here.",
+      "drafts": "Drafts from Sophie",
+      "noDrafts": "No drafts yet. Ask Sophie for post ideas and she will save them here.",
       "discard": "Discard draft",
-      "publishHint": "To publish a draft, ask Shira. She prepares it and you confirm before anything goes out."
+      "publishHint": "To publish a draft, ask Sophie. She prepares it and you confirm before anything goes out."
     }
   },
   "staffApp": {
