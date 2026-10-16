@@ -4057,10 +4057,26 @@
     "myTemplates": "התבניות שלי",
     "suggested": "הצעות",
     "text": "נוסח ההודעה",
-    "insert": "הוספה:",
     "variables": {
       "first_name": "שם פרטי",
-      "business": "שם העסק"
+      "last_name": "שם משפחה",
+      "full_name": "שם מלא",
+      "phone": "טלפון",
+      "email": "אימייל",
+      "birthday": "תאריך לידה",
+      "id_last4": "ת.ז. (4 ספרות אחרונות)",
+      "plan_name": "שם המנוי",
+      "plan_expires": "המנוי מסתיים ב",
+      "sessions_left": "אימונים שנותרו",
+      "next_booking": "התור הבא (תאריך ושעה)",
+      "next_service": "התור הבא (שירות)",
+      "staff_name": "התור הבא (מדריך)",
+      "business": "שם העסק",
+      "branch": "סניף",
+      "branch_address": "כתובת הסניף",
+      "app_link": "קישור לאפליקציה",
+      "join_code": "קוד הצטרפות",
+      "booking_link": "קישור להזמנת תור"
     },
     "sendTo": "{count, plural, =0 {אין נמענים} one {שליחה לנמען אחד} other {שליחה ל-# נמענים}}",
     "sentTo": "{count, plural, =0 {לא נשלח לאף אחד} one {נשלח לנמען אחד} other {נשלח ל-# נמענים}}",
@@ -4112,7 +4128,18 @@
     "promotional": "זו הודעה פרסומית",
     "promotionalHint": "נשלחת רק למי שאישר לקבל הצעות.",
     "channelsHint": "אפשר לבחור כמה ערוצים. מייל, התראה וחלון קופץ מגיעים למי שיש לו מייל או חשבון באפליקציה.",
-    "staffChannelsHint": "לעובדים שולחים במייל, בהתראה או בחלון קופץ."
+    "staffChannelsHint": "לעובדים שולחים במייל, בהתראה או בחלון קופץ.",
+    "variableGroups": {
+      "client": "לקוח",
+      "plan": "מנוי",
+      "booking": "תורים",
+      "business": "עסק וסניף"
+    },
+    "addVariable": "הוספת משתנה",
+    "fallbackLabel": "אם אין ללקוח ערך",
+    "fallbackPlaceholder": "למשל: לקוח יקר",
+    "fallbackHint": "לא חובה. נכתב אחרי המשתנה כ-'{'name|טקסט'}'.",
+    "missingValue": "{count, plural, one {ללקוח אחד אין} other {ל-# לקוחות אין}} \"{variable}\" ובנוסח אין ערך חלופי. אפשר לקבוע אחד עם '{'name|טקסט'}'."
   },
   "reviews": {
     "title": "שביעות רצון ({count} ימים)",
