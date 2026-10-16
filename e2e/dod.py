@@ -116,7 +116,7 @@ with sync_playwright() as p:
     member.goto(APP); member.wait_for_url("**/sign-in", timeout=60000)
     member.get_by_label("אימייל").fill(member_email)
     member.get_by_role("button", name="שליחת קוד").click()
-    member.get_by_label("הקוד מהמייל").fill(otp(member_email))
+    member.get_by_label("הקוד בן 6 הספרות").fill(otp(member_email))
     member.get_by_role("button", name="כניסה").click(); member.wait_for_url("**/join", timeout=90000)
     member.get_by_label("קוד הצטרפות").fill(code)
     member.get_by_role("button", name="המשך").click()
