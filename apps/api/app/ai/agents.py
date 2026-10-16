@@ -95,7 +95,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "secretary",
             "Personal secretary",
-            {"he": "מאיה", "en": "Maya"},
+            {"he": "שירי", "en": "Shiri"},
             "#06B6D4",
             "Calendar, bookings, waiting lists, reminders, free slots and client messages.",
             "You are the personal secretary: calendar, bookings, waiting lists, free slots and "
