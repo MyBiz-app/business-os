@@ -17,6 +17,7 @@ from tests.conftest import AuthHeaders, add_member, local_today
 from tests.test_assistant import FakeProvider, calls, enable_ai_pro, says, use_provider
 from tests.test_bookings import new_client, new_session
 from tests.test_branch_access import branches, member_at_north
+from tests.test_workspace import PNG
 
 
 def tool_names(provider: FakeProvider, call: int = 0) -> set[str]:
@@ -521,3 +522,114 @@ def test_groups_scope_fails_closed_until_branch_groups_exist() -> None:
         **{**agent.__dict__, "location_scope": "groups", "location_group_ids": frozenset({uuid4()})}
     )
     assert scope.agent_branches(None, grouped) == frozenset()  # type: ignore[arg-type]
+
+
+# --- the new-agent wizard (A4): pictures, plan limits, the trial chat ---------------------------
+
+
+def new_agent(client: TestClient, headers: dict, name: str = "Gal", **extra: Any):
+    return client.post(
+        "/ai/agents", json={"name": name, "tool_domains": ["clients"], **extra}, headers=headers
+    )
+
+
+def test_agent_pictures(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine
+) -> None:
+    enable_ai_pro(client, studio)
+    owner = studio["headers"]
+    card = new_agent(client, owner, avatar_preset="gallery-03").json()
+    assert card["avatar_url"] is None
+
+    uploaded = client.put(
+        f"/ai/agents/{card['key']}/avatar",
+        files={"file": ("a.png", PNG, "image/png")},
+        headers=owner,
+    )
+    assert uploaded.status_code == 200, uploaded.text
+    body = uploaded.json()
+    assert body["avatar_preset"] is None and body["avatar_url"].startswith(
+        f"/ai/agents/{card['key']}/avatar?v="
+    )
+    served = client.get(body["avatar_url"], headers=owner)
+    assert (served.status_code, served.content) == (200, PNG)
+    assert served.headers["content-type"] == "image/png"
+
+    # A built-in agent can have its own face too; choosing a gallery face drops the upload.
+    chief = client.put(
+        "/ai/agents/chief/avatar", files={"file": ("a.png", PNG, "image/png")}, headers=owner
+    )
+    assert chief.json()["avatar_url"]
+    back = client.patch("/ai/agents/chief", json={"avatar_preset": "gallery-01"}, headers=owner)
+    assert back.json()["avatar_url"] is None
+    assert client.get("/ai/agents/chief/avatar", headers=owner).status_code == 404
+
+    bad = client.put(
+        f"/ai/agents/{card['key']}/avatar",
+        files={"file": ("a.txt", b"nope", "text/plain")},
+        headers=owner,
+    )
+    assert bad.status_code == 415
+    removed = client.delete(f"/ai/agents/{card['key']}/avatar", headers=owner)
+    assert removed.json()["avatar_url"] is None
+    assert client.get(body["avatar_url"], headers=owner).status_code == 404
+
+    desk = manager_headers(client, auth, engine, studio, "front_desk")
+    assert (
+        client.put(
+            f"/ai/agents/{card['key']}/avatar",
+            files={"file": ("a.png", PNG, "image/png")},
+            headers=desk,
+        ).status_code
+        == 403
+    )
+
+
+def test_custom_agent_limit_follows_the_ai_module(client: TestClient, studio: dict) -> None:
+    owner = studio["headers"]
+    client.put(
+        "/tenants/current/modules",
+        json={"modules": {"client_app": 1, "ai_basic": 1}},
+        headers=owner,
+    )
+    for i in range(3):
+        assert new_agent(client, owner, f"A{i}").status_code == 201
+    team = client.get("/ai/team", headers=owner).json()
+    assert (team["custom_count"], team["custom_limit"]) == (3, 3)
+    full = new_agent(client, owner, "Four")
+    assert (full.status_code, full.json()["detail"]) == (409, "agent_limit")
+
+    enable_ai_pro(client, studio)
+    assert client.get("/ai/team", headers=owner).json()["custom_limit"] == 10
+    assert new_agent(client, owner, "Four").status_code == 201
+
+
+def test_a_draft_agent_can_be_tried_before_it_joins_the_team(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine, use_provider
+) -> None:
+    enable_ai_pro(client, studio)
+    owner = studio["headers"]
+    desk = manager_headers(client, auth, engine, studio, "front_desk")
+    draft = new_agent(client, owner, allowed_roles=["owner", "front_desk"], draft=True).json()
+
+    team = client.get("/ai/team", headers=owner).json()
+    assert draft["key"] not in [a["key"] for a in team["agents"]]
+    assert team["custom_count"] == 1  # it already counts against the plan
+
+    provider = FakeProvider([says("Hello, I am Gal.")])
+    use_provider(provider)
+    assert ask(client, owner, chat(client, owner, draft["key"]), "hi").status_code == 200
+    assert (
+        client.post("/ai/conversations", json={"agent_key": draft["key"]}, headers=desk).status_code
+        == 403
+    )
+
+    saved = client.patch(f"/ai/agents/{draft['key']}", json={"draft": False}, headers=owner)
+    assert saved.status_code == 200
+    assert draft["key"] in [
+        a["key"] for a in client.get("/ai/team", headers=owner).json()["agents"]
+    ]
+    assert (
+        client.post("/ai/conversations", json={"agent_key": draft["key"]}, headers=desk).status_code
+        == 201
+    )
