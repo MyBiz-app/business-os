@@ -24,13 +24,13 @@ hours × rate.
 - **Retainer** per client (`app.retainers`): a monthly fee, the minutes it includes and the
   hourly rate beyond them (or only an hourly rate).
 - **Bills**: "bill the month" turns a client's retainer and unbilled time into a bill. A bill is
-  a quote of kind `bill` (#44): numbered, lines, a private link — already accepted, the whole
-  amount due — so the client pays it the same way (payments provider, receipt). Billed time
+  a quote of kind `bill` (#44): numbered, lines, a private link - already accepted, the whole
+  amount due - so the client pays it the same way (payments provider, receipt). Billed time
   entries point to their bill and are never billed twice.
 
 ## Screens
 
-- Business web: on the client card — documents (upload, share, ask to sign), time (log, list,
+- Business web: on the client card - documents (upload, share, ask to sign), time (log, list,
   unbilled total), retainer, "bill the month"; "My time" for each staff member.
 - Client app: My documents (view, upload, sign) and bills under My quotes.
 - Business app: log time on the client card.

@@ -131,7 +131,7 @@ export default function Bookings() {
         <View style={local.info}>
           <Text style={[local.name, { color: palette.foreground }]}>{booking.service_name}</Text>
           <Text style={[local.meta, { color: palette.muted }]}>
-            {formatTime(booking.starts_at, locale, business.time_zone)}–{formatTime(booking.ends_at, locale, business.time_zone)}
+            {formatTime(booking.starts_at, locale, business.time_zone)}-{formatTime(booking.ends_at, locale, business.time_zone)}
             {booking.dependent_name ? ` · ${booking.dependent_name}` : ""}
           </Text>
         </View>
@@ -215,7 +215,7 @@ export default function Bookings() {
                 <View style={local.buy}>
                   <Button
                     label={t("buy")}
-                    accessibilityLabel={`${t("buy")} – ${plan.name}`}
+                    accessibilityLabel={`${t("buy")} - ${plan.name}`}
                     palette={palette}
                     busy={buying === plan.id}
                     disabled={buying !== null}

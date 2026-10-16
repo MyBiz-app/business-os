@@ -88,7 +88,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     return `${rounded > 0 ? "+" : ""}${number.format(rounded)}`;
   };
   const show = (metric: MetricValue, value: number | null) => {
-    if (value === null) return "—";
+    if (value === null) return "-";
     if (metric.unit === "money") return formatMoney(Math.round(value), tenant.currency, locale);
     if (metric.unit === "percent") return `${number.format(Math.round(value))}%`;
     return number.format(value);

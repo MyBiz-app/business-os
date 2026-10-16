@@ -29024,6 +29024,18 @@
               }
             ],
             "title": "Address"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind",
+            "description": "The branch's own sub-category (a catalog key)"
           }
         },
         "type": "object",
@@ -29341,6 +29353,19 @@
             "type": "string",
             "format": "date-time",
             "title": "Ends At"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id",
+            "description": "The branch the session is at"
           },
           "status": {
             "type": "string",

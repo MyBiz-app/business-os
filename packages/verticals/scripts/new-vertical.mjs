@@ -91,4 +91,4 @@ for (const locale of LOCALES) {
   messages.verticals = { ...messages.verticals, [key]: texts };
   writeFileSync(file, `${JSON.stringify(messages, null, 2)}\n`);
 }
-console.log(`added verticals.${key} to the translations (${LOCALES.join(", ")}) — fill in the TODOs`);
+console.log(`added verticals.${key} to the translations (${LOCALES.join(", ")}) - fill in the TODOs`);

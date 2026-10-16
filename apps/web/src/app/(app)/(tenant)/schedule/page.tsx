@@ -86,7 +86,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       start: startsAt,
       // Past midnight: drawn to the end of its day.
       end: dayOf(session.ends_at, tenant.time_zone) === day ? Math.max(minutesIn(session.ends_at, tenant.time_zone), startsAt + 15) : 24 * 60,
-      time: `${formatTime(session.starts_at, locale, tenant.time_zone)}–${formatTime(session.ends_at, locale, tenant.time_zone)}`,
+      time: `${formatTime(session.starts_at, locale, tenant.time_zone)}-${formatTime(session.ends_at, locale, tenant.time_zone)}`,
       title: session.service.name,
       detail: cancelled
         ? t("cancelled")
@@ -107,10 +107,10 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     userId: shift.user_id,
     name: shift.user_name,
     avatar: avatarOf.get(shift.user_id) ?? null,
-    label: `${formatTime(shift.starts_at, locale, tenant.time_zone)}–${formatTime(shift.ends_at, locale, tenant.time_zone)}${shift.position ? ` · ${shift.position}` : ""}`,
+    label: `${formatTime(shift.starts_at, locale, tenant.time_zone)}-${formatTime(shift.ends_at, locale, tenant.time_zone)}${shift.position ? ` · ${shift.position}` : ""}`,
     warn: shift.on_time_off || shift.outside_hours,
     details: {
-      time: `${formatTime(shift.starts_at, "en-GB", tenant.time_zone)}–${formatTime(shift.ends_at, "en-GB", tenant.time_zone)}`,
+      time: `${formatTime(shift.starts_at, "en-GB", tenant.time_zone)}-${formatTime(shift.ends_at, "en-GB", tenant.time_zone)}`,
       role: roleOf.get(shift.user_id) ?? null,
       position: shift.position ?? null,
       place: shift.location_name,
@@ -144,7 +144,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
     view === "day"
       ? formatDay(start, locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" })
       : view === "week"
-        ? `${formatDay(days[0], locale, { day: "numeric", month: "short" })} – ${formatDay(days[6], locale, { day: "numeric", month: "short", year: "numeric" })}`
+        ? `${formatDay(days[0], locale, { day: "numeric", month: "short" })} - ${formatDay(days[6], locale, { day: "numeric", month: "short", year: "numeric" })}`
         : formatDay(monthStart(anchor), locale, { month: "long", year: "numeric" });
   const link = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams();

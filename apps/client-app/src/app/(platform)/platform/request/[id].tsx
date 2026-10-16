@@ -138,7 +138,7 @@ export default function RequestScreen() {
           options={(["new", "in_progress", "done"] as Status[]).map((value) => ({ value, label: tInbox(`statuses.${value}`) }))}
         />
         <Text style={[styles.muted, { color: palette.muted }]}>
-          {request.assignee ? tInbox("assigned", { who: mine ? t("you") : request.assignee }) : "—"}
+          {request.assignee ? tInbox("assigned", { who: mine ? t("you") : request.assignee }) : "-"}
         </Text>
         {request.status !== "done" &&
           (mine ? (

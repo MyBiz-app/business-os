@@ -268,8 +268,8 @@
       "default_plans": [
         {
           "names": {
-            "he": "ליווי — 4 פגישות מעקב",
-            "en": "Coaching — 4 follow-ups"
+            "he": "ליווי - 4 פגישות מעקב",
+            "en": "Coaching - 4 follow-ups"
           },
           "kind": "punch_card",
           "validity_days": 90,

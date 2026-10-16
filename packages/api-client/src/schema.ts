@@ -6541,6 +6541,11 @@ export interface components {
             name: string;
             /** Address */
             address: string | null;
+            /**
+             * Kind
+             * @description The branch's own sub-category (a catalog key)
+             */
+            kind?: string | null;
         };
         /** ClientNote */
         ClientNote: {
@@ -6676,6 +6681,11 @@ export interface components {
              * Format: date-time
              */
             ends_at: string;
+            /**
+             * Location Id
+             * @description The branch the session is at
+             */
+            location_id?: string | null;
             /**
              * Status
              * @enum {string}

@@ -63,7 +63,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
             <>
               {formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })} ·{" "}
               <Ltr>
-                {formatTime(session.starts_at, locale, tenant.time_zone)}–{formatTime(session.ends_at, locale, tenant.time_zone)}
+                {formatTime(session.starts_at, locale, tenant.time_zone)}-{formatTime(session.ends_at, locale, tenant.time_zone)}
               </Ltr>
               {cancelled && ` · ${t("cancelled")}`}
             </>

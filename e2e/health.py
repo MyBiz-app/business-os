@@ -88,7 +88,7 @@ with sync_playwright() as p:
 
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
-    member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
+    member.get_by_role("button", name=re.compile("^הרשמה - פילאטיס")).click()
     expect(member.get_by_text("יש למלא הצהרת בריאות לפני ההרשמה.")).to_be_visible()
     print("2. booking blocked without a declaration: ok")
 
@@ -102,7 +102,7 @@ with sync_playwright() as p:
     member.screenshot(path=f"{h.OUT}/health-pending.png", full_page=True)
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
-    member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
+    member.get_by_role("button", name=re.compile("^הרשמה - פילאטיס")).click()
     expect(member.get_by_text("העסק צריך לאשר את הצהרת הבריאות שלך")).to_be_visible()
     print("3. a \"yes\" waits for approval: ok")
 
@@ -120,7 +120,7 @@ with sync_playwright() as p:
 
     member.goto(f"{h.APP}/schedule")
     member.get_by_role("tab", name=re.compile(str(int(tomorrow[-2:])))).first.click()
-    member.get_by_role("button", name=re.compile("^הרשמה – פילאטיס")).click()
+    member.get_by_role("button", name=re.compile("^הרשמה - פילאטיס")).click()
     expect(member.get_by_text("נרשמת")).to_be_visible()
     print("5. member books after approval: ok")
 

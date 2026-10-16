@@ -63,7 +63,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   })();
   const today = todayIn(tenant.time_zone);
   const inquiryLink = `${await siteOrigin()}/inquiry/${tenant.join_code}`;
-  const rate = board.conversion_rate === null ? "—" : `${Math.round(board.conversion_rate * 100)}%`;
+  const rate = board.conversion_rate === null ? "-" : `${Math.round(board.conversion_rate * 100)}%`;
   const stats = [
     { label: t("stats.new30"), value: board.new_last_30_days, icon: Inbox },
     { label: t("stats.won30"), value: board.won_last_30_days, icon: Trophy },

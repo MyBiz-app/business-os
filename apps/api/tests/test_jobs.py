@@ -588,7 +588,7 @@ def test_staff_are_emailed_once_when_their_shifts_are_published(
     assert email.to == "coach@example.com"
     assert email.subject == "המשמרות החדשות שלך ב" + "Studio Flow"
     assert email.text.startswith("שלום Dana,")
-    assert email.text.count("09:00–15:00 · Main · Coach") == 2
+    assert email.text.count("09:00-15:00 · Main · Coach") == 2
     with engine.connect() as connection:
         usage = (
             connection.execute(
@@ -685,8 +685,8 @@ def test_edits_to_a_published_shift_are_emailed_once_after_a_quiet_period(
         assert notify_roster_changes(connection, sender, later)["sent"] == 0  # once only
     [email] = sender.sent
     assert email.to == "coach@example.com"
-    assert email.text.count("09:00–15:00 · Main · Coach") == 1
-    assert email.text.count("12:00–18:00 · Main · Coach") == 1
+    assert email.text.count("09:00-15:00 · Main · Coach") == 1
+    assert email.text.count("12:00-18:00 · Main · Coach") == 1
     assert email.text.count("10:00") == 0 and email.text.count("11:00") == 0
 
 
@@ -716,7 +716,7 @@ def test_a_removed_shift_is_emailed_and_one_put_back_is_not(
     with engine.begin() as connection:
         assert notify_roster_changes(connection, sender, later)["sent"] == 1
     [email] = sender.sent
-    assert email.text.count("09:00–15:00 · Main · Coach") == 1
+    assert email.text.count("09:00-15:00 · Main · Coach") == 1
 
 
 def test_drafts_and_shifts_not_yet_announced_record_no_changes(

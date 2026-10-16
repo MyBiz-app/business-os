@@ -213,7 +213,7 @@ export default function SessionScreen() {
         <Heading palette={palette}>{session.service.name}</Heading>
         <Text style={[styles.muted, { color: palette.muted }]}>
           {formatDay(dayOf(session.starts_at, timeZone), locale, { weekday: "long", day: "numeric", month: "long" })} ·{" "}
-          {formatTime(session.starts_at, locale, timeZone)}–{formatTime(session.ends_at, locale, timeZone)}
+          {formatTime(session.starts_at, locale, timeZone)}-{formatTime(session.ends_at, locale, timeZone)}
         </Text>
         <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
           {open ? (
