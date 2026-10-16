@@ -47,6 +47,16 @@ with sync_playwright() as p:
     page.screenshot(path=f"{h.OUT}/marketing-pricing.png", full_page=True)
     print("pricing from the API, currency switch: ok")
 
+    # The calculator: choose clients and an add-on, then "Start with this" opens the journey
+    # at the business details with the same plan.
+    page.goto(h.BASE + "/pricing?currency=ILS"); h.ready(page)
+    page.locator("#calc-clients").fill("240")
+    page.get_by_role("button", name=re.compile("^(אפליקציה|App)")).first.click()
+    page.get_by_role("link", name=re.compile("מתחילים עם זה|Start with this")).first.click()
+    page.wait_for_url("**/start?**from=calc**"); h.ready(page)
+    expect(page.get_by_role("heading", level=1)).to_be_visible()
+    print("pricing calculator hands its plan to the journey: ok")
+
     email = f"lead{time.time_ns()}@example.com"
     page.goto(h.BASE + "/contact"); h.ready(page)
     page.get_by_label("שם מלא").fill("דנה כהן")

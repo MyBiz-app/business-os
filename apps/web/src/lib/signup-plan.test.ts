@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { businessNumberOk, chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
+import { businessNumberOk, calcPlanQuery, clientsTier, modulesFromParam, wholeParam, chooseTier, decodePlan, encodePlan, priceLines, type SignupPlan, tierOf, withLocations, withoutOrphans } from "./signup-plan.ts";
 
 const catalog = {
   core: [
@@ -93,4 +93,29 @@ test("an Israeli business number needs a valid check digit; abroad it is optiona
   assert.equal(businessNumberOk("ILS", ""), false);
   assert.equal(businessNumberOk("USD", ""), true);
   assert.equal(decodePlan(encodePlan({ ...plan, businessNumber: "000 000 018" }))?.businessNumber, "000000018");
+});
+
+test("a client count lands in the right core tier", () => {
+  assert.equal(clientsTier(0), 100);
+  assert.equal(clientsTier(100), 100);
+  assert.equal(clientsTier(101), 300);
+  assert.equal(clientsTier(240), 300);
+  assert.equal(clientsTier(1000), 1000);
+  assert.equal(clientsTier(1001), 1500);
+});
+
+test("the calculator plan round-trips through the /start link", () => {
+  const query = new URLSearchParams(calcPlanQuery({ vertical: "beauty", clients: 240, locations: 2, currency: "ILS", modules: { client_app: 1, ai_basic: 1, extra_location: 1 } }));
+  assert.equal(query.get("from"), "calc");
+  assert.equal(query.get("vertical"), "beauty");
+  assert.equal(query.get("modules"), "client_app,ai_basic");
+  assert.deepEqual(modulesFromParam(query.get("modules")), { client_app: 1, ai_basic: 1 });
+  assert.equal(wholeParam(query.get("clients"), 0, 100000, 100), 240);
+  assert.equal(wholeParam("abc", 0, 10, 7), 7);
+  assert.deepEqual(modulesFromParam("client_app,evil"), { client_app: 1 });
+});
+
+test("the price at 240 clients, 2 locations and the app", () => {
+  const { total } = priceLines(catalog, { clients: 240, modules: withLocations({ client_app: 1 }, 2) });
+  assert.equal(total, 14900 + 4900 + 2900);
 });

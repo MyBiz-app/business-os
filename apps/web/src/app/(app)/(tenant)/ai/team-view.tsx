@@ -1,6 +1,6 @@
 "use client";
 
-import { FlaskConical, LayoutGrid, Network, UserPlus } from "lucide-react";
+import { FlaskConical, LayoutGrid, MessageCircle, Maximize2, Minimize2, Network, UserPlus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +16,7 @@ import {
   startConversation,
 } from "./actions";
 import { AgentDialog } from "./agent-dialog";
+import { AgentAvatar } from "./agent-avatar";
 import { AgentEditor } from "./agent-editor";
 import type { RoleOption } from "./agent-fields";
 import { AgentWizard } from "./agent-wizard";
@@ -24,6 +25,8 @@ import { type Branch } from "./scope-picker";
 import { TeamList } from "./team-list";
 import { TeamMap } from "./team-map";
 import type { Agent, Team, Upsell } from "./types";
+
+const MAP_WIDE_KEY = "ai-team-map-wide";
 
 type Props = {
   team: Team;
@@ -52,6 +55,8 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   const [view, setView] = useState<"map" | "list">("map");
   const [closedAgent, setClosedAgent] = useState<Agent | null>(null);
   const router = useRouter();
+  // The map can take the whole width while a chat stays open, shown as a small floating card.
+  const [mapWide, setMapWide] = useState(false);
   const [wizard, setWizard] = useState(false);
   const [editing, setEditing] = useState<Agent | null>(null);
   const [waitingFor, setWaitingFor] = useState<string | null>(null);
@@ -157,6 +162,41 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
   }, []);
 
   const chatOpen = agent !== null;
+  const wide = chatOpen && mapWide;
+
+  // The last choice is remembered per browser.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        setMapWide(window.localStorage.getItem(MAP_WIDE_KEY) === "1");
+      } catch {
+        // storage unavailable: start in the split view
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function changeMapWide(next: boolean) {
+    setMapWide(next);
+    try {
+      window.localStorage.setItem(MAP_WIDE_KEY, next ? "1" : "0");
+    } catch {
+      // not remembered
+    }
+  }
+
+  // M toggles the big map while a chat is open (not while typing).
+  useEffect(() => {
+    if (!chatOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "m" || event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true'], dialog[open]")) return;
+      changeMapWide(!mapWide);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [chatOpen, mapWide]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -194,21 +234,35 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
       </div>
 
       <div className="flex items-start gap-4">
-        <div className={`min-w-0 transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
+        <div className={`relative min-w-0 motion-reduce:transition-none transition-[width] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${wide ? "w-full" : chatOpen ? "hidden w-full lg:block lg:w-72 lg:shrink-0 xl:w-80" : "w-full"}`}>
+          {chatOpen && view === "map" && (
+            <button
+              type="button"
+              onClick={() => changeMapWide(!wide)}
+              aria-pressed={wide}
+              aria-keyshortcuts="M"
+              title={t(wide ? "map.shrink" : "map.expand")}
+              aria-label={t(wide ? "map.shrink" : "map.expand")}
+              className="absolute end-3 top-3 z-20 hidden rounded-full border border-border bg-background/90 p-2 text-muted shadow-sm backdrop-blur hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary md:block"
+            >
+              {wide ? <Minimize2 aria-hidden="true" className="size-4" /> : <Maximize2 aria-hidden="true" className="size-4" />}
+            </button>
+          )}
           {view === "map" ? (
             <>
               <div className="hidden md:block">
-                <TeamMap agents={team.agents} selected={selected} compact={chatOpen} onPick={open} />
+                <TeamMap agents={team.agents} selected={selected} compact={chatOpen && !wide} onPick={open} />
               </div>
               <div className="md:hidden">
                 <TeamList agents={team.agents} selected={selected} onPick={open} />
               </div>
             </>
           ) : (
-            <TeamList agents={team.agents} selected={selected} compact={chatOpen} onPick={open} />
+            <TeamList agents={team.agents} selected={selected} compact={chatOpen && !wide} onPick={open} />
           )}
         </div>
         {agent && (
+          <div className={wide ? "hidden" : "contents"}>
           <ChatPanel
             key={agent.key}
             agent={agent}
@@ -238,8 +292,30 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
               setConversation(null);
             }}
           />
+          </div>
         )}
       </div>
+
+      {agent && wide && (
+        <button
+          type="button"
+          onClick={() => changeMapWide(false)}
+          className="ai-panel-in fixed bottom-4 end-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-border bg-background p-3 text-start shadow-lg hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <span className="relative">
+            <AgentAvatar agent={agent} className="size-10" />
+            <MessageCircle aria-hidden="true" className="absolute -bottom-1 -end-1 size-4 rounded-full bg-primary p-0.5 text-on-primary" />
+          </span>
+          <span className="flex min-w-0 flex-col leading-tight">
+            <span className="truncate text-sm font-semibold" dir="auto">
+              {t("map.floatingChat", { name: agent.name })}
+            </span>
+            <span className="text-xs text-muted" role="status">
+              {waitingFor ? t("map.floatingBusy") : t("map.floatingCount", { count: conversation?.turns.length ?? 0 })}
+            </span>
+          </span>
+        </button>
+      )}
 
       {closedAgent && (
         <AgentDialog

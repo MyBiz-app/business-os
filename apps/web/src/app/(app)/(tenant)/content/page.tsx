@@ -58,12 +58,15 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
   // The view: networks, period and whether to compare, all kept in the address.
   const connectedNetworks = [...new Set(accounts.map((a) => a.network))];
   const chosen = (Array.isArray(query.network) ? query.network : [query.network]).filter((n): n is string => typeof n === "string" && connectedNetworks.includes(n));
-  const range = pick(query.range, ["7", "30", "90", "custom"] as const) ?? "30";
+  const range = pick(query.range, ["7", "30", "90", "month", "last_month", "custom"] as const) ?? "30";
   const today = todayIn(tenant.time_zone);
   const customFrom = typeof query.from === "string" && isDay(query.from) ? query.from : null;
   const customTo = typeof query.to === "string" && isDay(query.to) ? query.to : null;
-  const to = range === "custom" && customTo ? customTo : today;
-  const from = range === "custom" && customFrom ? customFrom : addDays(to, -((range === "custom" ? 30 : Number(range)) - 1));
+  const monthStart = `${today.slice(0, 7)}-01`;
+  const prevMonthEnd = addDays(monthStart, -1);
+  const from =
+    range === "month" ? monthStart : range === "last_month" ? `${prevMonthEnd.slice(0, 7)}-01` : range === "custom" && customFrom ? customFrom : addDays(range === "custom" && customTo ? customTo : today, -((range === "custom" ? 30 : Number(range)) - 1));
+  const to = range === "month" ? today : range === "last_month" ? prevMonthEnd : range === "custom" && customTo ? customTo : today;
   const compare = query.compare === "1";
   const sort = pick(query.sort, ["views", "engagement"] as const) ?? "views";
   const selection = { networks: chosen.length > 0 ? chosen : undefined, from, to };
