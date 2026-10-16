@@ -4,8 +4,8 @@ One row per purpose (main, inbox, billing, reply_to, notifications), for the bus
 (location_id null) or for one branch. A branch without its own row inherits the business's.
 A new address is unusable until the link emailed to it is opened (verified_at).
 
-Revision ID: 0097
-Revises: 0096
+Revision ID: 0098
+Revises: 0097
 Create Date: 2026-10-16
 """
 
@@ -13,8 +13,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0097"
-down_revision: str | None = "0096"
+revision: str = "0098"
+down_revision: str | None = "0097"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
