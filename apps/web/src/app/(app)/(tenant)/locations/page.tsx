@@ -8,7 +8,8 @@ import { getTenantFor } from "@/lib/tenant";
 import { industryTexts } from "@/lib/verticals";
 import { canManageSettings } from "@/lib/permissions";
 
-import { updateNetworkScope } from "./actions";
+import { deleteLocationGroup, saveLocationGroup, updateNetworkScope } from "./actions";
+import { LocationGroups } from "./location-groups";
 import { NetworkPolicy } from "./network-policy";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -19,6 +20,7 @@ export default async function LocationsPage() {
   const { tenant, api, scope } = await getTenantFor("catalog.read");
   const { text } = industryTexts(t);
   const locations = unwrap(await api.GET("/locations", { params: scope }));
+  const groups = unwrap(await api.GET("/location-groups", { params: scope }));
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
@@ -36,6 +38,15 @@ export default async function LocationsPage() {
 
       {canManageSettings(tenant) && (
         <NetworkPolicy action={updateNetworkScope} scope={tenant.network_scope} multiBranch={locations.length > 1} />
+      )}
+
+      {canManageSettings(tenant) && locations.length > 1 && (
+        <LocationGroups
+          branches={locations.map(({ id, name }) => ({ id, name }))}
+          groups={groups}
+          saveGroup={saveLocationGroup}
+          removeGroup={deleteLocationGroup}
+        />
       )}
 
       {locations.length === 0 ? (

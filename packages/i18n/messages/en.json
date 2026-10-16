@@ -325,7 +325,7 @@
     "settings": "Settings",
     "schedule": "Schedule",
     "plans": "Plans",
-    "assistant": "AI assistant",
+    "assistant": "AI team",
     "reports": "Reports",
     "leads": "Leads",
     "messages": "Messages",
@@ -748,7 +748,24 @@
     "logoUpload": "Upload logo",
     "logoRemove": "Back to the network's logo",
     "color": "Branch color",
-    "colorNetwork": "Use the network's color"
+    "colorNetwork": "Use the network's color",
+    "groups": {
+      "title": "Branch groups",
+      "hint": "Group branches (for example a district) so a message, a report or an AI agent can be pointed at all of them at once. A branch can be in several groups.",
+      "empty": "No groups yet.",
+      "name": "Group name",
+      "branches": "Branches in the group",
+      "save": "Save group",
+      "add": "Add group",
+      "new": "New group",
+      "delete": "Delete group",
+      "confirmDelete": "Delete the group \"{name}\"? The branches are not deleted."
+    },
+    "scope": {
+      "legend": "Branches",
+      "all": "All branches",
+      "count": "{selected, plural, =0 {No branches selected} one {1 branch selected of {total}} other {# branches selected of {total}}}"
+    }
   },
   "team": {
     "title": "Team",
@@ -1494,6 +1511,119 @@
     "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything.",
     "logTimePreview": "Log {hours} h for {client}: {description}",
     "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all"
+  },
+  "aiTeam": {
+    "title": "AI team",
+    "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
+    "mapLabel": "The AI team",
+    "listLabel": "AI agents",
+    "view": "View",
+    "views": {
+      "map": "Map",
+      "list": "List"
+    },
+    "usage": "{used} of {included} AI credits used this month",
+    "state": {
+      "active": "Available",
+      "locked": "Locked: not in your plan",
+      "disabled": "Switched off",
+      "forbidden": "No access for your role"
+    },
+    "chatWith": "Chat with {name}",
+    "backToTeam": "Back to the team",
+    "history": "History",
+    "noHistory": "No earlier chats with this agent.",
+    "newChat": "New chat",
+    "switchAgent": "Switch agent",
+    "greeting": "Hi, I'm {name}. How can I help?",
+    "thinking": "{name} is working on it…",
+    "placeholder": "Write to {name}",
+    "handoff": "Switch to {name}",
+    "close": "Close",
+    "scope": {
+      "label": "Branches this chat looks at",
+      "all": "All branches",
+      "some": "{count, plural, one {# branch} other {# branches}}",
+      "hint": "Changing this starts a new chat that keeps the last exchange.",
+      "branches": "Branches",
+      "done": "Done"
+    },
+    "suggestions": {
+      "chief": {
+        "s1": "How did last month go?",
+        "s2": "What needs my attention today?",
+        "s3": "Who should I talk to about unpaid bills?"
+      },
+      "secretary": {
+        "s1": "What's on the schedule tomorrow?",
+        "s2": "Which classes have a waitlist this week?",
+        "s3": "Book a client into tomorrow's class"
+      },
+      "marketing": {
+        "s1": "Which leads need a follow-up?",
+        "s2": "Which clients have gone quiet?",
+        "s3": "Draft a message to win back inactive clients"
+      },
+      "sales": {
+        "s1": "How much did we sell this month?",
+        "s2": "Which memberships expire soon?",
+        "s3": "Which quotes are still open?"
+      },
+      "finance": {
+        "s1": "Who owes us money?",
+        "s2": "How is this month's billing?",
+        "s3": "What's the cash flow outlook?"
+      },
+      "team": {
+        "s1": "Are there gaps in next week's roster?",
+        "s2": "Who asked for time off?",
+        "s3": "How many hours did the team work this month?"
+      },
+      "care": {
+        "s1": "What's waiting in the inbox?",
+        "s2": "Which clients might be leaving?",
+        "s3": "Any new reviews?"
+      },
+      "analyst": {
+        "s1": "Compare my branches this month",
+        "s2": "What changed compared to last month?",
+        "s3": "Anything unusual in the numbers?"
+      },
+      "creative": {
+        "s1": "Write a post for this week's promotion",
+        "s2": "Give me three ideas for stories",
+        "s3": "Draft a newsletter"
+      },
+      "custom": {
+        "s1": "What can you help me with?",
+        "s2": "Summarize what you know about my business",
+        "s3": "What should I look at first?"
+      }
+    },
+    "upsell": {
+      "title": "Meet {name}, your {role}",
+      "pitch": {
+        "chief": "{name} runs the whole team and answers questions across the business.",
+        "secretary": "{name} keeps your schedule, bookings and reminders in order.",
+        "marketing": "{name} follows up on leads, wins back quiet clients and drafts campaigns for your approval.",
+        "sales": "{name} tracks sales, renewals and open quotes, and points to the next opportunity.",
+        "finance": "{name} watches open bills, receipts and cash flow so nothing slips.",
+        "team": "{name} spots gaps in the roster and handles swaps, time off and hours.",
+        "care": "{name} keeps the inbox, reviews and at-risk clients under watch.",
+        "analyst": "{name} compares branches, finds trends and flags what is unusual.",
+        "creative": "{name} writes posts, promotions and newsletters in your voice."
+      },
+      "p1": "Works from your real business data",
+      "p2": "Asks for your approval before anything changes",
+      "p3": "Included in your monthly AI credits",
+      "price": "Comes with {module}: {price} per month",
+      "add": "Add to my plan",
+      "askOwner": "Ask the business owner to add {module} to the plan."
+    },
+    "closed": {
+      "disabled": "{name} is switched off for this business.",
+      "forbidden": "Your role can't use {name}. Ask the business owner to open access."
+    }
   },
   "modules": {
     "title": "Modules and plan",

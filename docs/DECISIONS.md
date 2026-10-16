@@ -175,6 +175,10 @@ When a decision changes, update the row and note the date - do not delete histor
 
 Business code asks for a tier (`fast`, `standard`, `strong`), never a model name; the registry in `app/ai/models.py` holds vendor, tier, prices and context per model. OpenAI and Gemini adapters exist and are tested but stay disabled (`ENABLED_VENDORS`) until the business operates and has a key (paid-provider policy). The fallback provider moves to the next provider only when one is unavailable, not when it is rate limiting us. Long and medium dashes are stripped from all model text.
 
+### Branch groups (2026-10-16, round 5 G1)
+
+A group is a named set of branches of one business (`location_groups`, `location_group_members`, migration 0085); a branch may be in several groups. Groups only select branches: every consumer (messages, reports, AI agents) resolves a group to its `location_ids` and applies the same branch-scope checks as for single branches, so a group never widens what someone may see. The owner (business settings) manages groups; anyone who can read the catalog sees them, limited to branches they may see. Deleting a group or a branch only removes memberships.
+
 ### AI agents core (2026-10-16, round 5 A1)
 
 The nine built-in agents live in code (`app/ai/agents.py`); a database row (`app.ai_agents`, migration 0083) only holds the business's overrides, and custom agents are full rows. An agent is a persona, instructions, a toolbox of tool domains (`TOOL_DOMAINS` in `app/ai/tools.py`, a test fails for a tool without one), a branch scope, the roles that may use it and a model tier (`fast` starts cheap and escalates as before; `standard` and `strong` use the strong model from the first step). New permission `ai.manage` (owner and manager) shapes the team; `ai.use` still gates chatting.
@@ -183,7 +187,7 @@ The branches a conversation sees are the user's branches âˆ© the agent's scope â
 
 ### AI spend controls (2026-10-16, round 5 A2)
 
-Pay-as-you-go extra credits are off by default (`app.tenant_ai_settings`, migration 0084). When on, questions keep working after the included credits (400 / 1200 stay) and the extra use is a line on the account at 6.00 ILS / 1.70 USD / 1.60 EUR per 100 credits (`AI_EXTRA_PRICE_PER_100`); no payment is taken while payments (#46) are a disabled adapter. An optional monthly cap (minor units) sets where questions stop; no cap means no limit. Roles and people can have a lower monthly limit (`app.ai_credit_limits`; a role limit applies to each person). Alerts at 80, 100, 150 and 200% of the included credits are recorded once a month (`app.ai_credit_alerts`) and shown in the CRM; email alerts follow later. The three "coming soon" modules (`analytics_pro`, `agent_finance`, `agent_marketing`) are now selectable.
+Pay-as-you-go extra credits are off by default (`app.tenant_ai_settings`, migration 0086). When on, questions keep working after the included credits (400 / 1200 stay) and the extra use is a line on the account at 6.00 ILS / 1.70 USD / 1.60 EUR per 100 credits (`AI_EXTRA_PRICE_PER_100`); no payment is taken while payments (#46) are a disabled adapter. An optional monthly cap (minor units) sets where questions stop; no cap means no limit. Roles and people can have a lower monthly limit (`app.ai_credit_limits`; a role limit applies to each person). Alerts at 80, 100, 150 and 200% of the included credits are recorded once a month (`app.ai_credit_alerts`) and shown in the CRM; email alerts follow later. The three "coming soon" modules (`analytics_pro`, `agent_finance`, `agent_marketing`) are now selectable.
 
 ## Open
 

@@ -5,8 +5,8 @@ Pay-as-you-go is off by default. With it on, the business keeps working after it
 and the extra use becomes a line on the account; an optional cap (minor units of the business
 currency) stops it. No cap means no limit.
 
-Revision ID: 0084
-Revises: 0083
+Revision ID: 0086
+Revises: 0085
 Create Date: 2026-10-16
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0084"
-down_revision: str | None = "0083"
+revision: str = "0086"
+down_revision: str | None = "0085"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
