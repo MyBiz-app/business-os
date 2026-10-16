@@ -24,6 +24,7 @@ from app.seed.activity import (
     _seed_messages,
     _seed_reservations,
 )
+from app.seed.agents import seed_agents
 from app.seed.common import (
     CLIENTS,
     FIRST_NAMES,
@@ -87,7 +88,12 @@ def seed(
     )
     apply_vertical_pack(conn, tenant_id, spec.vertical, "he", "ILS")
     # Show everything: the richest preset plus the CRM and messaging.
-    modules = {**dict.fromkeys(PRESETS["ai_powered"], 1), "crm": 1, "whatsapp": 1}
+    modules = {
+        **dict.fromkeys(PRESETS["ai_powered"], 1),
+        **dict.fromkeys(
+            ("crm", "whatsapp", "agent_finance", "agent_marketing", "social_studio"), 1
+        ),
+    }
     set_modules(conn, tenant_id, modules)
 
     # Branches (the extra-branch charge follows them), each with rooms for classes.
@@ -705,6 +711,7 @@ def seed(
         )
     _seed_messages(conn, tenant_id, owner, today, rng)
     shifts = seed_workspace(conn, tenant_id, owner, category, spec.color, staff, today, rng)
+    seed_agents(conn, tenant_id, owner, branches, staff, today, rng, f"demo-{tenant_id.hex[:8]}")
 
     print(
         f"Created demo business {tenant_id} ({spec.name}): {len(branches)} branches, "

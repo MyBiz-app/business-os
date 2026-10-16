@@ -174,7 +174,9 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
   const nameOf = (key: string) => agents.find((a) => a.key === key)?.name ?? key;
   const suggestions = turns.length === 0 && !busy ? (["s1", "s2", "s3"] as const).map((k) => t(`suggestions.${agent.builtin ? agent.key : "custom"}.${k}` as "suggestions.chief.s1")) : [];
 
-  useEffect(() => end.current?.scrollIntoView({ block: "end", behavior: "smooth" }), [turns.length, waitingFor]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+  }, [turns.length, waitingFor]);
 
   function submit(value: string) {
     const question = value.trim();

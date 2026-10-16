@@ -78,7 +78,7 @@ with sync_playwright() as p:
     coach.get_by_role("button", name="יצירת חשבון").click(); coach.wait_for_url("**/check-email**")
     coach.goto(h.confirm_link(coach_email)); coach.wait_for_url("**/invite/**"); h.ready(coach)
     coach.get_by_role("button", name=re.compile("הצטרפות ל")).click(); coach.wait_for_url("**/dashboard")
-    expect(coach.get_by_role("navigation", name="ניווט ראשי").get_by_role("link", name="צוות")).to_have_count(0)
+    expect(coach.get_by_role("navigation", name="ניווט ראשי").get_by_role("link", name="צוות", exact=True)).to_have_count(0)
     print("3. employee joined with front-desk permissions: ok")
 
     # Service/class, session tomorrow, member with a plan.
@@ -143,9 +143,19 @@ with sync_playwright() as p:
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
-    owner.goto(f"{h.BASE}/ai"); h.ready(owner)
-    owner.get_by_role("button", name="אורי").first.click()
-    owner.get_by_role("button", name="איך היה החודש שעבר?").click()
+    owner.on("pageerror", lambda e: print("pageerror:", e))
+    owner.on("console", lambda m: print("console:", m.text[:300]) if m.type == "error" else None)
+    owner.goto(f"{h.BASE}/ai?agent=chief"); h.ready(owner)  # opens the chat with the chief agent
+    expect(owner.locator("#ai-question")).to_be_visible(timeout=20000)
+    h.ready(owner)
+    for _ in range(5):  # the chat re-renders when its history arrives and then drops what was typed
+        owner.get_by_label("השאלה שלך").fill("איך היה החודש שעבר?")
+        try:
+            expect(owner.get_by_role("button", name="שליחה")).to_be_enabled(timeout=2000)
+            break
+        except AssertionError:
+            continue
+    owner.get_by_role("button", name="שליחה").click()
     expect(owner.get_by_text("ב-30 הימים האחרונים")).to_be_visible(timeout=20000)
     owner.get_by_label("השאלה שלך").fill("תרשום את כהן לשיעור מחר")
     owner.get_by_role("button", name="שליחה").click()

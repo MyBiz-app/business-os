@@ -55,6 +55,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `console.py <team email of an owner>`: the MyBiz console - an owner builds the team (manager, employee), each level sees only its own parts, a business writes in and the inbox handles it, an owner enters a business and fixes something, extends a trial and changes a plan, and the audit log has it all.
 
+`agents.py [platform admin email]`: round 5 on the networks demo - the AI team page with its custom agent and scheduled task, a chat with an agent (scripted model), the content studio on demo accounts, branch groups, and, for a platform admin, the console's broadcast center and AI board.
+
 `crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
 
 `client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.

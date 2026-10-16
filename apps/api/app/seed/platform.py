@@ -1,5 +1,6 @@
 """The MyBiz side of the demo: small businesses, invoices and requests for the team."""
 
+import json
 import random
 from uuid import UUID
 
@@ -45,6 +46,7 @@ def seed_platform(
             """)
         )
         conn.execute(text("DELETE FROM app.contact_requests WHERE email LIKE '%@example.invalid'"))
+        conn.execute(text("DELETE FROM app.announcements WHERE created_by = 'demo generator'"))
     tenants = []
     for index, (spec, owner_name) in enumerate(PLATFORM_BUSINESSES, start=1):
         email = f"demo-owner-{index}@example.invalid"
@@ -91,8 +93,61 @@ def seed_platform(
                 "days": rng.randint(0, 12),
             },
         )
+    _seed_announcements(conn, len(tenants))
     print(
         f"Platform demo: {len(tenants)} businesses, {len(PLATFORM_REQUESTS)} requests, "
         f"{staff_email} is a MyBiz owner."
     )
     return tenants
+
+
+def _seed_announcements(conn: Connection, owners: int) -> None:
+    """The broadcast center: a pop-up already sent to business owners and an email draft."""
+    for kind, channels, status, content in (
+        (
+            "service",
+            ["popup"],
+            "sent",
+            {
+                "he": {"subject": "צוות ה-AI שלכם הגיע", "body": "כל סוכן עם תפקיד משלו."},
+                "en": {"subject": "Your AI team is here", "body": "Each agent has its own role."},
+            },
+        ),
+        (
+            "marketing",
+            ["email"],
+            "draft",
+            {
+                "he": {"subject": "סטודיו התוכן נפתח", "body": "כל הרשתות החברתיות בדשבורד אחד."},
+                "en": {"subject": "The content studio is open",
+                       "body": "Every social network in one dashboard."},
+            },
+        ),
+    ):  # fmt: skip
+        conn.execute(
+            text("""
+                INSERT INTO app.announcements
+                    (issuer, kind, channels, audience, content, status, recipient_count,
+                     created_by, sent_at)
+                VALUES ('platform', :kind, :channels, CAST(:audience AS jsonb),
+                        CAST(:content AS jsonb), :status, :count, 'demo generator',
+                        CASE WHEN :status = 'sent' THEN now() - interval '1 day' END)
+            """),
+            {
+                "kind": kind,
+                "channels": channels,
+                "audience": json.dumps(
+                    {
+                        "groups": ["owners"],
+                        "verticals": [],
+                        "locales": [],
+                        "business_ids": [],
+                        "modules": [],
+                        "status": None,
+                    }
+                ),
+                "content": json.dumps(content),
+                "status": status,
+                "count": owners if status == "sent" else None,
+            },
+        )
