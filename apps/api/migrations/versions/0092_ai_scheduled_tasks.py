@@ -81,7 +81,8 @@ def upgrade() -> None:
         )
     """)
     op.execute(
-        "CREATE INDEX ai_task_runs_task_idx ON app.ai_task_runs (tenant_id, task_id, started_at DESC)"
+        "CREATE INDEX ai_task_runs_task_idx ON app.ai_task_runs "
+        "(tenant_id, task_id, started_at DESC)"
     )
     op.execute("GRANT SELECT, INSERT, UPDATE, DELETE ON app.ai_scheduled_tasks TO app_api")
     op.execute("GRANT SELECT, INSERT, UPDATE ON app.ai_task_runs TO app_api")
