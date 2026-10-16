@@ -33,6 +33,8 @@ OVERRIDES = {
     "promo_codes": {"amount_off": "1", "code": "'TESTCODE'"},
     "shift_templates": {"ends": "'17:00'", "starts": "'09:00'"},
     "support_grants": {"expires_at": "now() + interval '1 day'"},
+    "social_audience": {"dimension": "'age'"},
+    "social_posts": {"kind": "'post'"},
     "tenant_integrations": {"capability": "'payments'", "provider": "'stub'"},
     "whatsapp_conversations": {"phone": "'0501234567'"},
     "whatsapp_inbox": {"from_phone": "'0501234567'"},

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 from uuid import UUID
 
-from sqlalchemy import text
+from sqlalchemy import TextClause, text
 from sqlalchemy.orm import Session
 
 SUMMED = ("reach", "impressions", "video_views", "engagements", "profile_views", "link_clicks")
@@ -27,6 +27,18 @@ class Selection:
         }
 
 
+ORDERS = {"views": "pm.views", "engagement": "(pm.likes + pm.comments + pm.shares + pm.saves)"}
+SUMS = ", ".join(f"coalesce(sum(m.{c}), 0)::int AS {c}" for c in SUMMED)
+
+
+def _sql(template: str, **parts: str) -> TextClause:
+    """A query from a template and constant fragments (the account filter, column lists, an
+    ORDER BY picked from ORDERS). Values never go in here: they are bound as :params."""
+    for name, fragment in {"filter": ACCOUNT_FILTER, "sums": SUMS, **parts}.items():
+        template = template.replace(f"@{name}@", fragment)
+    return text(template)
+
+
 # Added to a query that selects from `app.social_accounts a`.
 ACCOUNT_FILTER = """
     (CAST(:accounts AS uuid[]) IS NULL OR a.id = ANY(CAST(:accounts AS uuid[])))
@@ -37,11 +49,11 @@ ACCOUNT_FILTER = """
 def _totals(db: Session, selection: Selection, start: date, end: date) -> dict[str, int]:
     row = (
         db.execute(
-            text(f"""
-                SELECT {", ".join(f"coalesce(sum(m.{c}), 0)::int AS {c}" for c in SUMMED)}
+            _sql("""
+                SELECT @sums@
                 FROM app.social_metrics_daily m
                 JOIN app.social_accounts a ON a.id = m.account_id
-                WHERE m.day BETWEEN :start AND :end AND {ACCOUNT_FILTER}
+                WHERE m.day BETWEEN :start AND :end AND @filter@
             """),
             {"start": start, "end": end, **selection.params()},
         )
@@ -54,13 +66,13 @@ def _totals(db: Session, selection: Selection, start: date, end: date) -> dict[s
 def _followers_at(db: Session, selection: Selection, day: date) -> int:
     """The followers of the selected accounts on a day (the latest known on or before it)."""
     return db.execute(
-        text(f"""
+        _sql("""
             SELECT coalesce(sum(latest.followers), 0)::int FROM app.social_accounts a
             JOIN LATERAL (
                 SELECT m.followers FROM app.social_metrics_daily m
                 WHERE m.account_id = a.id AND m.day <= :day ORDER BY m.day DESC LIMIT 1
             ) latest ON true
-            WHERE {ACCOUNT_FILTER}
+            WHERE @filter@
         """),
         {"day": day, **selection.params()},
     ).scalar_one()
@@ -92,10 +104,10 @@ def dashboard(
     }
 
     followers = db.execute(
-        text(f"""
+        _sql("""
             SELECT a.network, m.day, sum(m.followers)::int AS followers
             FROM app.social_metrics_daily m JOIN app.social_accounts a ON a.id = m.account_id
-            WHERE m.day BETWEEN :start AND :end AND {ACCOUNT_FILTER}
+            WHERE m.day BETWEEN :start AND :end AND @filter@
               AND a.network <> 'google_business'
             GROUP BY a.network, m.day ORDER BY a.network, m.day
         """),
@@ -108,37 +120,37 @@ def dashboard(
         )
 
     weekly = db.execute(
-        text(f"""
+        _sql("""
             SELECT date_trunc('week', m.day)::date AS week_start, sum(m.video_views)::int AS views
             FROM app.social_metrics_daily m JOIN app.social_accounts a ON a.id = m.account_id
-            WHERE m.day BETWEEN :start AND :end AND {ACCOUNT_FILTER}
+            WHERE m.day BETWEEN :start AND :end AND @filter@
             GROUP BY 1 ORDER BY 1
         """),
         {"start": start, "end": end, **selection.params()},
     ).mappings()
 
     kinds = db.execute(
-        text(f"""
+        _sql("""
             SELECT p.kind, sum(pm.likes + pm.comments + pm.shares + pm.saves)::int AS engagements
             FROM app.social_posts p
             JOIN app.social_post_metrics pm ON pm.post_id = p.id
             JOIN app.social_accounts a ON a.id = p.account_id
             WHERE p.published_at >= :start AND p.published_at < CAST(:end AS date) + 1
-              AND {ACCOUNT_FILTER}
+              AND @filter@
             GROUP BY p.kind ORDER BY 2 DESC
         """),
         {"start": start, "end": end, **selection.params()},
     ).mappings()
 
     cells = db.execute(
-        text(f"""
+        _sql("""
             SELECT extract(dow FROM p.published_at AT TIME ZONE :tz)::int AS weekday,
                    extract(hour FROM p.published_at AT TIME ZONE :tz)::int AS hour,
                    round(avg(pm.likes + pm.comments + pm.shares + pm.saves))::int AS value
             FROM app.social_posts p
             JOIN app.social_post_metrics pm ON pm.post_id = p.id
             JOIN app.social_accounts a ON a.id = p.account_id
-            WHERE p.published_at >= CAST(:end AS date) - :days AND {ACCOUNT_FILTER}
+            WHERE p.published_at >= CAST(:end AS date) - :days AND @filter@
             GROUP BY 1, 2 ORDER BY 1, 2
         """),
         {"end": end, "days": HEATMAP_DAYS, "tz": time_zone, **selection.params()},
@@ -146,7 +158,7 @@ def dashboard(
 
     google = (
         db.execute(
-            text(f"""
+            _sql("""
                 SELECT coalesce(sum(m.searches), 0)::int AS searches,
                        coalesce(sum(m.profile_views), 0)::int AS profile_views,
                        coalesce(sum(m.calls), 0)::int AS calls,
@@ -155,7 +167,7 @@ def dashboard(
                        round(avg(m.rating), 2) AS rating
                 FROM app.social_metrics_daily m JOIN app.social_accounts a ON a.id = m.account_id
                 WHERE m.day BETWEEN :start AND :end AND a.network = 'google_business'
-                  AND {ACCOUNT_FILTER}
+                  AND @filter@
                 HAVING count(*) > 0
             """),
             {"start": start, "end": end, **selection.params()},
@@ -180,9 +192,9 @@ def dashboard(
 def top_posts(
     db: Session, selection: Selection, start: date, end: date, sort: str, limit: int
 ) -> list[dict[str, object]]:
-    order = "pm.views" if sort == "views" else "(pm.likes + pm.comments + pm.shares + pm.saves)"
     rows = db.execute(
-        text(f"""
+        _sql(
+            """
             SELECT p.id, a.network, a.name AS account_name, p.kind, p.published_at,
                    p.thumbnail_url, p.permalink, p.caption, pm.views,
                    (pm.likes + pm.comments + pm.shares + pm.saves) AS engagements,
@@ -191,9 +203,11 @@ def top_posts(
             JOIN app.social_post_metrics pm ON pm.post_id = p.id
             JOIN app.social_accounts a ON a.id = p.account_id
             WHERE p.published_at >= :start AND p.published_at < CAST(:end AS date) + 1
-              AND {ACCOUNT_FILTER}
-            ORDER BY {order} DESC, p.published_at DESC LIMIT :limit
-        """),
+              AND @filter@
+            ORDER BY @order@ DESC, p.published_at DESC LIMIT :limit
+        """,
+            order=ORDERS[sort],
+        ),
         {"start": start, "end": end, "limit": limit, **selection.params()},
     ).mappings()
     return [dict(r) for r in rows]
@@ -203,11 +217,11 @@ def audience(db: Session, selection: Selection) -> list[dict[str, object]]:
     """The audience of the selected accounts: each account's latest snapshot, weighted by its
     followers, so a big account counts more than a small one."""
     rows = db.execute(
-        text(f"""
+        _sql("""
             WITH latest AS (
                 SELECT a.id, max(s.captured_on) AS captured_on
                 FROM app.social_accounts a JOIN app.social_audience s ON s.account_id = a.id
-                WHERE {ACCOUNT_FILTER} GROUP BY a.id
+                WHERE @filter@ GROUP BY a.id
             ), weight AS (
                 SELECT l.id, l.captured_on, greatest(coalesce((
                     SELECT m.followers FROM app.social_metrics_daily m

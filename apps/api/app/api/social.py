@@ -191,7 +191,7 @@ def list_social_providers(context: ReadDep) -> SocialProviders:
 
 @router.get("/accounts")
 def list_social_accounts(context: ReadDep) -> list[SocialAccount]:
-    rows = context.session.execute(text(f"{ACCOUNT_SELECT} ORDER BY network, name")).mappings()
+    rows = context.session.execute(text(ACCOUNT_SELECT + " ORDER BY network, name")).mappings()
     return [SocialAccount.model_validate(dict(r)) for r in rows]
 
 
