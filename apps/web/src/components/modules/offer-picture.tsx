@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 
 /** Pictures of the CRM board and a WhatsApp reminder, for the sign-up journey and the
  * previews of modules a business doesn't have yet. */
-export function OfferPicture({ offer }: { offer: "client_app" | "ai" | "crm" | "whatsapp" }) {
+export function OfferPicture({ offer }: { offer: "client_app" | "ai" | "crm" | "whatsapp" | "social" }) {
   const t = useTranslations("start.offers");
   if (offer === "crm") {
     const columns = t.raw("crm.columns") as string[];
@@ -21,6 +21,27 @@ export function OfferPicture({ offer }: { offer: "client_app" | "ai" | "crm" | "
             ))}
           </div>
         ))}
+      </div>
+    );
+  }
+  if (offer === "social") {
+    const labels = t.raw("social.picture") as string[];
+    const bars = [38, 52, 46, 64, 58, 78, 92];
+    return (
+      <div className="card flex flex-col gap-4 p-5 shadow-xl">
+        <div className="grid grid-cols-3 gap-2">
+          {labels.map((label, index) => (
+            <div key={label} className="rounded-xl bg-foreground/5 p-3">
+              <p className="text-[11px] text-muted">{label}</p>
+              <p className="text-lg font-extrabold">{["12.4K", "86K", "7.2%"][index]}</p>
+            </div>
+          ))}
+        </div>
+        <div aria-hidden="true" className="flex h-24 items-end gap-2">
+          {bars.map((height, index) => (
+            <span key={index} className="flex-1 rounded-t-md bg-gradient-to-t from-primary to-ai" style={{ height: `${height}%` }} />
+          ))}
+        </div>
       </div>
     );
   }

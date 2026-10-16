@@ -28,6 +28,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "settings"
   ],
   "tenant": [
+    "aiBubble",
     "aiTeam",
     "appointments",
     "assistant",
@@ -41,6 +42,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "clients",
     "closure",
     "common",
+    "content",
     "dependents",
     "documents",
     "hours",

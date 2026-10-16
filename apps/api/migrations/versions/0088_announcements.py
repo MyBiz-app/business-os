@@ -12,7 +12,7 @@ caller, and the tables themselves have no API access. A new console permission, 
 guards the whole feature.
 
 Revision ID: 0088
-Revises: 0094
+Revises: 0097
 Create Date: 2026-10-16
 """
 
@@ -21,7 +21,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0088"
-down_revision: str | None = "0094"
+down_revision: str | None = "0097"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

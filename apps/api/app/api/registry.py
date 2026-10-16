@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 
 from app.api import (
+    ai_tasks,
     ai_team,
     appointments,
     assistant,
@@ -25,6 +26,7 @@ from app.api import (
     documents,
     friends,
     integrations,
+    internal,
     leads,
     location_groups,
     locations,
@@ -50,6 +52,8 @@ from app.api import (
     shift_planning,
     shift_swaps,
     shifts,
+    social,
+    social_drafts,
     staff,
     stations,
     support,
@@ -65,6 +69,8 @@ from app.api.routes import router
 
 ROUTERS: list[APIRouter] = [
     router,
+    ai_tasks.router,
+    internal.router,
     businesses.router,
     client_import.router,
     clients.router,
@@ -101,6 +107,8 @@ ROUTERS: list[APIRouter] = [
     availability.router,
     shift_planning.router,
     stations.router,
+    social.router,
+    social_drafts.router,
     schedule.router,
     bookings.router,
     appointments.router,

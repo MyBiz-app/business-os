@@ -153,6 +153,7 @@ def ask(
     conversation_id: UUID,
     question: str,
     on_text: Callable[[str], None] | None = None,
+    pending_ttl: dt.timedelta | None = None,
 ) -> None:
     """Adds the user's question and the agent's answer (with any tool calls) to the
     conversation. Errors from the provider propagate; nothing partial is stored then, except
@@ -220,7 +221,9 @@ def ask(
                 ],
             }
         )
-        modules = {key for key in ("ai_basic", "ai_pro", "crm") if has_module(db, key)}
+        modules = {
+            key for key in ("ai_basic", "ai_pro", "crm", "social_studio") if has_module(db, key)
+        }
         pack = CATALOG_VERTICALS.get(row["vertical"])
         if pack and pack.time_billing:
             modules.add("time_billing")  # the industry's features gate tools like modules do
@@ -237,6 +240,7 @@ def ask(
             modules,
             agent_key=agent.key,
             handoff_keys=handoff_keys,
+            **({"pending_ttl": pending_ttl} if pending_ttl else {}),
         )
         system = SYSTEM_PROMPT + "\n\n" + system_part(agent)
         # Everyday questions stay on the cheap model unless the agent asks for a better one.

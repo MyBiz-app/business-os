@@ -75,6 +75,39 @@ A payments provider also implements `parse_webhook` (verify the signature with t
 secret; raise `WebhookRejected` otherwise) and is given its webhook address
 `{API}/webhooks/payments/{name}/{tenant_id}` in the provider's dashboard.
 
+## Social networks (content studio)
+
+Social networks are read through their own small registry, not the capability registry above,
+because one business connects several accounts of several networks. A provider is a class in
+`apps/api/app/social/` that implements `SocialProvider` (`authorize_url`, `exchange_code`,
+`refresh`, `fetch_account_metrics`, `fetch_posts`, `fetch_audience`) and is registered with
+`register_social(...)`. The networks the studio shows are listed in `NETWORKS`
+(`app/social/providers.py`): a network whose provider is not registered shows as "coming soon".
+Tokens are stored encrypted (`app/providers/secrets.py`) and only summarized, public numbers of
+the business's own accounts are kept. The `demo` provider gives believable numbers without any
+account.
+
+The Meta provider (`app/social/meta.py`, Facebook Pages + Instagram as `meta`, Threads as
+`threads`) is the first real one. It is configured by `API_META_APP_ID` / `API_META_APP_SECRET`
+(Threads: `API_META_THREADS_APP_ID` / `API_META_THREADS_APP_SECRET`, `API_META_GRAPH_VERSION`
+for the Graph API version); a provider with a `configured()` method stays "coming soon" until it
+returns true. Register `{API}/social/callback/meta` (and `/social/callback/threads` for Threads)
+as the OAuth redirect URI at the network. Optional `publish(account, text, image_url)` on a
+provider enables `POST /social/accounts/{id}/publish`; a provider raises `NeedsReauth` when a
+token is refused and the account is then marked "needs reconnect".
+
+Google and TikTok connectors: `youtube` and `google_business` (`app/social/google.py`, one Google
+OAuth client) and `tiktok` (`app/social/tiktok.py`); `x`, `linkedin`, `pinterest` and `snapchat`
+are disabled adapters (`app/social/soon.py`). Environment: `API_GOOGLE_OAUTH_CLIENT_ID` /
+`API_GOOGLE_OAUTH_CLIENT_SECRET`, `API_TIKTOK_CLIENT_KEY` / `API_TIKTOK_CLIENT_SECRET`; without
+them the networks stay "coming soon". Redirect URIs to register: `{API_API_URL}/social/callback/youtube`
+and `/social/callback/google_business` (both in the same Google OAuth client) and
+`/social/callback/tiktok`. Google scopes: `youtube.readonly`, `yt-analytics.readonly`,
+`business.manage` (Business Profile APIs need Google's access approval). TikTok scopes:
+`user.info.basic`, `user.info.stats`, `video.list`; TikTok keeps no daily history, so followers
+build up from our own daily reads. These tokens expire within a day, so the sync renews them on
+every run. Publishing is not built for these networks yet.
+
 ## Switching provider
 
 - **A business**: settings → Integrations → choose another provider and fill its settings.

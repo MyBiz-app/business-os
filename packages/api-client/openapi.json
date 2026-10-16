@@ -317,6 +317,596 @@
         }
       }
     },
+    "/ai/tasks": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "List Tasks",
+        "operationId": "list_tasks",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tasks"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/tasks/{task_id}/runs": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "List Runs",
+        "operationId": "list_runs",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RunCard"
+                  },
+                  "title": "Response List Runs"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/tasks/{task_id}": {
+      "patch": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Task",
+        "operationId": "update_task",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TaskUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Delete Task",
+        "operationId": "delete_task",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/tasks/{task_id}/run": {
+      "post": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Run Task Now",
+        "description": "Runs the task right away, as its owner, without moving its schedule.",
+        "operationId": "run_task_now",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Task Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/tasks/proactive": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Get Proactive",
+        "description": "The person's own proactive behaviours: what is on and at what time.",
+        "operationId": "get_proactive",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Proactive"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/tasks/proactive/{key}": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Set Proactive",
+        "description": "Switches the morning briefing or the weekly suggestions on or off, or moves the time. They\nrun as the person who switches them on, so they never see more than that person can.",
+        "operationId": "set_proactive",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "morning_briefing",
+                "suggestions"
+              ],
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProactiveBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Proactive"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/jobs/tick": {
+      "post": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Tick",
+        "description": "Runs the scheduled AI tasks that are due. Called every few minutes by the keep-awake\nworkflow (and, later, by a worker every minute). Answers at once; the work continues in the\nbackground, so a slow model call never holds the caller.",
+        "operationId": "tick",
+        "parameters": [
+          {
+            "name": "x-internal-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Internal-Token"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tick"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/me/businesses": {
       "get": {
         "tags": [
@@ -10649,7 +11239,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ScheduleBody"
+                "$ref": "#/components/schemas/app__api__broadcasts__ScheduleBody"
               }
             }
           }
@@ -14250,6 +14840,1206 @@
               "type": "string",
               "format": "uuid",
               "title": "Station Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/providers": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "List Social Providers",
+        "description": "Every network the studio knows, and whether it can be connected yet or is \"soon\".",
+        "operationId": "list_social_providers",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialProviders"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/accounts": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "List Social Accounts",
+        "operationId": "list_social_accounts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SocialAccount"
+                  },
+                  "title": "Response List Social Accounts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/connect/{provider}": {
+      "post": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Connect Social",
+        "description": "Starts a connection. `demo` connects sample accounts with believable numbers; other\nproviders return the address where the owner agrees to share their numbers.",
+        "operationId": "connect_social",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Provider"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/pending/{pending_id}": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Pending Connection",
+        "description": "The accounts found after the owner agreed, to choose from (no tokens are returned).",
+        "operationId": "get_pending_connection",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pending_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pending Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingConnection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/pending/{pending_id}/select": {
+      "post": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Select Pending Accounts",
+        "operationId": "select_pending_accounts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pending_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Pending Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectAccounts"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SocialAccount"
+                  },
+                  "title": "Response Select Pending Accounts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/accounts/{account_id}/publish": {
+      "post": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Publish Post",
+        "description": "Publishes a post now on a connected account (Instagram needs a picture).",
+        "operationId": "publish_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Account Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublishResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/accounts/{account_id}": {
+      "delete": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Disconnect Social",
+        "description": "Removes the account and every number we kept for it. (The owner can also revoke access\non the network itself.)",
+        "operationId": "disconnect_social",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Account Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/sync": {
+      "post": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Sync Social Now",
+        "description": "\"Refresh now\": reads the latest numbers, at most once an hour.",
+        "operationId": "sync_social_now",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SocialAccount"
+                  },
+                  "title": "Response Sync Social Now"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/dashboard": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Social Dashboard",
+        "operationId": "get_social_dashboard",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accounts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these accounts",
+              "title": "Accounts"
+            },
+            "description": "Only these accounts"
+          },
+          {
+            "name": "networks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these networks",
+              "title": "Networks"
+            },
+            "description": "Only these networks"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "compare",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Compare"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SocialDashboard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/posts/top": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Social Top Posts",
+        "operationId": "get_social_top_posts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accounts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these accounts",
+              "title": "Accounts"
+            },
+            "description": "Only these accounts"
+          },
+          {
+            "name": "networks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these networks",
+              "title": "Networks"
+            },
+            "description": "Only these networks"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "views",
+                "engagement"
+              ],
+              "type": "string",
+              "default": "views",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TopPost"
+                  },
+                  "title": "Response Get Social Top Posts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/audience": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Get Social Audience",
+        "operationId": "get_social_audience",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "accounts",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "format": "uuid"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these accounts",
+              "title": "Accounts"
+            },
+            "description": "Only these accounts"
+          },
+          {
+            "name": "networks",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only these networks",
+              "title": "Networks"
+            },
+            "description": "Only these networks"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AudienceShare"
+                  },
+                  "title": "Response Get Social Audience"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/drafts": {
+      "get": {
+        "tags": [
+          "social"
+        ],
+        "summary": "List Social Drafts",
+        "description": "The open drafts, newest first.",
+        "operationId": "list_social_drafts",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SocialDraft"
+                  },
+                  "title": "Response List Social Drafts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/social/drafts/{draft_id}": {
+      "delete": {
+        "tags": [
+          "social"
+        ],
+        "summary": "Discard Social Draft",
+        "operationId": "discard_social_draft",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "draft_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Draft Id"
             }
           },
           {
@@ -21392,6 +23182,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -28251,6 +30042,35 @@
         ],
         "title": "AudienceCount"
       },
+      "AudienceShare": {
+        "properties": {
+          "dimension": {
+            "type": "string",
+            "enum": [
+              "age",
+              "gender",
+              "city",
+              "country"
+            ],
+            "title": "Dimension"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "share_bp": {
+            "type": "integer",
+            "title": "Share Bp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dimension",
+          "label",
+          "share_bp"
+        ],
+        "title": "AudienceShare"
+      },
       "AuditEntry": {
         "properties": {
           "occurred_at": {
@@ -29658,25 +31478,6 @@
         ],
         "title": "CampaignResult"
       },
-      "Candidate": {
-        "properties": {
-          "user_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "User Id"
-          },
-          "user_name": {
-            "type": "string",
-            "title": "User Name"
-          }
-        },
-        "type": "object",
-        "required": [
-          "user_id",
-          "user_name"
-        ],
-        "title": "Candidate"
-      },
       "Catalog": {
         "properties": {
           "currency": {
@@ -29711,6 +31512,7 @@
                   "analytics_pro",
                   "agent_finance",
                   "agent_marketing",
+                  "social_studio",
                   "whatsapp",
                   "whatsapp_ai",
                   "pack_plus",
@@ -29758,6 +31560,7 @@
               "analytics_pro",
               "agent_finance",
               "agent_marketing",
+              "social_studio",
               "whatsapp",
               "whatsapp_ai",
               "pack_plus",
@@ -29796,6 +31599,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -29823,6 +31627,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -31711,6 +33516,33 @@
         ],
         "title": "ComplaintCreate"
       },
+      "ConnectResult": {
+        "properties": {
+          "accounts": {
+            "items": {
+              "$ref": "#/components/schemas/SocialAccount"
+            },
+            "type": "array",
+            "title": "Accounts"
+          },
+          "authorize_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Authorize Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accounts"
+        ],
+        "title": "ConnectResult"
+      },
       "ConsentBody": {
         "properties": {
           "consent": {
@@ -32163,7 +33995,7 @@
           },
           "available": {
             "items": {
-              "$ref": "#/components/schemas/Candidate"
+              "$ref": "#/components/schemas/app__api__availability__Candidate"
             },
             "type": "array",
             "title": "Available",
@@ -33606,6 +35438,46 @@
         ],
         "title": "EraseResult"
       },
+      "FollowerPoint": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "followers": {
+            "type": "integer",
+            "title": "Followers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "followers"
+        ],
+        "title": "FollowerPoint"
+      },
+      "FollowerSeries": {
+        "properties": {
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/FollowerPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "network",
+          "points"
+        ],
+        "title": "FollowerSeries"
+      },
       "Form": {
         "properties": {
           "key": {
@@ -33851,6 +35723,51 @@
         ],
         "title": "GettingStarted"
       },
+      "GoogleBusiness": {
+        "properties": {
+          "searches": {
+            "type": "integer",
+            "title": "Searches"
+          },
+          "profile_views": {
+            "type": "integer",
+            "title": "Profile Views"
+          },
+          "calls": {
+            "type": "integer",
+            "title": "Calls"
+          },
+          "directions": {
+            "type": "integer",
+            "title": "Directions"
+          },
+          "reviews_new": {
+            "type": "integer",
+            "title": "Reviews New"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          }
+        },
+        "type": "object",
+        "required": [
+          "searches",
+          "profile_views",
+          "calls",
+          "directions",
+          "reviews_new",
+          "rating"
+        ],
+        "title": "GoogleBusiness"
+      },
       "Grant": {
         "properties": {
           "id": {
@@ -33983,6 +35900,29 @@
           "environment"
         ],
         "title": "HealthResponse"
+      },
+      "HeatCell": {
+        "properties": {
+          "weekday": {
+            "type": "integer",
+            "title": "Weekday"
+          },
+          "hour": {
+            "type": "integer",
+            "title": "Hour"
+          },
+          "value": {
+            "type": "integer",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": [
+          "weekday",
+          "hour",
+          "value"
+        ],
+        "title": "HeatCell"
       },
       "HomeBranch": {
         "properties": {
@@ -35147,6 +37087,49 @@
           "code"
         ],
         "title": "JoinRequest"
+      },
+      "KindEngagement": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "engagements": {
+            "type": "integer",
+            "title": "Engagements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "engagements"
+        ],
+        "title": "KindEngagement"
+      },
+      "Kpi": {
+        "properties": {
+          "value": {
+            "type": "integer",
+            "title": "Value"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          }
+        },
+        "type": "object",
+        "required": [
+          "value",
+          "previous"
+        ],
+        "title": "Kpi"
       },
       "Lead": {
         "properties": {
@@ -37132,6 +39115,46 @@
         ],
         "title": "MyReview"
       },
+      "NetworkOption": {
+        "properties": {
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "soon"
+            ],
+            "title": "Status"
+          },
+          "gives": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Gives"
+          },
+          "connected": {
+            "type": "integer",
+            "title": "Connected"
+          }
+        },
+        "type": "object",
+        "required": [
+          "network",
+          "provider",
+          "status",
+          "gives",
+          "connected"
+        ],
+        "title": "NetworkOption"
+      },
       "NewBranchPreview": {
         "properties": {
           "currency": {
@@ -37591,6 +39614,33 @@
           "result"
         ],
         "title": "PendingAction"
+      },
+      "PendingConnection": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/app__api__social__Candidate"
+            },
+            "type": "array",
+            "title": "Candidates"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "provider",
+          "candidates"
+        ],
+        "title": "PendingConnection"
       },
       "PendingReview": {
         "properties": {
@@ -38420,6 +40470,148 @@
         ],
         "title": "PreviewBody"
       },
+      "Proactive": {
+        "properties": {
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/ProactiveSetting"
+            },
+            "type": "array",
+            "title": "Settings"
+          },
+          "can_manage": {
+            "type": "boolean",
+            "title": "Can Manage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "settings",
+          "can_manage"
+        ],
+        "title": "Proactive"
+      },
+      "ProactiveBody": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time",
+            "description": "Local HH:MM"
+          },
+          "weekday": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 6.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekday"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "ProactiveBody"
+      },
+      "ProactiveSetting": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "enum": [
+              "morning_briefing",
+              "suggestions"
+            ],
+            "title": "Key"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "time": {
+            "type": "string",
+            "title": "Time"
+          },
+          "weekday": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekday",
+            "description": "Suggestions only: 0 = Monday .. 6 = Sunday"
+          },
+          "paused_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused Reason"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "enabled",
+          "time",
+          "weekday",
+          "paused_reason",
+          "next_run_at",
+          "last_run_at",
+          "agent_key"
+        ],
+        "title": "ProactiveSetting"
+      },
       "PromoCode": {
         "properties": {
           "id": {
@@ -38942,6 +41134,59 @@
         ],
         "title": "PublicQuote",
         "description": "What the client sees by the private link."
+      },
+      "PublishRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 2200,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000,
+                "pattern": "^https://"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "PublishRequest"
+      },
+      "PublishResult": {
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "title": "External Id"
+          },
+          "permalink": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permalink"
+          }
+        },
+        "type": "object",
+        "required": [
+          "external_id",
+          "permalink"
+        ],
+        "title": "PublishResult"
       },
       "PublishShifts": {
         "properties": {
@@ -39590,6 +41835,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -39619,6 +41865,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -39967,6 +42214,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -40695,6 +42943,8 @@
                 "sales.manage",
                 "reports.read",
                 "ai.use",
+                "social.read",
+                "social.manage",
                 "ai.manage",
                 "staff.read",
                 "staff.manage",
@@ -40702,7 +42952,7 @@
               ]
             },
             "type": "array",
-            "maxItems": 16,
+            "maxItems": 18,
             "title": "Permissions"
           }
         },
@@ -40746,6 +42996,8 @@
                     "sales.manage",
                     "reports.read",
                     "ai.use",
+                    "social.read",
+                    "social.manage",
                     "ai.manage",
                     "staff.read",
                     "staff.manage",
@@ -40985,6 +43237,100 @@
         "type": "object",
         "title": "RoomUpdate"
       },
+      "RunCard": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running",
+              "ok",
+              "failed",
+              "skipped"
+            ],
+            "title": "Status"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "pending_action_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Pending Action Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "started_at",
+          "finished_at",
+          "status",
+          "credits",
+          "summary",
+          "error",
+          "conversation_id",
+          "pending_action_ids"
+        ],
+        "title": "RunCard"
+      },
       "Sale": {
         "properties": {
           "plan_id": {
@@ -41114,25 +43460,6 @@
           "tenant_id"
         ],
         "title": "SampleCreated"
-      },
-      "ScheduleBody": {
-        "properties": {
-          "scheduled_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Scheduled At",
-            "description": "When to send; empty sends at the next job run"
-          }
-        },
-        "type": "object",
-        "title": "ScheduleBody"
       },
       "ScheduleOptions": {
         "properties": {
@@ -41510,6 +43837,24 @@
         ],
         "title": "ScheduledSession"
       },
+      "SelectAccounts": {
+        "properties": {
+          "external_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "External Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "external_ids"
+        ],
+        "title": "SelectAccounts"
+      },
       "Selection": {
         "properties": {
           "modules": {
@@ -41527,6 +43872,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -43077,6 +45423,254 @@
         ],
         "title": "Slot"
       },
+      "SocialAccount": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "connected",
+              "needs_reauth"
+            ],
+            "title": "Status"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "last_synced_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Synced At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "network",
+          "name",
+          "provider",
+          "status",
+          "is_demo",
+          "location_id",
+          "last_synced_at"
+        ],
+        "title": "SocialAccount"
+      },
+      "SocialDashboard": {
+        "properties": {
+          "period_from": {
+            "type": "string",
+            "format": "date",
+            "title": "Period From"
+          },
+          "period_to": {
+            "type": "string",
+            "format": "date",
+            "title": "Period To"
+          },
+          "previous_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous From"
+          },
+          "previous_to": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous To"
+          },
+          "kpis": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Kpi"
+            },
+            "type": "object",
+            "title": "Kpis"
+          },
+          "followers_series": {
+            "items": {
+              "$ref": "#/components/schemas/FollowerSeries"
+            },
+            "type": "array",
+            "title": "Followers Series"
+          },
+          "video_views_weekly": {
+            "items": {
+              "$ref": "#/components/schemas/WeeklyViews"
+            },
+            "type": "array",
+            "title": "Video Views Weekly"
+          },
+          "engagement_by_kind": {
+            "items": {
+              "$ref": "#/components/schemas/KindEngagement"
+            },
+            "type": "array",
+            "title": "Engagement By Kind"
+          },
+          "heatmap": {
+            "items": {
+              "$ref": "#/components/schemas/HeatCell"
+            },
+            "type": "array",
+            "title": "Heatmap"
+          },
+          "google_business": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GoogleBusiness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "period_from",
+          "period_to",
+          "previous_from",
+          "previous_to",
+          "kpis",
+          "followers_series",
+          "video_views_weekly",
+          "engagement_by_kind",
+          "heatmap",
+          "google_business"
+        ],
+        "title": "SocialDashboard"
+      },
+      "SocialDraft": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "network": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Network"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "idea": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Idea"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "network",
+          "body",
+          "image_url",
+          "idea",
+          "created_at"
+        ],
+        "title": "SocialDraft"
+      },
+      "SocialProviders": {
+        "properties": {
+          "networks": {
+            "items": {
+              "$ref": "#/components/schemas/NetworkOption"
+            },
+            "type": "array",
+            "title": "Networks"
+          },
+          "demo_available": {
+            "type": "boolean",
+            "title": "Demo Available"
+          }
+        },
+        "type": "object",
+        "required": [
+          "networks",
+          "demo_available"
+        ],
+        "title": "SocialProviders"
+      },
       "SpendUpdate": {
         "properties": {
           "payg_enabled": {
@@ -43704,6 +46298,273 @@
         ],
         "title": "SystemRole"
       },
+      "TaskCard": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "action",
+              "agent_run"
+            ],
+            "title": "Kind"
+          },
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "done",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "status_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Reason"
+          },
+          "schedule": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Schedule"
+          },
+          "time_zone": {
+            "type": "string",
+            "title": "Time Zone"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "max_credits": {
+            "type": "integer",
+            "title": "Max Credits"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instruction"
+          },
+          "preview": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview"
+          },
+          "mine": {
+            "type": "boolean",
+            "title": "Mine"
+          },
+          "system_key": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "morning_briefing",
+                  "suggestions"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Key"
+          },
+          "last_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "running",
+                  "ok",
+                  "failed",
+                  "skipped"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Status"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "waiting_for_approval": {
+            "type": "integer",
+            "title": "Waiting For Approval"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "kind",
+          "agent_key",
+          "status",
+          "status_reason",
+          "schedule",
+          "time_zone",
+          "next_run_at",
+          "last_run_at",
+          "max_credits",
+          "instruction",
+          "preview",
+          "mine",
+          "system_key",
+          "last_status",
+          "last_error",
+          "waiting_for_approval"
+        ],
+        "title": "TaskCard"
+      },
+      "TaskUpdate": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "paused"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "instruction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instruction"
+          },
+          "schedule": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__api__ai_tasks__ScheduleBody"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "TaskUpdate"
+      },
+      "Tasks": {
+        "properties": {
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/TaskCard"
+            },
+            "type": "array",
+            "title": "Tasks"
+          },
+          "active": {
+            "type": "integer",
+            "title": "Active"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "precise_timing": {
+            "type": "boolean",
+            "title": "Precise Timing",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "tasks",
+          "active",
+          "limit"
+        ],
+        "title": "Tasks"
+      },
       "Template": {
         "properties": {
           "id": {
@@ -44166,6 +47027,7 @@
                 "analytics_pro",
                 "agent_finance",
                 "agent_marketing",
+                "social_studio",
                 "whatsapp",
                 "whatsapp_ai",
                 "pack_plus",
@@ -44628,6 +47490,19 @@
         "type": "object",
         "title": "Texts"
       },
+      "Tick": {
+        "properties": {
+          "started": {
+            "type": "boolean",
+            "title": "Started"
+          }
+        },
+        "type": "object",
+        "required": [
+          "started"
+        ],
+        "title": "Tick"
+      },
       "TimeEntry": {
         "properties": {
           "id": {
@@ -45022,6 +47897,99 @@
         ],
         "title": "TimeOffRequestCreate"
       },
+      "TopPost": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "account_name": {
+            "type": "string",
+            "title": "Account Name"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url"
+          },
+          "permalink": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permalink"
+          },
+          "caption": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caption"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "engagements": {
+            "type": "integer",
+            "title": "Engagements"
+          },
+          "avg_watch_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Watch Sec"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "network",
+          "account_name",
+          "kind",
+          "published_at",
+          "thumbnail_url",
+          "permalink",
+          "caption",
+          "views",
+          "engagements",
+          "avg_watch_sec"
+        ],
+        "title": "TopPost"
+      },
       "Trial": {
         "properties": {
           "trial_ends_at": {
@@ -45255,6 +48223,25 @@
         ],
         "title": "WeekCopy"
       },
+      "WeeklyViews": {
+        "properties": {
+          "week_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Week Start"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          }
+        },
+        "type": "object",
+        "required": [
+          "week_start",
+          "views"
+        ],
+        "title": "WeeklyViews"
+      },
       "WeeklyWindow": {
         "properties": {
           "weekday": {
@@ -45332,6 +48319,70 @@
         },
         "type": "object",
         "title": "WelcomeRequest"
+      },
+      "app__api__ai_tasks__ScheduleBody": {
+        "properties": {
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "once",
+              "daily",
+              "weekly",
+              "monthly"
+            ],
+            "title": "Frequency"
+          },
+          "time": {
+            "type": "string",
+            "title": "Time",
+            "description": "Local HH:MM"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date",
+            "description": "YYYY-MM-DD, for once"
+          },
+          "weekdays": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weekdays",
+            "description": "0 = Monday .. 6 = Sunday"
+          },
+          "day_of_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Of Month",
+            "description": "1-28, for monthly"
+          }
+        },
+        "type": "object",
+        "required": [
+          "frequency",
+          "time"
+        ],
+        "title": "ScheduleBody"
       },
       "app__api__ai_team__Team": {
         "properties": {
@@ -45574,6 +48625,25 @@
         ],
         "title": "Turn"
       },
+      "app__api__availability__Candidate": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "user_name": {
+            "type": "string",
+            "title": "User Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "user_name"
+        ],
+        "title": "Candidate"
+      },
       "app__api__billing__Usage": {
         "properties": {
           "pack": {
@@ -45645,6 +48715,25 @@
         ],
         "title": "Usage",
         "description": "This calendar month's use against the business's bundle (space and messages)."
+      },
+      "app__api__broadcasts__ScheduleBody": {
+        "properties": {
+          "scheduled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled At",
+            "description": "When to send; empty sends at the next job run"
+          }
+        },
+        "type": "object",
+        "title": "ScheduleBody"
       },
       "app__api__client_app__ProfileUpdate": {
         "properties": {
@@ -45813,6 +48902,41 @@
         },
         "type": "object",
         "title": "ProfileUpdate"
+      },
+      "app__api__social__Candidate": {
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "title": "External Id"
+          },
+          "network": {
+            "type": "string",
+            "title": "Network"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "external_id",
+          "network",
+          "name",
+          "avatar_url"
+        ],
+        "title": "Candidate"
       },
       "app__api__staff__Team": {
         "properties": {

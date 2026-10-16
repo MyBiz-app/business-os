@@ -16,6 +16,7 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from sqlalchemy import text
 
+from app.ai import scheduled
 from app.ai.scope import CLIENT_IN_SCOPE, visible_clients
 from app.api import bookings as bookings_api
 from app.api import plans as plans_api
@@ -26,6 +27,8 @@ from app.api.deps import TenantContext
 from app.api.pagination import Page
 from app.core.permissions import Permission
 from app.reports.metrics import METRICS, compute, members_at_risk, previous_period
+from app.social import studio
+from app.social.providers import NETWORK_KEYS
 
 PENDING_ACTION_TTL = dt.timedelta(minutes=15)
 MAX_ROWS = 25
@@ -43,6 +46,9 @@ class ToolContext:
     # may be handed over to.
     agent_key: str = "chief"
     handoff_keys: frozenset[str] = frozenset()
+    # How long a card this conversation proposes stays open (a scheduled run nobody watches
+    # leaves its cards for days).
+    pending_ttl: dt.timedelta = PENDING_ACTION_TTL
 
 
 class ToolError(Exception):
@@ -518,7 +524,7 @@ def _propose(
             "payload": json.dumps(payload),
             "hash": payload_hash(tool_name, payload),
             "preview": json.dumps(preview),
-            "ttl": PENDING_ACTION_TTL,
+            "ttl": ctx.pending_ttl,
         },
     ).scalar_one()
     return {
@@ -658,6 +664,253 @@ def suggest_agent(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
         "instruction": "The user sees a card offering the hand-over. Tell them in a sentence who "
         "can take it from here and why; do not claim anything was switched.",
     }
+
+
+def _dry_run(ctx: ToolContext, tool_name: str, args: dict[str, Any]) -> dict[str, Any]:
+    """Runs a write tool only to learn what it would propose (payload, hash, preview), then
+    throws the proposed card away. The tool's own checks decide whether the request is valid."""
+    db = ctx.tenant.session
+    tool = TOOLS[tool_name]
+    if tool.permission not in ctx.tenant.permissions or (
+        tool.module is not None and tool.module not in ctx.modules
+    ):
+        raise ToolError("the user cannot run that action")
+    attempt = db.begin_nested()
+    try:
+        card = tool.run(ctx, args)
+        row = (
+            db.execute(
+                text(
+                    "SELECT payload, payload_hash, preview FROM app.pending_actions WHERE id = :id"
+                ),
+                {"id": card["pending_action_id"]},
+            )
+            .mappings()
+            .one()
+        )
+        return dict(row)
+    finally:
+        attempt.rollback()
+
+
+def schedule_task(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    kind = str(args["kind"])
+    if kind not in scheduled.KINDS:
+        raise ToolError("kind must be action or agent_run")
+    title = str(args["title"]).strip()[:120]
+    if not title:
+        raise ToolError("give the task a short title")
+    weekdays = args["weekdays"] if isinstance(args["weekdays"], list) else []
+    try:
+        schedule = scheduled.build_schedule(
+            str(args["frequency"]),
+            str(args["time"]),
+            str(args["date"]) or None,
+            weekdays,
+            args["day_of_month"] or None,
+        )
+        first = scheduled.next_run(schedule, ctx.time_zone, dt.datetime.now(dt.UTC))
+        if first is None:
+            raise scheduled.ScheduleError("that time has already passed")
+        scheduled.check_limit(ctx.tenant.session, ctx.modules)
+    except scheduled.ScheduleError as error:
+        raise ToolError(str(error)) from error
+    spec: dict[str, Any] = {"kind": kind, "title": title, "schedule": schedule}
+    preview: dict[str, Any] = {
+        "kind": "schedule_task",
+        "task_kind": kind,
+        "title": title,
+        "schedule": schedule,
+        "first_run": _local(first, ctx.time_zone),
+    }
+    if kind == "agent_run":
+        instruction = str(args["instruction"]).strip()[:2000]
+        if not instruction:
+            raise ToolError("say what the agent should do (instruction)")
+        spec["instruction"] = instruction
+        spec["max_credits"] = scheduled.DEFAULT_MAX_CREDITS
+        preview["instruction"] = instruction
+        preview["max_credits"] = scheduled.DEFAULT_MAX_CREDITS
+    else:
+        name = str(args["action_tool"])
+        if name not in scheduled.SCHEDULABLE_TOOLS:
+            raise ToolError(
+                "that action cannot be scheduled; " + ", ".join(sorted(scheduled.SCHEDULABLE_TOOLS))
+            )
+        try:
+            action_args = json.loads(str(args["action_args_json"]) or "{}")
+        except ValueError as error:
+            raise ToolError("action_args_json must be a JSON object") from error
+        if not isinstance(action_args, dict):
+            raise ToolError("action_args_json must be a JSON object")
+        proposed = _dry_run(ctx, name, action_args)
+        spec.update(
+            tool_name=name,
+            payload=proposed["payload"],
+            payload_hash=proposed["payload_hash"],
+            preview=proposed["preview"],
+        )
+        preview["action"] = proposed["preview"]
+    return _propose(ctx, "schedule_task", spec, preview)
+
+
+def list_scheduled_tasks(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
+    rows = ctx.tenant.session.execute(
+        text("""
+            SELECT id, title, kind, status, schedule, next_run_at FROM app.ai_scheduled_tasks
+            WHERE created_by = :user AND status IN ('active', 'paused')
+            ORDER BY next_run_at NULLS LAST LIMIT :limit
+        """),
+        {"user": ctx.user_id, "limit": MAX_ROWS},
+    ).mappings()
+    return {
+        "tasks": [
+            {
+                "id": str(r["id"]),
+                "title": r["title"],
+                "kind": r["kind"],
+                "status": r["status"],
+                "schedule": r["schedule"],
+                "next_run": _local(r["next_run_at"], ctx.time_zone) if r["next_run_at"] else None,
+            }
+            for r in rows
+        ]
+    }
+
+
+def cancel_scheduled_task(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    task_id = _uuid(args["task_id"], "task_id")
+    row = ctx.tenant.session.execute(
+        text("""
+            SELECT title FROM app.ai_scheduled_tasks
+            WHERE id = :id AND created_by = :user AND status IN ('active', 'paused')
+        """),
+        {"id": task_id, "user": ctx.user_id},
+    ).first()
+    if row is None:
+        raise ToolError("no scheduled task of the user with that id (see list_scheduled_tasks)")
+    preview = {"kind": "cancel_scheduled_task", "title": row.title}
+    return _propose(ctx, "cancel_scheduled_task", {"task_id": str(task_id)}, preview)
+
+
+def _network(args: dict[str, Any]) -> str:
+    value = str(args["network"]).strip()
+    if value and value not in NETWORK_KEYS:
+        raise ToolError(f"unknown network; use one of: {', '.join(NETWORK_KEYS)} or '' for all")
+    return value
+
+
+def _studio_accounts(ctx: ToolContext, args: dict[str, Any]) -> list[dict[str, Any]]:
+    return studio.visible_accounts(ctx.tenant.session, ctx.tenant.branches, _network(args))
+
+
+def _today(ctx: ToolContext) -> dt.date:
+    return dt.datetime.now(ZoneInfo(ctx.time_zone)).date()
+
+
+def social_overview(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    return studio.overview(
+        ctx.tenant.session,
+        _studio_accounts(ctx, args),
+        int(args["days"]),
+        _today(ctx),
+        ctx.time_zone,
+    )
+
+
+def top_posts(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    sort = str(args["sort"])
+    if sort not in ("views", "engagement"):
+        raise ToolError("sort must be 'views' or 'engagement'")
+    posts = studio.best_posts(
+        ctx.tenant.session,
+        _studio_accounts(ctx, args),
+        int(args["days"]),
+        _today(ctx),
+        sort,
+        int(args["limit"]),
+    )
+    return {"posts": posts}
+
+
+def audience_summary(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "audience": studio.audience_summary(ctx.tenant.session, _studio_accounts(ctx, args)),
+        "note": "percent of the audience; only where the network shares it",
+    }
+
+
+def draft_post(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    body = str(args["text"]).strip()
+    if not 1 <= len(body) <= 2200:
+        raise ToolError("the post text must be 1 to 2200 characters")
+    image_url = str(args["image_url"]).strip()
+    if image_url and not image_url.startswith("https://"):
+        raise ToolError("image_url must be an https link, or ''")
+    idea = str(args["idea"]).strip()[:300]
+    draft_id = studio.save_draft(
+        ctx.tenant.session,
+        ctx.user_id,
+        ctx.agent_key,
+        _network(args) or None,
+        body,
+        image_url or None,
+        idea or None,
+    )
+    return {
+        "draft_id": str(draft_id),
+        "saved": True,
+        "instruction": "The draft is saved, not published. Tell the owner it waits in their "
+        "content drafts and offer to publish it (that needs their confirmation).",
+    }
+
+
+def list_drafts(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "drafts": [
+            {
+                "draft_id": str(d["id"]),
+                "network": d["network"],
+                "text": d["body"][:500],
+                "has_image": bool(d["image_url"]),
+                "idea": d["idea"],
+            }
+            for d in studio.open_drafts(ctx.tenant.session)
+        ]
+    }
+
+
+def publish_post(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    draft_id, account_id = (
+        _uuid(args["draft_id"], "draft_id"),
+        _uuid(args["account_id"], "account_id"),
+    )
+    draft = studio.get_draft(ctx.tenant.session, draft_id)
+    if draft is None or draft["status"] != "draft":
+        raise ToolError("that draft is not open (not found, published or discarded)")
+    account = next(
+        (
+            a
+            for a in studio.visible_accounts(ctx.tenant.session, ctx.tenant.branches)
+            if a["id"] == account_id
+        ),
+        None,
+    )
+    if account is None:
+        raise ToolError("no such connected account (ids come from social_overview)")
+    if draft["network"] and draft["network"] != account["network"]:
+        raise ToolError("the draft was written for another network")
+    if not studio.can_publish(account):
+        raise ToolError("this account cannot publish: demo data, not reconnected, or no support")
+    preview = {
+        "kind": "publish_post",
+        "network": account["network"],
+        "account": account["name"],
+        "text": draft["body"][:300],
+        "image_url": draft["image_url"],
+    }
+    payload = {"draft_id": str(draft_id), "account_id": str(account_id)}
+    return _propose(ctx, "publish_post", payload, preview)
 
 
 DATE = {"type": "string", "description": "Local date, YYYY-MM-DD"}
@@ -832,6 +1085,114 @@ TOOLS: dict[str, Tool] = {
             feature="time_billing",
         ),
         Tool(
+            "social_overview",
+            "The business's connected social accounts (ids, networks, whether each can publish) "
+            "and their summed numbers for the last N days (1-90) against the period before: "
+            "followers, reach, views, video views, engagement, link clicks, the content kinds "
+            "that work and the best times to post. network is facebook, instagram, threads, "
+            "youtube, tiktok or google_business, or '' for all.",
+            {"network": {"type": "string"}, "days": {"type": "integer"}},
+            Permission.SOCIAL_READ,
+            social_overview,
+            module="social_studio",
+        ),
+        Tool(
+            "top_posts",
+            "The best posts and videos of the last N days (1-90), sorted by 'views' or "
+            "'engagement', at most `limit` (1-10). network '' is all.",
+            {
+                "network": {"type": "string"},
+                "days": {"type": "integer"},
+                "sort": {"type": "string", "description": "'views' or 'engagement'"},
+                "limit": {"type": "integer"},
+            },
+            Permission.SOCIAL_READ,
+            top_posts,
+            module="social_studio",
+        ),
+        Tool(
+            "audience_summary",
+            "Who follows the accounts: the biggest age, gender and city groups. network '' is all.",
+            {"network": {"type": "string"}},
+            Permission.SOCIAL_READ,
+            audience_summary,
+            module="social_studio",
+        ),
+        Tool(
+            "draft_post",
+            "Save a post draft for the owner (nothing is published). network is the one it is "
+            "written for or ''; image_url is an https link or ''; idea is one line on why it "
+            "should work or ''.",
+            {
+                "network": {"type": "string"},
+                "text": {"type": "string"},
+                "image_url": {"type": "string"},
+                "idea": {"type": "string"},
+            },
+            Permission.SOCIAL_MANAGE,
+            draft_post,
+            module="social_studio",
+        ),
+        Tool(
+            "list_drafts",
+            "The owner's open post drafts (newest first, at most 10), with the ids needed to "
+            "publish one.",
+            {},
+            Permission.SOCIAL_READ,
+            list_drafts,
+            module="social_studio",
+        ),
+        Tool(
+            "publish_post",
+            "Propose publishing an open draft on a connected account. Creates a card the owner "
+            "must confirm; nothing is published until they do.",
+            {"draft_id": ID, "account_id": ID},
+            Permission.SOCIAL_MANAGE,
+            publish_post,
+            module="ai_pro",
+        ),
+        Tool(
+            "schedule_task",
+            "Propose a task for later: once or repeating (daily, weekly on weekdays "
+            "0=Monday..6=Sunday, monthly on a day 1-28), at a local HH:MM. "
+            "kind agent_run: an instruction you will carry out then (read-only; whatever it "
+            "proposes waits for approval). kind action: "
+            "run action_tool (book_client, cancel_booking or bill_month) with action_args_json, "
+            "the JSON arguments that tool takes, at that time. Use empty values for fields that "
+            "do not apply (date '' unless once, weekdays [], day_of_month 0, instruction '' for "
+            "an action, action_tool '' and action_args_json '' for agent_run). Creates a card "
+            "the user must confirm.",
+            {
+                "kind": {"type": "string", "enum": ["agent_run", "action"]},
+                "title": {"type": "string", "description": "Short name shown on the board"},
+                "frequency": {"type": "string", "enum": ["once", "daily", "weekly", "monthly"]},
+                "date": {"type": "string", "description": "YYYY-MM-DD for once, else empty"},
+                "time": {"type": "string", "description": "Local HH:MM"},
+                "weekdays": {"type": "array", "items": {"type": "integer"}},
+                "day_of_month": {"type": "integer"},
+                "instruction": {"type": "string"},
+                "action_tool": {"type": "string"},
+                "action_args_json": {"type": "string"},
+            },
+            Permission.AI_USE,
+            schedule_task,
+        ),
+        Tool(
+            "list_scheduled_tasks",
+            "The user's scheduled tasks (active or paused) with their next run time.",
+            {},
+            Permission.AI_USE,
+            list_scheduled_tasks,
+        ),
+        Tool(
+            "cancel_scheduled_task",
+            "Propose cancelling one of the user's scheduled tasks (id from list_scheduled_tasks). "
+            "Creates a card the user must confirm.",
+            {"task_id": ID},
+            Permission.AI_USE,
+            cancel_scheduled_task,
+        ),
+        Tool(
             "suggest_agent",
             "Offer the user a hand-over to a specialist on the team when their question is "
             "mostly that specialist's work. Only offers: the user decides.",
@@ -865,7 +1226,16 @@ TOOL_DOMAINS: dict[str, str] = {
     "log_time": "time",
     "billing_preview": "billing",
     "bill_month": "billing",
+    "social_overview": "social",
+    "top_posts": "social",
+    "audience_summary": "social",
+    "list_drafts": "content",
+    "draft_post": "content",
+    "publish_post": "social",
     "suggest_agent": "routing",
+    "schedule_task": "tasks",
+    "list_scheduled_tasks": "tasks",
+    "cancel_scheduled_task": "tasks",
 }
 
 # Tools whose data has no branch to filter by (leads, for now). Whenever the conversation is
