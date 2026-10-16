@@ -57,3 +57,18 @@ export async function taskRuns(id: string): Promise<TaskRun[]> {
   const { data } = await api.GET("/ai/tasks/{task_id}/runs", { params: { ...scope, path: { task_id: id } } });
   return data ?? [];
 }
+
+export type ProactiveSettings = components["schemas"]["Proactive"];
+export type ProactiveSetting = components["schemas"]["ProactiveSetting"];
+
+/** Switches the morning briefing or the weekly suggestions on or off, or moves their time. */
+export async function setProactive(key: ProactiveSetting["key"], change: { enabled: boolean; time?: string; weekday?: number }): Promise<TaskResult> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(await api.PUT("/ai/tasks/proactive/{key}", { params: { ...scope, path: { key } }, body: change }));
+  } catch (error) {
+    return failure(error);
+  }
+  revalidatePath("/ai");
+  return { ok: true };
+}

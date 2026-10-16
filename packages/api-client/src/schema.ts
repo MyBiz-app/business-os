@@ -173,6 +173,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/tasks/proactive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Proactive
+         * @description The person's own proactive behaviours: what is on and at what time.
+         */
+        get: operations["get_proactive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/tasks/proactive/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Proactive
+         * @description Switches the morning briefing or the weekly suggestions on or off, or moves the time. They
+         *     run as the person who switches them on, so they never see more than that person can.
+         */
+        put: operations["set_proactive"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/internal/jobs/tick": {
         parameters: {
             query?: never;
@@ -10011,6 +10052,50 @@ export interface components {
             /** Value */
             value: number;
         };
+        /** Proactive */
+        Proactive: {
+            /** Settings */
+            settings: components["schemas"]["ProactiveSetting"][];
+            /** Can Manage */
+            can_manage: boolean;
+        };
+        /** ProactiveBody */
+        ProactiveBody: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Time
+             * @description Local HH:MM
+             */
+            time?: string | null;
+            /** Weekday */
+            weekday?: number | null;
+        };
+        /** ProactiveSetting */
+        ProactiveSetting: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "morning_briefing" | "suggestions";
+            /** Enabled */
+            enabled: boolean;
+            /** Time */
+            time: string;
+            /**
+             * Weekday
+             * @description Suggestions only: 0 = Monday .. 6 = Sunday
+             */
+            weekday: number | null;
+            /** Paused Reason */
+            paused_reason: string | null;
+            /** Next Run At */
+            next_run_at: string | null;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Agent Key */
+            agent_key: string;
+        };
         /** PromoCode */
         PromoCode: {
             /**
@@ -12170,6 +12255,8 @@ export interface components {
             } | null;
             /** Mine */
             mine: boolean;
+            /** System Key */
+            system_key: ("morning_briefing" | "suggestions") | null;
             /** Last Status */
             last_status: ("running" | "ok" | "failed" | "skipped") | null;
             /** Last Error */
@@ -13512,6 +13599,78 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RunCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_proactive: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Proactive"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_proactive: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                key: "morning_briefing" | "suggestions";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProactiveBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Proactive"];
                 };
             };
             /** @description Validation Error */
