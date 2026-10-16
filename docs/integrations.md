@@ -75,6 +75,18 @@ A payments provider also implements `parse_webhook` (verify the signature with t
 secret; raise `WebhookRejected` otherwise) and is given its webhook address
 `{API}/webhooks/payments/{name}/{tenant_id}` in the provider's dashboard.
 
+## Social networks (content studio)
+
+Social networks are read through their own small registry, not the capability registry above,
+because one business connects several accounts of several networks. A provider is a class in
+`apps/api/app/social/` that implements `SocialProvider` (`authorize_url`, `exchange_code`,
+`refresh`, `fetch_account_metrics`, `fetch_posts`, `fetch_audience`) and is registered with
+`register_social(...)`. The networks the studio shows are listed in `NETWORKS`
+(`app/social/providers.py`): a network whose provider is not registered shows as "coming soon".
+Tokens are stored encrypted (`app/providers/secrets.py`) and only summarized, public numbers of
+the business's own accounts are kept. The `demo` provider gives believable numbers without any
+account.
+
 ## Switching provider
 
 - **A business**: settings → Integrations → choose another provider and fill its settings.

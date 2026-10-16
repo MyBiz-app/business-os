@@ -22,7 +22,7 @@ const GROUPS = [
   { key: "run", rows: [{ core: "schedule" }, { core: "clients" }, { core: "plans" }, { core: "payments" }, { core: "reports" }, { core: "team" }] },
   { key: "clients", rows: [{ module: "client_app" }, { module: "client_app_branded" }] },
   { key: "ai", rows: [{ module: "ai_basic" }, { module: "ai_pro" }, { module: "agent_finance" }, { module: "agent_marketing" }] },
-  { key: "growth", rows: [{ module: "crm" }, { module: "crm_automation" }, { module: "whatsapp" }, { module: "analytics_pro" }] },
+  { key: "growth", rows: [{ module: "crm" }, { module: "crm_automation" }, { module: "whatsapp" }, { module: "social_studio" }, { module: "analytics_pro" }] },
 ] as const;
 
 export async function generateMetadata(): Promise<Metadata> {

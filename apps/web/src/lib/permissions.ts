@@ -14,6 +14,7 @@ export const canWriteSchedule = (tenant: Access) => has(tenant, "schedule.write"
 export const canManageBookings = (tenant: Access) => has(tenant, "bookings.manage");
 export const canSell = (tenant: Access) => has(tenant, "sales.manage");
 export const canReadReports = (tenant: Access) => has(tenant, "reports.read");
+export const canManageSocial = (tenant: Access) => has(tenant, "social.manage");
 export const canUseAssistant = (tenant: Access) => has(tenant, "ai.use");
 /** The team and its roles (viewing needs `staff.read`, changing needs `staff.manage`). */
 export const canManageTeam = (tenant: Access) => has(tenant, "staff.manage");

@@ -5,6 +5,7 @@ export const UPGRADES = {
   ai: { modules: ["ai_basic", "ai_pro"], href: "/assistant", permission: "ai.use" },
   crm: { modules: ["crm"], href: "/leads", permission: "clients.read" },
   whatsapp: { modules: ["whatsapp"], href: "/messages", permission: "clients.read" },
+  social: { modules: ["social_studio"], href: "/content", permission: "social.read" },
 } as const;
 
 export type Upgrade = keyof typeof UPGRADES;

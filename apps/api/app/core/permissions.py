@@ -19,6 +19,8 @@ class Permission(StrEnum):
     SALES_MANAGE = "sales.manage"  # sell, freeze and cancel clients' plans
     REPORTS_READ = "reports.read"  # business KPIs (revenue, occupancy, ...)
     AI_USE = "ai.use"  # the AI assistant (its tools still check the permissions above)
+    SOCIAL_READ = "social.read"  # the content studio dashboard
+    SOCIAL_MANAGE = "social.manage"  # connect and disconnect social accounts
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
@@ -39,6 +41,8 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.SALES_MANAGE,
             Permission.REPORTS_READ,
             Permission.AI_USE,
+            Permission.SOCIAL_READ,
+            Permission.SOCIAL_MANAGE,
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,

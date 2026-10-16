@@ -13,6 +13,7 @@
                                                until a real WhatsApp provider fills the inbox)
     uv run python -m app.jobs issue-documents (receipts to each business's invoicing provider)
     uv run python -m app.jobs delete-closed-businesses [--apply] (dry run unless --apply)
+    uv run python -m app.jobs sync-social     (reads the numbers of connected social accounts)
     uv run python -m app.jobs move-files      (documents kept in the database → the object store)
     uv run python -m app.jobs run-daily       (every daily job in turn, for a cron service)
     uv run python -m app.jobs run-hourly      (every hourly job in turn)
@@ -560,6 +561,29 @@ def move_files(conn: Connection, batch: int = MOVE_BATCH) -> dict[str, int] | st
     return {"moved": moved, "left": left}
 
 
+def sync_social(conn: Connection) -> dict[str, int]:
+    """Reads the latest numbers of every connected social account (the content studio). One
+    account failing (a network down, a token the owner revoked) does not stop the others."""
+    from app.social.sync import sync_account
+
+    rows = conn.execute(
+        text("""
+            SELECT a.id, a.tenant_id FROM app.social_accounts a
+            JOIN app.tenants t ON t.id = a.tenant_id
+            WHERE a.status = 'connected' AND t.closed_at IS NULL ORDER BY a.tenant_id
+        """)
+    ).all()
+    synced = failed = 0
+    for account_id, tenant_id in rows:
+        try:
+            with conn.begin_nested():
+                sync_account(conn, tenant_id, account_id)
+            synced += 1
+        except Exception:  # a provider can fail in any way
+            failed += 1
+    return {"synced": synced, "failed": failed}
+
+
 JOBS = {
     "extend-series": extend_series,
     "remind-sessions": remind_sessions,
@@ -576,6 +600,7 @@ JOBS = {
     "answer-whatsapp": answer_inbox,
     "issue-documents": issue_documents,
     "move-files": move_files,
+    "sync-social": sync_social,
 }
 
 # How often each scheduled job must succeed, in hours: the schedule plus slack for a delayed
@@ -591,6 +616,7 @@ DAILY = [
     "delete-closed-businesses",
     "send-messages",
     "issue-documents",
+    "sync-social",
 ]
 HOURLY = ["publish-shifts", "send-emails", "notify-shifts"]
 MAX_HOURS = {**{job: 27 for job in DAILY}, **{job: 3 for job in HOURLY}}

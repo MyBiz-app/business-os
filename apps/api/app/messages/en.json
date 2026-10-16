@@ -113,7 +113,8 @@
       "setup_guided": "Guided setup",
       "setup_full": "Done-for-you setup",
       "noSupport": "Standard support",
-      "noPack": "Included amount"
+      "noPack": "Included amount",
+      "social_studio": "Content studio"
     }
   },
   "locations": {

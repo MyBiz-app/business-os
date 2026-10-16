@@ -38,6 +38,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/clients/join", group: g("clients"), label: t("nav.clientApp"), icon: "clientApp", permission: "clients.read", upgrade: "client_app" },
     { href: "/leads", group: g("clients"), label: t("nav.leads"), icon: "leads", permission: "clients.read", upgrade: "crm" },
     { href: "/messages", group: g("clients"), label: t("nav.messages"), icon: "messages", permission: "clients.read", upgrade: "whatsapp" },
+    { href: "/content", group: g("clients"), label: t("nav.content"), icon: "content", permission: "social.read", upgrade: "social" },
     { href: "/services", group: g("catalog"), label: t("nav.services"), icon: "services", permission: "catalog.read" },
     { href: "/plans", group: g("catalog"), label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
     { href: "/quotes", group: g("money"), label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },

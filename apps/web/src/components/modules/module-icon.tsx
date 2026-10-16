@@ -8,6 +8,7 @@ import {
   Megaphone,
   MessageCircle,
   MessagesSquare,
+  Share2,
   Rocket,
   Smartphone,
   Sparkles,
@@ -37,6 +38,7 @@ const MODULES = {
   analytics_pro: { icon: BarChart3, gradient: "from-cyan-500 to-blue-500" },
   agent_finance: { icon: Wallet, gradient: "from-lime-500 to-emerald-600" },
   agent_marketing: { icon: Megaphone, gradient: "from-rose-500 to-orange-500" },
+  social_studio: { icon: Share2, gradient: "from-pink-500 to-violet-600" },
   extra_location: { icon: Building2, gradient: "from-slate-500 to-slate-700" },
 } as const;
 

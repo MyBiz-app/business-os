@@ -2392,6 +2392,156 @@ export interface paths {
         patch: operations["update_station"];
         trace?: never;
     };
+    "/social/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Social Providers
+         * @description Every network the studio knows, and whether it can be connected yet or is "soon".
+         */
+        get: operations["list_social_providers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Social Accounts */
+        get: operations["list_social_accounts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/connect/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Connect Social
+         * @description Starts a connection. `demo` connects sample accounts with believable numbers; other
+         *     providers return the address where the owner agrees to share their numbers.
+         */
+        post: operations["connect_social"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/accounts/{account_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Disconnect Social
+         * @description Removes the account and every number we kept for it. (The owner can also revoke access
+         *     on the network itself.)
+         */
+        delete: operations["disconnect_social"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sync Social Now
+         * @description "Refresh now": reads the latest numbers, at most once an hour.
+         */
+        post: operations["sync_social_now"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Social Dashboard */
+        get: operations["get_social_dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/posts/top": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Social Top Posts */
+        get: operations["get_social_top_posts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/social/audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Social Audience */
+        get: operations["get_social_audience"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/sessions/options": {
         parameters: {
             query?: never;
@@ -5305,6 +5455,18 @@ export interface components {
              */
             recipients: number;
         };
+        /** AudienceShare */
+        AudienceShare: {
+            /**
+             * Dimension
+             * @enum {string}
+             */
+            dimension: "age" | "gender" | "city" | "country";
+            /** Label */
+            label: string;
+            /** Share Bp */
+            share_bp: number;
+        };
         /** AuditEntry */
         AuditEntry: {
             /**
@@ -5912,7 +6074,7 @@ export interface components {
             modules: components["schemas"]["CatalogModule"][];
             /** Presets */
             presets: {
-                [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+                [key: string]: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             };
         };
         /** CatalogModule */
@@ -5921,7 +6083,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
+            key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
             /**
              * Price
              * @description Monthly, minor units (per unit when per_unit)
@@ -5932,9 +6094,9 @@ export interface components {
             /** Per Unit */
             per_unit: boolean;
             /** Requires Any */
-            requires_any: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+            requires_any: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             /** Requires All */
-            requires_all: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
+            requires_all: ("client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location")[];
             /**
              * Group
              * @description Tiers of one thing: at most one per group
@@ -6636,6 +6798,13 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ConnectResult */
+        ConnectResult: {
+            /** Accounts */
+            accounts: components["schemas"]["SocialAccount"][];
+            /** Authorize Url */
+            authorize_url?: string | null;
+        };
         /** ContactCreate */
         ContactCreate: {
             /** Name */
@@ -7272,6 +7441,23 @@ export interface components {
             /** Removed Health Declarations */
             removed_health_declarations: number;
         };
+        /** FollowerPoint */
+        FollowerPoint: {
+            /**
+             * Day
+             * Format: date
+             */
+            day: string;
+            /** Followers */
+            followers: number;
+        };
+        /** FollowerSeries */
+        FollowerSeries: {
+            /** Network */
+            network: string;
+            /** Points */
+            points: components["schemas"]["FollowerPoint"][];
+        };
         /** Form */
         Form: {
             /** Key */
@@ -7371,6 +7557,21 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** GoogleBusiness */
+        GoogleBusiness: {
+            /** Searches */
+            searches: number;
+            /** Profile Views */
+            profile_views: number;
+            /** Calls */
+            calls: number;
+            /** Directions */
+            directions: number;
+            /** Reviews New */
+            reviews_new: number;
+            /** Rating */
+            rating: number | null;
+        };
         /** Grant */
         Grant: {
             /**
@@ -7408,6 +7609,15 @@ export interface components {
             status: string;
             /** Environment */
             environment: string;
+        };
+        /** HeatCell */
+        HeatCell: {
+            /** Weekday */
+            weekday: number;
+            /** Hour */
+            hour: number;
+            /** Value */
+            value: number;
         };
         /** HomeBranch */
         HomeBranch: {
@@ -7883,6 +8093,20 @@ export interface components {
         JoinRequest: {
             /** Code */
             code: string;
+        };
+        /** KindEngagement */
+        KindEngagement: {
+            /** Kind */
+            kind: string;
+            /** Engagements */
+            engagements: number;
+        };
+        /** Kpi */
+        Kpi: {
+            /** Value */
+            value: number;
+            /** Previous */
+            previous: number | null;
         };
         /** Lead */
         Lead: {
@@ -8506,6 +8730,22 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** NetworkOption */
+        NetworkOption: {
+            /** Network */
+            network: string;
+            /** Provider */
+            provider: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "available" | "soon";
+            /** Gives */
+            gives: string[];
+            /** Connected */
+            connected: number;
         };
         /**
          * NewBranchPreview
@@ -9945,14 +10185,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "staff.read" | "staff.manage" | "business.settings")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "staff.read" | "staff.manage" | "business.settings")[] | null;
         };
         /** Roles */
         Roles: {
@@ -10816,6 +11056,68 @@ export interface components {
             /** Staff Name */
             staff_name: string;
         };
+        /** SocialAccount */
+        SocialAccount: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Network */
+            network: string;
+            /** Name */
+            name: string;
+            /** Provider */
+            provider: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "connected" | "needs_reauth";
+            /** Is Demo */
+            is_demo: boolean;
+            /** Location Id */
+            location_id: string | null;
+            /** Last Synced At */
+            last_synced_at: string | null;
+        };
+        /** SocialDashboard */
+        SocialDashboard: {
+            /**
+             * Period From
+             * Format: date
+             */
+            period_from: string;
+            /**
+             * Period To
+             * Format: date
+             */
+            period_to: string;
+            /** Previous From */
+            previous_from: string | null;
+            /** Previous To */
+            previous_to: string | null;
+            /** Kpis */
+            kpis: {
+                [key: string]: components["schemas"]["Kpi"];
+            };
+            /** Followers Series */
+            followers_series: components["schemas"]["FollowerSeries"][];
+            /** Video Views Weekly */
+            video_views_weekly: components["schemas"]["WeeklyViews"][];
+            /** Engagement By Kind */
+            engagement_by_kind: components["schemas"]["KindEngagement"][];
+            /** Heatmap */
+            heatmap: components["schemas"]["HeatCell"][];
+            google_business: components["schemas"]["GoogleBusiness"] | null;
+        };
+        /** SocialProviders */
+        SocialProviders: {
+            /** Networks */
+            networks: components["schemas"]["NetworkOption"][];
+            /** Demo Available */
+            demo_available: boolean;
+        };
         /** StaffHours */
         StaffHours: {
             /**
@@ -11522,6 +11824,37 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** TopPost */
+        TopPost: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Network */
+            network: string;
+            /** Account Name */
+            account_name: string;
+            /** Kind */
+            kind: string;
+            /**
+             * Published At
+             * Format: date-time
+             */
+            published_at: string;
+            /** Thumbnail Url */
+            thumbnail_url: string | null;
+            /** Permalink */
+            permalink: string | null;
+            /** Caption */
+            caption: string | null;
+            /** Views */
+            views: number;
+            /** Engagements */
+            engagements: number;
+            /** Avg Watch Sec */
+            avg_watch_sec: number | null;
+        };
         /** Trial */
         Trial: {
             /**
@@ -11655,6 +11988,16 @@ export interface components {
              * @description First local date of the target week
              */
             to_date: string;
+        };
+        /** WeeklyViews */
+        WeeklyViews: {
+            /**
+             * Week Start
+             * Format: date
+             */
+            week_start: string;
+            /** Views */
+            views: number;
         };
         /** WeeklyWindow */
         WeeklyWindow: {
@@ -18015,6 +18358,294 @@ export interface operations {
             };
         };
     };
+    list_social_providers: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialProviders"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_social_accounts: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialAccount"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_social: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disconnect_social: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                account_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sync_social_now: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialAccount"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_social_dashboard: {
+        parameters: {
+            query?: {
+                /** @description Only these accounts */
+                accounts?: string[] | null;
+                /** @description Only these networks */
+                networks?: string[] | null;
+                from?: string | null;
+                to?: string | null;
+                compare?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SocialDashboard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_social_top_posts: {
+        parameters: {
+            query?: {
+                /** @description Only these accounts */
+                accounts?: string[] | null;
+                /** @description Only these networks */
+                networks?: string[] | null;
+                from?: string | null;
+                to?: string | null;
+                sort?: "views" | "engagement";
+                limit?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TopPost"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_social_audience: {
+        parameters: {
+            query?: {
+                /** @description Only these accounts */
+                accounts?: string[] | null;
+                /** @description Only these networks */
+                networks?: string[] | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudienceShare"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     schedule_options: {
         parameters: {
             query?: never;
@@ -20696,7 +21327,7 @@ export interface operations {
                 "X-Location-Id"?: string | null;
             };
             path: {
-                key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
+                key: "client_app" | "client_app_branded" | "ai_basic" | "ai_pro" | "crm" | "crm_automation" | "analytics_pro" | "agent_finance" | "agent_marketing" | "social_studio" | "whatsapp" | "whatsapp_ai" | "pack_plus" | "pack_max" | "support_priority" | "support_vip" | "setup_guided" | "setup_full" | "extra_location";
             };
             cookie?: never;
         };
