@@ -2232,6 +2232,7 @@
       "website": "Website (leave empty)",
       "otherVertical": "Other",
       "chooseVertical": "Choose an industry (optional)",
+      "noVerticalMatch": "No matching industry",
       "points": [
         "Reply within one business day",
         "No commitment, no setup fee",

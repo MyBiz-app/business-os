@@ -4,7 +4,8 @@ import { CheckCircle2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
-import { Field, SelectField, TextAreaField } from "@/components/form/field";
+import { ComboboxField } from "@/components/form/combobox";
+import { Field, TextAreaField } from "@/components/form/field";
 import { FormError } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
@@ -37,10 +38,11 @@ export function ContactForm({ vertical }: { vertical?: string }) {
         <Field label={t("phone")} name="phone" type="tel" maxLength={40} autoComplete="tel" dir="ltr" />
         <Field label={t("business")} name="business" maxLength={160} autoComplete="organization" />
       </div>
-      <SelectField
+      <ComboboxField
         label={t("vertical")}
         name="vertical"
         defaultValue={vertical ?? ""}
+        emptyText={t("noVerticalMatch")}
         options={[
           // No industry is assumed: the person picks one, or leaves it empty.
           { value: "", label: t("chooseVertical") },
