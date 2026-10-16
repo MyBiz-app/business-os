@@ -101,7 +101,8 @@ with sync_playwright() as p:
         owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$")); h.ready(owner)
     plans = owner.get_by_role("region", name="מנויים וכרטיסיות")
     plans.get_by_role("button", name="מכירה").click()
-    expect(plans.get_by_text("המסלול נמכר.")).to_be_visible()
+    # Confirmations are toasts (role=status) outside the page sections, not text inside the form.
+    expect(owner.get_by_role("status").filter(has_text="המסלול נמכר.")).to_be_visible()
     print("4. class, session, member with a membership: ok")
 
     # Member: branded mobile app (Expo web) → join → book.
