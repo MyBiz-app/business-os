@@ -1949,6 +1949,13 @@
       "branch_manager": "מנהל סניף",
       "front_desk": "קבלה",
       "staff": "צוות"
+    },
+    "map": {
+      "expand": "הגדלת המפה (M)",
+      "shrink": "חזרה למפה ושיחה (M)",
+      "floatingChat": "שיחה עם {name}",
+      "floatingBusy": "מגיב…",
+      "floatingCount": "{count, plural, =0 {אין הודעות עדיין} one {הודעה אחת} other {# הודעות}}"
     }
   },
   "aiBubble": {
