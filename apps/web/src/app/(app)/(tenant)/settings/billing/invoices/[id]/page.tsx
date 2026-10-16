@@ -10,6 +10,7 @@ import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { Container } from "@/components/layout/container";
+import { DownloadLink } from "@/components/download-link";
 import { PrintButton } from "@/components/print-button";
 
 /** A MyBiz invoice to the business, laid out as a printable document. */
@@ -37,7 +38,10 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
         <Link href="/settings/billing" className="text-sm text-primary underline-offset-4 hover:underline">
           {t("back")}
         </Link>
-        <PrintButton label={t("print")} />
+        <div className="flex flex-wrap items-center gap-2">
+          <DownloadLink href={`/settings/billing/invoices/${id}/pdf`} label={t("download")} />
+          <PrintButton label={t("print")} />
+        </div>
       </div>
 
       <article className="card flex flex-col gap-8 p-8 sm:p-10 print:border-0 print:shadow-none">

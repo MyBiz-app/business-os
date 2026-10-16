@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
 
 import { Container } from "@/components/layout/container";
+import { DownloadLink } from "@/components/download-link";
 import { PrintButton } from "@/components/print-button";
 
 /** A payment's receipt, laid out as a printable document. */
@@ -33,7 +34,10 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
         <Link href={`/clients/${receipt.client_id}`} className="text-sm text-primary underline-offset-4 hover:underline">
           {t("back")}
         </Link>
-        <PrintButton label={t("print")} />
+        <div className="flex flex-wrap items-center gap-2">
+          <DownloadLink href={`/receipts/${id}/pdf`} label={t("download")} />
+          <PrintButton label={t("print")} />
+        </div>
       </div>
 
       <article className="card relative flex flex-col gap-8 overflow-hidden p-8 sm:p-10 print:border-0 print:shadow-none">

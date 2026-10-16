@@ -1,0 +1,25 @@
+{% extends "_frame.html" %}
+{% block title %}{{ doc_title }} {{ doc_number }}{% endblock %}
+{% block stamp %}{% if status_label %}<div class="stamp" {% if not paid %}style="border-color: var(--muted); color: var(--muted)"{% endif %}>{{ status_label }}</div>{% endif %}{% endblock %}
+{% block body %}
+<table class="meta">
+  <tr><th>{{ t.issuedAt }}</th><td>{{ issued }}</td></tr>
+  <tr><th>{{ t.period }}</th><td><bdi>{{ period }}</bdi></td></tr>
+  <tr><th>{{ t.to }}</th><td>{{ client_name }}</td></tr>
+  {% if client_tax_id %}<tr><th>{{ t.taxId }}</th><td class="ltr">{{ client_tax_id }}</td></tr>{% endif %}
+  {% if client_email %}<tr><th></th><td class="ltr">{{ client_email }}</td></tr>{% endif %}
+</table>
+<table class="lines">
+  <thead><tr><th>{{ t.item }}</th><th class="num">{{ t.amount }}</th></tr></thead>
+  <tbody>
+  {% for line in lines %}
+    <tr>
+      <td>{{ line.label }}{% if line.quantity > 1 %} × {{ line.quantity }}{% endif %}{% if line.detail %}<span class="sub">{{ line.detail }}</span>{% endif %}</td>
+      <td class="num"><bdi>{{ line.amount }}</bdi></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="total-row"><span class="label">{{ t.total }}</span><span class="total"><bdi>{{ total }}</bdi></span></div>
+{% if payment_note %}<p class="note">{{ payment_note }}</p>{% endif %}
+{% endblock %}
