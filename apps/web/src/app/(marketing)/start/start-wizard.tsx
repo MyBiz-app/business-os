@@ -92,12 +92,15 @@ type Props = {
   signedIn: boolean;
   /** Where Google or Apple sign-in comes back to (this page, with its preselections). */
   returnTo: string;
+  /** Arrived from the pricing calculator: the plan is chosen already, so after the business
+   * details the journey goes straight to the summary. */
+  fromCalc?: boolean;
 };
 
 /** The sign-up journey: like booking a low-cost flight. The business and its size, then one
  * add-on per screen, each with a basic and a pro choice (2-4 per screen, decision X16) and a
  * live cart, the extras (bundle, support, setup) and a boarding pass; then the payment step. */
-export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, providers, signedIn, returnTo }: Props) {
+export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, providers, signedIn, returnTo, fromCalc = false }: Props) {
   const t = useTranslations("start");
   const tModules = useTranslations("modules");
   const tAuth = useTranslations("auth.oauth");
@@ -357,7 +360,10 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           onSubmit={(event) => {
             event.preventDefault();
             setNumberTouched(true);
-            if (draft.name.trim() && businessNumberOk(draft.currency, draft.businessNumber ?? "") && (draft.currency !== "ILS" || draft.entityType)) next();
+            if (draft.name.trim() && businessNumberOk(draft.currency, draft.businessNumber ?? "") && (draft.currency !== "ILS" || draft.entityType)) {
+              if (fromCalc) goTo("summary");
+              else next();
+            }
           }}
         >
           <TextInput

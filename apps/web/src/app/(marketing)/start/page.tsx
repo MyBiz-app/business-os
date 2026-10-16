@@ -9,7 +9,7 @@ import { ChatMock, PhoneMock } from "@/components/marketing/mocks";
 import { API_URL } from "@/lib/api";
 import { providerButtons } from "@/lib/auth-providers";
 import { createClient } from "@/lib/supabase/server";
-import { CURRENCIES, type Currency, trialEndsOn, withLocations } from "@/lib/signup-plan";
+import { CURRENCIES, type Currency, modulesFromParam, trialEndsOn, wholeParam, withLocations, withoutOrphans } from "@/lib/signup-plan";
 
 import { StartWizard } from "./start-wizard";
 
@@ -58,6 +58,8 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
   const vertical = typeof query.vertical === "string" && isOpen(query.vertical) ? query.vertical : null;
   const requestedCurrency = asked<Currency>(query.currency, CURRENCIES);
   const currency = requestedCurrency && catalogs[requestedCurrency] ? requestedCurrency : locale === "he" && catalogs.ILS ? "ILS" : (Object.keys(catalogs)[0] as Currency);
+  const fromCalc = query.from === "calc";
+  const locations = fromCalc ? wholeParam(query.locations, 1, 11, 1) : 1;
   const preset = typeof query.preset === "string" ? query.preset : "";
   const presetModules = Object.values(catalogs)[0]!.presets[preset] ?? [];
   const { data: claims } = await (await createClient()).auth.getClaims();
@@ -73,12 +75,13 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
         initial={{
           vertical,
           name: "",
-          clients: 100,
+          clients: fromCalc ? wholeParam(query.clients, 0, 100_000, 100) : 100,
           staff: 2,
-          locations: 1,
+          locations,
           currency,
-          modules: withLocations(Object.fromEntries(presetModules.map((key) => [key, 1])), 1),
+          modules: withLocations(fromCalc ? withoutOrphans(modulesFromParam(query.modules), catalogs[currency] ?? Object.values(catalogs)[0]!) : Object.fromEntries(presetModules.map((key) => [key, 1])), locations),
         }}
+        fromCalc={fromCalc}
         trialEndsOn={trialEndsOn()}
         providers={signedIn ? [] : await providerButtons()}
         signedIn={signedIn}

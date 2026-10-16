@@ -299,3 +299,30 @@ export function decodePlan(value: unknown): SignupPlan | null {
     ...(entityType ? { entityType } : {}),
   };
 }
+
+/** The core tier a client count lands in (100 / 300 / 1000, or 1500 for "1,000+"). */
+export function clientsTier(clients: number): (typeof CLIENT_SIZES)[number] {
+  return CLIENT_SIZES.find((size) => size < 1500 && clients <= size) ?? 1500;
+}
+
+/** The pricing calculator's plan as a /start link: the business starts the journey with
+ * everything already chosen (`from=calc` opens it at the business details, then the summary). */
+export function calcPlanQuery(plan: Pick<SignupPlan, "clients" | "locations" | "currency" | "modules"> & { vertical?: string | null }): string {
+  const modules = MODULE_KEYS.filter((key) => key !== "extra_location" && plan.modules[key]);
+  const params = new URLSearchParams({ from: "calc", currency: plan.currency, clients: String(plan.clients), locations: String(plan.locations) });
+  if (plan.vertical) params.set("vertical", plan.vertical);
+  if (modules.length > 0) params.set("modules", modules.join(","));
+  return params.toString();
+}
+
+/** The modules named in a /start link's `modules` parameter (unknown keys are dropped). */
+export function modulesFromParam(value: unknown): Modules {
+  if (typeof value !== "string") return {};
+  return Object.fromEntries(value.split(",").filter((key): key is ModuleKey => (MODULE_KEYS as readonly string[]).includes(key)).map((key) => [key, 1]));
+}
+
+/** A whole number from a link parameter, within bounds, else the fallback. */
+export function wholeParam(value: unknown, min: number, max: number, fallback: number): number {
+  const number = typeof value === "string" && /^\d{1,6}$/.test(value) ? Number(value) : NaN;
+  return Number.isInteger(number) && number >= min && number <= max ? number : fallback;
+}
