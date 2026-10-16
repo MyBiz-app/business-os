@@ -32,6 +32,7 @@ KIND_ICONS = {"gym": "bars", "pilates": "ring", "crossfit": "bolt", "padel_tenni
 # The business's Latin initials (names in Hebrew have no letters this font can draw).
 LATIN = {
     "אדיר פיטנס": "AF",
+    "Adir fitness": "AF",
     "סטודיו": "S",
 }
 ICONS = ("ring", "bars", "leaf", "bolt", "hex", "wave")
