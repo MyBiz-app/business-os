@@ -36,6 +36,7 @@ from app.seed.common import (
 )
 from app.seed.demos import seed_demo
 from app.seed.platform import seed_platform
+from app.seed.profiles import enrich_profiles
 
 __all__ = [
     "ACCOUNTING_FIRM",
@@ -61,7 +62,7 @@ def main() -> None:
     parser.add_argument(
         "--demo",
         default="studio",
-        choices=sorted(DEMOS),
+        choices=sorted([*DEMOS, "profiles"]),
         help="studio: one fitness studio; club: a padel club renting courts by the hour; "
         "pets: a pet grooming salon with owners and their pets; "
         "jobs: an air-conditioning company with on-site jobs at clients' addresses; "
@@ -72,6 +73,8 @@ def main() -> None:
         "Studio Bloom (hair salon, three) for one owner; "
         "categories: a gym network with a strength and a pilates branch, a padel network "
         "(three courts branches) and a beauty business, one per kind of calendar; "
+        "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
+        "businesses (adds only, deletes nothing); "
         "platform: the owner email becomes a MyBiz team owner and the "
         "platform gets small businesses, invoices and requests",
     )
@@ -88,6 +91,9 @@ def main() -> None:
 
     engine = create_engine(args.database_url or get_settings().database_url)
     with engine.begin() as conn:
+        if args.demo == "profiles":
+            print(enrich_profiles(conn, args.owner_email))
+            return
         if args.demo == "platform":
             seed_platform(
                 conn,

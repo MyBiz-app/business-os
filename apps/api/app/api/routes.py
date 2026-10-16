@@ -47,7 +47,7 @@ def load_current_tenant(session: Session) -> Tenant:
                        t.primary_color, t.cancellation_window_minutes, t.booking_horizon_days,
                        t.weekly_release_weekday, t.weekly_release_time, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.network_scope,
-                       t.resource_payment,
+                       t.resource_payment, t.client_id_number,
                        t.schedule_default_view,
                        coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
                        t.shifts_default_view, t.shifts_default_range,

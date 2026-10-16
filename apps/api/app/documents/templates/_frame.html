@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+<meta charset="utf-8">
+<title>{% block title %}{% endblock %}</title>
+<style>
+@font-face { font-family: "Assistant Hebrew"; font-weight: 400; src: url("fonts/assistant-hebrew-400-normal.woff"); }
+@font-face { font-family: "Assistant Hebrew"; font-weight: 700; src: url("fonts/assistant-hebrew-700-normal.woff"); }
+@font-face { font-family: "Assistant Latin"; font-weight: 400; src: url("fonts/assistant-latin-400-normal.woff"); }
+@font-face { font-family: "Assistant Latin"; font-weight: 700; src: url("fonts/assistant-latin-700-normal.woff"); }
+@font-face { font-family: "Jakarta"; font-weight: 400; src: url("fonts/plus-jakarta-sans-latin-400-normal.woff"); }
+@font-face { font-family: "Jakarta"; font-weight: 700; src: url("fonts/plus-jakarta-sans-latin-700-normal.woff"); }
+
+:root { --accent: {{ accent }}; --ink: #111827; --muted: #4b5563; --line: #e5e7eb; --tint: #f3f4f8; }
+@page { size: A4; margin: 18mm 16mm 24mm; }
+html { font-family: "Assistant Latin", "Assistant Hebrew", sans-serif; font-size: 10.5pt; color: var(--ink); line-height: 1.45; }
+html[lang="en"] h1, html[lang="en"] .issuer-name, html[lang="en"] .total { font-family: "Jakarta", "Assistant Latin", "Assistant Hebrew", sans-serif; }
+body { margin: 0; }
+.bar { height: 5px; background: var(--accent); margin: 0 0 8mm; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10mm; }
+.issuer { display: flex; gap: 4mm; align-items: center; }
+.issuer img { height: 14mm; max-width: 40mm; }
+.issuer img.mark { width: 14mm; border-radius: 3mm; }
+.issuer-name { font-size: 15pt; font-weight: 700; unicode-bidi: plaintext; }
+.issuer-lines { color: var(--muted); font-size: 9pt; }
+.issuer-lines div { unicode-bidi: plaintext; }
+.doc-title { text-align: end; }
+h1 { margin: 0; font-size: 24pt; font-weight: 700; color: var(--accent); line-height: 1.1; }
+.doc-no { color: var(--muted); font-size: 11pt; margin-top: 1mm; }
+.stamp { display: inline-block; margin-top: 3mm; padding: 1mm 4mm; border: 1.5px solid #15803d; color: #15803d; font-weight: 700; border-radius: 2mm; }
+.meta { margin: 9mm 0 7mm; border-collapse: collapse; }
+.meta th { text-align: start; font-weight: 400; color: var(--muted); padding: 0.8mm 0; padding-inline-end: 8mm; white-space: nowrap; }
+.meta td { padding: 0.8mm 0; unicode-bidi: plaintext; text-align: start; }
+.meta td.ltr { direction: ltr; unicode-bidi: isolate; }
+table.lines { width: 100%; border-collapse: collapse; margin-top: 4mm; }
+table.lines th.num, table.lines td.num { text-align: end; }
+table.lines th { text-align: start; color: var(--muted); font-weight: 400; border-bottom: 1px solid var(--line); padding: 2mm 0; }
+table.lines td { padding: 3mm 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.num { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sub { display: block; color: var(--muted); font-size: 9pt; }
+.total-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 6mm; padding: 4mm 5mm; background: var(--tint); border-radius: 2mm; }
+.total-row .label { font-size: 12pt; font-weight: 700; }
+.total { font-size: 18pt; font-weight: 700; }
+.note { margin-top: 8mm; color: var(--muted); }
+.sample { margin: 0 0 6mm; padding: 2mm 4mm; border: 1px solid #d97706; background: #fffbeb; color: #92400e; text-align: center; font-weight: 700; border-radius: 2mm; }
+.foot { position: fixed; bottom: -14mm; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 2.5mm; color: var(--muted); font-size: 8.5pt; }
+.foot .brand { white-space: nowrap; display: flex; align-items: center; gap: 2mm; }
+.foot img { height: 4.5mm; width: 4.5mm; }
+{% if watermark %}
+.watermark { position: fixed; top: 105mm; left: 0; right: 0; text-align: center; font-size: 56pt; font-weight: 700; color: rgba(17, 24, 39, 0.06); transform: rotate(-28deg); }
+{% endif %}
+</style>
+</head>
+<body>
+{% if watermark %}<div class="watermark">{{ watermark }}</div>{% endif %}
+<div class="bar"></div>
+{% if sample_note %}<p class="sample">{{ sample_note }}</p>{% endif %}
+<div class="head">
+  <div class="issuer">
+    {% if issuer.logo %}<img {% if issuer.is_mark %}class="mark" {% endif %}src="{{ issuer.logo }}" alt="">{% endif %}
+    <div>
+      <div class="issuer-name">{{ issuer.name }}</div>
+      <div class="issuer-lines">{% for line in issuer.lines %}<div>{{ line }}</div>{% endfor %}</div>
+    </div>
+  </div>
+  <div class="doc-title">
+    <h1>{{ doc_title }}</h1>
+    <div class="doc-no">{{ doc_number }}</div>
+    {% block stamp %}{% endblock %}
+  </div>
+</div>
+{% block body %}{% endblock %}
+<div class="foot">
+  <span class="brand"><img src="{{ mark }}" alt=""><span>{{ issued_with }}</span></span>
+  <span>{{ footer_right }}</span>
+</div>
+</body>
+</html>

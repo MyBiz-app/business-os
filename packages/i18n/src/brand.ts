@@ -3,7 +3,7 @@
 // brand.json (plus the store names in each Expo app's app.json, see docs/design-system.md).
 import brand from "../brand.json";
 
-export const BRAND: { name: string } = brand;
+export const BRAND: { name: string; legal: typeof brand.legal } = brand;
 
 const WRITTEN = "MyBiz";
 

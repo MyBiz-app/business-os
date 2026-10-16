@@ -6,7 +6,7 @@ shows what each one unlocks (a tax invoice needs the address, payroll needs the 
 and the dashboard reminds the owner 60 days before the licence expires. Nothing here blocks.
 
 Revision ID: 0103
-Revises: 0101
+Revises: 0102
 Create Date: 2026-10-16
 """
 
@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0103"
-down_revision: str | None = "0101"
+down_revision: str | None = "0102"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

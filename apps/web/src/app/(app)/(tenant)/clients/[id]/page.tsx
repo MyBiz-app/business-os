@@ -20,6 +20,7 @@ import { StatusBadge } from "../status-badge";
 import { AddressesSection } from "./addresses-section";
 import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
+import { IdentitySection } from "./identity-section";
 import { PlansSection } from "./plans-section";
 import { PrivacySection } from "./privacy-section";
 import { UserText } from "@/components/bidi";
@@ -273,6 +274,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           <AddressesSection clientId={client.id} context={context} locked={erased} />
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
+
+          {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
 
           {!erased && tenant.requires_health_declaration && <HealthSection clientId={client.id} context={context} />}
 

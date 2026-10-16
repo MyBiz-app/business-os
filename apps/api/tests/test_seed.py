@@ -14,6 +14,7 @@ from app.seed import (
     seed_demo,
     seed_platform,
 )
+from app.seed.profiles import _add_crossfit_branch, enrich_profiles
 
 
 def test_demo_studio_respects_the_invariants(engine: Engine) -> None:
@@ -384,10 +385,43 @@ def test_categories_demo_has_one_business_per_kind_of_calendar(engine: Engine) -
     assert kinds == {
         ("gym", "gym"),
         ("gym", "pilates"),
+        ("gym", "crossfit"),
         ("padel_tennis", "padel_tennis"),
         ("hair_salon", "hair_salon"),
     }
     assert sessions > 0
+
+
+def test_profiles_add_logos_portraits_and_a_crossfit_branch_without_repeating(
+    engine: Engine,
+) -> None:
+    owner = uuid4()
+    email = f"pics-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+        (tenant,) = seed_demo(connection, email, "club", 1, random.Random(4))
+        added = _add_crossfit_branch(connection, tenant)
+        again = _add_crossfit_branch(connection, tenant)
+        first = enrich_profiles(connection, email)
+        second = enrich_profiles(connection, email)
+    assert added is not None and again is None
+    assert first["businesses"] == 1 and first["branches"] >= 1
+    assert first["staff"] > 0 and first["clients"] == 40
+    assert second == {"businesses": 0, "branches": 0, "staff": 0, "clients": 0, "new_branches": 0}
+    with engine.connect() as connection:
+        row = connection.execute(
+            text("""
+                SELECT (SELECT count(*) FROM app.clients c JOIN app.users u ON u.id = c.user_id
+                        WHERE c.tenant_id = :t AND u.avatar IS NOT NULL) AS client_portraits,
+                       (SELECT count(*) FROM app.locations
+                        WHERE tenant_id = :t AND logo IS NULL) AS without_logo
+            """),
+            {"t": tenant},
+        ).one()
+    assert row.client_portraits == 40 and row.without_logo == 0
 
 
 def test_networks_demo_has_the_round_5_features(engine: Engine) -> None:

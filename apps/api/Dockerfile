@@ -1,6 +1,11 @@
 # Production image for the API. Build from apps/api:  docker build -t business-os-api .
 FROM python:3.13-slim AS base
 
+# WeasyPrint (PDF documents) needs Pango and HarfBuzz; the fonts it uses ship with the code.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN pip install --no-cache-dir uv==0.8.17
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

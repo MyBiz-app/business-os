@@ -332,6 +332,7 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         """),
         {"name": ERASED_NAME.get(locale, ERASED_NAME["en"]), "id": client_id},
     )
+    db.execute(text("DELETE FROM app.person_identities WHERE client_id = :id"), {"id": client_id})
     db.execute(
         text("""
             UPDATE app.clients

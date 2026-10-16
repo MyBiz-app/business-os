@@ -134,6 +134,7 @@ class TenantUpdate(BaseModel):
         description="Branches the shifts board opens with; empty means all of them",
     )
     network_scope: Literal["network", "branch"] | None = None
+    client_id_number: Literal["off", "optional", "required"] | None = None
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
@@ -232,6 +233,9 @@ class Tenant(BaseModel):
     network_scope: Literal["network", "branch"] = Field(
         default="network",
         description="network: clients shared by all branches; branch: each branch keeps its own",
+    )
+    client_id_number: Literal["off", "optional", "required"] = Field(
+        default="off", description="Whether the business asks its clients for an ID number"
     )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",
