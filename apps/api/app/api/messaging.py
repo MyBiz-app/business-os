@@ -238,7 +238,7 @@ def _people(
         # Owners and managers work in every branch; others in the branches on their list (none
         # listed = all, except for a branch manager, who has only their own).
         rows = db.execute(
-            text(f"""
+            text("""
                 SELECT u.id AS user_id, lower(u.email) AS email,
                        coalesce(nullif(split_part(trim(u.full_name), ' ', 1), ''),
                                 split_part(u.email, '@', 1)) AS first_name
@@ -248,10 +248,10 @@ def _people(
                        OR (cardinality(m.location_ids) = 0
                            AND NOT (m.role = ANY(CAST(:bound AS text[]))))
                        OR m.location_ids && CAST(:locs AS uuid[]))
-                  AND {"u.marketing_consent_at IS NOT NULL" if promotional else "TRUE"}
+                  AND (NOT CAST(:promo AS boolean) OR u.marketing_consent_at IS NOT NULL)
                 ORDER BY first_name, u.id
             """),
-            {**params, "bound": list(BRANCH_BOUND)},
+            {**params, "bound": list(BRANCH_BOUND), "promo": promotional},
         ).mappings()
         return [Recipient.model_validate(dict(r)) for r in rows]
     consent = (
