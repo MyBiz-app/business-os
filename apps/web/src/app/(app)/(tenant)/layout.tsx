@@ -6,12 +6,14 @@ import { type NavItem, SideNav } from "@/components/side-nav";
 import { apiAssetUrl } from "@/lib/api";
 import { isolate } from "@/lib/bidi";
 import { brandStyle } from "@/lib/brand";
-import { canManageSettings, canManageTeam } from "@/lib/permissions";
+import { canManageSettings, canManageTeam, canUseAssistant } from "@/lib/permissions";
 import { hasUpgrade, type Upgrade } from "@/lib/upgrades";
 import { getBranches, getTenant, hasBookableRooms } from "@/lib/tenant";
 
 import { leaveSupport } from "../platform/actions";
 import { WorkspaceSwitcher } from "./_menu/workspace-switcher";
+import { AiBubble } from "./ai-bubble/ai-bubble";
+import { ScreenContextProvider } from "./ai-bubble/screen-context";
 
 export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const { tenant, me, branch } = await getTenant();
@@ -63,9 +65,13 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const rank = (item: NavItem) => order.findIndex((key) => g(key) === item.group);
   items.sort((a, b) => rank(a) - rank(b));
 
+  // The floating AI chat: for whoever may use the assistant, in a business that has the AI module.
+  const aiBubble = canUseAssistant(tenant) && tenant.modules.some((m) => m === "ai_basic" || m === "ai_pro");
+
   // The business's brand color replaces the product color inside its own area.
   return (
     <ScopedMessages scopes={["app", "tenant"]}>
+    <ScreenContextProvider>
     <div style={brandStyle(brandColor)} className="brand flex flex-1 flex-col md:flex-row">
       <aside className="nav-dark print:hidden max-md:border-b max-md:border-border md:sticky md:top-16 md:h-[calc(100dvh-4rem)] md:w-64 md:shrink-0 md:overflow-y-auto">
         <WorkspaceSwitcher
@@ -98,6 +104,8 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
         {children}
       </div>
     </div>
+    {aiBubble && <AiBubble />}
+    </ScreenContextProvider>
     </ScopedMessages>
   );
 }

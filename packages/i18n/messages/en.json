@@ -1788,6 +1788,14 @@
       "staff": "Staff"
     }
   },
+  "aiBubble": {
+    "open": "Ask {name} or the AI team",
+    "close": "Close the chat",
+    "openFull": "Open in the full team",
+    "fan": "Choose who to ask",
+    "about": "About: {what}",
+    "screenClient": "Client: {name}"
+  },
   "modules": {
     "title": "Modules and plan",
     "subtitle": "Priced by what you use. Core depends on active clients (now: {count}).",
