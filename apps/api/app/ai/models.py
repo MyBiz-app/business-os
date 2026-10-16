@@ -50,6 +50,18 @@ MODELS: dict[str, ModelInfo] = {
 DEAREST = "claude-opus-5-5"
 
 
+# Models the console chose for a tier (platform_ai_settings); refreshed from the database on
+# requests, so every API process follows a change within one request.
+OVERRIDES: dict[Tier, str] = {}
+
+
+def set_overrides(fast: str | None, standard: str | None, strong: str | None) -> None:
+    OVERRIDES.clear()
+    for tier, model in (("fast", fast), ("standard", standard), ("strong", strong)):
+        if model in MODELS and MODELS[model].vendor in ENABLED_VENDORS:
+            OVERRIDES[tier] = model  # type: ignore[index]
+
+
 def prices_of(model: str) -> tuple[float, float, float, float]:
     return MODELS.get(model, MODELS[DEAREST]).prices
 
@@ -58,6 +70,8 @@ def model_for_tier(tier: Tier, vendor: str = "anthropic") -> str:
     """The model that serves a tier. Anthropic's tiers come from settings (the console can
     change them); other vendors use the first registry entry of that tier."""
     if vendor == "anthropic":
+        if tier in OVERRIDES:
+            return OVERRIDES[tier]
         settings = get_settings()
         configured = {
             "fast": settings.ai_model,

@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
-from app.ai.models import MODELS, clean_text, prices_of
+from app.ai.models import MODELS, clean_text, model_for_tier, prices_of
 from app.core.config import get_settings
 
 
@@ -228,8 +228,8 @@ def get_provider() -> LLMProvider | None:
         return None
     return AnthropicProvider(
         settings.anthropic_api_key.get_secret_value(),
-        settings.ai_model,
-        settings.ai_strong_model,
+        model_for_tier("fast"),
+        model_for_tier("standard"),
         settings.ai_max_tokens,
         settings.ai_timeout_seconds,
     )
