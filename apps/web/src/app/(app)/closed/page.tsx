@@ -1,7 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
-import { signOut } from "@/app/(auth)/actions";
+import { signOutToLogin } from "@/app/(auth)/actions";
 import { getApi } from "@/lib/api";
 import { getActiveMembership } from "@/lib/tenant";
 
@@ -42,7 +42,7 @@ export default async function ClosedPage() {
           <p className="text-sm text-muted">{t("notOwner", { name: membership.tenant_name })}</p>
         )}
       </section>
-      <form action={signOut} className="text-center">
+      <form action={signOutToLogin} className="text-center">
         <button type="submit" className="text-sm text-primary underline">
           {t("signOut")}
         </button>

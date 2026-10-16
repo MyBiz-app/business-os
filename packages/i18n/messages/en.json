@@ -2116,6 +2116,7 @@
     "openDocument": "Open the document"
   },
   "marketing": {
+    "signedOut": "You signed out successfully. See you soon.",
     "nav": {
       "features": "Features",
       "industries": "Industries",
