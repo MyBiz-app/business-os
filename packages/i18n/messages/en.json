@@ -748,7 +748,24 @@
     "logoUpload": "Upload logo",
     "logoRemove": "Back to the network's logo",
     "color": "Branch color",
-    "colorNetwork": "Use the network's color"
+    "colorNetwork": "Use the network's color",
+    "groups": {
+      "title": "Branch groups",
+      "hint": "Group branches (for example a district) so a message, a report or an AI agent can be pointed at all of them at once. A branch can be in several groups.",
+      "empty": "No groups yet.",
+      "name": "Group name",
+      "branches": "Branches in the group",
+      "save": "Save group",
+      "add": "Add group",
+      "new": "New group",
+      "delete": "Delete group",
+      "confirmDelete": "Delete the group \"{name}\"? The branches are not deleted."
+    },
+    "scope": {
+      "legend": "Branches",
+      "all": "All branches",
+      "count": "{selected, plural, =0 {No branches selected} one {1 branch selected of {total}} other {# branches selected of {total}}}"
+    }
   },
   "team": {
     "title": "Team",

@@ -222,3 +222,38 @@ export async function updateNetworkScope(_state: FormState, formData: FormData):
   revalidatePath("/", "layout");
   return { saved: true };
 }
+
+/** Creates (`groupId` null) or updates a branch group: its name and the branches in it. */
+export async function saveLocationGroup(
+  groupId: string | null,
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const { api, scope } = await getTenant();
+  const body = {
+    name: value(formData, "name"),
+    location_ids: formData.getAll("location_id").map(String),
+  };
+  try {
+    if (groupId === null) {
+      unwrap(await api.POST("/location-groups", { params: scope, body }));
+    } else {
+      unwrap(
+        await api.PATCH("/location-groups/{group_id}", {
+          params: { ...scope, path: { group_id: groupId } },
+          body,
+        }),
+      );
+    }
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/locations");
+  return { saved: true };
+}
+
+export async function deleteLocationGroup(groupId: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  await api.DELETE("/location-groups/{group_id}", { params: { ...scope, path: { group_id: groupId } } });
+  revalidatePath("/locations");
+}
