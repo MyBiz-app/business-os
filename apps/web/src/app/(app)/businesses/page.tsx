@@ -101,12 +101,12 @@ export default async function BusinessesPage() {
                   <Stat
                     icon={<Users className="size-4" />}
                     label={t("activeClients")}
-                    value={business.active_clients === null ? "—" : number.format(business.active_clients)}
+                    value={business.active_clients === null ? "-" : number.format(business.active_clients)}
                   />
                   <Stat
                     icon={<Wallet className="size-4" />}
                     label={t("revenue")}
-                    value={business.revenue_month === null ? "—" : formatMoney(business.revenue_month, business.currency, locale)}
+                    value={business.revenue_month === null ? "-" : formatMoney(business.revenue_month, business.currency, locale)}
                   />
                 </dl>
 

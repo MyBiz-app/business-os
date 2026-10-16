@@ -14,7 +14,7 @@ to know when the technician is on the way. Today an appointment happens at the b
 ## Model
 
 - **An on-site service** is an appointment service marked `on_site`, with `travel_minutes`
-  (the time to get there, 0–240). It keeps everything appointments already have: a technician
+  (the time to get there, 0-240). It keeps everything appointments already have: a technician
   (the staff member), working hours, time off, free times, no double booking.
 - **Travel time blocks the technician before the job**: a job from 10:00 with 30 minutes of
   travel takes the technician from 09:30. Free times and the database check both count it, so two

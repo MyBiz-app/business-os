@@ -135,7 +135,7 @@ export default function Jobs() {
             {next && (
               <Button
                 label={t(`actions.${next as Exclude<JobStatus, "scheduled">}`)}
-                accessibilityLabel={`${t(`actions.${next as Exclude<JobStatus, "scheduled">}`)} – ${job.client_name ?? job.service_name}`}
+                accessibilityLabel={`${t(`actions.${next as Exclude<JobStatus, "scheduled">}`)} - ${job.client_name ?? job.service_name}`}
                 palette={palette}
                 busy={busy === job.session_id}
                 onPress={() => void move(job, next)}

@@ -28,7 +28,7 @@ export default async function TimeOffRequestsPage() {
   const decided = requests.flatMap((request) => (request.status === "pending" ? [] : [{ ...request, status: request.status }]));
   // Requests carry plain calendar dates, so format them without any zone shift.
   const day = (iso: string) => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
-  const period = (from: string, to: string) => (from === to ? day(from) : `${day(from)} – ${day(to)}`);
+  const period = (from: string, to: string) => (from === to ? day(from) : `${day(from)} - ${day(to)}`);
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">

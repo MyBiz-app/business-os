@@ -25,7 +25,7 @@ __pycache__/
 ios/
 android/
 
-# Env and secrets — never commit
+# Env and secrets - never commit
 .env
 .env.*
 !.env.example

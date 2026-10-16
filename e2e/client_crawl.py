@@ -1,5 +1,5 @@
-"""Client app review (#39): a client of a busy demo business visits every screen on a phone —
-Hebrew light and English dark — and the crawl reports accessibility issues, horizontal
+"""Client app review (#39): a client of a busy demo business visits every screen on a phone -
+Hebrew light and English dark - and the crawl reports accessibility issues, horizontal
 overflow and console errors, with a screenshot of each screen.
 
     uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \\

@@ -71,7 +71,7 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
                   <form action={setDependentActive.bind(null, clientId, dependent.id, !dependent.active)}>
                     <button
                       type="submit"
-                      aria-label={`${dependent.active ? t("retire") : t("restore")} – ${dependent.name}`}
+                      aria-label={`${dependent.active ? t("retire") : t("restore")} - ${dependent.name}`}
                       className="btn-secondary px-2.5 py-1 text-xs"
                     >
                       {dependent.active ? t("retire") : t("restore")}

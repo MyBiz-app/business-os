@@ -57,7 +57,7 @@ export function HoursForm({
                 {mine.map(({ block, index }) => (
                   <div key={index} className="flex flex-wrap items-center gap-2">
                     <label className="flex items-center gap-2 text-sm">
-                      <span className="sr-only">{`${names[day]} – ${t("from")}`}</span>
+                      <span className="sr-only">{`${names[day]} - ${t("from")}`}</span>
                       <input
                         type="time"
                         step={900}
@@ -67,9 +67,9 @@ export function HoursForm({
                         dir="ltr"
                       />
                     </label>
-                    <span aria-hidden="true">–</span>
+                    <span aria-hidden="true">-</span>
                     <label className="flex items-center gap-2 text-sm">
-                      <span className="sr-only">{`${names[day]} – ${t("to")}`}</span>
+                      <span className="sr-only">{`${names[day]} - ${t("to")}`}</span>
                       <input
                         type="time"
                         step={900}
@@ -81,7 +81,7 @@ export function HoursForm({
                     </label>
                     <button
                       type="button"
-                      aria-label={`${t("remove")} – ${names[day]} ${block.starts}–${block.ends}`}
+                      aria-label={`${t("remove")} - ${names[day]} ${block.starts}-${block.ends}`}
                       onClick={() => setBlocks((current) => current.filter((_, i) => i !== index))}
                       className="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-danger/10 hover:text-danger"
                     >
@@ -94,7 +94,7 @@ export function HoursForm({
                 type="button"
                 onClick={() => setBlocks((current) => [...current, { weekday: day, starts: "09:00", ends: "17:00" }])}
                 className="btn-secondary px-3 py-1.5 text-sm"
-                aria-label={`${t("addBlock")} – ${names[day]}`}
+                aria-label={`${t("addBlock")} - ${names[day]}`}
               >
                 <Plus aria-hidden="true" className="size-4" />
                 {t("addBlock")}

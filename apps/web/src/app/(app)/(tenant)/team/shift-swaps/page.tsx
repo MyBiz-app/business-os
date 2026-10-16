@@ -30,7 +30,7 @@ export default async function ShiftSwapsPage() {
   const others = swaps.filter((swap) => swap.status !== "pending_manager");
   const when = (swap: (typeof swaps)[number]) =>
     `${formatDay(dayOf(swap.starts_at, tenant.time_zone), locale, { weekday: "short", day: "numeric", month: "short" })} ` +
-    `${formatTime(swap.starts_at, locale, tenant.time_zone)}–${formatTime(swap.ends_at, locale, tenant.time_zone)} · ${swap.location_name}`;
+    `${formatTime(swap.starts_at, locale, tenant.time_zone)}-${formatTime(swap.ends_at, locale, tenant.time_zone)} · ${swap.location_name}`;
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">

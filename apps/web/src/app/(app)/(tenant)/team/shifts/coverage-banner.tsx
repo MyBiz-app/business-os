@@ -35,7 +35,7 @@ export function CoverageBanner({ gaps, locale, showBranch, roster }: { gaps: Boa
               <span className="flex flex-wrap items-center gap-x-2">
                 <span className="font-medium">{formatDay(g.day, locale, { weekday: "short", day: "numeric", month: "short" })}</span>
                 {showBranch && <span dir="auto" className="text-muted">{g.locationName}</span>}
-                <span dir="ltr" className="tabular-nums">{g.starts}–{g.ends}</span>
+                <span dir="ltr" className="tabular-nums">{g.starts}-{g.ends}</span>
                 <span className="text-muted">{t("coverage.gap", { have: g.have, needed: g.needed })}</span>
               </span>
               {roster && (

@@ -234,7 +234,7 @@ export default async function BillingPage() {
                   <tr key={invoice.id} className="border-b border-border last:border-0">
                     <td className="py-3 tabular-nums"><Ltr>{invoice.number}</Ltr></td>
                     <td className="py-3">
-                      {formatDay(invoice.period_start, locale, { day: "numeric", month: "short" })} –{" "}
+                      {formatDay(invoice.period_start, locale, { day: "numeric", month: "short" })} -{" "}
                       {formatDay(invoice.period_end, locale, { day: "numeric", month: "short", year: "numeric" })}
                     </td>
                     <td className="py-3">

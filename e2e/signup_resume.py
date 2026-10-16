@@ -40,7 +40,7 @@ with sync_playwright() as p:
     print("signed in from a third browser: back at the payment step")
 
     # "Not now" still leads to the welcome page (sample business).
-    third.get_by_role("link", name="Not now – explore a sample business first").click()
+    third.get_by_role("link", name="Not now - explore a sample business first").click()
     third.wait_for_url("**/welcome?fresh=1")
     expect(third.get_by_role("heading", level=1)).to_be_visible()
 

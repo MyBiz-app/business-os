@@ -1,7 +1,7 @@
 # Business workspace upgrade (October 2026): gap analysis and plan
 
 The owner's 16-section requirements list (project thread, 2026-10-10) asks to take the business
-web app (the "CRM") and the site from "70–80% there" to a premium business operating system.
+web app (the "CRM") and the site from "70-80% there" to a premium business operating system.
 This document maps each section to what already exists, lists the gaps, and orders the work in
 phases. Every phase ships as small pull requests that keep tenant isolation, i18n/RTL, dark mode
 and accessibility intact. Choices made without the owner (he asked for work to continue
@@ -36,12 +36,12 @@ revisited.
 | 2 | Business ID | Free-text `tax_id` on the MyBiz billing details only | Legal entity type + validated identifier on the business (Israeli check digit for ח.פ. / עוסק מורשה / עמותה; free format for other countries); visible only to owners and managers |
 | 3 | Live data | Server actions revalidate the page after own changes | Refresh shared screens (calendar, dashboard, shifts) when the tab returns to focus and every minute while visible; pending/success/error states on forms |
 | 4 | Employee scheduling | Weekly availability per person, time off | Shifts (per person, branch, date, time, role note), week board by person/branch, overlap detection, copy week; branch opening hours with breaks; one-person businesses get the simple "opening hours and availability" view instead of a shift board |
-| 5 | Org hierarchy | — | `job_title` and `reports_to` per membership (no cycles), a collapsible org chart with avatars, titles and branches; reporting never changes permissions |
+| 5 | Org hierarchy | - | `job_title` and `reports_to` per membership (no cycles), a collapsible org chart with avatars, titles and branches; reporting never changes permissions |
 | 6 | Business / branch selector | `<details>` menu for businesses + a native `<select>` for branches | One popover: networks with their branches nested, search when long, keyboard and click-outside, no clipping, RTL, animated |
 | 7 | Multi-branch | One current branch or "all" | Branch comparison report (revenue, sessions, attendance, new clients, appointments) and a multi-branch calendar filter with branch colors; never beyond the person's branches |
 | 8 | Calendar | Week as seven columns of cards | Day and week time grid with a live "now" line, today highlighted, scroll to the current hour, shifts and closed periods drawn differently from sessions |
 | 9 | Workspace images | Logo, brand color | A cover image for the business (dashboard header, menu) with a tasteful default |
-| 10 | Themes | Light / dark / system, indigo accent | Three palettes: **MyBiz** (black, white, deep purple — default), **Ocean**, **Forest**; per person, remembered; contrast checked in both modes |
+| 10 | Themes | Light / dark / system, indigo accent | Three palettes: **MyBiz** (black, white, deep purple - default), **Ocean**, **Forest**; per person, remembered; contrast checked in both modes |
 | 11 | Buttons, navigation | `btn-primary` / `btn-secondary`, side menu | Lighter, consistent button sizes; a submit button with spinner and double-submit guard; a back link / breadcrumb on detail pages; dropdowns per section 6 |
 | 12 | Performance | Server components, a `loading.tsx` for the business area | Measure each navigation; remove sequential API round trips in the layout; skeletons per page; prefetch |
 | 13 | Demo data | Demos per industry (studio, club, pets, jobs, events, office, owner, platform) | Shifts, opening hours, hierarchy, titles, cover images in every demo |
@@ -79,16 +79,16 @@ revisited.
 
 ## Phases and pull requests
 
-1. **Architecture and data model** — migration 0057: avatars and phone on users; job title and
+1. **Architecture and data model** - migration 0057: avatars and phone on users; job title and
    reports-to on memberships; legal entity and business number on tenants; branch opening hours;
    shifts. API endpoints with permissions and tenant-isolation tests.
-2. **Core functionality** — profile page with picture; business ID in settings and sign-up;
+2. **Core functionality** - profile page with picture; business ID in settings and sign-up;
    opening hours per branch; shift board; org chart; branch comparison report; time-grid calendar
    with the now line and multi-branch filter; cover image.
-3. **UI/UX** — the network/branch popover; header profile menu; buttons and submit states; back
+3. **UI/UX** - the network/branch popover; header profile menu; buttons and submit states; back
    links; the three palettes; workspace cover.
-4. **Performance** — measure, parallelize the layout's API calls, skeletons, prefetch.
-5. **Demo and validation** — demo data for all of the above; the `networks` demo owner; e2e checks
+4. **Performance** - measure, parallelize the layout's API calls, skeletons, prefetch.
+5. **Demo and validation** - demo data for all of the above; the `networks` demo owner; e2e checks
    for the new screens; STATUS and DECISIONS updated.
 
 ## Progress

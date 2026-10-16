@@ -7,7 +7,7 @@ import { formatMoney, minorDigits } from "@/lib/money";
 
 type Props = {
   value: number;
-  /** money: minor units; percent: 0–100. */
+  /** money: minor units; percent: 0-100. */
   kind: "money" | "percent" | "count";
   currency?: string;
   durationMs?: number;

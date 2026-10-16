@@ -10,7 +10,7 @@ import { useBusiness } from "@/providers/business-provider";
 
 const ERRORS = ["already_reviewed", "not_reviewable"] as const;
 
-/** Rate a visit: 1–5 stars and an optional comment. */
+/** Rate a visit: 1-5 stars and an optional comment. */
 export default function Review() {
   const t = useTranslations("client.review");
   const { id, service } = useLocalSearchParams<{ id: string; service?: string }>();

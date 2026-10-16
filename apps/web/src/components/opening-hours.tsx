@@ -14,7 +14,7 @@ export async function OpeningHoursList({ hours, weekStartsOn }: { hours: { weekd
           <div key={day} className="contents">
             <dt className="font-medium">{names[day]}</dt>
             <dd className={intervals.length ? "tabular-nums" : "text-muted"} dir={intervals.length ? "ltr" : undefined}>
-              {intervals.length ? intervals.map((h) => `${h.opens.slice(0, 5)}–${h.closes.slice(0, 5)}`).join(", ") : tOpening("closed")}
+              {intervals.length ? intervals.map((h) => `${h.opens.slice(0, 5)}-${h.closes.slice(0, 5)}`).join(", ") : tOpening("closed")}
             </dd>
           </div>
         );

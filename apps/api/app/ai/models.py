@@ -82,7 +82,7 @@ def vendor_enabled(vendor: str) -> bool:
     return vendor in ENABLED_VENDORS
 
 
-_DASHES = re.compile(r"\s*[–—]\s*")
+_DASHES = re.compile(r"\s*[\u2013\u2014]\s*")
 
 
 def clean_text(value: str) -> str:

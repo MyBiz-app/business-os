@@ -135,7 +135,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
             <form key={next} action={setBookingStatus.bind(null, session.id, booking.id, next)}>
               <button
                 type="submit"
-                aria-label={`${t(`actions.${next}`)} – ${booking.dependent_name ?? booking.client_name}`}
+                aria-label={`${t(`actions.${next}`)} - ${booking.dependent_name ?? booking.client_name}`}
                 className={`btn-secondary px-2.5 py-1 text-xs font-medium ${next === "cancelled" ? "text-danger" : ""}`}
               >
                 {t(`actions.${next}`)}
@@ -205,7 +205,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                           <form key={choice.id ?? "none"} action={bookClient.bind(null, session.id, client.id, choice.id)}>
                             <button
                               type="submit"
-                              aria-label={`${label} – ${tDependents("bookFor", { dependent: choice.name, owner: name })}`}
+                              aria-label={`${label} - ${tDependents("bookFor", { dependent: choice.name, owner: name })}`}
                               className="btn-primary px-3 py-1 text-xs"
                             >
                               <span dir="auto">{choice.name}</span>
@@ -217,7 +217,7 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                       <form action={bookClient.bind(null, session.id, client.id, undefined)}>
                         <button
                           type="submit"
-                          aria-label={`${label} – ${name}`}
+                          aria-label={`${label} - ${name}`}
                           className="btn-primary px-3 py-1 text-xs"
                         >
                           {label}

@@ -709,8 +709,8 @@ export const CATALOG: Entry[] = [
         "default_services": [
           {
             "names": {
-              "he": "לייזר — אזור קטן",
-              "en": "Laser — small area"
+              "he": "לייזר - אזור קטן",
+              "en": "Laser - small area"
             },
             "duration_minutes": 20,
             "booking_mode": "appointment",
@@ -721,8 +721,8 @@ export const CATALOG: Entry[] = [
           },
           {
             "names": {
-              "he": "לייזר — אזור גדול",
-              "en": "Laser — large area"
+              "he": "לייזר - אזור גדול",
+              "en": "Laser - large area"
             },
             "duration_minutes": 45,
             "booking_mode": "appointment",
@@ -733,8 +733,8 @@ export const CATALOG: Entry[] = [
           },
           {
             "names": {
-              "he": "לייזר — גוף מלא",
-              "en": "Laser — full body"
+              "he": "לייזר - גוף מלא",
+              "en": "Laser - full body"
             },
             "duration_minutes": 90,
             "booking_mode": "appointment",
@@ -1117,8 +1117,8 @@ export const CATALOG: Entry[] = [
         "default_plans": [
           {
             "names": {
-              "he": "ליווי — 4 פגישות מעקב",
-              "en": "Coaching — 4 follow-ups"
+              "he": "ליווי - 4 פגישות מעקב",
+              "en": "Coaching - 4 follow-ups"
             },
             "kind": "punch_card",
             "validity_days": 90,

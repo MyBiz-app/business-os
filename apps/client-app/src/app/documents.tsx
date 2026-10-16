@@ -86,7 +86,7 @@ export default function Documents() {
           <Text style={[styles.muted, { color: palette.muted }]}>
             {t(`kinds.${document.kind}`)} · {date.format(new Date(document.created_at))}
           </Text>
-          <Button label={t("open")} accessibilityLabel={`${t("open")} – ${document.name}`} variant="secondary" palette={palette} onPress={() => void open(document)} />
+          <Button label={t("open")} accessibilityLabel={`${t("open")} - ${document.name}`} variant="secondary" palette={palette} onPress={() => void open(document)} />
           {document.sign_requested && !document.signed_at && (
             signing === document.id ? (
               <View style={{ gap: 8 }}>
@@ -94,7 +94,7 @@ export default function Documents() {
                 <Button label={t("sign")} palette={palette} disabled={!name.trim()} onPress={() => void sign(document)} />
               </View>
             ) : (
-              <Button label={t("sign")} accessibilityLabel={`${t("sign")} – ${document.name}`} palette={palette} onPress={() => setSigning(document.id)} />
+              <Button label={t("sign")} accessibilityLabel={`${t("sign")} - ${document.name}`} palette={palette} onPress={() => setSigning(document.id)} />
             )
           )}
         </Card>

@@ -191,7 +191,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           day: s.day,
           start,
           end: sameDay ? minutesIn(raw.ends_at, tenant.time_zone) : 1440,
-          time: `${s.starts}–${s.ends}`,
+          time: `${s.starts}-${s.ends}`,
           title: people.find((p) => p.id === s.userId)?.name ?? "",
           detail: s.draft ? t("shifts.publish.draft") : s.isCover ? t("shifts.coverFrom", { branch: s.homeName ?? "" }) : (s.stationName ?? s.position),
           color: s.color,
@@ -212,7 +212,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
       ? formatDay(win.start, locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" })
       : range === "month"
         ? formatDay(win.start, locale, { month: "long", year: "numeric" })
-        : `${formatDay(win.start, locale, { day: "numeric", month: "short" })} – ${formatDay(last, locale, { day: "numeric", month: "short", year: "numeric" })}`;
+        : `${formatDay(win.start, locale, { day: "numeric", month: "short" })} - ${formatDay(last, locale, { day: "numeric", month: "short", year: "numeric" })}`;
   const showToday = !days.includes(today);
   const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((id) => b.includes(id));
   const savedView = tenant.shifts_default_view ?? "people";
@@ -298,7 +298,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           locale={locale}
           events={gridEvents}
           shifts={[]}
-          gaps={gaps.map((g) => ({ laneId: g.locationId, day: g.day, start: g.startMinute, end: g.endMinute, label: `${g.locationName} ${g.starts}–${g.ends}: ${t("shifts.coverage.gap", { have: g.have, needed: g.needed })}` }))}
+          gaps={gaps.map((g) => ({ laneId: g.locationId, day: g.day, start: g.startMinute, end: g.endMinute, label: `${g.locationName} ${g.starts}-${g.ends}: ${t("shifts.coverage.gap", { have: g.have, needed: g.needed })}` }))}
           lanes={branchList.filter((b) => shown.includes(b.id)).map((b) => ({ id: b.id, name: b.name, color: b.color }))}
           closed={{}}
           open={null}

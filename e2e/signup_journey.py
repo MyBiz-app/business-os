@@ -47,13 +47,13 @@ with sync_playwright() as p:
     page.get_by_role("button", name="המשך").click()  # the name is required
     expect(page.get_by_role("heading", level=1)).to_have_text("ספרו לנו על הברברשופ")
     page.get_by_label("שם העסק").fill("המספרה של שירה")
-    page.get_by_text("101–300").click()
+    page.get_by_text("101-300").click()
     page.get_by_role("button", name="יותר סניפים").click()
     check(page, "2-business")
     page.get_by_role("button", name="המשך").click()
 
     # The size cards: the business's own size is chosen, the others are a tap away.
-    expect(page.get_by_role("button", name=re.compile("101–300"))).to_have_attribute("aria-pressed", "true")
+    expect(page.get_by_role("button", name=re.compile("101-300"))).to_have_attribute("aria-pressed", "true")
     expect(page.get_by_role("button", name=re.compile("לקוחות פעילים"))).to_have_count(4)
     expect(page.get_by_text("סניף נוסף אחד", exact=False)).to_be_visible()
     assert cart_total(page) == "178₪", cart_total(page)

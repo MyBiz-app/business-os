@@ -66,7 +66,7 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
                         {entry.tenant_name}
                       </Link>
                     ) : (
-                      "—"
+                      "-"
                     )}
                   </td>
                   <td className="px-4 py-2.5 text-muted" dir="ltr">{detail(entry.details)}</td>

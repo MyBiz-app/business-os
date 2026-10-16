@@ -151,7 +151,7 @@ export default function MySchedule() {
   const incoming = swaps.filter((swap) => swap.to_user_id === userId && swap.status === "pending_colleague");
   const mine = swaps.filter((swap) => swap.from_user_id === userId);
   const swapWhen = (swap: ShiftSwap) =>
-    `${dayLabel(dayOf(swap.starts_at, timeZone))}  ${formatTime(swap.starts_at, locale, timeZone)}–${formatTime(swap.ends_at, locale, timeZone)} · ${swap.location_name}`;
+    `${dayLabel(dayOf(swap.starts_at, timeZone))}  ${formatTime(swap.starts_at, locale, timeZone)}-${formatTime(swap.ends_at, locale, timeZone)} · ${swap.location_name}`;
   const now = new Date();
 
   return (
@@ -167,7 +167,7 @@ export default function MySchedule() {
           <ListRow
             key={shift.id}
             palette={palette}
-            title={`${dayLabel(dayOf(shift.starts_at, timeZone))}  ${formatTime(shift.starts_at, locale, timeZone)}–${formatTime(shift.ends_at, locale, timeZone)}`}
+            title={`${dayLabel(dayOf(shift.starts_at, timeZone))}  ${formatTime(shift.starts_at, locale, timeZone)}-${formatTime(shift.ends_at, locale, timeZone)}`}
             subtitle={[shift.location_name, shift.position].filter(Boolean).join(" · ")}
             trailing={shift.is_cover ? <Badge label={t("cover")} palette={palette} /> : undefined}
             onPress={canOfferSwap(shift, swaps, now) ? () => setOffering(shift.id) : undefined}

@@ -69,9 +69,9 @@ export default function Numbers() {
 
   const number = new Intl.NumberFormat(locale);
   const percent = (value: number | null | undefined) =>
-    value === null || value === undefined ? "—" : `${number.format(Math.round(value))}%`;
+    value === null || value === undefined ? "-" : `${number.format(Math.round(value))}%`;
   const show = (unit: string, value: number | null) => {
-    if (value === null) return "—";
+    if (value === null) return "-";
     if (unit === "money") return formatMoney(Math.round(value), tenant.currency, locale);
     if (unit === "percent") return percent(value);
     return number.format(value);
@@ -178,7 +178,7 @@ export default function Numbers() {
         <ListRow
           key={row.key}
           palette={palette}
-          title={row.label ?? "—"}
+          title={row.label ?? "-"}
           subtitle={t("breakdownLine", {
             sessions: row.sessions,
             attended: row.attended,
