@@ -85,6 +85,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "businesses",
     "clientFields",
     "common",
+    "content",
     "marketing",
     "modules",
     "nav",
@@ -98,6 +99,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
   "app": [
     "accessibility",
     "account",
+    "app",
     "appearance",
     "auth",
     "clientFields",

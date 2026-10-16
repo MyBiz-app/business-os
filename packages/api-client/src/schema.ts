@@ -2077,6 +2077,198 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/broadcasts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Broadcasts */
+        get: operations["list_broadcasts"];
+        put?: never;
+        /** Create Broadcast */
+        post: operations["create_broadcast"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/broadcasts/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview
+         * @description Who would get it right now: people counted once however many groups they are in.
+         */
+        post: operations["preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/broadcasts/{announcement_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Broadcast */
+        get: operations["get_broadcast"];
+        /**
+         * Update Broadcast
+         * @description Only a draft or a scheduled message can still be changed; a scheduled one goes back to
+         *     a draft, so it is checked again before it is scheduled.
+         */
+        put: operations["update_broadcast"];
+        post?: never;
+        /** Delete Broadcast */
+        delete: operations["delete_broadcast"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/broadcasts/{announcement_id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Schedule Broadcast */
+        post: operations["schedule_broadcast"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/broadcasts/{announcement_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel Broadcast */
+        post: operations["cancel_broadcast"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/broadcasts/{announcement_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Test
+         * @description Sends the email version to the signed-in team member alone, to see how it looks.
+         */
+        post: operations["send_test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Announcements
+         * @description The pop-ups meant for the signed-in person, not yet dismissed, in their language.
+         */
+        get: operations["my_announcements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/announcements/{announcement_id}/{event}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark Announcement */
+        post: operations["mark_announcement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/marketing-consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Marketing Consent
+         * @description Agree to (or stop) marketing messages; service messages are sent either way.
+         */
+        put: operations["set_marketing_consent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/announcements/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unsubscribe
+         * @description The opt-out link in a marketing email (the link is signed; no sign-in needed).
+         */
+        get: operations["unsubscribe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/locations/{location_id}/hours": {
         parameters: {
             query?: never;
@@ -6180,6 +6372,60 @@ export interface components {
             /** Limits */
             limits: components["schemas"]["CreditLimit"][];
         };
+        /** Announcement */
+        Announcement: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "marketing" | "service";
+            /** Channels */
+            channels: ("email" | "push" | "popup" | "whatsapp" | "sms")[];
+            audience: components["schemas"]["StoredAudience"];
+            /** Content */
+            content: {
+                [key: string]: components["schemas"]["Texts"];
+            };
+            /** Scheduled At */
+            scheduled_at: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "draft" | "scheduled" | "sending" | "sent" | "cancelled";
+            /** Recipient Count */
+            recipient_count: number | null;
+            /** Created By */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Sent At */
+            sent_at: string | null;
+            stats: components["schemas"]["DeliveryStats"];
+        };
+        /** AnnouncementBody */
+        AnnouncementBody: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "marketing" | "service";
+            /** Channels */
+            channels: ("email" | "push" | "popup" | "whatsapp" | "sms")[];
+            audience: components["schemas"]["Audience"];
+            /** Content */
+            content?: {
+                [key: string]: components["schemas"]["Texts"];
+            };
+        };
         /** Answer */
         "Answer-Input": {
             /** Accept */
@@ -6288,6 +6534,21 @@ export interface components {
             count: number;
             /** Items */
             items: components["schemas"]["AttentionItem"][];
+        };
+        /** Audience */
+        Audience: {
+            /** Groups */
+            groups?: ("team" | "owners" | "staff" | "clients")[];
+            /** Verticals */
+            verticals?: string[];
+            /** Locales */
+            locales?: ("he" | "en")[];
+            /** Business Ids */
+            business_ids?: string[];
+            /** Modules */
+            modules?: string[];
+            /** Status */
+            status?: ("trial" | "active") | null;
         };
         /** AudienceCount */
         AudienceCount: {
@@ -7745,6 +8006,11 @@ export interface components {
             /** Authorize Url */
             authorize_url?: string | null;
         };
+        /** ConsentBody */
+        ConsentBody: {
+            /** Consent */
+            consent: boolean;
+        };
         /** ContactCreate */
         ContactCreate: {
             /** Name */
@@ -8207,6 +8473,48 @@ export interface components {
              * @constant
              */
             accept: true;
+        };
+        /** DeliveryStats */
+        DeliveryStats: {
+            /**
+             * Queued
+             * @default 0
+             */
+            queued: number;
+            /**
+             * Sent
+             * @default 0
+             */
+            sent: number;
+            /**
+             * Failed
+             * @default 0
+             */
+            failed: number;
+            /**
+             * Skipped
+             * @default 0
+             */
+            skipped: number;
+            /**
+             * Viewed
+             * @default 0
+             */
+            viewed: number;
+            /**
+             * Clicked
+             * @default 0
+             */
+            clicked: number;
+            /**
+             * Unsubscribed
+             * @default 0
+             */
+            unsubscribed: number;
+            /** Sent By Channel */
+            sent_by_channel?: {
+                [key: string]: number;
+            };
         };
         /** Dependent */
         Dependent: {
@@ -9813,6 +10121,22 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** MyAnnouncement */
+        MyAnnouncement: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "marketing" | "service";
+            texts: components["schemas"]["Texts"];
+            /** Sent At */
+            sent_at: string | null;
+        };
         /** MyBooking */
         MyBooking: {
             /**
@@ -10454,7 +10778,7 @@ export interface components {
          * PlatformPermission
          * @enum {string}
          */
-        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage";
+        PlatformPermission: "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage";
         /** Point */
         Point: {
             /**
@@ -10464,6 +10788,32 @@ export interface components {
             bucket: string;
             /** Value */
             value: number;
+        };
+        /** Preview */
+        Preview: {
+            /** Total */
+            total: number;
+            /** Email */
+            email: number;
+            /** Push */
+            push: number;
+            /** Popup */
+            popup: number;
+            /** Phone */
+            phone: number;
+            /** By Group */
+            by_group: {
+                [key: string]: number;
+            };
+        };
+        /** PreviewBody */
+        PreviewBody: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "marketing" | "service";
+            audience: components["schemas"]["Audience"];
         };
         /** Proactive */
         Proactive: {
@@ -11614,34 +11964,6 @@ export interface components {
             /** Tenant Id */
             tenant_id: string;
         };
-        /** ScheduleBody */
-        ScheduleBody: {
-            /**
-             * Frequency
-             * @enum {string}
-             */
-            frequency: "once" | "daily" | "weekly" | "monthly";
-            /**
-             * Time
-             * @description Local HH:MM
-             */
-            time: string;
-            /**
-             * Date
-             * @description YYYY-MM-DD, for once
-             */
-            date?: string | null;
-            /**
-             * Weekdays
-             * @description 0 = Monday .. 6 = Sunday
-             */
-            weekdays?: number[] | null;
-            /**
-             * Day Of Month
-             * @description 1-28, for monthly
-             */
-            day_of_month?: number | null;
-        };
         /** ScheduleOptions */
         ScheduleOptions: {
             /** Services */
@@ -12599,6 +12921,24 @@ export interface components {
             /** Sort Order */
             sort_order?: number | null;
         };
+        /**
+         * StoredAudience
+         * @description An audience as stored: every key is present.
+         */
+        StoredAudience: {
+            /** Groups */
+            groups: ("team" | "owners" | "staff" | "clients")[];
+            /** Verticals */
+            verticals: string[];
+            /** Locales */
+            locales: ("he" | "en")[];
+            /** Business Ids */
+            business_ids: string[];
+            /** Modules */
+            modules: string[];
+            /** Status */
+            status: ("trial" | "active") | null;
+        };
         /** SupportAccess */
         SupportAccess: {
             /**
@@ -12734,7 +13074,7 @@ export interface components {
             title?: string | null;
             /** Instruction */
             instruction?: string | null;
-            schedule?: components["schemas"]["ScheduleBody"] | null;
+            schedule?: components["schemas"]["app__api__ai_tasks__ScheduleBody"] | null;
         };
         /** Tasks */
         Tasks: {
@@ -13051,6 +13391,41 @@ export interface components {
              * @enum {string}
              */
             brand: "visa" | "mastercard" | "amex";
+        };
+        /** TestResult */
+        TestResult: {
+            /** Sent To */
+            sent_to: string;
+            /** Email */
+            email: boolean;
+        };
+        /** Texts */
+        Texts: {
+            /**
+             * Subject
+             * @default
+             */
+            subject: string;
+            /**
+             * Body
+             * @default
+             */
+            body: string;
+            /**
+             * Cta Label
+             * @default
+             */
+            cta_label: string;
+            /**
+             * Cta Url
+             * @default
+             */
+            cta_url: string;
+            /**
+             * Image Url
+             * @default
+             */
+            image_url: string;
         };
         /** Tick */
         Tick: {
@@ -13419,6 +13794,34 @@ export interface components {
              */
             expected_active_clients: number;
         };
+        /** ScheduleBody */
+        app__api__ai_tasks__ScheduleBody: {
+            /**
+             * Frequency
+             * @enum {string}
+             */
+            frequency: "once" | "daily" | "weekly" | "monthly";
+            /**
+             * Time
+             * @description Local HH:MM
+             */
+            time: string;
+            /**
+             * Date
+             * @description YYYY-MM-DD, for once
+             */
+            date?: string | null;
+            /**
+             * Weekdays
+             * @description 0 = Monday .. 6 = Sunday
+             */
+            weekdays?: number[] | null;
+            /**
+             * Day Of Month
+             * @description 1-28, for monthly
+             */
+            day_of_month?: number | null;
+        };
         /** Team */
         app__api__ai_team__Team: {
             /** Agents */
@@ -13583,6 +13986,14 @@ export interface components {
              * @default 0
              */
             ai_extra_minor: number;
+        };
+        /** ScheduleBody */
+        app__api__broadcasts__ScheduleBody: {
+            /**
+             * Scheduled At
+             * @description When to send; empty sends at the next job run
+             */
+            scheduled_at?: string | null;
         };
         /** ProfileUpdate */
         app__api__client_app__ProfileUpdate: {
@@ -19054,6 +19465,396 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_broadcasts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Announcement"][];
+                };
+            };
+        };
+    };
+    create_broadcast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnouncementBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Announcement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreviewBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Preview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_broadcast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Announcement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_broadcast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnnouncementBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Announcement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_broadcast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    schedule_broadcast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__broadcasts__ScheduleBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Announcement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_broadcast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Announcement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_test: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TestResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_announcements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyAnnouncement"][];
+                };
+            };
+        };
+    };
+    mark_announcement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                announcement_id: string;
+                event: "viewed" | "dismissed" | "clicked";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_marketing_consent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsubscribe: {
+        parameters: {
+            query: {
+                t: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
             };
             /** @description Validation Error */
             422: {

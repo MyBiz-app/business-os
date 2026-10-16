@@ -32,6 +32,7 @@ class PlatformPermission(StrEnum):
     INBOX_MANAGE = "inbox.manage"
     USAGE_READ = "usage.read"
     STAFF_MANAGE = "staff.manage"
+    BROADCASTS_MANAGE = "broadcasts.manage"
 
 
 Level = Literal["primary_owner", "owner", "manager", "employee"]

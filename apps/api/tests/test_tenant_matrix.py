@@ -17,7 +17,13 @@ from app.seed.common import STUDIO, URBAN_SLICE
 
 SPECS = (STUDIO, GROOMING_SALON, AC_COMPANY, PHOTO_STUDIO, ACCOUNTING_FIRM, PADEL_CLUB, URBAN_SLICE)
 # MyBiz's own tables: no API access at all (checked in test_database_security.py).
-PLATFORM_TABLES = {"contact_requests", "platform_audit", "platform_ai_pauses"}
+PLATFORM_TABLES = {
+    "contact_requests",
+    "platform_audit",
+    "platform_ai_pauses",
+    "announcements",
+    "announcement_deliveries",
+}
 # Tenant tables neither the demo data nor `_synthetic_row` can fill (a CHECK constraint needs a
 # real value). Add a row for them in the seed (preferred) or list them here.
 UNSEEDED: set[str] = set()

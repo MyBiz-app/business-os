@@ -64,6 +64,7 @@ ICONS = {
     "friend_request": "🤝",
     "class_invite": "💌",
     "roster": "📅",
+    "broadcast": "📣",
 }
 
 

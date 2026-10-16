@@ -13,10 +13,17 @@ GLOBAL_TABLES = {
     "platform_ai_conversations",
     "push_tokens",
     "job_runs",
+    "announcement_views",
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
 # API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.
-PLATFORM_TABLES = {"contact_requests", "platform_audit", "platform_ai_pauses"}
+PLATFORM_TABLES = {
+    "contact_requests",
+    "platform_audit",
+    "platform_ai_pauses",
+    "announcements",
+    "announcement_deliveries",
+}
 
 
 def _query(engine: Engine, sql: str) -> list:
@@ -49,7 +56,7 @@ def test_every_table_has_row_level_security(engine: Engine) -> None:
     assert [name for name, scoped in tenant_tables if not scoped] == []
     assert {name for name, _, has_tenant, _ in tables if not has_tenant} <= GLOBAL_TABLES
     # MyBiz's own tables stay unreachable from the API role.
-    own = tuple(sorted(PLATFORM_TABLES | {"platform_staff", "job_runs"}))
+    own = tuple(sorted(PLATFORM_TABLES | {"platform_staff", "job_runs", "announcement_views"}))
     reachable = _query(
         engine,
         f"""

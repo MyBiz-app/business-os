@@ -10,7 +10,7 @@ import { SubmitButton } from "@/components/form/submit-button";
 import { removeStaff, saveStaff, setPaused, type StaffState } from "./actions";
 
 type Level = "owner" | "manager" | "employee";
-type Permission = "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage";
+type Permission = "businesses.read" | "businesses.act" | "billing.manage" | "inbox.manage" | "usage.read" | "staff.manage" | "broadcasts.manage";
 
 export type Member = {
   email: string;
