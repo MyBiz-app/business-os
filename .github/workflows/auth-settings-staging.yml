@@ -28,6 +28,6 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: mywfwzdrlbpxeheszasd
           SITE_URL: https://business-os-alpha-drab.vercel.app
-          REDIRECT_URLS: https://business-os-alpha-drab.vercel.app/**,mybiz://**
+          REDIRECT_URLS: https://business-os-alpha-drab.vercel.app/**,https://mybizapp.click/**,mybiz://**
           APPLY: ${{ inputs.apply && '--apply' || '' }}
         run: python supabase/apply_auth_settings.py $APPLY
