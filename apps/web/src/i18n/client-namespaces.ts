@@ -123,6 +123,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "imageCrop",
     "inquiry",
     "locales",
+    "locations",
     "marketing",
     "modules",
     "nav",
