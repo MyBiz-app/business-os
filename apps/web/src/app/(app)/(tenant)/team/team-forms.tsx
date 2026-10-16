@@ -2,11 +2,12 @@
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 
 import { Avatar } from "@/components/avatar";
 import { Field, SelectField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
+import { IdentityEditor } from "@/components/identity-editor";
 import { PermissionList } from "@/components/permission-list";
 import { SubmitButton } from "@/components/form/submit-button";
 
@@ -125,6 +126,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
         </span>
         {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} home={homeBranch} />}
         <MemberPermissions email={email} all={allPermissions} allowed={permissions} />
+        <MemberIdentity userId={userId} name={name ?? email} />
         <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
         </Link>
@@ -223,6 +225,25 @@ function MemberPermissions({ email, all, allowed }: { email: string; all: string
         <Link href="/team/roles" className="text-sm text-primary underline-offset-4 hover:underline">
           {t("manageRoles")}
         </Link>
+      </div>
+    </details>
+  );
+}
+
+/** The member's ID number (payroll and forms): masked, revealed only to those allowed, and loaded
+ * only when the popover opens. */
+function MemberIdentity({ userId, name }: { userId: string; name: string }) {
+  const t = useTranslations("identity");
+  const [open, setOpen] = useState(false);
+  const subject = useMemo(() => ({ kind: "member" as const, id: userId }), [userId]);
+  return (
+    <details className="group relative" onToggle={(event) => setOpen(event.currentTarget.open)}>
+      <summary className="control cursor-pointer list-none px-2 py-1.5 text-sm [&::-webkit-details-marker]:hidden">{t("title")}</summary>
+      <div className="absolute end-0 top-full z-20 mt-1 flex w-72 max-w-[85vw] flex-col gap-3 rounded-2xl bg-surface p-4 shadow-xl ring-1 ring-border">
+        <p className="text-sm font-medium" dir="auto">
+          {t("memberIntro", { name })}
+        </p>
+        {open && <IdentityEditor subject={subject} />}
       </div>
     </details>
   );

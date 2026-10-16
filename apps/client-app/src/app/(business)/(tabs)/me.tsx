@@ -10,6 +10,7 @@ import { PreferencesCard } from "@business-os/app-kit/components/preferences-car
 import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { AreaSwitcher } from "@/components/area-switcher";
 import { BrandColorCard } from "@/components/brand-color-card";
+import { StaffIdentityCard } from "@/components/identity-card";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -120,6 +121,8 @@ export default function Me() {
         />
         <Button label={t("save")} palette={palette} busy={saving} onPress={() => void save()} />
       </Card>
+
+      <StaffIdentityCard />
 
       {can("business.settings") && <BrandColorCard />}
 

@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 
 import { CloseSection } from "./close-section";
 import { ContactEmails } from "./contact-emails";
+import { LegalReadiness } from "./legal-readiness";
 import { removeCover, removeLogo } from "./actions";
 import { BrandColorForm, CoverForm, DetailsForm, IdentityForm, LogoForm } from "./settings-forms";
 import { Container } from "@/components/layout/container";
@@ -25,6 +26,7 @@ export default async function SettingsPage() {
   if (!canManageSettings(tenant)) redirect("/dashboard");
   const logo = apiAssetUrl(tenant.logo_url);
   const emails = (await context.api.GET("/contact-emails", { params: context.scope })).data;
+  const readiness = (await context.api.GET("/tenants/current/readiness", { params: context.scope })).data;
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
@@ -64,6 +66,18 @@ export default async function SettingsPage() {
         </div>
         <IdentityForm type={tenant.legal_entity_type ?? null} number={tenant.business_number ?? null} />
       </section>
+
+      {readiness && (
+        <section aria-labelledby="readiness-heading" className="flex flex-col gap-4 card p-6">
+          <div className="flex flex-col gap-1">
+            <h2 id="readiness-heading" className="text-lg font-semibold">
+              {t("readiness.title")}
+            </h2>
+            <p className="text-sm text-muted">{t("readiness.subtitle")}</p>
+          </div>
+          <LegalReadiness tenant={tenant} readiness={readiness} />
+        </section>
+      )}
 
       <section aria-labelledby="brand-heading" className="flex flex-col gap-6 card p-6">
         <div className="flex flex-col gap-1">

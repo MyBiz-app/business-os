@@ -11,11 +11,12 @@
     "./dates": "./src/dates.ts",
     "./money": "./src/money.ts",
     "./usage": "./src/usage.ts",
-    "./brand": "./src/brand.ts"
+    "./brand": "./src/brand.ts",
+    "./israeli-id": "./src/israeli-id.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts test/money.test.ts test/usage.test.ts",
+    "test": "node --test test/messages.test.mjs && node --test --experimental-strip-types test/dates.test.ts test/money.test.ts test/usage.test.ts test/israeli-id.test.ts",
     "export:api": "node scripts/export-api.mjs"
   },
   "devDependencies": {

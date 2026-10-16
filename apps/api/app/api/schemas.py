@@ -134,6 +134,7 @@ class TenantUpdate(BaseModel):
         description="Branches the shifts board opens with; empty means all of them",
     )
     network_scope: Literal["network", "branch"] | None = None
+    client_id_number: Literal["off", "optional", "required"] | None = None
     shifts_publish_auto: bool | None = None
     shifts_publish_cadence: Literal["daily", "weekly", "monthly"] | None = None
     shifts_publish_weekday: int | None = Field(default=None, ge=0, le=6)
@@ -143,6 +144,13 @@ class TenantUpdate(BaseModel):
     business_number: str | None = Field(
         default=None, max_length=20, description="Registration number (ח.פ., עוסק מורשה...)"
     )
+    address_line: str | None = Field(default=None, max_length=200)
+    address_city: str | None = Field(default=None, max_length=100)
+    employer_file_number: str | None = Field(
+        default=None, pattern=r"^[0-9A-Za-z/-]{2,20}$", description="Deductions file (תיק ניכויים)"
+    )
+    business_license_number: str | None = Field(default=None, max_length=40)
+    business_license_expires_on: dt.date | None = None
 
     @model_validator(mode="after")
     def release_is_complete(self) -> "TenantUpdate":
@@ -151,7 +159,14 @@ class TenantUpdate(BaseModel):
             raise ValueError("the weekly release needs both a weekday and a time (or neither)")
         return self
 
-    @field_validator("business_number", mode="before")
+    @field_validator("address_line", "address_city", "business_license_number", mode="before")
+    @classmethod
+    def trim_text(cls, value: object) -> object:
+        if isinstance(value, str):
+            return value.strip() or None
+        return value
+
+    @field_validator("business_number", "employer_file_number", mode="before")
     @classmethod
     def normalize_number(cls, value: object) -> object:
         # People type it with spaces or dashes; an empty field clears it.
@@ -193,6 +208,13 @@ class Tenant(BaseModel):
     business_number: str | None = Field(
         default=None, description="Shown only to people who manage the business's settings"
     )
+    address_line: str | None = Field(default=None, description="Settings managers only")
+    address_city: str | None = Field(default=None, description="Settings managers only")
+    employer_file_number: str | None = Field(default=None, description="Settings managers only")
+    business_license_number: str | None = Field(default=None, description="Settings managers only")
+    business_license_expires_on: dt.date | None = Field(
+        default=None, description="Settings managers only"
+    )
     cancellation_window_minutes: int
     booking_horizon_days: int = Field(
         default=7, description="Without a weekly release: how many days ahead classes open"
@@ -211,6 +233,9 @@ class Tenant(BaseModel):
     network_scope: Literal["network", "branch"] = Field(
         default="network",
         description="network: clients shared by all branches; branch: each branch keeps its own",
+    )
+    client_id_number: Literal["off", "optional", "required"] = Field(
+        default="off", description="Whether the business asks its clients for an ID number"
     )
     resource_payment: Literal["app", "venue"] = Field(
         default="app",

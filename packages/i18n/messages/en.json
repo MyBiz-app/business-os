@@ -158,7 +158,58 @@
       "notSent": "Saved, but we could not send the confirmation email yet.",
       "saved": "Saved.",
       "invalid": "Enter a valid email address."
-    }
+    },
+    "readiness": {
+      "title": "Legal readiness",
+      "subtitle": "What we know about your business and what each missing detail would unlock. Nothing here blocks you.",
+      "optional": "optional",
+      "capabilities": "What is switched on",
+      "items": {
+        "entity_type": "Type of business",
+        "business_number": "Business number",
+        "address": "Business address",
+        "employer_file": "Employer deductions file",
+        "license": "Business licence"
+      },
+      "unlocks": {
+        "tax_invoice": "Needed to issue tax invoices",
+        "payroll": "Needed to run payroll"
+      },
+      "warnings": {
+        "company_prefix": "Company numbers usually start with 51. Check it is the right one."
+      },
+      "license": {
+        "expiring": "Expires in {days, plural, one {# day} other {# days}}. Renew it with your local authority.",
+        "expired": "The licence has expired."
+      },
+      "capability": {
+        "taxInvoice": {
+          "on": "Tax invoices: ready",
+          "off": "Tax invoices: details missing"
+        },
+        "payroll": {
+          "on": "Payroll: ready",
+          "off": "Payroll: details missing"
+        }
+      },
+      "receiptsOnly": "Exempt dealer: receipts only",
+      "form": {
+        "addressLine": "Street and number",
+        "addressCity": "City",
+        "employerFile": "Deductions file number",
+        "employerFileHint": "From the Tax Authority. Needed only for payroll.",
+        "licenseNumber": "Licence number",
+        "licenseHint": "Only if your type of business needs one. We remind you 60 days before it expires.",
+        "licenseExpires": "Licence expires on"
+      }
+    },
+    "clientIdNumber": "Ask clients for an ID number",
+    "clientIdNumbers": {
+      "off": "Don't ask",
+      "optional": "Ask, optional",
+      "required": "Ask, required"
+    },
+    "clientIdNumberHint": "Common for clinics, health declarations and insurance. The number is kept encrypted and shown masked."
   },
   "locales": {
     "he": "עברית",
@@ -326,13 +377,15 @@
         "plan_ending": "Plans ending without a renewal",
         "inactive": "Haven't come in lately",
         "leads_due": "Leads to call back",
-        "health_review": "Health declarations to review"
+        "health_review": "Health declarations to review",
+        "license_expiring": "Business licence about to expire"
       },
       "dates": {
         "plan_ending": "until {date}",
         "inactive": "last visit {date}",
         "leads_due": "since {date}",
-        "health_review": "signed {date}"
+        "health_review": "signed {date}",
+        "license_expiring": "expires {date}"
       },
       "never": "no visit yet",
       "all": "See all {count}"
@@ -2537,6 +2590,8 @@
     "social_read_hint": "The social networks dashboard and its numbers",
     "social_manage": "Manage social accounts",
     "social_manage_hint": "Connect and disconnect social networks",
+    "identity_read": "Reveal ID numbers",
+    "identity_read_hint": "See people's full ID numbers (every look is logged)",
     "files_read": "Open the files area",
     "files_read_hint": "Business files; some folders also need their own permission",
     "files_manage": "Manage files",
@@ -4219,7 +4274,30 @@
       "numberOptional": "Company registration number (optional)",
       "numberPlaceholder": "9 digits",
       "numberHint": "Used for invoices. Companies use the ח.פ. number, sole traders their ID number.",
-      "numberInvalid": "Check the number: it should be up to 9 digits with a valid check digit."
+      "numberInvalid": "Check the number: it should be up to 9 digits with a valid check digit.",
+      "entity": {
+        "legend": "Type of business",
+        "legendOptional": "Type of business (optional)",
+        "hint": "This decides which documents you can issue, for example a sole trader who is exempt from VAT issues receipts, not tax invoices.",
+        "required": "Choose the type of business to continue.",
+        "prefixWarning": "Companies are usually registered under numbers that start with 51. Check the number; you can still continue.",
+        "types": {
+          "company": "Company (Ltd.)",
+          "licensed_dealer": "Licensed dealer",
+          "exempt_dealer": "Exempt dealer",
+          "nonprofit": "Nonprofit",
+          "partnership": "Partnership",
+          "other": "Other"
+        },
+        "hints": {
+          "company": "Uses the company number (ח.פ.).",
+          "licensed_dealer": "Uses the owner's ID number and issues tax invoices.",
+          "exempt_dealer": "Uses the owner's ID number and issues receipts only.",
+          "nonprofit": "Uses the nonprofit registration number.",
+          "partnership": "Uses the partnership registration number.",
+          "other": "Enter the registration number you have."
+        }
+      }
     },
     "base": {
       "eyebrow": "Your base plan",
@@ -4550,7 +4628,8 @@
       "passSize": "Size",
       "passSizeValue": "{staff, plural, one {# employee} other {# employees}} · {locations, plural, one {# location} other {# locations}}",
       "passAddons": "Add-ons",
-      "passNoAddons": "Core only"
+      "passNoAddons": "Core only",
+      "passEntity": "Business type"
     },
     "finish": {
       "title": "Last step: payment details",
@@ -6715,6 +6794,45 @@
     "badTitle": "This link is not valid",
     "badText": "It may have expired or the address was changed. Ask for a new confirmation email in the settings.",
     "home": "Back to MyBiz"
+  },
+  "identity": {
+    "title": "ID number",
+    "loading": "Loading...",
+    "none": "No ID number saved",
+    "clientsOff": "This business does not ask its clients for an ID number. Turn it on in the business settings.",
+    "show": "Show",
+    "hide": "Hide",
+    "add": "Add an ID number",
+    "replace": "Replace",
+    "remove": "Remove",
+    "removeConfirm": "Remove this ID number?",
+    "type": "Type",
+    "number": "Number",
+    "country": "Country code",
+    "countryHint": "Two letters, for example US",
+    "save": "Save",
+    "cancel": "Cancel",
+    "types": {
+      "il_id": "Israeli ID",
+      "passport": "Passport",
+      "foreign": "Foreign ID"
+    },
+    "memberIntro": "ID number of {name}",
+    "clientIntro": "Kept encrypted and shown masked. Only people with the right permission can reveal it, and every reveal is logged.",
+    "errors": {
+      "invalid_id_number": "This number is not valid. Check the digits.",
+      "invalid_id_country": "Enter the two-letter country code.",
+      "id_number_in_use": "This number already belongs to someone else in this business.",
+      "client_id_off": "This business does not ask its clients for an ID number.",
+      "forbidden": "You don't have permission for this.",
+      "generic": "Something went wrong. Try again."
+    },
+    "mine": {
+      "title": "ID number",
+      "intro": "Needed for payroll and legal forms. It is kept encrypted and only shown to you and to people the business trusts with it.",
+      "optionalClient": "Optional: your business may ask for it for forms and insurance.",
+      "requiredClient": "This business asks for your ID number."
+    }
   },
   "files": {
     "title": "Files",

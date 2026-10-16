@@ -47,7 +47,7 @@ def load_current_tenant(session: Session) -> Tenant:
                        t.primary_color, t.cancellation_window_minutes, t.booking_horizon_days,
                        t.weekly_release_weekday, t.weekly_release_time, t.booking_requires_plan,
                        t.requires_health_declaration, t.online_sales, t.network_scope,
-                       t.resource_payment,
+                       t.resource_payment, t.client_id_number,
                        t.schedule_default_view,
                        coalesce(t.schedule_default_branches, '{}') AS schedule_default_branches,
                        t.shifts_default_view, t.shifts_default_range,
@@ -69,7 +69,9 @@ def load_current_tenant(session: Session) -> Tenant:
                        CASE WHEN t.cover IS NULL THEN NULL
                             ELSE '/tenants/current/cover?v='
                                  || extract(epoch FROM t.cover_updated_at)::bigint END AS cover_url,
-                       t.legal_entity_type, t.business_number
+                       t.legal_entity_type, t.business_number,
+                       t.address_line, t.address_city, t.employer_file_number,
+                       t.business_license_number, t.business_license_expires_on
                 FROM app.tenants t
                 LEFT JOIN app.tenant_members m
                     ON m.tenant_id = t.id AND m.user_id = app.current_user_id()
@@ -86,7 +88,16 @@ def load_current_tenant(session: Session) -> Tenant:
     )
     # The registration number is for the people who manage the business, not the whole team.
     if Permission.BUSINESS_SETTINGS.value not in data["permissions"]:
-        data["legal_entity_type"] = data["business_number"] = None
+        for hidden in (
+            "legal_entity_type",
+            "business_number",
+            "address_line",
+            "address_city",
+            "employer_file_number",
+            "business_license_number",
+            "business_license_expires_on",
+        ):
+            data[hidden] = None
     return Tenant.model_validate(data)
 
 

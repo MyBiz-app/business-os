@@ -29,6 +29,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           cancellation_window_minutes: Number(value("cancellation_window_minutes")),
           booking_requires_plan: formData.get("booking_requires_plan") === "on",
           requires_health_declaration: formData.get("requires_health_declaration") === "on",
+          client_id_number: ["optional", "required"].includes(value("client_id_number")) ? (value("client_id_number") as "optional" | "required") : "off",
           online_sales: formData.get("online_sales") === "on",
           resource_payment: value("resource_payment") === "venue" ? "venue" : "app",
         },
@@ -108,4 +109,29 @@ export async function removeCover(): Promise<void> {
   const { api, scope } = await getTenant();
   await api.DELETE("/tenants/current/cover", { params: scope });
   revalidatePath("/", "layout");
+}
+
+/** Address, employer file and the optional business licence (the legal-readiness card). */
+export async function updateLegalDetails(_state: FormState, formData: FormData): Promise<FormState> {
+  const { api, scope } = await getTenant();
+  const value = (name: string) => String(formData.get(name) ?? "").trim();
+  try {
+    unwrap(
+      await api.PATCH("/tenants/current", {
+        params: scope,
+        body: {
+          address_line: value("address_line"),
+          address_city: value("address_city"),
+          employer_file_number: value("employer_file_number"),
+          business_license_number: value("business_license_number"),
+          business_license_expires_on: value("business_license_expires_on") || null,
+        },
+      }),
+    );
+  } catch (error) {
+    return errorState(error);
+  }
+  revalidatePath("/settings");
+  revalidatePath("/dashboard");
+  return { saved: true };
 }

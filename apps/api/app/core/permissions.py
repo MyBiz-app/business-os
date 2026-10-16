@@ -27,6 +27,7 @@ class Permission(StrEnum):
     BUSINESS_SETTINGS = "business.settings"
     FILES_READ = "files.read"  # open the business's files area (some folders need more)
     FILES_MANAGE = "files.manage"  # add, archive and organize files and folders
+    IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
