@@ -144,7 +144,7 @@ def network_status(network: Network) -> str:
 
 
 def _load_providers() -> None:
-    from app.social import demo, meta  # noqa: F401  (each registers itself)
+    from app.social import demo, google, meta, soon, tiktok  # noqa: F401  (each registers itself)
 
 
 _load_providers()
