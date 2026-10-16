@@ -200,6 +200,13 @@ Pay-as-you-go extra credits are off by default (`app.tenant_ai_settings`, migrat
 
 One engine sends a message to a mix of audiences over several channels; the MyBiz console uses it now, and a business owner writing to their own clients (round 5, 2.7 and F4) will use the same tables (`announcements.issuer` is `platform` or `tenant`). A person in several audiences is counted and sent to once (key: email, else user, else client). Marketing messages go only to people who agreed (`marketing_consent_at` on users and on clients, turned on or off by the person with `PUT /me/marketing-consent`), carry "Ad" in the subject and a signed opt-out link (`GET /public/announcements/unsubscribe`, valid one year); service messages go to everyone in the audience. The audience is resolved by SECURITY DEFINER functions because the console reads across businesses; the raw resolver is not callable by the API. Pop-ups are delivery rows read by the person's own account, so nobody sees a message not meant for them. WhatsApp and SMS go through the businesses' existing outbox, for clients with a phone, and stay simulated until a paid provider is connected (project rule). Sending runs in the hourly `send-announcements` job, so "send now" means the next run. Email opens and clicks are not tracked.
 
+### Messages by branch (2026-10-16, round 5 F4, migration 0101)
+
+- A campaign carries `location_ids` (null = the whole network) and `channels`. Branch groups are only a shortcut in the picker: the API takes branch ids. A client is in a branch through its home branch or `client_locations`; a client on no list is not reached by a message aimed at specific branches. Staff are reached by their `location_ids` (owners and managers: always; no list: all, except a branch manager, who has only their own).
+- Email, push and pop-up go through the broadcast engine as `issuer = 'tenant'` announcements. The API resolves the people (segment rules such as "inactive" live in the API) and stores their ids on the announcement; the sender job only turns ids into deliveries, so a scheduled send later can reuse it.
+- Default: a business's message is a service message. "This is an advertisement" makes it marketing, which goes only to people with marketing consent, on every channel including WhatsApp and SMS.
+- Leads have no branch: a branch-aimed message cannot target them, and they are reached by phone only.
+
 ## Open
 
 | # | Question |

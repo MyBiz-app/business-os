@@ -3940,12 +3940,16 @@
       "inactive": "Plan holders who haven't come in 14 days",
       "plan_ending": "Plan ending soon",
       "no_plan": "Active without a valid plan",
-      "open_leads": "Open leads"
+      "open_leads": "Open leads",
+      "staff": "Staff"
     },
     "channel": "Channel",
     "channels": {
       "whatsapp": "WhatsApp",
-      "sms": "SMS"
+      "sms": "SMS",
+      "email": "Email",
+      "push": "App notification",
+      "popup": "Pop-up in the app"
     },
     "startFrom": "Start from a template",
     "chooseTemplate": "Choose a template…",
@@ -4001,7 +4005,13 @@
         "name": "Holiday greeting",
         "body": "Happy holidays, {first_name}! Warm wishes from the {business} team."
       }
-    }
+    },
+    "branches": "Branches",
+    "subject": "Subject (email and notification title)",
+    "promotional": "This is an advertisement",
+    "promotionalHint": "Goes only to people who agreed to receive offers.",
+    "channelsHint": "Pick one or more. Email, app notification and pop-up reach people with an email or an app account.",
+    "staffChannelsHint": "Staff are reached by email, app notification or pop-up."
   },
   "reviews": {
     "title": "Satisfaction ({count} days)",

@@ -21,11 +21,14 @@ export default async function MessagesPage() {
   const { tenant, api, scope } = await getTenantFor("clients.read");
   if (!tenant.modules.includes("whatsapp")) redirect("/upgrade/whatsapp");
   const writable = canWriteClients(tenant);
-  const [audiences, templates, campaigns] = await Promise.all([
+  const [audiences, templates, campaigns, branches, groups] = await Promise.all([
     api.GET("/messages/audiences", { params: scope }).then(unwrap),
     api.GET("/messages/templates", { params: scope }).then(unwrap),
     api.GET("/messages/campaigns", { params: scope }).then(unwrap),
+    api.GET("/locations", { params: scope }).then(unwrap),
+    api.GET("/location-groups", { params: scope }).then(unwrap),
   ]);
+  const branchName = new Map(branches.map((branch) => [branch.id, branch.name]));
   const when = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: tenant.time_zone });
 
   return (
@@ -56,6 +59,8 @@ export default async function MessagesPage() {
             suggestions={SUGGESTIONS.map((key) => ({ name: t(`suggestions.${key}.name`), body: t.raw(`suggestions.${key}.body`) as string }))}
             businessName={tenant.name}
             sampleName={t("sampleName")}
+            branches={branches.map((branch) => ({ id: branch.id, name: branch.name }))}
+            groups={groups}
           />
         </section>
       )}
@@ -71,13 +76,14 @@ export default async function MessagesPage() {
                 <li key={campaign.id} className="flex flex-col gap-1.5 rounded-xl border border-border p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
                     <span className="font-medium text-foreground">
-                      {t(`audiences.${campaign.audience}`)} · {t(`channels.${campaign.channel}`)}
+                      {t(`audiences.${campaign.audience}`)} · {campaign.channels.map((c) => t(`channels.${c}`)).join(", ")}
                     </span>
                     <time dateTime={campaign.created_at}>{when.format(new Date(campaign.created_at))}</time>
                   </div>
                   <p dir="auto" className="line-clamp-3 whitespace-pre-wrap text-sm">{campaign.body}</p>
                   <p className="text-xs text-muted">
                     {t("sentTo", { count: campaign.recipients })}
+                    {campaign.location_ids && ` · ${campaign.location_ids.map((id) => branchName.get(id) ?? "").filter(Boolean).join(", ")}`}
                     {campaign.author_name && ` · ${campaign.author_name}`}
                   </p>
                 </li>
