@@ -1502,6 +1502,7 @@
     "suggestion3": "Which classes have a waitlist this week?",
     "needsConfirmation": "Needs your confirmation",
     "bookPreview": "Book {client} into {service}",
+    "publishPreview": "Publish on {network} ({account}): {text}",
     "cancelPreview": "Cancel {client}'s booking for {service}",
     "fullWaitlist": "It's full, so this will add them to the waitlist.",
     "confirm": "Confirm",
@@ -4612,6 +4613,19 @@
       "bubble": "Ask the AI team",
       "noAgents": "No AI agents are available to you yet.",
       "genericAction": "The agent prepared an action for you to confirm."
+    },
+    "content": {
+      "back": "Back",
+      "open": "Content & creative",
+      "askShira": "Ask Shira",
+      "noAccounts": "No social network is connected yet. Connect Facebook, Instagram, TikTok and more from the content tab in the web CRM, and the numbers will show here.",
+      "networks": "Connected networks",
+      "needsReconnect": "Reconnect",
+      "demo": "Demo",
+      "drafts": "Drafts from Shira",
+      "noDrafts": "No drafts yet. Ask Shira for post ideas and she will save them here.",
+      "discard": "Discard draft",
+      "publishHint": "To publish a draft, ask Shira. She prepares it and you confirm before anything goes out."
     }
   },
   "staffApp": {

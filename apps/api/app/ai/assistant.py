@@ -220,7 +220,9 @@ def ask(
                 ],
             }
         )
-        modules = {key for key in ("ai_basic", "ai_pro", "crm") if has_module(db, key)}
+        modules = {
+            key for key in ("ai_basic", "ai_pro", "crm", "social_studio") if has_module(db, key)
+        }
         pack = CATALOG_VERTICALS.get(row["vertical"])
         if pack and pack.time_billing:
             modules.add("time_billing")  # the industry's features gate tools like modules do

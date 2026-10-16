@@ -16,6 +16,7 @@ from app.api import time_billing
 from app.api.bookings import cancel_booking, lock_session, place_booking
 from app.api.deps import TenantContext, has_module
 from app.messaging.notifications import notify_booking
+from app.social import studio
 
 # What each action changed, for the audit log: the entity type and its id in the result.
 ENTITY = {
@@ -23,6 +24,7 @@ ENTITY = {
     "cancel_booking": ("booking", lambda result: result["booking_id"]),
     "log_time": ("time_entry", lambda result: result["time_entry_id"]),
     "bill_month": ("quote", lambda result: result["bills"][0]),
+    "publish_post": ("social_draft", lambda result: result["draft_id"]),
 }
 
 
@@ -66,6 +68,12 @@ def _execute(tenant: TenantContext, tool_name: str, payload: dict[str, Any]) -> 
         if not result.bills:
             raise _conflict("nothing_to_bill")
         return {"bills": [str(bill.id) for bill in result.bills], "skipped": len(result.skipped)}
+    if tool_name == "publish_post":
+        account_id = UUID(payload["account_id"])
+        # Re-validated now: the account must still be in view of the person who confirms.
+        if all(a["id"] != account_id for a in studio.visible_accounts(db, tenant.branches)):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+        return studio.publish_draft(db, account_id, UUID(payload["draft_id"]))
     raise _conflict("unknown_action")
 
 
