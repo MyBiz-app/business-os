@@ -31,7 +31,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
   const candidates: (NavItem & { permission?: string; upgrade?: Upgrade })[] = [
     { href: "/dashboard", group: g("overview"), label: t("nav.dashboard"), icon: "dashboard" },
     { href: "/reports", group: g("overview"), label: t("nav.reports"), icon: "reports", permission: "reports.read" },
-    { href: "/assistant", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
+    { href: "/ai", group: g("overview"), label: t("nav.assistant"), icon: "assistant", permission: "ai.use", upgrade: "ai" },
     { href: "/schedule", group: g("work"), label: t(`terms.${termsOf(tenant.vertical)}.schedule` as "terms.fitness.schedule"), icon: "schedule", permission: "schedule.read" },
     ...(rents ? [{ href: "/resources", group: g("work"), label: t("nav.resources"), icon: "resources" as const, permission: "schedule.read" }] : []),
     { href: "/clients", group: g("clients"), label: t(`terms.${termsOf(tenant.vertical)}.clients` as "terms.fitness.clients"), icon: "clients", permission: "clients.read" },

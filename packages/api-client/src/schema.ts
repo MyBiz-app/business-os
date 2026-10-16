@@ -1448,6 +1448,45 @@ export interface paths {
         patch: operations["update_service"];
         trace?: never;
     };
+    "/location-groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Location Groups */
+        get: operations["list_location_groups"];
+        put?: never;
+        /** Create Location Group */
+        post: operations["create_location_group"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/location-groups/{group_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Location Group
+         * @description Removes the group only; its branches stay.
+         */
+        delete: operations["delete_location_group"];
+        options?: never;
+        head?: never;
+        /** Update Location Group */
+        patch: operations["update_location_group"];
+        trace?: never;
+    };
     "/locations": {
         parameters: {
             query?: never;
@@ -1557,6 +1596,31 @@ export interface paths {
         post?: never;
         /** Delete Location Logo */
         delete: operations["delete_location_logo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/locations/{location_id}/manager": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Appoint Branch Manager
+         * @description Appoints a team member as the branch's manager. Staff become branch managers: manager
+         *     rights at the branches they manage only. The previous manager steps down.
+         */
+        put: operations["appoint_branch_manager"];
+        post?: never;
+        /**
+         * Remove Branch Manager
+         * @description The branch has no appointed manager (its owner still reaches it).
+         */
+        delete: operations["remove_branch_manager"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3533,6 +3597,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/conversations/{conversation_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive Conversation */
+        post: operations["archive_conversation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/conversations/{conversation_id}": {
         parameters: {
             query?: never;
@@ -3616,6 +3697,153 @@ export interface paths {
         put?: never;
         /** Reject Action */
         post: operations["reject_action"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/team": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Team */
+        get: operations["ai_team"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/agents/{agent_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Agent
+         * @description Removes a custom agent (its past conversations stay, with the agent gone). Built-in
+         *     agents cannot be deleted, only switched off.
+         */
+        delete: operations["delete_agent"];
+        options?: never;
+        head?: never;
+        /** Update Agent */
+        patch: operations["update_agent"];
+        trace?: never;
+    };
+    "/ai/agents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Agent */
+        post: operations["create_agent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/agents/{agent_key}/avatar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Agent Avatar */
+        get: operations["get_agent_avatar"];
+        /**
+         * Upload Agent Avatar
+         * @description The agent's own picture (PNG, JPEG or WebP up to 2 MB) instead of a gallery face.
+         */
+        put: operations["upload_agent_avatar"];
+        post?: never;
+        /**
+         * Delete Agent Avatar
+         * @description Drops the uploaded picture; the agent goes back to its gallery face or default.
+         */
+        delete: operations["delete_agent_avatar"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Usage
+         * @description This month's AI credits by agent, by person and by day.
+         */
+        get: operations["ai_usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/spend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Spend Status
+         * @description The month's AI spend: included credits, pay-as-you-go settings, extra cost, alerts and the
+         *     limits per role and person.
+         */
+        get: operations["ai_spend_status"];
+        /**
+         * Update Ai Spend
+         * @description Turns pay-as-you-go extra credits on or off and sets the monthly cap (no cap: no limit).
+         */
+        put: operations["update_ai_spend"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ai/spend/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Ai Limits
+         * @description Replaces the monthly credit limits per role and per person (each person gets the limit,
+         *     not the role as a whole).
+         */
+        put: operations["update_ai_limits"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5333,6 +5561,157 @@ export interface components {
             /** Active */
             active?: boolean | null;
         };
+        /** AgentCard */
+        AgentCard: {
+            /** Key */
+            key: string;
+            /** Id */
+            id: string | null;
+            /** Builtin */
+            builtin: boolean;
+            /** Name */
+            name: string;
+            /** Role Title */
+            role_title: string;
+            /** Color */
+            color: string;
+            /** Topic */
+            topic: string;
+            /**
+             * Tone
+             * @enum {string}
+             */
+            tone: "friendly" | "formal" | "short";
+            /** Enabled */
+            enabled: boolean;
+            /** Avatar Preset */
+            avatar_preset: string | null;
+            /** Avatar Key */
+            avatar_key: string | null;
+            /** Avatar Url */
+            avatar_url?: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "active" | "locked" | "disabled" | "forbidden";
+            /** Upsell Module */
+            upsell_module?: string | null;
+            /**
+             * Credits Used Month
+             * @default 0
+             */
+            credits_used_month: number;
+            /**
+             * Routes
+             * @default []
+             */
+            routes: string[];
+            /** Instructions */
+            instructions?: string | null;
+            /** Tool Domains */
+            tool_domains?: string[] | null;
+            /** Allowed Roles */
+            allowed_roles?: string[] | null;
+            /** Location Scope */
+            location_scope?: ("all" | "locations") | null;
+            /** Location Ids */
+            location_ids?: string[] | null;
+            /** Model Tier */
+            model_tier?: ("fast" | "standard" | "strong") | null;
+        };
+        /**
+         * AgentChange
+         * @description Fields left out stay as they are; for a built-in agent `null` goes back to the default.
+         */
+        AgentChange: {
+            /** Name */
+            name?: string | null;
+            /** Role Title */
+            role_title?: string | null;
+            /** Color */
+            color?: string | null;
+            /** Topic */
+            topic?: string | null;
+            /** Instructions */
+            instructions?: string | null;
+            /** Tone */
+            tone?: ("friendly" | "formal" | "short") | null;
+            /** Tool Domains */
+            tool_domains?: string[] | null;
+            /** Enabled */
+            enabled?: boolean | null;
+            /** Location Scope */
+            location_scope?: ("all" | "locations") | null;
+            /** Location Ids */
+            location_ids?: string[] | null;
+            /** Allowed Roles */
+            allowed_roles?: string[] | null;
+            /** Model Tier */
+            model_tier?: ("fast" | "standard" | "strong") | null;
+            /** Avatar Preset */
+            avatar_preset?: string | null;
+            /** Draft */
+            draft?: false | null;
+        };
+        /**
+         * AgentSuggestion
+         * @description A card offering to hand the user over to a specialist agent.
+         */
+        AgentSuggestion: {
+            /** Agent Key */
+            agent_key: string;
+            /** Reason */
+            reason: string;
+        };
+        /** AiSpend */
+        AiSpend: {
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /** Currency */
+            currency: string;
+            /** Credits Included */
+            credits_included: number;
+            /** Credits Used */
+            credits_used: number;
+            /** Payg Enabled */
+            payg_enabled: boolean;
+            /**
+             * Payg Cap Minor
+             * @description Most extra spend per month; null: no cap
+             */
+            payg_cap_minor: number | null;
+            /**
+             * Price Per 100 Minor
+             * @description Price of 100 extra credits, minor units
+             */
+            price_per_100_minor: number;
+            /**
+             * Extra Credits
+             * @description Credits used above the included ones
+             */
+            extra_credits: number;
+            /**
+             * Extra Minor
+             * @description What that costs this month, minor units
+             */
+            extra_minor: number;
+            /**
+             * Credits Limit
+             * @description Where questions stop; null: no limit
+             */
+            credits_limit: number | null;
+            /**
+             * Alerts
+             * @description Thresholds (%) passed this month
+             */
+            alerts: number[];
+            /** Limits */
+            limits: components["schemas"]["CreditLimit"][];
+        };
         /** Answer */
         "Answer-Input": {
             /** Accept */
@@ -5586,7 +5965,7 @@ export interface components {
              * @description Sum of open invoices, minor units
              */
             balance_due: number;
-            usage: components["schemas"]["Usage"];
+            usage: components["schemas"]["app__api__billing__Usage"];
         };
         /** BillingDetails */
         BillingDetails: {
@@ -5656,6 +6035,11 @@ export interface components {
             commit: boolean;
             /** Source */
             source?: ("walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "app" | "other") | null;
+        };
+        /** Body_upload_agent_avatar */
+        Body_upload_agent_avatar: {
+            /** File */
+            file: string;
         };
         /** Body_upload_avatar */
         Body_upload_avatar: {
@@ -5783,6 +6167,15 @@ export interface components {
              * @enum {string}
              */
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
+        };
+        /** BranchManager */
+        BranchManager: {
+            /**
+             * User Id
+             * Format: uuid
+             * @description The team member who will manage the branch
+             */
+            user_id: string;
         };
         /** BranchMetric */
         BranchMetric: {
@@ -5966,7 +6359,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Logo Url */
             logo_url: string | null;
             /** Primary Color */
@@ -6891,6 +7284,30 @@ export interface components {
              */
             tier: "standard" | "priority" | "vip";
         };
+        /** ConversationStart */
+        ConversationStart: {
+            /**
+             * Agent Key
+             * @description A built-in key or custom:<id>
+             * @default chief
+             */
+            agent_key: string;
+            /**
+             * Location Ids
+             * @description Narrow the chat to these branches (within the user's own)
+             */
+            location_ids?: string[] | null;
+            /**
+             * Page Context
+             * @description The screen the chat is opened from
+             */
+            page_context?: string | null;
+            /**
+             * Handoff From
+             * @description A conversation of this user whose last exchange is carried over
+             */
+            handoff_from?: string | null;
+        };
         /** CopiedShifts */
         CopiedShifts: {
             /** Created */
@@ -7015,7 +7432,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /**
              * Status
              * @enum {string}
@@ -7031,6 +7448,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Location Ids
+             * @description Branches the new member will be kept to
+             */
+            location_ids: string[];
             /** Token */
             token: string;
         };
@@ -7040,6 +7462,86 @@ export interface components {
             series_id: string | null;
             /** Session Ids */
             session_ids: string[];
+        };
+        /** CreditLimit */
+        CreditLimit: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "role" | "user";
+            /**
+             * Key
+             * @description A role key, or a user id
+             */
+            key: string;
+            /** Monthly Credits */
+            monthly_credits: number;
+        };
+        /** CustomAgent */
+        CustomAgent: {
+            /** Name */
+            name: string;
+            /**
+             * Role Title
+             * @default
+             */
+            role_title: string;
+            /**
+             * Color
+             * @default #6B7280
+             */
+            color: string;
+            /**
+             * Topic
+             * @default
+             */
+            topic: string;
+            /**
+             * Instructions
+             * @default
+             */
+            instructions: string;
+            /**
+             * Tone
+             * @default friendly
+             * @enum {string}
+             */
+            tone: "friendly" | "formal" | "short";
+            /** Tool Domains */
+            tool_domains: string[];
+            /**
+             * Allowed Roles
+             * @default [
+             *       "owner",
+             *       "manager"
+             *     ]
+             */
+            allowed_roles: string[];
+            /**
+             * Location Scope
+             * @default all
+             * @enum {string}
+             */
+            location_scope: "all" | "locations";
+            /**
+             * Location Ids
+             * @default []
+             */
+            location_ids: string[];
+            /**
+             * Model Tier
+             * @default fast
+             * @enum {string}
+             */
+            model_tier: "fast" | "standard" | "strong";
+            /** Avatar Preset */
+            avatar_preset?: string | null;
+            /**
+             * Draft
+             * @default false
+             */
+            draft: boolean;
         };
         /** CustomRole */
         CustomRole: {
@@ -7598,6 +8100,23 @@ export interface components {
              */
             hours: number;
         };
+        /** GroupFields */
+        GroupFields: {
+            /**
+             * Name
+             * @description E.g. "South district"
+             */
+            name: string;
+            /** Location Ids */
+            location_ids?: string[];
+        };
+        /** GroupUpdate */
+        GroupUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Location Ids */
+            location_ids?: string[] | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -7839,7 +8358,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /**
              * Status
              * @enum {string}
@@ -7855,6 +8374,11 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * Location Ids
+             * @description Branches the new member will be kept to
+             */
+            location_ids: string[];
         };
         /** InvitationCreate */
         InvitationCreate: {
@@ -7867,7 +8391,12 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
+            /**
+             * Location Ids
+             * @description Branches the new member is kept to (empty: all; a branch manager's own)
+             */
+            location_ids?: string[];
         };
         /** InvitationPreview */
         InvitationPreview: {
@@ -7877,7 +8406,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Email */
             email: string;
             /**
@@ -8302,6 +8831,11 @@ export interface components {
             /** Source */
             source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
         };
+        /** LimitsUpdate */
+        LimitsUpdate: {
+            /** Limits */
+            limits: components["schemas"]["CreditLimit"][];
+        };
         /** Location */
         Location: {
             /**
@@ -8327,6 +8861,11 @@ export interface components {
             updated_at: string;
             /** Rooms */
             rooms: components["schemas"]["Room"][];
+            /**
+             * Manager User Id
+             * @description Who manages the branch (the owner until someone is appointed)
+             */
+            manager_user_id: string | null;
             /**
              * Kind
              * @description The branch's own sub-category, if it set one
@@ -8379,6 +8918,21 @@ export interface components {
              * @description The branch's sub-category (a catalog key); null: as the business
              */
             kind?: string | null;
+        };
+        /** LocationGroup */
+        LocationGroup: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Location Ids
+             * @description The branches in the group that you may see
+             */
+            location_ids: string[];
         };
         /** LocationUpdate */
         LocationUpdate: {
@@ -8481,7 +9035,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Custom Role Id */
             custom_role_id: string | null;
             /** Custom Role Name */
@@ -8574,7 +9128,7 @@ export interface components {
          */
         MemberUpdate: {
             /** Role */
-            role?: ("owner" | "manager" | "staff" | "front_desk") | null;
+            role?: ("owner" | "manager" | "branch_manager" | "staff" | "front_desk") | null;
             /** Custom Role Id */
             custom_role_id?: string | null;
         };
@@ -8591,7 +9145,7 @@ export interface components {
              * Role
              * @enum {string}
              */
-            role: "owner" | "manager" | "staff" | "front_desk";
+            role: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
         };
         /** Message */
         Message: {
@@ -10185,14 +10739,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "staff.read" | "staff.manage" | "business.settings")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "staff.read" | "staff.manage" | "business.settings")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings")[] | null;
         };
         /** Roles */
         Roles: {
@@ -11118,6 +11672,13 @@ export interface components {
             /** Demo Available */
             demo_available: boolean;
         };
+        /** SpendUpdate */
+        SpendUpdate: {
+            /** Payg Enabled */
+            payg_enabled: boolean;
+            /** Payg Cap Minor */
+            payg_cap_minor?: number | null;
+        };
         /** StaffHours */
         StaffHours: {
             /**
@@ -11335,16 +11896,9 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "owner" | "manager" | "staff" | "front_desk";
+            key: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Permissions */
             permissions: string[];
-        };
-        /** Team */
-        Team: {
-            /** Members */
-            members: components["schemas"]["Member"][];
-            /** Invitations */
-            invitations: components["schemas"]["Invitation"][];
         };
         /** Template */
         Template: {
@@ -11540,7 +12094,7 @@ export interface components {
              * Role
              * @description 'support': MyBiz support, read-only, while the owner's grant lasts. 'platform': MyBiz staff working in the business for its owner (audited).
              */
-            role: ("owner" | "manager" | "staff" | "front_desk") | ("support" | "platform");
+            role: ("owner" | "manager" | "branch_manager" | "staff" | "front_desk") | ("support" | "platform");
         };
         /** TenantCreate */
         TenantCreate: {
@@ -11885,46 +12439,6 @@ export interface components {
             /** Offer Id */
             offer_id: string | null;
         };
-        /**
-         * Usage
-         * @description This calendar month's use against the business's bundle (space and messages).
-         */
-        Usage: {
-            /**
-             * Pack
-             * @description None: the included one
-             */
-            pack: ("pack_plus" | "pack_max") | null;
-            /**
-             * Month Start
-             * Format: date
-             */
-            month_start: string;
-            /**
-             * Messages
-             * @description Messages sent this month (all channels)
-             */
-            messages: number;
-            /** Messages Included */
-            messages_included: number;
-            /**
-             * Storage Bytes
-             * @description Files kept now
-             */
-            storage_bytes: number;
-            /** Storage Included Bytes */
-            storage_included_bytes: number;
-            /**
-             * Ai Credits
-             * @description AI credits used this month (1 credit = 1 US cent)
-             */
-            ai_credits: number;
-            /**
-             * Ai Credits Included
-             * @description 0 when the business has no AI module
-             */
-            ai_credits_included: number;
-        };
         /** UsagePoint */
         UsagePoint: {
             /**
@@ -11936,6 +12450,13 @@ export interface components {
             meter: string;
             /** Quantity */
             quantity: number;
+        };
+        /** UsageRow */
+        UsageRow: {
+            /** Key */
+            key: string;
+            /** Credits */
+            credits: number;
         };
         /** ValidationError */
         ValidationError: {
@@ -12043,6 +12564,50 @@ export interface components {
              */
             expected_active_clients: number;
         };
+        /** Team */
+        app__api__ai_team__Team: {
+            /** Agents */
+            agents: components["schemas"]["AgentCard"][];
+            /** Credits Used */
+            credits_used: number;
+            /** Credits Included */
+            credits_included: number;
+            /**
+             * Payg Enabled
+             * @default false
+             */
+            payg_enabled: boolean;
+            /** Can Manage */
+            can_manage: boolean;
+            /**
+             * Custom Count
+             * @default 0
+             */
+            custom_count: number;
+            /**
+             * Custom Limit
+             * @default 3
+             */
+            custom_limit: number;
+        };
+        /** Usage */
+        app__api__ai_team__Usage: {
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /** Credits Used */
+            credits_used: number;
+            /** Credits Included */
+            credits_included: number;
+            /** By Agent */
+            by_agent: components["schemas"]["UsageRow"][];
+            /** By User */
+            by_user: components["schemas"]["UsageRow"][];
+            /** By Day */
+            by_day: components["schemas"]["UsageRow"][];
+        };
         /** Conversation */
         app__api__assistant__Conversation: {
             /**
@@ -12050,6 +12615,17 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Agent Key */
+            agent_key: string;
+            /** Title */
+            title: string | null;
+            /** Page Context */
+            page_context: string | null;
+            /**
+             * Location Ids
+             * @description The branches this chat was narrowed to (none: not narrowed)
+             */
+            location_ids: string[] | null;
             /** Turns */
             turns: components["schemas"]["app__api__assistant__Turn"][];
             /**
@@ -12065,8 +12641,12 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /** Agent Key */
+            agent_key: string;
             /** Title */
             title: string;
+            /** Archived */
+            archived: boolean;
             /**
              * Updated At
              * Format: date-time
@@ -12087,6 +12667,57 @@ export interface components {
              * @default []
              */
             pending_actions: components["schemas"]["PendingAction"][];
+            /**
+             * Suggestions
+             * @default []
+             */
+            suggestions: components["schemas"]["AgentSuggestion"][];
+        };
+        /**
+         * Usage
+         * @description This calendar month's use against the business's bundle (space and messages).
+         */
+        app__api__billing__Usage: {
+            /**
+             * Pack
+             * @description None: the included one
+             */
+            pack: ("pack_plus" | "pack_max") | null;
+            /**
+             * Month Start
+             * Format: date
+             */
+            month_start: string;
+            /**
+             * Messages
+             * @description Messages sent this month (all channels)
+             */
+            messages: number;
+            /** Messages Included */
+            messages_included: number;
+            /**
+             * Storage Bytes
+             * @description Files kept now
+             */
+            storage_bytes: number;
+            /** Storage Included Bytes */
+            storage_included_bytes: number;
+            /**
+             * Ai Credits
+             * @description AI credits used this month (1 credit = 1 US cent)
+             */
+            ai_credits: number;
+            /**
+             * Ai Credits Included
+             * @description 0 when the business has no AI module
+             */
+            ai_credits_included: number;
+            /**
+             * Ai Extra Minor
+             * @description Pay-as-you-go: this month's extra AI use, minor units
+             * @default 0
+             */
+            ai_extra_minor: number;
         };
         /** ProfileUpdate */
         app__api__client_app__ProfileUpdate: {
@@ -12118,6 +12749,13 @@ export interface components {
             /** Palette */
             palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
+        };
+        /** Team */
+        app__api__staff__Team: {
+            /** Members */
+            members: components["schemas"]["Member"][];
+            /** Invitations */
+            invitations: components["schemas"]["Invitation"][];
         };
         /** Conversation */
         app__api__whatsapp_ai__Conversation: {
@@ -15858,6 +16496,148 @@ export interface operations {
             };
         };
     };
+    list_location_groups: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationGroup"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_location_group: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationGroup"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_location_group: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_location_group: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                group_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GroupUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocationGroup"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_locations: {
         parameters: {
             query?: never;
@@ -16224,6 +17004,80 @@ export interface operations {
             };
         };
     };
+    appoint_branch_manager: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BranchManager"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_branch_manager: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_team: {
         parameters: {
             query?: never;
@@ -16243,7 +17097,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Team"];
+                    "application/json": components["schemas"]["app__api__staff__Team"];
                 };
             };
             /** @description Validation Error */
@@ -20901,7 +21755,12 @@ export interface operations {
     };
     list_conversations: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Only chats with this agent */
+                agent?: string | null;
+                /** @description Archived chats instead of the live ones */
+                archived?: boolean;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -20943,10 +21802,49 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ConversationStart"] | null;
+            };
+        };
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__assistant__Conversation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    archive_conversation: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                conversation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -21135,6 +22033,402 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PendingAction"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_team: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__ai_team__Team"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_agent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_agent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AgentChange"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_agent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CustomAgent"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_agent_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": unknown;
+                    "image/jpeg": unknown;
+                    "image/webp": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_agent_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_agent_avatar"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_agent_avatar: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                agent_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentCard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_usage: {
+        parameters: {
+            query?: {
+                /** @description Any day of the month; default now */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__ai_team__Usage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_spend_status: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ai_spend: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SpendUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSpend"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_ai_limits: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LimitsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiSpend"];
                 };
             };
             /** @description Validation Error */
@@ -21405,7 +22699,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Usage"];
+                    "application/json": components["schemas"]["app__api__billing__Usage"];
                 };
             };
             /** @description Validation Error */

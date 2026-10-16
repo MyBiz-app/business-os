@@ -311,6 +311,7 @@
   "roles": {
     "owner": "Owner",
     "manager": "Manager",
+    "branch_manager": "Branch manager",
     "staff": "Staff",
     "front_desk": "Front desk",
     "support": "Platform support (read-only)",
@@ -325,7 +326,7 @@
     "settings": "Settings",
     "schedule": "Schedule",
     "plans": "Plans",
-    "assistant": "AI assistant",
+    "assistant": "AI team",
     "reports": "Reports",
     "leads": "Leads",
     "messages": "Messages",
@@ -696,6 +697,14 @@
     }
   },
   "locations": {
+    "manager": {
+      "title": "Branch manager",
+      "subtitle": "Who runs this branch. They get manager rights here only: staff, shifts, bookings and clients of this branch.",
+      "none": "No one is appointed (the owner manages it)",
+      "label": "Manager",
+      "save": "Save manager",
+      "clear": "Remove manager"
+    },
     "title": "Locations",
     "subtitle": "Where your business operates, and the rooms in each place.",
     "add": "Add location",
@@ -749,7 +758,24 @@
     "logoUpload": "Upload logo",
     "logoRemove": "Back to the network's logo",
     "color": "Branch color",
-    "colorNetwork": "Use the network's color"
+    "colorNetwork": "Use the network's color",
+    "groups": {
+      "title": "Branch groups",
+      "hint": "Group branches (for example a district) so a message, a report or an AI agent can be pointed at all of them at once. A branch can be in several groups.",
+      "empty": "No groups yet.",
+      "name": "Group name",
+      "branches": "Branches in the group",
+      "save": "Save group",
+      "add": "Add group",
+      "new": "New group",
+      "delete": "Delete group",
+      "confirmDelete": "Delete the group \"{name}\"? The branches are not deleted."
+    },
+    "scope": {
+      "legend": "Branches",
+      "all": "All branches",
+      "count": "{selected, plural, =0 {No branches selected} one {1 branch selected of {total}} other {# branches selected of {total}}}"
+    }
   },
   "team": {
     "title": "Team",
@@ -780,6 +806,8 @@
       "generic": "Something went wrong. Please try again.",
       "cannot_change_own_role": "You can't change your own role.",
       "exceeds_own_permissions": "You can't grant permissions you don't have yourself.",
+      "exceeds_own_level": "A branch manager works with staff and front desk only.",
+      "branch_manager_needs_branch": "A branch manager needs at least one branch.",
       "name_taken": "A role with that name already exists.",
       "role_in_use": "This role is still assigned to team members. Change their role first.",
       "reporting_cycle": "That would make a loop: this person already manages them."
@@ -982,6 +1010,7 @@
     "role": {
       "owner": "Owner",
       "manager": "Manager",
+      "branch_manager": "Branch manager",
       "staff": "Staff",
       "front_desk": "Front desk"
     },
@@ -1495,6 +1524,270 @@
     "demoMode": "Demo mode: the assistant answers common questions from your real data, without real AI (and at no cost). With an AI key set up, it answers anything.",
     "logTimePreview": "Log {hours} h for {client}: {description}",
     "billMonthPreview": "{count, plural, one {Bill one client} other {Bill # clients}} for {month}: {total} in all"
+  },
+  "aiTeam": {
+    "title": "AI team",
+    "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
+    "mapLabel": "The AI team",
+    "listLabel": "AI agents",
+    "view": "View",
+    "views": {
+      "map": "Map",
+      "list": "List"
+    },
+    "usage": "{used} of {included} AI credits used this month",
+    "state": {
+      "active": "Available",
+      "locked": "Locked: not in your plan",
+      "disabled": "Switched off",
+      "forbidden": "No access for your role"
+    },
+    "chatWith": "Chat with {name}",
+    "backToTeam": "Back to the team",
+    "history": "History",
+    "noHistory": "No earlier chats with this agent.",
+    "newChat": "New chat",
+    "switchAgent": "Switch agent",
+    "greeting": "Hi, I'm {name}. How can I help?",
+    "thinking": "{name} is working on it…",
+    "placeholder": "Write to {name}",
+    "handoff": "Switch to {name}",
+    "close": "Close",
+    "scope": {
+      "label": "Branches this chat looks at",
+      "all": "All branches",
+      "some": "{count, plural, one {# branch} other {# branches}}",
+      "hint": "Changing this starts a new chat that keeps the last exchange.",
+      "branches": "Branches",
+      "done": "Done"
+    },
+    "suggestions": {
+      "chief": {
+        "s1": "How did last month go?",
+        "s2": "What needs my attention today?",
+        "s3": "Who should I talk to about unpaid bills?"
+      },
+      "secretary": {
+        "s1": "What's on the schedule tomorrow?",
+        "s2": "Which classes have a waitlist this week?",
+        "s3": "Book a client into tomorrow's class"
+      },
+      "marketing": {
+        "s1": "Which leads need a follow-up?",
+        "s2": "Which clients have gone quiet?",
+        "s3": "Draft a message to win back inactive clients"
+      },
+      "sales": {
+        "s1": "How much did we sell this month?",
+        "s2": "Which memberships expire soon?",
+        "s3": "Which quotes are still open?"
+      },
+      "finance": {
+        "s1": "Who owes us money?",
+        "s2": "How is this month's billing?",
+        "s3": "What's the cash flow outlook?"
+      },
+      "team": {
+        "s1": "Are there gaps in next week's roster?",
+        "s2": "Who asked for time off?",
+        "s3": "How many hours did the team work this month?"
+      },
+      "care": {
+        "s1": "What's waiting in the inbox?",
+        "s2": "Which clients might be leaving?",
+        "s3": "Any new reviews?"
+      },
+      "analyst": {
+        "s1": "Compare my branches this month",
+        "s2": "What changed compared to last month?",
+        "s3": "Anything unusual in the numbers?"
+      },
+      "creative": {
+        "s1": "Write a post for this week's promotion",
+        "s2": "Give me three ideas for stories",
+        "s3": "Draft a newsletter"
+      },
+      "custom": {
+        "s1": "What can you help me with?",
+        "s2": "Summarize what you know about my business",
+        "s3": "What should I look at first?"
+      }
+    },
+    "upsell": {
+      "title": "Meet {name}, your {role}",
+      "pitch": {
+        "chief": "{name} runs the whole team and answers questions across the business.",
+        "secretary": "{name} keeps your schedule, bookings and reminders in order.",
+        "marketing": "{name} follows up on leads, wins back quiet clients and drafts campaigns for your approval.",
+        "sales": "{name} tracks sales, renewals and open quotes, and points to the next opportunity.",
+        "finance": "{name} watches open bills, receipts and cash flow so nothing slips.",
+        "team": "{name} spots gaps in the roster and handles swaps, time off and hours.",
+        "care": "{name} keeps the inbox, reviews and at-risk clients under watch.",
+        "analyst": "{name} compares branches, finds trends and flags what is unusual.",
+        "creative": "{name} writes posts, promotions and newsletters in your voice."
+      },
+      "p1": "Works from your real business data",
+      "p2": "Asks for your approval before anything changes",
+      "p3": "Included in your monthly AI credits",
+      "price": "Comes with {module}: {price} per month",
+      "add": "Add to my plan",
+      "askOwner": "Ask the business owner to add {module} to the plan."
+    },
+    "closed": {
+      "disabled": "{name} is switched off for this business.",
+      "forbidden": "Your role can't use {name}. Ask the business owner to open access."
+    },
+    "wizard": {
+      "hire": "Hire an agent",
+      "hireNamed": "Hire {name}",
+      "title": "Hire a new agent",
+      "stepOf": "Step {step} of {total}: {name}",
+      "steps": {
+        "topic": "Topic",
+        "identity": "Identity",
+        "role": "Role",
+        "data": "Data access",
+        "access": "Who may use it",
+        "trial": "Try it"
+      },
+      "limitReached": "Your plan allows {limit} custom agents and all of them are in use. Remove one or move up to AI Pro for more.",
+      "topicHint": "What should the new agent help with? Pick a starting point; you can change everything next.",
+      "templates": {
+        "nutrition": {
+          "label": "Nutrition advisor",
+          "blurb": "Eating plans, follow-ups and answers for clients.",
+          "name": "Nina",
+          "role": "Nutrition advisor",
+          "does": "Answer clients' nutrition questions in plain words, suggest simple eating plans and remind them to check in."
+        },
+        "purchasing": {
+          "label": "Purchasing and inventory",
+          "blurb": "What to reorder, what is running low, supplier costs.",
+          "name": "Pavel",
+          "role": "Purchasing and inventory",
+          "does": "Watch what we spend and what is running low, and tell me what to reorder and when."
+        },
+        "social": {
+          "label": "Social media",
+          "blurb": "Post ideas, captions and replies to comments.",
+          "name": "Sasha",
+          "role": "Social media",
+          "does": "Come up with post ideas and captions in the business's voice and draft replies to comments and messages."
+        },
+        "hiring": {
+          "label": "Hiring",
+          "blurb": "Job posts, screening candidates, scheduling interviews.",
+          "name": "Hila",
+          "role": "Hiring",
+          "does": "Help write job posts, go over applicants and suggest interview times that fit the team's shifts."
+        },
+        "support": {
+          "label": "Customer care",
+          "blurb": "Questions, complaints and reviews.",
+          "name": "Carmel",
+          "role": "Customer care",
+          "does": "Answer clients' questions kindly, draft replies to complaints and reviews, and flag what needs a person."
+        },
+        "other": {
+          "label": "Something else",
+          "blurb": "Start from a blank page and describe the job yourself."
+        }
+      },
+      "name": "Name",
+      "roleTitle": "Job title",
+      "color": "Color",
+      "upload": "Upload a picture",
+      "uploadHint": "PNG, JPG or WebP up to 2 MB. You crop it to a circle next.",
+      "resetFace": "Use the default face",
+      "gallery": "Faces",
+      "does": "What does this agent do?",
+      "doesPlaceholder": "For example: answer clients' questions about their membership.",
+      "tone": "How does it speak?",
+      "tones": {
+        "friendly": "Warm and friendly",
+        "formal": "Formal and precise",
+        "short": "Short and to the point"
+      },
+      "never": "What must it never do?",
+      "neverPlaceholder": "For example: never promise discounts or give medical advice.",
+      "knowledge": "What should it know?",
+      "knowledgePlaceholder": "Questions and answers, policies, price list, opening hours.",
+      "counter": "{used} of {max} characters",
+      "labels": {
+        "does": "What the agent does:",
+        "never": "What the agent must never do:",
+        "knowledge": "What the agent knows about the business:"
+      },
+      "dataHint": "Tick the parts of the business this agent can look into. It still never sees more than the person talking to it is allowed to.",
+      "domainsLegend": "Access to data",
+      "branches": "Branches",
+      "domains": {
+        "schedule": "Schedule and classes",
+        "bookings": "Bookings",
+        "clients": "Clients",
+        "messages": "Messages to clients",
+        "leads": "Leads",
+        "sources": "Lead sources",
+        "sales": "Sales",
+        "plans": "Plans and memberships",
+        "quotes": "Quotes",
+        "metrics": "Business numbers",
+        "billing": "Billing",
+        "receipts": "Receipts",
+        "balances": "Open balances",
+        "shifts": "Shifts",
+        "staff": "Team",
+        "time": "Time and attendance",
+        "inbox": "Inbox",
+        "reviews": "Reviews",
+        "reports": "Reports",
+        "content": "Content",
+        "social": "Social media"
+      },
+      "accessHint": "Who on your team may talk to this agent? Owners always can.",
+      "rolesLegend": "Roles with access",
+      "trialHint": "Talk to the agent before you hire it. Nothing is saved to your team until you press the button below.",
+      "send": "Send",
+      "back": "Back",
+      "next": "Next",
+      "tryIt": "Try it out",
+      "preparing": "Getting it ready…",
+      "errors": {
+        "agent_limit": "Your plan allows {limit} custom agents. Remove one or move up to AI Pro.",
+        "unknown_tool_domain": "One of the data areas is not available.",
+        "unknown_role": "One of the roles no longer exists.",
+        "unknown_branch": "One of the branches no longer exists.",
+        "image_too_large": "The picture is too large (2 MB at most).",
+        "unsupported_image": "Use a PNG, JPG or WebP picture.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "edit": {
+      "open": "Edit",
+      "title": "{name}: settings",
+      "usage": "{used} credits used this month",
+      "enabled": "This agent is switched on",
+      "topic": "One line about what it does",
+      "instructions": "Role description",
+      "tier": "Model quality",
+      "tiers": {
+        "fast": "Fast and economical",
+        "standard": "Standard",
+        "strong": "Strongest, uses more credits"
+      },
+      "delete": "Remove this agent",
+      "deleteAsk": "Remove {name}? Past chats stay, but the agent is gone.",
+      "deleteYes": "Yes, remove",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "roles": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "branch_manager": "Branch manager",
+      "front_desk": "Front desk",
+      "staff": "Staff"
+    }
   },
   "modules": {
     "title": "Modules and plan",
@@ -3187,6 +3480,18 @@
       "overAi": "You've used this month's AI allowance, so the assistant is paused until next month. Everything else keeps working; a bigger AI module raises the allowance.",
       "nearStorage": "Your files take {percent}% of your space.",
       "overStorage": "Your space for files is full: new files can't be added. Delete some or choose a bigger bundle."
+    },
+    "aiSpend": {
+      "title": "Extra AI credits",
+      "intro": "Your plan includes {included} AI credits a month. With pay-as-you-go on, the AI keeps working after that and the extra is added to your invoice at {price} per 100 credits. It is off by default.",
+      "toggle": "Keep the AI working after the included credits",
+      "cap": "Monthly cap on extra credits ({currency})",
+      "capHint": "Leave empty for no cap.",
+      "save": "Save",
+      "saved": "Saved",
+      "extraSoFar": "Extra this month: {credits} credits, {amount}",
+      "alerts": "You passed {percent}% of this month's AI credits.",
+      "needModule": "Choose an AI plan to use extra credits."
     }
   },
   "visitNotes": {

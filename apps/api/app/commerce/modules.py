@@ -58,19 +58,17 @@ MODULES: dict[str, Module] = {
         Module("ai_pro", {"ILS": 11900, "USD": 3500, "EUR": 3200}, group="ai"),
         Module("crm", {"ILS": 3900, "USD": 1200, "EUR": 1100}),
         Module("crm_automation", {"ILS": 3900, "USD": 1200, "EUR": 1100}, requires_all=("crm",)),
-        Module("analytics_pro", {"ILS": 3900, "USD": 1200, "EUR": 1100}, available=False),
+        Module("analytics_pro", {"ILS": 3900, "USD": 1200, "EUR": 1100}),
         Module(
             "agent_finance",
             {"ILS": 6900, "USD": 2000, "EUR": 1900},
             requires_any=("ai_basic", "ai_pro"),
-            available=False,
         ),
         Module(
             "agent_marketing",
             {"ILS": 6900, "USD": 2000, "EUR": 1900},
             requires_any=("ai_basic", "ai_pro"),
             requires_all=("crm",),
-            available=False,
         ),
         # Content studio: social networks connected, one analytics dashboard (migration 0093).
         Module("social_studio", {"ILS": 3900, "USD": 1200, "EUR": 1100}),
@@ -121,6 +119,17 @@ ALLOWANCES: dict[str | None, Allowance] = {
 # it earns. Soft limit: warnings from 80%, new questions stop at 100% until next month or a
 # bigger module.
 AI_CREDITS_INCLUDED: dict[str, int] = {"ai_basic": 400, "ai_pro": 1200}
+
+
+# Pay-as-you-go: when the business turns it on, questions keep working after the included credits
+# and the extra use is billed at the end of the month at this price per 100 credits (minor units;
+# our cost is about $1 per 100). Off by default; while payments (#46) are disabled it is only a
+# line on the account.
+AI_EXTRA_PRICE_PER_100: dict[str, int] = {"ILS": 600, "USD": 170, "EUR": 160}
+
+
+def ai_extra_price(currency: str) -> int:
+    return AI_EXTRA_PRICE_PER_100.get(currency, AI_EXTRA_PRICE_PER_100["USD"])
 
 
 def ai_credits_allowed(modules: "dict[str, int] | list[str]") -> int:

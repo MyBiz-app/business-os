@@ -21,6 +21,7 @@ class Permission(StrEnum):
     AI_USE = "ai.use"  # the AI assistant (its tools still check the permissions above)
     SOCIAL_READ = "social.read"  # the content studio dashboard
     SOCIAL_MANAGE = "social.manage"  # connect and disconnect social accounts
+    AI_MANAGE = "ai.manage"  # shape the AI team: agents, their branch scope, roles and budget
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
@@ -43,9 +44,28 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.AI_USE,
             Permission.SOCIAL_READ,
             Permission.SOCIAL_MANAGE,
+            Permission.AI_MANAGE,
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
+        }
+    ),
+    # A manager at their own branches only (the API keeps them to `location_ids`): everything a
+    # manager does for running a branch, but nothing that reaches across the business (catalog,
+    # settings, AI budget). They manage staff within their branches, never above their own level.
+    "branch_manager": frozenset(
+        {
+            Permission.CLIENTS_READ,
+            Permission.CLIENTS_WRITE,
+            Permission.CATALOG_READ,
+            Permission.SCHEDULE_READ,
+            Permission.SCHEDULE_WRITE,
+            Permission.BOOKINGS_MANAGE,
+            Permission.SALES_MANAGE,
+            Permission.REPORTS_READ,
+            Permission.AI_USE,
+            Permission.STAFF_READ,
+            Permission.STAFF_MANAGE,
         }
     ),
     "front_desk": frozenset(

@@ -9,7 +9,7 @@ private messages and never personal data of followers. Provider tokens are encry
 Our own daily history is kept because some networks only give 90 days back.
 
 Revision ID: 0093
-Revises: 0082
+Revises: 0094
 Create Date: 2026-10-16
 """
 
@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0093"
-down_revision: str | None = "0082"
+down_revision: str | None = "0094"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

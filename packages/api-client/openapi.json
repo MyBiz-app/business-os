@@ -7833,6 +7833,308 @@
         }
       }
     },
+    "/location-groups": {
+      "get": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "List Location Groups",
+        "operationId": "list_location_groups",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocationGroup"
+                  },
+                  "title": "Response List Location Groups"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Create Location Group",
+        "operationId": "create_location_group",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupFields"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationGroup"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/location-groups/{group_id}": {
+      "patch": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Update Location Group",
+        "operationId": "update_location_group",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Group Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocationGroup"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Delete Location Group",
+        "description": "Removes the group only; its branches stay.",
+        "operationId": "delete_location_group",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Group Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/locations": {
       "get": {
         "tags": [
@@ -8621,6 +8923,170 @@
         }
       }
     },
+    "/locations/{location_id}/manager": {
+      "put": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Appoint Branch Manager",
+        "description": "Appoints a team member as the branch's manager. Staff become branch managers: manager\nrights at the branches they manage only. The previous manager steps down.",
+        "operationId": "appoint_branch_manager",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchManager"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "locations"
+        ],
+        "summary": "Remove Branch Manager",
+        "description": "The branch has no appointed manager (its owner still reaches it).",
+        "operationId": "remove_branch_manager",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "location_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Location Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Location"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff": {
       "get": {
         "tags": [
@@ -8670,7 +9136,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Team"
+                  "$ref": "#/components/schemas/app__api__staff__Team"
                 }
               }
             }
@@ -19304,6 +19770,36 @@
         ],
         "parameters": [
           {
+            "name": "agent",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only chats with this agent",
+              "title": "Agent"
+            },
+            "description": "Only chats with this agent"
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Archived chats instead of the live ones",
+              "default": false,
+              "title": "Archived"
+            },
+            "description": "Archived chats instead of the live ones"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -19402,8 +19898,102 @@
             "description": "The current branch (none: all branches)"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/ConversationStart"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__api__assistant__Conversation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/conversations/{conversation_id}/archive": {
+      "post": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Archive Conversation",
+        "operationId": "archive_conversation",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -19813,6 +20403,847 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PendingAction"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/team": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Team",
+        "operationId": "ai_team",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__api__ai_team__Team"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/agents/{agent_key}": {
+      "patch": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Agent",
+        "operationId": "update_agent",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "agent_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Delete Agent",
+        "description": "Removes a custom agent (its past conversations stay, with the agent gone). Built-in\nagents cannot be deleted, only switched off.",
+        "operationId": "delete_agent",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "agent_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/agents": {
+      "post": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Create Agent",
+        "operationId": "create_agent",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomAgent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/agents/{agent_key}/avatar": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Upload Agent Avatar",
+        "description": "The agent's own picture (PNG, JPEG or WebP up to 2 MB) instead of a gallery face.",
+        "operationId": "upload_agent_avatar",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "agent_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_agent_avatar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Delete Agent Avatar",
+        "description": "Drops the uploaded picture; the agent goes back to its gallery face or default.",
+        "operationId": "delete_agent_avatar",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "agent_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentCard"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Get Agent Avatar",
+        "operationId": "get_agent_avatar",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "agent_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Agent Key"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "image/png": {},
+              "image/jpeg": {},
+              "image/webp": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/usage": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Usage",
+        "description": "This month's AI credits by agent, by person and by day.",
+        "operationId": "ai_usage",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "month",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Any day of the month; default now",
+              "title": "Month"
+            },
+            "description": "Any day of the month; default now"
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__api__ai_team__Usage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/spend": {
+      "get": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Ai Spend Status",
+        "description": "The month's AI spend: included credits, pay-as-you-go settings, extra cost, alerts and the\nlimits per role and person.",
+        "operationId": "ai_spend_status",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSpend"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Ai Spend",
+        "description": "Turns pay-as-you-go extra credits on or off and sets the monthly cap (no cap: no limit).",
+        "operationId": "update_ai_spend",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpendUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSpend"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ai/spend/limits": {
+      "put": {
+        "tags": [
+          "ai"
+        ],
+        "summary": "Update Ai Limits",
+        "description": "Replaces the monthly credit limits per role and per person (each person gets the limit,\nnot the role as a whole).",
+        "operationId": "update_ai_limits",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LimitsUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSpend"
                 }
               }
             }
@@ -20354,7 +21785,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Usage"
+                  "$ref": "#/components/schemas/app__api__billing__Usage"
                 }
               }
             }
@@ -25976,6 +27407,535 @@
         "type": "object",
         "title": "AddressUpdate"
       },
+      "AgentCard": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "builtin": {
+            "type": "boolean",
+            "title": "Builtin"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "role_title": {
+            "type": "string",
+            "title": "Role Title"
+          },
+          "color": {
+            "type": "string",
+            "title": "Color"
+          },
+          "topic": {
+            "type": "string",
+            "title": "Topic"
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "friendly",
+              "formal",
+              "short"
+            ],
+            "title": "Tone"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "avatar_preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Preset"
+          },
+          "avatar_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Key"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "locked",
+              "disabled",
+              "forbidden"
+            ],
+            "title": "State"
+          },
+          "upsell_module": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upsell Module"
+          },
+          "credits_used_month": {
+            "type": "number",
+            "title": "Credits Used Month",
+            "default": 0
+          },
+          "routes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Routes",
+            "default": []
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "tool_domains": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Domains"
+          },
+          "allowed_roles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed Roles"
+          },
+          "location_scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "locations"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Scope"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids"
+          },
+          "model_tier": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "fast",
+                  "standard",
+                  "strong"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Tier"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "id",
+          "builtin",
+          "name",
+          "role_title",
+          "color",
+          "topic",
+          "tone",
+          "enabled",
+          "avatar_preset",
+          "avatar_key",
+          "state"
+        ],
+        "title": "AgentCard"
+      },
+      "AgentChange": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role_title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role Title"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^#[0-9A-Fa-f]{6}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "tone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "friendly",
+                  "formal",
+                  "short"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tone"
+          },
+          "tool_domains": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tool Domains"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          },
+          "location_scope": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "locations"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Scope"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids"
+          },
+          "allowed_roles": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed Roles"
+          },
+          "model_tier": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "fast",
+                  "standard",
+                  "strong"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Tier"
+          },
+          "avatar_preset": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Preset"
+          },
+          "draft": {
+            "anyOf": [
+              {
+                "type": "boolean",
+                "const": false
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft"
+          }
+        },
+        "type": "object",
+        "title": "AgentChange",
+        "description": "Fields left out stay as they are; for a built-in agent `null` goes back to the default."
+      },
+      "AgentSuggestion": {
+        "properties": {
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_key",
+          "reason"
+        ],
+        "title": "AgentSuggestion",
+        "description": "A card offering to hand the user over to a specialist agent."
+      },
+      "AiSpend": {
+        "properties": {
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "credits_included": {
+            "type": "integer",
+            "title": "Credits Included"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "payg_enabled": {
+            "type": "boolean",
+            "title": "Payg Enabled"
+          },
+          "payg_cap_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payg Cap Minor",
+            "description": "Most extra spend per month; null: no cap"
+          },
+          "price_per_100_minor": {
+            "type": "integer",
+            "title": "Price Per 100 Minor",
+            "description": "Price of 100 extra credits, minor units"
+          },
+          "extra_credits": {
+            "type": "number",
+            "title": "Extra Credits",
+            "description": "Credits used above the included ones"
+          },
+          "extra_minor": {
+            "type": "integer",
+            "title": "Extra Minor",
+            "description": "What that costs this month, minor units"
+          },
+          "credits_limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credits Limit",
+            "description": "Where questions stop; null: no limit"
+          },
+          "alerts": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Alerts",
+            "description": "Thresholds (%) passed this month"
+          },
+          "limits": {
+            "items": {
+              "$ref": "#/components/schemas/CreditLimit"
+            },
+            "type": "array",
+            "title": "Limits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month_start",
+          "currency",
+          "credits_included",
+          "credits_used",
+          "payg_enabled",
+          "payg_cap_minor",
+          "price_per_100_minor",
+          "extra_credits",
+          "extra_minor",
+          "credits_limit",
+          "alerts",
+          "limits"
+        ],
+        "title": "AiSpend"
+      },
       "Answer-Input": {
         "properties": {
           "accept": {
@@ -26523,7 +28483,7 @@
             "description": "Sum of open invoices, minor units"
           },
           "usage": {
-            "$ref": "#/components/schemas/Usage"
+            "$ref": "#/components/schemas/app__api__billing__Usage"
           }
         },
         "type": "object",
@@ -26723,6 +28683,20 @@
           "file"
         ],
         "title": "Body_import_clients"
+      },
+      "Body_upload_agent_avatar": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "File"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_upload_agent_avatar"
       },
       "Body_upload_avatar": {
         "properties": {
@@ -27042,6 +29016,21 @@
           "status"
         ],
         "title": "BookingUpdate"
+      },
+      "BranchManager": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id",
+            "description": "The team member who will manage the branch"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id"
+        ],
+        "title": "BranchManager"
       },
       "BranchMetric": {
         "properties": {
@@ -27433,6 +29422,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -29994,6 +31984,60 @@
         ],
         "title": "ContactRequest"
       },
+      "ConversationStart": {
+        "properties": {
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key",
+            "description": "A built-in key or custom:<id>",
+            "default": "chief"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids",
+            "description": "Narrow the chat to these branches (within the user's own)"
+          },
+          "page_context": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Context",
+            "description": "The screen the chat is opened from"
+          },
+          "handoff_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Handoff From",
+            "description": "A conversation of this user whose last exchange is carried over"
+          }
+        },
+        "type": "object",
+        "title": "ConversationStart"
+      },
       "CopiedShifts": {
         "properties": {
           "created": {
@@ -30222,6 +32266,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -30246,6 +32291,15 @@
             "format": "date-time",
             "title": "Created At"
           },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "description": "Branches the new member will be kept to"
+          },
           "token": {
             "type": "string",
             "title": "Token"
@@ -30259,6 +32313,7 @@
           "status",
           "expires_at",
           "created_at",
+          "location_ids",
           "token"
         ],
         "title": "CreatedInvitation"
@@ -30292,6 +32347,152 @@
           "session_ids"
         ],
         "title": "CreatedSessions"
+      },
+      "CreditLimit": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "role",
+              "user"
+            ],
+            "title": "Kind"
+          },
+          "key": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Key",
+            "description": "A role key, or a user id"
+          },
+          "monthly_credits": {
+            "type": "integer",
+            "maximum": 1000000.0,
+            "minimum": 0.0,
+            "title": "Monthly Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "key",
+          "monthly_credits"
+        ],
+        "title": "CreditLimit"
+      },
+      "CustomAgent": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "role_title": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Role Title",
+            "default": ""
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "title": "Color",
+            "default": "#6B7280"
+          },
+          "topic": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Topic",
+            "default": ""
+          },
+          "instructions": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Instructions",
+            "default": ""
+          },
+          "tone": {
+            "type": "string",
+            "enum": [
+              "friendly",
+              "formal",
+              "short"
+            ],
+            "title": "Tone",
+            "default": "friendly"
+          },
+          "tool_domains": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Tool Domains"
+          },
+          "allowed_roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Roles",
+            "default": [
+              "owner",
+              "manager"
+            ]
+          },
+          "location_scope": {
+            "type": "string",
+            "enum": [
+              "all",
+              "locations"
+            ],
+            "title": "Location Scope",
+            "default": "all"
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "default": []
+          },
+          "model_tier": {
+            "type": "string",
+            "enum": [
+              "fast",
+              "standard",
+              "strong"
+            ],
+            "title": "Model Tier",
+            "default": "fast"
+          },
+          "avatar_preset": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Preset"
+          },
+          "draft": {
+            "type": "boolean",
+            "title": "Draft",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "tool_domains"
+        ],
+        "title": "CustomAgent"
       },
       "CustomRole": {
         "properties": {
@@ -31740,6 +33941,66 @@
         ],
         "title": "GrantCreate"
       },
+      "GroupFields": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60,
+            "minLength": 1,
+            "title": "Name",
+            "description": "E.g. \"South district\""
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 500,
+            "title": "Location Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "GroupFields"
+      },
+      "GroupUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 60,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array",
+                "maxItems": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids"
+          }
+        },
+        "type": "object",
+        "title": "GroupUpdate"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -32359,6 +34620,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -32382,6 +34644,15 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "description": "Branches the new member will be kept to"
           }
         },
         "type": "object",
@@ -32391,7 +34662,8 @@
           "role",
           "status",
           "expires_at",
-          "created_at"
+          "created_at",
+          "location_ids"
         ],
         "title": "Invitation"
       },
@@ -32407,10 +34679,21 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
             "title": "Role"
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Location Ids",
+            "description": "Branches the new member is kept to (empty: all; a branch manager's own)"
           }
         },
         "type": "object",
@@ -32431,6 +34714,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -33682,6 +35966,23 @@
         "type": "object",
         "title": "LeadUpdate"
       },
+      "LimitsUpdate": {
+        "properties": {
+          "limits": {
+            "items": {
+              "$ref": "#/components/schemas/CreditLimit"
+            },
+            "type": "array",
+            "maxItems": 200,
+            "title": "Limits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "limits"
+        ],
+        "title": "LimitsUpdate"
+      },
       "Location": {
         "properties": {
           "id": {
@@ -33724,6 +36025,19 @@
             },
             "type": "array",
             "title": "Rooms"
+          },
+          "manager_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manager User Id",
+            "description": "Who manages the branch (the owner until someone is appointed)"
           },
           "kind": {
             "anyOf": [
@@ -33810,6 +36124,7 @@
           "created_at",
           "updated_at",
           "rooms",
+          "manager_user_id",
           "kind",
           "effective_kind",
           "schedule_view",
@@ -33860,6 +36175,35 @@
           "name"
         ],
         "title": "LocationCreate"
+      },
+      "LocationGroup": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "location_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Location Ids",
+            "description": "The branches in the group that you may see"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "location_ids"
+        ],
+        "title": "LocationGroup"
       },
       "LocationUpdate": {
         "properties": {
@@ -34163,6 +36507,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -34433,6 +36778,7 @@
                 "enum": [
                   "owner",
                   "manager",
+                  "branch_manager",
                   "staff",
                   "front_desk"
                 ]
@@ -34476,6 +36822,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -38404,13 +40751,14 @@
                 "ai.use",
                 "social.read",
                 "social.manage",
+                "ai.manage",
                 "staff.read",
                 "staff.manage",
                 "business.settings"
               ]
             },
             "type": "array",
-            "maxItems": 17,
+            "maxItems": 18,
             "title": "Permissions"
           }
         },
@@ -38456,6 +40804,7 @@
                     "ai.use",
                     "social.read",
                     "social.manage",
+                    "ai.manage",
                     "staff.read",
                     "staff.manage",
                     "business.settings"
@@ -40955,6 +43304,32 @@
         ],
         "title": "SocialProviders"
       },
+      "SpendUpdate": {
+        "properties": {
+          "payg_enabled": {
+            "type": "boolean",
+            "title": "Payg Enabled"
+          },
+          "payg_cap_minor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100000000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payg Cap Minor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payg_enabled"
+        ],
+        "title": "SpendUpdate"
+      },
       "StaffHours": {
         "properties": {
           "user_id": {
@@ -41459,6 +43834,7 @@
             "enum": [
               "owner",
               "manager",
+              "branch_manager",
               "staff",
               "front_desk"
             ],
@@ -41478,30 +43854,6 @@
           "permissions"
         ],
         "title": "SystemRole"
-      },
-      "Team": {
-        "properties": {
-          "members": {
-            "items": {
-              "$ref": "#/components/schemas/Member"
-            },
-            "type": "array",
-            "title": "Members"
-          },
-          "invitations": {
-            "items": {
-              "$ref": "#/components/schemas/Invitation"
-            },
-            "type": "array",
-            "title": "Invitations"
-          }
-        },
-        "type": "object",
-        "required": [
-          "members",
-          "invitations"
-        ],
-        "title": "Team"
       },
       "Template": {
         "properties": {
@@ -41854,6 +44206,7 @@
                 "enum": [
                   "owner",
                   "manager",
+                  "branch_manager",
                   "staff",
                   "front_desk"
                 ]
@@ -42938,72 +45291,6 @@
         ],
         "title": "TryReply"
       },
-      "Usage": {
-        "properties": {
-          "pack": {
-            "anyOf": [
-              {
-                "type": "string",
-                "enum": [
-                  "pack_plus",
-                  "pack_max"
-                ]
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Pack",
-            "description": "None: the included one"
-          },
-          "month_start": {
-            "type": "string",
-            "format": "date",
-            "title": "Month Start"
-          },
-          "messages": {
-            "type": "integer",
-            "title": "Messages",
-            "description": "Messages sent this month (all channels)"
-          },
-          "messages_included": {
-            "type": "integer",
-            "title": "Messages Included"
-          },
-          "storage_bytes": {
-            "type": "integer",
-            "title": "Storage Bytes",
-            "description": "Files kept now"
-          },
-          "storage_included_bytes": {
-            "type": "integer",
-            "title": "Storage Included Bytes"
-          },
-          "ai_credits": {
-            "type": "number",
-            "title": "Ai Credits",
-            "description": "AI credits used this month (1 credit = 1 US cent)"
-          },
-          "ai_credits_included": {
-            "type": "integer",
-            "title": "Ai Credits Included",
-            "description": "0 when the business has no AI module"
-          }
-        },
-        "type": "object",
-        "required": [
-          "pack",
-          "month_start",
-          "messages",
-          "messages_included",
-          "storage_bytes",
-          "storage_included_bytes",
-          "ai_credits",
-          "ai_credits_included"
-        ],
-        "title": "Usage",
-        "description": "This calendar month's use against the business's bundle (space and messages)."
-      },
       "UsagePoint": {
         "properties": {
           "day": {
@@ -43027,6 +45314,24 @@
           "quantity"
         ],
         "title": "UsagePoint"
+      },
+      "UsageRow": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "credits"
+        ],
+        "title": "UsageRow"
       },
       "ValidationError": {
         "properties": {
@@ -43238,12 +45543,148 @@
         "type": "object",
         "title": "WelcomeRequest"
       },
+      "app__api__ai_team__Team": {
+        "properties": {
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/AgentCard"
+            },
+            "type": "array",
+            "title": "Agents"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "credits_included": {
+            "type": "integer",
+            "title": "Credits Included"
+          },
+          "payg_enabled": {
+            "type": "boolean",
+            "title": "Payg Enabled",
+            "default": false
+          },
+          "can_manage": {
+            "type": "boolean",
+            "title": "Can Manage"
+          },
+          "custom_count": {
+            "type": "integer",
+            "title": "Custom Count",
+            "default": 0
+          },
+          "custom_limit": {
+            "type": "integer",
+            "title": "Custom Limit",
+            "default": 3
+          }
+        },
+        "type": "object",
+        "required": [
+          "agents",
+          "credits_used",
+          "credits_included",
+          "can_manage"
+        ],
+        "title": "Team"
+      },
+      "app__api__ai_team__Usage": {
+        "properties": {
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "credits_used": {
+            "type": "number",
+            "title": "Credits Used"
+          },
+          "credits_included": {
+            "type": "integer",
+            "title": "Credits Included"
+          },
+          "by_agent": {
+            "items": {
+              "$ref": "#/components/schemas/UsageRow"
+            },
+            "type": "array",
+            "title": "By Agent"
+          },
+          "by_user": {
+            "items": {
+              "$ref": "#/components/schemas/UsageRow"
+            },
+            "type": "array",
+            "title": "By User"
+          },
+          "by_day": {
+            "items": {
+              "$ref": "#/components/schemas/UsageRow"
+            },
+            "type": "array",
+            "title": "By Day"
+          }
+        },
+        "type": "object",
+        "required": [
+          "month_start",
+          "credits_used",
+          "credits_included",
+          "by_agent",
+          "by_user",
+          "by_day"
+        ],
+        "title": "Usage"
+      },
       "app__api__assistant__Conversation": {
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
             "title": "Id"
+          },
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "page_context": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Context"
+          },
+          "location_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Ids",
+            "description": "The branches this chat was narrowed to (none: not narrowed)"
           },
           "turns": {
             "items": {
@@ -43261,6 +45702,10 @@
         "type": "object",
         "required": [
           "id",
+          "agent_key",
+          "title",
+          "page_context",
+          "location_ids",
           "turns",
           "updated_at"
         ],
@@ -43273,9 +45718,17 @@
             "format": "uuid",
             "title": "Id"
           },
+          "agent_key": {
+            "type": "string",
+            "title": "Agent Key"
+          },
           "title": {
             "type": "string",
             "title": "Title"
+          },
+          "archived": {
+            "type": "boolean",
+            "title": "Archived"
           },
           "updated_at": {
             "type": "string",
@@ -43286,7 +45739,9 @@
         "type": "object",
         "required": [
           "id",
+          "agent_key",
           "title",
+          "archived",
           "updated_at"
         ],
         "title": "ConversationSummary"
@@ -43312,6 +45767,14 @@
             "type": "array",
             "title": "Pending Actions",
             "default": []
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/AgentSuggestion"
+            },
+            "type": "array",
+            "title": "Suggestions",
+            "default": []
           }
         },
         "type": "object",
@@ -43320,6 +45783,78 @@
           "text"
         ],
         "title": "Turn"
+      },
+      "app__api__billing__Usage": {
+        "properties": {
+          "pack": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pack_plus",
+                  "pack_max"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pack",
+            "description": "None: the included one"
+          },
+          "month_start": {
+            "type": "string",
+            "format": "date",
+            "title": "Month Start"
+          },
+          "messages": {
+            "type": "integer",
+            "title": "Messages",
+            "description": "Messages sent this month (all channels)"
+          },
+          "messages_included": {
+            "type": "integer",
+            "title": "Messages Included"
+          },
+          "storage_bytes": {
+            "type": "integer",
+            "title": "Storage Bytes",
+            "description": "Files kept now"
+          },
+          "storage_included_bytes": {
+            "type": "integer",
+            "title": "Storage Included Bytes"
+          },
+          "ai_credits": {
+            "type": "number",
+            "title": "Ai Credits",
+            "description": "AI credits used this month (1 credit = 1 US cent)"
+          },
+          "ai_credits_included": {
+            "type": "integer",
+            "title": "Ai Credits Included",
+            "description": "0 when the business has no AI module"
+          },
+          "ai_extra_minor": {
+            "type": "integer",
+            "title": "Ai Extra Minor",
+            "description": "Pay-as-you-go: this month's extra AI use, minor units",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "pack",
+          "month_start",
+          "messages",
+          "messages_included",
+          "storage_bytes",
+          "storage_included_bytes",
+          "ai_credits",
+          "ai_credits_included"
+        ],
+        "title": "Usage",
+        "description": "This calendar month's use against the business's bundle (space and messages)."
       },
       "app__api__client_app__ProfileUpdate": {
         "properties": {
@@ -43488,6 +46023,30 @@
         },
         "type": "object",
         "title": "ProfileUpdate"
+      },
+      "app__api__staff__Team": {
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            },
+            "type": "array",
+            "title": "Members"
+          },
+          "invitations": {
+            "items": {
+              "$ref": "#/components/schemas/Invitation"
+            },
+            "type": "array",
+            "title": "Invitations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "members",
+          "invitations"
+        ],
+        "title": "Team"
       },
       "app__api__whatsapp_ai__Conversation": {
         "properties": {

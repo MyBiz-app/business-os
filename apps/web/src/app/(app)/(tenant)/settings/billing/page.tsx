@@ -12,6 +12,7 @@ import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
 import { addTestCard, payInvoice, removeCard } from "./actions";
+import { AiSpend } from "./ai-spend";
 import { DetailsForm } from "./details-form";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -29,6 +30,8 @@ export default async function BillingPage() {
   const { tenant, api, scope } = await getTenant();
   if (!canManageSettings(tenant)) redirect("/dashboard");
   const billing = unwrap(await api.GET("/billing", { params: scope }));
+  // Only people who manage the AI team see the spend controls (403 for the rest).
+  const aiSpend = (await api.GET("/ai/spend", { params: scope })).data;
   const money = (amount: number, currency = billing.estimate.currency) => formatMoney(amount, currency, locale);
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "long", year: "numeric" });
   const method = billing.payment_method;
@@ -137,6 +140,8 @@ export default async function BillingPage() {
           </Link>
         )}
       </section>
+
+      {aiSpend && <AiSpend spend={aiSpend} />}
 
       <div className="grid gap-6 md:grid-cols-2">
         <section aria-labelledby="plan-heading" className="card flex flex-col gap-4 p-6">

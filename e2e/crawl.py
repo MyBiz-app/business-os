@@ -41,7 +41,7 @@ with psycopg.connect(h.DATABASE_URL) as conn:
     }
 
 pages = [
-    "/dashboard", "/reports", "/assistant", "/schedule", "/schedule/new", "/schedule/appointment",
+    "/dashboard", "/reports", "/ai", "/schedule", "/schedule/new", "/schedule/appointment",
     "/schedule/closed", "/clients", "/clients/new", "/clients/import", "/clients/join", "/leads",
     "/leads/new", "/messages", "/services", "/services/new", "/plans", "/plans/new", "/locations",
     "/locations/new", "/team", "/team/roles", "/account", "/settings", "/settings/modules", "/settings/billing",

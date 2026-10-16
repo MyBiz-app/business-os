@@ -16,17 +16,20 @@ from zoneinfo import ZoneInfo
 from fastapi import HTTPException
 from sqlalchemy import text
 
+from app.ai.scope import CLIENT_IN_SCOPE, visible_clients
 from app.api import bookings as bookings_api
 from app.api import plans as plans_api
 from app.api import resources as resources_api
 from app.api import schedule as schedule_api
 from app.api import time_billing as time_api
 from app.api.deps import TenantContext
+from app.api.pagination import Page
 from app.core.permissions import Permission
 from app.reports.metrics import METRICS, compute, members_at_risk, previous_period
 
 PENDING_ACTION_TTL = dt.timedelta(minutes=15)
 MAX_ROWS = 25
+MAX_ROSTER = 200
 
 
 @dataclass(frozen=True)
@@ -36,6 +39,10 @@ class ToolContext:
     conversation_id: UUID
     time_zone: str
     modules: set[str]
+    # The agent talking (its key is filed on the actions it proposes) and the agents the user
+    # may be handed over to.
+    agent_key: str = "chief"
+    handoff_keys: frozenset[str] = frozenset()
 
 
 class ToolError(Exception):
@@ -90,14 +97,19 @@ def _date(value: str, what: str) -> dt.date:
 def find_clients(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     pattern = "%" + args["query"].strip().replace("\\", "\\\\").replace("%", "\\%") + "%"
     rows = ctx.tenant.session.execute(
-        text("""
+        text(
+            """
             SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name, c.status
             FROM app.clients c
             WHERE c.erased_at IS NULL
               AND (c.first_name || ' ' || coalesce(c.last_name, '') ILIKE :p
                    OR c.email ILIKE :p OR c.phone ILIKE :p)
+              AND """
+            + CLIENT_IN_SCOPE
+            + """
             ORDER BY c.first_name, c.last_name LIMIT :limit
-        """),
+        """
+        ),
         {"p": pattern, "limit": MAX_ROWS},
     ).mappings()
     return {"clients": [{**dict(r), "id": str(r["id"])} for r in rows]}
@@ -106,6 +118,8 @@ def find_clients(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
 def get_client(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     client_id = _uuid(args["client_id"], "client_id")
     db = ctx.tenant.session
+    if not visible_clients(db, [client_id]):  # another branch's client looks like no client
+        raise ToolError("no client with that id")
     row = (
         db.execute(
             text("""
@@ -201,7 +215,9 @@ def list_sessions(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
 
 def get_session_roster(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     session_id = _uuid(args["session_id"], "session_id")
-    roster = bookings_api.list_bookings(session_id=session_id, context=ctx.tenant)
+    roster = bookings_api.list_bookings(
+        session_id=session_id, context=ctx.tenant, page=Page(limit=MAX_ROSTER, offset=0)
+    )
     return {
         "bookings": [
             {
@@ -290,15 +306,20 @@ def list_plans(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
 def client_sources(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     start, end = _date(args["start_date"], "start_date"), _date(args["end_date"], "end_date")
     rows = ctx.tenant.session.execute(
-        text("""
+        text(
+            """
             SELECT coalesce(c.source, 'unknown') AS source, count(*) AS new_clients,
                    count(*) FILTER (WHERE EXISTS (
                        SELECT 1 FROM app.entitlements e WHERE e.client_id = c.id
                    )) AS bought_a_plan
             FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
             WHERE (c.created_at AT TIME ZONE t.time_zone)::date BETWEEN :start AND :end
+              AND """
+            + CLIENT_IN_SCOPE
+            + """
             GROUP BY 1 ORDER BY 2 DESC
-        """),
+        """
+        ),
         {"start": start, "end": end},
     ).mappings()
     return {"period": f"{start} to {end}", "sources": [dict(r) for r in rows]}
@@ -306,9 +327,11 @@ def client_sources(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
 
 def inactive_members(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     days = min(max(int(args["days"]), 7), 180)
-    members = [
+    at_risk = [
         m for m in members_at_risk(ctx.tenant.session, days, limit=500) if m.reason == "inactive"
-    ][:MAX_ROWS]
+    ]
+    visible = visible_clients(ctx.tenant.session, [UUID(m.client_id) for m in at_risk])
+    members = [m for m in at_risk if UUID(m.client_id) in visible][:MAX_ROWS]
     return {
         "members_with_a_valid_plan_and_no_visit_in_days": days,
         "members": [
@@ -360,14 +383,18 @@ def open_balances(ctx: ToolContext, _args: dict[str, Any]) -> dict[str, Any]:
     """Quotes and bills: what clients still owe on accepted ones, and sent quotes awaiting an
     answer."""
     rows = ctx.tenant.session.execute(
-        text("""
+        text(
+            """
             SELECT q.number, q.kind, q.title, q.status, q.currency,
                    trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client,
                    app.quote_total(q.id) AS total, app.quote_paid(q.id) AS paid, q.sent_at
             FROM app.quotes q JOIN app.clients c ON c.id = q.client_id
-            WHERE q.status IN ('sent', 'accepted')
+            WHERE q.status IN ('sent', 'accepted') AND """
+            + CLIENT_IN_SCOPE
+            + """
             ORDER BY q.sent_at
-        """)
+        """
+        )
     ).mappings()
     owed, awaiting = [], []
     for row in rows:
@@ -398,6 +425,8 @@ def logged_time(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     entries = time_api.time_entries(
         context=ctx.tenant, client_id=client_id, mine=False, start=start, end=end
     )
+    visible = visible_clients(ctx.tenant.session, list({e.client_id for e in entries}))
+    entries = [e for e in entries if e.client_id in visible]
     per_client: dict[str, int] = {}
     per_staff: dict[str, int] = {}
     for entry in entries:
@@ -433,9 +462,16 @@ def _month_arg(value: str) -> str:
     return value
 
 
+def _billable_clients(ctx: ToolContext, month: str) -> list[time_api.BillPreview]:
+    """The month's billing preview, for the clients in the current branches only."""
+    rows = time_api.billing_preview(context=ctx.tenant, month=month)
+    visible = visible_clients(ctx.tenant.session, [r.client_id for r in rows])
+    return [r for r in rows if r.client_id in visible]
+
+
 def billing_preview(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     """What billing the month would bill each client (retainer fee and hours beyond it)."""
-    rows = time_api.billing_preview(context=ctx.tenant, month=_month_arg(args["month"]))
+    rows = _billable_clients(ctx, _month_arg(args["month"]))
     to_bill = [r for r in rows if not r.billed and r.total > 0]
     return {
         "amounts": "minor units",
@@ -469,7 +505,7 @@ def _propose(
             INSERT INTO app.pending_actions
                 (tenant_id, conversation_id, requested_by, agent_key, tool_name, payload,
                  payload_hash, preview, risk_level, expires_at)
-            VALUES (:tenant_id, :conversation_id, :user_id, 'assistant', :tool, :payload,
+            VALUES (:tenant_id, :conversation_id, :user_id, :agent, :tool, :payload,
                     :hash, :preview, 'low', now() + :ttl)
             RETURNING id
         """),
@@ -477,6 +513,7 @@ def _propose(
             "tenant_id": ctx.tenant.tenant_id,
             "conversation_id": ctx.conversation_id,
             "user_id": ctx.user_id,
+            "agent": ctx.agent_key,
             "tool": tool_name,
             "payload": json.dumps(payload),
             "hash": payload_hash(tool_name, payload),
@@ -589,9 +626,7 @@ def log_time(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
 def bill_month(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     month = _month_arg(args["month"])
     rows = {
-        str(r.client_id): r
-        for r in time_api.billing_preview(context=ctx.tenant, month=month)
-        if not r.billed and r.total > 0
+        str(r.client_id): r for r in _billable_clients(ctx, month) if not r.billed and r.total > 0
     }
     wanted = args.get("client_ids") or list(rows)
     chosen = [rows[c] for c in dict.fromkeys(wanted) if c in rows]
@@ -607,6 +642,22 @@ def bill_month(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     }
     payload = {"month": month, "client_ids": [str(r.client_id) for r in chosen]}
     return _propose(ctx, "bill_month", payload, preview)
+
+
+def suggest_agent(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
+    """Offers the user a hand-over to a specialist agent. Nothing is switched: the app shows a
+    card and the user decides."""
+    key = str(args["agent_key"])
+    if key not in ctx.handoff_keys:
+        raise ToolError("that agent is not available to this user; answer it yourself")
+    reason = str(args["reason"]).strip()[:300]
+    if not reason:
+        raise ToolError("say in a sentence why that agent fits")
+    return {
+        "agent_suggestion": {"agent_key": key, "reason": reason},
+        "instruction": "The user sees a card offering the hand-over. Tell them in a sentence who "
+        "can take it from here and why; do not claim anything was switched.",
+    }
 
 
 DATE = {"type": "string", "description": "Local date, YYYY-MM-DD"}
@@ -780,8 +831,47 @@ TOOLS: dict[str, Tool] = {
             module="ai_pro",
             feature="time_billing",
         ),
+        Tool(
+            "suggest_agent",
+            "Offer the user a hand-over to a specialist on the team when their question is "
+            "mostly that specialist's work. Only offers: the user decides.",
+            {
+                "agent_key": {"type": "string", "description": "The specialist's key"},
+                "reason": {"type": "string", "description": "One sentence: why they fit"},
+            },
+            Permission.AI_USE,
+            suggest_agent,
+        ),
     )
 }
+
+# The toolbox domain of every tool: an agent only gets the tools of its domains. A new tool must
+# be listed here (a test fails otherwise), so no tool reaches an agent by accident.
+TOOL_DOMAINS: dict[str, str] = {
+    "find_clients": "clients",
+    "get_client": "clients",
+    "inactive_members": "clients",
+    "list_sessions": "schedule",
+    "free_courts": "schedule",
+    "get_session_roster": "bookings",
+    "book_client": "bookings",
+    "cancel_booking": "bookings",
+    "get_metrics": "metrics",
+    "client_sources": "sources",
+    "lead_pipeline": "leads",
+    "list_plans": "plans",
+    "open_balances": "balances",
+    "logged_time": "time",
+    "log_time": "time",
+    "billing_preview": "billing",
+    "bill_month": "billing",
+    "suggest_agent": "routing",
+}
+
+# Tools whose data has no branch to filter by (leads, for now). Whenever the conversation is
+# narrowed to some branches (a branch-limited user, an agent or a chat with a scope), they are
+# not offered, because their numbers would come from every branch.
+BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline"})
 
 
 def _allowed(tool: Tool, permissions: frozenset[str], modules: set[str]) -> bool:
@@ -792,16 +882,36 @@ def _allowed(tool: Tool, permissions: frozenset[str], modules: set[str]) -> bool
     )
 
 
-def tools_for(permissions: frozenset[str], modules: set[str]) -> list[Tool]:
+def tools_for(
+    permissions: frozenset[str],
+    modules: set[str],
+    domains: frozenset[str] | None = None,
+    narrowed: bool = False,
+) -> list[Tool]:
     """Only the tools the user's permissions and the business's modules (and its industry's
-    features, given in the same set) allow are offered."""
-    return [tool for tool in TOOLS.values() if _allowed(tool, permissions, modules)]
+    features, given in the same set) allow are offered; an agent narrows them to its domains,
+    and a conversation kept to some branches drops the tools that cannot filter by branch."""
+    return [
+        tool
+        for tool in TOOLS.values()
+        if _allowed(tool, permissions, modules)
+        and (domains is None or TOOL_DOMAINS[tool.name] in domains)
+        and not (narrowed and tool.name in BRANCH_BLIND)
+    ]
 
 
-def run_tool(ctx: ToolContext, name: str, args: dict[str, Any]) -> tuple[dict[str, Any], bool]:
-    """Runs a tool for the model. Returns (result, is_error); never raises for tool errors."""
+def run_tool(
+    ctx: ToolContext, name: str, args: dict[str, Any], offered: frozenset[str] | None = None
+) -> tuple[dict[str, Any], bool]:
+    """Runs a tool for the model. Returns (result, is_error); never raises for tool errors.
+    `offered` is the set of tool names this conversation was given: the model asking for any
+    other tool is refused, even one the user could use elsewhere."""
     tool = TOOLS.get(name)
-    if tool is None or not _allowed(tool, ctx.tenant.permissions, ctx.modules):
+    if (
+        tool is None
+        or not _allowed(tool, ctx.tenant.permissions, ctx.modules)
+        or (offered is not None and name not in offered)
+    ):
         return {"error": "this tool is not available to the user"}, True
     try:
         with ctx.tenant.session.begin_nested():  # a failed tool leaves no partial writes
