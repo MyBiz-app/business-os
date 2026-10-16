@@ -23,6 +23,7 @@ from app.core.signed_links import sign
 from app.messaging import email_layout as layout
 from app.messaging.contact_emails import resolve_email, sender_name
 from app.messaging.email import Email, Sender, load_messages
+from app.messaging.placeholders import client_values, lead_values, render_placeholders
 from app.messaging.push import PushSender, push_to_user
 
 BATCH = 200
@@ -50,17 +51,11 @@ def _lang(locale: str) -> str:
     return locale if locale in ("he", "en") else "he"
 
 
-def personalize(
-    texts: dict[str, str], first_name: str | None, business: str | None
-) -> dict[str, str]:
-    """A business's message may say {first_name} and {business}; MyBiz's own never does."""
-    if business is None:
+def personalize(texts: dict[str, str], values: dict[str, str] | None) -> dict[str, str]:
+    """A business's message may use the placeholders; MyBiz's own never does (`values` None)."""
+    if values is None:
         return texts
-    name = (first_name or "").strip()
-    return {
-        key: value.replace("{first_name}", name).replace("{business}", business)
-        for key, value in texts.items()
-    }
+    return {key: render_placeholders(value, values) for key, value in texts.items()}
 
 
 def _email(
@@ -253,9 +248,23 @@ def _send_batch(
     if announcement["issuer"] == "tenant":
         business = sender_name_for(conn, announcement)
         location_id = _location(announcement)
+    values: dict[Any, dict[str, str]] = {}
+    if business is not None:
+        values = client_values(
+            conn,
+            announcement["tenant_id"],
+            [r["client_id"] for r in rows if r["client_id"]],
+            business,
+        )
     for row in rows:
         lang = _lang(row["locale"])
-        texts = personalize(content_for(announcement["content"], lang), row["first_name"], business)
+        person = None
+        if business is not None:  # staff and others without a client record: name and contact
+            person = values.get(row["client_id"]) or lead_values(
+                {"first_name": row["first_name"], "phone": row["phone"], "email": row["email"]},
+                business,
+            )
+        texts = personalize(content_for(announcement["content"], lang), person)
         channel = row["channel"]
         try:
             if channel == "popup":

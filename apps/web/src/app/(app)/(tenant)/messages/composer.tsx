@@ -10,12 +10,12 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { type Reach, type SendState, previewCampaign, sendCampaign } from "./actions";
+import { VariablePicker, type VariableGroup, type VariableName } from "./variable-picker";
 import { isolate } from "@/lib/bidi";
 
 type AudienceCount = components["schemas"]["AudienceCount"];
 type Template = components["schemas"]["Template"];
 
-const VARIABLES = ["first_name", "business"] as const;
 const PHONE = ["whatsapp", "sms"] as const;
 const NET = ["email", "push", "popup"] as const;
 type ChannelKey = (typeof PHONE)[number] | (typeof NET)[number];
@@ -26,14 +26,16 @@ type Props = {
   templates: Template[];
   suggestions: { name: string; body: string }[];
   businessName: string;
-  sampleName: string;
+  /** A made-up client's values, for the live preview. */
+  sample: Record<string, string>;
+  variableGroups: VariableGroup[];
   /** The branches this person may message (a single one hides the picker). */
   branches: ScopeBranch[];
   groups: ScopeGroup[];
 };
 
 /** Write a message, pick who gets it, and see it as they will. */
-export function Composer({ audiences, templates, suggestions, businessName, sampleName, branches, groups }: Props) {
+export function Composer({ audiences, templates, suggestions, businessName, sample, variableGroups, branches, groups }: Props) {
   const t = useTranslations("messaging");
   const [state, action] = useActionState<SendState, FormData>(sendCampaign, {});
   const [audience, setAudience] = useState(audiences[0]?.audience ?? "active");
@@ -49,6 +51,7 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
   const [reach, setReach] = useState<Reach>(() => ({
     recipients: audiences.find((a) => a.audience === audience)?.recipients ?? 0,
     byChannel: audiences.find((a) => a.audience === audience)?.by_channel ?? {},
+    warnings: [],
   }));
   const nobody = usable.length === 0 || scope.length === 0;
   const count = nobody ? 0 : reach.recipients;
@@ -76,11 +79,31 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
 
   const toggleChannel = (value: ChannelKey) =>
     setChannels((current) => (current.includes(value) ? current.filter((c) => c !== value) : [...current, value]));
-  const preview = body.replaceAll("{first_name}", sampleName).replaceAll("{business}", businessName);
+  const sampleName = sample.first_name ?? "";
+  const preview = body.replace(/\{([a-z0-9_]+)(?:\|([^{}]*))?\}/g, (whole, name: string, fallback?: string) =>
+    name in sample ? sample[name] || (fallback ?? "").trim() : whole,
+  );
+  const [missing, setMissing] = useState<{ variable: string; recipients: number }[]>([]);
+  const shownMissing = body.includes("{") && !nobody ? missing : [];
 
-  const insert = (variable: string) => {
+  // Variables some recipients have no value for, checked on the server as the text is written.
+  useEffect(() => {
+    if (!body.includes("{") || usable.length === 0 || scope.length === 0) return;
+    let current = true;
+    const timer = setTimeout(() => {
+      previewCampaign({ audience, channels: usable, locationIds: allBranches ? null : scope, promotional, body }).then(
+        (result) => current && setMissing(result.warnings),
+      );
+    }, 500);
+    return () => {
+      current = false;
+      clearTimeout(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [body, audience, usable.join(","), scope.join(","), promotional]);
+
+  const insert = (token: string) => {
     const element = textArea.current;
-    const token = `{${variable}}`;
     if (!element) return setBody((value) => value + token);
     const start = element.selectionStart;
     const next = body.slice(0, start) + token + body.slice(element.selectionEnd);
@@ -222,19 +245,18 @@ export function Composer({ audiences, templates, suggestions, businessName, samp
             className="control w-full px-3 py-2"
           />
           <div id="message-help" className="flex flex-wrap items-center gap-2 text-xs text-muted">
-            <span>{t("insert")}</span>
-            {VARIABLES.map((variable) => (
-              <button
-                key={variable}
-                type="button"
-                onClick={() => insert(variable)}
-                className="rounded-full bg-primary/10 px-2.5 py-1 font-medium text-foreground transition-colors hover:bg-primary/20"
-              >
-                {t(`variables.${variable}`)}
-              </button>
-            ))}
+                        <VariablePicker groups={variableGroups} onPick={insert} />
             <span className="ms-auto tabular-nums">{body.length}/1000</span>
           </div>
+          {shownMissing.length > 0 && (
+            <ul role="status" className="flex flex-col gap-1 rounded-lg border border-warning/50 bg-warning/10 px-3 py-2 text-xs">
+              {shownMissing.map((item) => (
+                <li key={item.variable}>
+                  {t("missingValue", { count: item.recipients, variable: t(`variables.${item.variable as VariableName}`) })}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">

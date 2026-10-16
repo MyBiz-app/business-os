@@ -1,7 +1,7 @@
 """Profile pictures for a demo account, and the gym network's third branch.
 
 Fills an owner's demo businesses with logos (business and branch), portraits for staff and
-clients, and gives "Iron & Flow" a crossfit branch next to its strength and pilates ones. It
+clients, and gives "Adir fitness" a crossfit branch next to its strength and pilates ones. It
 only adds: a logo or a portrait that is already set is kept, and nothing is deleted, so it is
 safe to run on an account that has real activity. The images are drawn by
 `scripts/generate_demo_images.py` (synthetic: no photos of real people).
@@ -18,7 +18,7 @@ from sqlalchemy import Connection, text
 from app.seed.workspace import OPENING_HOURS
 
 ASSETS = Path(__file__).parent / "assets"
-GYM_NETWORK = "Iron & Flow"
+GYM_NETWORK = "Adir fitness"
 CROSSFIT_BRANCH = ("חיפה - קרוספיט", "הנמל 12, חיפה")
 CROSSFIT_COACHES = (("אורן", "שגיא"), ("שירן", "בן דוד"), ("גיא", "מזרחי"))
 CLIENTS_WITH_PORTRAIT = 40  # per business: clients who have a sign-in profile in the demo

@@ -44,7 +44,7 @@
    "file": "logos/b11.png",
    "color": "#db2777"
   },
-  "Iron & Flow": {
+  "Adir fitness": {
    "file": "logos/b12.png",
    "color": "#0f766e"
   },
@@ -174,52 +174,56 @@
    "file": "logos/br23.png",
    "color": "#be185d"
   },
-  "Iron & Flow/תל אביב - כוח": {
+  "Adir fitness/תל אביב - כוח": {
    "file": "logos/br24.png",
    "color": "#c2410c"
   },
-  "Iron & Flow/רמת גן - פילאטיס": {
+  "Adir fitness/רמת גן - פילאטיס": {
    "file": "logos/br25.png",
    "color": "#7c3aed"
   },
-  "Padel Nation/הרצליה": {
+  "Adir fitness/חיפה - קרוספיט": {
    "file": "logos/br26.png",
-   "color": "#4d7c0f"
+   "color": "#b45309"
   },
-  "Padel Nation/ראשון לציון": {
+  "Padel Nation/הרצליה": {
    "file": "logos/br27.png",
    "color": "#4d7c0f"
   },
-  "Padel Nation/רעננה": {
+  "Padel Nation/ראשון לציון": {
    "file": "logos/br28.png",
    "color": "#4d7c0f"
   },
-  "Glow Beauty/תל אביב - שינקין": {
+  "Padel Nation/רעננה": {
    "file": "logos/br29.png",
+   "color": "#4d7c0f"
+  },
+  "Glow Beauty/תל אביב - שינקין": {
+   "file": "logos/br30.png",
    "color": "#be185d"
   },
   "יוגה בגבעה/זכרון יעקב": {
-   "file": "logos/br30.png",
+   "file": "logos/br31.png",
    "color": "#059669"
   },
   "קרוספיט צפון/קריית ביאליק": {
-   "file": "logos/br31.png",
+   "file": "logos/br32.png",
    "color": "#b45309"
   },
   "פיזיו פלוס/פתח תקווה": {
-   "file": "logos/br32.png",
+   "file": "logos/br33.png",
    "color": "#0284c7"
   },
   "סטודיו מחול רונה/רחובות": {
-   "file": "logos/br33.png",
+   "file": "logos/br34.png",
    "color": "#db2777"
   },
   "מספרת הדר/באר שבע": {
-   "file": "logos/br34.png",
+   "file": "logos/br35.png",
    "color": "#be185d"
   },
   "מוסך המומחים/חולון": {
-   "file": "logos/br35.png",
+   "file": "logos/br36.png",
    "color": "#475569"
   },
   "kind:crossfit": {

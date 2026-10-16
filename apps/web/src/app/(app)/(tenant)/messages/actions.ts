@@ -12,7 +12,11 @@ type Channel = components["schemas"]["Campaign"]["channel"];
 type PhoneChannel = components["schemas"]["DirectMessage"]["channel"];
 
 export type SendState = FormState & { sent?: number };
-export type Reach = { recipients: number; byChannel: Record<string, number> };
+export type Reach = {
+  recipients: number;
+  byChannel: Record<string, number>;
+  warnings: { variable: string; recipients: number }[];
+};
 
 /** The branches, channels and promotional flag of a message, as the form sends them. No branch
  * inputs means the whole network. */
@@ -35,6 +39,7 @@ export async function previewCampaign(input: {
   channels: string[];
   locationIds: string[] | null;
   promotional: boolean;
+  body?: string;
 }): Promise<Reach> {
   const { api, scope } = await getTenant();
   try {
@@ -47,14 +52,14 @@ export async function previewCampaign(input: {
           channels: input.channels as Channel[],
           location_ids: input.locationIds && input.locationIds.length > 0 ? input.locationIds : null,
           promotional: input.promotional,
-          body: "-",
+          body: input.body?.trim() || "-",
           dry_run: true,
         },
       }),
     );
-    return { recipients: result.recipients, byChannel: result.by_channel ?? {} };
+    return { recipients: result.recipients, byChannel: result.by_channel ?? {}, warnings: result.warnings ?? [] };
   } catch {
-    return { recipients: 0, byChannel: {} };
+    return { recipients: 0, byChannel: {}, warnings: [] };
   }
 }
 

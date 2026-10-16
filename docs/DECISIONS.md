@@ -215,6 +215,12 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Built-in agents use realistic portraits that are AI-generated or supplied by the owner, never photos of real customers. The earlier illustrations live on as `gallery-17` to `gallery-25`.
 - A name or face the business changed is stored as an override and is never replaced by a default change.
 
+### AI team structure (2026-10-16, round 6 U3, migration 0111)
+
+- Reporting lines are stored per agent (`reports_to_key`, default the chief); teams are a table with an optional lead. Built-in agents keep these on their override row.
+- Hand-overs go to a team's lead first (`handoff_target`); the morning briefing is not yet grouped by team.
+- A locked agent cannot be wired in; the chief cannot report to anyone; loops are refused by the API.
+
 ## Open
 
 | # | Question |
