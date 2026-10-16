@@ -44,3 +44,8 @@ export function homeCardsFor(business: { vertical?: string | null; home_cards?: 
 export function bookingModesFor(business: { vertical?: string | null } | null | undefined): string[] {
   return vertical(business?.vertical)?.bookingModes ?? [];
 }
+
+/** How clients see the schedule: class blocks, appointments by staff member, or courts by the hour. */
+export function scheduleViewFor(business: { vertical?: string | null } | null | undefined): "class_blocks" | "appointments" | "courts" {
+  return vertical(business?.vertical)?.scheduleView ?? "class_blocks";
+}
