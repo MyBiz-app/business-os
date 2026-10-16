@@ -42,7 +42,7 @@ def sign_in(page, email_label: str, send: str, code_label: str, enter: str) -> N
     page.get_by_label(code_label).wait_for(timeout=30000)
     page.wait_for_timeout(2000)  # let the new code's email arrive (older ones are still there)
     page.get_by_label(code_label).fill(h.otp(OWNER))
-    page.get_by_role("button", name=enter).click()
+    # Filling the last digit signs in on its own.
 
 
 def tab(page, name: str) -> None:
