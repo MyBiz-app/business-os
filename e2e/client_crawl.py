@@ -53,7 +53,8 @@ with sync_playwright() as p:
     page.get_by_label("אימייל").fill(client_email)
     page.get_by_role("button", name="שליחת קוד").click()
     page.get_by_label("הקוד בן 6 הספרות").fill(h.otp(client_email))
-    page.get_by_role("button", name="כניסה").click(); page.wait_for_url("**/join")
+    # Filling the last digit signs in on its own.
+    page.wait_for_url("**/join")
     scan(page, "join")
     page.get_by_label("קוד הצטרפות").fill(code)
     page.get_by_role("button", name="המשך").click()
