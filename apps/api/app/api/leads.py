@@ -237,8 +237,8 @@ def list_leads(
                       OR l.stage_changed_at > now() - make_interval(days => :closed_days))"""
     params: dict[str, object] = {"closed_days": closed_days}
     if search and search.strip():
-        where += " AND concat_ws(' ', l.first_name, l.last_name, l.email, l.phone, l.interest)"
-        where += " ILIKE :pattern"
+        # Through the function: row level security would keep Postgres from using the index.
+        where += " AND l.id IN (SELECT app.search_lead_ids(:pattern))"
         params["pattern"] = _like(search.strip())
     if source:
         where += " AND l.source = :source"

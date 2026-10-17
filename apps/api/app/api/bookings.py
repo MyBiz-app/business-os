@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.health import HEALTH_STATE_SQL, HealthState
-from app.api.pagination import PageDep, WidePageDep
+from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, WidePageDep, encode_cursor
 from app.api.plans import usable_entitlement
 from app.catalog.verticals import CATALOG, VerticalPack
 from app.core.permissions import Permission
@@ -321,24 +321,43 @@ def update_booking(booking_id: UUID, body: BookingUpdate, context: ManageDep) ->
 
 @router.get("/clients/{client_id}/bookings")
 def list_client_bookings(
-    client_id: UUID, context: ClientsReadDep, page: PageDep
+    client_id: UUID, context: ClientsReadDep, page: KeysetDep, response: Response
 ) -> list[ClientBooking]:
     """A client's bookings, newest session first (a member kept to some branches sees those
-    made at their branches)."""
-    rows = context.session.execute(
-        text("""
+    made at their branches). The header `X-Next-Cursor`, when present, goes in `after`."""
+    rows = (
+        context.session.execute(
+            text("""
             SELECT b.id, b.session_id, sv.name AS service_name, s.starts_at, s.ends_at,
                    s.status AS session_status, b.status, b.late_cancel,
                    d.name AS dependent_name,
-                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating
+                   (SELECT r.rating FROM app.reviews r WHERE r.booking_id = b.id) AS rating,
+                   b.id AS key_id
             FROM app.bookings b
             JOIN app.sessions s ON s.id = b.session_id
             JOIN app.services sv ON sv.id = s.service_id
             LEFT JOIN app.dependents d ON d.id = b.dependent_id
             WHERE b.client_id = :id AND (s.location_id IS NULL OR app.in_branch(s.location_id))
-            ORDER BY s.starts_at DESC, b.id
-            LIMIT :limit OFFSET :offset
+              AND (CAST(:after_at AS timestamptz) IS NULL
+                   OR (s.starts_at, b.id) <
+                       (CAST(:after_at AS timestamptz), CAST(:after_id AS uuid)))
+            ORDER BY s.starts_at DESC, b.id DESC
+            LIMIT :fetch OFFSET :offset
         """),
-        {"id": client_id, "limit": page.limit, "offset": page.offset},
-    ).mappings()
+            {
+                "id": client_id,
+                "fetch": page.fetch,
+                "offset": page.offset,
+                "after_at": page.after[0] if page.after else None,
+                "after_id": page.after[1] if page.after and len(page.after) > 1 else None,
+            },
+        )
+        .mappings()
+        .all()
+    )
+    if len(rows) > page.limit:
+        rows = rows[: page.limit]
+        response.headers[NEXT_CURSOR_HEADER] = encode_cursor(
+            rows[-1]["starts_at"].isoformat(), rows[-1]["key_id"]
+        )
     return [ClientBooking.model_validate(dict(row)) for row in rows]

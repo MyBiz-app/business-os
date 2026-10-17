@@ -25,6 +25,7 @@ from app.api.bookings import (
 from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
 from app.api.health import ensure_may_book
+from app.api.pagination import FullPageDep
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
 from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
@@ -529,5 +530,5 @@ def business_plans(context: ClientDep) -> list[Plan]:
 
 
 @router.get("/entitlements")
-def my_entitlements(context: ClientDep) -> list[Entitlement]:
-    return list_entitlements(context.session, context.client_id)
+def my_entitlements(context: ClientDep, page: FullPageDep) -> list[Entitlement]:
+    return list_entitlements(context.session, context.client_id, page)
