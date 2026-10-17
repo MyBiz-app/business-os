@@ -336,30 +336,32 @@ def members_at_risk(db: Session, days: int, limit: int = 100) -> list[MemberAtRi
                 SELECT time_zone, (now() AT TIME ZONE time_zone)::date AS today
                 FROM app.tenants WHERE id = app.current_tenant_id()
             ),
-            -- One pass over each table instead of a lookup per client: this runs on the
-            -- dashboard and the reports page, so it must stay flat as the client list grows.
+            -- Only plans that can still matter (active, not yet over) are read. This runs on the
+            -- dashboard and the reports page, so it must stay flat as the history grows.
             plans AS (
                 SELECT e.client_id,
-                       max(e.ends_on) FILTER (WHERE e.status = 'active'
-                                              AND e.ends_on >= t.today) AS plan_ends_on,
-                       bool_or(e.status = 'active'
-                               AND t.today BETWEEN e.starts_on AND e.ends_on) AS holds_valid
+                       max(e.ends_on) AS plan_ends_on,
+                       bool_or(t.today BETWEEN e.starts_on AND e.ends_on) AS holds_valid
                 FROM app.entitlements e CROSS JOIN t
+                WHERE e.status = 'active' AND e.ends_on >= t.today
                 GROUP BY e.client_id
             ),
+            -- The booking's own check-in time, not the session's start: joining sessions costs
+            -- a row level security check per booking (0.8s for 16,000 check-ins), and one pass
+            -- over the bookings is far cheaper than a lookup per member.
             visits AS (
-                SELECT b.client_id, max(s.starts_at) AS last_visit
-                FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+                SELECT b.client_id, max(b.checked_in_at) AS last_visit
+                FROM app.bookings b
                 WHERE b.status = 'checked_in'
                 GROUP BY b.client_id
             ),
             members AS (
                 SELECT c.id, trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS name,
                        p.plan_ends_on, v.last_visit
-                FROM app.clients c
-                JOIN plans p ON p.client_id = c.id AND p.holds_valid
+                FROM plans p
+                JOIN app.clients c ON c.id = p.client_id
                 LEFT JOIN visits v ON v.client_id = c.id
-                WHERE c.erased_at IS NULL
+                WHERE p.holds_valid AND c.erased_at IS NULL
                   -- clients without a home branch belong to every branch
                   AND (c.home_location_id IS NULL OR app.in_branch(c.home_location_id))
             )
