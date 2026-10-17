@@ -16,8 +16,10 @@ from app.ai import budget as ai_budget
 from app.api.common import blank_to_none, check_columns, not_found
 from app.api.deps import TenantContext, require
 from app.api.modules import QuoteOut, _tenant_modules, enabled_modules
+from app.commerce import quotas
 from app.commerce.billing import add_months
 from app.commerce.modules import allowance
+from app.commerce.quotas import QuotaAlert
 from app.core.config import get_settings
 from app.core.permissions import Permission
 
@@ -88,6 +90,10 @@ class Usage(BaseModel):
     ai_credits_included: int = Field(description="0 when the business has no AI module")
     ai_extra_minor: int = Field(
         default=0, description="Pay-as-you-go: this month's extra AI use, minor units"
+    )
+    alerts: list[QuotaAlert] = Field(
+        default_factory=list,
+        description="Marks (80 and 100 percent) the month's messages and space have passed",
     )
 
 
@@ -205,9 +211,16 @@ def usage(db: Session, today: date) -> Usage:
         """),
         {"start": month_start},
     ).one()
+    quotas.raise_alerts(
+        db,
+        month_start,
+        {"messages": int(row.messages), "storage": int(row.storage)},
+        {"messages": allowed.messages, "storage": allowed.storage_bytes},
+    )
     return Usage(
         pack=pack,  # type: ignore[arg-type]
         month_start=month_start,
+        alerts=quotas.month_alerts(db, month_start),
         messages=int(row.messages),
         messages_included=allowed.messages,
         storage_bytes=int(row.storage),

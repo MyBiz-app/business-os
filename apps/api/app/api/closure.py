@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from app.api.deps import TenantContext, get_tenant_context
+from app.core import events
 from app.core.mfa import mfa_required, sensitive_action_needs_mfa
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 
@@ -88,6 +89,7 @@ def close_business(body: CloseRequest, context: OwnerDep) -> Closure:
     if not changed:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="already_closed")
     _audit(context, "tenant.closed")
+    events.record(db, "business_closed")
     return _state(context)
 
 

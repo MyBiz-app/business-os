@@ -20,6 +20,7 @@ from app.commerce.modules import (
     recommend,
     validate,
 )
+from app.core import events
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["modules"])
@@ -185,6 +186,12 @@ def set_modules(db: Session | Connection, tenant_id: object, selection: dict[str
     db.execute(text("SELECT app.sync_my_extra_locations()"))
 
 
+def _record_added(db: Session, before: dict[str, int], after: dict[str, int]) -> None:
+    """A product event for each module the business just switched on."""
+    for key in after.keys() - before.keys():
+        events.record(db, "module_enabled", key)
+
+
 def _tenant_modules(db: Session) -> TenantModules:
     modules = enabled_modules(db)
     row = db.execute(
@@ -213,7 +220,9 @@ def get_tenant_modules(context: TenantDep) -> TenantModules:
 def put_tenant_modules(body: Selection, context: SettingsDep) -> TenantModules:
     """Replaces the business's modules (billing is simulated in the prototype)."""
     check_selection(body.modules)
+    before = enabled_modules(context.session)
     set_modules(context.session, context.tenant_id, body.modules)
+    _record_added(context.session, before, body.modules)
     return _tenant_modules(context.session)
 
 
@@ -230,5 +239,7 @@ def add_tenant_module(key: ModuleKey, context: SettingsDep) -> TenantModules:
             selection.pop(other)
         selection[key] = 1
         check_selection(selection)
+        before = enabled_modules(db)
         set_modules(db, context.tenant_id, selection)
+        _record_added(db, before, selection)
     return _tenant_modules(db)

@@ -5,8 +5,8 @@ When the email provider reports a hard bounce or a spam complaint, the address g
 has no direct grants: the signed webhook files entries through `app.suppress_email()` and the
 senders and the CRM read through `app.email_is_suppressed()`.
 
-Revision ID: 0122
-Revises: 0121
+Revision ID: 0123
+Revises: 0122
 Create Date: 2026-10-17
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0122"
-down_revision: str | None = "0121"
+revision: str = "0123"
+down_revision: str | None = "0122"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
