@@ -27,6 +27,7 @@ class Permission(StrEnum):
     BUSINESS_SETTINGS = "business.settings"
     FILES_READ = "files.read"  # open the business's files area (some folders need more)
     FILES_MANAGE = "files.manage"  # add, archive and organize files and folders
+    MIGRATION_MANAGE = "migration.manage"  # move an existing business onto MyBiz (and undo it)
     IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
 
 
@@ -53,6 +54,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.BUSINESS_SETTINGS,
             Permission.FILES_READ,
             Permission.FILES_MANAGE,
+            Permission.MIGRATION_MANAGE,
         }
     ),
     # A manager at their own branches only (the API keeps them to `location_ids`): everything a

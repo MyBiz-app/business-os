@@ -214,6 +214,14 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Payslips and employee papers are sealed with `API_SECRETS_KEY` (Fernet) before they reach the database or the object store, so a signed storage link is never used for them: the API opens and serves them. Folders with `retain` never delete a file, only archive it.
 - A file filed for one employee (`owner_user_id`) is always open to that employee ("My documents"), whatever the folder's permission. `payroll.read` is named in the payslips folder before the payroll slice defines it; owners open every folder.
 - Files in the imports folder expire after 30 days and are removed by the daily `purge-expired` job.
+### Migration hub core (2026-10-17, round 6 M1, migration 0110)
+
+- A move is a session (`import_sessions`) that starts with the owner confirming the right to transfer the data. Its files live in the imports folder of the files area (30 days) and each has a `kind` and a column-to-field `mapping` (`import_files`). Five kinds: clients, memberships (a balance and an expiry, so a card with 7 entries left stays 7), services, staff, upcoming appointments.
+- The dry run is the real import inside a savepoint that is rolled back, so the preview can never disagree with the import and every constraint is checked. Order: services, staff, clients, then memberships and appointments, which find their client by email, then phone, then full name (a name shared by two clients is "ambiguous", never guessed).
+- Everything an import creates is recorded in `import_batch_items`. Undo is open for 14 days and runs in the database function `app.undo_import_batch` (the API role cannot delete these rows itself). It removes a record only when it was not edited after the import and nothing else points at it; with the owner's explicit choice it also removes edited ones, but a record that later data depends on (a note, a payment, a booking by someone else) always stays, so no cascade deletes data added after the import.
+- Imported cards and memberships hang on an inactive plan named after the file's own plan name, so they do not show up for sale. Expired memberships, empty balances and past appointments are left out and counted as such. Staff are invited (role staff, front desk or manager, never owner), not created; the invitation links are shown once, right after the import.
+- Default chosen: the import runs in one request, not as a background job (a file holds up to 5,000 rows). AI mapping, saved templates for known systems, export guides, ICS and VCF files, the client notice and the concierge service are slices M2 and M3.
+
 ### AI agent names and faces (2026-10-16, round 6 U2)
 
 - Built-in agent names are international and work in Hebrew and English: Adir, Shiri, Lia, Daniel, Adam, Emma, Noah, Ethan, Sophie. The chief defaults to the owner's own first name.

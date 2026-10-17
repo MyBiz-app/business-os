@@ -53,6 +53,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/sales", group: g("money"), label: t("nav.sales"), icon: "sales", permission: "reports.read" },
     { href: "/locations", group: g("business"), label: t("nav.locations"), icon: "locations", permission: "catalog.read" },
     { href: "/files", group: g("business"), label: t("nav.files"), icon: "files", permission: "files.read" },
+    { href: "/migration", group: g("business"), label: t("nav.migration"), icon: "migration", permission: "migration.manage" },
   ];
   // Modules the business doesn't have stay in the menu, locked, and open a preview.
   const items: NavItem[] = candidates

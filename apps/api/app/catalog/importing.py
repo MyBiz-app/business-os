@@ -80,6 +80,9 @@ def _cell(value: object) -> str:
     if value is None:
         return ""
     if isinstance(value, datetime):
+        # A date with a time of day keeps it (appointments); a plain date stays a date.
+        if value.hour or value.minute:
+            return value.isoformat(sep=" ", timespec="minutes")
         return value.date().isoformat()
     if isinstance(value, date):
         return value.isoformat()
@@ -88,9 +91,9 @@ def _cell(value: object) -> str:
     return str(value).strip()
 
 
-def read_table(data: bytes, filename: str) -> list[list[str]]:
+def read_table(data: bytes, filename: str, max_bytes: int = MAX_BYTES) -> list[list[str]]:
     """The file as rows of text cells; the first row is the header. Empty rows are dropped."""
-    if len(data) > MAX_BYTES:
+    if len(data) > max_bytes:
         raise ImportFileError("file_too_large")
     if filename.lower().endswith((".xlsx", ".xlsm")) or data[:2] == b"PK":
         try:
