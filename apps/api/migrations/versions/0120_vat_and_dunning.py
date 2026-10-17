@@ -20,6 +20,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
+# contract: nothing is dropped on upgrade (only the downgrade drops what this adds), so the previous
+# code keeps working on the new schema.
 revision: str = "0120"
 down_revision: str | None = "0119"
 branch_labels: str | Sequence[str] | None = None

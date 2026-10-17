@@ -16,6 +16,10 @@ GLOBAL_TABLES = {
     "legal_acceptances",
     "job_runs",
     "announcement_views",
+    "vat_rates",  # dated VAT rates, the same for every business; read-only for the API
+    "dunning_settings",  # MyBiz's collection steps; read-only for the API
+    "platform_series",  # MyBiz's invoice counter; system only
+    "dunning_events",  # reminders sent per MyBiz invoice; system only
     "payroll_rates",  # law-driven rates, the same for every business; read-only for the API
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
