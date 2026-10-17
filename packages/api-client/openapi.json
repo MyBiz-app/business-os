@@ -13455,6 +13455,260 @@
         }
       }
     },
+    "/migration/sessions/{session_id}/follow-up": {
+      "get": {
+        "tags": [
+          "migration"
+        ],
+        "summary": "Follow Up",
+        "description": "Where a move stands after the import: who can be told, what went out, what MyBiz got.",
+        "operationId": "follow_up",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FollowUpOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/migration/sessions/{session_id}/notice": {
+      "post": {
+        "tags": [
+          "migration"
+        ],
+        "summary": "Send Notice",
+        "description": "Tells the clients of the move that the business has moved (a service message, so it needs\nno marketing consent). The text may use the variables of the messages editor; `{join_code}`\nand `{app_link}` take the client to the app.",
+        "operationId": "send_notice",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoticeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoticeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/migration/sessions/{session_id}/concierge": {
+      "post": {
+        "tags": [
+          "migration"
+        ],
+        "summary": "Ask Concierge",
+        "description": "\"Do it for me\": opens a task in the MyBiz console's inbox for this move and lets MyBiz\nsupport look in for a limited time (ended early from the support settings). The business keeps\nthe last word: it still approves the dry run itself.",
+        "operationId": "ask_concierge",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConciergeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConciergeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/whatsapp-ai/conversations": {
       "get": {
         "tags": [
@@ -43204,6 +43458,57 @@
         "type": "object",
         "title": "ComponentUpdate"
       },
+      "ConciergeOut": {
+        "properties": {
+          "requested_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Requested At"
+          },
+          "included": {
+            "type": "boolean",
+            "title": "Included"
+          },
+          "support_until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Support Until"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requested_at",
+          "included",
+          "support_until"
+        ],
+        "title": "ConciergeOut"
+      },
+      "ConciergeRequest": {
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "support_hours": {
+            "type": "integer",
+            "maximum": 72.0,
+            "minimum": 1.0,
+            "title": "Support Hours",
+            "description": "How long MyBiz may look in",
+            "default": 72
+          }
+        },
+        "type": "object",
+        "title": "ConciergeRequest"
+      },
       "ConnectResult": {
         "properties": {
           "accounts": {
@@ -45947,6 +46252,88 @@
           "name"
         ],
         "title": "FolderRename"
+      },
+      "FollowUpOut": {
+        "properties": {
+          "clients": {
+            "type": "integer",
+            "title": "Clients",
+            "description": "Clients the move created"
+          },
+          "with_email": {
+            "type": "integer",
+            "title": "With Email"
+          },
+          "with_phone_only": {
+            "type": "integer",
+            "title": "With Phone Only"
+          },
+          "notice_sent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice Sent At"
+          },
+          "notice_recipients": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notice Recipients"
+          },
+          "concierge_requested_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concierge Requested At"
+          },
+          "concierge_included": {
+            "type": "boolean",
+            "title": "Concierge Included",
+            "description": "The business bought the done-for-you setup"
+          },
+          "support_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support Until",
+            "description": "MyBiz support may look in until then"
+          }
+        },
+        "type": "object",
+        "required": [
+          "clients",
+          "with_email",
+          "with_phone_only",
+          "notice_sent_at",
+          "notice_recipients",
+          "concierge_requested_at",
+          "concierge_included",
+          "support_until"
+        ],
+        "title": "FollowUpOut"
       },
       "FollowerPoint": {
         "properties": {
@@ -51277,6 +51664,122 @@
         ],
         "title": "NoteCreate"
       },
+      "NoticeOut": {
+        "properties": {
+          "recipients": {
+            "type": "integer",
+            "title": "Recipients",
+            "description": "Clients of the move that can be reached on a chosen channel"
+          },
+          "clients": {
+            "type": "integer",
+            "title": "Clients",
+            "description": "Everyone the move created"
+          },
+          "by_channel": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Channel"
+          },
+          "preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preview"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/PlaceholderWarning"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "sent": {
+            "type": "boolean",
+            "title": "Sent"
+          },
+          "phone_only": {
+            "items": {
+              "$ref": "#/components/schemas/PhoneOnlyClient"
+            },
+            "type": "array",
+            "title": "Phone Only",
+            "description": "Clients with a phone number and no email: the owner sends these from WhatsApp"
+          },
+          "phone_only_total": {
+            "type": "integer",
+            "title": "Phone Only Total"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recipients",
+          "clients",
+          "by_channel",
+          "preview",
+          "warnings",
+          "sent",
+          "phone_only",
+          "phone_only_total"
+        ],
+        "title": "NoticeOut"
+      },
+      "NoticeRequest": {
+        "properties": {
+          "subject": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 1,
+            "title": "Subject"
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Body"
+          },
+          "channels": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "email",
+                "push",
+                "popup"
+              ]
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Channels"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "description": "Only count and preview; send nothing",
+            "default": true
+          },
+          "resend": {
+            "type": "boolean",
+            "title": "Resend",
+            "description": "Send again after a notice already went out",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "subject",
+          "body",
+          "channels"
+        ],
+        "title": "NoticeRequest"
+      },
       "Notification": {
         "properties": {
           "id": {
@@ -52343,6 +52846,49 @@
           "by_service"
         ],
         "title": "PersonProfile"
+      },
+      "PhoneOnlyClient": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text",
+            "description": "The notice as this client gets it"
+          },
+          "whatsapp_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Whatsapp Link",
+            "description": "Opens WhatsApp with the text; null if no usable number"
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "first_name",
+          "phone",
+          "text",
+          "whatsapp_link"
+        ],
+        "title": "PhoneOnlyClient"
       },
       "PlaceholderGroup": {
         "properties": {

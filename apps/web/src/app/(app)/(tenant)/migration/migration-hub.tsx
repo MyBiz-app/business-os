@@ -5,6 +5,7 @@ import { useId, useState, useTransition } from "react";
 
 import { FileField } from "@/components/form/file-field";
 
+import { ConciergePanel, FollowUpPanel } from "./follow-up";
 import {
   aiMapMoveFile,
   removeMoveFile,
@@ -33,7 +34,7 @@ function useLookup(): Lookup {
 }
 
 /** The moving flow: confirm the right to transfer, add files, check what each is, dry run, import. */
-export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession | null; batches: Batch[]; timeZone: string }) {
+export function MigrationHub({ draft, movedId, batches, timeZone }: { draft: MoveSession | null; movedId: string | null; batches: Batch[]; timeZone: string }) {
   const t = useTranslations("migration");
   const word = useLookup();
   const [session, setSession] = useState<MoveSession | null>(draft);
@@ -65,8 +66,13 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
       )}
 
       {report?.committed ? (
-        <Done report={report} onAgain={() => { setSession(null); setFiles([]); setReport(null); }} />
+        <>
+          <Done report={report} onAgain={() => { setSession(null); setFiles([]); setReport(null); }} />
+          {session && <FollowUpPanel sessionId={session.id} timeZone={timeZone} />}
+        </>
       ) : !session ? (
+        <>
+          {movedId && <FollowUpPanel sessionId={movedId} timeZone={timeZone} />}
         <Start
           pending={pending}
           onStart={(origin) =>
@@ -77,6 +83,7 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
             })
           }
         />
+        </>
       ) : (
         <>
           <section aria-labelledby="files-heading" className="flex flex-col gap-4 card p-6">
@@ -186,6 +193,7 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
               )}
             </section>
           )}
+          {files.length > 0 && <ConciergePanel sessionId={session.id} timeZone={timeZone} />}
         </>
       )}
 

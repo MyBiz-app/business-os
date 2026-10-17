@@ -240,6 +240,14 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Only export formats that are known for sure are saved as templates (Google Contacts CSV, Outlook contacts CSV); another system is a new `Template` entry in `app/migration/templates.py`, not new code. vCard and iCalendar files are turned into the same table as a spreadsheet; an event gets a client only from an attendee name.
 - Default chosen: no migration; the confidence of each column is shown after the AI answer but not stored.
 
+### Migration hub: client notice and done-for-you (2026-10-17, round 6 M3, no migration)
+
+- The notice goes to the clients the move created (read from `import_batch_items`, so an undone move has nobody to tell) through the existing free channels only: email, push and pop-up, as a service message (no marketing consent needed). Imported clients have no account yet, so in practice email is the channel; push and pop-up reach those who already joined. WhatsApp and SMS are not sent by MyBiz (the paid providers stay disabled adapters): clients with a phone and no email come back as `wa.me` links with the text filled in, which the owner opens from their own phone, one at a time.
+- It reuses the messaging engine (`_announce`, placeholders), so `{first_name}`, `{business}`, `{join_code}` and `{app_link}` work and a preview shows what the first client gets. It sends once per move; sending again needs an explicit "resend". Nothing is stored in a new table: "sent" and "asked" are read back from the audit log (`migration.notice`, `migration.concierge`).
+- "Do it for me" opens a task in the console inbox through the existing complaint path (message starts with `[migration]`, with the session, origin and file count) and gives MyBiz support a time-limited look into the business (24 to 72 hours, ended early from the support settings). The owner still approves the dry run. It is open to every business; the message says whether the setup service (`setup_full`) was bought, and if not the team quotes first. No payment is taken here.
+- The parallel-week checklist is a plain checklist kept in the owner's browser.
+- Default chosen: no migration, no console screen of its own; the inbox row is recognised by the `[migration]` prefix.
+
 ### AI agent names and faces (2026-10-16, round 6 U2)
 
 - Built-in agent names are international and work in Hebrew and English: Adir, Shiri, Lia, Daniel, Adam, Emma, Noah, Ethan, Sophie. The chief defaults to the owner's own first name.

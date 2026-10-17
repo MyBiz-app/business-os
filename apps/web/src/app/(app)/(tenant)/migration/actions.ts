@@ -11,6 +11,10 @@ export type MoveFile = components["schemas"]["MigrationFileOut"];
 export type MoveReport = components["schemas"]["MoveReport"];
 export type UndoReport = components["schemas"]["MigrationUndoReport"];
 export type AiMap = components["schemas"]["MigrationAiMapOut"];
+export type FollowUp = components["schemas"]["FollowUpOut"];
+export type NoticeResult = components["schemas"]["NoticeOut"];
+export type ConciergeResult = components["schemas"]["ConciergeOut"];
+export type NoticeChannel = components["schemas"]["NoticeRequest"]["channels"][number];
 export type MoveKind = NonNullable<MoveFile["kind"]>;
 
 export type MoveResult<T> = { data?: T; error?: string };
@@ -119,6 +123,44 @@ export async function undoBatch(batchId: string, includeEdited: boolean, commit:
       commit
         ? await api.POST("/migration/batches/{batch_id}/undo", options)
         : await api.POST("/migration/batches/{batch_id}/undo-preview", options),
+    ),
+  );
+}
+
+/** Who can be told after a move, what went out and what the MyBiz team was asked. */
+export async function getFollowUp(sessionId: string): Promise<MoveResult<FollowUp>> {
+  const { api, scope } = await getTenantFor(PERMISSION);
+  return call(async () =>
+    unwrap(await api.GET("/migration/sessions/{session_id}/follow-up", { params: { ...scope, path: { session_id: sessionId } } })),
+  );
+}
+
+/** The notice to the moved clients: a preview (`dryRun`) or the send itself. */
+export async function sendNotice(
+  sessionId: string,
+  notice: { subject: string; body: string; channels: NoticeChannel[]; resend: boolean },
+  dryRun: boolean,
+): Promise<MoveResult<NoticeResult>> {
+  const { api, scope } = await getTenantFor(PERMISSION);
+  return call(async () =>
+    unwrap(
+      await api.POST("/migration/sessions/{session_id}/notice", {
+        params: { ...scope, path: { session_id: sessionId } },
+        body: { ...notice, dry_run: dryRun },
+      }),
+    ),
+  );
+}
+
+/** "Do it for me": the MyBiz team gets a task and may look into the business for a while. */
+export async function askConcierge(sessionId: string, note: string, supportHours: number): Promise<MoveResult<ConciergeResult>> {
+  const { api, scope } = await getTenantFor(PERMISSION);
+  return call(async () =>
+    unwrap(
+      await api.POST("/migration/sessions/{session_id}/concierge", {
+        params: { ...scope, path: { session_id: sessionId } },
+        body: { note: note.trim() || null, support_hours: supportHours },
+      }),
     ),
   );
 }
