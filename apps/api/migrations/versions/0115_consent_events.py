@@ -90,6 +90,27 @@ OLD_RULE = """
 """
 
 
+EXTRA = """            -- The trail stays as proof an ad was allowed; the address and device go.
+            UPDATE app.consent_events SET ip = NULL, user_agent = NULL
+            WHERE client_id = p_client AND tenant_id = v_tenant;
+"""
+
+ERASE = """
+        CREATE OR REPLACE FUNCTION app.erase_client_traces(p_client uuid) RETURNS void
+        LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+        DECLARE v_tenant uuid := app.current_tenant_id();
+        BEGIN
+            DELETE FROM app.announcement_deliveries
+            WHERE client_id = p_client AND tenant_id = v_tenant;
+            DELETE FROM app.client_social WHERE client_id = p_client AND tenant_id = v_tenant;
+            DELETE FROM app.whatsapp_offers WHERE client_id = p_client AND tenant_id = v_tenant;
+            DELETE FROM app.ai_conversations c USING app.clients cl
+            WHERE cl.id = p_client AND cl.tenant_id = v_tenant AND c.tenant_id = v_tenant
+              AND cl.user_id = c.user_id;
+@@EXTRA@@        END $$
+"""
+
+
 def upgrade() -> None:
     op.execute("""
         ALTER TABLE app.clients
@@ -282,6 +303,8 @@ def upgrade() -> None:
     # At send time too: someone who opted out after the message was scheduled is skipped.
     op.execute(RECIPIENTS.replace("@@RULE@@", NEW_RULE))
 
+    op.execute(ERASE.replace("@@EXTRA@@", EXTRA))
+
     # Today's agreements get their first event, so the trail starts complete.
     op.execute("""
         INSERT INTO app.consent_events (tenant_id, client_id, user_id, action, source, created_at)
@@ -296,6 +319,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.execute(ERASE.replace("@@EXTRA@@", ""))
     op.execute(RECIPIENTS.replace("@@RULE@@", OLD_RULE))
     op.execute("DROP FUNCTION app.unsubscribe_by_token(text, text, text)")
     op.execute("DROP FUNCTION app.marketing_unsubscribe(text, uuid)")
