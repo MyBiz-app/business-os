@@ -70,7 +70,7 @@ def test_password_rules_and_authenticator_codes_are_pushed() -> None:
     result = payload({})
     assert result["password_min_length"] == 10
     required = result["password_required_characters"].split(":")
-    assert len(required) == 2 and "a" in required[0] and "0123456789" == required[1]
+    assert len(required) == 2 and "a" in required[0] and required[1] == "0123456789"
     assert result["security_update_password_require_reauthentication"] is True
     assert result["mfa_totp_enroll_enabled"] is True and result["mfa_totp_verify_enabled"] is True
 
