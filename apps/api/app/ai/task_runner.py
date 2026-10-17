@@ -1,6 +1,6 @@
 """Running the scheduled agent tasks that are due (round 5, A10).
 
-`run_due_tasks` is a background job (app/jobs.py, called every few minutes by the keep-awake
+`run_due_tasks` is a background job (app/jobs/, called every few minutes by the keep-awake
 workflow through POST /internal/jobs/tick, or by a worker once there is one). A task runs as the
 user who approved it, with that user's permissions and branches as they are NOW, never as the
 system: a member who left or lost AI access pauses the task, and an approved action is checked

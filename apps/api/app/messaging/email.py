@@ -1,4 +1,4 @@
-"""Emailing client notifications (the send-emails job; see app/jobs.py).
+"""Emailing client notifications (the send-emails job; see app/jobs/).
 
 The text comes from the shared translation files: packages/i18n/messages is the source and
 app/messages holds the API's checked-in copy (pnpm --filter @business-os/i18n export:api), so

@@ -37,7 +37,7 @@ push (Expo's service); the email needs `EMAIL_PROVIDER` as for the other mail (s
 `docs/integrations.md`). An owner gets the push after signing in to the app on their phone once
 (that registers the phone).
 
-Where: `apps/api/app/messaging/alerts.py` (recipients and delivery), `apps/api/app/jobs.py`
+Where: `apps/api/app/messaging/alerts.py` (recipients and delivery), `apps/api/app/jobs/`
 (`run_job` failure alert, `check-jobs`, `test-alert`), `.github/workflows/check-jobs-staging.yml`.
 
 **Check it works** (a manual step, do it once after signing in on the phone): GitHub → Actions →

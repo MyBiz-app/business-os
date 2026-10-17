@@ -3,7 +3,7 @@
 Recipients are the active owners of the MyBiz team (platform staff with level `owner` or
 `primary_owner`) who have signed in, so their phone has registered a push token. The push goes
 first; the email always follows, so an alert still arrives when the phone has no app installed or
-the push service is down. Used when a background job fails or stops running (app/jobs.py)."""
+the push service is down. Used when a background job fails or stops running (app/jobs/)."""
 
 import logging
 from dataclasses import dataclass

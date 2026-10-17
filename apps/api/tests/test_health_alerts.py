@@ -46,7 +46,7 @@ def test_alert_skips_a_channel_that_is_off(engine: Engine) -> None:
 
 def test_a_failing_job_alerts_once(engine: Engine, monkeypatch: pytest.MonkeyPatch) -> None:
     alerts: list[str] = []
-    monkeypatch.setattr(jobs, "notify_team", lambda _e, title, _b: alerts.append(title))
+    monkeypatch.setattr(jobs.runner, "notify_team", lambda _e, title, _b: alerts.append(title))
 
     def boom(_conn) -> None:
         raise RuntimeError("provider down")
