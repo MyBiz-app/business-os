@@ -14,7 +14,7 @@ from sqlalchemy.exc import DBAPIError
 
 from app.api.common import not_found
 from app.api.deps import ClientDep, TenantContext, require
-from app.api.pagination import PageDep
+from app.api.pagination import KeysetDep, encode_cursor
 from app.api.plans import Entitlement, issue_receipts_now, load_entitlement
 from app.commerce.payments import provider_for_business
 from app.core.config import get_settings
@@ -226,12 +226,15 @@ class Order(BaseModel):
 class OrderPage(BaseModel):
     items: list[Order]
     total: int
+    next_cursor: str | None = Field(
+        default=None, description="Pass as `after` for the next (older) page"
+    )
 
 
 @staff_router.get("/orders")
 def list_orders(
     context: OrdersDep,
-    page: PageDep,
+    page: KeysetDep,
     order_status: Annotated[
         Literal["pending", "paid", "cancelled", "failed"] | None, Query(alias="status")
     ] = None,
@@ -239,8 +242,10 @@ def list_orders(
     """Online purchases by clients, newest first (the business's own tenant only, by RLS)."""
     params: dict[str, object] = {
         "status": order_status,
-        "limit": page.limit,
+        "fetch": page.fetch,
         "offset": page.offset,
+        "after_at": page.after[0] if page.after else None,
+        "after_id": page.after[1] if page.after and len(page.after) > 1 else None,
     }
     db = context.session
     total = db.execute(
@@ -250,18 +255,33 @@ def list_orders(
         """),
         params,
     ).scalar_one()
-    rows = db.execute(
-        text("""
+    rows = (
+        db.execute(
+            text("""
             SELECT k.id, k.client_id, concat_ws(' ', c.first_name, c.last_name) AS client_name,
                    p.name AS plan_name, k.amount, k.currency, k.status,
                    k.provider = 'simulated' AS simulated, k.created_at, k.completed_at
             FROM app.checkouts k
             JOIN app.clients c ON c.id = k.client_id
             JOIN app.plans p ON p.id = k.plan_id
-            WHERE CAST(:status AS text) IS NULL OR k.status = CAST(:status AS text)
-            ORDER BY k.created_at DESC, k.id
-            LIMIT :limit OFFSET :offset
+            WHERE (CAST(:status AS text) IS NULL OR k.status = CAST(:status AS text))
+              AND (CAST(:after_at AS timestamptz) IS NULL
+                   OR (k.created_at, k.id) <
+                       (CAST(:after_at AS timestamptz), CAST(:after_id AS uuid)))
+            ORDER BY k.created_at DESC, k.id DESC
+            LIMIT :fetch OFFSET :offset
         """),
-        params,
-    ).mappings()
-    return OrderPage(items=[Order.model_validate(dict(row)) for row in rows], total=total)
+            params,
+        )
+        .mappings()
+        .all()
+    )
+    more = len(rows) > page.limit
+    rows = rows[: page.limit]
+    return OrderPage(
+        items=[Order.model_validate(dict(row)) for row in rows],
+        total=total,
+        next_cursor=encode_cursor(rows[-1]["created_at"].isoformat(), rows[-1]["id"])
+        if more
+        else None,
+    )

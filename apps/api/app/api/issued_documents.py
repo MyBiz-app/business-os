@@ -22,7 +22,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
-from app.api.pagination import PageDep
+from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, encode_cursor
 from app.api.pdf import PDF_RESPONSES, _pdf, _watermark
 from app.core.legal_readiness import evaluate
 from app.core.permissions import Permission
@@ -414,23 +414,42 @@ def issue(body: IssueRequest, context: SalesDep) -> IssuedDocument:
 @router.get("")
 def list_issued(
     context: SalesDep,
-    page: PageDep,
+    page: KeysetDep,
+    response: Response,
     kind: Annotated[Kind | None, Query()] = None,
     client_id: Annotated[UUID | None, Query()] = None,
 ) -> list[IssuedDocument]:
-    """Newest first."""
-    rows = context.session.execute(
-        text(
-            SELECT_ROW
-            + """
+    """Newest first. The header `X-Next-Cursor`, when present, goes in `after` for the next page."""
+    rows = (
+        context.session.execute(
+            text(
+                SELECT_ROW
+                + """
             WHERE (cast(:kind AS text) IS NULL OR kind = :kind)
               AND (cast(:client_id AS uuid) IS NULL OR client_id = :client_id)
-            ORDER BY issued_at DESC, number DESC
-            LIMIT :limit OFFSET :offset
+              AND (cast(:after_at AS timestamptz) IS NULL
+                   OR (issued_at, id) < (cast(:after_at AS timestamptz), cast(:after_id AS uuid)))
+            ORDER BY issued_at DESC, id DESC
+            LIMIT :fetch OFFSET :offset
         """
-        ),
-        {"kind": kind, "client_id": client_id, "limit": page.limit, "offset": page.offset},
-    ).mappings()
+            ),
+            {
+                "kind": kind,
+                "client_id": client_id,
+                "fetch": page.fetch,
+                "offset": page.offset,
+                "after_at": page.after[0] if page.after else None,
+                "after_id": page.after[1] if page.after and len(page.after) > 1 else None,
+            },
+        )
+        .mappings()
+        .all()
+    )
+    if len(rows) > page.limit:
+        rows = rows[: page.limit]
+        response.headers[NEXT_CURSOR_HEADER] = encode_cursor(
+            rows[-1]["issued_at"].isoformat(), rows[-1]["id"]
+        )
     return [IssuedDocument.model_validate(dict(row)) for row in rows]
 
 
