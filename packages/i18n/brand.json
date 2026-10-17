@@ -13,6 +13,17 @@
     },
     "email": "billing@mybizapp.click",
     "website": "mybizapp.click",
-    "fictitious": true
+    "fictitious": true,
+    "versions": {
+      "terms": { "version": "2026-10-16", "date": "2026-10-16" },
+      "privacy": { "version": "2026-10-16", "date": "2026-10-16" },
+      "dpa": { "version": "2026-10-17", "date": "2026-10-17" },
+      "subprocessors": { "version": "2026-10-17", "date": "2026-10-17" },
+      "accessibility": { "version": "2026-10-17", "date": "2026-10-17" }
+    },
+    "accessibilityCoordinator": {
+      "name": { "he": "רכז הנגישות של מייביז", "en": "MyBiz accessibility coordinator" },
+      "email": "accessibility@mybizapp.click"
+    }
   }
 }
