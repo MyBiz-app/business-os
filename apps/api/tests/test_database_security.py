@@ -14,6 +14,7 @@ GLOBAL_TABLES = {
     "push_tokens",
     "job_runs",
     "announcement_views",
+    "payroll_rates",  # law-driven rates, the same for every business; read-only for the API
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no
 # API access at all (RLS with no policy), and are read through SECURITY DEFINER functions.

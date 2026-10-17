@@ -42,6 +42,12 @@ OVERRIDES = {
     "form101_forms": {"tax_year": "2026"},
     "invitations": {"role": "'staff'"},
     "notifications": {"kind": "'session_cancelled'"},
+    "pay_adjustments": {
+        "amount_minor": "1",
+        "kind": "'bonus'",
+        "period": "date_trunc('month', current_date)",
+    },
+    "pay_components": {"kind": "'travel'", "calc": "'by_month'"},
     "pending_actions": {"risk_level": "'low'"},
     "person_identities": {"user_id": "gen_random_uuid()", "id_type": "'il_id'", "country": "'IL'"},
     "promo_codes": {"amount_off": "1", "code": "'TESTCODE'"},
