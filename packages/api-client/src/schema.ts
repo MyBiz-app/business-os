@@ -362,9 +362,31 @@ export interface paths {
         get?: never;
         /**
          * Set Client Marketing Consent
-         * @description Record that the client agreed to (or stopped) marketing messages, e.g. at the desk.
+         * @description Record that the client agreed to (or stopped) marketing messages, e.g. at the desk. An
+         *     agreement needs a source; a client who stopped ads with the opt-out link agrees again only
+         *     by their own choice, so the desk records it with a source too.
          */
         put: operations["set_client_marketing_consent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/consent-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Consent Events
+         * @description The trail of this client's marketing consent, newest first.
+         */
+        get: operations["client_consent_events"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -3631,7 +3653,8 @@ export interface paths {
         get?: never;
         /**
          * Set Marketing Consent
-         * @description Agree to (or stop) marketing messages; service messages are sent either way.
+         * @description Agree to (or stop) marketing messages; service messages are sent either way. Each change
+         *     is kept with its time, source and device.
          */
         put: operations["set_marketing_consent"];
         post?: never;
@@ -3654,7 +3677,36 @@ export interface paths {
          */
         get: operations["unsubscribe"];
         put?: never;
-        post?: never;
+        /**
+         * Unsubscribe One Click Signed
+         * @description The mail app's own "Unsubscribe" button (RFC 8058 one-click) on the same signed link.
+         */
+        post: operations["unsubscribe_one_click_signed"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/u/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unsubscribe By Link
+         * @description The short opt-out link of an ad sent by a business (SMS, WhatsApp, email): one tap, no
+         *     sign-in. It stops that business's ads for that client and is kept in the consent trail.
+         */
+        get: operations["unsubscribe_by_link"];
+        put?: never;
+        /**
+         * Unsubscribe One Click
+         * @description The mail app's own "Unsubscribe" button (RFC 8058 one-click).
+         */
+        post: operations["unsubscribe_one_click"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9596,6 +9648,21 @@ export interface components {
              * @default false
              */
             marketing_consent: boolean;
+            /**
+             * Marketing Consent At
+             * @description When the agreement was given
+             */
+            marketing_consent_at?: string | null;
+            /**
+             * Marketing Consent Source
+             * @description Where the last consent change came from
+             */
+            marketing_consent_source?: ("app_join" | "app_profile" | "desk_signed" | "desk_verbal" | "desk_other" | "unsubscribe_link" | "unsubscribe_email") | null;
+            /**
+             * Marketing Opted Out At
+             * @description Stopped ads with the opt-out link; only the client can undo it
+             */
+            marketing_opted_out_at?: string | null;
         };
         /** ClientAppointmentCreate */
         ClientAppointmentCreate: {
@@ -9755,6 +9822,11 @@ export interface components {
         ClientConsentBody: {
             /** Consent */
             consent: boolean;
+            /**
+             * Source
+             * @description How the client agreed (signed form, said so in person, other); required when recording an agreement, so it cannot be ticked without a source
+             */
+            source?: ("desk_signed" | "desk_verbal" | "desk_other") | null;
         };
         /** ClientCreate */
         ClientCreate: {
@@ -9895,6 +9967,21 @@ export interface components {
              * @default false
              */
             marketing_consent: boolean;
+            /**
+             * Marketing Consent At
+             * @description When the agreement was given
+             */
+            marketing_consent_at?: string | null;
+            /**
+             * Marketing Consent Source
+             * @description Where the last consent change came from
+             */
+            marketing_consent_source?: ("app_join" | "app_profile" | "desk_signed" | "desk_verbal" | "desk_other" | "unsubscribe_link" | "unsubscribe_email") | null;
+            /**
+             * Marketing Opted Out At
+             * @description Stopped ads with the opt-out link; only the client can undo it
+             */
+            marketing_opted_out_at?: string | null;
             /**
              * Plan Name
              * @description The plan valid today, if any
@@ -10332,6 +10419,38 @@ export interface components {
         ConsentBody: {
             /** Consent */
             consent: boolean;
+            /**
+             * Source
+             * @description Where the person chose: when joining, or in the profile
+             * @default app_profile
+             * @enum {string}
+             */
+            source: "app_join" | "app_profile";
+        };
+        /** ConsentEvent */
+        ConsentEvent: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "granted" | "withdrawn";
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "app_join" | "app_profile" | "desk_signed" | "desk_verbal" | "desk_other" | "unsubscribe_link" | "unsubscribe_email";
+            /** Recorded By Name */
+            recorded_by_name: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** ContactCreate */
         ContactCreate: {
@@ -19296,6 +19415,41 @@ export interface operations {
             };
         };
     };
+    client_consent_events: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentEvent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_member_identity: {
         parameters: {
             query?: never;
@@ -27561,6 +27715,97 @@ export interface operations {
                 content: {
                     "text/html": string;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsubscribe_one_click_signed: {
+        parameters: {
+            query: {
+                t: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsubscribe_by_link: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsubscribe_one_click: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

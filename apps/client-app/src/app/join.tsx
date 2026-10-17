@@ -68,7 +68,7 @@ export default function Join() {
         body: { first_name: firstName.trim(), last_name: lastName.trim() || joined.last_name || null, phone: joined.phone ?? known?.phone ?? null },
       }).then(unwrap);
       // A failure here must not undo the join; the person can still choose on their profile.
-      if (marketing) await apiClient().PUT("/me/marketing-consent", { body: { consent: true } }).catch(() => undefined);
+      if (marketing) await apiClient().PUT("/me/marketing-consent", { body: { consent: true, source: "app_join" } }).catch(() => undefined);
       await refresh();
       router.replace("/home");
     } catch {

@@ -28,6 +28,11 @@ CLIENT_TABLES: dict[str, ClientTable] = {
     "client_locations": ClientTable("branches", "deleted"),
     "client_notes": ClientTable("visit_notes", "deleted"),
     "client_social": ClientTable("friends_profile", "deleted"),
+    "consent_events": ClientTable(
+        "marketing_consent_history",
+        "kept",
+        "proof that ads were allowed; address and device cleared",
+    ),
     "dependents": ClientTable("dependents", "deleted"),
     "entitlements": ClientTable("plans", "kept", "commercial history; freeze reasons cleared"),
     "health_declarations": ClientTable("health_declarations", "deleted"),

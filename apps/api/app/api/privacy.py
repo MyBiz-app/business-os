@@ -277,6 +277,14 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "marketing_consent_history": _rows(
+            db,
+            """
+            SELECT action, source, ip, user_agent, created_at
+            FROM app.consent_events WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
         "announcements_received": _rows(
             db, "SELECT * FROM app.client_announcement_deliveries(:id)", client_id
         ),

@@ -51,7 +51,7 @@ every background job (late and failing ones in red), messages and emails waiting
 failed in 24 hours, database size, AI credits today against the daily alarm, response times per
 route (median and p95) and the last 20 crashes with their request id. Search that id in the host's
 logs to see the whole request. Job and queue numbers come from the database
-(`app.platform_health()`, migration 0116); timings and crashes are the API process's own memory and
+(`app.platform_health()`, migration 0117); timings and crashes are the API process's own memory and
 reset when it restarts (`apps/api/app/core/metrics.py`). CPU and memory stay in the Render and
 Supabase dashboards.
 

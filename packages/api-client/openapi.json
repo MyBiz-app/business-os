@@ -1715,7 +1715,7 @@
           "clients"
         ],
         "summary": "Set Client Marketing Consent",
-        "description": "Record that the client agreed to (or stopped) marketing messages, e.g. at the desk.",
+        "description": "Record that the client agreed to (or stopped) marketing messages, e.g. at the desk. An\nagreement needs a source; a client who stopped ads with the opt-out link agrees again only\nby their own choice, so the desk records it with a source too.",
         "operationId": "set_client_marketing_consent",
         "security": [
           {
@@ -1780,6 +1780,88 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients/{client_id}/consent-events": {
+      "get": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Client Consent Events",
+        "description": "The trail of this client's marketing consent, newest first.",
+        "operationId": "client_consent_events",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConsentEvent"
+                  },
+                  "title": "Response Client Consent Events"
                 }
               }
             }
@@ -19212,7 +19294,7 @@
           "account"
         ],
         "summary": "Set Marketing Consent",
-        "description": "Agree to (or stop) marketing messages; service messages are sent either way.",
+        "description": "Agree to (or stop) marketing messages; service messages are sent either way. Each change\nis kept with its time, source and device.",
         "operationId": "set_marketing_consent",
         "requestBody": {
           "content": {
@@ -19277,6 +19359,126 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "Unsubscribe One Click Signed",
+        "description": "The mail app's own \"Unsubscribe\" button (RFC 8058 one-click) on the same signed link.",
+        "operationId": "unsubscribe_one_click_signed",
+        "parameters": [
+          {
+            "name": "t",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 600,
+              "title": "T"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/u/{token}": {
+      "get": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "Unsubscribe By Link",
+        "description": "The short opt-out link of an ad sent by a business (SMS, WhatsApp, email): one tap, no\nsign-in. It stops that business's ads for that client and is kept in the consent trail.",
+        "operationId": "unsubscribe_by_link",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "broadcasts",
+          "account"
+        ],
+        "summary": "Unsubscribe One Click",
+        "description": "The mail app's own \"Unsubscribe\" button (RFC 8058 one-click).",
+        "operationId": "unsubscribe_one_click",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -43545,6 +43747,53 @@
             "title": "Marketing Consent",
             "description": "Agreed to marketing messages; service messages are sent either way",
             "default": false
+          },
+          "marketing_consent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Consent At",
+            "description": "When the agreement was given"
+          },
+          "marketing_consent_source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "app_join",
+                  "app_profile",
+                  "desk_signed",
+                  "desk_verbal",
+                  "desk_other",
+                  "unsubscribe_link",
+                  "unsubscribe_email"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Consent Source",
+            "description": "Where the last consent change came from"
+          },
+          "marketing_opted_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Opted Out At",
+            "description": "Stopped ads with the opt-out link; only the client can undo it"
           }
         },
         "type": "object",
@@ -43900,6 +44149,23 @@
           "consent": {
             "type": "boolean",
             "title": "Consent"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "desk_signed",
+                  "desk_verbal",
+                  "desk_other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source",
+            "description": "How the client agreed (signed form, said so in person, other); required when recording an agreement, so it cannot be ticked without a source"
           }
         },
         "type": "object",
@@ -44333,6 +44599,53 @@
             "title": "Marketing Consent",
             "description": "Agreed to marketing messages; service messages are sent either way",
             "default": false
+          },
+          "marketing_consent_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Consent At",
+            "description": "When the agreement was given"
+          },
+          "marketing_consent_source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "app_join",
+                  "app_profile",
+                  "desk_signed",
+                  "desk_verbal",
+                  "desk_other",
+                  "unsubscribe_link",
+                  "unsubscribe_email"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Consent Source",
+            "description": "Where the last consent change came from"
+          },
+          "marketing_opted_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Opted Out At",
+            "description": "Stopped ads with the opt-out link; only the client can undo it"
           },
           "plan_name": {
             "anyOf": [
@@ -45591,6 +45904,16 @@
           "consent": {
             "type": "boolean",
             "title": "Consent"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "app_join",
+              "app_profile"
+            ],
+            "title": "Source",
+            "description": "Where the person chose: when joining, or in the profile",
+            "default": "app_profile"
           }
         },
         "type": "object",
@@ -45598,6 +45921,61 @@
           "consent"
         ],
         "title": "ConsentBody"
+      },
+      "ConsentEvent": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "granted",
+              "withdrawn"
+            ],
+            "title": "Action"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "app_join",
+              "app_profile",
+              "desk_signed",
+              "desk_verbal",
+              "desk_other",
+              "unsubscribe_link",
+              "unsubscribe_email"
+            ],
+            "title": "Source"
+          },
+          "recorded_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded By Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "source",
+          "recorded_by_name",
+          "created_at"
+        ],
+        "title": "ConsentEvent"
       },
       "ContactCreate": {
         "properties": {
