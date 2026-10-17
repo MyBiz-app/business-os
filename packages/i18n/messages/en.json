@@ -430,7 +430,8 @@
       "money": "Money",
       "business": "Business"
     },
-    "content": "Content & creative"
+    "content": "Content & creative",
+    "files": "Files"
   },
   "terms": {
     "fitness": {
@@ -2623,7 +2624,19 @@
     "social_manage": "Manage social accounts",
     "social_manage_hint": "Connect and disconnect social networks",
     "identity_read": "Reveal ID numbers",
-    "identity_read_hint": "See people's full ID numbers (every look is logged)"
+    "identity_read_hint": "See people's full ID numbers (every look is logged)",
+    "files_read": "Open the files area",
+    "files_read_hint": "Business files; some folders also need their own permission",
+    "files_manage": "Manage files",
+    "files_manage_hint": "Add, archive and organize files and folders",
+    "payroll_read": "See payroll files",
+    "payroll_read_hint": "Employment terms and Form 101 of the team",
+    "payroll_manage": "Manage payroll files",
+    "payroll_manage_hint": "Set employment terms, request and correct Form 101",
+    "payroll_approve": "Approve payroll",
+    "payroll_approve_hint": "Approve and lock pay runs (owners only)",
+    "time_approve": "Approve hours",
+    "time_approve_hint": "Correct clocked hours and approve a person's month"
   },
   "health": {
     "title": "Health declaration",
@@ -5239,6 +5252,86 @@
       "noDrafts": "No drafts yet. Ask Sophie for post ideas and she will save them here.",
       "discard": "Discard draft",
       "publishHint": "To publish a draft, ask Sophie. She prepares it and you confirm before anything goes out."
+    },
+    "myDocuments": {
+      "open": "My documents",
+      "title": "My documents",
+      "hint": "Payslips and papers the business filed for you.",
+      "none": "Nothing here yet.",
+      "openFile": "Open",
+      "failed": "Couldn't open the file. Try again."
+    },
+    "form101": {
+      "open": "Fill in Form 101 (tax credits)",
+      "back": "Back",
+      "title": "Form 101 for {year}",
+      "intro": "Your employer uses this to compute your income tax. Answer once a year; you can sign again if something changes.",
+      "signedNow": "Signed and sent. Thank you.",
+      "signedBefore": "Already signed by {name}. Signing again replaces your answers.",
+      "personal": "Personal details",
+      "fullName": "Full name",
+      "birthDate": "Date of birth",
+      "dateHint": "Format: YYYY-MM-DD",
+      "gender": "Gender",
+      "genders": {
+        "female": "Female",
+        "male": "Male",
+        "other": "Other"
+      },
+      "address": "Address",
+      "phone": "Phone",
+      "marital": "Marital status",
+      "maritals": {
+        "single": "Single",
+        "married": "Married",
+        "divorced": "Divorced",
+        "widowed": "Widowed",
+        "separated": "Separated"
+      },
+      "credits": "Tax credits",
+      "resident": "Israeli resident",
+      "children": "Children's birth years",
+      "childrenHint": "For example: 2018, 2021. Leave empty if none.",
+      "singleParent": "Single parent",
+      "immigrant": "New immigrant since (if relevant)",
+      "soldier": "Discharged from service on (if relevant)",
+      "degree": "Year you finished an academic degree (if relevant)",
+      "disability": "Disability percentage (if relevant)",
+      "yes": "Yes",
+      "no": "No",
+      "sign": "Signature",
+      "declaration": "I declare that the details above are correct and complete.",
+      "signedName": "Type your full name to sign",
+      "signSubmit": "Sign and send",
+      "signAgain": "Sign again",
+      "errors": {
+        "invalid": "Please check the details: names, dates (YYYY-MM-DD) and years.",
+        "generic": "Something went wrong. Please try again."
+      }
+    },
+    "timeClock": {
+      "open": "Time clock",
+      "title": "Time clock",
+      "back": "Back",
+      "clockedOutHint": "Press when your shift starts.",
+      "clockedIn": "Clocked in since {time}",
+      "plannedShift": "Planned shift: {from} - {to} · {branch}",
+      "noShift": "No shift planned right now.",
+      "clockIn": "Clock in",
+      "clockOut": "Clock out",
+      "branch": "Branch",
+      "thisWeek": "Last 8 days",
+      "empty": "No clocked time yet.",
+      "running": "running",
+      "corrected": "Corrected by a manager: {reason}",
+      "errors": {
+        "already_clocked_in": "You are already clocked in.",
+        "not_clocked_in": "You are not clocked in.",
+        "month_approved": "This month was approved by a manager. Ask them to reopen it.",
+        "location_required": "Choose the branch you are working at.",
+        "invalid_branch": "Choose a branch of this business.",
+        "generic": "Something went wrong. Try again."
+      }
     }
   },
   "staffApp": {
@@ -6248,7 +6341,35 @@
     "stagingMark": "Sample document",
     "issuedWith": "Issued with {brand}",
     "thanks": "Thank you!",
-    "page": "Page {page} of {pages}"
+    "page": "Page {page} of {pages}",
+    "form101": "Form 101 for {year}",
+    "form101Intro": "Employee's tax-credit declaration",
+    "form101Draft": "Credit points are computed by the system and are subject to the accountant's review.",
+    "fullName": "Full name",
+    "idLast4": "ID number (last 4)",
+    "birthDate": "Date of birth",
+    "gender": "Gender",
+    "genders": {
+      "female": "Female",
+      "male": "Male",
+      "other": "Other"
+    },
+    "address": "Address",
+    "maritalStatus": "Marital status",
+    "maritalStatuses": {
+      "single": "Single",
+      "married": "Married",
+      "divorced": "Divorced",
+      "widowed": "Widowed",
+      "separated": "Separated"
+    },
+    "children": "Children (birth year)",
+    "noChildren": "None",
+    "creditPoints": "Tax credit points",
+    "overrideNote": "Adjusted by payroll: {note}",
+    "declaration": "I declare that the details above are correct and complete.",
+    "signedBy": "Signed by",
+    "signedOn": "Signed on"
   },
   "time": {
     "title": "Time and billing",
@@ -6900,6 +7021,195 @@
       "intro": "Needed for payroll and legal forms. It is kept encrypted and only shown to you and to people the business trusts with it.",
       "optionalClient": "Optional: your business may ask for it for forms and insurance.",
       "requiredClient": "This business asks for your ID number."
+    }
+  },
+  "files": {
+    "title": "Files",
+    "subtitle": "Your business's documents in one place. Payslips and employee papers are kept sealed and only the right people can open them.",
+    "folders": "Folders",
+    "system": {
+      "payroll": "Payslips",
+      "employees": "Employees",
+      "business_docs": "Business documents",
+      "imports": "Imports",
+      "general": "General"
+    },
+    "count": "{count, plural, =0 {No files} one {# file} other {# files}}",
+    "sealed": "Sealed",
+    "kept": "Kept, never deleted",
+    "showArchived": "Show archive",
+    "hideArchived": "Hide archive",
+    "zip": "Download as ZIP",
+    "importsHint": "Files uploaded when moving to MyBiz. They are deleted 30 days after they were added.",
+    "payrollHint": "Payslips appear here when payroll is approved. They are kept for 7 years and can be archived, not deleted.",
+    "none": "No files in this folder yet.",
+    "noneArchived": "Nothing in the archive.",
+    "noFolders": "You don't have access to any folder.",
+    "expires": "deleted on {date}",
+    "add": "Add a file",
+    "file": "File",
+    "fileHint": "PDF, image, Word or Excel, up to 10 MB.",
+    "name": "Name (optional)",
+    "upload": "Upload",
+    "archive": "Archive",
+    "restore": "Restore",
+    "delete": "Delete {name}",
+    "newFolder": "New folder here",
+    "folderName": "Folder name",
+    "createFolder": "Create folder",
+    "deleteFolder": "Delete this empty folder"
+  },
+  "payroll": {
+    "open": "Payroll file",
+    "title": "Payroll file: {name}",
+    "subtitle": "Employment terms and tax forms",
+    "tabsLabel": "Payroll file sections",
+    "tabs": {
+      "personal": "Personal details",
+      "terms": "Employment terms",
+      "components": "Pay components",
+      "documents": "Documents"
+    },
+    "save": "Save",
+    "saved": "Saved",
+    "personal": {
+      "idTitle": "ID number",
+      "bankTitle": "Bank account",
+      "noBank": "No bank account saved yet. Add it under Employment terms.",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "form101": {
+      "title": "Form 101 (tax credits)",
+      "hint": "The employee fills in Form 101 in the app and signs it with their name. Credit points are computed from the answers and can be corrected here. They are a draft until your accountant confirms them.",
+      "request": "Ask {name} to fill in Form 101 for {year}",
+      "none": "No Form 101 requested yet.",
+      "year": "Form 101 for {year}",
+      "status": {
+        "requested": "Waiting for the employee",
+        "submitted": "Signed"
+      },
+      "points": "Credit points",
+      "adjusted": "adjusted",
+      "adjust": "Adjust",
+      "note": "Reason for the change",
+      "clear": "Use computed points",
+      "pdf": "Download PDF",
+      "signedBy": "Signed by {name}"
+    },
+    "terms": {
+      "type": "Type of employment",
+      "types": {
+        "global": "Global (monthly)",
+        "hourly": "Hourly",
+        "global_overtime": "Global plus overtime"
+      },
+      "jobTitle": "Job title",
+      "monthly": "Monthly amount ({currency})",
+      "hourly": "Hourly rate ({currency})",
+      "scope": "Scope of position (%)",
+      "days": "Work days per week",
+      "start": "Start date",
+      "notice": "Employment notice sent on",
+      "pension": "Pension",
+      "fund": "Fund name",
+      "employeePct": "Employee (%)",
+      "employerPct": "Employer (%)",
+      "severancePct": "Severance (%)",
+      "bank": "Bank account",
+      "bankCode": "Bank number",
+      "branch": "Branch",
+      "account": "Account number",
+      "bankKept": "Leave empty to keep the saved account"
+    },
+    "components": {
+      "soon": "Fixed pay components (travel, meals, phone, car, recurring additions and deductions) are added in the next update."
+    },
+    "documents": {
+      "title": "Documents",
+      "notice": "Employment notice",
+      "notSent": "Not sent yet",
+      "none": "No signed documents yet.",
+      "more": "The files area will also hold payslips and the employment contract."
+    },
+    "errors": {
+      "hourly_rate_required": "Enter an hourly rate for hourly employment.",
+      "monthly_amount_required": "Enter the monthly amount.",
+      "invalid_reference": "That branch does not exist.",
+      "form_exists": "A Form 101 for this year already exists.",
+      "forbidden": "You do not have permission for this.",
+      "invalid": "Please check the details and try again.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "timeClock": {
+    "title": "Time clock",
+    "subtitle": "Hours people clocked in the app, against the shifts planned. Fix a forgotten clock-out, then approve the month.",
+    "back": "Team",
+    "open": "Time clock",
+    "month": "Month",
+    "previous": "Previous month",
+    "next": "Next month",
+    "person": "Person",
+    "planned": "Planned",
+    "worked": "Worked",
+    "overtime": "Overtime",
+    "missing": "Missing shifts",
+    "status": "Status",
+    "approved": "Approved",
+    "pending": "Not approved",
+    "open_entries": "Clock running",
+    "corrections": "{count, plural, one {# correction} other {# corrections}}",
+    "empty": "No shifts or clocked time this month.",
+    "hours": "{value} h",
+    "detail": "Open",
+    "regular": "Regular hours",
+    "tier1": "Overtime {percent}%",
+    "tier2": "Overtime {percent}%",
+    "restDay": "Rest day {percent}%",
+    "total": "Total",
+    "weighted": "Paid-hours equivalent",
+    "entries": "Entries",
+    "in": "In",
+    "out": "Out",
+    "branch": "Branch",
+    "source": "Source",
+    "clock": "Clocked",
+    "manual": "Added by a manager",
+    "running": "Running",
+    "reason": "Reason (shown in the log)",
+    "reasonHint": "Required for every change, e.g. forgot to clock out.",
+    "clockIn": "Clock in",
+    "clockOut": "Clock out",
+    "save": "Save correction",
+    "delete": "Delete",
+    "addEntry": "Add missing time",
+    "add": "Add",
+    "approve": "Approve month",
+    "reopen": "Reopen month",
+    "locked": "This month is approved and locked. Reopen it to change hours.",
+    "saved": "Saved.",
+    "rules": {
+      "title": "Overtime rules",
+      "hint": "Used for the hours summary. Defaults are the Israeli rules; your accountant confirms them.",
+      "workDays": "Work days per week",
+      "weekHours": "Week limit (hours)",
+      "day5": "Day limit, 5-day week",
+      "day6": "Day limit, 6-day week",
+      "tier1Hours": "Overtime hours at the first rate, per day",
+      "tier1Percent": "First rate (%)",
+      "tier2Percent": "Second rate (%)",
+      "restPercent": "Rest day rate (%)",
+      "restWeekday": "Weekly rest day",
+      "save": "Save rules",
+      "saved": "Rules saved."
+    },
+    "errors": {
+      "month_approved": "This month is approved. Reopen it first.",
+      "entry_overlap": "This overlaps another entry of the same person.",
+      "entry_open": "A clock is still running. Close it before approving.",
+      "invalid_period": "The end must be after the start, within 24 hours.",
+      "generic": "Something went wrong. Try again."
     }
   }
 }

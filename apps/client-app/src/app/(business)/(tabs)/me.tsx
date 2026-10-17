@@ -21,6 +21,9 @@ export default function Me() {
   const tRoles = useTranslations("roles");
   const tSchedule = useTranslations("business.schedule");
   const tAvailability = useTranslations("business.availability");
+  const tClock = useTranslations("business.timeClock");
+  const tForm = useTranslations("business.form101");
+  const tDocuments = useTranslations("business.myDocuments");
   const { palette, tenant, api, refresh, branches, branch, selectBranch, can } = useStaff();
   const { session } = useSession();
   const [name, setName] = useState<string | null>(null);
@@ -100,6 +103,9 @@ export default function Me() {
         />
       )}
       {can("schedule.read") && (
+        <Button label={tClock("open")} variant="secondary" palette={palette} onPress={() => router.push("/time-clock")} />
+      )}
+      {can("schedule.read") && (
         <Button
           label={tAvailability("open")}
           variant="secondary"
@@ -107,6 +113,14 @@ export default function Me() {
           onPress={() => router.push("/availability")}
         />
       )}
+      <Button label={tDocuments("open")} variant="secondary" palette={palette} onPress={() => router.push("/my-documents")} />
+
+      <Button
+        label={tForm("open")}
+        variant="secondary"
+        palette={palette}
+        onPress={() => router.push("/form101")}
+      />
 
       <Card palette={palette}>
         <Field

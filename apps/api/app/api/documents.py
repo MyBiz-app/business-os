@@ -21,10 +21,10 @@ from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
 from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
-from app.commerce.modules import allowance
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.core.signed_links import sign, verify
+from app.files import check_space
 from app.providers.choice import choose
 from app.providers.storage import StorageError, StorageProvider, tenant_key
 
@@ -121,18 +121,6 @@ def _read(file: UploadFile) -> tuple[bytes, str]:
     return content, content_type
 
 
-def _check_space(db: Session, tenant_id: UUID, size: int) -> None:
-    """New files stop at the business's space allowance (#104, the owner chose the soft limit:
-    messages keep going, uploads stop); deleting files or a bigger bundle makes room."""
-    modules = db.execute(
-        text("SELECT module_key FROM app.tenant_modules WHERE tenant_id = :t"), {"t": tenant_id}
-    ).scalars()
-    _, allowed = allowance(list(modules))
-    used = db.execute(text("SELECT app.storage_used()")).scalar_one()
-    if used + size > allowed.storage_bytes:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="storage_full")
-
-
 def _store(
     db: Session,
     tenant_id: UUID,
@@ -147,7 +135,7 @@ def _store(
     by_client: bool,
 ) -> Document:
     ensure_not_erased(db, client_id)
-    _check_space(db, tenant_id, len(content))
+    check_space(db, tenant_id, len(content))
     storage = choose(db, None, "storage").instance
     document_id = uuid4()
     key = None
