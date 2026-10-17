@@ -4,7 +4,7 @@ import datetime as dt
 import hashlib
 import logging
 from datetime import UTC, datetime
-from typing import Annotated
+from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header
@@ -13,6 +13,7 @@ from sqlalchemy import text
 
 from app.api.deps import SessionDep, UserDep
 from app.api.routes import ensure_profile
+from app.core.audit import record_everywhere
 from app.core.config import get_settings
 from app.messaging.email import Email, Sender, load_all_messages, sender_from_settings
 
@@ -119,11 +120,25 @@ def check_device(
         {"keep": MAX_DEVICES},
     )
     new = bool(inserted)
+    if new and others:
+        record_everywhere(session, "login.new_device", label=body.label)
     if new and others and sender is not None and user.email:
         background.add_task(
             _send, sender, new_device_email(user.email, body.label, body.locale, datetime.now(UTC))
         )
     return DeviceCheckResult(new_device=new)
+
+
+class SecurityEventBody(BaseModel):
+    kind: Literal["mfa_enabled", "mfa_disabled"]
+
+
+@router.post("/events", status_code=204)
+def security_event(body: SecurityEventBody, user: UserDep, session: SessionDep) -> None:
+    """The web app reports that the person turned two-step sign-in on or off, so the businesses
+    they work for can see it in their audit log."""
+    ensure_profile(session, user.id, user.email)
+    record_everywhere(session, body.kind.replace("_", ".", 1))
 
 
 @policy_router.get("")

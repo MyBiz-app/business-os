@@ -211,7 +211,9 @@
     },
     "clientIdNumberHint": "Common for clinics, health declarations and insurance. The number is kept encrypted and shown masked.",
     "requireMfaForStaff": "Require two-step sign-in for the whole team",
-    "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected."
+    "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected.",
+    "auditLink": "Audit log",
+    "auditHint": "Who changed roles, team, settings and exports."
   },
   "locales": {
     "he": "עברית",
@@ -3613,6 +3615,7 @@
               "leads and AI conversations: 12 months;",
               "enquiries: 12 months;",
               "message log: 24 months;",
+              "audit log of who changed what: 24 months;",
               "a closed Business: deleted 90 days after closing;",
               "billing records: as long as tax law requires."
             ]
@@ -7972,6 +7975,66 @@
       "device": "Device",
       "unknownDevice": "Unknown device",
       "when": "When"
+    }
+  },
+  "auditLog": {
+    "title": "Audit log",
+    "subtitle": "Who changed what in your business: roles, team, settings, exports and sign-ins.",
+    "back": "Settings",
+    "person": "Person",
+    "everyone": "Everyone",
+    "kind": "Kind",
+    "allKinds": "All kinds",
+    "from": "From",
+    "to": "To",
+    "filter": "Filter",
+    "exportCsv": "Download CSV",
+    "empty": "Nothing recorded for these filters.",
+    "when": "When",
+    "who": "Person",
+    "action": "What",
+    "details": "Details",
+    "system": "System",
+    "mybizTeam": "MyBiz team",
+    "newest": "Newest",
+    "older": "Older",
+    "retention": "Entries are kept for 24 months and then deleted.",
+    "link": "Audit log",
+    "hint": "Who changed roles, team, settings and exports.",
+    "categories": {
+      "team": "Team and roles",
+      "settings": "Settings",
+      "security": "Sign-in and security",
+      "payroll": "Payroll",
+      "privacy": "Privacy",
+      "export": "Exports",
+      "support": "MyBiz support",
+      "other": "Other"
+    },
+    "actions": {
+      "staff_invited": "Invited a team member",
+      "staff_invitation_revoked": "Cancelled an invitation",
+      "staff_role_changed": "Changed a role",
+      "staff_branches_set": "Changed a member's branches",
+      "staff_removed": "Removed a team member",
+      "role_created": "Created a custom role",
+      "role_updated": "Changed a custom role",
+      "role_deleted": "Deleted a custom role",
+      "tenant_updated": "Changed business settings",
+      "mfa_team_requirement_set": "Changed the two-step requirement for the team",
+      "mfa_enabled": "Turned on two-step sign-in",
+      "mfa_disabled": "Turned off two-step sign-in",
+      "login_new_device": "Signed in from a new device",
+      "export_audit_log": "Downloaded the audit log",
+      "clients_export": "Exported a client's data",
+      "clients_erase": "Erased a client's data",
+      "payroll_exported": "Exported a payroll month",
+      "payroll_annual_exported": "Exported the yearly payroll summary",
+      "platform_view": "MyBiz support viewed a page",
+      "support_view": "MyBiz support viewed a page",
+      "platform_change": "MyBiz support changed something",
+      "tenant_closed": "Closed the business",
+      "tenant_reopened": "Reopened the business"
     }
   }
 }

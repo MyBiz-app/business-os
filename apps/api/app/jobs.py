@@ -366,13 +366,14 @@ RETENTION_MONTHS = {
     "whatsapp_conversations": 12,  # AI chats, on WhatsApp
     "whatsapp_inbox": 12,  # the clients' messages those chats answered
     "messages": 24,
+    "audit_log": 24,  # the owner's record of who did what
 }
 
 
 def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, int]:
     """Deletes what has passed its time: leads that never became clients and nobody touched,
     website and in-app requests, the AI's conversations (in the app and on WhatsApp) with the
-    WhatsApp messages they answered, the message log and files past their expiry."""
+    WhatsApp messages they answered, the message log, the audit log and files past their expiry."""
     now = now or datetime.now(UTC)
 
     def before(kind: str) -> datetime:
@@ -392,6 +393,7 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
         ),
         "whatsapp_inbox": "DELETE FROM app.whatsapp_inbox WHERE received_at < :before",
         "messages": "DELETE FROM app.messages WHERE created_at < :before",
+        "audit_log": "DELETE FROM app.audit_log WHERE occurred_at < :before",
     }
     deleted = {
         kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
