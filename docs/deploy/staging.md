@@ -6,7 +6,7 @@
 
 | Part | Provider | Deploys from | Config |
 |---|---|---|---|
-| Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main`, through GitHub Actions (the Hobby plan can't deploy a private organization repository from Git, so there are no PR previews) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json), [`deploy-web.yml`](../../.github/workflows/deploy-web.yml) (needs the `VERCEL_TOKEN` secret in the `staging` environment) |
+| Web (`apps/web`) | Vercel, functions in Frankfurt (`fra1`) | `main`, through GitHub Actions (the Hobby plan can't deploy a private organization repository from Git, so there are no PR previews; `git.deploymentEnabled: false` in `apps/web/vercel.json` and `apps/client-app/vercel.json` also stops Vercel's own Git builds of every branch and of `main`, so only the manual workflows deploy) | Vercel project settings, [`apps/web/vercel.json`](../../apps/web/vercel.json), [`deploy-web.yml`](../../.github/workflows/deploy-web.yml) (needs the `VERCEL_TOKEN` secret in the `staging` environment) |
 | Client app on the web (`apps/client-app`) | Vercel, static site | `main` | [`apps/client-app/vercel.json`](../../apps/client-app/vercel.json), [`apps/client-app/README.md`](../../apps/client-app/README.md) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | - | Supabase dashboard |
