@@ -151,6 +151,15 @@ class Settings(BaseSettings):
     # require it of their team always do.
     mfa_enforced: bool | None = None
     mfa_required_from: dt.date | None = None
+    # Comma-separated emails of demo owners who may browse staging without a code. Only read on
+    # staging: production and local ignore it (see `mfa_exempt`).
+    mfa_demo_exempt_emails: str = ""
+
+    def mfa_exempt(self, email: str) -> bool:
+        if self.environment != "staging" or not email:
+            return False
+        listed = {part.strip().lower() for part in self.mfa_demo_exempt_emails.split(",")}
+        return email.strip().lower() in listed
 
     @property
     def mfa_on(self) -> bool:

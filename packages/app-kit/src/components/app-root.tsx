@@ -13,6 +13,7 @@ import { ThemeProvider, useTheme } from "../providers/theme-provider";
 import { AnnouncementsModal } from "./announcements-modal";
 import { AppLockGate } from "./app-lock-gate";
 import { LaunchSplash } from "./launch-splash";
+import { LegalUpdateModal } from "./legal-update-modal";
 import { ToastProvider } from "./toast";
 
 initMonitoring();
@@ -46,6 +47,7 @@ export function AppRoot({ Provider }: { Provider: ComponentType<{ children: Reac
             <ToastProvider>
               <AppLockGate>
                 <ThemedStack />
+                <LegalUpdateModal />
                 <AnnouncementsModal />
               </AppLockGate>
               <LaunchSplash />
