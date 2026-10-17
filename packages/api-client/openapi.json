@@ -15650,6 +15650,85 @@
         }
       }
     },
+    "/me/legal": {
+      "get": {
+        "tags": [
+          "legal"
+        ],
+        "summary": "My Pending Documents",
+        "operationId": "my_pending_documents",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PendingDocument"
+                  },
+                  "type": "array",
+                  "title": "Response My Pending Documents"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "legal"
+        ],
+        "summary": "Accept Documents",
+        "description": "Accepts the current version of the given documents (the banner after a document changed).",
+        "operationId": "accept_documents",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PendingDocument"
+                  },
+                  "type": "array",
+                  "title": "Response Accept Documents"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/location-groups": {
       "get": {
         "tags": [
@@ -39336,6 +39415,24 @@
         ],
         "title": "AcceptInvitation"
       },
+      "AcceptRequest": {
+        "properties": {
+          "documents": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "minProperties": 1,
+            "title": "Documents",
+            "description": "Document -> the version being accepted (must be the current)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "documents"
+        ],
+        "title": "AcceptRequest"
+      },
       "Accepted": {
         "properties": {
           "tenant_id": {
@@ -51525,6 +51622,21 @@
             "maxLength": 16,
             "minLength": 4,
             "title": "Code"
+          },
+          "accepted_legal": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Legal",
+            "description": "Legal documents accepted when joining (document -> version)"
           }
         },
         "type": "object",
@@ -52280,6 +52392,24 @@
         "type": "object",
         "title": "LeadUpdate"
       },
+      "LegalPending": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "title": "Document"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "version"
+        ],
+        "title": "LegalPending"
+      },
       "LimitsUpdate": {
         "properties": {
           "limits": {
@@ -52785,6 +52915,14 @@
             "title": "Marketing Consent",
             "description": "Agreed to marketing messages (service messages are sent anyway)",
             "default": false
+          },
+          "legal_pending": {
+            "items": {
+              "$ref": "#/components/schemas/LegalPending"
+            },
+            "type": "array",
+            "title": "Legal Pending",
+            "description": "Legal documents whose current version the person has not accepted yet"
           },
           "palette": {
             "anyOf": [
@@ -55141,6 +55279,26 @@
           "candidates"
         ],
         "title": "PendingConnection"
+      },
+      "PendingDocument": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "title": "Document",
+            "description": "terms, privacy or dpa"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "description": "The current version, which is also its date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "version"
+        ],
+        "title": "PendingDocument"
       },
       "PendingReview": {
         "properties": {
@@ -64244,6 +64402,21 @@
             ],
             "title": "Modules",
             "description": "Modules to enable; defaults to the vertical pack's preset"
+          },
+          "accepted_legal": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Legal",
+            "description": "Legal documents accepted at sign-up (document -> version)"
           }
         },
         "type": "object",

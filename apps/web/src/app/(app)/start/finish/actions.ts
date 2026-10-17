@@ -2,6 +2,7 @@
 
 import { getLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { legalVersion } from "@business-os/i18n/brand";
 
 import { ApiError, getApi, type Tenant, unwrap } from "@/lib/api";
 import { clearResumePath } from "@/lib/resume";
@@ -36,6 +37,7 @@ export async function startTrial(_state: FinishState, formData: FormData): Promi
           time_zone: supported.includes(timeZone) ? timeZone : fallbackZone,
           currency: plan.currency,
           modules: plan.modules,
+          accepted_legal: { terms: legalVersion("terms"), privacy: legalVersion("privacy"), dpa: legalVersion("dpa") },
         },
       }),
     );

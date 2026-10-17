@@ -2,6 +2,7 @@ import type { ApiClient, components } from "@business-os/api-client";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { legalVersion } from "@business-os/i18n/brand";
 import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
 import { brandPalette } from "@business-os/app-kit/lib/brand";
 import type { Palette } from "@business-os/app-kit/lib/theme";
@@ -58,7 +59,9 @@ export function BusinessProvider({ children }: { children: React.ReactNode }) {
 
   const join = useCallback(
     async (code: string) => {
-      const joined = unwrap(await apiClient().POST("/client/businesses", { body: { code } }));
+      const joined = unwrap(await apiClient().POST("/client/businesses", {
+          body: { code, accepted_legal: { terms: legalVersion("terms"), privacy: legalVersion("privacy") } },
+        }));
       setBusinesses((current) => [...(current ?? []).filter((b) => b.id !== joined.id), joined]);
       await select(joined.id);
       return joined;
