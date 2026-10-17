@@ -222,7 +222,7 @@ export default async function Home() {
         innerClassName="flex flex-col gap-10"
       >
         <SectionHeading id="steps-heading" title={t("steps.title")} />
-        <ol className="swipe gap-4 sm:grid md:grid-cols-3">
+        <ol tabIndex={0} aria-labelledby="steps-heading" className="swipe gap-4 sm:grid md:grid-cols-3">
           {steps.map((step, index) => (
             <li key={step.title} className="card flex flex-col gap-3 p-6">
               <span aria-hidden="true" className="btn-primary size-10 text-lg">

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
 
+import { ChoiceCard } from "@/components/form/choice-card";
 import { useToast } from "@/components/toast/toaster";
 
 import {
@@ -55,13 +56,7 @@ function Checks<T extends string>({ legend, hint, items, selected, onChange }: {
       {hint && <p className="text-xs text-muted">{hint}</p>}
       <div className="grid gap-2 sm:grid-cols-2">
         {items.map((item) => (
-          <label key={item.value} className="flex items-start gap-2 rounded-xl border border-border p-3 text-sm">
-            <input type="checkbox" checked={selected.includes(item.value)} onChange={() => onChange(toggle(selected, item.value))} className="mt-0.5 size-4 accent-[var(--primary)]" />
-            <span className="flex flex-col">
-              <span className="font-medium">{item.label}</span>
-              {item.hint && <span className="text-xs text-muted">{item.hint}</span>}
-            </span>
-          </label>
+          <ChoiceCard key={item.value} type="checkbox" checked={selected.includes(item.value)} onChange={() => onChange(toggle(selected, item.value))} title={item.label} hint={item.hint} />
         ))}
       </div>
     </fieldset>
@@ -147,13 +142,7 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
         <legend className="text-sm font-medium">{t("kind")}</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {(["service", "marketing"] as const).map((value) => (
-            <label key={value} className={`flex cursor-pointer flex-col gap-0.5 rounded-xl border p-3 text-sm ${kind === value ? "border-primary bg-primary/10" : "border-border"}`}>
-              <span className="flex items-center gap-2 font-semibold">
-                <input type="radio" name="kind" value={value} checked={kind === value} onChange={() => setKind(value)} className="accent-[var(--primary)]" />
-                {t(`kinds.${value}`)}
-              </span>
-              <span className="text-xs text-muted">{t(`kindHints.${value}`)}</span>
-            </label>
+            <ChoiceCard key={value} type="radio" name="kind" value={value} checked={kind === value} onChange={() => setKind(value)} title={t(`kinds.${value}`)} hint={t(`kindHints.${value}`)} />
           ))}
         </div>
       </fieldset>
@@ -243,15 +232,11 @@ export function Composer({ initial, verticals, modules, businesses, locale }: { 
         <>
           <fieldset className="flex flex-col gap-2">
             <legend className="text-sm font-medium">{t("when.title")}</legend>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="radio" name="when" checked={sendNow} onChange={() => setSendNow(true)} className="accent-[var(--primary)]" />
-              {t("when.now")}
-            </label>
-            <label className="flex flex-wrap items-center gap-2 text-sm">
-              <input type="radio" name="when" checked={!sendNow} onChange={() => setSendNow(false)} className="accent-[var(--primary)]" />
-              {t("when.later")}
-              <input type="datetime-local" aria-label={t("when.later")} value={at} disabled={sendNow} onChange={(e) => setAt(e.target.value)} className="control px-3 py-1.5" dir="ltr" />
-            </label>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <ChoiceCard type="radio" name="when" checked={sendNow} onChange={() => setSendNow(true)} title={t("when.now")} />
+              <ChoiceCard type="radio" name="when" checked={!sendNow} onChange={() => setSendNow(false)} title={t("when.later")} />
+            </div>
+            <input type="datetime-local" aria-label={t("when.later")} value={at} disabled={sendNow} onChange={(e) => setAt(e.target.value)} className="control w-fit px-3 py-1.5" dir="ltr" />
           </fieldset>
           <div className="flex flex-wrap gap-3">
             <button

@@ -18,12 +18,13 @@ export type HomePhoneLabels = {
 
 const SCREENS = 3;
 const SWAP_MS = 4200;
+/** Dark enough that the white label passes AA (>= 4.5:1) on each tile. */
 const BLOCKS = [
-  { time: "07:00", top: 0, height: 52, color: "#ec4899" },
-  { time: "09:30", top: 64, height: 76, color: "#10b981" },
-  { time: "18:00", top: 152, height: 52, color: "#f59e0b" },
+  { time: "07:00", top: 0, height: 52, color: "#be185d" },
+  { time: "09:30", top: 64, height: 76, color: "#047857" },
+  { time: "18:00", top: 152, height: 52, color: "#b45309" },
 ];
-const AVATARS = ["from-pink-500 to-rose-400", "from-emerald-500 to-teal-400", "from-amber-500 to-orange-400", "from-sky-500 to-indigo-400"];
+const AVATARS = ["from-pink-700 to-rose-600", "from-emerald-700 to-teal-600", "from-amber-700 to-orange-700", "from-sky-700 to-indigo-600"];
 
 function calm() {
   return (
@@ -126,7 +127,7 @@ export function HomePhoneStage({ labels }: { labels: HomePhoneLabels }) {
                     className="absolute inset-x-0 rounded-xl px-2.5 py-1.5 text-white [transform:translateZ(18px)] shadow-lg"
                     style={{ top: block.top, height: block.height, backgroundColor: block.color }}
                   >
-                    <p className="text-[10px] font-bold tabular-nums opacity-90">{block.time}</p>
+                    <p className="text-[10px] font-bold tabular-nums">{block.time}</p>
                     <p className="truncate text-xs font-bold">{labels.classes[index]}</p>
                   </div>
                 ))}

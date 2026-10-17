@@ -6,6 +6,7 @@ import { ColumnChart } from "@/components/charts/column-chart";
 import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { getPlatform } from "@/lib/platform";
+import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -116,7 +117,7 @@ export default async function PlatformPage() {
               </Link>
             </div>
             {leads.length === 0 ? (
-              <p className="text-sm text-muted">{t("platform.noLeads")}</p>
+              <EmptyState variant="inbox">{t("platform.noLeads")}</EmptyState>
             ) : (
               <ul className="flex flex-col divide-y divide-border">
                 {leads.slice(0, 5).map((lead) => (
