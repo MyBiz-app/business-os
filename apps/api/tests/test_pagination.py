@@ -67,6 +67,8 @@ BOUNDED = {
     # the SQL function returns at most 5 open banners, or the latest 50
     "/public/incidents": "limit in SQL",
     "/platform/incidents": "limit in SQL",
+    # one row per quote status and currency
+    "/quotes/summary": "grouped",
     # a required date window of at most 42 days
     "/sessions": "window",
     "/client/sessions": "window",
