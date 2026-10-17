@@ -1,71 +1,7 @@
-import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
-import { unwrap } from "@/lib/api";
-import { formatDay, todayIn } from "@/lib/dates";
-import { getTenantFor } from "@/lib/tenant";
-
-import { HoursForm } from "@/components/form/hours-form";
-import { toBlocks, weekStartFor } from "@/lib/hours";
-
-import { removeTimeOff, saveHours } from "./actions";
-import { TimeOffForm } from "./time-off";
-import { isolate } from "@/lib/bidi";
-import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/layout/page-header";
-
+/** Working hours and time off now live in the member's card. */
 export default async function StaffHoursPage({ params }: PageProps<"/team/[userId]/hours">) {
   const { userId } = await params;
-  const t = await getTranslations();
-  const { api, scope, tenant } = await getTenantFor("schedule.write");
-  const team = unwrap(await api.GET("/staff", { params: scope }));
-  const member = team.members.find((m) => m.user_id === userId);
-  if (!member) notFound();
-  const [hours, timeOff] = await Promise.all([
-    api.GET("/staff/{user_id}/hours", { params: { ...scope, path: { user_id: userId } } }).then(unwrap),
-    api.GET("/staff/{user_id}/time-off", { params: { ...scope, path: { user_id: userId } } }).then(unwrap),
-  ]);
-  const locale = await getLocale();
-  const day = (value: string) => formatDay(value, locale, { weekday: "short", day: "numeric", month: "short" });
-  const weekStartsOn = weekStartFor(tenant.locale);
-
-  return (
-    <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/team" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {t("common.back")}
-      </Link>
-      <PageHeader title={t("hours.title")} description={t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })} />
-      <section className="card p-6">
-        <HoursForm save={saveHours.bind(null, userId)} weekStartsOn={weekStartsOn} initial={toBlocks(hours.blocks)} />
-      </section>
-
-      <section aria-labelledby="time-off-heading" className="card flex flex-col gap-4 p-6">
-        <div className="flex flex-col gap-1">
-          <h2 id="time-off-heading" className="text-lg font-semibold">{t("timeOff.title")}</h2>
-          <p className="text-sm text-muted">{t("timeOff.hint")}</p>
-        </div>
-        {timeOff.length > 0 && (
-          <ul className="flex flex-col divide-y divide-border">
-            {timeOff.map((entry) => (
-              <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 text-sm">
-                <span>
-                  <span className="font-medium">
-                    {entry.starts_on === entry.ends_on ? day(entry.starts_on) : `${day(entry.starts_on)} - ${day(entry.ends_on)}`}
-                  </span>
-                  {entry.reason && <span dir="auto" className="text-muted"> · {entry.reason}</span>}
-                </span>
-                <form action={removeTimeOff.bind(null, userId, entry.id)}>
-                  <button type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
-                    {t("timeOff.remove")}
-                  </button>
-                </form>
-              </li>
-            ))}
-          </ul>
-        )}
-        <TimeOffForm userId={userId} today={todayIn(tenant.time_zone)} />
-      </section>
-    </Container>
-  );
+  redirect(`/team/${userId}?tab=availability`);
 }

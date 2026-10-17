@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
+import { SummaryTiles } from "@/components/ui/summary-tiles";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { DOCUMENT_KINDS } from "@/lib/issued-documents";
@@ -22,10 +23,28 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
   const { tenant, api, scope } = await getTenantFor("sales.manage");
   const raw = (await searchParams).kind;
   const filter = DOCUMENT_KINDS.find((k) => k === raw);
-  const [documents, series] = await Promise.all([
+  const [documents, recent, series] = await Promise.all([
     api.GET("/issued-documents", { params: { ...scope, query: filter ? { kind: filter, limit: 100 } : { limit: 100 } } }).then(unwrap),
+    // The tiles always count the latest documents of every kind, whichever kind the list shows.
+    filter ? api.GET("/issued-documents", { params: { ...scope, query: { limit: 100 } } }).then(unwrap) : Promise.resolve(null),
     api.GET("/issued-documents/series", { params: scope }).then(unwrap),
   ]);
+  const counted = recent ?? documents;
+  const tiles = DOCUMENT_KINDS.flatMap((kind) => {
+    const rows = counted.filter((doc) => doc.kind === kind);
+    if (rows.length === 0 && filter !== kind) return [];
+    const currencies = new Set(rows.map((doc) => doc.currency));
+    return [
+      {
+        key: kind,
+        label: t(`kinds.${kind}`),
+        value: `${rows.length}${counted.length >= 100 ? "+" : ""}`,
+        hint: rows.length > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, doc) => sum + doc.total, 0), [...currencies][0], locale) : undefined,
+        href: `/invoices?kind=${kind}`,
+        active: filter === kind,
+      },
+    ];
+  });
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
 
   return (
@@ -51,6 +70,7 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
         active={filter ?? "all"}
         options={[undefined, ...DOCUMENT_KINDS].map((k) => ({ key: k ?? "all", label: k ? t(`kinds.${k}`) : t("all"), href: k ? `/invoices?kind=${k}` : "/invoices" }))}
       />
+      {tiles.length > 0 && <SummaryTiles label={t("tiles.label")} tiles={tiles} />}
       {documents.length === 0 ? (
         <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (

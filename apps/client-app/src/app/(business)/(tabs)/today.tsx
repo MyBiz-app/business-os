@@ -91,6 +91,7 @@ export default function Today() {
       value,
       label: formatDay(value, locale, { day: "numeric" }),
       sublabel: value === today ? t("title") : formatDay(value, locale, { weekday: "short" }),
+      count,
       accessibilityLabel: `${long}, ${t("sessions", { count })}`,
     };
   });

@@ -49,7 +49,7 @@ pages = [
 detail = {
     "client": "/clients/{}", "lead": "/leads/{}", "location": "/locations/{}", "plan": "/plans/{}",
     "receipt": "/receipts/{}", "session": "/schedule/{}", "service": "/services/{}",
-    "invoice": "/settings/billing/invoices/{}", "member": "/team/{}/hours",
+    "invoice": "/settings/billing/invoices/{}", "member": "/team/{}",
 }  # fmt: skip
 pages += [path.format(ids[key]) for key, path in detail.items() if ids[key]]
 
