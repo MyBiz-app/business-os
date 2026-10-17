@@ -61,7 +61,7 @@ with sync_playwright() as p:
     # Work in the gym: the three demo businesses were created together, so pick it by name.
     page.goto(f"{h.BASE}/dashboard"); h.ready(page)
     if "Adir fitness" not in page.get_by_role("heading", level=1).inner_text():
-        page.locator("button[aria-expanded][aria-controls]").first.click()
+        page.locator("aside button[aria-expanded][aria-controls]").first.click()  # the header has menus too
         page.get_by_role("dialog").get_by_role("button", name=re.compile("Adir fitness")).click()
         page.wait_for_url("**/dashboard"); h.ready(page)
     expect(page.get_by_role("heading", level=1)).to_contain_text("Adir fitness")
