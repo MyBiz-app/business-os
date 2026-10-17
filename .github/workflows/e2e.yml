@@ -75,6 +75,11 @@ jobs:
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
             python e2e/agents.py "$ADMIN_EMAIL"
 
+      - name: Run the round 6 walk-through (payroll, move to MyBiz, documents)
+        run: |
+          uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
+            python e2e/round6.py
+
       - name: Show the API log
         if: failure()
         run: tail -n 60 api.log || true
