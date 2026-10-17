@@ -12,10 +12,12 @@ import { GettingStartedCard } from "@/components/getting-started";
 import { Container } from "@/components/layout/container";
 import { LiveRefresh } from "@/components/live-refresh";
 import { CountUp } from "@/components/motion/count-up";
+import { PendingArea, PeriodPicker, PeriodProvider } from "@/components/period-picker";
 import { unwrap } from "@/lib/api";
 import { addDays, formatDay, formatTime, todayIn } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { canManageSettings, canReadReports } from "@/lib/permissions";
+import { resolveRange } from "@/lib/range";
 import { getTenant } from "@/lib/tenant";
 import { coverSrc } from "@/lib/workspace";
 
@@ -23,8 +25,7 @@ import { isolate } from "@/lib/bidi";
 
 type MetricValue = components["schemas"]["MetricValue"];
 
-const PERIODS = { "7": 7, "30": 30, "90": 90 } as const;
-type Period = keyof typeof PERIODS;
+const PRESETS = [7, 30, 90] as const;
 const TILES = ["revenue", "active_clients", "attendance", "occupancy", "no_show_rate", "new_clients"] as const;
 const TILE_ICONS = {
   revenue: Banknote,
@@ -46,11 +47,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   const locale = await getLocale();
   const { me, tenant, api, scope } = await getTenant();
   const query = await searchParams;
-  const period: Period = query.period === "7" || query.period === "90" ? query.period : "30";
   const today = todayIn(tenant.time_zone);
-  // Completed days only, so the comparison with the previous period is fair.
-  const end = addDays(today, -1);
-  const start = addDays(end, -(PERIODS[period] - 1));
+  // Completed days only for the presets, so the comparison with the previous period is fair.
+  const range = resolveRange(query, today, { presets: PRESETS, fallback: 30 });
+  const { start, end } = range;
   const reports = canReadReports(tenant);
 
   const canSeeSchedule = tenant.permissions.includes("schedule.read");
@@ -92,6 +92,26 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     if (metric.unit === "money") return formatMoney(Math.round(value), tenant.currency, locale);
     if (metric.unit === "percent") return `${number.format(Math.round(value))}%`;
     return number.format(value);
+  };
+  // Where each tile leads: the same period, already filtered to what the number counts.
+  const tileHref = (key: string) => {
+    const span = new URLSearchParams({ from: start, to: end });
+    switch (key) {
+      case "revenue":
+        return `/sales?${span}`;
+      case "active_clients":
+        return "/clients?status=active";
+      case "new_clients":
+        return `/clients?${new URLSearchParams({ joined_from: start, joined_to: end })}`;
+      case "no_show_rate":
+        return `/clients?${new URLSearchParams({ no_show_from: start, no_show_to: end })}`;
+      case "attendance":
+        return `/schedule?${new URLSearchParams({ view: range.days <= 7 ? "week" : "month", date: end })}`;
+      case "occupancy":
+        return `/reports?${span}&sort=occupancy#by-service`;
+      default:
+        return null;
+    }
   };
   const mine = todays.filter((session) => session.instructor_user_id === me.id);
   const sessionList = (sessions: typeof todays) => (
@@ -140,6 +160,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       })}
     </ul>
   );
+  // A weekly bar covers its first day to the sixth after it, never past today.
+  const weekEnd = (bucket: string) => (addDays(bucket, 6) < today ? addDays(bucket, 6) : today);
   const weekLabel = (bucket: string) => formatDay(bucket, locale, { day: "numeric", month: "numeric" });
 
   return (
@@ -216,24 +238,15 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
       <AttentionPanel context={{ api, scope }} />
 
       {reports && (
+        <PeriodProvider>
         <section aria-labelledby="kpi-heading" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 id="kpi-heading" className="text-lg font-semibold">
               {t("dashboard.kpis")}
             </h2>
-            <nav aria-label={t("dashboard.period")} className="flex w-full gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm sm:w-auto">
-              {(Object.keys(PERIODS) as Period[]).map((value) => (
-                <Link
-                  key={value}
-                  href={`/dashboard?period=${value}`}
-                  aria-current={value === period ? "page" : undefined}
-                  className={`flex-1 whitespace-nowrap rounded-lg px-2 py-1 text-center transition-colors sm:flex-none sm:px-3 ${value === period ? "bg-primary text-on-primary shadow-sm" : "hover:bg-foreground/5"}`}
-                >
-                  {t("dashboard.lastDays", { count: PERIODS[value] })}
-                </Link>
-              ))}
-            </nav>
+            <PeriodPicker presets={PRESETS} value={range.key} from={start} to={end} today={today} />
           </div>
+          <PendingArea>
           <ul className="enter-items grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
             {metrics.map((metric) => {
               const delta =
@@ -250,7 +263,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               const Icon = TILE_ICONS[metric.key as keyof typeof TILE_ICONS] ?? Gauge;
               const DeltaIcon = delta! > 0 ? ArrowUpRight : delta! < 0 ? ArrowDownRight : Minus;
               return (
-                <li key={metric.key} className="card card-hover flex flex-col gap-3 p-5">
+                <li key={metric.key}>
+                  <Link
+                    href={tileHref(metric.key) ?? "/reports"}
+                    className="group card card-hover flex h-full flex-col gap-3 p-5 outline-offset-2 transition-shadow focus-visible:outline-2 focus-visible:outline-primary"
+                  >
                   <span className="flex items-center justify-between gap-2">
                     <span className="text-sm font-medium text-muted">{t(`metrics.${metric.key}`)}</span>
                     <span className="icon-tile size-9">
@@ -288,14 +305,18 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                       </span>
                     </span>
                   )}
+                  <span className="mt-auto flex items-center gap-1 text-xs font-medium text-primary-ink opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                    {t("dashboard.openDetails")}
+                    <ArrowRight aria-hidden="true" className="size-3.5 rtl:rotate-180" />
+                  </span>
+                  </Link>
                 </li>
               );
             })}
           </ul>
+          </PendingArea>
         </section>
-      )}
-
-      {reports && (
+        <PendingArea>
         <section className="card grid gap-8 p-6 lg:grid-cols-2">
           <ColumnChart
             title={t("dashboard.weeklyRevenue")}
@@ -307,6 +328,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               label: weekLabel(point.bucket),
               value: point.value,
               display: formatMoney(Math.round(point.value), tenant.currency, locale),
+              href: `/sales?${new URLSearchParams({ from: point.bucket, to: weekEnd(point.bucket) })}`,
             }))}
           />
           <ColumnChart
@@ -319,9 +341,12 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               label: weekLabel(point.bucket),
               value: point.value,
               display: number.format(point.value),
+              href: `/schedule?${new URLSearchParams({ view: "week", date: point.bucket })}`,
             }))}
           />
         </section>
+        </PendingArea>
+        </PeriodProvider>
       )}
 
       {canSeeSchedule && <section aria-labelledby="today-heading" className="card flex flex-col gap-3 p-6">

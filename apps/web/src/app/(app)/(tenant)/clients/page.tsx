@@ -1,10 +1,11 @@
+import { X } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { termsOf } from "@business-os/verticals";
 
 import { Avatar } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
-import { formatDay, todayIn } from "@/lib/dates";
+import { formatDay, isDay, todayIn } from "@/lib/dates";
 import { canWriteClients } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
@@ -32,6 +33,10 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
   const plan = PLANS.find((p) => p === params.plan) as PlanFilter | undefined;
   const absent = ABSENCES.find((d) => String(d) === params.absent);
   const page = Math.max(1, Number(params.page) || 1);
+  // Date filters that come from the dashboard tiles ("new clients", "no-shows").
+  const day = (value: unknown) => (isDay(value) ? value : undefined);
+  const joined = { from: day(params.joined_from), to: day(params.joined_to) };
+  const noShow = { from: day(params.no_show_from), to: day(params.no_show_to) };
 
   const result = unwrap(
     await api.GET("/clients", {
@@ -42,6 +47,10 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
           status,
           plan,
           absent_days: absent,
+          joined_from: joined.from,
+          joined_to: joined.to,
+          no_show_from: noShow.from,
+          no_show_to: noShow.to,
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
         },
@@ -56,12 +65,30 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
     return days <= 0 ? t("clients.list.today") : days < 30 ? t("clients.list.daysAgo", { days }) : shortDate(day);
   };
   const pages = Math.max(1, Math.ceil(result.total / PAGE_SIZE));
+  const dateFilters = { joined_from: joined.from, joined_to: joined.to, no_show_from: noShow.from, no_show_to: noShow.to };
+  const rangeText = (range: { from?: string; to?: string }) =>
+    [range.from, range.to].map((value) => (value ? formatDay(value, locale, { day: "numeric", month: "short" }) : "...")).join(" - ");
+  // What the list is narrowed to by date, each with a link that removes just that filter.
+  const dateChips = [
+    joined.from || joined.to ? { key: "joined", text: t("clients.joinedChip", { range: rangeText(joined) }), keys: ["joined_from", "joined_to"] } : null,
+    noShow.from || noShow.to ? { key: "noShow", text: t("clients.noShowChip", { range: rangeText(noShow) }), keys: ["no_show_from", "no_show_to"] } : null,
+  ].filter((chip) => chip !== null);
+  const withoutKeys = (keys: string[]) => {
+    const query = new URLSearchParams();
+    if (search) query.set("q", search);
+    if (status) query.set("status", status);
+    if (plan) query.set("plan", plan);
+    if (absent) query.set("absent", String(absent));
+    for (const [key, value] of Object.entries(dateFilters)) if (value && !keys.includes(key)) query.set(key, value);
+    return query.size ? `/clients?${query}` : "/clients";
+  };
   const pageHref = (target: number) => {
     const query = new URLSearchParams();
     if (search) query.set("q", search);
     if (status) query.set("status", status);
     if (plan) query.set("plan", plan);
     if (absent) query.set("absent", String(absent));
+    for (const [key, value] of Object.entries(dateFilters)) if (value) query.set(key, value);
     query.set("page", String(target));
     return `/clients?${query}`;
   };
@@ -94,6 +121,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
       />
 
       <form role="search" className="flex flex-wrap items-end gap-3">
+        {Object.entries(dateFilters).map(([key, value]) => (value ? <input key={key} type="hidden" name={key} value={value} /> : null))}
         <label className="flex min-w-60 flex-1 flex-col gap-1.5 text-sm font-medium">
           {t("clients.search")}
           <input
@@ -146,9 +174,27 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
         </button>
       </form>
 
+      {dateChips.length > 0 && (
+        <ul className="flex flex-wrap items-center gap-2" aria-label={t("clients.activeFilters")}>
+          {dateChips.map((chip) => (
+            <li key={chip.key}>
+              <Link
+                href={withoutKeys(chip.keys)}
+                scroll={false}
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary-ink transition-colors hover:bg-primary/15"
+              >
+                {chip.text}
+                <X aria-hidden="true" className="size-3.5" />
+                <span className="sr-only">{t("clients.removeFilter")}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
       {result.items.length === 0 ? (
         <EmptyState variant="people">
-          {search || status || plan || absent ? term("noResults") : term("noClients")}
+          {search || status || plan || absent || dateChips.length > 0 ? term("noResults") : term("noClients")}
         </EmptyState>
       ) : (
         <ScrollRegion labelledBy="clients-heading" className="rounded-2xl border border-border">
