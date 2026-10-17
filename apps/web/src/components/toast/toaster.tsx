@@ -1,19 +1,24 @@
 "use client";
 
-import { CircleAlert, CircleCheck, X } from "lucide-react";
+import { AlertCircle, Check, Info, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 import "./toast.css";
 
-export type ToastTone = "success" | "error";
-type ToastItem = { id: number; tone: ToastTone; message: string; leaving?: boolean };
+export type ToastTone = "success" | "error" | "info";
+/** An optional button in the toast: "Undo" after a delete, "View" after a create, "Try again" after an error. */
+export type ToastAction = { label: string; onClick?: () => void; href?: string };
+export type ToastOptions = { action?: ToastAction };
+type ToastItem = { id: number; tone: ToastTone; message: string; action?: ToastAction; leaving?: boolean };
 
-const DURATION_MS: Record<ToastTone, number> = { success: 5000, error: 9000 };
+/** Errors have no timer: they stay until closed. */
+const DURATION_MS: Record<ToastTone, number | null> = { success: 5000, info: 5000, error: null };
 const MAX_VISIBLE = 3;
 const LEAVE_MS = 180;
 
-const ToastContext = createContext<(tone: ToastTone, message: string) => void>(() => {});
+type ShowToast = (tone: ToastTone, message: string, options?: ToastOptions) => void;
+const ToastContext = createContext<ShowToast>(() => {});
 
 /** Shows a toast: `const toast = useToast(); toast("success", "Saved.")`. Forms get this for free
  * through FormNotice and FormError. */
@@ -38,14 +43,15 @@ export function Toaster({ children }: { children: React.ReactNode }) {
   }, []);
 
   const push = useCallback(
-    (tone: ToastTone, message: string) => {
+    (tone: ToastTone, message: string, options?: ToastOptions) => {
       const id = nextId.current++;
       setItems((all) => {
         // The same message again replaces the old one, so it restarts instead of piling up.
         const rest = all.filter((item) => !(item.tone === tone && item.message === message && !item.leaving));
-        return [...rest, { id, tone, message }].slice(-MAX_VISIBLE);
+        return [...rest, { id, tone, message, action: options?.action }].slice(-MAX_VISIBLE);
       });
-      timers.current.set(id, window.setTimeout(() => remove(id), DURATION_MS[tone]));
+      const ms = DURATION_MS[tone];
+      if (ms !== null) timers.current.set(id, window.setTimeout(() => remove(id), ms));
     },
     [remove],
   );
@@ -73,41 +79,62 @@ export function Toaster({ children }: { children: React.ReactNode }) {
     timers.current.delete(id);
   };
   const resume = (item: ToastItem) => {
-    if (timers.current.has(item.id) || item.leaving) return;
+    if (timers.current.has(item.id) || item.leaving || DURATION_MS[item.tone] === null) return;
     timers.current.set(item.id, window.setTimeout(() => remove(item.id), 2500));
   };
 
-  const api = useMemo(() => push, [push]);
+  const api = useMemo<ShowToast>(() => push, [push]);
 
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div ref={layer} popover="manual" className="toaster">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="toast"
-            data-tone={item.tone}
-            data-leaving={item.leaving ? "true" : undefined}
-            role={item.tone === "error" ? "alert" : "status"}
-            style={{ "--toast-ms": `${DURATION_MS[item.tone]}ms` } as React.CSSProperties}
-            onMouseEnter={() => pause(item.id)}
-            onMouseLeave={() => resume(item)}
-            onFocus={() => pause(item.id)}
-            onBlur={() => resume(item)}
-          >
-            {item.tone === "error" ? (
-              <CircleAlert aria-hidden="true" className="toast-icon size-5" />
-            ) : (
-              <CircleCheck aria-hidden="true" className="toast-icon size-5" />
-            )}
-            <p className="toast-message">{item.message}</p>
-            <button type="button" className="btn-plain toast-close" aria-label={t("dismiss")} onClick={() => remove(item.id)}>
-              <X aria-hidden="true" className="size-4" />
-            </button>
-            <span aria-hidden="true" className="toast-bar" />
-          </div>
-        ))}
+      <div ref={layer} popover="manual" className="toaster" aria-label={t("notifications")} data-count={items.length}>
+        <div className="toaster-pile">
+        {items.map((item, index) => {
+          const ms = DURATION_MS[item.tone];
+          return (
+            <div
+              key={item.id}
+              className="toast"
+              data-tone={item.tone}
+              data-leaving={item.leaving ? "true" : undefined}
+              role={item.tone === "error" ? "alert" : "status"}
+              style={{ "--toast-depth": items.length - 1 - index, ...(ms !== null ? { "--toast-ms": `${ms}ms` } : {}) } as React.CSSProperties}
+              onMouseEnter={() => pause(item.id)}
+              onMouseLeave={() => resume(item)}
+              onFocus={() => pause(item.id)}
+              onBlur={() => resume(item)}
+            >
+              <span aria-hidden="true" className="toast-icon">
+                {item.tone === "error" ? <AlertCircle className="size-3.5" strokeWidth={3} /> : item.tone === "info" ? <Info className="size-3.5" strokeWidth={3} /> : <Check className="size-3.5" strokeWidth={3} />}
+              </span>
+              <p className="toast-message">{item.message}</p>
+              {item.action ? (
+                item.action.href ? (
+                  <a href={item.action.href} className="toast-action" onClick={() => remove(item.id)}>
+                    {item.action.label}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn-plain toast-action"
+                    onClick={() => {
+                      item.action?.onClick?.();
+                      remove(item.id);
+                    }}
+                  >
+                    {item.action.label}
+                  </button>
+                )
+              ) : null}
+              <button type="button" className="btn-plain toast-close" aria-label={t("dismiss")} onClick={() => remove(item.id)}>
+                <X aria-hidden="true" className="size-4" />
+              </button>
+              {ms !== null ? <span aria-hidden="true" className="toast-bar" /> : null}
+            </div>
+          );
+        })}
+        </div>
       </div>
     </ToastContext.Provider>
   );
@@ -115,10 +142,10 @@ export function Toaster({ children }: { children: React.ReactNode }) {
 
 /** For results kept in state without a form action (a transition, a fetch): shows the message
  * each time `source` changes to a new result, even when the text is the same as last time. */
-export function ToastOnChange({ source, tone, message }: { source: unknown; tone: ToastTone; message?: string }) {
+export function ToastOnChange({ source, tone, message, action }: { source: unknown; tone: ToastTone; message?: string; action?: ToastAction }) {
   const toast = useToast();
   useEffect(() => {
-    if (message) toast(tone, message);
+    if (message) toast(tone, message, action ? { action } : undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [source]);
   return null;
