@@ -116,9 +116,9 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
       </ScrollRegion>
       {pages > 1 && (
         <nav aria-label={t("platform.list.count", { count: found.length })} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary-ink">{t("platform.list.previous")}</Link> : <span />}
+          {page > 1 ? <Link scroll={false} href={pageHref(page - 1)} className="text-primary-ink">{t("platform.list.previous")}</Link> : <span />}
           <span className="text-muted">{t("platform.list.pageOf", { page, pages })}</span>
-          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary-ink">{t("platform.list.next")}</Link> : <span />}
+          {page < pages ? <Link scroll={false} href={pageHref(page + 1)} className="text-primary-ink">{t("platform.list.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

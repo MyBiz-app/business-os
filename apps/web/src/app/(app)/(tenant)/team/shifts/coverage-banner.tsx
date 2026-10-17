@@ -1,9 +1,9 @@
 import { ShieldAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { formatDay } from "@/lib/dates";
 
-import { Segmented } from "./segmented";
 import type { BoardGap } from "./shift-board";
 
 /** Managers choose whether drafts count: the plan, or only what the team already sees. */
@@ -13,6 +13,7 @@ type Roster = { current: "plan" | "published"; plan: string; published: string }
  * coverage rules ask, and (for managers) who said they can work then and is free. */
 export function CoverageBanner({ gaps, locale, showBranch, roster }: { gaps: BoardGap[]; locale: string; showBranch: boolean; roster?: Roster }) {
   const t = useTranslations("shifts");
+  const tc = useTranslations("common");
   if (gaps.length === 0 && roster?.current !== "published") return null;
   return (
     <details className="card border-warning/40 bg-warning/5 p-0" open={gaps.length <= 3}>
@@ -21,9 +22,11 @@ export function CoverageBanner({ gaps, locale, showBranch, roster }: { gaps: Boa
         {t("coverage.banner", { count: gaps.length })}
         {roster && (
           <span className="ms-auto">
-            <Segmented
+            <LinkSegmented
               label={t("coverage.roster")}
-              items={(["plan", "published"] as const).map((mode) => ({ key: mode, label: t(mode === "plan" ? "coverage.rosterPlan" : "coverage.rosterPublished"), href: roster[mode], active: roster.current === mode }))}
+              loadingLabel={tc("loading")}
+              active={roster.current}
+              options={(["plan", "published"] as const).map((mode) => ({ key: mode, label: t(mode === "plan" ? "coverage.rosterPlan" : "coverage.rosterPublished"), href: roster[mode] }))}
             />
           </span>
         )}

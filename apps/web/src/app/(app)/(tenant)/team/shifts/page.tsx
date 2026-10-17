@@ -27,7 +27,7 @@ import { PublishBar } from "./publish-bar";
 import { PublishSettings } from "./publish-settings";
 import { SaveShiftsDefault } from "./save-default";
 import { StationSettings } from "./station-settings";
-import { Segmented } from "./segmented";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { type BoardGap, type BoardPerson, type BoardShift, type BoardStation, type BoardTemplate, type Editing, ShiftBoard } from "./shift-board";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -229,35 +229,39 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={t("shifts.navigate")} className="flex items-center gap-1.5">
-          <Link href={href({ date: stepWindow(range, win, -1) })} aria-label={t(`shifts.previous.${range}`)} className="btn-secondary size-9">
+          <Link scroll={false} href={href({ date: stepWindow(range, win, -1) })} aria-label={t(`shifts.previous.${range}`)} className="btn-secondary size-9">
             <ChevronsLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
           </Link>
           {(range === "week" || range === "custom") && (
-            <Link href={href({ date: addDays(anchor, -1) })} aria-label={t("shifts.previous.day")} className="btn-secondary size-9">
+            <Link scroll={false} href={href({ date: addDays(anchor, -1) })} aria-label={t("shifts.previous.day")} className="btn-secondary size-9">
               <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
           )}
-          <Link href={href({ date: today })} aria-current={showToday ? undefined : "date"} className={`${showToday ? "btn-secondary" : "btn-primary"} px-3 py-2 text-sm`}>
+          <Link scroll={false} href={href({ date: today })} aria-current={showToday ? undefined : "date"} className={`${showToday ? "btn-secondary" : "btn-primary"} px-3 py-2 text-sm`}>
             {t("shifts.today")}
           </Link>
           {(range === "week" || range === "custom") && (
-            <Link href={href({ date: addDays(anchor, 1) })} aria-label={t("shifts.next.day")} className="btn-secondary size-9">
+            <Link scroll={false} href={href({ date: addDays(anchor, 1) })} aria-label={t("shifts.next.day")} className="btn-secondary size-9">
               <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
           )}
-          <Link href={href({ date: stepWindow(range, win, 1) })} aria-label={t(`shifts.next.${range}`)} className="btn-secondary size-9">
+          <Link scroll={false} href={href({ date: stepWindow(range, win, 1) })} aria-label={t(`shifts.next.${range}`)} className="btn-secondary size-9">
             <ChevronsRight aria-hidden="true" className="size-4 rtl:rotate-180" />
           </Link>
           <span className="ms-2 text-lg font-semibold">{rangeLabel}</span>
         </nav>
         <div className="flex flex-wrap items-center gap-2">
-          <Segmented
+          <LinkSegmented
             label={t("shifts.rangeLabel")}
-            items={RANGES.map((r) => ({ key: r, label: t(`shifts.ranges.${r}`), href: href({ range: r }), active: r === range }))}
+            loadingLabel={t("common.loading")}
+            active={range}
+            options={RANGES.map((r) => ({ key: r, label: t(`shifts.ranges.${r}`), href: href({ range: r }) }))}
           />
-          <Segmented
+          <LinkSegmented
             label={t("shifts.viewLabel")}
-            items={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v }), active: v === view }))}
+            loadingLabel={t("common.loading")}
+            active={view}
+            options={(["people", "branches"] as const).map((v) => ({ key: v, label: t(`shifts.views.${v}`), href: href({ view: v }) }))}
           />
         </div>
       </div>
@@ -269,7 +273,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
             const next = on ? shown.filter((id) => id !== b.id) : [...shown, b.id];
             const nextIds = view === "branches" ? next.slice(-limit) : next;
             return (
-              <Link
+              <Link scroll={false}
                 key={b.id}
                 href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? (savedBranches.length ? "all" : undefined) : nextIds.join(",") })}
                 aria-current={on ? "true" : undefined}
