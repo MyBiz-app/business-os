@@ -57,6 +57,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `agents.py [platform admin email]`: round 5 on the networks demo - the AI team page with its custom agent and scheduled task, a chat with an agent (scripted model), the content studio on demo accounts, branch groups, and, for a platform admin, the console's broadcast center and AI board.
 
+`round6.py`: round 6 on the curated demo - the time clock with approved hours, the month's payroll run walked to approval with a payslip PDF and export, the "Move to MyBiz" Excel file (check, import, undo) and an issued quote with its PDF.
+
 `crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
 
 `client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.
