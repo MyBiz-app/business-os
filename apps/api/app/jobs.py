@@ -16,6 +16,7 @@
     uv run python -m app.jobs delete-closed-businesses [--apply] (dry run unless --apply)
     uv run python -m app.jobs sync-social     (reads the numbers of connected social accounts)
     uv run python -m app.jobs move-files      (documents kept in the database → the object store)
+    uv run python -m app.jobs rotate-secrets [--apply] (re-encrypts with the newest key; manual)
     uv run python -m app.jobs run-daily       (every daily job in turn, for a cron service)
     uv run python -m app.jobs run-hourly      (every hourly job in turn)
     uv run python -m app.jobs check-jobs      (fails when a scheduled job is late)
@@ -54,6 +55,7 @@ from app.messaging.whatsapp_ai import answer_inbox
 from app.providers.choice import choose
 from app.providers.storage import tenant_key
 from app.schedule.scheduling import weekly_occurrences
+from app.secrets_rotation import rotate_secrets
 
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
 
@@ -619,7 +621,11 @@ JOBS = {
     "move-files": move_files,
     "run-ai-tasks": run_ai_tasks,
     "sync-social": sync_social,
+    "rotate-secrets": rotate_secrets,
 }
+
+# Jobs that only report unless told `--apply`.
+APPLY_JOBS = (delete_closed_businesses, rotate_secrets)
 
 # How often each scheduled job must succeed, in hours: the schedule plus slack for a delayed
 # run (GitHub's scheduler can start a run late). check-jobs reports a job as late after that.
@@ -656,7 +662,7 @@ def run_job(engine: Engine, name: str, apply: bool = False) -> object:
     try:
         with engine.begin() as conn:
             job = JOBS[name]
-            result = job(conn, apply=apply) if job is delete_closed_businesses else job(conn)
+            result = job(conn, apply=apply) if job in APPLY_JOBS else job(conn)
         ok = True
         return result
     except Exception as error:
@@ -709,7 +715,7 @@ def main() -> None:
     parser.add_argument(
         "--apply",
         action="store_true",
-        help="Really delete (delete-closed-businesses only reports without it)",
+        help="Really change data (delete-closed-businesses, rotate-secrets: a report without it)",
     )
     args = parser.parse_args()
     engine = create_engine(args.database_url or get_settings().database_url)

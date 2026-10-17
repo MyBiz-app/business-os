@@ -276,6 +276,12 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Deferred: leave balances on the payslip (the product has no leave ledger or accrual rules yet; it needs its own slice with the work-days-per-week and seniority rules from spec 3.9) and the pension tax credit (not in the spec; the accountant applies it).
 - Web: corrections are issued from the payslip sheet of an approved month (owner only) and the yearly summary is its own page under Team > Payroll.
 
+### Encryption key rotation (2026-10-17, go-live slice GL6)
+
+- One `MultiFernet` list (`API_SECRETS_KEYS`, newest first) instead of a single key; a re-encrypt job (`rotate-secrets`) that is a dry run unless `--apply`, so a rotation is two reversible steps: add the key, re-encrypt, then retire the old key.
+- Signed links are verified against every listed key (they live 10 minutes). The ID-number hash cannot be re-keyed without recomputing, so it stays keyed by `API_ID_HASH_KEY`, else the oldest listed key; the runbook says to pin it before the old key leaves the list.
+- Rotate yearly, or at once after a suspected leak. Backups keep the key that sealed them, so the old key is kept (sealed) as long as such a backup may be restored.
+
 ## Open
 
 | # | Question |

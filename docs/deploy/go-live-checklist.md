@@ -24,7 +24,7 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | `API_ENVIRONMENT` | `production` |
 | `API_DATABASE_URL` | Supabase session pooler string, with the password |
 | `API_JWKS_URL` | `https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json` |
-| `API_SECRETS_KEY` | A Fernet key (encrypts businesses' provider secrets); keep a copy in the secret store |
+| `API_SECRETS_KEY` | A Fernet key (encrypts businesses' provider secrets); keep a copy in the secret store; to rotate it, see [runbooks/key-rotation.md](../runbooks/key-rotation.md) (`API_SECRETS_KEYS`) |
 | `API_INTERNAL_TOKEN` | A long random value, the same on Render and Vercel |
 | `API_WEB_URL`, `API_API_URL` | The public addresses (not localhost) |
 | `API_CORS_ORIGINS` | JSON list of the real web and app origins (not localhost) |
