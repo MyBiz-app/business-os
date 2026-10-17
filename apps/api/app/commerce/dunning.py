@@ -7,7 +7,7 @@ The days, and the whole sequence, are set from the MyBiz console (`dunning_setti
 extension from the console holds off read-only and suspension until it ends.
 
 The API enforces `tenants.billing_state` (see app/api/deps.py); this job moves it. Paying the last
-open invoice lifts it at once (migration 0121, `pay_platform_invoice`)."""
+open invoice lifts it at once (migration 0122, `pay_platform_invoice`)."""
 
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta

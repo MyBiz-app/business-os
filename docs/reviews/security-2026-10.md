@@ -1,5 +1,7 @@
 # Security review before go-live (October 2026)
 
+> **Status (go-live, October 2026):** items fixed since this review are tracked with ✅ / 🟡 / 🔴 and their pull request in the [go-live scorecard](go-live-readiness-2026-10.md). Where the two disagree, the scorecard is current.
+
 Part of [#51](https://github.com/MyBiz-app/business-os/issues/51). Scope: the API (sign-in,
 business isolation, public endpoints, webhooks, file uploads and links, raw SQL, secrets).
 The web app and the Expo apps call the API with the user's token and hold no extra authority,

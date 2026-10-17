@@ -5,6 +5,14 @@
     "announcements": {
       "label": "Message from {brand}",
       "close": "Close"
+    },
+    "incidentBanner": {
+      "kinds": {
+        "incident": "Incident",
+        "maintenance": "Planned maintenance",
+        "security": "Security notice"
+      },
+      "status": "Status page"
     }
   },
   "errorPages": {
@@ -2216,7 +2224,8 @@
       "integrations": "Integrations",
       "broadcasts": "Broadcasts",
       "ai": "AI",
-      "health": "System health"
+      "health": "System health",
+      "incidents": "Incident banners"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2671,6 +2680,33 @@
       "path": "Route",
       "business": "Business",
       "noErrors": "No errors since the server started."
+    },
+    "incidents": {
+      "title": "Incident banners",
+      "subtitle": "A bar on top of every page of the web app and the mobile app, until you resolve it. Use it for an outage, planned maintenance or a security event.",
+      "kind": "Type",
+      "kinds": {
+        "incident": "Incident",
+        "maintenance": "Planned maintenance",
+        "security": "Security event"
+      },
+      "language": {
+        "he": "Hebrew text",
+        "en": "English text"
+      },
+      "titleField": "Title",
+      "bodyField": "Details (optional)",
+      "statusUrl": "Status page address (optional)",
+      "open": "Show the banner",
+      "opened": "The banner is live",
+      "resolve": "Resolve",
+      "resolved": "Resolved",
+      "openNow": "Open",
+      "empty": "No banners yet. All is well.",
+      "errors": {
+        "generic": "Could not save. Check that a title is filled in and try again.",
+        "forbidden": "You are not allowed to do this."
+      }
     },
     "overdue": {
       "title": "Businesses with unpaid invoices",

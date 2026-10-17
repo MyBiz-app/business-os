@@ -64,6 +64,9 @@ def test_leads_board_is_paged_with_whole_board_counts(
 BOUNDED = {
     # the console's unpaid-invoice list: the function returns at most 500 businesses
     "/platform/billing/overdue": "capped",
+    # the SQL function returns at most 5 open banners, or the latest 50
+    "/public/incidents": "limit in SQL",
+    "/platform/incidents": "limit in SQL",
     # a required date window of at most 42 days
     "/sessions": "window",
     "/client/sessions": "window",

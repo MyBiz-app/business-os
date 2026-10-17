@@ -36,7 +36,7 @@ line-length = 100
 target-version = "py313"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF", "S"]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF", "S", "C901", "PLR0915"]
 ignore = [
     # Hebrew letters are legitimate content (vertical packs, demo data), not look-alike characters.
     "RUF001",
@@ -46,6 +46,13 @@ ignore = [
     # parameters. tests/test_sql_fstrings.py fails on any new f-string inside text(...).
     "S608",
 ]
+
+[tool.ruff.lint.mccabe]
+# Ceilings just above today's largest functions: they stop growth, they do not demand a rewrite.
+max-complexity = 55
+
+[tool.ruff.lint.pylint]
+max-statements = 220
 
 [tool.ruff.lint.per-file-ignores]
 # Inline-styled email HTML reads better unwrapped.
