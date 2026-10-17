@@ -33,6 +33,7 @@ export async function confirmEnrollment(state: EnrollState, formData: FormData):
   if (!isCode(code)) return { ...state, error: "invalid_code" };
   const { error } = await (await createClient()).auth.mfa.challengeAndVerify({ factorId, code });
   if (error) return { ...state, error: "invalid_code" };
+  await reportSecurityEvent("mfa_enabled");
   revalidatePath("/account");
   return { done: true };
 }
@@ -43,8 +44,26 @@ export type RemoveState = { error?: string; done?: boolean };
 export async function removeFactor(_state: RemoveState, formData: FormData): Promise<RemoveState> {
   const { error } = await (await createClient()).auth.mfa.unenroll({ factorId: String(formData.get("factor") ?? "") });
   if (error) return { error: error.code === "insufficient_aal" ? "needs_recent_code" : "generic" };
+  await reportSecurityEvent("mfa_disabled");
   revalidatePath("/account");
   return { done: true };
+}
+
+/** Lets the businesses the person works for see in their audit log that two-step sign-in was
+ * turned on or off. Never blocks the page. */
+async function reportSecurityEvent(kind: "mfa_enabled" | "mfa_disabled"): Promise<void> {
+  try {
+    const { data } = await (await createClient()).auth.getSession();
+    if (!data.session) return;
+    await fetch(`${API_URL}/me/devices/events`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${data.session.access_token}` },
+      body: JSON.stringify({ kind }),
+      cache: "no-store",
+    });
+  } catch {
+    // the audit entry is a convenience; turning two-step on or off has already worked
+  }
 }
 
 /** Ends every session of the account on every device, this one included. */

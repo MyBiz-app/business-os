@@ -20,7 +20,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev --no-install-project
 
-COPY alembic.ini ./
+COPY alembic.ini docker-entrypoint.sh ./
 COPY migrations ./migrations
 COPY app ./app
 
@@ -30,10 +30,9 @@ USER api
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
-# Hosting platforms pass the port in $PORT. WEB_CONCURRENCY sets the worker processes (uvicorn
-# reads it; default 2). Limits that count per process (rate limits) apply per worker.
-# The port comes from $PORT (hosting platforms). The database is brought up to date before the API
-# starts, so new code never runs against an old schema (the host keeps the previous version
-# serving until this one is healthy). Migrations are additive, so the previous version keeps
-# working while it drains.
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --no-proxy-headers --workers ${WEB_CONCURRENCY:-2}"]
+# The entrypoint runs the migrations (only where RUN_MIGRATIONS_ON_START allows it, see the script)
+# and then starts the API; the port comes from $PORT. Migrations are additive, so the previous
+# version keeps working while it drains.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD python -c "import os, urllib.request; urllib.request.urlopen('http://127.0.0.1:%s/health' % os.environ.get('PORT', '8000'), timeout=4)"
+CMD ["sh", "/app/docker-entrypoint.sh"]
