@@ -33,6 +33,7 @@ class Permission(StrEnum):
     PAYROLL_READ = "payroll.read"  # see employment terms and Form 101 of the team
     PAYROLL_MANAGE = "payroll.manage"  # set employment terms, request and correct Form 101
     PAYROLL_APPROVE = "payroll.approve"  # approve and lock pay runs; owners only
+    PAYROLL_PROPOSE = "payroll.propose"  # propose a bonus for people at one's own branches
 
 
 ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
@@ -62,6 +63,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.FILES_READ,
             Permission.FILES_MANAGE,
             Permission.MIGRATION_MANAGE,
+            Permission.PAYROLL_PROPOSE,
         }
     ),
     # A manager at their own branches only (the API keeps them to `location_ids`): everything a
@@ -80,6 +82,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.AI_USE,
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
+            Permission.PAYROLL_PROPOSE,
             Permission.TIME_APPROVE,
         }
     ),

@@ -9,9 +9,13 @@ import { IdentityEditor } from "@/components/identity-editor";
 import type { components } from "@business-os/api-client";
 
 import {
+  type ComponentInput,
   type EmploymentInput,
   type PayrollError,
+  addPayComponent,
   overrideCreditPoints,
+  removePayComponent,
+  updatePayComponent,
   requestForm101,
   revealBank,
   saveEmployment,
@@ -19,6 +23,7 @@ import {
 
 type Employment = components["schemas"]["Employment"];
 type FormSummary = components["schemas"]["Form101Summary"];
+type PayComponent = components["schemas"]["PayComponent"];
 type Tab = "personal" | "terms" | "components" | "documents";
 const TABS: Tab[] = ["personal", "terms", "components", "documents"];
 
@@ -31,6 +36,7 @@ export function PayrollFile(props: {
   locale: string;
   employment: Employment;
   forms: FormSummary[];
+  components: PayComponent[];
   canManage: boolean;
   thisYear: number;
 }) {
@@ -59,7 +65,7 @@ export function PayrollFile(props: {
       <section role="tabpanel" id={`payroll-panel-${tab}`} aria-labelledby={`payroll-tab-${tab}`} className="card flex flex-col gap-6 p-6">
         {tab === "personal" && <Personal {...props} />}
         {tab === "terms" && <Terms {...props} />}
-        {tab === "components" && <p className="text-sm text-muted">{t("components.soon")}</p>}
+        {tab === "components" && <Components {...props} />}
         {tab === "documents" && <Documents {...props} />}
       </section>
     </div>
@@ -354,5 +360,221 @@ function Documents({ userId, forms, employment }: Parameters<typeof PayrollFile>
       {signed.length === 0 && <p className="text-sm text-muted">{t("documents.none")}</p>}
       <p className="text-xs text-muted">{t("documents.more")}</p>
     </div>
+  );
+}
+
+const KINDS = ["travel", "meals", "phone", "car", "fixed_addition", "recuperation", "fixed_deduction"] as const;
+const CALCS = ["per_work_day", "monthly", "by_month", "automatic"] as const;
+/** What a new line of each kind starts as: how it is paid and whether it is taxable, liable to
+ * national insurance and part of the pension base. The API applies the same defaults. */
+const DEFAULTS: Record<(typeof KINDS)[number], { calc: (typeof CALCS)[number]; flags: [boolean, boolean, boolean] }> = {
+  travel: { calc: "per_work_day", flags: [false, false, false] },
+  meals: { calc: "monthly", flags: [true, true, false] },
+  phone: { calc: "monthly", flags: [true, true, false] },
+  car: { calc: "monthly", flags: [true, true, false] },
+  fixed_addition: { calc: "monthly", flags: [true, true, true] },
+  recuperation: { calc: "automatic", flags: [false, false, false] },
+  fixed_deduction: { calc: "monthly", flags: [false, false, false] },
+};
+
+function Components({ userId, currency, locale, components: lines, canManage }: Parameters<typeof PayrollFile>[0]) {
+  const t = useTranslations("payroll.components");
+  const [editing, setEditing] = useState<string | "new" | null>(null);
+  const [error, setError] = useState<PayrollError | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  function summary(line: PayComponent) {
+    const amount = line.amount_minor != null ? formatMoney(line.amount_minor, line.currency, locale) : "";
+    const base =
+      line.calc === "per_work_day"
+        ? t("summary.perWorkDay", { amount })
+        : line.calc === "monthly"
+          ? t("summary.monthly", { amount })
+          : line.calc === "by_month"
+            ? t("summary.byMonth")
+            : t("summary.automatic");
+    return line.cap_minor != null ? `${base}, ${t("summary.cap", { amount: formatMoney(line.cap_minor, line.currency, locale) })}` : base;
+  }
+
+  function flags(line: PayComponent) {
+    const on = [
+      line.taxable && t("flags.taxable"),
+      line.social_security_liable && t("flags.socialSecurity"),
+      line.pension_base && t("flags.pension"),
+    ].filter(Boolean);
+    return on.length ? on.join(", ") : t("flags.none");
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-lg font-semibold">{t("title")}</h2>
+        <p className="text-sm text-muted">{t("hint")}</p>
+      </div>
+      <ErrorLine error={error} />
+      {lines.length === 0 && <p className="text-sm text-muted">{t("empty")}</p>}
+      <ul className="flex flex-col divide-y divide-border">
+        {lines.map((line) =>
+          editing === line.id ? (
+            <li key={line.id} className="py-3">
+              <ComponentForm
+                userId={userId}
+                currency={currency}
+                line={line}
+                onDone={() => setEditing(null)}
+              />
+            </li>
+          ) : (
+            <li key={line.id} className="flex flex-wrap items-center justify-between gap-2 py-3 text-sm">
+              <div className="flex flex-col">
+                <span className="font-medium">
+                  {line.name} <span className="text-muted">({t(`kinds.${line.kind}`)})</span>
+                </span>
+                <span className="text-muted">{summary(line)}</span>
+                <span className="text-xs text-muted">{flags(line)}</span>
+              </div>
+              {canManage && (
+                <span className="flex items-center gap-3">
+                  <button type="button" className="text-primary underline-offset-4 hover:underline" onClick={() => setEditing(line.id)}>
+                    {t("edit")}
+                  </button>
+                  <button
+                    type="button"
+                    className="text-danger underline-offset-4 hover:underline"
+                    disabled={pending}
+                    onClick={() =>
+                      startTransition(async () => {
+                        const result = await removePayComponent(userId, line.id);
+                        setError(result.error ?? null);
+                      })
+                    }
+                  >
+                    {t("remove")}
+                  </button>
+                </span>
+              )}
+            </li>
+          ),
+        )}
+      </ul>
+      {canManage &&
+        (editing === "new" ? (
+          <ComponentForm userId={userId} currency={currency} line={null} onDone={() => setEditing(null)} />
+        ) : (
+          <div>
+            <button type="button" className="btn-secondary px-3 py-1.5 text-sm" onClick={() => setEditing("new")}>
+              {t("add")}
+            </button>
+          </div>
+        ))}
+    </>
+  );
+}
+
+function ComponentForm({
+  userId,
+  currency,
+  line,
+  onDone,
+}: {
+  userId: string;
+  currency: string;
+  line: PayComponent | null;
+  onDone: () => void;
+}) {
+  const t = useTranslations("payroll.components");
+  const [kind, setKind] = useState<(typeof KINDS)[number]>(line?.kind ?? "travel");
+  const [name, setName] = useState(line?.name ?? "");
+  const [calc, setCalc] = useState<(typeof CALCS)[number]>(line?.calc ?? DEFAULTS.travel.calc);
+  const [amount, setAmount] = useState(line?.amount_minor != null ? toMajorUnits(line.amount_minor, currency) : "");
+  const [cap, setCap] = useState(line?.cap_minor != null ? toMajorUnits(line.cap_minor, currency) : "");
+  const [taxable, setTaxable] = useState(line?.taxable ?? DEFAULTS.travel.flags[0]);
+  const [socialSecurity, setSocialSecurity] = useState(line?.social_security_liable ?? DEFAULTS.travel.flags[1]);
+  const [pension, setPension] = useState(line?.pension_base ?? DEFAULTS.travel.flags[2]);
+  const [validFrom, setValidFrom] = useState(line?.valid_from ?? "");
+  const [validTo, setValidTo] = useState(line?.valid_to ?? "");
+  const [error, setError] = useState<PayrollError | null>(null);
+  const [pending, startTransition] = useTransition();
+  const needsAmount = calc !== "by_month" && calc !== "automatic";
+
+  function pickKind(next: (typeof KINDS)[number]) {
+    setKind(next);
+    setCalc(DEFAULTS[next].calc);
+    [setTaxable, setSocialSecurity, setPension].forEach((set, index) => set(DEFAULTS[next].flags[index]));
+  }
+
+  function submit(event: React.FormEvent) {
+    event.preventDefault();
+    const amountMinor = needsAmount && amount !== "" ? toMinorUnits(amount, currency) : null;
+    const capMinor = cap === "" ? null : toMinorUnits(cap, currency);
+    if ((needsAmount && amountMinor === null) || (cap !== "" && capMinor === null)) return setError("amount_required");
+    const common = {
+      name: name.trim(),
+      calc,
+      amount_minor: amountMinor,
+      cap_minor: capMinor,
+      taxable,
+      social_security_liable: socialSecurity,
+      pension_base: pension,
+      valid_to: validTo || null,
+    };
+    startTransition(async () => {
+      const result = line
+        ? await updatePayComponent(userId, line.id, common)
+        : await addPayComponent(userId, { ...common, kind, currency, valid_from: validFrom || null } satisfies ComponentInput);
+      setError(result.error ?? null);
+      if (result.ok) onDone();
+    });
+  }
+
+  return (
+    <form onSubmit={submit} className="flex flex-col gap-4 rounded-xl bg-surface-muted p-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        {!line && (
+          <SelectField
+            label={t("fields.kind")}
+            value={kind}
+            onChange={(event) => pickKind(event.target.value as (typeof KINDS)[number])}
+            options={KINDS.map((value) => ({ value, label: t(`kinds.${value}`) }))}
+          />
+        )}
+        <Field label={t("fields.name")} required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} />
+        <SelectField
+          label={t("fields.calc")}
+          value={calc}
+          onChange={(event) => setCalc(event.target.value as (typeof CALCS)[number])}
+          options={CALCS.map((value) => ({ value, label: t(`calcs.${value}`) }))}
+        />
+        {needsAmount && (
+          <Field label={`${t("fields.amount")} (${currency})`} inputMode="decimal" required value={amount} onChange={(event) => setAmount(event.target.value)} />
+        )}
+        <Field label={`${t("fields.cap")} (${currency})`} inputMode="decimal" value={cap} onChange={(event) => setCap(event.target.value)} />
+        {!line && <Field label={t("fields.validFrom")} type="date" value={validFrom} onChange={(event) => setValidFrom(event.target.value)} />}
+        <Field label={t("fields.validTo")} type="date" value={validTo} onChange={(event) => setValidTo(event.target.value)} />
+      </div>
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        {(
+          [
+            ["taxable", taxable, setTaxable],
+            ["socialSecurity", socialSecurity, setSocialSecurity],
+            ["pension", pension, setPension],
+          ] as const
+        ).map(([key, value, set]) => (
+          <label key={key} className="flex items-center gap-2">
+            <input type="checkbox" checked={value} onChange={(event) => set(event.target.checked)} />
+            {t(`fields.${key}`)}
+          </label>
+        ))}
+      </div>
+      <ErrorLine error={error} />
+      <div className="flex gap-2">
+        <button type="submit" className="btn-primary px-3 py-1.5 text-sm" disabled={pending}>
+          {t("save")}
+        </button>
+        <button type="button" className="btn-ghost px-3 py-1.5 text-sm" disabled={pending} onClick={onDone}>
+          {t("cancel")}
+        </button>
+      </div>
+    </form>
   );
 }
