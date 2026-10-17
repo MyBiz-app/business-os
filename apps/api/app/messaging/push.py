@@ -58,7 +58,7 @@ class ExpoPushSender:
             request = urllib.request.Request(
                 EXPO_PUSH_URL, data=json.dumps(messages).encode(), method="POST", headers=headers
             )
-            with urllib.request.urlopen(request, timeout=15) as response:
+            with urllib.request.urlopen(request, timeout=15) as response:  # noqa: S310 (fixed https URL)
                 tickets: list[dict[str, Any]] = json.loads(response.read()).get("data", [])
             for token, ticket in zip(chunk, tickets, strict=False):
                 if ticket.get("status") == "ok":

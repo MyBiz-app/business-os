@@ -560,7 +560,7 @@ def upload_agent_avatar(
 ) -> AgentCard:
     """The agent's own picture (PNG, JPEG or WebP up to 2 MB) instead of a gallery face."""
     db = context.session
-    data, content_type = read_image(file, MAX_AVATAR_BYTES)
+    data, content_type = read_image(file, MAX_AVATAR_BYTES, context)
     agent = _manageable(db, agent_key)
     version = str(int(dt.datetime.now(dt.UTC).timestamp() * 1000))
     if agent.builtin:

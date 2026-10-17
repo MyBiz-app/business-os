@@ -185,7 +185,10 @@ def pay_page(checkout_id: UUID, context: ClientDep) -> Checkout:
 @router.post("/checkouts/{checkout_id}/simulate-payment")
 def simulate_payment(checkout_id: UUID, context: ClientDep) -> CheckoutPaid:
     """Completes a simulated checkout: records a test payment and creates the plan. Calling it
-    again returns the same plan."""
+    again returns the same plan. It does not exist in production: no real checkout is ever
+    completed by the client."""
+    if get_settings().environment == "production":
+        raise not_found()
     checkout = _load(context, checkout_id)
     if not checkout.simulated:
         raise not_found()

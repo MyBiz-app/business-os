@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
     <>
       <AuthHeading title={t("login.title")} subtitle={t("login.subtitle")} />
       <OAuthButtons next={nextPath} />
-      <LoginForm initialError={error === "link_invalid" ? "link_invalid" : undefined} next={nextPath} />
+      <LoginForm initialError={error === "link_invalid" || error === "session_expired" ? error : undefined} next={nextPath} />
       <Link href={nextPath ? `/login/code?next=${encodeURIComponent(nextPath)}` : "/login/code"} className="btn-secondary px-4 py-2.5 text-center">
         {t("codeLogin.useCode")}
       </Link>

@@ -3,6 +3,7 @@ import "server-only";
 import { type ApiClient, createApiClient } from "@business-os/api-client";
 
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -83,8 +84,22 @@ export async function getApi(): Promise<ApiClient> {
   return createApiClient({
     baseUrl: API_URL,
     headers,
-    fetch: (request) => fetch(request, { cache: "no-store" }),
+    fetch: async (request) => {
+      const response = await fetch(request, { cache: "no-store" });
+      if (response.status === 403) await sendToTwoStepSetup(response);
+      return response;
+    },
   });
+}
+
+/** The API wants a code this session doesn't have (the MyBiz team, a business that requires it,
+ * a sensitive action): off to the account page to turn two-step sign-in on. The account page
+ * itself is left alone so it can't loop. */
+async function sendToTwoStepSetup(response: Response): Promise<void> {
+  const body = (await response.clone().json().catch(() => null)) as { detail?: unknown } | null;
+  if (body?.detail !== "mfa_required") return;
+  if ((await headers()).get("x-pathname")?.startsWith("/account")) return;
+  redirect("/account?mfa=required#security");
 }
 
 /** Returns the response data, or throws ApiError for any non-2xx response. */

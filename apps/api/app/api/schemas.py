@@ -122,6 +122,7 @@ class TenantUpdate(BaseModel):
     booking_requires_plan: bool | None = None
     requires_health_declaration: bool | None = None
     online_sales: bool | None = None
+    require_mfa_for_staff: bool | None = None
     resource_payment: Literal["app", "venue"] | None = None
     schedule_default_view: Literal["day", "week", "month"] | None = None
     schedule_default_branches: list[UUID] | None = Field(
@@ -233,6 +234,9 @@ class Tenant(BaseModel):
         description="Clients need a valid health declaration to book in the app"
     )
     online_sales: bool = Field(description="Clients can buy plans in the app")
+    require_mfa_for_staff: bool = Field(
+        default=False, description="Every team member must sign in with an authenticator code"
+    )
     network_scope: Literal["network", "branch"] = Field(
         default="network",
         description="network: clients shared by all branches; branch: each branch keeps its own",

@@ -282,6 +282,17 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Signed links are verified against every listed key (they live 10 minutes). The ID-number hash cannot be re-keyed without recomputing, so it stays keyed by `API_ID_HASH_KEY`, else the oldest listed key; the runbook says to pin it before the old key leaves the list.
 - Rotate yearly, or at once after a suspected leak. Backups keep the key that sealed them, so the old key is kept (sealed) as long as such a backup may be restored.
 
+### Two-step sign-in, passwords and sessions (2026-10-17, go-live GL1, migration 0113)
+
+Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the owner asked for everything free to be built).
+
+- Authenticator-app codes (TOTP, free) are required of the MyBiz team always; of owners and managers for sensitive actions from `API_MFA_REQUIRED_FROM` (14 days after go-live); and of a business's whole team when its owner ticks `require_mfa_for_staff`. Optional for everyone else; never for end clients.
+- A second authenticator is the backup: Supabase has no recovery codes for TOTP.
+- Passwords: 10 characters, letters and digits, and a recent sign-in to change one.
+- Idle sign-out: 12 hours on the web, 30 days in the apps, done by the apps themselves (Supabase's server-side timeouts are a paid feature).
+- A sign-in from a new device is emailed; only a hash of the device id is stored.
+- The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
+
 ## Open
 
 | # | Question |

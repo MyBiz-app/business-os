@@ -21,7 +21,7 @@ from app.social.providers import (
 )
 
 AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
-TOKEN_URL = "https://oauth2.googleapis.com/token"
+TOKEN_URL = "https://oauth2.googleapis.com/token"  # noqa: S105 (a public endpoint URL)
 YT_DATA = "https://www.googleapis.com/youtube/v3"
 YT_ANALYTICS = "https://youtubeanalytics.googleapis.com/v2/reports"
 GBP_ACCOUNTS = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"

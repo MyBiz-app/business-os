@@ -24,6 +24,7 @@ from app.catalog.importing import (
     suggest_mapping,
 )
 from app.core.permissions import Permission
+from app.files.scan import ensure_clean
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -78,6 +79,7 @@ def import_clients(
     source: Annotated[ClientSource | None, Form()] = None,
 ) -> ImportResult:
     data = file.file.read(MAX_BYTES + 1)
+    ensure_clean(data)
     try:
         table = read_table(data, file.filename or "")
     except ImportFileError as error:

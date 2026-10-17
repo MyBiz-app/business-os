@@ -4,6 +4,7 @@ dashboard cannot drift from the repo (docs/deploy/auth-settings.md).
     SUPABASE_ACCESS_TOKEN=... SUPABASE_PROJECT_REF=... python supabase/apply_auth_settings.py
     ... --apply        really change the project (without it: only print the differences)
 
+PAID_AUTH=1 also switches on the settings that need a paid Supabase plan (leaked-password check).
 SITE_URL and REDIRECT_URLS (comma separated) override the localhost values of config.toml for
 the environment. Standard library only. Email template bodies are sent but never printed."""
 
@@ -27,6 +28,17 @@ TEMPLATES = {
         "reauthentication",
     )
 }
+LOWER, UPPER, DIGITS = "abcdefghijklmnopqrstuvwxyz", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "0123456789"
+SYMBOLS = "!@#$%^&*()_+-=[]{};':\\|<>?,./`~"
+# config.toml's `password_requirements` as the Management API's `password_required_characters`.
+PASSWORD_REQUIREMENTS = {
+    "": "",
+    "letters_digits": f"{LOWER}{UPPER}:{DIGITS}",
+    "lower_upper_letters_digits": f"{LOWER}:{UPPER}:{DIGITS}",
+    "lower_upper_letters_digits_symbols": f"{LOWER}:{UPPER}:{DIGITS}:{SYMBOLS}",
+}
+# Settings that need a paid Supabase plan: switched on only with PAID_AUTH=1 (go-live checklist).
+PAID_SETTINGS = {"password_hibp_enabled": True}  # reject passwords found in known leaks
 # Security notifications (config.toml: [auth.email.notification.*]) are named differently in the API.
 NOTIFICATIONS = ("password_changed", "email_changed")
 
@@ -49,6 +61,11 @@ def build_payload(config: dict, root: Path = ROOT, env: dict | None = None) -> d
         "security_refresh_token_reuse_interval": auth["refresh_token_reuse_interval"],
         "external_anonymous_users_enabled": auth["enable_anonymous_sign_ins"],
         "password_min_length": auth["minimum_password_length"],
+        "password_required_characters": PASSWORD_REQUIREMENTS[auth["password_requirements"]],
+        "security_update_password_require_reauthentication": email["secure_password_change"],
+        "mfa_max_enrolled_factors": auth["mfa"]["max_enrolled_factors"],
+        "mfa_totp_enroll_enabled": auth["mfa"]["totp"]["enroll_enabled"],
+        "mfa_totp_verify_enabled": auth["mfa"]["totp"]["verify_enabled"],
         "mailer_autoconfirm": not email["enable_confirmations"],
         "mailer_otp_length": email["otp_length"],
         "mailer_otp_exp": email["otp_expiry"],
@@ -64,6 +81,8 @@ def build_payload(config: dict, root: Path = ROOT, env: dict | None = None) -> d
         payload[f"mailer_subjects_{name}_notification"] = notification["subject"]
         path = root / notification["content_path"].removeprefix("./")
         payload[f"mailer_templates_{name}_notification_content"] = path.read_text(encoding="utf-8")
+    if env.get("PAID_AUTH") == "1":
+        payload.update(PAID_SETTINGS)
     return payload
 
 

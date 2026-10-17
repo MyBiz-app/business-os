@@ -114,6 +114,14 @@
       }
     }
   },
+  "securityEmail": {
+    "subject": "New sign-in to your MyBiz account",
+    "greeting": "Hi,",
+    "body": "We noticed a sign-in to your account from a device we haven't seen before.\n\nIf this was you, there is nothing to do. If it was not, change your password and choose \"Sign out of all devices\" in your account settings right away.",
+    "device": "Device",
+    "unknownDevice": "Unknown device",
+    "when": "When"
+  },
   "pdfDocuments": {
     "receipt": "Receipt",
     "receiptNumber": "Receipt no. {number}",

@@ -60,7 +60,7 @@ def test_documents_shared_signed_and_private(
     assert again.status_code == 409
     paper = client.post(
         "/client/documents",
-        files={"file": ("id-card.png", b"\x89PNG fake", "image/png")},
+        files={"file": ("id-card.png", b"\x89PNG\r\n\x1a\n fake", "image/png")},
         headers=me,
         data={"name": "ID card"},
     )
