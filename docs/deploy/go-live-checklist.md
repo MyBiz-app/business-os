@@ -19,6 +19,22 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | GL3-a | `simulate-payment` returns 404 in production; uploads are checked by their bytes and by the storage allowance (logo, cover, branch logo, AI agent picture, documents, files area, migration files) | Done | Nothing |
 | GL3-b | Virus scanning of uploads (ClamAV) | Built, **off** (costs about $7 a month for the scanner service) | See "Switching on virus scanning" below |
 
+## Production as code (GL12)
+
+The whole production set-up is written down and **off**: [production.md](production.md) is the step
+by step (Supabase project, Render Blueprint, Vercel project, GitHub `production` environment,
+variables, releases, who can reach what). Files: [`render.production.yaml`](../../render.production.yaml)
+(API web service + the two job crons), [`deploy-web-production.yml`](../../.github/workflows/deploy-web-production.yml)
+(from a `v*` tag, with approval), the `production` build profile in `apps/client-app/eas.json`.
+
+| Paid item | State | Cost (monthly, list price) | To switch on |
+|---|---|---|---|
+| Render API (Starter, no sleep, pre-deploy migration, readiness check) | Built, **off** | about $7 | production.md section 2 |
+| Render job crons (daily, hourly) | Built, **off** | about $14 for the two | production.md section 2 |
+| Supabase Pro (separate production project, backups, leaked-password check) | Built, **off** | about $25 | production.md section 1 |
+| Vercel Pro (production site, domain, more deployments) | Built, **off** | about $20 per seat | production.md section 3 |
+| Apple Developer program (iOS) | Not bought | about $99 a year | production.md section 7 |
+
 ## Production settings (the API will not start without the first six)
 
 | Variable | Value |
