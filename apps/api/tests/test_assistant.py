@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
 from app.ai.gateway import LLMResponse, ProviderBusy, Usage, get_provider
+from app.ai.untrusted import unwrap
 from tests.conftest import AuthHeaders, add_member
 from tests.test_bookings import new_client, new_session
 
@@ -123,7 +124,7 @@ def test_answers_with_metrics_and_records_usage(
     assert turns[1]["text"] == "Let me check.\n\nRevenue in September was ₪0."
     # The tool result went back to the model, and the context names the business.
     second = provider.calls[1]["messages"]
-    tool_result = json.loads(second[-1]["content"][0]["content"])
+    tool_result = json.loads(unwrap(second[-1]["content"][0]["content"]))
     assert tool_result["metrics"][0]["metric"] == "revenue"
     assert "Studio Flow" in second[0]["content"][0]["text"]
     assert "Revenue" not in provider.calls[0]["system"]  # system prompt is static (cacheable)
@@ -282,10 +283,10 @@ def test_marketing_and_retention_tools(
 
     ask(client, headers, conversation(client, headers), "Where do clients come from?")
 
-    sources = json.loads(provider.calls[1]["messages"][-1]["content"][0]["content"])
+    sources = json.loads(unwrap(provider.calls[1]["messages"][-1]["content"][0]["content"]))
     assert sum(s["new_clients"] for s in sources["sources"]) == 170
     assert {s["source"] for s in sources["sources"]} >= {"instagram", "referral"}
-    inactive = json.loads(provider.calls[2]["messages"][-1]["content"][0]["content"])
+    inactive = json.loads(unwrap(provider.calls[2]["messages"][-1]["content"][0]["content"]))
     assert inactive["members"], "the demo studio has paying members who stopped coming"
 
 
