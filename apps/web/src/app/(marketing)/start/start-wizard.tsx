@@ -649,6 +649,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                     {chunks}
                   </Link>
                 ),
+                dpa: (chunks) => (
+                  <Link href="/legal/dpa" target="_blank" className="font-semibold text-primary-ink underline underline-offset-4">
+                    {chunks}
+                  </Link>
+                ),
               })}
             </span>
           </label>

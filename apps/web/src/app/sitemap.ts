@@ -15,6 +15,8 @@ const PAGES = [
   "/contact",
   "/legal/terms",
   "/legal/privacy",
+  "/legal/dpa",
+  "/legal/subprocessors",
   "/legal/accessibility",
 ];
 

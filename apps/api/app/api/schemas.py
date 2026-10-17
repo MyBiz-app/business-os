@@ -40,6 +40,11 @@ class PaletteColors(BaseModel):
     accent: str = Field(pattern=r"^#[0-9a-f]{6}$")
 
 
+class LegalPending(BaseModel):
+    document: str
+    version: str
+
+
 class Me(BaseModel):
     id: UUID
     email: str
@@ -56,6 +61,10 @@ class Me(BaseModel):
     )
     marketing_consent: bool = Field(
         default=False, description="Agreed to marketing messages (service messages are sent anyway)"
+    )
+    legal_pending: list[LegalPending] = Field(
+        default_factory=list,
+        description="Legal documents whose current version the person has not accepted yet",
     )
     palette: Palette | None = Field(
         default=None, description="The person's color palette (none: the MyBiz default)"
@@ -84,6 +93,10 @@ class TenantCreate(BaseModel):
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     modules: dict[str, int] | None = Field(
         default=None, description="Modules to enable; defaults to the vertical pack's preset"
+    )
+    accepted_legal: dict[str, str] | None = Field(
+        default=None,
+        description="Legal documents accepted at sign-up (document -> version)",
     )
 
     @field_validator("name")
