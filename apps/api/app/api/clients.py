@@ -200,7 +200,7 @@ def client_fields(context: ReadDep) -> list[ClientFieldDefinition]:
     ]
 
 
-# The text the trigram index `clients_search_trgm_idx` covers (migration 0117), word for word.
+# The text the trigram index `clients_search_trgm_idx` covers (migration 0118), word for word.
 SEARCH_TEXT = (
     "(coalesce(first_name, '') || ' ' || coalesce(last_name, '') || ' ' || "
     "coalesce(email, '') || ' ' || coalesce(phone, ''))"

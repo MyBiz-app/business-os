@@ -156,6 +156,7 @@ BOUNDED = {
     "/client/bookings": "capped at 200 in code",
     "/client/receipts": "capped at 100 in code",
     "/events": "window",
+    "/me/legal": "one row per legal document",
 }
 
 

@@ -18,8 +18,8 @@ those ids. The expressions inside the functions must match the indexes word for 
 # exclusion constraints on rooms/resources bind to the operators by OID, so the previous API
 # version keeps working on this database.
 
-Revision ID: 0117
-Revises: 0116
+Revision ID: 0118
+Revises: 0117
 Create Date: 2026-10-17
 """
 
@@ -27,8 +27,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0117"
-down_revision: str | None = "0116"
+revision: str = "0118"
+down_revision: str | None = "0117"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
