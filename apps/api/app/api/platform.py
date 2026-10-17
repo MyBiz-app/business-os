@@ -5,6 +5,7 @@ them all. The database functions enforce the same rules."""
 import datetime as dt
 import json
 import logging
+import os
 from collections.abc import Callable
 from enum import StrEnum
 from typing import Annotated, Any, Literal
@@ -19,8 +20,10 @@ from sqlalchemy.orm import Session
 from app.api.deps import SessionDep, UserDep
 from app.api.modules import check_selection
 from app.api.pagination import MAX_LIMIT, FullPageDep, Page, PageDep
+from app.core import metrics
 from app.core.config import get_settings
 from app.core.mfa import require_aal2
+from app.jobs import MAX_HOURS
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/platform", tags=["platform"])
@@ -149,6 +152,90 @@ def ai_spend(db: UsageDep) -> AISpend:
     if over:
         logger.warning("AI spend alarm: %.0f credits today, threshold %d", spent, threshold)
     return AISpend(today=spent, alert_at=threshold, over=over, days=days)
+
+
+class JobHealth(BaseModel):
+    job: str
+    last_run_at: dt.datetime | None
+    last_ok_at: dt.datetime | None
+    last_ok: bool | None = Field(description="Did the latest finished run succeed")
+    last_result: str | None
+    runs_24h: int
+    failures_24h: int
+    late: bool = Field(description="Scheduled, and its last success is older than it allows")
+
+
+class RouteTiming(BaseModel):
+    route: str
+    count: int
+    p50_ms: float
+    p95_ms: float
+
+
+class RecentCrash(BaseModel):
+    at: dt.datetime
+    request_id: str | None
+    method: str
+    path: str | None
+    tenant_id: UUID | None
+    status: int
+    error: str | None
+
+
+class SystemHealth(BaseModel):
+    jobs: list[JobHealth]
+    messages_queued: int
+    messages_failed_24h: int
+    emails_waiting: int
+    database_bytes: int
+    ai_credits_today: float
+    ai_alert_at: int
+    routes: list[RouteTiming] = Field(description="Busiest routes of this API process")
+    errors: list[RecentCrash] = Field(description="The last crashes of this API process")
+    release: str | None = Field(description="The commit the API runs, when the host tells us")
+
+
+@router.get("/health")
+def system_health(db: UsageDep) -> SystemHealth:
+    """What the console's "System health" page shows (go-live GL13). Job and queue numbers come
+    from the database; timings and crashes are this API process's own (they reset on restart)."""
+    data = db.execute(text("SELECT app.platform_health()")).scalar_one()
+    now = dt.datetime.now(dt.UTC)
+    late_after = {job: dt.timedelta(hours=hours) for job, hours in MAX_HOURS.items()}
+    jobs = []
+    for row in data["jobs"]:
+        row["last_run_at"] = _timestamp(row["last_run_at"])
+        row["last_ok_at"] = _timestamp(row["last_ok_at"])
+        limit = late_after.get(row["job"])
+        row["late"] = bool(limit and row["last_ok_at"] and now - row["last_ok_at"] > limit)
+        jobs.append(JobHealth.model_validate(row))
+    today = now.date()
+    spent = sum(
+        p.quantity
+        for p in (
+            UsagePoint.model_validate(dict(row))
+            for row in db.execute(
+                text("SELECT * FROM app.platform_usage(NULL, 2) WHERE meter = 'ai_credits'")
+            ).mappings()
+        )
+        if p.day == today
+    )
+    return SystemHealth(
+        jobs=jobs,
+        messages_queued=data["messages_queued"],
+        messages_failed_24h=data["messages_failed_24h"],
+        emails_waiting=data["emails_waiting"],
+        database_bytes=data["database_bytes"],
+        ai_credits_today=spent,
+        ai_alert_at=get_settings().ai_daily_alert_credits,
+        routes=[RouteTiming(**vars(stat)) for stat in metrics.route_stats()],
+        errors=[RecentCrash(**vars(error)) for error in metrics.recent_errors()],
+        release=get_settings().sentry_release or os.environ.get("RENDER_GIT_COMMIT") or None,
+    )
+
+
+def _timestamp(value: str | None) -> dt.datetime | None:
+    return dt.datetime.fromisoformat(value) if value else None
 
 
 class ContactRequest(BaseModel):

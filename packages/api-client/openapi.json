@@ -34063,6 +34063,33 @@
         ]
       }
     },
+    "/platform/health": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "System Health",
+        "description": "What the console's \"System health\" page shows (go-live GL13). Job and queue numbers come\nfrom the database; timings and crashes are this API process's own (they reset on restart).",
+        "operationId": "system_health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemHealth"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/platform/contact-requests": {
       "get": {
         "tags": [
@@ -52368,6 +52395,86 @@
         "title": "Job",
         "description": "One on-site job in a technician's day."
       },
+      "JobHealth": {
+        "properties": {
+          "job": {
+            "type": "string",
+            "title": "Job"
+          },
+          "last_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Run At"
+          },
+          "last_ok_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Ok At"
+          },
+          "last_ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Ok",
+            "description": "Did the latest finished run succeed"
+          },
+          "last_result": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Result"
+          },
+          "runs_24h": {
+            "type": "integer",
+            "title": "Runs 24H"
+          },
+          "failures_24h": {
+            "type": "integer",
+            "title": "Failures 24H"
+          },
+          "late": {
+            "type": "boolean",
+            "title": "Late",
+            "description": "Scheduled, and its last success is older than it allows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "job",
+          "last_run_at",
+          "last_ok_at",
+          "last_ok",
+          "last_result",
+          "runs_24h",
+          "failures_24h",
+          "late"
+        ],
+        "title": "JobHealth"
+      },
       "JobStatusUpdate": {
         "properties": {
           "status": {
@@ -59318,6 +59425,79 @@
         ],
         "title": "Receipt"
       },
+      "RecentCrash": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "method": {
+            "type": "string",
+            "title": "Method"
+          },
+          "path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Path"
+          },
+          "tenant_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tenant Id"
+          },
+          "status": {
+            "type": "integer",
+            "title": "Status"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "request_id",
+          "method",
+          "path",
+          "tenant_id",
+          "status",
+          "error"
+        ],
+        "title": "RecentCrash"
+      },
       "Recipient": {
         "properties": {
           "user_id": {
@@ -60461,6 +60641,34 @@
         },
         "type": "object",
         "title": "RoomUpdate"
+      },
+      "RouteTiming": {
+        "properties": {
+          "route": {
+            "type": "string",
+            "title": "Route"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "p50_ms": {
+            "type": "number",
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "type": "number",
+            "title": "P95 Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "route",
+          "count",
+          "p50_ms",
+          "p95_ms"
+        ],
+        "title": "RouteTiming"
       },
       "Rules": {
         "properties": {
@@ -64268,6 +64476,83 @@
         },
         "type": "object",
         "title": "SwapDecision"
+      },
+      "SystemHealth": {
+        "properties": {
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobHealth"
+            },
+            "type": "array",
+            "title": "Jobs"
+          },
+          "messages_queued": {
+            "type": "integer",
+            "title": "Messages Queued"
+          },
+          "messages_failed_24h": {
+            "type": "integer",
+            "title": "Messages Failed 24H"
+          },
+          "emails_waiting": {
+            "type": "integer",
+            "title": "Emails Waiting"
+          },
+          "database_bytes": {
+            "type": "integer",
+            "title": "Database Bytes"
+          },
+          "ai_credits_today": {
+            "type": "number",
+            "title": "Ai Credits Today"
+          },
+          "ai_alert_at": {
+            "type": "integer",
+            "title": "Ai Alert At"
+          },
+          "routes": {
+            "items": {
+              "$ref": "#/components/schemas/RouteTiming"
+            },
+            "type": "array",
+            "title": "Routes",
+            "description": "Busiest routes of this API process"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/RecentCrash"
+            },
+            "type": "array",
+            "title": "Errors",
+            "description": "The last crashes of this API process"
+          },
+          "release": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Release",
+            "description": "The commit the API runs, when the host tells us"
+          }
+        },
+        "type": "object",
+        "required": [
+          "jobs",
+          "messages_queued",
+          "messages_failed_24h",
+          "emails_waiting",
+          "database_bytes",
+          "ai_credits_today",
+          "ai_alert_at",
+          "routes",
+          "errors",
+          "release"
+        ],
+        "title": "SystemHealth"
       },
       "SystemRole": {
         "properties": {

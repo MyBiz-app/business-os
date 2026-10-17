@@ -1,8 +1,9 @@
 name: Check background jobs on staging
 
 # Fails when a scheduled job is late or keeps failing (its last success is older than allowed,
-# see MAX_HOURS in apps/api/app/jobs.py). GitHub emails the repository's watchers on a failed
-# scheduled run, so a stopped job is noticed. Runs after the 02:17 daily jobs.
+# see MAX_HOURS in apps/api/app/jobs.py). A late job alerts the MyBiz owners' phones (push) and
+# email (GL13, docs/monitoring.md), and GitHub emails the repository's watchers on the failed run.
+# Runs after the 02:17 daily jobs.
 on:
   schedule:
     - cron: "23 6 * * *"  # 06:23 UTC
@@ -28,4 +29,7 @@ jobs:
         env:
           API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
           API_ENVIRONMENT: staging
+          API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+          API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
         run: uv run python -m app.jobs check-jobs

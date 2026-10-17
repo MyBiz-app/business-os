@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { unwrap } from "@/lib/api";
+import { statusPageUrl } from "@/lib/status";
 import type { getTenant } from "@/lib/tenant";
 
 import { grantSupport, revokeSupport } from "./support-actions";
@@ -20,6 +21,11 @@ export async function SupportSection({ context }: { context: Awaited<ReturnType<
           {t("title")}
         </h2>
         <p className="text-sm text-muted">{t("intro")}</p>
+        {statusPageUrl() && (
+          <a href={statusPageUrl()} target="_blank" rel="noopener noreferrer" className="text-sm text-primary-ink underline-offset-4 hover:underline">
+            {t("status")}
+          </a>
+        )}
       </div>
       {status.active ? (
         <div className="flex flex-wrap items-center justify-between gap-3">
