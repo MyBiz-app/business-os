@@ -18,6 +18,7 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | B4 | Backups and a restore drill | After P0-1 | Follow `restore-runbook.md` and fill in its drill table |
 | GL22 | Emails that reach the inbox: SPF, DKIM, DMARC on the sending domain; bounces and spam complaints stop further sends | Built, **off** until a domain and a Resend account exist (free up to 3,000 emails a month, domain about $15 a year) | Owner task A6: follow [email-domain.md](email-domain.md) (DNS records, API variables, Resend webhook, Supabase SMTP), then check 10/10 on mail-tester |
 | GL15 | Second backup (encrypted database dump + files to Cloudflare R2, 30 days) and quarterly restore drill | Built, **off** (free) | Owner task A2: follow "Switching it on" in `restore-runbook.md` (Cloudflare account, bucket, token, age key, GitHub secrets, then variable `OFFSITE_BACKUP_ENABLED=true`) and run the drill |
+| GL23 | Incident banners (console, web, app) and the Amendment 13 papers in `docs/legal/` | Built | Owner tasks in "Incident response and Amendment 13 (GL23)" below |
 | B5 | Test cards refused in production | Done (#191) | Nothing |
 | GL3-a | `simulate-payment` returns 404 in production; uploads are checked by their bytes and by the storage allowance (logo, cover, branch logo, AI agent picture, documents, files area, migration files) | Done | Nothing |
 | GL3-b | Virus scanning of uploads (ClamAV) | Built, **off** (costs about $7 a month for the scanner service) | See "Switching on virus scanning" below |
@@ -149,6 +150,17 @@ no longer be used (the API answers `account_deleted`), but the login row stays a
 ## Load test on staging (GL18)
 
 Optional, free, at night: the real figure for "how many businesses one Starter instance holds" (the table in [the load test](../reviews/load-test-2026-10.md) is an estimate until then). Steps are in that document ("Run it", against staging); use `VUS=20`, then `50`, and write the numbers into its table. Switch the rate limits back on afterwards. When a second API instance is added, also create the Render Key Value and set `API_RATE_LIMIT_REDIS_URL` ([staging.md](staging.md)).
+
+## Incident response and Amendment 13 (GL23)
+
+The banner is built and free; the rest is decisions only you can make.
+
+1. **Open a banner to try it** (2 min): Console, **Incident banners**, type "Planned maintenance", a test title, then **Resolve**. The bar shows on every page of the site and in the app while it is open.
+2. **Support address and status page.** Create `support@<domain>` with the domain, and a free hosted status page; put the status address in the banner form when you open one, and fill both in `on-call.md` (Contacts) and `support.md`.
+3. **Appoint the data security officer** (yourself until the lawyer says otherwise): sign the appointment text in `docs/legal/security-officer.md` and fill the name, phone and email in `docs/legal/security-procedure.he.md` section 2.
+4. **A backup on-call person** with two-step sign-in on Render, Vercel, Supabase and GitHub, who has read `on-call.md`. Fill the Contacts table.
+5. **Book a lawyer for one session** with `docs/legal/README.md` ("What the lawyer is asked to decide" lists the seven questions). Then replace every `{placeholder}` and the fictitious company details (`packages/i18n/brand.json`).
+6. **Diary dates:** quarterly restore drill and report, yearly procedure review, vendor review and team training (the tables at the end of the legal files are the log).
 
 ## Still the owner's
 

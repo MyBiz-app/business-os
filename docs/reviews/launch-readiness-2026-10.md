@@ -1,5 +1,7 @@
 # Launch-readiness review (October 2026)
 
+> **Status (go-live, October 2026):** items fixed since this review are tracked with ✅ / 🟡 / 🔴 and their pull request in the [go-live scorecard](go-live-readiness-2026-10.md). Where the two disagree, the scorecard is current.
+
 _2026-10-10_ · Whole-repository review before the first real customers: architecture and file
 layout, API, database and migrations, web, Expo apps, shared packages, CI, deployment,
 scheduled jobs, observability, security, performance, tests and cost. It builds on the

@@ -1,10 +1,10 @@
 # Load test, 2026-10
 
-The three busiest journeys of the business app, run against a demo business ten times its usual size.
+The three busiest journeys of the business area of the app, run against a demo business ten times its usual size.
 
 ## What was measured
 
-Each journey is the set of requests one screen makes when it opens (`apps/business-app/src/app/(tabs)`):
+Each journey is the set of requests one screen makes when it opens (`apps/client-app/src/app/(business)`):
 
 | Journey | Requests |
 |---|---|

@@ -14,6 +14,19 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
     },
   },
+  // Code order: big files and hard-coded UI text are warnings, not errors (go-live GL25). New code
+  // should stay under the limit; user-facing text comes from the translation files.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "max-lines": ["warn", { max: 500, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
+    files: ["src/**/*.tsx"],
+    rules: { "react/jsx-no-literals": ["warn", { noStrings: false, allowedStrings: ["/", "-", "·", "•", ":"] }] },
+  },
   // Right-to-left safety: no physical left/right classes (see eslint-rules/no-physical-classes.mjs).
   {
     files: ["src/**/*.{ts,tsx}"],

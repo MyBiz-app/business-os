@@ -1,5 +1,7 @@
 # Privacy review before go-live (October 2026)
 
+> **Status (go-live, October 2026):** items fixed since this review are tracked with ✅ / 🟡 / 🔴 and their pull request in the [go-live scorecard](go-live-readiness-2026-10.md). Where the two disagree, the scorecard is current.
+
 Part of [#51](https://github.com/MyBiz-app/business-os/issues/51), with Israel's Privacy
 Protection Law (Amendment 13) in mind. Each business is the controller of its clients' data;
 MyBiz processes it for them. This review checks that a business can answer a client's request

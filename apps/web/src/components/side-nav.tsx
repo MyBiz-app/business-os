@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, Clock, CreditCard, Dumbbell, FileSignature, FileText, FolderOpen, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Target, Truck, Users, UsersRound, Wallet } from "lucide-react";
+import { Activity, BarChart3, Bot, Building2, CalendarDays, ChevronDown, Clock, CreditCard, Dumbbell, FileSignature, FileText, FolderOpen, Inbox, LayoutDashboard, LayoutGrid, Lock, MapPin, Megaphone, Menu, MessageCircle, Plug, Receipt, ScrollText, Settings, Smartphone, Sparkles, Target, Truck, TriangleAlert, Users, UsersRound, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,6 +30,7 @@ const ICONS = {
   health: Activity,
   integrations: Plug,
   broadcasts: Megaphone,
+  incidents: TriangleAlert,
   quotes: FileSignature,
   invoices: FileText,
   time: Clock,

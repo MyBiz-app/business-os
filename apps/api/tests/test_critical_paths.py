@@ -117,6 +117,7 @@ PUBLIC_ROUTES = {
     ("GET", "/public/files/{token}"),
     ("POST", "/public/businesses/{code}/inquiries"),
     ("GET", "/public/pricing"),
+    ("GET", "/public/incidents"),
     ("POST", "/public/contact"),
     ("GET", "/public/announcements/unsubscribe"),
     ("POST", "/public/announcements/unsubscribe"),
