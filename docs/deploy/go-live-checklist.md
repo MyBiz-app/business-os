@@ -15,6 +15,7 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | P0-8 | Supabase Auth settings applied from CI | Built | Add `SUPABASE_ACCESS_TOKEN` to the GitHub environment; see `auth-settings.md` |
 | P0-9 | Legal text from a lawyer (privacy policy, terms, DPA, cookie banner); account closure and 90-day deletion | Closure built; text open | Lawyer; real deletion is enabled with `--apply` on `delete-closed-businesses` |
 | B4 | Backups and a restore drill | After P0-1 | Follow `restore-runbook.md` and fill in its drill table |
+| GL15 | Second backup (encrypted database dump + files to Cloudflare R2, 30 days) and quarterly restore drill | Built, **off** (free) | Owner task A2: follow "Switching it on" in `restore-runbook.md` (Cloudflare account, bucket, token, age key, GitHub secrets, then variable `OFFSITE_BACKUP_ENABLED=true`) and run the drill |
 | B5 | Test cards refused in production | Done (#191) | Nothing |
 | GL3-a | `simulate-payment` returns 404 in production; uploads are checked by their bytes and by the storage allowance (logo, cover, branch logo, AI agent picture, documents, files area, migration files) | Done | Nothing |
 | GL3-b | Virus scanning of uploads (ClamAV) | Built, **off** (costs about $7 a month for the scanner service) | See "Switching on virus scanning" below |
