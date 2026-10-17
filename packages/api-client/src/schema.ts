@@ -2383,6 +2383,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/migration/sessions/{session_id}/files/{file_id}/ai-map": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ai Map File
+         * @description Ask the AI for the columns the names alone did not explain (and the kind, if unknown).
+         *     It sees headers and one hidden example per column, never the file; it costs credits from the
+         *     monthly AI allowance. Columns already recognized are kept; the owner still checks the map.
+         */
+        post: operations["ai_map_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/migration/sessions/{session_id}/preview": {
         parameters: {
             query?: never;
@@ -12341,6 +12363,25 @@ export interface components {
             previous: number | null;
             /** Higher Is Better */
             higher_is_better: boolean;
+        };
+        /** MigrationAiMapOut */
+        MigrationAiMapOut: {
+            file: components["schemas"]["MigrationFileOut"];
+            /**
+             * Confidence
+             * @description 0 to 1 per column; null when unmapped
+             */
+            confidence: (number | null)[];
+            /**
+             * Source
+             * @description Per column: "name", "ai" or null
+             */
+            source: (string | null)[];
+            /**
+             * Credits
+             * @description AI credits this suggestion used
+             */
+            credits: number;
         };
         /** MigrationBatchOut */
         MigrationBatchOut: {
@@ -23377,6 +23418,42 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_map_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationAiMapOut"];
+                };
             };
             /** @description Validation Error */
             422: {

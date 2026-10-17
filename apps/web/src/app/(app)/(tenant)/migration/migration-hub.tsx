@@ -6,12 +6,14 @@ import { useId, useState, useTransition } from "react";
 import { FileField } from "@/components/form/file-field";
 
 import {
+  aiMapMoveFile,
   removeMoveFile,
   runMove,
   startMove,
   undoBatch,
   updateMoveFile,
   uploadMoveFile,
+  type AiMap,
   type MoveFile,
   type MoveKind,
   type MoveReport,
@@ -38,6 +40,8 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
   const [files, setFiles] = useState<MoveFile[]>(draft?.files ?? []);
   const [report, setReport] = useState<MoveReport | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // What the AI chose per file (how sure it was), shown next to the columns until the page reloads.
+  const [aiNotes, setAiNotes] = useState<Record<string, Pick<AiMap, "confidence" | "source">>>({});
   const [pending, startTransition] = useTransition();
 
   const fail = (code?: string) => setError(code ?? "generic");
@@ -83,7 +87,7 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
             <FileField
               label={t("files.add")}
               hint={t("files.fileHint")}
-              accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              accept=".csv,.xlsx,.vcf,.ics,text/csv,text/vcard,text/calendar,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               onChange={(event) => {
                 const chosen = event.target.files?.[0];
                 event.target.value = "";
@@ -105,6 +109,16 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
                   key={file.id}
                   file={file}
                   pending={pending}
+                  ai={aiNotes[file.id]}
+                  onAiMap={() =>
+                    act(async () => {
+                      const result = await aiMapMoveFile(session.id, file.id);
+                      if (result.data) {
+                        setAiNotes((current) => ({ ...current, [file.id]: result.data! }));
+                        replace(result.data.file);
+                      } else fail(result.error);
+                    })
+                  }
                   onChange={(change) =>
                     act(async () => {
                       const result = await updateMoveFile(session.id, file.id, change);
@@ -182,6 +196,7 @@ export function MigrationHub({ draft, batches, timeZone }: { draft: MoveSession 
 
 function Start({ pending, onStart }: { pending: boolean; onStart: (origin: string) => void }) {
   const t = useTranslations("migration");
+  const word = useLookup();
   const [origin, setOrigin] = useState<string>(ORIGINS[0]);
   const [confirmed, setConfirmed] = useState(false);
   const originId = useId();
@@ -201,6 +216,10 @@ function Start({ pending, onStart }: { pending: boolean; onStart: (origin: strin
         <input id={rightsId} type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} className="mt-1 size-4" />
         <label htmlFor={rightsId} className="text-sm">{t("start.rights")}</label>
       </div>
+      <div className="flex flex-col gap-1 rounded-lg bg-surface-2 p-3">
+        <p className="text-sm font-medium">{t("start.guideTitle")}</p>
+        <p className="text-sm text-muted">{word("start.guides", origin, "")}</p>
+      </div>
       <p className="text-sm text-muted">{t("start.privacy")}</p>
       <div>
         <button type="button" className="btn-primary px-4 py-2.5" disabled={pending || !confirmed} aria-busy={pending} onClick={() => onStart(origin)}>
@@ -214,11 +233,15 @@ function Start({ pending, onStart }: { pending: boolean; onStart: (origin: strin
 function FileCard({
   file,
   pending,
+  ai,
+  onAiMap,
   onChange,
   onRemove,
 }: {
   file: MoveFile;
   pending: boolean;
+  ai?: Pick<AiMap, "confidence" | "source">;
+  onAiMap: () => void;
   onChange: (change: { kind?: MoveKind; mapping?: (string | null)[] }) => void;
   onRemove: () => void;
 }) {
@@ -229,6 +252,7 @@ function FileCard({
     // A field can feed only one column: picking it here clears it elsewhere.
     onChange({ mapping: file.mapping.map((current, i) => (i === column ? target : current === target ? null : current)) });
   };
+  const unmapped = !file.kind || file.mapping.some((field) => !field);
   return (
     <li className="flex flex-col gap-3 rounded-xl border border-border p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -254,6 +278,16 @@ function FileCard({
           </button>
         </div>
       </div>
+      {unmapped && (
+        <div className="flex flex-col gap-1">
+          <div>
+            <button type="button" className="btn-secondary px-3 py-2 text-sm" disabled={pending} aria-busy={pending} onClick={onAiMap}>
+              {t("files.aiMap")}
+            </button>
+          </div>
+          <p className="text-sm text-muted">{t("files.aiHint")}</p>
+        </div>
+      )}
       {file.kind && (
         <ul className="flex flex-col divide-y divide-border">
           {file.columns.map((column, i) => {
@@ -262,6 +296,9 @@ function FileCard({
               <li key={i} className="grid gap-2 py-2 sm:grid-cols-2 sm:items-center">
                 <div className="flex min-w-0 flex-col">
                   <span className="font-medium" dir="auto">{name}</span>
+                  {ai?.source[i] === "ai" && (
+                    <span className="text-sm font-medium text-muted">{t("files.aiChose", { percent: Math.round((ai.confidence[i] ?? 0) * 100) })}</span>
+                  )}
                   {column.example && <span className="truncate text-sm text-muted" dir="auto">{t("files.example", { value: column.example })}</span>}
                 </div>
                 <select aria-label={t("files.fieldFor", { column: name })} value={file.mapping[i] ?? ""} disabled={pending} onChange={(event) => remap(i, event.target.value)} className={CONTROL}>
