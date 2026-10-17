@@ -221,7 +221,81 @@
     "requireMfaForStaff": "Require two-step sign-in for the whole team",
     "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected.",
     "auditLink": "Audit log",
-    "auditHint": "Who changed roles, team, settings and exports."
+    "auditHint": "Who changed roles, team, settings and exports.",
+    "detailsHint": "Name, language, currency, time zone and booking rules.",
+    "nav": {
+      "label": "Settings topics",
+      "back": "All settings",
+      "groups": {
+        "business": "Business",
+        "look": "Look and feel",
+        "plan": "Plan and billing",
+        "connections": "Connections",
+        "security": "Security",
+        "data": "Data and privacy",
+        "help": "Help"
+      },
+      "items": {
+        "business": "Business details",
+        "branding": "Branding",
+        "modules": "Modules and plan",
+        "billing": "Billing and subscription",
+        "integrations": "Integrations",
+        "audit": "Activity log",
+        "data": "Export and close",
+        "help": "Support"
+      },
+      "hints": {
+        "business": "Details, legal identity, legal readiness and your business emails.",
+        "branding": "Name, color, logo and cover, with a live preview.",
+        "data": "Download your business data, or close the business.",
+        "help": "Let our team look at your account, or write to us."
+      }
+    },
+    "branding": {
+      "nameTitle": "Display name",
+      "name": "Business name",
+      "nameHint": "Shown to your clients in the app and on documents.",
+      "custom": "Custom color",
+      "presets": {
+        "blue": "Blue",
+        "purple": "Purple",
+        "teal": "Teal",
+        "green": "Green",
+        "orange": "Orange",
+        "red": "Red",
+        "pink": "Pink",
+        "slate": "Slate"
+      },
+      "check": {
+        "good": "This color reads well in light and dark mode.",
+        "adjusted": "Readable, but a little faint on one theme. Small text and links use an automatically adjusted shade there.",
+        "weak": "This color is hard to read on one of the themes. We adjust the shade for text automatically, but a stronger color will look better."
+      },
+      "preview": {
+        "title": "How it looks",
+        "tabs": {
+          "app": "Client app",
+          "receipt": "Receipt",
+          "join": "Join page"
+        },
+        "greeting": "Hi, Dana",
+        "next": "Your next class",
+        "nextItem": "Tomorrow, 18:00",
+        "chipOne": "Classes",
+        "chipTwo": "My plan",
+        "chipThree": "Shop",
+        "receipt": "Receipt",
+        "receiptNumber": "No. 1042",
+        "receiptItem": "Monthly plan",
+        "receiptVat": "VAT",
+        "receiptTotal": "Total",
+        "joinTitle": "Join {name}",
+        "joinHint": "Enter your join code to see classes and book.",
+        "joinButton": "Join"
+      },
+      "presetsLabel": "Ready-made colors"
+    }
   },
   "locales": {
     "he": "עברית",
@@ -4447,6 +4521,13 @@
       "noCard": "Add a payment method under Billing once the business is back, or pay with the test card below.",
       "addCard": "Add a test card and pay",
       "resume": "Resume the subscription"
+    },
+    "summary": {
+      "plan": "Plan",
+      "perMonth": "/ month",
+      "nextPayment": "Next payment",
+      "method": "Payment method",
+      "noMethod": "No card yet"
     }
   },
   "visitNotes": {

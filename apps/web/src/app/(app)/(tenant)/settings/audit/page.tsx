@@ -5,8 +5,7 @@ import { redirect } from "next/navigation";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { EmptyState } from "@/components/empty-state";
-import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/layout/page-header";
+import { TopicHeader } from "../topic-header";
 import { ScrollRegion } from "@/components/scroll-region";
 import { unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
@@ -57,11 +56,8 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/setting
   const olderHref = page.next_cursor ? `/settings/audit?${new URLSearchParams([...params, ["cursor", page.next_cursor]])}` : null;
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/settings" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {t("back")}
-      </Link>
-      <PageHeader titleId="audit-heading" title={t("title")} description={t("subtitle")} />
+    <div className="flex flex-col gap-6">
+      <TopicHeader title={t("title")} description={t("subtitle")} />
       <form method="get" className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {t("person")}
@@ -103,7 +99,7 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/setting
       {page.entries.length === 0 ? (
         <EmptyState variant="list">{t("empty")}</EmptyState>
       ) : (
-        <ScrollRegion labelledBy="audit-heading" className="rounded-2xl border border-border">
+        <ScrollRegion label={t("title")} className="rounded-2xl border border-border">
           <table className="w-full text-sm">
             <thead className="bg-surface text-muted">
               <tr>
@@ -136,6 +132,6 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/setting
         {olderHref ? <Link scroll={false} href={olderHref} className="text-primary-ink">{t("older")}</Link> : <span />}
       </nav>
       <p className="text-xs text-muted">{t("retention")}</p>
-    </Container>
+    </div>
   );
 }

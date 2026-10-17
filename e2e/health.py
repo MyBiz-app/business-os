@@ -42,7 +42,7 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard")
 
-    owner.goto(f"{h.BASE}/settings"); h.ready(owner)
+    owner.goto(f"{h.BASE}/settings/business"); h.ready(owner)
     expect(owner.get_by_label("לקוחות צריכים הצהרת בריאות כדי להירשם באפליקציה")).to_be_checked()
 
     owner.goto(f"{h.BASE}/services/new"); h.ready(owner)
