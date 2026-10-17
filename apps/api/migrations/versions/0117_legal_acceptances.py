@@ -53,4 +53,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # contract: only the downgrade drops the table this migration added; no earlier version uses it
     op.execute("DROP TABLE app.legal_acceptances")
