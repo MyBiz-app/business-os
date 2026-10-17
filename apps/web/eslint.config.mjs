@@ -48,6 +48,7 @@ const eslintConfig = defineConfig([
     files: [
       "src/lib/brand.ts", // derives AA-safe brand colors (math on hex)
       "src/lib/palette-colors.ts", // the palette swatches people choose from
+      "src/lib/brand-presets.ts", // the ready-made brand colors in Settings → Branding
       "src/lib/calendar.ts", // event colors people choose from
       "src/components/palette.tsx", // the palette picker
       "src/components/modules/module-icon.tsx", // one illustrated icon per module

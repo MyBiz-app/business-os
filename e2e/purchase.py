@@ -28,7 +28,7 @@ with sync_playwright() as p:
     owner.get_by_role("button", name="המשך").click()
     owner.get_by_role("button", name="יצירת העסק").click()
     owner.wait_for_url("**/dashboard")
-    owner.goto(f"{h.BASE}/settings"); h.ready(owner)
+    owner.goto(f"{h.BASE}/settings/business"); h.ready(owner)
     owner.get_by_label("לקוחות יכולים לרכוש מנויים באפליקציה").check()
     with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
         owner.get_by_role("button", name="שמירה").first.click()

@@ -66,3 +66,21 @@ export function brandStyle(primary: string | null | undefined): React.CSSPropert
     "--on-brand-dark": textOn(dark),
   } as React.CSSProperties;
 }
+
+export type BrandCheck = {
+  /** good: reads on both themes as is; adjusted: one theme gets a shifted shade; weak: nearly invisible on a theme. */
+  level: "good" | "adjusted" | "weak";
+  /** The colors actually used for text and links in each theme. */
+  light: string;
+  dark: string;
+  lightRatio: number;
+  darkRatio: number;
+};
+
+/** How a chosen brand color will read on the light and dark surfaces (shown next to the picker). */
+export function checkBrandColor(hex: string): BrandCheck {
+  const lightRatio = contrastRatio(hex, LIGHT_SURFACE);
+  const darkRatio = contrastRatio(hex, DARK_SURFACE);
+  const level = lightRatio < 2 || darkRatio < 1.6 ? "weak" : lightRatio < 3 || darkRatio < 3 ? "adjusted" : "good";
+  return { level, light: readableOn(hex, LIGHT_SURFACE), dark: readableOn(hex, DARK_SURFACE), lightRatio, darkRatio };
+}

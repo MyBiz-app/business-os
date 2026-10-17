@@ -37,3 +37,16 @@ test("no brand color means no overrides", () => {
   assert.ok(contrastRatio(style["--brand"], "#f4f4f5") >= 4.5);
   assert.notEqual(style["--brand-dark"], "#0f766e"); // lightened for dark mode
 });
+
+test("brand color check flags colors that cannot be read as they are", async () => {
+  const { checkBrandColor } = await import("./brand.ts");
+  assert.equal(checkBrandColor("#2563eb").level, "good"); // the default blue reads on both
+  assert.equal(checkBrandColor("#fde047").level, "weak"); // yellow on white
+  assert.equal(checkBrandColor("#ffffff").level, "weak");
+  assert.equal(checkBrandColor("#f97316").level, "adjusted"); // orange is light on white
+  for (const color of SAMPLES) {
+    const check = checkBrandColor(color);
+    assert.ok(contrastRatio(check.light, "#f8fafc") >= 4.5, `${color} light shade`);
+    assert.ok(contrastRatio(check.dark, "#111827") >= 4.5, `${color} dark shade`);
+  }
+});

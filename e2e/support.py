@@ -32,7 +32,7 @@ with sync_playwright() as p:
     owner.get_by_label("שם פרטי").fill("דנה")
     owner.get_by_role("button", name="יצירה").click()
     owner.wait_for_url(re.compile(r".*/clients/[0-9a-f-]{36}$"))
-    owner.goto(f"{h.BASE}/settings"); h.ready(owner)
+    owner.goto(f"{h.BASE}/settings/help"); h.ready(owner)
     owner.get_by_role("button", name="אישור גישת תמיכה ל-24 שעות").click()
     expect(owner.get_by_text(re.compile("^התמיכה יכולה לצפות עד"))).to_be_visible()
     print("1. owner allowed support: ok")
@@ -56,7 +56,7 @@ with sync_playwright() as p:
     h.ready(admin)
     print("2. admin opened the business read-only and left: ok | a11y:", serious or "ok")
 
-    owner.goto(f"{h.BASE}/settings"); h.ready(owner)
+    owner.goto(f"{h.BASE}/settings/help"); h.ready(owner)
     owner.get_by_text(re.compile("דפים שהתמיכה פתחה")).click()
     expect(owner.get_by_text("/clients", exact=False).first).to_be_visible()
     owner.get_by_role("button", name="סיום גישת התמיכה עכשיו").click()
