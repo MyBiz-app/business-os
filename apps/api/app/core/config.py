@@ -136,6 +136,10 @@ class Settings(BaseSettings):
     # Shared rate-limit counts for several API instances (redis://…). Unset: counts per process.
     rate_limit_redis_url: SecretStr | None = None
 
+    # Signed-in requests one business may make per minute (staff and clients together); 0 turns
+    # the business ceiling off. Counted in the same store as the address limits.
+    tenant_rate_limit_per_minute: int = 600
+
     @property
     def rate_limits_on(self) -> bool:
         if self.rate_limits is not None:

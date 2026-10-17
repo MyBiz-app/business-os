@@ -51,7 +51,8 @@ variables, releases, who can reach what). Files: [`render.production.yaml`](../.
 | `API_TRUST_FORWARDED_FOR` | `true` behind Render's proxy |
 | `API_MFA_REQUIRED_FROM` | A date (`YYYY-MM-DD`) 14 days after go-live: from then owners and managers need an authenticator code for sensitive actions (settings, pay, ID numbers, team roles, closing the business). The MyBiz team always needs one. Without it, required from the start |
 | `API_MFA_ENFORCED` | Leave unset (on everywhere but local development) |
-| `API_RATE_LIMIT_REDIS_URL` | Optional; only when running more than one API instance (**off**) |
+| `API_RATE_LIMIT_REDIS_URL` | Optional; only when running more than one API instance: a Render Key Value, internal URL (**off**, steps in [staging.md](staging.md)) |
+| `API_TENANT_RATE_LIMIT_PER_MINUTE` | Optional; the most signed-in requests one business may make a minute, default 600 (GL18) |
 | `API_ANTHROPIC_API_KEY`, `API_EMAIL_*` | Optional until the AI assistant and real email are wanted |
 
 ## Website headers (slice GL5)
@@ -143,6 +144,10 @@ their login at Supabase Auth, set `API_SUPABASE_URL` (the project URL) and
 `API_SUPABASE_SERVICE_KEY` (the service role key, from Supabase, Settings, API) as secrets on
 the API host. Never put the key in the repository or in the apps. Without them the account can
 no longer be used (the API answers `account_deleted`), but the login row stays at Supabase.
+
+## Load test on staging (GL18)
+
+Optional, free, at night: the real figure for "how many businesses one Starter instance holds" (the table in [the load test](../reviews/load-test-2026-10.md) is an estimate until then). Steps are in that document ("Run it", against staging); use `VUS=20`, then `50`, and write the numbers into its table. Switch the rate limits back on afterwards. When a second API instance is added, also create the Render Key Value and set `API_RATE_LIMIT_REDIS_URL` ([staging.md](staging.md)).
 
 ## Still the owner's
 
