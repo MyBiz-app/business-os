@@ -118,7 +118,7 @@ class ResendSender:
                 "Content-Type": "application/json",
             },
         )
-        with urllib.request.urlopen(request, timeout=15) as response:
+        with urllib.request.urlopen(request, timeout=15) as response:  # noqa: S310 (fixed https URL)
             response.read()
 
 

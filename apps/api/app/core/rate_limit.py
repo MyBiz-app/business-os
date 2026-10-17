@@ -105,7 +105,7 @@ def build_store(redis_url: str | None) -> LimiterStore:
 
 
 VISITOR_HEADER = "x-visitor-address"
-INTERNAL_TOKEN_HEADER = "x-internal-token"
+INTERNAL_TOKEN_HEADER = "x-internal-token"  # noqa: S105 (a header name, not a secret)
 
 
 def client_address(

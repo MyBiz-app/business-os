@@ -36,13 +36,29 @@ line-length = 100
 target-version = "py313"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
-# Hebrew letters are legitimate content (vertical packs, demo data), not look-alike characters.
-ignore = ["RUF001"]
+select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF", "S"]
+ignore = [
+    # Hebrew letters are legitimate content (vertical packs, demo data), not look-alike characters.
+    "RUF001",
+    # assert is used for type narrowing in app code and is the pytest idiom in tests.
+    "S101",
+    # Only identifiers and clauses written in code reach these f-strings; values are always bound
+    # parameters. tests/test_sql_fstrings.py fails on any new f-string inside text(...).
+    "S608",
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Inline-styled email HTML reads better unwrapped.
 "app/catalog/welcome.py" = ["E501"]
+# Demo data, samples and load tests need reproducible pseudo-random numbers, not secrets.
+"app/seed/*" = ["S311"]
+"app/social/demo.py" = ["S311"]
+"app/api/samples.py" = ["S311"]
+"scripts/*" = ["S311"]
+# Test fixtures use fake tokens and secrets, seeded random data and local subprocesses.
+"tests/*" = ["S105", "S106", "S311", "S603"]
+# Names of constants (a header name, a URL, a lookup column), not secret values.
+"migrations/versions/0050_documents_time.py" = ["S105"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
