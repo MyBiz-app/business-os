@@ -8,6 +8,7 @@ import { ShowAccessibilityButton } from "@/components/marketing/show-accessibili
 import { SocialIcon } from "@/components/marketing/social-icons";
 import { BrandMark } from "@/components/brand-mark";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { statusPageUrl } from "@/lib/status";
 import { socialLinks } from "@/lib/social";
 import { industryTexts } from "@/lib/verticals";
 
@@ -15,6 +16,7 @@ export async function MarketingFooter() {
   const t = await getTranslations("marketing");
   const tApp = await getTranslations("app");
   const { text } = industryTexts(await getTranslations());
+  const statusUrl = statusPageUrl();
   const columns = [
     {
       title: t("footer.product"),
@@ -40,6 +42,7 @@ export async function MarketingFooter() {
       links: [
         { href: "/about", label: t("nav.about") },
         { href: "/contact", label: t("nav.contact") },
+        ...(statusUrl ? [{ href: statusUrl, label: t("footer.status") }] : []),
       ],
     },
     {
