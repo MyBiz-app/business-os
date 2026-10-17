@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { createNonce, enforcedCsp, parseCspReports, strictCsp } from "./csp.ts";
+import { apiOrigin, createNonce, enforcedCsp, parseCspReports, strictCsp } from "./csp.ts";
 
 test("nonces are fresh 128-bit base64 values", () => {
   const a = createNonce();
@@ -17,6 +17,12 @@ test("the strict policy allows scripts only by nonce and reports violations", ()
   assert.match(policy, /frame-ancestors 'none'/);
   assert.match(policy, /object-src 'none'/);
   assert.match(policy, /report-uri \/api\/csp-report/);
+});
+
+test("images may load from the API origin (business logos)", () => {
+  assert.equal(apiOrigin("https://api.example.com/v1"), "https://api.example.com");
+  assert.equal(apiOrigin("not a url"), undefined);
+  assert.match(enforcedCsp({ dev: false }), /img-src 'self' data: blob: http[^;]*(;|$)/);
 });
 
 test("dev mode allows eval (React refresh)", () => {

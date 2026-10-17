@@ -272,7 +272,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
               <Link
                 key={b.id}
                 href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? (savedBranches.length ? "all" : undefined) : nextIds.join(",") })}
-                aria-pressed={on}
+                aria-current={on ? "true" : undefined}
                 className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${on ? "border-transparent font-medium text-foreground" : "border-border text-muted hover:text-foreground"}`}
                 style={on ? { background: `color-mix(in oklab, ${b.color} 16%, var(--surface))`, boxShadow: `inset 0 0 0 1.5px ${b.color}` } : undefined}
               >

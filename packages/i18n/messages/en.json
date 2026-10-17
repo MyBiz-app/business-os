@@ -433,7 +433,9 @@
     "content": "Content & creative",
     "files": "Files",
     "migration": "Move to MyBiz",
-    "invoices": "Invoices"
+    "invoices": "Invoices",
+    "sidebarLight": "Use a light sidebar",
+    "sidebarDark": "Use a dark sidebar"
   },
   "terms": {
     "fitness": {
@@ -722,7 +724,16 @@
       "today": "Today",
       "daysAgo": "{days, plural, one {Yesterday} other {# days ago}}"
     },
-    "pageOf": "Page {page} of {pages}"
+    "pageOf": "Page {page} of {pages}",
+    "consent": {
+      "title": "Marketing messages",
+      "on": "Agreed to receive marketing messages",
+      "off": "Has not agreed to marketing messages",
+      "hint": "Service messages (reminders, receipts) are sent either way. Record consent only when the client gave it.",
+      "toggleOn": "Record consent",
+      "toggleOff": "Withdraw consent",
+      "error": "Could not save. Try again."
+    }
   },
   "common": {
     "dismiss": "Close notification",

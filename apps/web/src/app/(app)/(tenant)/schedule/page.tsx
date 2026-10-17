@@ -274,11 +274,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                 </>
               );
               return href ? (
-                <Link key={b.id} href={href} aria-pressed={on} className={className}>
+                <Link key={b.id} href={href} aria-current={on ? "true" : undefined} className={className}>
                   {content}
                 </Link>
               ) : (
-                <span key={b.id} aria-disabled="true" title={t("branchLimit", { count: limit })} className={className}>
+                <span key={b.id} role="link" aria-disabled="true" title={t("branchLimit", { count: limit })} className={className}>
                   {content}
                 </span>
               );
