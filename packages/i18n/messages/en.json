@@ -1204,6 +1204,13 @@
     "noMatches": "No matching active clients who aren't already booked.",
     "book": "Book",
     "addToWaitlist": "Add to waitlist",
+    "overCapacity": "Over capacity",
+    "addOverCapacity": "Add over capacity",
+    "overCapacityTitle": "This class is full",
+    "overCapacityBody": "The class is full ({booked} of {capacity}). Adding {name} goes over the capacity you set. Add anyway?",
+    "overCapacityNote": "{count, plural, one {# over the capacity} other {# over the capacity}}",
+    "overCapacitySince": "Added over capacity",
+    "keepOnWaitlist": "Add to waitlist instead",
     "lateCancel": "Late cancel",
     "sessionCancelled": "Session cancelled",
     "noneYet": "No bookings yet.",
@@ -1778,6 +1785,7 @@
     "title": "AI team",
     "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
     "mapLabel": "The AI team",
+    "toolbar": "AI team tools",
     "listLabel": "AI agents",
     "view": "View",
     "views": {
@@ -2174,7 +2182,7 @@
     "structure": {
       "edit": "Edit structure",
       "title": "Team structure",
-      "hint": "Drag the circle above an agent onto the agent it reports to. Click a line to remove it. Drag an agent into a team frame to add it. You can also use the lists below.",
+      "hint": "Drag a dot on the rim of an agent's picture onto another agent to connect them: the bottom dot is for the agents under it, the top dot for its manager. Click a line to remove it. Drag an agent into a team frame to add it. You can also use the lists below.",
       "relayout": "Tidy up",
       "cancel": "Cancel",
       "save": "Save",
@@ -2198,6 +2206,8 @@
       "agentsLabel": "Agents and where they stand",
       "removeLine": "Remove the line: {name} goes back under the chief",
       "handle": "Drag onto the agent that {name} reports to",
+      "portTop": "Top dot of {name}: attach the agent {name} reports to",
+      "portBottom": "Bottom dot of {name}: drag onto an agent that reports to {name}",
       "errors": {
         "locked_agent": "A locked agent cannot be connected. Add its module to the plan first.",
         "cycle": "Agents cannot report to each other in a loop.",
@@ -4332,7 +4342,8 @@
       "new30": "New leads (30 days)",
       "won30": "Became clients (30 days)",
       "conversion": "Conversion (90 days)",
-      "followUps": "Follow up today"
+      "followUps": "Follow up today",
+      "label": "Lead numbers"
     },
     "stages": {
       "new": "New",
@@ -4362,7 +4373,9 @@
       "created": "Lead created",
       "converted": "Became a client"
     },
-    "pipeline": "Lead pipeline"
+    "pipeline": "Lead pipeline",
+    "viewShowing": "Showing {view}: {count}",
+    "viewClear": "Show all leads"
   },
   "inquiry": {
     "title": "Get in touch · {name}",
@@ -6712,6 +6725,13 @@
       "payTitle": "Payment",
       "payBill": "Pay · {amount}",
       "billThanks": "Paid in full. Thank you!"
+    },
+    "tiles": {
+      "label": "Quote numbers",
+      "draft": "Drafts",
+      "sent": "Waiting for an answer",
+      "accepted": "Accepted",
+      "declined": "Declined or expired"
     }
   },
   "bills": {
@@ -8370,7 +8390,10 @@
     "allocationPending": "Allocation number pending",
     "allocationNumber": "Allocation number",
     "allocationNote": "This invoice is above the allocation threshold. Its allocation number from the tax authority is still to come.",
-    "fingerprint": "Fingerprint of the stored file (sha256):"
+    "fingerprint": "Fingerprint of the stored file (sha256):",
+    "tiles": {
+      "label": "Document numbers"
+    }
   },
   "security": {
     "title": "Account security",
@@ -8500,6 +8523,45 @@
       "platform_change": "MyBiz support changed something",
       "tenant_closed": "Closed the business",
       "tenant_reopened": "Reopened the business"
+    }
+  },
+  "staffCard": {
+    "title": "Team member",
+    "open": "Open card",
+    "tabsLabel": "Sections of the card",
+    "details": "Details",
+    "role": "Role",
+    "branches": "Branches",
+    "allBranches": "All branches",
+    "email": "Email",
+    "phone": "Phone",
+    "startedOn": "Started",
+    "hoursThisMonth": "Hours this month",
+    "plannedHours": "Planned: {hours}",
+    "openTimeClock": "Open the time clock",
+    "noClockAccess": "Hours worked show for those who approve time.",
+    "upcomingShifts": "Upcoming shifts",
+    "noShifts": "No shifts in the next {days} days.",
+    "openShifts": "Open the shift board",
+    "classesTaught": "Classes and appointments",
+    "noClasses": "Nothing to teach in the next {days} days.",
+    "openPayRun": "Open the pay run",
+    "aiTitle": "AI team",
+    "aiAllowed": "Can use the AI team",
+    "aiNotAllowed": "No access to the AI team",
+    "aiUsedThisMonth": "credits this month (the whole business: {used} of {included})",
+    "aiHint": "Access follows the role. Change it under Permissions.",
+    "openAi": "Open the AI team",
+    "permissionsTitle": "Role and permissions",
+    "roleIs": "Role: {role}",
+    "changeRole": "Change the role in the team list",
+    "tabs": {
+      "overview": "Overview",
+      "employment": "Employment and pay",
+      "availability": "Availability",
+      "documents": "Documents",
+      "ai": "AI",
+      "permissions": "Permissions"
     }
   }
 }

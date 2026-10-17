@@ -143,7 +143,7 @@ export function PillRow<T extends string>({
   label,
   palette,
 }: {
-  options: { value: T; label: string; sublabel?: string; accessibilityLabel?: string }[];
+  options: { value: T; label: string; sublabel?: string; /** A small number under the label (sessions on that day). */ count?: number; accessibilityLabel?: string }[];
   value: T;
   onChange: (value: T) => void;
   label: string;
@@ -175,6 +175,11 @@ export function PillRow<T extends string>({
               <Text style={[local.pillSub, { color: selected ? palette.onPrimary : palette.muted }]}>{option.sublabel}</Text>
             ) : null}
             <Text style={[local.pillText, { color: selected ? palette.onPrimary : palette.foreground }]}>{option.label}</Text>
+            {option.count !== undefined ? (
+              <Text style={[local.pillSub, { color: selected ? palette.onPrimary : palette.muted, fontVariant: ["tabular-nums"] }]}>
+                {option.count}
+              </Text>
+            ) : null}
           </Pressable>
         );
       })}

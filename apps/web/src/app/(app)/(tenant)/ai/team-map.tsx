@@ -46,7 +46,7 @@ export function layout(agents: Agent[], wide: boolean): Map<string, Spot> {
 
 const INACTIVE = new Set(["locked", "disabled", "forbidden"]);
 
-type Drag = { key: string; mode: "move" | "link"; x: number; y: number; moved: boolean };
+type Drag = { key: string; mode: "move" | "link" | "adopt"; x: number; y: number; moved: boolean };
 
 type MapProps = {
   agents: Agent[];
@@ -95,10 +95,11 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
   function finish(event: React.PointerEvent) {
     if (!drag || !onDraft) return setDrag(null);
     const at = percent(event);
-    if (drag.mode === "link") {
+    if (drag.mode === "link" || drag.mode === "adopt") {
       const hit = document.elementsFromPoint(event.clientX, event.clientY).find((el) => el instanceof HTMLElement && el.dataset.agent && el.dataset.agent !== drag.key);
       const target = hit instanceof HTMLElement ? hit.dataset.agent : undefined;
-      if (target) onDraft(connect(draft, agents, drag.key, target));
+      // From the bottom dot the dragged agent is the manager; from the top dot it is the one reporting.
+      if (target) onDraft(drag.mode === "link" ? connect(draft, agents, drag.key, target) : connect(draft, agents, target, drag.key));
     } else if (drag.moved) {
       let next: Draft = { ...draft, pos: { ...draft.pos, [drag.key]: at } };
       // Dropped inside a team's frame: the agent joins that team.
@@ -175,7 +176,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
             </g>
           );
         })}
-        {drag?.mode === "link" && <line x1={spotOf(drag.key).x} y1={spotOf(drag.key).y} x2={drag.x} y2={drag.y} stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" vectorEffect="non-scaling-stroke" className="text-primary-ink" />}
+        {(drag?.mode === "link" || drag?.mode === "adopt") && <line x1={spotOf(drag.key).x} y1={spotOf(drag.key).y} x2={drag.x} y2={drag.y} stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" vectorEffect="non-scaling-stroke" className="text-primary-ink" />}
       </svg>
 
       {agents.map((agent, index) => {
@@ -207,6 +208,12 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
                 agent={agent}
                 className={`relative shrink-0 ${size} transition-[width,height,filter,transform] duration-700 group-hover:scale-105 ${dim ? "grayscale brightness-[.55]" : ""}`}
               />
+              {editing && connectable(agent) && (
+                <>
+                  {!isChief && <Port agent={agent} side="top" label={t("structure.portTop", { name: agent.name })} onStart={(event) => start(event, agent, "link")} />}
+                  <Port agent={agent} side="bottom" label={t("structure.portBottom", { name: agent.name })} onStart={(event) => start(event, agent, "adopt")} />
+                </>
+              )}
               <span aria-hidden="true" className="absolute inset-0 rounded-full transition-shadow" style={{ boxShadow: `0 0 0 ${active ? 4 : 2}px ${dim ? "transparent" : active ? agent.color : `${agent.color}99`}` }} />
               {dim ? (
                 <span aria-hidden="true" className="absolute inset-0 grid place-items-center">
@@ -227,24 +234,20 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
           </button>
         );
       })}
-
-      {editing &&
-        agents.map((agent) => {
-          if (agent.key === CHIEF || !connectable(agent)) return null;
-          const spot = drag?.mode === "move" && drag.moved && drag.key === agent.key ? { x: drag.x, y: drag.y } : spotOf(agent.key);
-          return (
-            <button
-              key={`link-${agent.key}`}
-              type="button"
-              tabIndex={-1}
-              onPointerDown={(event) => start(event, agent, "link")}
-              aria-label={t("structure.handle", { name: agent.name })}
-              title={t("structure.handle", { name: agent.name })}
-              className="btn-plain absolute z-20 size-5 -translate-x-1/2 cursor-crosshair touch-none rounded-full border-2 border-primary bg-background shadow hover:bg-primary"
-              style={{ left: `${spot.x}%`, top: `calc(${spot.y}% - 3rem)` }}
-            />
-          );
-        })}
     </div>
+  );
+}
+
+/** A connection dot on the rim of an agent's picture (not on the face): the top one is where the agent's manager attaches, the bottom one is where the agents under it attach. Dropping a line on the agent or on a dot connects them. */
+function Port({ agent, side, label, onStart }: { agent: Agent; side: "top" | "bottom"; label: string; onStart: (event: React.PointerEvent) => void }) {
+  return (
+    <span
+      data-agent={agent.key}
+      onPointerDown={onStart}
+      title={label}
+      aria-hidden="true"
+      className={`absolute inset-x-0 z-20 mx-auto size-4 cursor-crosshair touch-none rounded-full border-2 bg-background shadow transition-transform hover:scale-125 hover:bg-primary ${side === "top" ? "-top-2" : "-bottom-2"}`}
+      style={{ borderColor: agent.color }}
+    />
   );
 }

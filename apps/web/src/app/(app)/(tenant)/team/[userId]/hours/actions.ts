@@ -20,7 +20,7 @@ export async function saveHours(userId: string, blocks: Block[]): Promise<HoursS
     const detail = (new ApiError(response.status, error).body as { detail?: unknown } | null)?.detail;
     return { error: detail === "overlapping_hours" ? "overlapping_hours" : response.status === 422 ? "invalid" : "generic" };
   }
-  revalidatePath(`/team/${userId}/hours`);
+  revalidatePath(`/team/${userId}`);
   return { saved: true };
 }
 
@@ -37,7 +37,7 @@ export async function addTimeOff(userId: string, _state: FormState, formData: Fo
   } catch (error) {
     return errorState(error);
   }
-  revalidatePath(`/team/${userId}/hours`);
+  revalidatePath(`/team/${userId}`);
   return { saved: true };
 }
 
@@ -47,5 +47,5 @@ export async function removeTimeOff(userId: string, timeOffId: string): Promise<
     params: { ...scope, path: { user_id: userId, time_off_id: timeOffId } },
   });
   if (!response.ok) throw new ApiError(response.status, "remove time off failed");
-  revalidatePath(`/team/${userId}/hours`);
+  revalidatePath(`/team/${userId}`);
 }

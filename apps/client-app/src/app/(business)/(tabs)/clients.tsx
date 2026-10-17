@@ -1,7 +1,7 @@
 import type { components } from "@business-os/api-client";
 import { formatDay, todayIn } from "@business-os/i18n/dates";
-import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useLocale, useTranslations } from "use-intl";
@@ -30,6 +30,11 @@ export default function Clients() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  // A number on the Numbers screen opens this list already narrowed (`?filter=absent`).
+  const { filter: requested } = useLocalSearchParams<{ filter?: string }>();
+  useEffect(() => {
+    if (requested === "all" || requested === "valid" || requested === "none" || requested === "absent") setFilter(requested);
+  }, [requested]);
   // Pages loaded after the first one; cleared whenever the search or filter changes.
   const [more, setMore] = useState<ClientItem[]>([]);
   const [loadingMore, setLoadingMore] = useState(false);

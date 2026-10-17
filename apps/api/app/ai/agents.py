@@ -160,7 +160,7 @@ CATALOG: dict[str, AgentSpec] = {
         AgentSpec(
             "care",
             "Customer care",
-            {"he": "נוח", "en": "Noah"},
+            {"he": "ליאו", "en": "Leo"},
             "#14B8A6",
             "The inbox, WhatsApp replies, reviews and clients at risk of leaving.",
             "You handle customer care: the inbox, replies, reviews and members at risk of "

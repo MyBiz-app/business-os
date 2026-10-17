@@ -66,6 +66,10 @@ def test_each_screen_route_belongs_to_one_agent() -> None:
     assert {"/files", "/migration", "/settings", "/quotes", "/time"} <= set(seen)
 
 
+def test_customer_care_agent_is_leo() -> None:
+    assert agent_catalog.CATALOG["care"].name == {"he": "ליאו", "en": "Leo"}
+
+
 def test_every_tool_belongs_to_a_domain_and_agents_use_known_domains() -> None:
     assert set(TOOL_DOMAINS) == set(TOOLS)
     assert set(TOOL_DOMAINS.values()) <= set(agent_catalog.DOMAINS)

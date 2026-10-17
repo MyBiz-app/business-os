@@ -53,7 +53,7 @@ export async function saveEmployment(userId: string, input: EmploymentInput): Pr
     body: input,
   });
   if (!response.response.ok) return failure(response.response.status, response.error);
-  revalidatePath(`/team/${userId}/payroll`);
+  revalidatePath(`/team/${userId}`);
   return { ok: true };
 }
 
@@ -74,7 +74,7 @@ export async function requestForm101(userId: string, taxYear: number): Promise<P
     body: { tax_year: taxYear },
   });
   if (!response.response.ok) return failure(response.response.status, response.error);
-  revalidatePath(`/team/${userId}/payroll`);
+  revalidatePath(`/team/${userId}`);
   return { ok: true };
 }
 
@@ -90,7 +90,7 @@ export async function overrideCreditPoints(
     body: { points, note: note || null },
   });
   if (!response.response.ok) return failure(response.response.status, response.error);
-  revalidatePath(`/team/${userId}/payroll`);
+  revalidatePath(`/team/${userId}`);
   return { ok: true };
 }
 
@@ -124,7 +124,7 @@ export async function addPayComponent(userId: string, input: ComponentInput): Pr
     body: input,
   });
   if (!response.response.ok) return failure(response.response.status, response.error);
-  revalidatePath(`/team/${userId}/payroll`);
+  revalidatePath(`/team/${userId}`);
   return { ok: true };
 }
 
@@ -139,7 +139,7 @@ export async function updatePayComponent(
     body: input,
   });
   if (!response.response.ok) return failure(response.response.status, response.error);
-  revalidatePath(`/team/${userId}/payroll`);
+  revalidatePath(`/team/${userId}`);
   return { ok: true };
 }
 
@@ -149,6 +149,6 @@ export async function removePayComponent(userId: string, componentId: string): P
     params: { ...scope, path: { component_id: componentId } },
   });
   if (!response.response.ok) return failure(response.response.status, response.error);
-  revalidatePath(`/team/${userId}/payroll`);
+  revalidatePath(`/team/${userId}`);
   return { ok: true };
 }

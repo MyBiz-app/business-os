@@ -29,6 +29,10 @@ ScheduleReadDep = Annotated[TenantContext, Depends(require(Permission.SCHEDULE_R
 ClientsReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 ManageDep = Annotated[TenantContext, Depends(require(Permission.BOOKINGS_MANAGE))]
 
+# Who may add a client to a full class: owners, managers and branch managers (not front desk or
+# instructors). Clients never can.
+OVER_CAPACITY_ROLES = frozenset({"owner", "manager", "branch_manager"})
+
 BookingStatus = Literal["booked", "waitlisted", "checked_in", "no_show", "cancelled"]
 
 # Allowed status changes by staff. Re-booking a cancelled booking is a new booking.
@@ -46,6 +50,11 @@ class BookingCreate(BaseModel):
     dependent_id: UUID | None = Field(
         default=None, description="Which of the client's pets / children comes (#43)"
     )
+    over_capacity: bool = Field(
+        default=False,
+        description="Book the client even though the class is full (owners and managers only); "
+        "ignored while a spot is free",
+    )
 
 
 class BookingUpdate(BaseModel):
@@ -62,6 +71,8 @@ class Booking(BaseModel):
     plan_name: str | None = Field(description="The client's plan this booking uses, if any")
     status: BookingStatus
     waitlist_position: int | None
+    over_capacity: bool = Field(description="Added beyond the class's capacity by a manager")
+    over_capacity_at: datetime | None = None
     late_cancel: bool
     checked_in_at: datetime | None
     cancelled_at: datetime | None
@@ -89,7 +100,8 @@ BOOKING_SELECT = f"""
            trim(c.first_name || ' ' || coalesce(c.last_name, '')) AS client_name,
            b.dependent_id, d.name AS dependent_name,
            e.name AS plan_name,
-           b.status, b.late_cancel, b.checked_in_at, b.cancelled_at, b.created_at,
+           b.status, b.over_capacity, b.over_capacity_at, b.late_cancel, b.checked_in_at,
+           b.cancelled_at, b.created_at,
            app.waitlist_position(b.id) AS waitlist_position,
            {HEALTH_STATE_SQL} AS health_state
     FROM app.bookings b
@@ -164,8 +176,10 @@ def place_booking(
     *,
     requires_plan: bool,
     dependent_id: UUID | None = None,
+    over_capacity: bool = False,
 ) -> UUID:
-    """Books the client if a spot is free, otherwise adds them to the waitlist. The booking
+    """Books the client if a spot is free, otherwise adds them to the waitlist (or, with
+    `over_capacity`, books them beyond the capacity and marks the booking). The booking
     uses one of the client's plans when one is valid; with `requires_plan`, it must. A booking
     can be for one of the client's dependents (a pet, a child); a client can then hold one
     booking per session and dependent."""
@@ -191,14 +205,17 @@ def place_booking(
 
     booked, _ = session_counts(db, session_id)
     full = booked >= session["capacity"]
+    over = full and over_capacity
     try:
         booking_id = db.execute(
             text("""
                 INSERT INTO app.bookings
                     (tenant_id, session_id, client_id, dependent_id, entitlement_id, status,
-                     waitlisted_at, created_by)
+                     waitlisted_at, created_by, over_capacity, over_capacity_by, over_capacity_at)
                 VALUES (:tenant_id, :session_id, :client_id, :dependent_id, :entitlement_id,
-                        :status, CASE WHEN :full THEN now() END, app.current_user_id())
+                        :status, CASE WHEN :waitlist THEN now() END, app.current_user_id(),
+                        :over, CASE WHEN :over THEN app.current_user_id() END,
+                        CASE WHEN :over THEN now() END)
                 RETURNING id
             """),
             {
@@ -207,8 +224,9 @@ def place_booking(
                 "client_id": client_id,
                 "dependent_id": dependent_id,
                 "entitlement_id": entitlement_id,
-                "status": "waitlisted" if full else "booked",
-                "full": full,
+                "status": "waitlisted" if full and not over else "booked",
+                "waitlist": full and not over,
+                "over": over,
             },
         ).scalar_one()
     except IntegrityError as error:
@@ -281,6 +299,8 @@ def list_bookings(session_id: UUID, context: ScheduleReadDep, page: WidePageDep)
 def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) -> Booking:
     """Books the client if a spot is free, otherwise adds them to the waitlist."""
     _check_session_branch(context, session_id)
+    if body.over_capacity and context.role not in OVER_CAPACITY_ROLES:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
     # Staff may book without a plan (walk-ins pay at the desk); the roster shows it.
     booking_id = place_booking(
         context.session,
@@ -289,6 +309,7 @@ def create_booking(session_id: UUID, body: BookingCreate, context: ManageDep) ->
         body.client_id,
         requires_plan=False,
         dependent_id=body.dependent_id,
+        over_capacity=body.over_capacity,
     )
     notify_booking(context.session, booking_id, "booked_by_studio")
     return _load(context.session, booking_id)
