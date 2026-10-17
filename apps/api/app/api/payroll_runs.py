@@ -842,6 +842,9 @@ def move_payroll_stage(
         {"stage": body.stage, "user": user.id, "id": run["id"]},
     )
     if body.stage == "approved":
+        from app.api.payslips import freeze_net
+
+        freeze_net(session, context.tenant_id, run)
         _store_export(context, run["id"], first)
     _audit(
         session, context.tenant_id, "payroll.run_stage", "payroll_run", run["id"], stage=body.stage

@@ -1002,6 +1002,101 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll/runs/{period}/net": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Run Net
+         * @description Net pay of everyone the reader may see, with the deductions it came from.
+         */
+        get: operations["get_run_net"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/payslips/{user_id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Payslip File */
+        get: operations["payslip_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/payslips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Payslips
+         * @description The signed-in team member's own approved months, newest first.
+         */
+        get: operations["my_payslips"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/payslips/{period}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Payslip File */
+        get: operations["my_payslip_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/bank-file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Bank File
+         * @description The Masav transfer file of an approved month (net pay of everyone with something to pay).
+         *     It is generated and kept in the payroll folder; it is never sent anywhere.
+         */
+        post: operations["bank_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dependents/settings": {
         parameters: {
             query?: never;
@@ -8042,6 +8137,23 @@ export interface components {
             /** Account */
             account: string;
         };
+        /** BankFileBody */
+        BankFileBody: {
+            /**
+             * Institution Code
+             * @description Masav institution code
+             */
+            institution_code: string;
+            /** Sending Code */
+            sending_code: string;
+            /** Institution Name */
+            institution_name: string;
+            /**
+             * Pay Date
+             * Format: date
+             */
+            pay_date: string;
+        };
         /** BillPreview */
         BillPreview: {
             /**
@@ -12654,6 +12766,17 @@ export interface components {
              */
             created_at: string;
         };
+        /** NetLine */
+        NetLine: {
+            /** Code */
+            code: string;
+            /** Amount Minor */
+            amount_minor: number;
+            /** Base Minor */
+            base_minor: number | null;
+            /** Percent */
+            percent: string | null;
+        };
         /** NetworkOption */
         NetworkOption: {
             /** Network */
@@ -12958,6 +13081,20 @@ export interface components {
             /** Verified */
             verified: boolean;
         };
+        /** PayslipRow */
+        PayslipRow: {
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /** Net Minor */
+            net_minor: number;
+            /** Currency */
+            currency: string;
+            /** Draft */
+            draft: boolean;
+        };
         /** PendingAction */
         PendingAction: {
             /**
@@ -13146,6 +13283,35 @@ export interface components {
             approved: boolean;
             /** Approved At */
             approved_at: string | null;
+        };
+        /** PersonNet */
+        PersonNet: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Gross Minor */
+            gross_minor: number;
+            /** Total Deductions Minor */
+            total_deductions_minor: number;
+            /** Net Minor */
+            net_minor: number;
+            /** Credit Points */
+            credit_points: string;
+            /** Deductions */
+            deductions: components["schemas"]["NetLine"][];
+            /** Employer */
+            employer: components["schemas"]["NetLine"][];
+            /** Problems */
+            problems: string[];
+            /**
+             * Frozen
+             * @description Worked out when the run was approved
+             */
+            frozen: boolean;
         };
         /** PersonProfile */
         PersonProfile: {
@@ -14820,6 +14986,27 @@ export interface components {
              * @description No error and every warning acknowledged
              */
             ready: boolean;
+        };
+        /** RunNet */
+        RunNet: {
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /** Currency */
+            currency: string;
+            /** Payslips Draft */
+            payslips_draft: boolean;
+            /**
+             * Example Rates
+             * @description Rates that came from the built-in examples, not from the rates table
+             */
+            example_rates: string[];
+            /** Net Minor */
+            net_minor: number;
+            /** People */
+            people: components["schemas"]["PersonNet"][];
         };
         /** RunNote */
         RunNote: {
@@ -19865,6 +20052,182 @@ export interface operations {
                 content: {
                     "application/json": unknown;
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_run_net: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunNet"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    payslip_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_payslips: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayslipRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_payslip_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    bank_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BankFileBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

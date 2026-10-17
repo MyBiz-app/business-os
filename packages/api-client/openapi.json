@@ -5459,6 +5459,393 @@
         }
       }
     },
+    "/payroll/runs/{period}/net": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Get Run Net",
+        "description": "Net pay of everyone the reader may see, with the deductions it came from.",
+        "operationId": "get_run_net",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunNet"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/payslips/{user_id}/pdf": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Payslip File",
+        "operationId": "payslip_file",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/payslips": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "My Payslips",
+        "description": "The signed-in team member's own approved months, newest first.",
+        "operationId": "my_payslips",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayslipRow"
+                  },
+                  "title": "Response My Payslips"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/payslips/{period}/pdf": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "My Payslip File",
+        "operationId": "my_payslip_file",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/bank-file": {
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Bank File",
+        "description": "The Masav transfer file of an approved month (net pay of everyone with something to pay).\nIt is generated and kept in the payroll folder; it is never sent anywhere.",
+        "operationId": "bank_file",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankFileBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dependents/settings": {
       "get": {
         "tags": [
@@ -38820,6 +39207,40 @@
         ],
         "title": "BankAccount"
       },
+      "BankFileBody": {
+        "properties": {
+          "institution_code": {
+            "type": "string",
+            "pattern": "^\\d{1,8}$",
+            "title": "Institution Code",
+            "description": "Masav institution code"
+          },
+          "sending_code": {
+            "type": "string",
+            "pattern": "^\\d{1,5}$",
+            "title": "Sending Code"
+          },
+          "institution_name": {
+            "type": "string",
+            "maxLength": 30,
+            "minLength": 1,
+            "title": "Institution Name"
+          },
+          "pay_date": {
+            "type": "string",
+            "format": "date",
+            "title": "Pay Date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "institution_code",
+          "sending_code",
+          "institution_name",
+          "pay_date"
+        ],
+        "title": "BankFileBody"
+      },
       "BillPreview": {
         "properties": {
           "client_id": {
@@ -51029,6 +51450,48 @@
         ],
         "title": "MyReview"
       },
+      "NetLine": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "amount_minor": {
+            "type": "integer",
+            "title": "Amount Minor"
+          },
+          "base_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Base Minor"
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "amount_minor",
+          "base_minor",
+          "percent"
+        ],
+        "title": "NetLine"
+      },
       "NetworkOption": {
         "properties": {
           "network": {
@@ -51667,6 +52130,35 @@
         ],
         "title": "PayrollRate"
       },
+      "PayslipRow": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "format": "date",
+            "title": "Period"
+          },
+          "net_minor": {
+            "type": "integer",
+            "title": "Net Minor"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "draft": {
+            "type": "boolean",
+            "title": "Draft"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "net_minor",
+          "currency",
+          "draft"
+        ],
+        "title": "PayslipRow"
+      },
       "PendingAction": {
         "properties": {
           "id": {
@@ -52095,6 +52587,82 @@
           "approved_at"
         ],
         "title": "PersonMonth"
+      },
+      "PersonNet": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "gross_minor": {
+            "type": "integer",
+            "title": "Gross Minor"
+          },
+          "total_deductions_minor": {
+            "type": "integer",
+            "title": "Total Deductions Minor"
+          },
+          "net_minor": {
+            "type": "integer",
+            "title": "Net Minor"
+          },
+          "credit_points": {
+            "type": "string",
+            "title": "Credit Points"
+          },
+          "deductions": {
+            "items": {
+              "$ref": "#/components/schemas/NetLine"
+            },
+            "type": "array",
+            "title": "Deductions"
+          },
+          "employer": {
+            "items": {
+              "$ref": "#/components/schemas/NetLine"
+            },
+            "type": "array",
+            "title": "Employer"
+          },
+          "problems": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Problems"
+          },
+          "frozen": {
+            "type": "boolean",
+            "title": "Frozen",
+            "description": "Worked out when the run was approved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "full_name",
+          "gross_minor",
+          "total_deductions_minor",
+          "net_minor",
+          "credit_points",
+          "deductions",
+          "employer",
+          "problems",
+          "frozen"
+        ],
+        "title": "PersonNet"
       },
       "PersonProfile": {
         "properties": {
@@ -56485,6 +57053,52 @@
           "ready"
         ],
         "title": "RunLine"
+      },
+      "RunNet": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "format": "date",
+            "title": "Period"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "payslips_draft": {
+            "type": "boolean",
+            "title": "Payslips Draft"
+          },
+          "example_rates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Example Rates",
+            "description": "Rates that came from the built-in examples, not from the rates table"
+          },
+          "net_minor": {
+            "type": "integer",
+            "title": "Net Minor"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/PersonNet"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "currency",
+          "payslips_draft",
+          "example_rates",
+          "net_minor",
+          "people"
+        ],
+        "title": "RunNet"
       },
       "RunNote": {
         "properties": {

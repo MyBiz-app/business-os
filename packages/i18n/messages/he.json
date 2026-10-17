@@ -6372,7 +6372,57 @@
     "overrideNote": "עודכן על ידי השכר: {note}",
     "declaration": "אני מצהיר/ה כי הפרטים לעיל נכונים ומלאים.",
     "signedBy": "נחתם על ידי",
-    "signedOn": "תאריך חתימה"
+    "signedOn": "תאריך חתימה",
+    "payslip": "תלוש שכר לחודש {month}",
+    "payslipDraft": "טיוטה לבדיקת רו\"ח",
+    "employeeName": "שם העובד",
+    "jobTitle": "תפקיד",
+    "employmentStart": "תחילת עבודה",
+    "bankAccount": "חשבון בנק",
+    "creditPointsLabel": "נקודות זיכוי",
+    "payments": "תשלומים",
+    "rate": "תעריף",
+    "totalPayments": "סה\"כ תשלומים",
+    "mandatoryDeductions": "ניכויים",
+    "totalDeductions": "סה\"כ ניכויים",
+    "netPay": "שכר נטו לתשלום",
+    "employerContributions": "הפרשות מעסיק",
+    "yearToDate": "מתחילת השנה",
+    "ytdGross": "ברוטו",
+    "ytdTax": "מס הכנסה",
+    "ytdNationalInsurance": "ביטוח לאומי",
+    "ytdHealth": "מס בריאות",
+    "payslipDisclaimer": "תלוש זה הופק באמצעות MyBiz. החישוב אינו מהווה ייעוץ ויש לאמת אותו מול רואה חשבון או לשכת שכר.",
+    "payslipItems": {
+      "monthly": "שכר חודשי",
+      "hourly": "שכר שעתי",
+      "overtime_tier1": "שעות נוספות",
+      "overtime_tier2": "שעות נוספות",
+      "rest_day": "עבודה ביום מנוחה",
+      "bonus": "בונוס",
+      "holiday_gift": "מתנת חג",
+      "expense_refund": "החזר הוצאות",
+      "travel": "נסיעות",
+      "meals": "ארוחות",
+      "phone": "טלפון",
+      "car": "רכב",
+      "fixed_addition": "תוספת קבועה",
+      "recuperation": "הבראה"
+    },
+    "payslipDeductions": {
+      "income_tax": "מס הכנסה",
+      "national_insurance": "ביטוח לאומי",
+      "health_insurance": "מס בריאות",
+      "pension_employee": "פנסיה עובד",
+      "study_fund_employee": "קרן השתלמות",
+      "other_deductions": "ניכויים אחרים"
+    },
+    "payslipEmployer": {
+      "pension_employer": "פנסיה",
+      "severance": "פיצויים",
+      "study_fund_employer": "קרן השתלמות",
+      "national_insurance_employer": "ביטוח לאומי"
+    }
   },
   "time": {
     "title": "שעות וחיוב",
@@ -7529,7 +7579,8 @@
       "bonus": "הוספת סכום חד-פעמי",
       "exportXlsx": "ייצוא לאקסל",
       "exportCsv": "ייצוא CSV",
-      "ownerOnly": "רק הבעלים מאשר את ההרצה."
+      "ownerOnly": "רק הבעלים מאשר את ההרצה.",
+      "payslip": "תלוש שכר (PDF)"
     },
     "warningsTitle": "דברים לבדוק",
     "warningsNone": "אין מה לבדוק.",
@@ -7629,6 +7680,16 @@
       "period_in_future": "החודש רחוק מדי קדימה.",
       "invalid": "כדאי לבדוק את הפרטים.",
       "generic": "משהו השתבש. אפשר לנסות שוב."
+    },
+    "bankFile": {
+      "title": "קובץ העברה לבנק",
+      "hint": "קובץ מס\"ב לשכר הנטו של החודש. הוא נוצר כאן בלבד; את ההעלאה לבנק עושים בעצמכם.",
+      "institutionCode": "קוד מוסד (8 ספרות)",
+      "sendingCode": "קוד מוסד שולח (5 ספרות)",
+      "institutionName": "שם המוסד",
+      "payDate": "תאריך תשלום",
+      "submit": "יצירת קובץ לבנק",
+      "problem": "לא ניתן ליצור את הקובץ. בדקו שלכל עובד יש מספר זהות וחשבון בנק."
     }
   }
 }
