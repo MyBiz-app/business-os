@@ -782,6 +782,11 @@
       "generic": "Something went wrong. Please try again.",
       "storage_full": "Your space for files is full. Delete some files or choose a bigger bundle in Billing."
     },
+    "closeDialog": "Close window",
+    "discardTitle": "Leave without saving?",
+    "discardBody": "Your changes will be lost.",
+    "keepEditing": "Keep editing",
+    "discard": "Leave without saving",
     "loading": "Loading…",
     "chooseFile": "Choose a file",
     "noFile": "No file chosen",
