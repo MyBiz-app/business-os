@@ -2634,7 +2634,9 @@
     "payroll_manage": "Manage payroll files",
     "payroll_manage_hint": "Set employment terms, request and correct Form 101",
     "payroll_approve": "Approve payroll",
-    "payroll_approve_hint": "Approve and lock pay runs (owners only)"
+    "payroll_approve_hint": "Approve and lock pay runs (owners only)",
+    "time_approve": "Approve hours",
+    "time_approve_hint": "Correct clocked hours and approve a person's month"
   },
   "health": {
     "title": "Health declaration",
@@ -5306,6 +5308,30 @@
         "invalid": "Please check the details: names, dates (YYYY-MM-DD) and years.",
         "generic": "Something went wrong. Please try again."
       }
+    },
+    "timeClock": {
+      "open": "Time clock",
+      "title": "Time clock",
+      "back": "Back",
+      "clockedOutHint": "Press when your shift starts.",
+      "clockedIn": "Clocked in since {time}",
+      "plannedShift": "Planned shift: {from} - {to} · {branch}",
+      "noShift": "No shift planned right now.",
+      "clockIn": "Clock in",
+      "clockOut": "Clock out",
+      "branch": "Branch",
+      "thisWeek": "Last 8 days",
+      "empty": "No clocked time yet.",
+      "running": "running",
+      "corrected": "Corrected by a manager: {reason}",
+      "errors": {
+        "already_clocked_in": "You are already clocked in.",
+        "not_clocked_in": "You are not clocked in.",
+        "month_approved": "This month was approved by a manager. Ask them to reopen it.",
+        "location_required": "Choose the branch you are working at.",
+        "invalid_branch": "Choose a branch of this business.",
+        "generic": "Something went wrong. Try again."
+      }
     }
   },
   "staffApp": {
@@ -7093,6 +7119,76 @@
       "forbidden": "You do not have permission for this.",
       "invalid": "Please check the details and try again.",
       "generic": "Something went wrong. Please try again."
+    }
+  },
+  "timeClock": {
+    "title": "Time clock",
+    "subtitle": "Hours people clocked in the app, against the shifts planned. Fix a forgotten clock-out, then approve the month.",
+    "back": "Team",
+    "open": "Time clock",
+    "month": "Month",
+    "previous": "Previous month",
+    "next": "Next month",
+    "person": "Person",
+    "planned": "Planned",
+    "worked": "Worked",
+    "overtime": "Overtime",
+    "missing": "Missing shifts",
+    "status": "Status",
+    "approved": "Approved",
+    "pending": "Not approved",
+    "open_entries": "Clock running",
+    "corrections": "{count, plural, one {# correction} other {# corrections}}",
+    "empty": "No shifts or clocked time this month.",
+    "hours": "{value} h",
+    "detail": "Open",
+    "regular": "Regular hours",
+    "tier1": "Overtime {percent}%",
+    "tier2": "Overtime {percent}%",
+    "restDay": "Rest day {percent}%",
+    "total": "Total",
+    "weighted": "Paid-hours equivalent",
+    "entries": "Entries",
+    "in": "In",
+    "out": "Out",
+    "branch": "Branch",
+    "source": "Source",
+    "clock": "Clocked",
+    "manual": "Added by a manager",
+    "running": "Running",
+    "reason": "Reason (shown in the log)",
+    "reasonHint": "Required for every change, e.g. forgot to clock out.",
+    "clockIn": "Clock in",
+    "clockOut": "Clock out",
+    "save": "Save correction",
+    "delete": "Delete",
+    "addEntry": "Add missing time",
+    "add": "Add",
+    "approve": "Approve month",
+    "reopen": "Reopen month",
+    "locked": "This month is approved and locked. Reopen it to change hours.",
+    "saved": "Saved.",
+    "rules": {
+      "title": "Overtime rules",
+      "hint": "Used for the hours summary. Defaults are the Israeli rules; your accountant confirms them.",
+      "workDays": "Work days per week",
+      "weekHours": "Week limit (hours)",
+      "day5": "Day limit, 5-day week",
+      "day6": "Day limit, 6-day week",
+      "tier1Hours": "Overtime hours at the first rate, per day",
+      "tier1Percent": "First rate (%)",
+      "tier2Percent": "Second rate (%)",
+      "restPercent": "Rest day rate (%)",
+      "restWeekday": "Weekly rest day",
+      "save": "Save rules",
+      "saved": "Rules saved."
+    },
+    "errors": {
+      "month_approved": "This month is approved. Reopen it first.",
+      "entry_overlap": "This overlaps another entry of the same person.",
+      "entry_open": "A clock is still running. Close it before approving.",
+      "invalid_period": "The end must be after the start, within 24 hours.",
+      "generic": "Something went wrong. Try again."
     }
   }
 }

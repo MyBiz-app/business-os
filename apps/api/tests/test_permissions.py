@@ -17,6 +17,7 @@ EXPECTED = {
         "ai.use",
         "staff.read",
         "staff.manage",
+        "time.approve",
     },
     "front_desk": {
         "clients.read",

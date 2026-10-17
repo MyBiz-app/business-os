@@ -209,12 +209,19 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Default: a business's message is a service message. "This is an advertisement" makes it marketing, which goes only to people with marketing consent, on every channel including WhatsApp and SMS.
 - Leads have no branch: a branch-aimed message cannot target them, and they are reached by phone only.
 
+### Time clock (2026-10-16, round 6 P2, migration 0107)
+
+- Overtime rules are rows in `time_clock_rules` (defaults are the Israeli ones), never constants in code. Overtime is counted per local day first, then regular hours past the week limit; work on the weekly rest day is all paid at the rest-day rate.
+- Every manager change to clocked time needs a written reason, is stored on the entry and written to the audit log. An approved month is locked until the manager reopens it. Only people with `time.approve` (owners, managers, branch managers within their branches) change or approve hours.
+- Location-limited clock-in is left out until branches have coordinates; the clock stores the branch, not a position.
+
 ### Business files area (2026-10-16, round 6 F1, migration 0104)
 
 - Folders carry their own rules (`read_permission`, `write_permission`, `retain`, `sensitive`) instead of one global rule. System folders are created per business on first use and cannot be removed; the business adds its own below them and they inherit the parent's rules.
 - Payslips and employee papers are sealed with `API_SECRETS_KEY` (Fernet) before they reach the database or the object store, so a signed storage link is never used for them: the API opens and serves them. Folders with `retain` never delete a file, only archive it.
 - A file filed for one employee (`owner_user_id`) is always open to that employee ("My documents"), whatever the folder's permission. `payroll.read` is named in the payslips folder before the payroll slice defines it; owners open every folder.
 - Files in the imports folder expire after 30 days and are removed by the daily `purge-expired` job.
+
 ### AI agent names and faces (2026-10-16, round 6 U2)
 
 - Built-in agent names are international and work in Hebrew and English: Adir, Shiri, Lia, Daniel, Adam, Emma, Noah, Ethan, Sophie. The chief defaults to the owner's own first name.
