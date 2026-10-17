@@ -293,6 +293,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Idle sign-out: 12 hours on the web, 30 days in the apps, done by the apps themselves (Supabase's server-side timeouts are a paid feature).
 - A sign-in from a new device is emailed; only a hash of the device id is stored.
 - The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
+- Staging demo browsing (2026-10-17): the demo owner `adiredri73@gmail.com` is listed in `API_MFA_DEMO_EXEMPT_EMAILS` (and `MFA_DEMO_EXEMPT_EMAILS` on the web app) so it can read the demo without a code. The API honors the list only when `API_ENVIRONMENT=staging`; production, local and test ignore it. No other account is affected.
 
 ## Open
 

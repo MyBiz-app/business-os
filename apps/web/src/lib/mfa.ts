@@ -21,6 +21,13 @@ export function needsCodeStep(current: string | null | undefined, next: string |
   return next === "aal2" && current !== "aal2";
 }
 
+/** Staging demo owners listed in MFA_DEMO_EXEMPT_EMAILS (comma-separated) skip the code step.
+ * Unset everywhere else; the API applies the same list only on staging. */
+export function isMfaExempt(email: string | null | undefined, list = process.env.MFA_DEMO_EXEMPT_EMAILS): boolean {
+  if (!email || !list) return false;
+  return list.split(",").some((entry) => entry.trim().toLowerCase() === email.trim().toLowerCase());
+}
+
 export function isCode(value: string): boolean {
   return new RegExp(`^\\d{${CODE_LENGTH}}$`).test(value);
 }
