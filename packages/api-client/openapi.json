@@ -19768,6 +19768,154 @@
         }
       }
     },
+    "/public/incidents": {
+      "get": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "Active Incidents",
+        "description": "The banners that are open now, newest first.",
+        "operationId": "active_incidents",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ActiveIncident"
+                  },
+                  "type": "array",
+                  "title": "Response Active Incidents"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/incidents": {
+      "get": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "List Incidents",
+        "operationId": "list_incidents",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Incident"
+                  },
+                  "type": "array",
+                  "title": "Response List Incidents"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "Open Incident",
+        "operationId": "open_incident",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Incident"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/incidents/{incident_id}/resolve": {
+      "post": {
+        "tags": [
+          "incidents"
+        ],
+        "summary": "Resolve Incident",
+        "operationId": "resolve_incident",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "incident_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Incident Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Incident"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/locations/{location_id}/hours": {
       "get": {
         "tags": [
@@ -39893,6 +40041,55 @@
         ],
         "title": "Acknowledge"
       },
+      "ActiveIncident": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "incident",
+              "maintenance",
+              "security"
+            ],
+            "title": "Kind"
+          },
+          "content": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IncidentTexts"
+            },
+            "propertyNames": {
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "object",
+            "title": "Content"
+          },
+          "status_url": {
+            "type": "string",
+            "title": "Status Url"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "content",
+          "status_url",
+          "created_at"
+        ],
+        "title": "ActiveIncident"
+      },
       "Activity": {
         "properties": {
           "id": {
@@ -50781,6 +50978,142 @@
         },
         "type": "object",
         "title": "InboxUpdate"
+      },
+      "Incident": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "incident",
+              "maintenance",
+              "security"
+            ],
+            "title": "Kind"
+          },
+          "content": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IncidentTexts"
+            },
+            "propertyNames": {
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "object",
+            "title": "Content"
+          },
+          "status_url": {
+            "type": "string",
+            "title": "Status Url"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "created_by": {
+            "type": "string",
+            "title": "Created By"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "resolved_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "content",
+          "status_url",
+          "created_at",
+          "created_by",
+          "resolved_at",
+          "resolved_by"
+        ],
+        "title": "Incident"
+      },
+      "IncidentBody": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "incident",
+              "maintenance",
+              "security"
+            ],
+            "title": "Kind"
+          },
+          "content": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IncidentTexts"
+            },
+            "propertyNames": {
+              "enum": [
+                "he",
+                "en"
+              ]
+            },
+            "type": "object",
+            "title": "Content"
+          },
+          "status_url": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Status Url",
+            "description": "The status page, if any",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "content"
+        ],
+        "title": "IncidentBody"
+      },
+      "IncidentTexts": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 150,
+            "title": "Title",
+            "default": ""
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 600,
+            "title": "Body",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "IncidentTexts"
       },
       "InquiryCreate": {
         "properties": {

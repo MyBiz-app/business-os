@@ -5,6 +5,14 @@
     "announcements": {
       "label": "הודעה מ-{brand}",
       "close": "סגירה"
+    },
+    "incidentBanner": {
+      "kinds": {
+        "incident": "תקלה",
+        "maintenance": "תחזוקה מתוכננת",
+        "security": "הודעת אבטחה"
+      },
+      "status": "דף הסטטוס"
     }
   },
   "errorPages": {
@@ -2215,7 +2223,8 @@
       "audit": "יומן פעולות",
       "integrations": "ספקים",
       "broadcasts": "הפצת הודעות",
-      "ai": "AI"
+      "ai": "AI",
+      "incidents": "באנר תקלות"
     },
     "levels": {
       "primary_owner": "בעלים ראשי",
@@ -2631,6 +2640,33 @@
         "ai_busy": "ה-AI עסוק. נסו שוב בעוד רגע.",
         "ai_unavailable": "ה-AI לא עונה כרגע.",
         "ai_not_configured": "ה-AI לא מוגדר בשרת הזה."
+      }
+    },
+    "incidents": {
+      "title": "באנר תקלות",
+      "subtitle": "פס בראש כל עמוד באתר ובאפליקציה, עד שמסמנים אותו כטופל. מתאים לתקלה, לתחזוקה מתוכננת או לאירוע אבטחה.",
+      "kind": "סוג",
+      "kinds": {
+        "incident": "תקלה",
+        "maintenance": "תחזוקה מתוכננת",
+        "security": "אירוע אבטחה"
+      },
+      "language": {
+        "he": "טקסט בעברית",
+        "en": "טקסט באנגלית"
+      },
+      "titleField": "כותרת",
+      "bodyField": "פרטים (לא חובה)",
+      "statusUrl": "כתובת דף הסטטוס (לא חובה)",
+      "open": "הצג את הבאנר",
+      "opened": "הבאנר מוצג",
+      "resolve": "סמן כטופל",
+      "resolved": "טופל",
+      "openNow": "פתוח",
+      "empty": "אין באנרים עדיין. הכול תקין.",
+      "errors": {
+        "generic": "השמירה נכשלה. ודאו שיש כותרת ונסו שוב.",
+        "forbidden": "אין לכם הרשאה לפעולה הזו."
       }
     }
   },
