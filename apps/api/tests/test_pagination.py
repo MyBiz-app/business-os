@@ -62,6 +62,9 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # the SQL function returns at most 5 open banners, or the latest 50
+    "/public/incidents": "limit in SQL",
+    "/platform/incidents": "limit in SQL",
     # a required date window of at most 42 days
     "/sessions": "window",
     "/client/sessions": "window",

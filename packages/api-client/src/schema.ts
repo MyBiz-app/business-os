@@ -3734,6 +3734,61 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/public/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Active Incidents
+         * @description The banners that are open now, newest first.
+         */
+        get: operations["active_incidents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/incidents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Incidents */
+        get: operations["list_incidents"];
+        put?: never;
+        /** Open Incident */
+        post: operations["open_incident"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/incidents/{incident_id}/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resolve Incident */
+        post: operations["resolve_incident"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/locations/{location_id}/hours": {
         parameters: {
             query?: never;
@@ -8027,6 +8082,30 @@ export interface components {
              */
             acknowledged: boolean;
         };
+        /** ActiveIncident */
+        ActiveIncident: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "incident" | "maintenance" | "security";
+            /** Content */
+            content: {
+                [key: string]: components["schemas"]["IncidentTexts"];
+            };
+            /** Status Url */
+            status_url: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** Activity */
         Activity: {
             /**
@@ -12168,6 +12247,67 @@ export interface components {
             assignee?: string | null;
             /** Notes */
             notes?: string | null;
+        };
+        /** Incident */
+        Incident: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "incident" | "maintenance" | "security";
+            /** Content */
+            content: {
+                [key: string]: components["schemas"]["IncidentTexts"];
+            };
+            /** Status Url */
+            status_url: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Resolved At */
+            resolved_at: string | null;
+            /** Resolved By */
+            resolved_by: string | null;
+        };
+        /** IncidentBody */
+        IncidentBody: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "incident" | "maintenance" | "security";
+            /** Content */
+            content: {
+                [key: string]: components["schemas"]["IncidentTexts"];
+            };
+            /**
+             * Status Url
+             * @description The status page, if any
+             * @default
+             */
+            status_url: string;
+        };
+        /** IncidentTexts */
+        IncidentTexts: {
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+            /**
+             * Body
+             * @default
+             */
+            body: string;
         };
         /** InquiryCreate */
         InquiryCreate: {
@@ -27972,6 +28112,110 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    active_incidents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActiveIncident"][];
+                };
+            };
+        };
+    };
+    list_incidents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"][];
+                };
+            };
+        };
+    };
+    open_incident: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IncidentBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resolve_incident: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                incident_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Incident"];
+                };
             };
             /** @description Validation Error */
             422: {
