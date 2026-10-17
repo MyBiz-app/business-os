@@ -83,11 +83,19 @@ def test_marketing_consent_is_recorded_and_withdrawn(
     client_id = client.post("/clients", json={"first_name": "Dana"}, headers=headers).json()["id"]
     assert client.get(f"/clients/{client_id}", headers=headers).json()["marketing_consent"] is False
 
-    agreed = client.put(
+    no_source = client.put(
         f"/clients/{client_id}/marketing-consent", json={"consent": True}, headers=headers
+    )
+    assert no_source.status_code == 422 and no_source.json()["detail"] == "consent_source_required"
+
+    agreed = client.put(
+        f"/clients/{client_id}/marketing-consent",
+        json={"consent": True, "source": "desk_signed"},
+        headers=headers,
     )
     assert agreed.status_code == 200
     assert agreed.json()["marketing_consent"] is True
+    assert agreed.json()["marketing_consent_source"] == "desk_signed"
 
     withdrawn = client.put(
         f"/clients/{client_id}/marketing-consent", json={"consent": False}, headers=headers
