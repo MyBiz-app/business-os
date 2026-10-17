@@ -21,7 +21,14 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found
-from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
+from app.api.deps import (
+    AnonymousSessionDep,
+    ClientDep,
+    TenantContext,
+    client_branch_filter,
+    ensure_client_visible,
+    require,
+)
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.providers.choice import choose
@@ -193,6 +200,13 @@ def _load(db: Session, quote_id: UUID) -> Quote:
     return Quote.model_validate(dict(row))
 
 
+def _load_visible(context: TenantContext, quote_id: UUID) -> Quote:
+    """A quote by id, "not found" when it belongs to a client at another branch."""
+    quote = _load(context.session, quote_id)
+    ensure_client_visible(context, quote.client_id)
+    return quote
+
+
 def _write_lines(db: Session, tenant_id: UUID, quote_id: UUID, lines: list[QuoteLine]) -> None:
     db.execute(text("DELETE FROM app.quote_lines WHERE quote_id = :id"), {"id": quote_id})
     db.execute(
@@ -240,15 +254,17 @@ def list_quotes(
     quote_status: Annotated[QuoteStatus | None, Query(alias="status")] = None,
 ) -> list[QuoteSummary]:
     """Quotes, newest first; by client or status (expired = sent and past its date)."""
+    ensure_client_visible(context, client_id)
+    visible, visible_params = client_branch_filter(context, "c.home_location_id")
     rows = context.session.execute(
         text(f"""
-            SELECT * FROM ({SUMMARY} {FROM}) q
+            SELECT * FROM ({SUMMARY} {FROM} WHERE {visible}) q
             WHERE (CAST(:client AS uuid) IS NULL OR q.client_id = :client)
               AND (CAST(:status AS text) IS NULL OR q.status = :status)
             ORDER BY q.number DESC
             LIMIT 300
         """),
-        {"client": client_id, "status": quote_status},
+        {"client": client_id, "status": quote_status, **visible_params},
     ).mappings()
     return [QuoteSummary.model_validate(dict(row)) for row in rows]
 
@@ -256,6 +272,7 @@ def list_quotes(
 @router.post("/quotes", status_code=status.HTTP_201_CREATED)
 def create_quote(body: QuoteCreate, context: SalesDep) -> Quote:
     db = context.session
+    ensure_client_visible(context, body.client_id)
     ensure_not_erased(db, body.client_id)
     try:
         quote_id = db.execute(
@@ -279,13 +296,14 @@ def create_quote(body: QuoteCreate, context: SalesDep) -> Quote:
 
 @router.get("/quotes/{quote_id}")
 def get_quote(quote_id: UUID, context: ReadDep) -> Quote:
-    return _load(context.session, quote_id)
+    return _load_visible(context, quote_id)
 
 
 @router.put("/quotes/{quote_id}")
 def update_quote(quote_id: UUID, body: QuoteFields, context: SalesDep) -> Quote:
     """Rewrites a draft (a sent quote is changed by copying it)."""
     db = context.session
+    _load_visible(context, quote_id)
     updated = db.execute(
         text("""
             UPDATE app.quotes SET title = :title, deposit_percent = :deposit_percent,
@@ -307,7 +325,7 @@ def update_quote(quote_id: UUID, body: QuoteFields, context: SalesDep) -> Quote:
 def send_quote(quote_id: UUID, context: SalesDep) -> Quote:
     """Marks a draft as sent: its private link now works. Sending again is harmless."""
     db = context.session
-    current = _load(db, quote_id)
+    current = _load_visible(context, quote_id)
     if current.status not in ("draft", "sent"):
         raise _conflict("already_answered")
     db.execute(
@@ -325,7 +343,7 @@ def send_quote(quote_id: UUID, context: SalesDep) -> Quote:
 def copy_quote(quote_id: UUID, context: SalesDep) -> Quote:
     """A new draft with the same client, lines and terms (a new version of a sent quote)."""
     db = context.session
-    current = _load(db, quote_id)
+    current = _load_visible(context, quote_id)
     local = None
     if current.event_starts_at is not None:
         time_zone = db.execute(
@@ -353,7 +371,7 @@ def record_quote_payment(quote_id: UUID, body: StaffPayment, context: SalesDep) 
     """Staff record a payment for an accepted quote (the deposit or the balance, at the venue
     or by transfer); never more than what is left."""
     db = context.session
-    current = _load(db, quote_id)
+    current = _load_visible(context, quote_id)
     if current.status != "accepted":
         raise _conflict("not_accepted")
     if body.amount > current.total - current.paid:
@@ -389,6 +407,7 @@ def events(
 ) -> list[QuoteSummary]:
     """Event projects: accepted quotes with an event date in the window, soonest first."""
     db = context.session
+    visible, visible_params = client_branch_filter(context, "c.home_location_id")
     time_zone = db.execute(
         text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
     ).scalar_one()
@@ -397,10 +416,10 @@ def events(
         text(f"""
             {SUMMARY} {FROM}
             WHERE q.status = 'accepted' AND q.event_starts_at >= :from
-              AND q.event_starts_at < :to
+              AND q.event_starts_at < :to AND {visible}
             ORDER BY q.event_starts_at
         """),
-        {"from": begin, "to": begin + timedelta(days=days)},
+        {"from": begin, "to": begin + timedelta(days=days), **visible_params},
     ).mappings()
     return [QuoteSummary.model_validate(dict(row)) for row in rows]
 
