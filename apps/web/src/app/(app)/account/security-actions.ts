@@ -1,5 +1,6 @@
 "use server";
 
+import { BRAND } from "@business-os/i18n/brand";
 import { revalidatePath } from "next/cache";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -20,7 +21,7 @@ export async function startEnrollment(_state: EnrollState): Promise<EnrollState>
   }
   const { data, error } = await supabase.auth.mfa.enroll({
     factorType: "totp",
-    friendlyName: `MyBiz ${new Date().toISOString().slice(0, 16)}`,
+    friendlyName: `${BRAND.name} ${new Date().toISOString().slice(0, 16)}`,
   });
   if (error || !data) return { error: "generic" };
   return { factorId: data.id, qr: data.totp.qr_code, secret: data.totp.secret };

@@ -5,6 +5,9 @@ from urllib.parse import urlparse
 from pydantic import AliasChoices, Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.core.brand import EMAILS as BRAND_EMAILS
+from app.core.brand import NAME as BRAND_NAME
+
 ENVIRONMENTS = ("local", "test", "staging", "production")
 LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "host.docker.internal", None}
 
@@ -66,7 +69,7 @@ class Settings(BaseSettings):
     push_provider: str = "expo"  # expo | log | off: push notifications to staff phones
     expo_access_token: SecretStr | None = None  # optional; only if Expo enhanced security is on
     email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password
-    email_from: str = "MyBiz <no-reply@example.com>"
+    email_from: str = f"{BRAND_NAME} <{BRAND_EMAILS['sender']}>"
     # Resend's signing secret ("whsec_...") for /webhooks/email/resend (bounces, complaints).
     email_webhook_secret: SecretStr | None = None
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server

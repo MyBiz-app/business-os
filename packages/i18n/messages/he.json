@@ -3442,7 +3442,7 @@
         "hideDetails": "הסתרת פירוט",
         "todayTitle": "כמה אני משלם היום? (לא חובה)",
         "todayHint": "מקלידים כמה משלמים היום בחודש. המספרים נשארים בדף הזה ומשמשים רק להשוואה.",
-        "todayCompare": "היום {today}, עם MyBiz {mybiz}",
+        "todayCompare": "היום {today}, עם MyBiz {total}",
         "todaySave": "זה {amount} פחות בכל חודש.",
         "todayMore": "MyBiz עולה {amount} יותר בכל חודש, על אותה רשימה.",
         "tier": {
@@ -6863,13 +6863,13 @@
     "subtitle": "בהיר או כהה, והצבעים שבהם עובדים. הבחירה שמורה רק לך.",
     "palette": "צבעים",
     "palettes": {
-      "mybiz": "MyBiz",
+      "brand": "MyBiz",
       "ocean": "אוקיינוס",
       "forest": "יער",
       "custom": "הצבעים שלי"
     },
     "paletteHints": {
-      "mybiz": "שחור, לבן וסגול עמוק",
+      "brand": "שחור, לבן וסגול עמוק",
       "ocean": "אפור-כחלחל וטורקיז",
       "forest": "ירוק מרווה רך",
       "custom": "בוחרים שלושה צבעים בעצמך"

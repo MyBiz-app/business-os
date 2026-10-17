@@ -1,3 +1,4 @@
+import { BRAND } from "@business-os/i18n/brand";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -41,7 +42,7 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
           <li>{t("step3")}</li>
         </ol>
         <a
-          href={`mybiz://join?code=${encodeURIComponent(joinCode)}`}
+          href={`${BRAND.app.scheme}://join?code=${encodeURIComponent(joinCode)}`}
           className="w-full btn-primary px-4 py-3"
         >
           {t("openApp")}

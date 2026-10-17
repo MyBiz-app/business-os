@@ -7,12 +7,12 @@ import { useActionState } from "react";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 
-import { type WriteState, writeToMyBiz } from "./support-actions";
+import { type WriteState, writeToSupport } from "./support-actions";
 
 /** The business writes to the MyBiz team; it lands in the console's inbox. */
-export function WriteToMyBiz() {
+export function WriteToSupport() {
   const t = useTranslations("support");
-  const [state, action] = useActionState<WriteState, FormData>(writeToMyBiz, {});
+  const [state, action] = useActionState<WriteState, FormData>(writeToSupport, {});
 
   return (
     <section aria-labelledby="write-heading" className="flex flex-col gap-4 card p-6">

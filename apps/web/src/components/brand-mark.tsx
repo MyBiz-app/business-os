@@ -6,7 +6,7 @@ import { LOGO_GRADIENT, MARK } from "@business-os/brand";
 export function BrandMark({ className }: { className?: string }) {
   // Each copy needs its own gradient id: a gradient defined inside a hidden copy (display: none)
   // does not paint in the others, which left the mark invisible on phones.
-  const gradientId = `mybiz-mark-${useId().replace(/:/g, "")}`;
+  const gradientId = `brand-mark-${useId().replace(/:/g, "")}`;
   const fill = `url(#${gradientId})`;
   return (
     <svg viewBox={`0 0 ${MARK.size} ${MARK.size}`} fill="none" aria-hidden="true" focusable="false" className={className}>

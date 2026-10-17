@@ -41,6 +41,7 @@ from sqlalchemy import Connection, Engine, create_engine, text
 
 from app.commerce.billing import bill_businesses
 from app.commerce.dunning import run_dunning
+from app.core.brand import NAME
 from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 from app.core.tenant_scope import Tally, start_tally, tenant_scope
@@ -63,7 +64,7 @@ from app.providers.storage import tenant_key
 from app.schedule.scheduling import weekly_occurrences
 from app.secrets_rotation import rotate_secrets
 
-LOCK_PREFIX = "mybiz-job:"  # advisory-lock key of a job: one run of each at a time
+LOCK_PREFIX = "bos-job:"  # advisory-lock key of a job: one run of each at a time
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
 
 
@@ -844,7 +845,7 @@ def _alert_failure(engine: Engine, name: str, run_id: int, error: str) -> None:
         return
     notify_team(
         engine,
-        f"MyBiz job failed: {name}",
+        f"{NAME} job failed: {name}",
         f"{name} failed on {get_settings().environment}.\n\n{error[:300]}",
     )
 
@@ -906,7 +907,7 @@ def main() -> None:
             names = ", ".join(item["job"] for item in late)
             sent = notify_team(
                 engine,
-                f"MyBiz: {len(late)} background job(s) late",
+                f"{NAME}: {len(late)} background job(s) late",
                 f"Late on {get_settings().environment}: {names}.",
             )
             print(f"alert: {sent.pushed} push, {sent.emailed} email, {sent.recipients} owners")
@@ -914,7 +915,7 @@ def main() -> None:
     if args.job == "test-alert":
         sent = notify_team(
             engine,
-            "MyBiz test alert",
+            f"{NAME} test alert",
             f"If this reached your phone, alerts work ({get_settings().environment}).",
         )
         print(f"test-alert: {sent.pushed} push, {sent.emailed} email, {sent.recipients} owners")

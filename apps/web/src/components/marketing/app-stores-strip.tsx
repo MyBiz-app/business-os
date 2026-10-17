@@ -1,9 +1,10 @@
+import { BRAND } from "@business-os/i18n/brand";
 import { getTranslations } from "next-intl/server";
 
 import { Container } from "@/components/layout/container";
 
 /** Until the apps are published in the stores, both badges say "coming soon" and open the web app. */
-const WEB_APP_URL = process.env.NEXT_PUBLIC_CLIENT_APP_URL || "https://mybiz-client-app.vercel.app";
+const WEB_APP_URL = process.env.NEXT_PUBLIC_CLIENT_APP_URL || BRAND.appUrl;
 
 function PlayGlyph() {
   return (

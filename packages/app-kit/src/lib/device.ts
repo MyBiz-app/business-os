@@ -1,3 +1,4 @@
+import { BRAND } from "@business-os/i18n/brand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 
@@ -21,7 +22,7 @@ export async function registerDevice(): Promise<void> {
     const stored = await loadLocale();
     const system = Platform.OS === "ios" ? "iOS" : Platform.OS === "android" ? "Android" : "web";
     await apiClient().POST("/me/devices/check", {
-      body: { device_id: await deviceId(), label: `MyBiz app on ${system}`, locale: stored === "en" ? "en" : "he" },
+      body: { device_id: await deviceId(), label: `${BRAND.name} app on ${system}`, locale: stored === "en" ? "en" : "he" },
     });
   } catch {
     // a failed check must never get in the way of signing in

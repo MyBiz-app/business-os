@@ -1,10 +1,10 @@
 import datetime as dt
 from datetime import date, datetime
-from typing import Literal
+from typing import Annotated, Literal
 from uuid import UUID
 from zoneinfo import available_timezones
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, BeforeValidator, Field, field_validator, model_validator
 
 from app.catalog.verticals import VERTICAL_PACKS
 
@@ -28,7 +28,12 @@ class SupportAccess(BaseModel):
     expires_at: datetime
 
 
-Palette = Literal["mybiz", "ocean", "forest", "custom"]
+def _legacy_palette(value: object) -> object:
+    """The default palette was stored as `mybiz` before the product name became configurable."""
+    return "brand" if value == "mybiz" else value
+
+
+Palette = Annotated[Literal["brand", "ocean", "forest", "custom"], BeforeValidator(_legacy_palette)]
 
 
 class PaletteColors(BaseModel):
@@ -67,7 +72,7 @@ class Me(BaseModel):
         description="Legal documents whose current version the person has not accepted yet",
     )
     palette: Palette | None = Field(
-        default=None, description="The person's color palette (none: the MyBiz default)"
+        default=None, description="The person's color palette (none: the brand default)"
     )
     palette_colors: PaletteColors | None = Field(
         default=None,

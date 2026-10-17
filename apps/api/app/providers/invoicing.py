@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
 
+from app.core.brand import NAME
 from app.providers.registry import register
 
 
@@ -54,9 +55,9 @@ class InvoicingUnavailable(RuntimeError):
 @register(
     "invoicing",
     "internal",
-    "MyBiz receipts",
+    f"{NAME} receipts",
     builtin=True,
-    description="MyBiz numbers and keeps the receipts; no outside invoicing account.",
+    description=f"{NAME} numbers and keeps the receipts; no outside invoicing account.",
 )
 class InternalReceipts:
     def __init__(self, settings: dict[str, str]) -> None:
