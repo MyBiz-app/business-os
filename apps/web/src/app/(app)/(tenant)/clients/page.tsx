@@ -249,9 +249,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
 
       {pages > 1 && (
         <nav aria-label={t("clients.total", { count: result.total })} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary-ink">{t("clients.previous")}</Link> : <span />}
+          {page > 1 ? <Link scroll={false} href={pageHref(page - 1)} className="text-primary-ink">{t("clients.previous")}</Link> : <span />}
           <span className="text-muted">{t("clients.pageOf", { page, pages })}</span>
-          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary-ink">{t("clients.next")}</Link> : <span />}
+          {page < pages ? <Link scroll={false} href={pageHref(page + 1)} className="text-primary-ink">{t("clients.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

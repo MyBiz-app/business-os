@@ -3465,7 +3465,7 @@
         "hideDetails": "Hide details",
         "todayTitle": "How much do I pay today? (optional)",
         "todayHint": "Enter what you pay each month now. It stays on this page and is only used for this comparison.",
-        "todayCompare": "Today {today}, with MyBiz {mybiz}",
+        "todayCompare": "Today {today}, with MyBiz {total}",
         "todaySave": "That is {amount} less each month.",
         "todayMore": "MyBiz costs {amount} more each month, for the same list.",
         "tier": {
@@ -6887,13 +6887,13 @@
     "subtitle": "Light or dark, and the colors you work in. Only you see your choice.",
     "palette": "Colors",
     "palettes": {
-      "mybiz": "MyBiz",
+      "brand": "MyBiz",
       "ocean": "Ocean",
       "forest": "Forest",
       "custom": "My own colors"
     },
     "paletteHints": {
-      "mybiz": "Black, white and deep purple",
+      "brand": "Black, white and deep purple",
       "ocean": "Cool slate and teal",
       "forest": "Soft sage and green",
       "custom": "Pick three colors yourself"

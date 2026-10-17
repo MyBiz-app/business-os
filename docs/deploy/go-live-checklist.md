@@ -4,6 +4,8 @@ Copy of section 1 of the 2026-10-11 remaining-work plan, plus how each item is s
 code. Everything marked **off** is built and disabled; nothing that costs money turns on by itself.
 Tick items here as they are done (and record cost decisions in `docs/DECISIONS.md`).
 
+The order of the day itself, with who does what and how to go back, is in [go-live-day.md](go-live-day.md); the state of every topic is in the [scorecard](../reviews/go-live-scorecard-2026-10.md).
+
 ## Blockers
 
 | # | Item | State | To switch on |

@@ -17,6 +17,7 @@ from fastapi import HTTPException
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
+from app.core.brand import NAME
 from app.core.data_rights import BUSINESS_EXPORT_SKIP, SECRET_COLUMN_PARTS
 from app.files import read_file
 from app.providers.storage import StorageError
@@ -24,7 +25,7 @@ from app.providers.storage import StorageError
 # The archive is built in memory; past this the remaining files are listed but not included.
 MAX_FILE_BYTES = 150 * 1024 * 1024
 
-README = """Your business data from MyBiz
+README = """Your business data from {brand}
 Exported: {when}
 
 data/*.csv     one file per kind of record (UTF-8, opens in Excel).
@@ -109,7 +110,9 @@ def build_archive(db: Session, tenant_id: UUID) -> tuple[bytes, int]:
     skipped: list[str] = []
     size = 0
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr("README.txt", README.format(when=datetime.now(UTC).isoformat()))
+        archive.writestr(
+            "README.txt", README.format(brand=NAME, when=datetime.now(UTC).isoformat())
+        )
         for table, scope in _tables(db):
             built = _csv(db, table, scope, tenant_id)
             if built is not None:

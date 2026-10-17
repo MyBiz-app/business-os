@@ -66,7 +66,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
         </ul>
         <nav aria-label={t("currency")} className="mt-2 flex gap-1 rounded-xl border border-border bg-surface p-1 text-sm text-foreground shadow-sm">
           {CURRENCIES.map((code) => (
-            <Link
+            <Link scroll={false}
               key={code}
               href={`/pricing?currency=${code}`}
               aria-current={code === currency ? "page" : undefined}

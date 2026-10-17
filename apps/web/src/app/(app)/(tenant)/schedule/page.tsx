@@ -18,6 +18,7 @@ import { CopyWeek } from "./copy-week";
 import { PublishWeek } from "./publish-week";
 import { SaveDefault } from "./save-default";
 import { Container } from "@/components/layout/container";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
 
 export default async function SchedulePage({ searchParams }: PageProps<"/schedule">) {
@@ -220,12 +221,12 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
       <div className="flex flex-wrap items-center justify-between gap-3">
         <nav aria-label={term("schedule")} className="flex flex-wrap items-center gap-1.5">
           {view === "day" && (
-            <Link href={link({ date: addDays(start, -7) })} aria-label={t("previousWeek")} title={t("previousWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
+            <Link scroll={false} href={link({ date: addDays(start, -7) })} aria-label={t("previousWeek")} title={t("previousWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
               <ChevronsLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
               <span className="hidden sm:inline">{t("stepWeek")}</span>
             </Link>
           )}
-          <Link
+          <Link scroll={false}
             href={link({ date: prev })}
             aria-label={view === "day" ? t("previousDay") : view === "week" ? t("previousWeek") : t("previousMonth")}
             className="btn-secondary h-9 gap-1 px-2 text-sm"
@@ -233,10 +234,10 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{stepName}</span>
           </Link>
-          <Link href={link({ date: null })} aria-current={includesToday ? "date" : undefined} className="btn-secondary h-9 px-3 text-sm font-semibold">
+          <Link scroll={false} href={link({ date: null })} aria-current={includesToday ? "date" : undefined} className="btn-secondary h-9 px-3 text-sm font-semibold">
             {t("today")}
           </Link>
-          <Link
+          <Link scroll={false}
             href={link({ date: next })}
             aria-label={view === "day" ? t("nextDay") : view === "week" ? t("nextWeek") : t("nextMonth")}
             className="btn-secondary h-9 gap-1 px-2 text-sm"
@@ -245,24 +246,22 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
           </Link>
           {view === "day" && (
-            <Link href={link({ date: addDays(start, 7) })} aria-label={t("nextWeek")} title={t("nextWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
+            <Link scroll={false} href={link({ date: addDays(start, 7) })} aria-label={t("nextWeek")} title={t("nextWeek")} className="btn-secondary h-9 gap-1 px-2 text-sm">
               <span className="hidden sm:inline">{t("stepWeek")}</span>
               <ChevronsRight aria-hidden="true" className="size-4 rtl:rotate-180" />
             </Link>
           )}
           <DateJump value={anchor} href={link({ date: "__day__" })} label={t("goToDate")} />
-          <div role="group" aria-label={t("view")} className="order-last flex w-full rounded-xl border border-border bg-surface p-0.5 text-sm sm:order-none sm:ms-1 sm:w-auto">
-            {(["day", "week", "month"] as const).map((option) => (
-              <Link
-                key={option}
-                href={viewLink(option)}
-                aria-current={view === option ? "page" : undefined}
-                className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors sm:flex-none ${view === option ? "bg-primary/12 text-primary-ink" : "text-muted hover:text-foreground"}`}
-              >
-                {t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView")}
-              </Link>
-            ))}
-          </div>
+          <LinkSegmented
+            label={t("view")}
+            loadingLabel={tAll("common.loading")}
+            active={view}
+            options={(["day", "week", "month"] as const).map((option) => ({
+              key: option,
+              label: t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView"),
+              href: viewLink(option),
+            }))}
+          />
         </nav>
         {(serviceId || instructorId) && (
           <Link
@@ -296,7 +295,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                 </>
               );
               return href ? (
-                <Link key={b.id} href={href} aria-current={on ? "true" : undefined} className={className}>
+                <Link key={b.id} scroll={false} href={href} aria-current={on ? "true" : undefined} className={className}>
                   {content}
                 </Link>
               ) : (
@@ -318,7 +317,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           <ul className="grid grid-cols-7 gap-1.5">
             {days.map((day) => (
               <li key={day}>
-                <Link
+                <Link scroll={false}
                   href={link({ view: "day", date: day })}
                   aria-current={day === today ? "date" : undefined}
                   className={`flex flex-col items-center rounded-xl border py-1.5 text-xs transition-colors ${day === today ? "border-primary bg-primary text-on-primary" : "border-border bg-surface hover:bg-foreground/5"}`}

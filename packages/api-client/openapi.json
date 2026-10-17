@@ -54681,7 +54681,7 @@
               {
                 "type": "string",
                 "enum": [
-                  "mybiz",
+                  "brand",
                   "ocean",
                   "forest",
                   "custom"
@@ -54692,7 +54692,7 @@
               }
             ],
             "title": "Palette",
-            "description": "The person's color palette (none: the MyBiz default)"
+            "description": "The person's color palette (none: the brand default)"
           },
           "palette_colors": {
             "anyOf": [
@@ -68586,7 +68586,7 @@
               {
                 "type": "string",
                 "enum": [
-                  "mybiz",
+                  "brand",
                   "ocean",
                   "forest",
                   "custom"

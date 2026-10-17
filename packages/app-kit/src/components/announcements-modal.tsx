@@ -1,3 +1,4 @@
+import { BRAND } from "@business-os/i18n/brand";
 import { useEffect, useState } from "react";
 import { Image, Linking, Modal, StyleSheet, View } from "react-native";
 import { useTranslations } from "use-intl";
@@ -70,7 +71,7 @@ export function AnnouncementsModal() {
   };
 
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={dismiss} accessibilityLabel={t("label", { brand: "MyBiz" })}>
+    <Modal visible transparent animationType="fade" onRequestClose={dismiss} accessibilityLabel={t("label", { brand: BRAND.name })}>
       <View style={styles2.scrim}>
         <View style={[styles2.sheet, { backgroundColor: palette.surface, borderColor: palette.border }]}>
           {current.imageUrl ? <Image source={{ uri: current.imageUrl }} style={styles2.image} accessibilityIgnoresInvertColors /> : null}

@@ -56,7 +56,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
       <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
         <nav aria-label={t("folders")} className="card flex flex-col gap-1 p-3">
           {folders.map((folder) => (
-            <Link
+            <Link scroll={false}
               key={folder.id}
               href={`/files?folder=${folder.id}`}
               aria-current={folder.id === open?.id ? "page" : undefined}
@@ -84,7 +84,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Link href={`/files?folder=${open.id}${showArchived ? "" : "&archived=1"}`} className="btn-secondary px-3 py-1.5 text-sm">
+                <Link scroll={false} href={`/files?folder=${open.id}${showArchived ? "" : "&archived=1"}`} className="btn-secondary px-3 py-1.5 text-sm">
                   <Archive aria-hidden="true" className="size-4" /> {showArchived ? t("hideArchived") : t("showArchived")}
                 </Link>
                 {open.file_count > 0 && (

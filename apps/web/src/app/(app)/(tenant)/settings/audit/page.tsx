@@ -132,8 +132,8 @@ export default async function AuditLogPage({ searchParams }: PageProps<"/setting
         </ScrollRegion>
       )}
       <nav aria-label={t("title")} className="flex items-center justify-between text-sm">
-        {cursor ? <Link href={`/settings/audit${params.size ? `?${params}` : ""}`} className="text-primary-ink">{t("newest")}</Link> : <span />}
-        {olderHref ? <Link href={olderHref} className="text-primary-ink">{t("older")}</Link> : <span />}
+        {cursor ? <Link scroll={false} href={`/settings/audit${params.size ? `?${params}` : ""}`} className="text-primary-ink">{t("newest")}</Link> : <span />}
+        {olderHref ? <Link scroll={false} href={olderHref} className="text-primary-ink">{t("older")}</Link> : <span />}
       </nav>
       <p className="text-xs text-muted">{t("retention")}</p>
     </Container>

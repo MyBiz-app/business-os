@@ -19,11 +19,13 @@ type AreaInput = {
   platformAdmin: boolean;
   memberships: { tenant_id: string; tenant_name: string; role: BusinessRole }[];
   businesses: { id: string; name: string }[];
+  /** The product's name, shown for the team area (the caller passes BRAND.name). */
+  platformName?: string;
 };
 
-export function buildAreas({ platformAdmin, memberships, businesses }: AreaInput): Area[] {
+export function buildAreas({ platformAdmin, memberships, businesses, platformName = "" }: AreaInput): Area[] {
   const areas: Area[] = [];
-  if (platformAdmin) areas.push({ key: "platform", kind: "platform", name: "MyBiz" });
+  if (platformAdmin) areas.push({ key: "platform", kind: "platform", name: platformName });
   for (const m of memberships) {
     areas.push({ key: `business:${m.tenant_id}`, kind: "business", tenantId: m.tenant_id, name: m.tenant_name, role: m.role });
   }

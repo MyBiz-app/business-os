@@ -13586,9 +13586,9 @@ export interface components {
             legal_pending?: components["schemas"]["LegalPending"][];
             /**
              * Palette
-             * @description The person's color palette (none: the MyBiz default)
+             * @description The person's color palette (none: the brand default)
              */
-            palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
+            palette?: ("brand" | "ocean" | "forest" | "custom") | null;
             /** @description The colors picked for the `custom` palette, kept when a preset is chosen */
             palette_colors?: components["schemas"]["PaletteColors"] | null;
             /**
@@ -19037,7 +19037,7 @@ export interface components {
             /** Status Text */
             status_text?: string | null;
             /** Palette */
-            palette?: ("mybiz" | "ocean" | "forest" | "custom") | null;
+            palette?: ("brand" | "ocean" | "forest" | "custom") | null;
             palette_colors?: components["schemas"]["PaletteColors"] | null;
         };
         /** Candidate */

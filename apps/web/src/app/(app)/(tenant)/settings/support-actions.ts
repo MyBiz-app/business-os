@@ -22,7 +22,7 @@ export async function revokeSupport(): Promise<void> {
 export type WriteState = { error?: "too_many_requests" | "generic"; sent?: boolean };
 
 /** A question or complaint from the business to the MyBiz team (the console's inbox). */
-export async function writeToMyBiz(_state: WriteState, formData: FormData): Promise<WriteState> {
+export async function writeToSupport(_state: WriteState, formData: FormData): Promise<WriteState> {
   const { api, scope } = await getTenant();
   const { response } = await api.POST("/support-requests", {
     params: scope,

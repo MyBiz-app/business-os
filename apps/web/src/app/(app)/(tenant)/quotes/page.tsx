@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Container } from "@/components/layout/container";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
@@ -17,6 +18,7 @@ const FILTERS = ["all", "draft", "sent", "accepted", "declined", "expired"] as c
 /** Quotes (#44): newest first, by status. */
 export default async function QuotesPage({ searchParams }: PageProps<"/quotes">) {
   const t = await getTranslations("quotes");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("clients.read");
   const raw = (await searchParams).status;
@@ -48,18 +50,13 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
           </>
         }
       />
-      <nav aria-label={t("filter")} className="flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <Link
-            key={f}
-            href={f === "all" ? "/quotes" : `/quotes?status=${f}`}
-            aria-current={f === filter ? "page" : undefined}
-            className={`rounded-full border px-3 py-1 text-sm ${f === filter ? "border-primary bg-primary text-on-primary" : "border-border bg-surface"}`}
-          >
-            {t(`filters.${f}`)}
-          </Link>
-        ))}
-      </nav>
+      <LinkSegmented
+        variant="chips"
+        label={t("filter")}
+        loadingLabel={tc("loading")}
+        active={filter}
+        options={FILTERS.map((f) => ({ key: f, label: t(`filters.${f}`), href: f === "all" ? "/quotes" : `/quotes?status=${f}` }))}
+      />
       {quotes.length === 0 ? (
         <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (

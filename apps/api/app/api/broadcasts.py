@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import AnonymousSessionDep, SessionDep
 from app.api.platform import PlatformPermission, require_platform, run_rule
+from app.core.brand import NAME
 from app.core.signed_links import verify
 from app.messaging.announcements import _email, content_for
 from app.messaging.consent import request_origin
@@ -352,7 +353,7 @@ def _opt_out_page(ok: bool) -> HTMLResponse:
         sections += f'<section lang="{lang}" dir="{direction}"><h1>{title}</h1>{detail}</section>'
     page = (
         '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width">'
-        "<title>MyBiz</title>"
+        f"<title>{NAME}</title>"
         '<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:3rem auto;'
         f'padding:0 1rem">{sections}</body>'
     )

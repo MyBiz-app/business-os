@@ -8,7 +8,7 @@ same value in several files, it should become a token here first.
 
 | I want to change… | Edit | Notes |
 |---|---|---|
-| The product's name ("MyBiz" for now, X21) | `packages/i18n/brand.json` | Translations write "MyBiz" and every app swaps it for this name (`@business-os/i18n/brand`); then `pnpm --filter @business-os/i18n export:api` for the API's copy. The store names live in each Expo app's `app.json` (`expo.name`). The logo and icons are separate assets. |
+| The product's name ("MyBiz" for now, X21) and every other place it appears: domain, emails, app scheme, company details | `packages/i18n/brand.json` | Translations write "MyBiz" and every app swaps it for this name (`@business-os/i18n/brand`). `pnpm brand:sync` copies the file to the API, Supabase config and templates and the Expo config; see [`brand-rename.md`](brand-rename.md). The logo and icons are separate assets. |
 | The website's font | `apps/web/src/app/fonts.ts` | Assistant (Hebrew + Latin) is the body font, exposed as `--font-main`; Latin headings (h1-h3, `.font-display`) use Plus Jakarta Sans. To swap, change the import in `fonts.ts` and the two files in `app/(marketing)/fonts/` used by the share image. |
 | Page width, gutters, section bands, page heading | `components/layout/` (`Container`, `Section`, `PageHeader`) and the `page-gutter`, `section-y*` utilities in `globals.css` | Containers cap at 1440px (`wide`), CRM uses `size="full"`. Bands (`Section`) reach the screen edges. |
 | Mixed Hebrew/English text | `components/bidi.tsx` (`Ltr`, `UserText`, `brandText`, `DIRECTIONAL_ICON`), `lib/bidi.ts` (`inputDir`) | Emails, phones, URLs, prices go in `<Ltr>`; user-typed text in `<UserText>`; the lint rule `direction/no-physical-classes` forbids `ml-`, `left-`, `text-left` and similar. |
@@ -95,6 +95,13 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   `text-red-600`...) in `src/**`. Use tokens. Allowed only in the allow-list in `eslint.config.mjs`
   (each entry has a reason: color math, swatches, logos, product mock-ups, the hero band). Add a
   file there only for content whose color *is* the content.
+- `design-system/no-scroll-jump`: a `Link` that only changes the query of its own page (period, month,
+  page number, filter), or whose address a page file builds with a function, needs `scroll={false}`
+  (or an explicit `scroll={true}` when the jump to the top is meant); `router.push/replace` to the
+  current page passes `{ scroll: false }`. Choices that change what a page shows use
+  `LinkSegmented` (`components/ui/link-segmented.tsx`): the pill slides at once, the page stays
+  put and dots show while the data loads. Heavy pages have a `loading.tsx` built from
+  `components/layout/page-skeletons.tsx` at the page's own `Container` width.
 - `design-system/no-raw-button`: a `<button>` needs `btn-primary`, `btn-secondary`, `btn-ghost`,
   `btn-danger`, `btn-link`, `btn-icon`, `btn-plain` or `control` in its `className`.
 
