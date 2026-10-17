@@ -67,6 +67,58 @@ jobs:
       - name: Run checks
         run: pnpm turbo run lint typecheck test build
 
+  # Runs in parallel with the main job, so it does not add to its 25 minute budget.
+  # CodeQL is not used: on a private repository it needs GitHub Advanced Security (paid).
+  # Bandit style code analysis is ruff's S rules, which run in the main job's lint step.
+  security:
+    name: Security scans
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Scan the git history for secrets (gitleaks)
+        env:
+          GITLEAKS_VERSION: 8.28.0
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar xz gitleaks
+          ./gitleaks detect --source . --config .gitleaks.toml --redact --no-banner
+
+      - name: Audit Python dependencies (pip-audit)
+        working-directory: apps/api
+        run: |
+          uv export --locked --no-dev --no-hashes --no-emit-project -o "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit -r "$RUNNER_TEMP/requirements.txt" --no-deps --disable-pip
+
+      - name: Audit JavaScript dependencies (pnpm audit)
+        run: node scripts/check-pnpm-audit.cjs
+
+      - name: Build the API image
+        run: docker build -t business-os-api:scan apps/api
+
+      # Warns only for now (the plan: block after a clean week); the nightly run reports it as an issue.
+      - name: Scan the API image (Trivy)
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: business-os-api:scan
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
   expo-web-export:
     name: Bundle ${{ matrix.app }} (Expo web)
     runs-on: ubuntu-latest

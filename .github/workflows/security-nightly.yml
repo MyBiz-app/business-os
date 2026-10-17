@@ -1,0 +1,85 @@
+name: Security scan (nightly)
+
+# The full scan: every dependency advisory, the whole git history and the whole API image
+# (including vulnerabilities with no fix yet). Findings are reported as one open issue.
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  scan:
+    name: Nightly security scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Scan the git history for secrets (gitleaks)
+        id: gitleaks
+        continue-on-error: true
+        env:
+          GITLEAKS_VERSION: 8.28.0
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar xz gitleaks
+          ./gitleaks detect --source . --config .gitleaks.toml --redact --no-banner
+
+      - name: Audit Python dependencies (pip-audit)
+        id: pip_audit
+        continue-on-error: true
+        working-directory: apps/api
+        run: |
+          uv export --locked --no-dev --no-hashes --no-emit-project -o "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit -r "$RUNNER_TEMP/requirements.txt" --no-deps --disable-pip
+
+      - name: Audit JavaScript dependencies (pnpm audit)
+        id: pnpm_audit
+        continue-on-error: true
+        run: pnpm audit --prod --audit-level moderate
+
+      - name: Build the API image
+        run: docker build -t business-os-api:scan apps/api
+
+      - name: Scan the API image (Trivy)
+        id: trivy
+        continue-on-error: true
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: business-os-api:scan
+          severity: MEDIUM,HIGH,CRITICAL
+          exit-code: "1"
+
+      - name: Report findings as an issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULTS: "gitleaks=${{ steps.gitleaks.outcome }} pip-audit=${{ steps.pip_audit.outcome }} pnpm-audit=${{ steps.pnpm_audit.outcome }} trivy=${{ steps.trivy.outcome }}"
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Nightly security scan found problems"
+          existing=$(gh issue list --state open --label security --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if echo "$RESULTS" | grep -q failure; then
+            body="Results: $RESULTS. Details: $RUN_URL"
+            if [ -n "$existing" ]; then
+              gh issue comment "$existing" --body "$body"
+            else
+              gh label create security --color B60205 --description "Security scan findings" 2>/dev/null || true
+              gh issue create --title "$title" --label security --body "$body"
+            fi
+          elif [ -n "$existing" ]; then
+            gh issue close "$existing" --comment "The latest nightly scan is clean: $RUN_URL"
+          fi
