@@ -16,6 +16,7 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | P0-8 | Supabase Auth settings applied from CI | Built | Add `SUPABASE_ACCESS_TOKEN` to the GitHub environment; see `auth-settings.md` |
 | P0-9 | Legal text from a lawyer (privacy policy, terms, DPA, cookie banner); account closure and 90-day deletion | Closure built; text open | Lawyer; real deletion is enabled with `--apply` on `delete-closed-businesses` |
 | B4 | Backups and a restore drill | After P0-1 | Follow `restore-runbook.md` and fill in its drill table |
+| GL22 | Emails that reach the inbox: SPF, DKIM, DMARC on the sending domain; bounces and spam complaints stop further sends | Built, **off** until a domain and a Resend account exist (free up to 3,000 emails a month, domain about $15 a year) | Owner task A6: follow [email-domain.md](email-domain.md) (DNS records, API variables, Resend webhook, Supabase SMTP), then check 10/10 on mail-tester |
 | GL15 | Second backup (encrypted database dump + files to Cloudflare R2, 30 days) and quarterly restore drill | Built, **off** (free) | Owner task A2: follow "Switching it on" in `restore-runbook.md` (Cloudflare account, bucket, token, age key, GitHub secrets, then variable `OFFSITE_BACKUP_ENABLED=true`) and run the drill |
 | GL23 | Incident banners (console, web, app) and the Amendment 13 papers in `docs/legal/` | Built | Owner tasks in "Incident response and Amendment 13 (GL23)" below |
 | B5 | Test cards refused in production | Done (#191) | Nothing |

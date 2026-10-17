@@ -78,6 +78,12 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   page or a jump to the top). Every transition is 200ms or less, never blocks an action and is off
   under "reduce motion". Styles are the `modal-*`, `section-*`, `segmented-pill`, `content-swap`,
   `loading-dots`, `progress-bar` and `pending-*` blocks at the end of `globals.css`.
+- Toasts: `useToast()` in `components/toast/toaster.tsx` (web) and `components/toast.tsx` in
+  app-kit (apps), same API: `toast("success" | "error" | "info", message, { action })`. A dark
+  card in the corner at the reading start (top on a phone), several stack as a pile that opens on
+  hover. Errors stay until closed; success and info fade after 5 seconds. Use `action` for
+  "Undo" after a delete or archive and "View" after a create. `FormNotice` also turns the form's
+  `SubmitButton` into "Saved" for a moment. Field errors stay next to the field.
 - Skip link: every page has one `<main id="main">`. `Container as="main"` sets the id for you;
   a bare `<main>` needs `id="main"`.
 

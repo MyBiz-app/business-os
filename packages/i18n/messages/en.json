@@ -716,6 +716,7 @@
     "homeBranch": "Home branch",
     "allBranches": "All branches",
     "profile": {
+      "emailUnreachable": "This email address bounced or reported spam, so no emails are sent to it. Update the address to reach the client by email.",
       "contact": "Contact",
       "call": "Call",
       "email": "Email",
@@ -765,6 +766,9 @@
     }
   },
   "common": {
+    "undo": "Undo",
+    "notifications": "Notifications",
+    "savedShort": "Saved",
     "dismiss": "Close notification",
     "skipToContent": "Skip to main content",
     "loadFailed": "Couldn't load this right now.",
