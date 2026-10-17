@@ -4332,7 +4332,8 @@
       "new30": "לידים חדשים (30 יום)",
       "won30": "הפכו ללקוחות (30 יום)",
       "conversion": "אחוז המרה (90 יום)",
-      "followUps": "לחזור היום"
+      "followUps": "לחזור היום",
+      "label": "מספרי הלידים"
     },
     "stages": {
       "new": "חדש",
@@ -4362,7 +4363,9 @@
       "created": "ליד נוצר",
       "converted": "הפך ללקוח"
     },
-    "pipeline": "צינור הלידים"
+    "pipeline": "צינור הלידים",
+    "viewShowing": "מוצגים {view}: {count}",
+    "viewClear": "הצגת כל הלידים"
   },
   "inquiry": {
     "title": "השארת פרטים · {name}",
@@ -6712,6 +6715,13 @@
       "payTitle": "תשלום",
       "payBill": "לתשלום · {amount}",
       "billThanks": "שולם במלואו. תודה!"
+    },
+    "tiles": {
+      "label": "מספרי הצעות המחיר",
+      "draft": "טיוטות",
+      "sent": "ממתינות לתשובה",
+      "accepted": "אושרו",
+      "declined": "נדחו או פגו"
     }
   },
   "bills": {
@@ -8370,7 +8380,10 @@
     "allocationPending": "ממתין למספר הקצאה",
     "allocationNumber": "מספר הקצאה",
     "allocationNote": "החשבונית מעל סף ההקצאה. מספר ההקצאה מרשות המסים עדיין יתקבל.",
-    "fingerprint": "טביעת האצבע של הקובץ השמור (sha256):"
+    "fingerprint": "טביעת האצבע של הקובץ השמור (sha256):",
+    "tiles": {
+      "label": "מספרי המסמכים"
+    }
   },
   "security": {
     "title": "אבטחת החשבון",
@@ -8500,6 +8513,45 @@
       "platform_change": "תמיכת MyBiz שינתה משהו",
       "tenant_closed": "סגר את העסק",
       "tenant_reopened": "פתח מחדש את העסק"
+    }
+  },
+  "staffCard": {
+    "title": "כרטיס עובד",
+    "open": "פתיחת כרטיס",
+    "tabsLabel": "חלקי הכרטיס",
+    "details": "פרטים",
+    "role": "תפקיד",
+    "branches": "סניפים",
+    "allBranches": "כל הסניפים",
+    "email": "אימייל",
+    "phone": "טלפון",
+    "startedOn": "תחילת עבודה",
+    "hoursThisMonth": "שעות החודש",
+    "plannedHours": "מתוכנן: {hours}",
+    "openTimeClock": "פתיחת שעון הנוכחות",
+    "noClockAccess": "שעות העבודה מוצגות למי שמאשר שעות.",
+    "upcomingShifts": "משמרות קרובות",
+    "noShifts": "אין משמרות ב-{days} הימים הקרובים.",
+    "openShifts": "פתיחת לוח המשמרות",
+    "classesTaught": "שיעורים ותורים",
+    "noClasses": "אין שיעורים או תורים ב-{days} הימים הקרובים.",
+    "openPayRun": "פתיחת ריצת השכר",
+    "aiTitle": "צוות AI",
+    "aiAllowed": "יכול להשתמש בצוות ה-AI",
+    "aiNotAllowed": "אין גישה לצוות ה-AI",
+    "aiUsedThisMonth": "קרדיטים החודש (כל העסק: {used} מתוך {included})",
+    "aiHint": "הגישה נקבעת לפי התפקיד. אפשר לשנות אותה בלשונית ההרשאות.",
+    "openAi": "פתיחת צוות ה-AI",
+    "permissionsTitle": "תפקיד והרשאות",
+    "roleIs": "תפקיד: {role}",
+    "changeRole": "שינוי התפקיד ברשימת הצוות",
+    "tabs": {
+      "overview": "סקירה",
+      "employment": "העסקה ושכר",
+      "availability": "זמינות",
+      "documents": "מסמכים",
+      "ai": "AI",
+      "permissions": "הרשאות"
     }
   }
 }
