@@ -46,7 +46,7 @@ export type NavIcon = keyof typeof ICONS;
 export type NavChild = { href: string; label: string; locked?: boolean };
 export type NavItem = { href: string; label: string; icon: NavIcon; locked?: boolean; group?: string; children?: NavChild[] };
 
-const STORAGE_KEY = "mybiz.nav.open";
+const STORAGE_KEY = "crm.nav.open";
 const pathOf = (href: string) => href.split("#")[0];
 const anchorOf = (href: string) => (href.includes("#") ? href.split("#")[1] : null);
 
