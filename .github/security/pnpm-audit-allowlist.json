@@ -1,0 +1,12 @@
+[
+  {
+    "id": "GHSA-86w9-cpqp-85rv",
+    "package": "node-forge",
+    "reason": "Only reachable through @expo/cli (developer tooling that signs EAS builds on a developer machine). No patched version exists. Not bundled into the web app or the API. Review when Expo updates @expo/cli."
+  },
+  {
+    "id": "GHSA-vfj7-8cjw-p6xm",
+    "package": "braces",
+    "reason": "Only reachable through metro/micromatch (the bundler's file watcher at build time, on trusted globs). No patched version exists. Not shipped in any runtime. Review when React Native updates metro."
+  }
+]

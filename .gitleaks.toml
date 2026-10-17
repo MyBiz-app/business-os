@@ -1,0 +1,15 @@
+title = "business-os gitleaks config"
+
+[extend]
+useDefault = true
+
+# Only keys that are public by design are allow-listed. Anything else must fail the scan.
+[[allowlists]]
+description = "Supabase publishable key (shipped to every browser and app by design; row level security protects the data)"
+regexTarget = "match"
+regexes = ['''sb_publishable_[A-Za-z0-9_-]+''']
+
+[[allowlists]]
+description = "The well-known Supabase local demo JWT (iss supabase-demo), identical on every `supabase start`"
+regexTarget = "match"
+regexes = ['''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIi[A-Za-z0-9_.-]+''']

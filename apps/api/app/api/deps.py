@@ -9,7 +9,14 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.core.auth import CurrentUser, get_current_user
+from app.core.config import get_settings
 from app.core.db import EngineDep, open_session, session_scope, set_tenant
+from app.core.mfa import (
+    SENSITIVE_PERMISSIONS,
+    mfa_required,
+    require_aal2,
+    sensitive_action_needs_mfa,
+)
 from app.core.permissions import Permission, effective_permissions
 
 UserDep = Annotated[CurrentUser, Depends(get_current_user)]
@@ -40,6 +47,8 @@ class TenantContext:
     permissions: frozenset[str] = frozenset()
     # The branches this person may work in; None means every branch (#64).
     branches: frozenset[UUID] | None = None
+    # "aal2" once the person entered an authenticator code (app/core/mfa.py).
+    aal: str = "aal1"
 
 
 def ensure_branch_visible(context: TenantContext, location_id: UUID | None) -> None:
@@ -110,7 +119,9 @@ def _audit_platform_visit(session: Session, tenant_id: UUID, action: str, reques
     )
 
 
-def _support_context(session: Session, tenant_id: UUID, request: Request) -> TenantContext:
+def _support_context(
+    session: Session, tenant_id: UUID, request: Request, aal: str
+) -> TenantContext:
     """A MyBiz staff member inside a business that granted support access: every request is
     audited for the owner, and the transaction is READ ONLY at the database level."""
     _audit_platform_visit(session, tenant_id, "support.view", request)
@@ -120,10 +131,13 @@ def _support_context(session: Session, tenant_id: UUID, request: Request) -> Ten
         tenant_id=tenant_id,
         role="support",
         permissions=effective_permissions("support", None),
+        aal=aal,
     )
 
 
-def _platform_context(session: Session, tenant_id: UUID, request: Request) -> TenantContext:
+def _platform_context(
+    session: Session, tenant_id: UUID, request: Request, aal: str
+) -> TenantContext:
     """A MyBiz staff member with `businesses.act` working in a business for its owner: they can
     fix things like a manager, and every request (reads and changes alike) is audited for the
     owner and for MyBiz."""
@@ -143,6 +157,7 @@ def _platform_context(session: Session, tenant_id: UUID, request: Request) -> Te
         tenant_id=tenant_id,
         role="platform",
         permissions=effective_permissions("platform", None),
+        aal=aal,
     )
 
 
@@ -184,6 +199,7 @@ def set_branch(
 
 def get_tenant_context(
     session: SessionDep,
+    user: UserDep,
     tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")],
     request: Request,
     branch_id: Annotated[
@@ -204,11 +220,13 @@ def get_tenant_context(
     ).first()
     if member is None:
         if session.execute(text("SELECT app.support_tenant_id()")).scalar() is not None:
-            context = _support_context(session, tenant_id, request)
+            require_aal2(user.aal)
+            context = _support_context(session, tenant_id, request, user.aal)
             set_branch(session, branch_id)
             return context
         if session.execute(text("SELECT app.platform_act_tenant_id()")).scalar() is not None:
-            context = _platform_context(session, tenant_id, request)
+            require_aal2(user.aal)
+            context = _platform_context(session, tenant_id, request, user.aal)
             set_branch(session, branch_id)
             return context
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_member")
@@ -229,6 +247,14 @@ def get_tenant_context(
         ).scalar()
     ):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
+    if (
+        user.aal != "aal2"
+        and get_settings().mfa_on
+        and session.execute(
+            text("SELECT require_mfa_for_staff FROM app.tenants WHERE id = app.current_tenant_id()")
+        ).scalar()
+    ):
+        raise mfa_required()
     set_branch(session, branch_id, allowed)
     return TenantContext(
         session=session,
@@ -236,6 +262,7 @@ def get_tenant_context(
         role=member.role,
         permissions=effective_permissions(member.role, member.custom_permissions),
         branches=allowed,
+        aal=user.aal,
     )
 
 
@@ -264,6 +291,8 @@ def require(permission: Permission) -> Callable[[TenantContext], TenantContext]:
     def check(context: TenantDep) -> TenantContext:
         if permission not in context.permissions:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
+        if permission in SENSITIVE_PERMISSIONS and sensitive_action_needs_mfa(context.aal):
+            raise mfa_required()
         return context
 
     return check

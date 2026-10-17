@@ -1,6 +1,7 @@
 """Endpoints for our own automation, not for people: they need the shared internal token."""
 
 import hmac
+import logging
 import threading
 from typing import Annotated
 
@@ -42,8 +43,8 @@ def tick(engine: EngineDep, x_internal_token: Annotated[str | None, Header()] = 
     def work() -> None:
         try:
             jobs.run_job(engine, "run-ai-tasks")
-        except Exception:  # recorded in app.job_runs by run_job
-            pass
+        except Exception:  # also recorded in app.job_runs by run_job
+            logging.getLogger(__name__).exception("run-ai-tasks tick failed")
         finally:
             _tick.release()
 

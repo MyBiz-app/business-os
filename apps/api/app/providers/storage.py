@@ -110,11 +110,12 @@ class SupabaseStorage:
             headers["Content-Type"] = content_type
         if method == "POST" and path.startswith("object/") and not path.startswith("object/sign"):
             headers["x-upsert"] = "true"
-        request = urllib.request.Request(
+        # The base URL is operator configuration (the Supabase project URL), not user input.
+        request = urllib.request.Request(  # noqa: S310
             f"{self.base}/{path}", data=body, method=method, headers=headers
         )
         try:
-            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:  # noqa: S310
                 return response.read()
         except urllib.error.HTTPError as error:
             if error.code in (400, 404) and method == "GET":

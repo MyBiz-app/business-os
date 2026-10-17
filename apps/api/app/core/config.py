@@ -1,3 +1,4 @@
+import datetime as dt
 from functools import lru_cache
 from urllib.parse import urlparse
 
@@ -132,6 +133,19 @@ class Settings(BaseSettings):
     def rate_limits_on(self) -> bool:
         if self.rate_limits is not None:
             return self.rate_limits
+        return self.environment not in ("local", "test")
+
+    # Two-step sign-in (app/core/mfa.py). Off in local development and tests like the rate
+    # limits; on everywhere else unless set. Owners' and managers' sensitive actions need a code
+    # from `mfa_required_from` on (none: from the start), the MyBiz team and businesses that
+    # require it of their team always do.
+    mfa_enforced: bool | None = None
+    mfa_required_from: dt.date | None = None
+
+    @property
+    def mfa_on(self) -> bool:
+        if self.mfa_enforced is not None:
+            return self.mfa_enforced
         return self.environment not in ("local", "test")
 
     # Public addresses used in emails (links to the web app and the client app).

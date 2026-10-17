@@ -8,7 +8,7 @@ with the business. They keep the business's name and tax number as text, and los
 (`tenant_id` becomes null) when the business is deleted.
 
 Revision ID: 0114
-Revises: 0112
+Revises: 0113
 Create Date: 2026-10-17
 """
 
@@ -17,7 +17,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0114"
-down_revision: str | None = "0112"
+down_revision: str | None = "0113"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

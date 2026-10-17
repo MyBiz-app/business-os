@@ -8,11 +8,11 @@ import { useTheme } from "@business-os/app-kit/providers/theme-provider";
 
 /** Sends the person where they belong: sign in, join a business, or the area they used last. */
 export default function Gate() {
-  const { session, loading } = useSession();
+  const { session, loading, mfaPending } = useSession();
   const { areas, active } = useAreas();
   const { palette } = useTheme();
 
-  if (!loading && !session) return <Redirect href="/sign-in" />;
+  if (!loading && (!session || mfaPending)) return <Redirect href="/sign-in" />;
   if (areas && areas.length === 0) return <Redirect href="/join" />;
   if (active) return <Redirect href={areaHome(active)} />;
   return (

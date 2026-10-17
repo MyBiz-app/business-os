@@ -1,5 +1,6 @@
 """Exporting the whole business (go-live, GL8): the owner asks, a ZIP of CSVs and files is built
-in the background, and a link valid for 24 hours is emailed to them. Owners only; both the
+in the background, and a link valid for 24 hours is emailed to them. Owners only, with a
+second sign-in step once that is required (app/core/mfa.py); both the
 request and the download are written to the audit log."""
 
 import logging
@@ -17,6 +18,7 @@ from app.core.business_export import build_archive
 from app.core.config import get_settings
 from app.core.db import EngineDep, open_session
 from app.core.logging import log
+from app.core.mfa import mfa_required, sensitive_action_needs_mfa
 from app.core.signed_links import sign, verify
 from app.messaging.email import Email, sender_from_settings
 from app.providers.choice import choose
@@ -31,6 +33,8 @@ LINK_HOURS = 24
 def require_owner(context: Annotated[TenantContext, Depends(get_tenant_context)]) -> TenantContext:
     if context.role != "owner":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="owner_only")
+    if sensitive_action_needs_mfa(context.aal):
+        raise mfa_required()
     return context
 
 

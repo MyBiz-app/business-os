@@ -32,8 +32,10 @@ def remove_sign_in(user_id: UUID) -> bool:
     settings = get_settings()
     if not settings.supabase_url or settings.supabase_service_key is None:
         return False
+    if not settings.supabase_url.startswith(("https://", "http://")):
+        return False
     key = settings.supabase_service_key.get_secret_value()
-    request = urllib.request.Request(
+    request = urllib.request.Request(  # noqa: S310 (http or https only, checked above)
         f"{settings.supabase_url.rstrip('/')}/auth/v1/admin/users/{user_id}",
         method="DELETE",
         headers={"apikey": key, "Authorization": f"Bearer {key}"},
@@ -41,7 +43,7 @@ def remove_sign_in(user_id: UUID) -> bool:
     )
     request.add_header("Content-Type", "application/json")
     try:
-        with urllib.request.urlopen(request, timeout=10):
+        with urllib.request.urlopen(request, timeout=10):  # noqa: S310 (same request)
             return True
     except (urllib.error.URLError, TimeoutError) as error:
         log(logging.ERROR, "sign-in removal failed", error=type(error).__name__)

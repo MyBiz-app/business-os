@@ -13,7 +13,10 @@ Walk this list for every new hosted project and after any change to the auth sec
 | Sign In / Providers → Email → confirm email | `[auth.email] enable_confirmations` | on |
 | Email OTP length | `[auth.email] otp_length` | 6 (the sign-in screens ask for exactly 6 digits) |
 | Email OTP expiry | `[auth.email] otp_expiry` | 3600 |
-| Minimum password length | `minimum_password_length` | 6 (raise together with the sign-up form) |
+| Minimum password length | `minimum_password_length` | 10 |
+| Password requirements | `password_requirements` | letters and digits (`letters_digits`) |
+| Require recent sign-in to change the password | `[auth.email] secure_password_change` | on |
+| Multi-factor → authenticator app (TOTP), enroll and verify | `[auth.mfa.totp]` | both on (free on every plan; no phone MFA) |
 | Anonymous sign-ins | `enable_anonymous_sign_ins` | off |
 | Refresh token rotation | `enable_refresh_token_rotation` | on, reuse interval 10 |
 | JWT expiry | `jwt_expiry` | 3600 |
@@ -21,7 +24,7 @@ Walk this list for every new hosted project and after any change to the auth sec
 | Providers → Google | - | on, with the project's own OAuth client; Apple stays off until `AUTH_APPLE_ENABLED` |
 | Phone sign-in (SMS) | `[auth.sms.twilio]` | **off until go-live.** Costs money per message (Twilio SMS to Israel is roughly 4-5 US cents each; a WhatsApp message is cheaper but needs a Meta-approved sender). To switch on: Dashboard → Authentication → Sign In / Providers → Phone, choose Twilio, paste the account SID, auth token and a message service SID; then the phone options appear on their own on the website and in the apps |
 | WhatsApp codes | - | after Phone is on and the Twilio WhatsApp sender is approved: set `AUTH_WHATSAPP_ENABLED=true` on the web host and `EXPO_PUBLIC_AUTH_WHATSAPP=true` for the apps, then redeploy |
-| Leaked password protection | - | on (Pro plan only) |
+| Leaked password protection | - | **off until a paid plan.** Switch on with the workflow input "paid_plan" (or `PAID_AUTH=1 python supabase/apply_auth_settings.py --apply`); Dashboard → Authentication → Attack Protection → "Prevent use of leaked passwords" |
 | SMTP | - | the project's own sender before real customers (the built-in one is rate limited) |
 
 ## Applying from CI
@@ -29,7 +32,7 @@ Walk this list for every new hosted project and after any change to the auth sec
 Run the workflow *Apply Supabase auth settings (staging)* (Actions, Run workflow). Without
 "apply" it only prints which settings differ from `supabase/config.toml`; with it, it changes
 them. It covers site URL, redirect URLs, OTP length and expiry, email confirmation, password
-length, anonymous sign-ins, token rotation, JWT expiry and the email templates and notices. To change an email's text or look, edit `supabase/templates/build.py` (or `apps/api/app/messaging/email_layout.py`), run `python supabase/templates/build.py` and commit the regenerated files; CI fails when they are out of date. Without the access token, paste each file by hand: Supabase Dashboard, Authentication, Emails (Templates tab: pick the template, paste the file's HTML into the body, copy the subject from `config.toml`; the two notices are under Notifications). The rest
+length and requirements, secure password change, authenticator-app sign-in, anonymous sign-ins, token rotation, JWT expiry and the email templates and notices. To change an email's text or look, edit `supabase/templates/build.py` (or `apps/api/app/messaging/email_layout.py`), run `python supabase/templates/build.py` and commit the regenerated files; CI fails when they are out of date. Without the access token, paste each file by hand: Supabase Dashboard, Authentication, Emails (Templates tab: pick the template, paste the file's HTML into the body, copy the subject from `config.toml`; the two notices are under Notifications). The rest
 of the table (Google provider, leaked-password protection, SMTP) stays manual. One-time setup:
 create a Supabase personal access token and save it as the secret `SUPABASE_ACCESS_TOKEN` in
 the GitHub `staging` environment. The staging URLs live in the workflow file.
