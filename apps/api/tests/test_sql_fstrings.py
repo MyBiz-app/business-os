@@ -56,6 +56,7 @@ ALLOWED = {
     "api/time_off_requests.py": 2,
     "files/__init__.py": 1,
     "reports/metrics.py": 1,
+    "secrets_rotation.py": 2,  # table and column names from the COLUMNS constant
 }
 
 
