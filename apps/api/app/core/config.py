@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     # Error monitoring (Sentry). Without a DSN nothing is sent and nothing is loaded.
     sentry_dsn: SecretStr | None = None
     sentry_traces_sample_rate: float = Field(default=0.0, ge=0.0, le=1.0)
+    sentry_release: str | None = None  # defaults to the commit Render deployed (RENDER_GIT_COMMIT)
 
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp

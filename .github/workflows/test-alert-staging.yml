@@ -1,0 +1,32 @@
+name: Send a test alert (staging)
+
+# Manual. Sends the alert that a late or failing job sends (push to the MyBiz owners' phones, then
+# email) so you can see it arrives. The run fails when neither channel reached anyone. See
+# docs/monitoring.md, "Alerts to your phone".
+on:
+  workflow_dispatch:
+
+jobs:
+  alert:
+    name: Test alert
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Install dependencies
+        working-directory: apps/api
+        run: uv sync --locked --no-dev
+
+      - name: Send
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+          API_EMAIL_PROVIDER: ${{ vars.EMAIL_PROVIDER }}
+          API_EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          API_EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+        run: uv run python -m app.jobs test-alert

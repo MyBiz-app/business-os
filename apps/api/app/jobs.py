@@ -19,7 +19,9 @@
     uv run python -m app.jobs rotate-secrets [--apply] (re-encrypts with the newest key; manual)
     uv run python -m app.jobs run-daily       (every daily job in turn, for a cron service)
     uv run python -m app.jobs run-hourly      (every hourly job in turn)
-    uv run python -m app.jobs check-jobs      (fails when a scheduled job is late)
+    uv run python -m app.jobs check-jobs      (fails when a scheduled job is late, and alerts the
+                                               MyBiz owners' phones and email)
+    uv run python -m app.jobs test-alert      (sends a test alert, to check the phones receive it)
 
 Every run is recorded in app.job_runs (started, finished, ok, result), so a job that stopped
 running or keeps failing is noticed by check-jobs (.github/workflows/check-jobs-staging.yml).
@@ -41,6 +43,7 @@ from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 from app.files import forget, purge_expired_files
 from app.messaging import outbox
+from app.messaging.alerts import AlertResult, alert_team
 from app.messaging.announcements import send_announcements as run_announcements
 from app.messaging.email import (
     MESSAGES_DIR,
@@ -699,6 +702,7 @@ def run_job(engine: Engine, name: str, apply: bool = False) -> object:
         return result
     except Exception as error:
         result = f"{type(error).__name__}: {error}"
+        _alert_failure(engine, name, run_id, result)
         raise
     finally:
         with engine.begin() as conn:
@@ -709,6 +713,45 @@ def run_job(engine: Engine, name: str, apply: bool = False) -> object:
             """),
                 {"id": run_id, "ok": ok, "result": str(result)[:2000]},
             )
+
+
+def notify_team(engine: Engine, title: str, body: str) -> AlertResult:
+    """Alerts the MyBiz owners (push, then email). Never raises: a broken alert channel must not
+    hide the failure that is being reported, which is also in the logs and the job runs."""
+    try:
+        sender = sender_from_settings()
+    except SystemExit:  # a provider without its key
+        sender = None
+    try:
+        with engine.begin() as conn:
+            return alert_team(conn, title, body, push_sender_from_settings(), sender)
+    except Exception as error:
+        print(f"alert not sent: {type(error).__name__}: {error}", file=sys.stderr)
+        return AlertResult()
+
+
+def _alert_failure(engine: Engine, name: str, run_id: int, error: str) -> None:
+    """Alerts when a job starts failing, once: a job that was already failing on its previous
+    run does not alert again (the daily check-jobs reminds while it stays broken)."""
+    try:
+        with engine.connect() as conn:
+            previous_ok = conn.execute(
+                text("""
+                    SELECT ok FROM app.job_runs
+                    WHERE job = :job AND id < :id AND finished_at IS NOT NULL
+                    ORDER BY id DESC LIMIT 1
+                """),
+                {"job": name, "id": run_id},
+            ).scalar()
+    except Exception:
+        previous_ok = None
+    if previous_ok is False:
+        return
+    notify_team(
+        engine,
+        f"MyBiz job failed: {name}",
+        f"{name} failed on {get_settings().environment}.\n\n{error[:300]}",
+    )
 
 
 def late_jobs(conn: Connection, now: datetime | None = None) -> list[dict]:
@@ -742,7 +785,9 @@ def run_group(engine: Engine, names: list[str]) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a background job.")
-    parser.add_argument("job", choices=[*JOBS, "run-daily", "run-hourly", "check-jobs"])
+    parser.add_argument(
+        "job", choices=[*JOBS, "run-daily", "run-hourly", "check-jobs", "test-alert"]
+    )
     parser.add_argument("--database-url", default=None, help="Defaults to API_DATABASE_URL")
     parser.add_argument(
         "--apply",
@@ -762,7 +807,23 @@ def main() -> None:
                 f"expected every {item['max_hours']}h at most"
             )
         print(f"check-jobs: {len(late)} late of {len(MAX_HOURS)}")
+        if late:
+            names = ", ".join(item["job"] for item in late)
+            sent = notify_team(
+                engine,
+                f"MyBiz: {len(late)} background job(s) late",
+                f"Late on {get_settings().environment}: {names}.",
+            )
+            print(f"alert: {sent.pushed} push, {sent.emailed} email, {sent.recipients} owners")
         sys.exit(1 if late else 0)
+    if args.job == "test-alert":
+        sent = notify_team(
+            engine,
+            "MyBiz test alert",
+            f"If this reached your phone, alerts work ({get_settings().environment}).",
+        )
+        print(f"test-alert: {sent.pushed} push, {sent.emailed} email, {sent.recipients} owners")
+        sys.exit(0 if sent.pushed or sent.emailed else 1)
     if args.job in ("run-daily", "run-hourly"):
         failed = run_group(engine, DAILY if args.job == "run-daily" else HOURLY)
         sys.exit(1 if failed else 0)

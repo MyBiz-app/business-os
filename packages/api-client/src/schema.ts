@@ -6307,6 +6307,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * System Health
+         * @description What the console's "System health" page shows (go-live GL13). Job and queue numbers come
+         *     from the database; timings and crashes are this API process's own (they reset on restart).
+         */
+        get: operations["system_health"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/contact-requests": {
         parameters: {
             query?: never;
@@ -12467,6 +12488,31 @@ export interface components {
             /** Client Phone */
             client_phone: string | null;
         };
+        /** JobHealth */
+        JobHealth: {
+            /** Job */
+            job: string;
+            /** Last Run At */
+            last_run_at: string | null;
+            /** Last Ok At */
+            last_ok_at: string | null;
+            /**
+             * Last Ok
+             * @description Did the latest finished run succeed
+             */
+            last_ok: boolean | null;
+            /** Last Result */
+            last_result: string | null;
+            /** Runs 24H */
+            runs_24h: number;
+            /** Failures 24H */
+            failures_24h: number;
+            /**
+             * Late
+             * @description Scheduled, and its last success is older than it allows
+             */
+            late: boolean;
+        };
         /** JobStatusUpdate */
         JobStatusUpdate: {
             /**
@@ -15107,6 +15153,26 @@ export interface components {
             /** Document Url */
             document_url?: string | null;
         };
+        /** RecentCrash */
+        RecentCrash: {
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Request Id */
+            request_id: string | null;
+            /** Method */
+            method: string;
+            /** Path */
+            path: string | null;
+            /** Tenant Id */
+            tenant_id: string | null;
+            /** Status */
+            status: number;
+            /** Error */
+            error: string | null;
+        };
         /** Recipient */
         Recipient: {
             /**
@@ -15557,6 +15623,17 @@ export interface components {
             active?: boolean | null;
             /** Bookable */
             bookable?: boolean | null;
+        };
+        /** RouteTiming */
+        RouteTiming: {
+            /** Route */
+            route: string;
+            /** Count */
+            count: number;
+            /** P50 Ms */
+            p50_ms: number;
+            /** P95 Ms */
+            p95_ms: number;
         };
         /** Rules */
         Rules: {
@@ -17020,6 +17097,38 @@ export interface components {
              * @description Shown to both people
              */
             note?: string | null;
+        };
+        /** SystemHealth */
+        SystemHealth: {
+            /** Jobs */
+            jobs: components["schemas"]["JobHealth"][];
+            /** Messages Queued */
+            messages_queued: number;
+            /** Messages Failed 24H */
+            messages_failed_24h: number;
+            /** Emails Waiting */
+            emails_waiting: number;
+            /** Database Bytes */
+            database_bytes: number;
+            /** Ai Credits Today */
+            ai_credits_today: number;
+            /** Ai Alert At */
+            ai_alert_at: number;
+            /**
+             * Routes
+             * @description Busiest routes of this API process
+             */
+            routes: components["schemas"]["RouteTiming"][];
+            /**
+             * Errors
+             * @description The last crashes of this API process
+             */
+            errors: components["schemas"]["RecentCrash"][];
+            /**
+             * Release
+             * @description The commit the API runs, when the host tells us
+             */
+            release: string | null;
         };
         /** SystemRole */
         SystemRole: {
@@ -33603,6 +33712,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AISpend"];
+                };
+            };
+        };
+    };
+    system_health: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemHealth"];
                 };
             };
         };
