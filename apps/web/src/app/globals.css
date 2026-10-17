@@ -1863,3 +1863,80 @@ h1[tabindex="-1"]:focus {
   inset-inline-start: 50%;
   translate: -50% 0;
 }
+
+/* ---- Page transitions (view transitions; see docs/design-system.md) ------------------------ */
+
+/* Clicks go through to the live page while a transition runs. */
+::view-transition {
+  pointer-events: none;
+}
+/* The header of the landing site stays put; only the page between header and footer moves. */
+::view-transition-group(mk-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(mk-header) {
+  display: none;
+}
+::view-transition-new(mk-header) {
+  animation: none;
+}
+/* Everything that is not named below swaps without a crossfade of its own. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    translate: 0 12px;
+  }
+}
+
+/* Landing site: the new page fades in and slides up 12px (250ms); the old one leaves quickly. */
+::view-transition-old(.vt-site-out) {
+  animation: 120ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.vt-site-in) {
+  animation:
+    250ms var(--ease-out) both vt-fade,
+    250ms var(--ease-out) both vt-rise;
+}
+/* CRM: the content area only fades, no movement you notice (150ms). */
+::view-transition-old(.vt-app-out) {
+  animation: 90ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.vt-app-in) {
+  animation: 150ms var(--ease-out) both vt-fade;
+}
+/* A card grows into the window opened from it and shrinks back (shared element). */
+::view-transition-group(.card-window) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-out);
+}
+/* The window carries its own pop-in; with a card to grow from it must not add a second one. */
+.modal-panel[data-morph] {
+  animation: none;
+}
+
+/* Less motion (the browser setting and the accessibility widget): the page simply swaps. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+html[data-motion="reduce"] ::view-transition-group(*),
+html[data-motion="reduce"] ::view-transition-old(*),
+html[data-motion="reduce"] ::view-transition-new(*) {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
