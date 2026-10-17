@@ -11,6 +11,7 @@ Nothing is sent to anyone: the move only creates records, and the payslip is a d
 import pathlib
 import re
 import subprocess
+import sys
 import time
 
 from axe_playwright_python.sync_playwright import Axe
@@ -145,6 +146,7 @@ with sync_playwright() as p:
     print("6. issued a quote and downloaded its PDF: ok")
     b.close()
 
-if issues:  # reported, not failing: dod.py treats the same findings on other pages the same way
-    print("a11y findings to fix later:", *issues, sep="\n  ")
+if issues:  # serious and critical axe findings block the run
+    print("a11y findings:", *issues, sep="\n  ")
+    sys.exit(1)
 print("round6: ok")
