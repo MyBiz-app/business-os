@@ -73,7 +73,14 @@ only) and not the transaction pooler (port 6543).
 - Counts are kept per API process by default. With more than one instance, set
   `API_RATE_LIMIT_REDIS_URL` (`redis://…`) and every instance counts in the same Redis
   (`RedisStore` in the same file; if Redis is unreachable it counts locally instead of failing).
-  Not set anywhere yet: Redis is a paid service on Render, so it stays off until production.
+  Not set anywhere yet: with one instance it is not needed, so it stays off until a second
+  instance is added. To switch it on: Render → New → Key Value → plan **Free** (kept only in
+  memory, which is fine for counters; the free tier is for testing, use Starter in production),
+  region Frankfurt, then copy its *Internal* URL into `API_RATE_LIMIT_REDIS_URL` on the API
+  service and redeploy.
+- The same store counts each business's signed-in requests: `API_TENANT_RATE_LIMIT_PER_MINUTE`
+  (default 600, 0 turns it off) answers 429 `tenant_rate_limited` over it. See
+  [the load test](../reviews/load-test-2026-10.md).
 - With `API_ENVIRONMENT=production` the API also refuses to start when `API_JWKS_URL`,
   `API_SECRETS_KEY`, `API_INTERNAL_TOKEN`, `API_WEB_URL`, `API_API_URL` or `API_CORS_ORIGINS`
   is missing or still points at localhost; the error names the missing ones. The background-job
