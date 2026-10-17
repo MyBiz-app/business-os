@@ -7123,7 +7123,8 @@ export interface paths {
         /**
          * Simulate Payment
          * @description Completes a simulated checkout: records a test payment and creates the plan. Calling it
-         *     again returns the same plan.
+         *     again returns the same plan. It does not exist in production: no real checkout is ever
+         *     completed by the client.
          */
         post: operations["simulate_payment"];
         delete?: never;

@@ -13,6 +13,7 @@ from sqlalchemy import Engine, text
 
 from app.ai import agents as agent_catalog
 from app.ai.tools import BRANCH_BLIND, TOOL_DOMAINS, TOOLS
+from app.ai.untrusted import unwrap
 from tests.conftest import AuthHeaders, add_member, local_today
 from tests.test_assistant import FakeProvider, calls, enable_ai_pro, says, use_provider
 from tests.test_bookings import new_client, new_session
@@ -39,7 +40,7 @@ def ask(client: TestClient, headers: dict, conversation_id: str, question: str):
 def tool_result(provider: FakeProvider, call: int = 1) -> dict[str, Any]:
     """The result of the first tool call, as the model got it on its next call."""
     block = provider.calls[call]["messages"][-1]["content"][0]
-    return json.loads(block["content"])
+    return json.loads(unwrap(block["content"]))
 
 
 def manager_headers(

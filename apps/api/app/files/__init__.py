@@ -17,6 +17,8 @@ from sqlalchemy import Connection, event, text
 from sqlalchemy.orm import Session
 
 from app.commerce.modules import allowance
+from app.files.content import ensure_matches
+from app.files.scan import ensure_clean
 from app.providers.choice import choose
 from app.providers.secrets import decrypt_bytes, encrypt_bytes
 from app.providers.storage import StorageError, StorageProvider, tenant_key
@@ -158,7 +160,9 @@ def store_file(
     )
     if folder is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    ensure_matches(content, content_type)
     check_space(db, tenant_id, len(content))
+    ensure_clean(content)
     sealed = bool(folder["sensitive"])
     payload = encrypt_bytes(content) if sealed else content
     storage = choose(db, None, "storage").instance
