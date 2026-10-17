@@ -182,7 +182,17 @@ with sync_playwright() as p:
     print("8. platform admin sees the business and AI usage:", credits)
 
     # Accessibility (axe) in Hebrew/light and English/dark.
-    pages = ["/dashboard", "/schedule", "/clients", "/plans", "/ai", "/settings", "/settings/modules"]
+    pages = [
+        "/dashboard", "/schedule", "/schedule/new", "/schedule/appointment", "/schedule/closed",
+        "/clients", "/clients/new", "/clients/join", "/leads", "/leads/new", "/plans", "/plans/new",
+        "/services", "/services/new", "/quotes", "/quotes/new", "/invoices", "/invoices/new",
+        "/sales", "/sales/orders", "/bills", "/reports", "/messages", "/events", "/files",
+        "/locations", "/locations/new", "/resources", "/assistant", "/content", "/ai",
+        "/team", "/team/shifts", "/team/time-clock", "/team/time-off", "/team/payroll", "/team/roles",
+        "/team/organization", "/team/bonuses", "/team/shift-swaps",
+        "/settings", "/settings/modules", "/settings/billing", "/settings/integrations",
+        "/account", "/migration",
+    ]  # fmt: skip
     for path in pages:
         owner.goto(f"{h.BASE}{path}"); h.ready(owner); check_a11y(owner, f"he-light {path}")
     en = b.new_context(locale="en-US", color_scheme="dark", viewport={"width": 1280, "height": 900})
@@ -197,3 +207,4 @@ with sync_playwright() as p:
     for line in a11y:
         print("   ", line)
     b.close()
+    assert not a11y, f"{len(a11y)} serious accessibility issues (listed above)"

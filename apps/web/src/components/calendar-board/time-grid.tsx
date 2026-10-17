@@ -61,6 +61,8 @@ type Props = {
   labels: {
     now: string;
     closed: string;
+    /** Name of the scrollable grid region (it takes keyboard focus so the keys scroll it). */
+    grid: string;
     shifts: string;
     empty: string;
     more: string;
@@ -174,7 +176,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
 
   return (
     <div className="card overflow-hidden p-0">
-      <div ref={scroller} className="max-h-[72dvh] overflow-auto overscroll-contain">
+      <div ref={scroller} tabIndex={0} role="region" aria-label={labels.grid} className="max-h-[72dvh] overflow-auto overscroll-contain">
         <div className="grid" style={{ gridTemplateColumns: `3.5rem repeat(${days.length * columns.length}, minmax(${minWidth}, 1fr))` }}>
           {/* Headers stay at the top while the hours scroll: the day, and under it the branch. */}
           <div className="sticky start-0 top-0 z-30 border-b border-border bg-surface" style={{ gridRow: laned ? "span 2" : undefined }} />
