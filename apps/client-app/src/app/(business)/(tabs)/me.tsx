@@ -21,6 +21,7 @@ export default function Me() {
   const tRoles = useTranslations("roles");
   const tSchedule = useTranslations("business.schedule");
   const tAvailability = useTranslations("business.availability");
+  const tDocuments = useTranslations("business.myDocuments");
   const { palette, tenant, api, refresh, branches, branch, selectBranch, can } = useStaff();
   const { session } = useSession();
   const [name, setName] = useState<string | null>(null);
@@ -107,6 +108,7 @@ export default function Me() {
           onPress={() => router.push("/availability")}
         />
       )}
+      <Button label={tDocuments("open")} variant="secondary" palette={palette} onPress={() => router.push("/my-documents")} />
 
       <Card palette={palette}>
         <Field

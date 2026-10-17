@@ -1097,6 +1097,185 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/files/folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Folders */
+        get: operations["list_folders"];
+        put?: never;
+        /**
+         * Create Folder
+         * @description A folder of the business's own, below one it may open; it keeps the parent's rules.
+         */
+        post: operations["create_folder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/folders/{folder_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Folder
+         * @description Only an empty folder of the business's own goes.
+         */
+        delete: operations["delete_folder"];
+        options?: never;
+        head?: never;
+        /** Rename Folder */
+        patch: operations["rename_folder"];
+        trace?: never;
+    };
+    "/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Files */
+        get: operations["list_files"];
+        put?: never;
+        /** Upload File */
+        post: operations["upload_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Files
+         * @description "My documents": what the business filed for me (payslips, my employment papers).
+         */
+        get: operations["my_files"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{file_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download File */
+        get: operations["download_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{file_id}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * File Link
+         * @description A short-lived link to open the file on a phone (the browser can't send the sign-in).
+         */
+        post: operations["file_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{file_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete File
+         * @description Deleting is for ordinary files; payslips and accounting papers can only be archived.
+         */
+        delete: operations["delete_file"];
+        options?: never;
+        head?: never;
+        /**
+         * Update File
+         * @description Rename a file, or move it to the archive and back. Archived files stay (and count toward
+         *     the space) but leave the folder's list.
+         */
+        patch: operations["update_file"];
+        trace?: never;
+    };
+    "/files/folders/{folder_id}/zip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Zip
+         * @description The folder's current files (and its subfolders') as one ZIP.
+         */
+        get: operations["download_zip"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/business-files/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signed Business File */
+        get: operations["signed_business_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/time": {
         parameters: {
             query?: never;
@@ -7075,6 +7254,22 @@ export interface components {
              */
             sign_requested: boolean;
         };
+        /** Body_upload_file */
+        Body_upload_file: {
+            /**
+             * Folder Id
+             * Format: uuid
+             */
+            folder_id: string;
+            /** File */
+            file: string;
+            /** Name */
+            name?: string | null;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            /** Location Id */
+            location_id?: string | null;
+        };
         /** Body_upload_location_logo */
         Body_upload_location_logo: {
             /** File */
@@ -9151,6 +9346,100 @@ export interface components {
             cancelled_bookings: number;
             /** Removed Health Declarations */
             removed_health_declarations: number;
+        };
+        /** FileLink */
+        FileLink: {
+            /**
+             * Url
+             * @description Opens the file without signing in, for 10 minutes
+             */
+            url: string;
+        };
+        /** FileOut */
+        FileOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Folder Id
+             * Format: uuid
+             */
+            folder_id: string;
+            /** Name */
+            name: string;
+            /** Content Type */
+            content_type: string;
+            /** Size */
+            size: number;
+            /** Owner User Id */
+            owner_user_id: string | null;
+            /** Owner Name */
+            owner_name?: string | null;
+            /** Location Id */
+            location_id: string | null;
+            /** Archived At */
+            archived_at: string | null;
+            /** Expires At */
+            expires_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** FileUpdate */
+        FileUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Archived */
+            archived?: boolean | null;
+        };
+        /** FolderCreate */
+        FolderCreate: {
+            /** Name */
+            name: string;
+            /** Parent Id */
+            parent_id?: string | null;
+        };
+        /** FolderOut */
+        FolderOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Name */
+            name: string;
+            /**
+             * System Key
+             * @description Set for the folders every business has
+             */
+            system_key: string | null;
+            /**
+             * Retain
+             * @description Files here are archived, never deleted
+             */
+            retain: boolean;
+            /**
+             * Sensitive
+             * @description Files here are sealed at rest
+             */
+            sensitive: boolean;
+            /** Can Upload */
+            can_upload: boolean;
+            /** File Count */
+            file_count: number;
+            /** Total Size */
+            total_size: number;
+        };
+        /** FolderRename */
+        FolderRename: {
+            /** Name */
+            name: string;
         };
         /** FollowerPoint */
         FollowerPoint: {
@@ -12224,14 +12513,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "identity.read")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "identity.read")[] | null;
         };
         /** Roles */
         Roles: {
@@ -17394,6 +17683,462 @@ export interface operations {
         };
     };
     signed_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_folders: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_folder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolderCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_folder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                folder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_folder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                folder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolderRename"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_files: {
+        parameters: {
+            query: {
+                folder_id: string;
+                archived?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_file"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_files: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_link: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileLink"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_zip: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                folder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    signed_business_file: {
         parameters: {
             query?: never;
             header?: never;
