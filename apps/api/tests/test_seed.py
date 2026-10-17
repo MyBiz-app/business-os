@@ -411,7 +411,7 @@ def test_profiles_add_logos_portraits_and_a_crossfit_branch_without_repeating(
     assert added is not None and again is None
     assert first["businesses"] == 1 and first["branches"] >= 1
     assert first["staff"] > 0 and first["clients"] == 40
-    assert second == {"businesses": 0, "branches": 0, "staff": 0, "clients": 0, "new_branches": 0}
+    assert not any(second.values())
     with engine.connect() as connection:
         row = connection.execute(
             text("""
@@ -529,3 +529,44 @@ def test_platform_demo_has_broadcasts(engine: Engine) -> None:
             text("SELECT status FROM app.announcements WHERE created_by = 'demo generator'")
         ).scalars().all()  # fmt: skip
     assert sorted(rows) == ["draft", "sent"]
+
+
+def test_curated_demo_has_round_6_pay_hours_run_and_move_without_repeating(
+    engine: Engine,
+) -> None:
+    owner = uuid4()
+    email = f"r6-{owner.hex[:6]}@example.com"
+    with engine.begin() as connection:
+        connection.execute(
+            text("INSERT INTO app.users (id, email) VALUES (:id, :email)"),
+            {"id": owner, "email": email},
+        )
+    with engine.begin() as connection:
+        first = curate(connection, email, 1, random.Random(4))
+    with engine.begin() as connection:
+        again = enrich_profiles(connection, email)
+    assert first["pay_setups"] > 0 and first["payroll_runs"] == 3 and first["move_sessions"] == 1
+    assert again["pay_setups"] == 0 and again["payroll_runs"] == 0 and again["move_sessions"] == 0
+    with engine.connect() as connection:
+        rows = connection.execute(
+            text("""
+                SELECT t.name,
+                  (SELECT count(*) FROM app.employment_profiles p WHERE p.tenant_id = t.id),
+                  (SELECT count(*) FROM app.time_clock_approvals a WHERE a.tenant_id = t.id),
+                  (SELECT count(*) FROM app.payroll_runs r WHERE r.tenant_id = t.id
+                     AND r.stage = 'hours'),
+                  (SELECT count(*) FROM app.payroll_run_lines l WHERE l.tenant_id = t.id
+                     AND l.gross_minor > 0),
+                  (SELECT count(*) FROM app.import_files i WHERE i.tenant_id = t.id
+                     AND i.kind = 'clients' AND i.row_count = 14 AND i.file_id IS NOT NULL)
+                FROM app.tenants t
+                JOIN app.tenant_members m ON m.tenant_id = t.id AND m.role = 'owner'
+                WHERE m.user_id = :owner
+            """),
+            {"owner": owner},
+        ).all()
+    assert len(rows) == 3
+    for name, profiles, approvals, runs, paid_lines, move_files in rows:
+        assert profiles == approvals and profiles > 0
+        assert runs == 1 and paid_lines == profiles
+        assert move_files == (1 if name == "Adir fitness" else 0)

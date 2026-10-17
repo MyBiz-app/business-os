@@ -261,6 +261,12 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Hand-overs go to a team's lead first (`handoff_target`); the morning briefing is not yet grouped by team.
 - A locked agent cannot be wired in; the chief cannot report to anyone; loops are refused by the API.
 
+### Round 6 demo data (2026-10-17, slice D1)
+
+- The round-6 demo data is added by the `curated` and `profiles` seeds (not by every demo), only adds, and is safe to repeat: existing pay terms, hours, runs and move sessions are kept.
+- The sample payroll run stays at the hours stage rather than approved: approving needs file storage and bank details the staging seed does not have, and an approved month is locked, which would stop the owner from trying the flow.
+- The sample move is a draft that is never imported by the seed, and its fictitious clients use reserved addresses; nothing is sent to anyone.
+
 ### Corrective payslips, yearly summary and deferred payroll items (2026-10-17, round 6 P6, migration 0112)
 
 - An approved month is never edited. A correction is a numbered version (`payslip_corrections`) for one person and month: reason, signed adjustment lines, the net worked out again from the dated rates table, and the difference to pay or recover. Only the owner issues one.

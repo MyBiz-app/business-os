@@ -1,20 +1,25 @@
-"""Profile pictures for a demo account, and the gym network's third branch.
+"""Profile pictures for a demo account, the gym network's third branch and round-6 data.
 
 Fills an owner's demo businesses with logos (business and branch), portraits for staff and
-clients, and gives "Adir fitness" a crossfit branch next to its strength and pilates ones. It
-only adds: a logo or a portrait that is already set is kept, and nothing is deleted, so it is
-safe to run on an account that has real activity. The images are drawn by
+clients, and gives "Adir fitness" a crossfit branch next to its strength and pilates ones. It also
+adds the round-6 pay terms, hours, payroll run and move (see `round6`). It only adds: a logo or a
+portrait that is already set is kept, and nothing is deleted, so it is safe to run on an account
+that has real activity. The images are drawn by
 `scripts/generate_demo_images.py` (synthetic: no photos of real people).
 
     uv run python -m app.seed --owner-email you@example.com --demo profiles
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 from uuid import UUID, uuid4
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import Connection, text
 
+from app.seed.common import TIME_ZONE
+from app.seed.round6 import seed_round6
 from app.seed.workspace import OPENING_HOURS
 
 ASSETS = Path(__file__).parent / "assets"
@@ -132,7 +137,17 @@ def _add_crossfit_branch(conn: Connection, tenant_id: UUID) -> UUID | None:
 def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
     """Adds logos and portraits (and the crossfit branch) to the owner's businesses."""
     manifest = _manifest()
-    counts = {"businesses": 0, "branches": 0, "staff": 0, "clients": 0, "new_branches": 0}
+    counts = {
+        "businesses": 0,
+        "branches": 0,
+        "staff": 0,
+        "clients": 0,
+        "new_branches": 0,
+        "pay_setups": 0,
+        "payroll_runs": 0,
+        "move_sessions": 0,
+    }
+    today = datetime.now(ZoneInfo(TIME_ZONE)).date()
     tenants = conn.execute(
         text("""
             SELECT t.id, t.name FROM app.tenants t
@@ -225,4 +240,9 @@ def enrich_profiles(conn: Connection, owner_email: str) -> dict[str, int]:
                 {"u": user_id, "c": client_id},
             )
             counts["clients"] += 1
+
+        # Round 6: pay terms, approved hours, a payroll run and (the gym) a move in progress.
+        added = seed_round6(conn, tenant_id, tenant_name, today)
+        for key in ("pay_setups", "payroll_runs", "move_sessions"):
+            counts[key] += added[key]
     return counts
