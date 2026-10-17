@@ -8,6 +8,7 @@ import {
   FileSignature,
   FileText,
   FolderOpen,
+  Truck,
   Plug,
   ScrollText,
   Wallet,
@@ -63,6 +64,7 @@ const ICONS = {
   invoices: FileText,
   time: Clock,
   files: FolderOpen,
+  migration: Truck,
 } as const;
 
 export type NavIcon = keyof typeof ICONS;

@@ -56,6 +56,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "locales",
     "locations",
     "messaging",
+    "migration",
     "modules",
     "nav",
     "onboarding",

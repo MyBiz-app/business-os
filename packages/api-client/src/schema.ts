@@ -2149,6 +2149,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/migration/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Move Sessions */
+        get: operations["list_move_sessions"];
+        put?: never;
+        /** Create Move Session */
+        post: operations["create_move_session"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Move Session */
+        get: operations["get_move_session"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Move File */
+        post: operations["add_move_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}/files/{file_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Move File */
+        put: operations["update_move_file"];
+        post?: never;
+        /** Remove Move File */
+        delete: operations["remove_move_file"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Preview Move */
+        post: operations["preview_move"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run Move Import */
+        post: operations["run_move_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/batches/{batch_id}/undo-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo Move Preview */
+        post: operations["undo_move_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/batches/{batch_id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo Move Batch */
+        post: operations["undo_move_batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/whatsapp-ai/conversations": {
         parameters: {
             query?: never;
@@ -7854,6 +7992,11 @@ export interface components {
              */
             skipped: string[];
         };
+        /** Body_add_move_file */
+        Body_add_move_file: {
+            /** File */
+            file: string;
+        };
         /** Body_import_clients */
         Body_import_clients: {
             /** File */
@@ -12061,6 +12204,131 @@ export interface components {
             /** Higher Is Better */
             higher_is_better: boolean;
         };
+        /** MigrationBatchOut */
+        MigrationBatchOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Counts */
+            counts: {
+                [key: string]: number;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Undo Until
+             * Format: date-time
+             */
+            undo_until: string;
+            /** Undone At */
+            undone_at: string | null;
+            /** Can Undo */
+            can_undo: boolean;
+        };
+        /** MigrationColumnOut */
+        MigrationColumnOut: {
+            /** Name */
+            name: string;
+            /** Example */
+            example: string;
+        };
+        /** MigrationFileOut */
+        MigrationFileOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Filename */
+            filename: string;
+            /** Kind */
+            kind: ("clients" | "memberships" | "services" | "staff" | "appointments") | null;
+            /** Columns */
+            columns: components["schemas"]["MigrationColumnOut"][];
+            /** Mapping */
+            mapping: (string | null)[];
+            /** Rows */
+            rows: number;
+            /**
+             * Fields
+             * @description The fields a column can be mapped to, for this kind
+             */
+            fields: string[];
+        };
+        /** MigrationFileUpdate */
+        MigrationFileUpdate: {
+            /** Kind */
+            kind?: ("clients" | "memberships" | "services" | "staff" | "appointments") | null;
+            /**
+             * Mapping
+             * @description A field (or null) per column; suggested when left out
+             */
+            mapping?: (string | null)[] | null;
+        };
+        /** MigrationSessionCreate */
+        MigrationSessionCreate: {
+            /**
+             * Origin
+             * @description Where the business comes from
+             */
+            origin: string;
+            /**
+             * Rights Confirmed
+             * @description The owner may transfer this data (must be true)
+             */
+            rights_confirmed: boolean;
+        };
+        /** MigrationSessionOut */
+        MigrationSessionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Origin */
+            origin: string;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Files */
+            files: components["schemas"]["MigrationFileOut"][];
+            /** Batches */
+            batches: components["schemas"]["MigrationBatchOut"][];
+        };
+        /** MigrationUndoReport */
+        MigrationUndoReport: {
+            /** Removed */
+            removed: {
+                [key: string]: number;
+            };
+            /**
+             * Kept
+             * @description Records left: edited, or other data depends on them
+             */
+            kept: {
+                [key: string]: number;
+            };
+        };
+        /** MigrationUndoRequest */
+        MigrationUndoRequest: {
+            /**
+             * Include Edited
+             * @description Also remove records that were edited after the import
+             * @default false
+             */
+            include_edited: boolean;
+        };
         /** ModelChoice */
         ModelChoice: {
             /** Id */
@@ -12094,6 +12362,83 @@ export interface components {
             month: string;
             /** People */
             people: components["schemas"]["PersonMonth"][];
+        };
+        /** MoveFileReport */
+        MoveFileReport: {
+            /**
+             * Import File Id
+             * Format: uuid
+             */
+            import_file_id: string;
+            /** Filename */
+            filename: string;
+            /** Kind */
+            kind: string | null;
+            /** Rows */
+            rows: number;
+            /**
+             * Ready
+             * @description New records the import creates (or created)
+             */
+            ready: number;
+            /** Duplicates */
+            duplicates: number;
+            /** Invalid */
+            invalid: number;
+            /**
+             * Skipped
+             * @description Rows left out on purpose (expired, past, empty balance)
+             */
+            skipped: number;
+            /**
+             * Issues
+             * @description The first 50 problems
+             */
+            issues: components["schemas"]["MoveIssue"][];
+            /**
+             * Sample
+             * @description The first records to be created
+             */
+            sample: {
+                [key: string]: string;
+            }[];
+        };
+        /** MoveInvitation */
+        MoveInvitation: {
+            /** Email */
+            email: string;
+            /** Role */
+            role: string;
+            /**
+             * Token
+             * @description Shown once; the invitee opens the invitation with it
+             */
+            token: string;
+        };
+        /** MoveIssue */
+        MoveIssue: {
+            /**
+             * Line
+             * @description Row number in the file (the header is row 1)
+             */
+            line: number;
+            /** Field */
+            field: string | null;
+            /** Code */
+            code: string;
+        };
+        /** MoveReport */
+        MoveReport: {
+            /** Files */
+            files: components["schemas"]["MoveFileReport"][];
+            /** Committed */
+            committed: boolean;
+            /** Batch Id */
+            batch_id: string | null;
+            /** Undo Until */
+            undo_until: string | null;
+            /** Invitations */
+            invitations: components["schemas"]["MoveInvitation"][];
         };
         /** MyAnnouncement */
         MyAnnouncement: {
@@ -14057,14 +14402,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve" | "payroll.propose")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "migration.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve" | "payroll.propose")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve" | "payroll.propose")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "migration.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve" | "payroll.propose")[] | null;
         };
         /** Roles */
         Roles: {
@@ -22087,6 +22432,372 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_move_sessions: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationSessionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_move_session: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MigrationSessionCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationSessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_move_session: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationSessionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_move_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_add_move_file"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationFileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_move_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MigrationFileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationFileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_move_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_move: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MoveReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_move_import: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MoveReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    undo_move_preview: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MigrationUndoRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationUndoReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    undo_move_batch: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MigrationUndoRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MigrationUndoReport"];
+                };
             };
             /** @description Validation Error */
             422: {
