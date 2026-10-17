@@ -17,7 +17,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Protocol
 
-from fastapi import Request
+from fastapi import HTTPException, Request, status
 from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
@@ -102,6 +102,29 @@ class RedisStore:
 def build_store(redis_url: str | None) -> LimiterStore:
     """The in-process store unless a Redis URL is configured."""
     return RedisStore.from_url(redis_url) if redis_url else MemoryStore()
+
+
+@dataclass(frozen=True)
+class TenantQuota:
+    """A ceiling on signed-in requests per business per window, so one busy business cannot use up
+    the API for the rest. It counts after the caller is known to belong to the business (the
+    `X-Tenant-Id` header alone is not trusted), through the same store as the address limits."""
+
+    store: LimiterStore
+    limit: int
+    window: int = 60
+
+    def check(self, tenant_id: object, clock: Callable[[], float] = time.time) -> None:
+        if self.limit <= 0:
+            return
+        now = clock()
+        count, ends = self.store.hit(f"tenant:{tenant_id}", self.window, now)
+        if count > self.limit:
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="tenant_rate_limited",
+                headers={"Retry-After": str(max(1, math.ceil(ends - now)))},
+            )
 
 
 VISITOR_HEADER = "x-visitor-address"
