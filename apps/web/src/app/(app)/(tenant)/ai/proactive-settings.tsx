@@ -15,15 +15,15 @@ type Translate = ReturnType<typeof useTranslations<"aiTeam">>;
 export function ProactiveSettingsPanel({ settings, timeZone }: { settings: ProactiveSettings; timeZone: string }) {
   const t = useTranslations("aiTeam");
   return (
-    <section aria-labelledby="proactive-title" className="flex flex-col gap-4">
+    <section aria-labelledby="proactive-title" className="card flex flex-col gap-4 p-5">
       <div className="flex flex-col gap-1">
-        <h2 id="proactive-title" className="flex items-center gap-2 text-xl font-semibold">
+        <h2 id="proactive-title" className="flex items-center gap-2 text-lg font-semibold">
           <Sunrise aria-hidden="true" className="size-5 text-primary-ink" />
           {t("tasks.proactive.title")}
         </h2>
-        <p className="max-w-3xl text-sm text-muted">{t("tasks.proactive.subtitle")}</p>
+        <p className="text-sm text-muted">{t("tasks.proactive.subtitle")}</p>
       </div>
-      <ul className="grid gap-3 md:grid-cols-2">
+      <ul className="flex flex-col gap-3">
         {settings.settings.map((setting) => (
           <ProactiveRow key={setting.key} setting={setting} canManage={settings.can_manage} timeZone={timeZone} t={t} />
         ))}
@@ -52,7 +52,7 @@ function ProactiveRow({ setting, canManage, timeZone, t }: { setting: ProactiveS
     });
 
   return (
-    <li className="card flex flex-col gap-3 p-4">
+    <li className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col gap-1">
           <h3 className="font-semibold">{t(`tasks.proactive.${key}.name`)}</h3>

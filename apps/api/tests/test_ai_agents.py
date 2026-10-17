@@ -54,6 +54,10 @@ def manager_headers(
 # --- the catalog and the tools ---------------------------------------------------------------
 
 
+def test_customer_care_agent_is_leo() -> None:
+    assert agent_catalog.CATALOG["care"].name == {"he": "ליאו", "en": "Leo"}
+
+
 def test_every_tool_belongs_to_a_domain_and_agents_use_known_domains() -> None:
     assert set(TOOL_DOMAINS) == set(TOOLS)
     assert set(TOOL_DOMAINS.values()) <= set(agent_catalog.DOMAINS)
