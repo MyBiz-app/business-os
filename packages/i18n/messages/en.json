@@ -2216,6 +2216,7 @@
       "integrations": "Integrations",
       "broadcasts": "Broadcasts",
       "ai": "AI",
+      "health": "System health",
       "growth": "Growth"
     },
     "levels": {
@@ -2634,6 +2635,44 @@
         "ai_not_configured": "AI is not set up on this server."
       }
     },
+    "health": {
+      "title": "System health",
+      "subtitle": "Background jobs, queues, database size, AI spend and recent errors. Alerts reach the owners' phones and email when a job fails or stops.",
+      "jobs": "Background jobs",
+      "job": "Job",
+      "lastRun": "Last run",
+      "lastOk": "Last success",
+      "runs": "Runs (24h)",
+      "failures": "Failures (24h)",
+      "status": "Status",
+      "ok": "OK",
+      "late": "Late",
+      "failed": "Failing",
+      "never": "never",
+      "noJobs": "No job has run yet.",
+      "queues": "Queues and size",
+      "messagesQueued": "Messages waiting",
+      "messagesFailed": "Messages failed (24h)",
+      "emailsWaiting": "Emails waiting",
+      "database": "Database size",
+      "aiToday": "AI credits today",
+      "aiLimit": "of {limit}",
+      "release": "Version",
+      "routes": "Response times",
+      "routesNote": "This server process only; resets when it restarts.",
+      "route": "Route",
+      "count": "Calls",
+      "p50": "Median (ms)",
+      "p95": "p95 (ms)",
+      "noRoutes": "No requests measured yet.",
+      "errors": "Latest errors",
+      "errorsNote": "The last 20 crashes of this server process. Search the request id in the logs.",
+      "when": "When",
+      "requestId": "Request id",
+      "path": "Route",
+      "business": "Business",
+      "noErrors": "No errors since the server started."
+    },
     "growth": {
       "title": "Growth",
       "hint": "Where sign-ups stop, how many businesses are active and who uses the most. The last {days} days.",
@@ -3009,7 +3048,8 @@
     "writeErrors": {
       "too_many_requests": "You've sent a few messages recently. Please try again in an hour.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "status": "See whether MyBiz is running normally: system status"
   },
   "receipts": {
     "title": "Receipt no. {number}",

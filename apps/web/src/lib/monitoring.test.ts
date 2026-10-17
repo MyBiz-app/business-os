@@ -18,3 +18,11 @@ test("sentryIngestOrigin is the host without credentials, and nothing without a 
   assert.equal(sentryIngestOrigin(undefined), undefined);
   assert.equal(sentryIngestOrigin("not a url"), undefined);
 });
+
+test("statusPageUrl is hidden until a https address is set", async () => {
+  const { statusPageUrl } = await import("./status.ts");
+  assert.equal(statusPageUrl(undefined), undefined);
+  assert.equal(statusPageUrl(""), undefined);
+  assert.equal(statusPageUrl("http://status.test"), undefined);
+  assert.equal(statusPageUrl("https://status.test"), "https://status.test");
+});
