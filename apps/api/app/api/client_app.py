@@ -22,13 +22,14 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
+from app.api.closed_days import ClosedDay
 from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
 from app.api.health import ensure_may_book
 from app.api.pagination import FullPageDep
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
-from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
+from app.api.schedule_models import JobStatus, ServiceSummary
 from app.api.settings import IMAGE_RESPONSES, image_response
 from app.catalog.verticals import CATALOG
 from app.legal.documents import check_versions, record_acceptance

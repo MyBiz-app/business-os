@@ -151,6 +151,16 @@ def platform_invoice_pdf(db: Session, invoice: Invoice) -> bytes:
             "client_tax_id": invoice.billing.tax_id,
             "client_email": invoice.billing.billing_email,
             "lines": lines,
+            "vat": (
+                {
+                    "subtotal_label": t["subtotal"],
+                    "subtotal": money(invoice.subtotal),
+                    "label": render.fill(t["vat"], rate=f"{invoice.vat_rate_bp / 100:g}"),
+                    "amount": money(invoice.vat_amount),
+                }
+                if invoice.vat_rate_bp
+                else None
+            ),
             "total": money(invoice.total),
             "status_label": t["status"][invoice.status] if invoice.status != "open" else None,
             "paid": paid,

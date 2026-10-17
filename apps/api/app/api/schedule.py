@@ -1,161 +1,39 @@
 import datetime as dt
 from datetime import datetime, time, timedelta
-from typing import Annotated, Any, Literal
+from typing import Annotated, Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.bookings import lock_session, promote_waitlist
-from app.api.common import blank_to_none, not_found, set_clause
+from app.api.common import not_found, set_clause
 from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
+from app.api.schedule_models import (
+    DEFAULT_SERIES_DAYS,
+    CreatedSessions,
+    InstructorOption,
+    OptionItem,
+    Placement,
+    RoomOption,
+    ScheduledSession,
+    ScheduleOptions,
+    ServiceOption,
+    SessionCreate,
+    SessionUpdate,
+)
 from app.core.permissions import Permission
 from app.messaging.notifications import live_clients, notify, notify_sessions, session_snapshot
-from app.schedule.release import MAX_AHEAD_DAYS, load_release
 from app.schedule.scheduling import local_to_utc, weekly_occurrences
 
 router = APIRouter(tags=["schedule"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.SCHEDULE_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.SCHEDULE_WRITE))]
-
-MAX_SERIES_DAYS = 26 * 7  # Series are expanded up front; a background job will extend them.
-DEFAULT_SERIES_DAYS = 12 * 7
-
-SessionStatus = Literal["scheduled", "cancelled"]
-JobStatus = Literal["scheduled", "on_the_way", "in_progress", "done"]
-
-
-class Placement(BaseModel):
-    location_id: UUID | None = None
-    room_id: UUID | None = None
-    instructor_user_id: UUID | None = None
-    notes: str | None = Field(default=None, max_length=2000)
-
-    @field_validator("notes", mode="before")
-    @classmethod
-    def blank_notes(cls, value: object) -> object:
-        return blank_to_none(value)
-
-
-class Repeat(BaseModel):
-    weekdays: list[int] = Field(min_length=1, description="0 = Monday … 6 = Sunday")
-    ends_on: dt.date | None = None
-
-    @field_validator("weekdays")
-    @classmethod
-    def valid_weekdays(cls, value: list[int]) -> list[int]:
-        if any(day < 0 or day > 6 for day in value):
-            raise ValueError("weekdays are 0 (Monday) to 6 (Sunday)")
-        return sorted(set(value))
-
-
-class SessionCreate(Placement):
-    service_id: UUID
-    date: dt.date = Field(description="Local date in the business's time zone")
-    start_time: time = Field(description="Local wall-clock time")
-    duration_minutes: int | None = Field(default=None, ge=5, le=1440)
-    capacity: int | None = Field(default=None, ge=1, le=1000)
-    repeat: Repeat | None = None
-
-    @model_validator(mode="after")
-    def bounded_series(self) -> "SessionCreate":
-        if self.repeat and self.repeat.ends_on:
-            if self.repeat.ends_on < self.date:
-                raise ValueError("repeat.ends_on is before date")
-            if (self.repeat.ends_on - self.date).days > MAX_SERIES_DAYS:
-                raise ValueError(f"a series can span at most {MAX_SERIES_DAYS} days")
-        return self
-
-
-class SessionUpdate(Placement):
-    date: dt.date | None = None
-    start_time: time | None = None
-    duration_minutes: int | None = Field(default=None, ge=5, le=1440)
-    capacity: int | None = Field(default=None, ge=1, le=1000)
-    status: SessionStatus | None = None
-
-
-class ServiceSummary(BaseModel):
-    id: UUID
-    name: str
-    color: str | None
-
-
-class ScheduledSession(BaseModel):
-    id: UUID
-    series_id: UUID | None
-    service: ServiceSummary
-    location_id: UUID | None
-    location_name: str | None
-    room_id: UUID | None
-    room_name: str | None
-    instructor_user_id: UUID | None
-    instructor_email: str | None
-    starts_at: datetime
-    ends_at: datetime
-    capacity: int
-    booked: int
-    waitlisted: int
-    series_open_ended: bool | None = Field(
-        description="For a session in a weekly series: whether the series keeps going"
-    )
-    status: SessionStatus
-    notes: str | None
-    booking_mode: Literal["class", "appointment", "resource"] = Field(
-        description="appointment: a one-to-one booking with the instructor;"
-        " resource: a room or court reserved by the hour"
-    )
-    appointment_client: str | None = Field(
-        description="For an appointment or a reservation: who it is with"
-    )
-    price_amount: int | None = Field(
-        default=None, description="For a reservation: its price, fixed when it was made"
-    )
-    price_currency: str | None = None
-    paid: bool | None = Field(default=None, description="For a reservation: whether it is paid")
-    address: str | None = Field(default=None, description="An on-site job: where (#42)")
-    address_notes: str | None = Field(
-        default=None, description="An on-site job: how to get in (gate code, floor)"
-    )
-    job_status: JobStatus | None = Field(default=None, description="An on-site job's progress")
-    travel_minutes: int = Field(default=0, description="Time to get there, before the job")
-
-
-class OptionItem(BaseModel):
-    id: UUID
-    name: str
-
-
-class ServiceOption(OptionItem):
-    duration_minutes: int
-    capacity: int
-
-
-class RoomOption(OptionItem):
-    location_id: UUID
-
-
-class InstructorOption(BaseModel):
-    user_id: UUID
-    email: str
-    full_name: str | None
-
-
-class ScheduleOptions(BaseModel):
-    services: list[ServiceOption]
-    locations: list[OptionItem]
-    rooms: list[RoomOption]
-    instructors: list[InstructorOption]
-
-
-class CreatedSessions(BaseModel):
-    series_id: UUID | None
-    session_ids: list[UUID]
 
 
 SESSION_SELECT = """
@@ -691,117 +569,3 @@ def copy_week(body: WeekCopy, context: WriteDep) -> WeekCopied:
         .one()
     )
     return WeekCopied(created=result["created"], skipped=result["skipped"])
-
-
-class ClosedDay(BaseModel):
-    id: UUID
-    day: dt.date
-    reason: str | None
-
-
-class ClosedDayCreate(BaseModel):
-    day: dt.date
-    reason: str | None = Field(default=None, max_length=120)
-
-    @field_validator("reason", mode="before")
-    @classmethod
-    def blank_reason(cls, value: object) -> object:
-        return blank_to_none(value)
-
-
-class ClosedDayCreated(BaseModel):
-    closed_day: ClosedDay
-    cancelled_sessions: int
-
-
-class PublishedWeek(BaseModel):
-    published_until: dt.date = Field(description="Last local date clients can now book")
-
-
-@router.post("/sessions/publish-week")
-def publish_week(context: WriteDep) -> PublishedWeek:
-    """Opens the next week for clients ahead of the scheduled release (or the rolling horizon)."""
-    db = context.session
-    release, time_zone = load_release(db)
-    today = datetime.now(ZoneInfo(time_zone)).date()
-    until = release.published_until + timedelta(days=7)
-    if until > today + timedelta(days=MAX_AHEAD_DAYS):
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="already_published")
-    db.execute(
-        text("""
-            UPDATE app.tenants SET schedule_published_until = :until
-            WHERE id = app.current_tenant_id()
-        """),
-        {"until": until},
-    )
-    return PublishedWeek(published_until=until)
-
-
-@router.get("/closed-days")
-def list_closed_days(
-    context: ReadDep, start: Annotated[dt.date | None, Query()] = None
-) -> list[ClosedDay]:
-    """Closed days from `start` (default: today, local) on."""
-    db = context.session
-    rows = db.execute(
-        text("""
-            SELECT id, day, reason FROM app.closed_days
-            WHERE day >= coalesce(CAST(:start AS date),
-                                  (SELECT (now() AT TIME ZONE time_zone)::date
-                                   FROM app.tenants WHERE id = app.current_tenant_id()))
-            ORDER BY day LIMIT 200
-        """),
-        {"start": start},
-    ).mappings()
-    return [ClosedDay.model_validate(dict(row)) for row in rows]
-
-
-@router.post("/closed-days", status_code=status.HTTP_201_CREATED)
-def close_day(body: ClosedDayCreate, context: WriteDep) -> ClosedDayCreated:
-    """Marks a day closed and cancels its scheduled sessions; booked clients are told."""
-    db = context.session
-    try:
-        row = (
-            db.execute(
-                text("""
-                    INSERT INTO app.closed_days (tenant_id, day, reason, created_by)
-                    VALUES (:tenant_id, :day, :reason, app.current_user_id())
-                    RETURNING id, day, reason
-                """),
-                {"tenant_id": context.tenant_id, "day": body.day, "reason": body.reason},
-            )
-            .mappings()
-            .one()
-        )
-    except IntegrityError as error:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT, detail="already_closed"
-        ) from error
-    time_zone = _time_zone(db)
-    sessions = db.execute(
-        text("""
-            UPDATE app.sessions SET status = 'cancelled', updated_at = now()
-            WHERE status = 'scheduled' AND starts_at >= :from AND starts_at < :to
-            RETURNING id, starts_at
-        """),
-        {
-            "from": local_to_utc(body.day, time.min, time_zone),
-            "to": local_to_utc(body.day + timedelta(days=1), time.min, time_zone),
-        },
-    ).all()
-    now = datetime.now(dt.UTC)
-    upcoming = [session_id for session_id, starts_at in sessions if starts_at > now]
-    notify_sessions(db, context.tenant_id, "session_cancelled", upcoming)
-    return ClosedDayCreated(
-        closed_day=ClosedDay.model_validate(dict(row)), cancelled_sessions=len(sessions)
-    )
-
-
-@router.delete("/closed-days/{closed_day_id}", status_code=status.HTTP_204_NO_CONTENT)
-def reopen_day(closed_day_id: UUID, context: WriteDep) -> None:
-    """Opens the day again for new sessions; sessions cancelled when it closed stay cancelled."""
-    deleted = context.session.execute(
-        text("DELETE FROM app.closed_days WHERE id = :id"), {"id": closed_day_id}
-    ).rowcount
-    if not deleted:
-        raise not_found()

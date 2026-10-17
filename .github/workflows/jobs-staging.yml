@@ -53,6 +53,13 @@ jobs:
           API_ENVIRONMENT: staging
         run: uv run python -m app.jobs bill-businesses
 
+      - name: Remind businesses with unpaid MyBiz invoices; read-only and suspension (simulated)
+        working-directory: apps/api
+        env:
+          API_DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+          API_ENVIRONMENT: staging
+        run: uv run python -m app.jobs dunning
+
       - name: Copy today's reminders to WhatsApp (simulated, messaging module)
         working-directory: apps/api
         env:

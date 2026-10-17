@@ -33178,6 +33178,140 @@
         }
       }
     },
+    "/billing/cancel": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Cancel Subscription",
+        "description": "Ends the subscription at the end of the paid period (or the trial). The business and its\ndata are kept; nothing is billed after that, and the owner can resume until it ends or later.",
+        "operationId": "cancel_subscription",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Collection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Resume Subscription",
+        "description": "Takes a cancellation back, and brings a business back whose subscription had ended.",
+        "operationId": "resume_subscription",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Collection"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/billing/usage": {
       "get": {
         "tags": [
@@ -34918,6 +35052,170 @@
             }
           }
         }
+      }
+    },
+    "/platform/billing/overdue": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Overdue Businesses",
+        "description": "Businesses with an unpaid invoice, the oldest first.",
+        "operationId": "overdue_businesses",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OverdueBusiness"
+                  },
+                  "type": "array",
+                  "title": "Response Overdue Businesses"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/platform/businesses/{tenant_id}/billing/grace": {
+      "post": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Extend Grace",
+        "description": "Gives a business more time to pay: lifts read-only or suspension now and holds off the\nnext one for `days` days (reminders still go out).",
+        "operationId": "extend_grace",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GraceExtension"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OverdueBusiness"
+                  },
+                  "title": "Response Extend Grace"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/billing/dunning": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Get Dunning",
+        "operationId": "get_dunning",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DunningSettings"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Set Dunning",
+        "operationId": "set_dunning",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DunningSettings"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DunningSettings"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/platform/ai/costs": {
@@ -42489,6 +42787,9 @@
             "title": "Balance Due",
             "description": "Sum of open invoices, minor units"
           },
+          "collection": {
+            "$ref": "#/components/schemas/Collection"
+          },
           "usage": {
             "$ref": "#/components/schemas/app__api__billing__Usage"
           }
@@ -42504,6 +42805,7 @@
           "details",
           "invoices",
           "balance_due",
+          "collection",
           "usage"
         ],
         "title": "Billing"
@@ -46534,6 +46836,95 @@
         ],
         "title": "Colleague"
       },
+      "Collection": {
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "read_only",
+              "suspended"
+            ],
+            "title": "State",
+            "description": "read_only: everything visible, nothing can be changed; suspended: no access"
+          },
+          "overdue_since": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overdue Since",
+            "description": "When the oldest unpaid invoice was issued"
+          },
+          "read_only_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read Only On",
+            "description": "Null when nothing is overdue or dunning is off"
+          },
+          "suspend_on": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suspend On"
+          },
+          "grace_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grace Until",
+            "description": "A grace extension from MyBiz, if any"
+          },
+          "cancel_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel At",
+            "description": "The subscription ends then; the business stays"
+          }
+        },
+        "type": "object",
+        "required": [
+          "state",
+          "overdue_since",
+          "read_only_on",
+          "suspend_on",
+          "grace_until",
+          "cancel_at"
+        ],
+        "title": "Collection",
+        "description": "Where the subscription stands when an invoice is unpaid or the subscription is ending."
+      },
       "Complaint": {
         "properties": {
           "id": {
@@ -49008,6 +49399,46 @@
         "type": "object",
         "title": "DocumentUpdate"
       },
+      "DunningSettings": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "description": "Off: no reminders, no read-only, no suspension"
+          },
+          "reminder_days": {
+            "items": {
+              "type": "integer",
+              "maximum": 60.0,
+              "minimum": 0.0
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Reminder Days",
+            "description": "Days after the invoice is issued that a reminder goes out"
+          },
+          "read_only_after_days": {
+            "type": "integer",
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Read Only After Days"
+          },
+          "suspend_after_days": {
+            "type": "integer",
+            "maximum": 180.0,
+            "minimum": 2.0,
+            "title": "Suspend After Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "reminder_days",
+          "read_only_after_days",
+          "suspend_after_days"
+        ],
+        "title": "DunningSettings"
+      },
       "Employment": {
         "properties": {
           "exists": {
@@ -50759,6 +51190,21 @@
         ],
         "title": "GoogleBusiness"
       },
+      "GraceExtension": {
+        "properties": {
+          "days": {
+            "type": "integer",
+            "maximum": 90.0,
+            "minimum": 1.0,
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "days"
+        ],
+        "title": "GraceExtension"
+      },
       "Grant": {
         "properties": {
           "id": {
@@ -51963,9 +52409,24 @@
             "type": "string",
             "title": "Currency"
           },
+          "subtotal": {
+            "type": "integer",
+            "title": "Subtotal",
+            "description": "Before VAT, minor units"
+          },
+          "vat_rate_bp": {
+            "type": "integer",
+            "title": "Vat Rate Bp",
+            "description": "VAT rate in basis points (1800 = 18%); 0 for no VAT"
+          },
+          "vat_amount": {
+            "type": "integer",
+            "title": "Vat Amount"
+          },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Including VAT"
           },
           "status": {
             "type": "string",
@@ -52034,6 +52495,9 @@
           "period_start",
           "period_end",
           "currency",
+          "subtotal",
+          "vat_rate_bp",
+          "vat_amount",
           "total",
           "status",
           "issued_at",
@@ -52096,9 +52560,24 @@
             "type": "string",
             "title": "Currency"
           },
+          "subtotal": {
+            "type": "integer",
+            "title": "Subtotal",
+            "description": "Before VAT, minor units"
+          },
+          "vat_rate_bp": {
+            "type": "integer",
+            "title": "Vat Rate Bp",
+            "description": "VAT rate in basis points (1800 = 18%); 0 for no VAT"
+          },
+          "vat_amount": {
+            "type": "integer",
+            "title": "Vat Amount"
+          },
           "total": {
             "type": "integer",
-            "title": "Total"
+            "title": "Total",
+            "description": "Including VAT"
           },
           "status": {
             "type": "string",
@@ -52134,6 +52613,9 @@
           "period_start",
           "period_end",
           "currency",
+          "subtotal",
+          "vat_rate_bp",
+          "vat_amount",
           "total",
           "status",
           "issued_at",
@@ -56135,6 +56617,82 @@
         },
         "type": "object",
         "title": "OtherIncome"
+      },
+      "OverdueBusiness": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "owner_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Email"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "open_invoices": {
+            "type": "integer",
+            "title": "Open Invoices"
+          },
+          "open_amount": {
+            "type": "integer",
+            "title": "Open Amount",
+            "description": "Minor units, VAT included"
+          },
+          "oldest_issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Oldest Issued At"
+          },
+          "billing_state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "read_only",
+              "suspended"
+            ],
+            "title": "Billing State"
+          },
+          "grace_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grace Until"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "owner_email",
+          "currency",
+          "open_invoices",
+          "open_amount",
+          "oldest_issued_at",
+          "billing_state",
+          "grace_until"
+        ],
+        "title": "OverdueBusiness"
       },
       "PaletteColors": {
         "properties": {
@@ -65607,6 +66165,16 @@
             "title": "Require Mfa For Staff",
             "description": "Every team member must sign in with an authenticator code",
             "default": false
+          },
+          "billing_state": {
+            "type": "string",
+            "enum": [
+              "active",
+              "read_only"
+            ],
+            "title": "Billing State",
+            "description": "read_only: an unpaid MyBiz invoice; everything is visible, nothing changes",
+            "default": "active"
           },
           "network_scope": {
             "type": "string",
