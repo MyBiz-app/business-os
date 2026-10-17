@@ -15,8 +15,10 @@ Revises: 0106
 Create Date: 2026-10-17
 """
 
+import json
 from collections.abc import Sequence
 
+import sqlalchemy as sa
 from alembic import op
 
 revision: str = "0108"
@@ -25,6 +27,22 @@ branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
 EXAMPLE = "example from the round 6 spec, to be verified by an accountant"
+EXAMPLE_RATES = [
+    ("min_wage_monthly", "2025-04-01", {"minor": 624767, "currency": "ILS"}),
+    ("min_wage_hourly", "2025-04-01", {"minor": 3432, "currency": "ILS"}),
+    ("weekly_hours", "2025-01-01", {"hours": 42}),
+    (
+        "overtime_tiers",
+        "2025-01-01",
+        {"tiers": [{"hours": 2, "pct": 125}, {"hours": None, "pct": 150}]},
+    ),
+    ("credit_point_monthly", "2025-01-01", {"minor": 24200, "currency": "ILS"}),
+    (
+        "pension_defaults",
+        "2025-01-01",
+        {"employee_pct": 6, "employer_pct": 6.5, "severance_pct": 6},
+    ),
+]
 
 
 def upgrade() -> None:
@@ -45,17 +63,15 @@ def upgrade() -> None:
     op.execute(
         "CREATE POLICY payroll_rates_read ON app.payroll_rates FOR SELECT TO app_api USING (true)"
     )
-    op.execute(f"""
-        INSERT INTO app.payroll_rates (rate_key, valid_from, value, source) VALUES
-        ('min_wage_monthly', '2025-04-01', '{{"minor": 624767, "currency": "ILS"}}', '{EXAMPLE}'),
-        ('min_wage_hourly', '2025-04-01', '{{"minor": 3432, "currency": "ILS"}}', '{EXAMPLE}'),
-        ('weekly_hours', '2025-01-01', '{{"hours": 42}}', '{EXAMPLE}'),
-        ('overtime_tiers', '2025-01-01',
-         '{{"tiers": [{{"hours": 2, "pct": 125}}, {{"hours": null, "pct": 150}}]}}', '{EXAMPLE}'),
-        ('credit_point_monthly', '2025-01-01', '{{"minor": 24200, "currency": "ILS"}}', '{EXAMPLE}'),
-        ('pension_defaults', '2025-01-01',
-         '{{"employee_pct": 6, "employer_pct": 6.5, "severance_pct": 6}}', '{EXAMPLE}')
+    seed = sa.text("""
+        INSERT INTO app.payroll_rates (rate_key, valid_from, value, source)
+        VALUES (:key, :valid_from, CAST(:value AS jsonb), :source)
     """)
+    for key, valid_from, value in EXAMPLE_RATES:
+        op.get_bind().execute(
+            seed,
+            {"key": key, "valid_from": valid_from, "value": json.dumps(value), "source": EXAMPLE},
+        )
 
     op.execute("""
         CREATE TABLE app.pay_components (
