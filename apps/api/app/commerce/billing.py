@@ -8,6 +8,7 @@ services (setup) are charged with the first invoice."""
 
 import calendar
 import json
+from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
@@ -16,6 +17,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import Connection, text
 
 from app.commerce.modules import quote
+from app.core.tenant_scope import tenant_scope
 
 MAX_PERIODS_PER_RUN = 24  # a business that was never billed catches up at most two years
 
@@ -76,53 +78,57 @@ def bill_businesses(
     ).all()
     issued = 0
     for tenant in tenants:
-        zone = ZoneInfo(tenant.time_zone)
-        today = now.astimezone(zone).date()
-        anchor = tenant.trial_ends_at.astimezone(zone).date()
-        modules = dict(
-            conn.execute(
-                text("SELECT module_key, quantity FROM app.tenant_modules WHERE tenant_id = :t"),
-                {"t": tenant.id},
-            ).all()
-        )
-        for period in periods_due(anchor, tenant.last_start, today):
-            clients = active_clients_on(conn, tenant.id, period.end)
-            priced = quote(modules, clients, tenant.currency)
-            lines = [{"key": "core", "quantity": 1, "amount": priced.core}] + [
-                {"key": key, "quantity": modules[key], "amount": amount}
-                for key, amount in priced.lines.items()
-            ]
-            total = priced.total
-            # One-time services (the setup bought in the sign-up journey) ride on the first one.
-            if period.start == anchor:
-                lines += [
-                    {"key": key, "quantity": 1, "amount": amount}
-                    for key, amount in priced.once.items()
+        # for one business (the API) an error reaches the caller; in the job it stays with it
+        with nullcontext() if tenant_id else tenant_scope(conn, tenant.id):
+            zone = ZoneInfo(tenant.time_zone)
+            today = now.astimezone(zone).date()
+            anchor = tenant.trial_ends_at.astimezone(zone).date()
+            modules = dict(
+                conn.execute(
+                    text(
+                        "SELECT module_key, quantity FROM app.tenant_modules WHERE tenant_id = :t"
+                    ),
+                    {"t": tenant.id},
+                ).all()
+            )
+            for period in periods_due(anchor, tenant.last_start, today):
+                clients = active_clients_on(conn, tenant.id, period.end)
+                priced = quote(modules, clients, tenant.currency)
+                lines = [{"key": "core", "quantity": 1, "amount": priced.core}] + [
+                    {"key": key, "quantity": modules[key], "amount": amount}
+                    for key, amount in priced.lines.items()
                 ]
-                total += sum(priced.once.values())
-            charged = tenant.card_last4 is not None
-            inserted = conn.execute(
-                text("""
-                    INSERT INTO app.platform_invoices
-                        (tenant_id, period_start, period_end, currency, active_clients, lines,
-                         total, status, issued_at, paid_at, card_last4)
-                    VALUES (:t, :start, :end, :currency, :clients, CAST(:lines AS jsonb), :total,
-                            :status, :now, :paid_at, :last4)
-                    ON CONFLICT (tenant_id, period_start) DO NOTHING
-                """),
-                {
-                    "t": tenant.id,
-                    "start": period.start,
-                    "end": period.end,
-                    "currency": tenant.currency,
-                    "clients": clients,
-                    "lines": json.dumps(lines),
-                    "total": total,
-                    "status": "paid" if charged else "open",
-                    "now": now,
-                    "paid_at": now if charged else None,
-                    "last4": tenant.card_last4,
-                },
-            ).rowcount
-            issued += inserted
+                total = priced.total
+                # One-time services (the setup bought in the sign-up journey) ride on the first one.
+                if period.start == anchor:
+                    lines += [
+                        {"key": key, "quantity": 1, "amount": amount}
+                        for key, amount in priced.once.items()
+                    ]
+                    total += sum(priced.once.values())
+                charged = tenant.card_last4 is not None
+                inserted = conn.execute(
+                    text("""
+                        INSERT INTO app.platform_invoices
+                            (tenant_id, period_start, period_end, currency, active_clients, lines,
+                             total, status, issued_at, paid_at, card_last4)
+                        VALUES (:t, :start, :end, :currency, :clients, CAST(:lines AS jsonb),
+                                :total, :status, :now, :paid_at, :last4)
+                        ON CONFLICT (tenant_id, period_start) DO NOTHING
+                    """),
+                    {
+                        "t": tenant.id,
+                        "start": period.start,
+                        "end": period.end,
+                        "currency": tenant.currency,
+                        "clients": clients,
+                        "lines": json.dumps(lines),
+                        "total": total,
+                        "status": "paid" if charged else "open",
+                        "now": now,
+                        "paid_at": now if charged else None,
+                        "last4": tenant.card_last4,
+                    },
+                ).rowcount
+                issued += inserted
     return issued

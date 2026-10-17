@@ -244,7 +244,8 @@ def test_messages_go_through_the_business_provider(
     assert first["sent"] == 1 and first["waiting"] == 1
     assert SENT[0].body == "Hi Dana" and SENT[0].to == "050-1111111"
     for _ in range(5):  # the provider stays down: given up after the attempts
-        with engine.begin() as connection:
+        with engine.begin() as connection:  # (skip the growing wait between attempts)
+            connection.execute(text("UPDATE app.messages SET next_attempt_at = NULL"))
             send_messages(connection)
     with engine.connect() as connection:
         rows = dict(
