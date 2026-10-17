@@ -64,3 +64,17 @@ def test_notifications_are_in_the_payload() -> None:
     assert result["mailer_notifications_password_changed_enabled"] is True
     assert "mailer_templates_email_changed_notification_content" in result
     assert "mailer_templates_invite_content" in result
+
+
+def test_password_rules_and_authenticator_codes_are_pushed() -> None:
+    result = payload({})
+    assert result["password_min_length"] == 10
+    required = result["password_required_characters"].split(":")
+    assert len(required) == 2 and "a" in required[0] and "0123456789" == required[1]
+    assert result["security_update_password_require_reauthentication"] is True
+    assert result["mfa_totp_enroll_enabled"] is True and result["mfa_totp_verify_enabled"] is True
+
+
+def test_the_leaked_password_check_waits_for_a_paid_plan() -> None:
+    assert "password_hibp_enabled" not in payload({})
+    assert payload({"PAID_AUTH": "1"})["password_hibp_enabled"] is True

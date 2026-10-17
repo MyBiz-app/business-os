@@ -18,6 +18,7 @@ ALLOWED_ALGORITHMS = ["ES256", "RS256"]
 class CurrentUser:
     id: UUID
     email: str
+    aal: str = "aal1"  # "aal2" once an authenticator code was entered (app/core/mfa.py)
 
 
 class SigningKeySource(Protocol):
@@ -61,6 +62,10 @@ def get_current_user(
             audience=get_settings().jwt_audience,
             options={"require": ["sub", "exp", "aud"]},
         )
-        return CurrentUser(id=UUID(claims["sub"]), email=claims.get("email", ""))
+        return CurrentUser(
+            id=UUID(claims["sub"]),
+            email=claims.get("email", ""),
+            aal=claims.get("aal", "aal1"),
+        )
     except (jwt.PyJWTError, ValueError) as error:
         raise UNAUTHORIZED from error

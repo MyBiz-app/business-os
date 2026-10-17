@@ -209,7 +209,9 @@
       "optional": "Ask, optional",
       "required": "Ask, required"
     },
-    "clientIdNumberHint": "Common for clinics, health declarations and insurance. The number is kept encrypted and shown masked."
+    "clientIdNumberHint": "Common for clinics, health declarations and insurance. The number is kept encrypted and shown masked.",
+    "requireMfaForStaff": "Require two-step sign-in for the whole team",
+    "requireMfaForStaffHint": "Every team member must enter an authenticator code after their password before they can work in this business. Clients are not affected."
   },
   "locales": {
     "he": "עברית",
@@ -219,7 +221,7 @@
     "email": "Email",
     "password": "Password",
     "newPassword": "New password",
-    "passwordHint": "At least 8 characters.",
+    "passwordHint": "At least 10 characters, with letters and digits.",
     "login": {
       "title": "Log in",
       "submit": "Log in",
@@ -252,13 +254,13 @@
     "reset": {
       "title": "Choose a new password",
       "submit": "Save password",
-      "subtitle": "Pick something at least 8 characters long."
+      "subtitle": "Pick something at least 10 characters long, with letters and digits."
     },
     "signOut": "Sign out",
     "errors": {
       "invalid_credentials": "Wrong email or password.",
       "email_not_confirmed": "Please confirm your email first. Check your inbox.",
-      "weak_password": "This password is too weak. Use at least 8 characters.",
+      "weak_password": "This password is too weak. Use at least 10 characters, with letters and digits.",
       "user_already_exists": "An account with this email already exists.",
       "over_email_send_rate_limit": "Too many emails were sent. Please wait a minute and try again.",
       "link_invalid": "This link is invalid or has expired. Please try again.",
@@ -268,7 +270,8 @@
       "unknown_phone": "We don't know this number. Sign in with your email first and add the number to your account.",
       "invalid_code": "That code is wrong or has expired.",
       "over_sms_send_rate_limit": "Too many codes were sent. Please wait a minute and try again.",
-      "invalid_email": "Enter a valid email address."
+      "invalid_email": "Enter a valid email address.",
+      "session_expired": "You were signed out after a long time without activity. Sign in again."
     },
     "oauth": {
       "google": "Continue with Google",
@@ -7911,5 +7914,64 @@
     "allocationNumber": "Allocation number",
     "allocationNote": "This invoice is above the allocation threshold. Its allocation number from the tax authority is still to come.",
     "fingerprint": "Fingerprint of the stored file (sha256):"
+  },
+  "security": {
+    "title": "Account security",
+    "subtitle": "Protect your account with a code from an authenticator app and see where you are signed in.",
+    "mfa": {
+      "title": "Two-step sign-in",
+      "hint": "After your password you enter a 6-digit code from an authenticator app such as Google Authenticator, Microsoft Authenticator or 1Password.",
+      "on": "On",
+      "off": "Off",
+      "enable": "Turn on",
+      "scan": "Scan this code with your authenticator app, then enter the 6 digits it shows.",
+      "secret": "Can't scan? Enter this key in the app:",
+      "code": "6-digit code",
+      "confirm": "Confirm and turn on",
+      "cancel": "Cancel",
+      "enabled": "Two-step sign-in is on.",
+      "remove": "Turn off",
+      "removeHint": "Turning it off needs a fresh code from the app.",
+      "removed": "Two-step sign-in is off.",
+      "addBackup": "Add another device",
+      "backupHint": "Tip: add a second phone or authenticator as a backup, so losing one phone does not lock you out.",
+      "factorLabel": "Authenticator {number}",
+      "requiredTeam": "Everyone on the MyBiz team must use two-step sign-in. Turn it on to continue.",
+      "requiredBusiness": "This business requires two-step sign-in. Turn it on to continue.",
+      "requiredSoon": "Owners and managers will have to use two-step sign-in from {date}. Turn it on now."
+    },
+    "challenge": {
+      "title": "Enter your code",
+      "subtitle": "Open your authenticator app and enter the 6-digit code.",
+      "submit": "Verify",
+      "signOut": "Sign in as someone else"
+    },
+    "signOutAll": {
+      "title": "Sign out of all devices",
+      "hint": "Ends every session of your account, including this one. Use it if a phone is lost or you suspect someone else signed in.",
+      "button": "Sign out of all devices"
+    },
+    "devices": {
+      "title": "Recent devices",
+      "hint": "Where your account signed in lately. We email you when a new device signs in.",
+      "current": "This device",
+      "lastSeen": "Last seen {when}",
+      "empty": "Nothing to show yet."
+    },
+    "passwordRule": "At least 10 characters, with letters and digits.",
+    "errors": {
+      "invalid_code": "The code is wrong or expired. Try the current code from the app.",
+      "mfa_required": "This needs two-step sign-in. Turn it on in your account settings.",
+      "needs_recent_code": "Enter a fresh code from the app first.",
+      "generic": "Something went wrong. Try again."
+    },
+    "email": {
+      "subject": "New sign-in to your MyBiz account",
+      "greeting": "Hi,",
+      "body": "We noticed a sign-in to your account from a device we haven't seen before.\n\nIf this was you, there is nothing to do. If it was not, change your password and choose \"Sign out of all devices\" in your account settings right away.",
+      "device": "Device",
+      "unknownDevice": "Unknown device",
+      "when": "When"
+    }
   }
 }
