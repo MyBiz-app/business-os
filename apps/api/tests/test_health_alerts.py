@@ -73,12 +73,14 @@ def test_health_page_data(client: TestClient, engine: Engine, auth: AuthHeaders)
     with engine.begin() as connection:
         connection.execute(
             text(
-                "INSERT INTO app.job_runs (job, finished_at, ok, result) VALUES ('send-messages', now() - interval '40 hours', true, 'done')"
+                "INSERT INTO app.job_runs (job, finished_at, ok, result)"
+                " VALUES ('send-messages', now() - interval '40 hours', true, 'done')"
             )
         )
         connection.execute(
             text(
-                "INSERT INTO app.job_runs (job, finished_at, ok, result) VALUES ('purge-expired', now(), false, 'RuntimeError: x')"
+                "INSERT INTO app.job_runs (job, finished_at, ok, result)"
+                " VALUES ('purge-expired', now(), false, 'RuntimeError: x')"
             )
         )
     client.get("/platform/me", headers=headers)
