@@ -27,6 +27,10 @@ def upgrade() -> None:
             ADD COLUMN over_capacity_by uuid REFERENCES app.users (id) ON DELETE SET NULL,
             ADD COLUMN over_capacity_at timestamptz
     """)
+    op.execute(
+        "CREATE INDEX bookings_over_capacity_by ON app.bookings (over_capacity_by)"
+        " WHERE over_capacity_by IS NOT NULL"
+    )
 
 
 def downgrade() -> None:
