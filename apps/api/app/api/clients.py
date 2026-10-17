@@ -41,7 +41,8 @@ COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
     "custom_fields, home_location_id, created_at, updated_at, erased_at, "
     "marketing_consent_at IS NOT NULL AS marketing_consent, marketing_consent_at, "
-    "marketing_consent_source, marketing_opted_out_at"
+    "marketing_consent_source, marketing_opted_out_at, "
+    "(email IS NOT NULL AND app.email_is_suppressed(email)) AS email_suppressed"
 )
 
 
@@ -114,6 +115,9 @@ class Client(BaseModel):
     )
     marketing_opted_out_at: datetime | None = Field(
         default=None, description="Stopped ads with the opt-out link; only the client can undo it"
+    )
+    email_suppressed: bool = Field(
+        default=False, description="The address bounced or reported spam: no emails are sent to it"
     )
 
 

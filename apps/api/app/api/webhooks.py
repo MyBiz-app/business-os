@@ -8,6 +8,11 @@ translates it; only then is the checkout completed, for exactly the amount it wa
 business's messaging provider verifies and translates them, and they wait in the inbox for the
 AI replies (module `whatsapp_ai`). Closed while the provider is the simulated one."""
 
+import base64
+import hashlib
+import hmac
+import json
+import time
 from typing import Annotated
 from uuid import UUID
 
@@ -16,6 +21,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 
 from app.api.deps import AnonymousSessionDep
+from app.core.config import get_settings
 from app.providers.choice import choose
 from app.providers.payments import WebhookRejected
 
@@ -90,4 +96,53 @@ def whatsapp_webhook(
                 "phone": message.from_phone,
                 "body": message.body,
             },
+        )
+
+
+SVIX_TOLERANCE_SECONDS = 300
+
+
+def _verify_svix(headers: dict[str, str], body: bytes, secret: str) -> None:
+    """Resend signs webhooks with Svix: HMAC-SHA256 over `id.timestamp.body`, key = the
+    base64 part of the `whsec_` secret; the header may list several `v1,<signature>` values."""
+    msg_id = headers.get("svix-id", "")
+    stamp = headers.get("svix-timestamp", "")
+    try:
+        key = base64.b64decode(secret.removeprefix("whsec_"))
+        age = abs(time.time() - int(stamp))
+    except ValueError as error:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="rejected") from error
+    expected = base64.b64encode(
+        hmac.new(key, f"{msg_id}.{stamp}.".encode() + body, hashlib.sha256).digest()
+    ).decode()
+    offered = [part.partition(",")[2] for part in headers.get("svix-signature", "").split()]
+    if age > SVIX_TOLERANCE_SECONDS or not any(hmac.compare_digest(expected, o) for o in offered):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="rejected")
+
+
+@router.post("/email/resend", status_code=status.HTTP_204_NO_CONTENT)
+def email_webhook(request: Request, body: RawBody, session: AnonymousSessionDep) -> None:
+    """Hard bounces and spam complaints from Resend: the address is never mailed again.
+    Closed (404) until `API_EMAIL_WEBHOOK_SECRET` is set."""
+    secret = get_settings().email_webhook_secret
+    if secret is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    _verify_svix(headers, body, secret.get_secret_value())
+    try:
+        event = json.loads(body)
+        kind = event["type"]
+        data = event.get("data") or {}
+    except (ValueError, KeyError, TypeError) as error:
+        raise HTTPException(status_code=422, detail="invalid_event") from error
+    if kind == "email.complained":
+        reason = "complained"
+    elif kind == "email.bounced" and (data.get("bounce") or {}).get("type") == "Permanent":
+        reason = "bounced"
+    else:
+        return  # delivered, opened, soft bounces and the rest need no action
+    for address in data.get("to") or []:
+        session.execute(
+            text("SELECT app.suppress_email(:address, :reason, :ref)"),
+            {"address": str(address), "reason": reason, "ref": data.get("email_id")},
         )

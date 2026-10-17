@@ -1456,6 +1456,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/webhooks/email/resend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email Webhook
+         * @description Hard bounces and spam complaints from Resend: the address is never mailed again.
+         *     Closed (404) until `API_EMAIL_WEBHOOK_SECRET` is set.
+         */
+        post: operations["email_webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/quotes": {
         parameters: {
             query?: never;
@@ -9695,6 +9716,12 @@ export interface components {
              * @description Stopped ads with the opt-out link; only the client can undo it
              */
             marketing_opted_out_at?: string | null;
+            /**
+             * Email Suppressed
+             * @description The address bounced or reported spam: no emails are sent to it
+             * @default false
+             */
+            email_suppressed: boolean;
         };
         /** ClientAppointmentCreate */
         ClientAppointmentCreate: {
@@ -10014,6 +10041,12 @@ export interface components {
              * @description Stopped ads with the opt-out link; only the client can undo it
              */
             marketing_opted_out_at?: string | null;
+            /**
+             * Email Suppressed
+             * @description The address bounced or reported spam: no emails are sent to it
+             * @default false
+             */
+            email_suppressed: boolean;
             /**
              * Plan Name
              * @description The plan valid today, if any
@@ -22236,6 +22269,24 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    email_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
