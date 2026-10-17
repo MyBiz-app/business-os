@@ -249,6 +249,15 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     return [ClientLocation.model_validate(dict(row)) for row in rows]
 
 
+def _joined_business(session: Session, client_id: UUID | None) -> ClientBusiness:
+    row = (
+        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
+        .mappings()
+        .one()
+    )
+    return _business(row)
+
+
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
 def join_business(
     body: JoinRequest, request: Request, user: UserDep, session: SessionDep
@@ -266,14 +275,10 @@ def join_business(
     ).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="unknown_code")
-    row = (
-        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
-        .mappings()
-        .one()
-    )
+    joined = _joined_business(session, client_id)
     if body.accepted_legal:
-        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", row["id"])
-    return _business(row)
+        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", joined.id)
+    return joined
 
 
 class MemberJoinRequest(BaseModel):
@@ -294,13 +299,7 @@ def join_own_business(
     ).scalar()
     if offers_app is False:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
-    client_id = join_as_member(session, body.tenant_id)
-    row = (
-        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
-        .mappings()
-        .one()
-    )
-    return _business(row)
+    return _joined_business(session, join_as_member(session, body.tenant_id))
 
 
 CLIENT_SESSION_SELECT = """
