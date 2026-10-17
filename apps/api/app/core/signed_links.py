@@ -8,29 +8,22 @@ import hashlib
 import hmac
 import time
 
-from app.core.config import get_settings
-from app.providers.secrets import DEV_KEY, SecretsKeyMissing
+from app.providers.secrets import secret_keys
 
 TTL_SECONDS = 600
 
 
-def _key() -> bytes:
-    """Derived from API_SECRETS_KEY. The development key is public (it is in this repository),
-    so outside local development and tests a missing key fails instead of signing with it."""
-    settings = get_settings()
-    if settings.secrets_key is not None:
-        secret = settings.secrets_key.get_secret_value().encode()
-    elif settings.environment in ("local", "test"):
-        secret = DEV_KEY
-    else:
-        raise SecretsKeyMissing("API_SECRETS_KEY is required to sign links")
-    return hashlib.sha256(b"signed-links:" + secret).digest()
+def _keys() -> list[bytes]:
+    """One signing key per secret key, newest first. The development key is public (it is in this
+    repository), so outside local development and tests a missing key fails instead of signing
+    with it."""
+    return [hashlib.sha256(b"signed-links:" + key.encode()).digest() for key in secret_keys()]
 
 
 def sign(subject: str, ttl: int = TTL_SECONDS, now: float | None = None) -> str:
     expires = int((now or time.time()) + ttl)
     payload = f"{subject}.{expires}"
-    mac = hmac.new(_key(), payload.encode(), hashlib.sha256).digest()
+    mac = hmac.new(_keys()[0], payload.encode(), hashlib.sha256).digest()
     token = f"{payload}.{base64.urlsafe_b64encode(mac).decode().rstrip('=')}"
     return base64.urlsafe_b64encode(token.encode()).decode().rstrip("=")
 
@@ -44,7 +37,11 @@ def verify(token: str, now: float | None = None) -> str | None:
         expired = int(expires) < (now or time.time())
     except ValueError:  # not base64, not text, not our shape (binascii and Unicode errors too)
         return None
-    expected = hmac.new(_key(), f"{subject}.{expires}".encode(), hashlib.sha256).digest()
-    if not hmac.compare_digest(expected, given) or expired:
+    signed = f"{subject}.{expires}".encode()
+    matches = [
+        hmac.compare_digest(hmac.new(key, signed, hashlib.sha256).digest(), given)
+        for key in _keys()
+    ]
+    if not any(matches) or expired:
         return None
     return subject
