@@ -105,6 +105,8 @@ SELECT = """
            (SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()))
 """
 
+ORDER_LIMIT = " ORDER BY a.occurred_at DESC, a.id DESC LIMIT :limit"
+
 
 def _params(filters: AuditFilters) -> dict[str, Any]:
     return filters.model_dump()
@@ -133,10 +135,10 @@ def list_audit_log(
     keyset = ""
     if cursor:
         params["after_at"], params["after_id"] = _decode(cursor)
-        keyset = "AND (a.occurred_at, a.id) < (:after_at, :after_id)"
+        keyset = " AND (a.occurred_at, a.id) < (:after_at, :after_id)"
     rows = (
         context.session.execute(
-            text(f"{SELECT} {keyset} ORDER BY a.occurred_at DESC, a.id DESC LIMIT :limit"), params
+            text(SELECT + keyset + ORDER_LIMIT), params
         )
         .mappings()
         .all()
@@ -162,7 +164,7 @@ def export_audit_log(context: AuditDep, filters: FiltersDep) -> Response:
     """The filtered log as CSV (the latest 10,000 entries). The export is itself logged."""
     rows = (
         context.session.execute(
-            text(f"{SELECT} ORDER BY a.occurred_at DESC, a.id DESC LIMIT :limit"),
+            text(SELECT + ORDER_LIMIT),
             _params(filters) | {"limit": EXPORT_LIMIT},
         )
         .mappings()
