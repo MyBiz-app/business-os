@@ -114,7 +114,22 @@ nothing in production was touched.
 
 Workflow: `.github/workflows/rehearsal.yml` (manual, and on every change to the workflow itself).
 
-RESULTS_PLACEHOLDER
+Run of 2026-10-17 on commit `229cedc` (all steps green):
+
+| Step | Result |
+|---|---|
+| Migrations from empty to head `0124` | 3 s |
+| Newest migration (0124) down and up again | ok, head unchanged |
+| Encrypted dump (`pg_dump` into `age`) | under 1 s |
+| Restore (decrypt, restore, smoke checks) | 2 s; row counts equal in 129 tables (11 rows); 164 row security policies in both |
+| Database stopped: `/health` | 200 (the process is alive) |
+| Database stopped: `/health/ready` | 503 (what the uptime monitor alerts on) |
+| Recovery after the database came back | 10 s until `/health/ready` was 200 again |
+
+Limits of this run: the database holds only what the migrations create (11 rows), so the dump and
+restore times say that the chain works, not how long a real database takes. The first real drill
+(after task A2) measures that and goes into the table in `restore-runbook.md`. The outage ran on
+one API process, not the two workers of production.
 
 What was not rehearsed, and why:
 
