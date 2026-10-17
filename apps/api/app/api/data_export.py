@@ -54,9 +54,6 @@ class ExportLink(BaseModel):
     url: str = Field(description="Downloads the ZIP without signing in, for 24 hours")
 
 
-COLUMNS = "id, status, created_at, expires_at, size, file_count"
-
-
 def _model(row: dict) -> DataExport:
     return DataExport(
         id=row["id"],
@@ -88,7 +85,10 @@ def download_url(tenant_id: UUID, export_id: UUID) -> str:
 @router.get("")
 def list_exports(context: OwnerDep) -> list[DataExport]:
     rows = context.session.execute(
-        text(f"SELECT {COLUMNS} FROM app.data_exports ORDER BY created_at DESC LIMIT 10")
+        text("""
+            SELECT id, status, created_at, expires_at, size, file_count
+            FROM app.data_exports ORDER BY created_at DESC LIMIT 10
+        """)
     ).mappings()
     return [_model(dict(row)) for row in rows]
 
@@ -107,9 +107,10 @@ def request_export(context: OwnerDep, background: BackgroundTasks, engine: Engin
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="export_in_progress")
     row = (
         db.execute(
-            text(f"""
+            text("""
                 INSERT INTO app.data_exports (tenant_id, requested_by)
-                VALUES (app.current_tenant_id(), app.current_user_id()) RETURNING {COLUMNS}
+                VALUES (app.current_tenant_id(), app.current_user_id())
+                RETURNING id, status, created_at, expires_at, size, file_count
             """)
         )
         .mappings()
@@ -152,11 +153,11 @@ def build_export(engine: Engine, tenant_id: UUID, user_id: UUID, export_id: UUID
                 storage.put(key, archive, "application/zip")
                 content = None
             session.execute(
-                text(f"""
+                text("""
                     UPDATE app.data_exports
                     SET status = 'ready', content = :content, storage_key = :key, size = :size,
                         file_count = :files, ready_at = now(),
-                        expires_at = now() + make_interval(hours => {LINK_HOURS})
+                        expires_at = now() + make_interval(hours => :hours)
                     WHERE id = :id
                 """),
                 {
@@ -164,6 +165,7 @@ def build_export(engine: Engine, tenant_id: UUID, user_id: UUID, export_id: UUID
                     "key": key,
                     "size": len(archive),
                     "files": files,
+                    "hours": LINK_HOURS,
                     "id": export_id,
                 },
             )
