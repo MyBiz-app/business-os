@@ -1013,6 +1013,7 @@
     "copyWeekError": "Couldn't copy the week. Try again.",
     "closedDays": "Closed days",
     "closedDay": "Closed",
+    "grid": "Calendar grid, scrollable",
     "closeDay": "Close a day",
     "closedDate": "Date",
     "closedReason": "Reason (optional)",
@@ -2640,6 +2641,8 @@
     "reports_read_hint": "Revenue and other business numbers",
     "ai_use": "Use the AI assistant",
     "ai_use_hint": "Its tools still follow the other permissions",
+    "ai_manage": "Manage the AI team",
+    "ai_manage_hint": "Agents, their branch scope, roles and budget",
     "staff_read": "View the team",
     "staff_read_hint": "Members and roles",
     "staff_manage": "Manage the team",
@@ -2664,6 +2667,8 @@
     "payroll_manage_hint": "Set employment terms, request and correct Form 101",
     "payroll_approve": "Approve payroll",
     "payroll_approve_hint": "Approve and lock pay runs (owners only)",
+    "payroll_propose": "Propose bonuses",
+    "payroll_propose_hint": "Suggest a bonus for people at their own branches, for the owner to decide",
     "time_approve": "Approve hours",
     "time_approve_hint": "Correct clocked hours and approve a person's month",
     "migration_manage": "Move to MyBiz",
@@ -3706,7 +3711,7 @@
             "id": "standard",
             "title": "Standard and testing",
             "p": [
-              "The site is built to Israeli Standard 5568 (based on WCAG 2.1 level AA). We test with automated tools and manually with a keyboard and screen readers. This statement was last reviewed in October 2026."
+              "The site is built to Israeli Standard 5568 (based on WCAG 2.1 level AA). Every release is checked automatically (axe) on the public pages and on every screen of the business web app, in Hebrew and English, light and dark, and the build fails on serious findings. We also check manually with a keyboard and screen readers. The latest automated check was on 17 October 2026; the latest manual review is listed in our accessibility checklist and will be updated here once completed. This statement was last reviewed in October 2026."
             ]
           },
           {

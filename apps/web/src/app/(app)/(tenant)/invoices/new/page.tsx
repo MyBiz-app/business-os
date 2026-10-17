@@ -63,7 +63,7 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/invo
         <p role="note" className="rounded-xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm">
           {tenant.legal_entity_type === "exempt_dealer" ? t("exemptNote") : t("taxNotReady")}{" "}
           {tenant.legal_entity_type !== "exempt_dealer" && (
-            <Link href="/settings" className="font-semibold text-primary-ink underline-offset-4 hover:underline">{t("completeDetails")}</Link>
+            <Link href="/settings" className="font-semibold text-foreground underline underline-offset-4">{t("completeDetails")}</Link>
           )}
         </p>
       )}

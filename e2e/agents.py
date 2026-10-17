@@ -97,6 +97,7 @@ with sync_playwright() as p:
         print("6. console broadcasts and AI board: ok")
     b.close()
 
-if issues:  # reported, not failing: dod.py treats the same findings on other pages the same way
-    print("a11y findings to fix later:", *issues, sep="\n  ")
+if issues:  # serious and critical axe findings block the run
+    print("a11y findings:", *issues, sep="\n  ")
+    sys.exit(1)
 print("agents: ok")
