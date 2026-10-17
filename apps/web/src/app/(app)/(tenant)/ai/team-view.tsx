@@ -1,10 +1,12 @@
 "use client";
 
-import { FlaskConical, GitBranch, LayoutGrid, MessageCircle, Maximize2, Minimize2, Network, UserPlus } from "lucide-react";
+import { FlaskConical, GitBranch, MessageCircle, Maximize2, Minimize2, RotateCcw, UserPlus } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { PageHeader } from "@/components/layout/page-header";
+import { SegmentedControl } from "@/components/segmented-control";
 import { type Draft, draftOf, payloadOf } from "@/lib/ai-structure";
 
 import {
@@ -245,31 +247,53 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
-        {team.can_manage && !structuring && (
-          <button type="button" onClick={startEditing} className="btn-secondary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
-            <GitBranch aria-hidden="true" className="size-4" />
-            {t("structure.edit")}
-          </button>
-        )}
-        {team.can_manage && (
-          <button type="button" onClick={() => setWizard(true)} className="btn-primary inline-flex items-center gap-2 px-3 py-1.5 text-sm">
-            <UserPlus aria-hidden="true" className="size-4" />
-            {t("wizard.hire")}
-          </button>
-        )}
-        <div role="group" aria-label={t("view")} className="hidden items-center gap-1 rounded-full border border-border p-1 md:flex">
-          {(["map", "list"] as const).map((mode) => {
-            const Icon = mode === "map" ? Network : LayoutGrid;
-            return (
-              <button key={mode} type="button" aria-pressed={view === mode} onClick={() => setView(mode)} className={`btn-plain inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm ${view === mode ? "bg-primary text-on-primary" : "text-muted hover:text-foreground"}`}>
-                <Icon aria-hidden="true" className="size-4" />
-                {t(`views.${mode}`)}
+      <PageHeader
+        title={t("title")}
+        description={t("subtitle")}
+        actions={
+          team.can_manage && (
+            <button type="button" onClick={() => setWizard(true)} disabled={structuring} className="btn-primary inline-flex h-11 items-center gap-2 px-4 text-sm">
+              <UserPlus aria-hidden="true" className="size-4" />
+              {t("wizard.hire")}
+            </button>
+          )
+        }
+      />
+
+      {/* One bar of a fixed height, so nothing jumps when the window changes size or the mode switches. */}
+      <div role="toolbar" aria-label={t("toolbar")} className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl border border-border bg-surface px-4 py-2">
+        {structuring ? (
+          <>
+            <p className="text-sm font-semibold">{t("structure.title")}</p>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => setDraft({ ...draft, pos: {} })} disabled={savingStructure} className="btn-secondary inline-flex h-9 items-center gap-1.5 px-3 text-sm">
+                <RotateCcw aria-hidden="true" className="size-4" />
+                {t("structure.relayout")}
               </button>
-            );
-          })}
-        </div>
+              <button type="button" onClick={() => setDraft(null)} disabled={savingStructure} className="btn-secondary h-9 px-3 text-sm">
+                {t("structure.cancel")}
+              </button>
+              <button type="button" onClick={() => void commitStructure()} disabled={savingStructure} className="btn-primary h-9 px-3 text-sm">
+                {savingStructure ? t("structure.saving") : t("structure.save")}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted">{t("usage", { used: number.format(team.credits_used), included: number.format(team.credits_included) })}</p>
+            <div className="flex items-center gap-2">
+              <div className="hidden md:block">
+                <SegmentedControl label={t("view")} value={view} onChange={setView} options={[{ value: "map", label: t("views.map") }, { value: "list", label: t("views.list") }]} />
+              </div>
+              {team.can_manage && (
+                <button type="button" onClick={startEditing} className="btn-secondary inline-flex h-9 items-center gap-2 px-3 text-sm">
+                  <GitBranch aria-hidden="true" className="size-4" />
+                  {t("structure.edit")}
+                </button>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex items-start gap-4">
@@ -339,12 +363,8 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         <StructurePanel
           agents={team.agents}
           draft={draft}
-          saving={savingStructure}
           error={structureError}
           onChange={setDraft}
-          onRelayout={() => setDraft({ ...draft, pos: {} })}
-          onSave={() => void commitStructure()}
-          onCancel={() => setDraft(null)}
         />
       )}
 

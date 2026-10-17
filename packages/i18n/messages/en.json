@@ -1778,6 +1778,7 @@
     "title": "AI team",
     "subtitle": "Your agents, each with a job. Pick one to talk, or ask the chief and it will point you to the right one.",
     "mapLabel": "The AI team",
+    "toolbar": "AI team tools",
     "listLabel": "AI agents",
     "view": "View",
     "views": {
@@ -2174,7 +2175,7 @@
     "structure": {
       "edit": "Edit structure",
       "title": "Team structure",
-      "hint": "Drag the circle above an agent onto the agent it reports to. Click a line to remove it. Drag an agent into a team frame to add it. You can also use the lists below.",
+      "hint": "Drag a dot on the rim of an agent's picture onto another agent to connect them: the bottom dot is for the agents under it, the top dot for its manager. Click a line to remove it. Drag an agent into a team frame to add it. You can also use the lists below.",
       "relayout": "Tidy up",
       "cancel": "Cancel",
       "save": "Save",
@@ -2198,6 +2199,8 @@
       "agentsLabel": "Agents and where they stand",
       "removeLine": "Remove the line: {name} goes back under the chief",
       "handle": "Drag onto the agent that {name} reports to",
+      "portTop": "Top dot of {name}: attach the agent {name} reports to",
+      "portBottom": "Bottom dot of {name}: drag onto an agent that reports to {name}",
       "errors": {
         "locked_agent": "A locked agent cannot be connected. Add its module to the plan first.",
         "cycle": "Agents cannot report to each other in a loop.",
