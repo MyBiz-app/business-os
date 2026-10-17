@@ -103,3 +103,13 @@ def test_eas_production_profile_does_not_use_staging_addresses():
     production = eas["build"]["production"]
     assert production.get("environment") == "production"
     assert "staging" not in json.dumps(production)
+
+
+def test_rollback_is_manual_and_release_notes_deploy_nothing():
+    rollback = yaml.safe_load((WORKFLOWS / "rollback.yml").read_text(encoding="utf-8"))
+    triggers = rollback.get(True) or rollback["on"]
+    assert list(triggers) == ["workflow_dispatch"]
+    release_text = (WORKFLOWS / "release.yml").read_text(encoding="utf-8")
+    assert "vercel" not in release_text.lower() and "deploy-hook" not in release_text.lower()
+    for name in ("rollback.yml", "deploy-web-production.yml"):
+        assert "DATABASE_URL" not in (WORKFLOWS / name).read_text(encoding="utf-8")
