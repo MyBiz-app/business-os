@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 
 import { createNonce, NONCE_HEADER, REPORTING_ENDPOINTS, strictCsp } from "@/lib/csp";
+import { cspReportOnly, hstsHeader, indexingAllowed } from "@/lib/site-config";
 import { updateSession } from "@/lib/supabase/proxy";
 
 export async function proxy(request: NextRequest) {
@@ -8,12 +9,17 @@ export async function proxy(request: NextRequest) {
   // scripts; our inline scripts read it from NONCE_HEADER (see app/layout.tsx).
   const nonce = createNonce();
   const policy = strictCsp(nonce, { dev: process.env.NODE_ENV !== "production" });
+  const cspHeader = cspReportOnly() ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
   request.headers.set(NONCE_HEADER, nonce);
-  request.headers.set("content-security-policy-report-only", policy);
+  request.headers.set(cspHeader, policy);
 
   const response = await updateSession(request);
-  response.headers.set("Content-Security-Policy-Report-Only", policy);
+  response.headers.set(cspHeader, policy);
   response.headers.set("Reporting-Endpoints", REPORTING_ENDPOINTS);
+  const hsts = hstsHeader();
+  if (hsts) response.headers.set("Strict-Transport-Security", hsts);
+  // Everything except the production site stays out of search results (robots.ts says the same).
+  if (!indexingAllowed()) response.headers.set("X-Robots-Tag", "noindex, nofollow");
   return response;
 }
 

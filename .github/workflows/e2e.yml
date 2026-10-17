@@ -80,6 +80,10 @@ jobs:
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
             python e2e/round6.py
 
+      - name: Check the Content-Security-Policy in a real browser (marketing pages and the CRM)
+        run: |
+          uv run --with playwright --with "psycopg[binary]" python e2e/csp.py
+
       - name: Show the API log
         if: failure()
         run: tail -n 60 api.log || true

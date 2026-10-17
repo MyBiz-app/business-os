@@ -7,7 +7,7 @@ import re
 import time
 import urllib.request
 
-BASE = "http://localhost:3000"  # web
+BASE = os.environ.get("E2E_WEB_URL", "http://localhost:3000")  # web
 APP = "http://localhost:8081"  # mobile app on Expo web
 MAILBOX = "http://127.0.0.1:54324/api/v1"  # Mailpit from `supabase start`
 DATABASE_URL = os.environ.get(
