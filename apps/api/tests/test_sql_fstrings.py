@@ -54,6 +54,7 @@ ALLOWED = {
     "api/stations.py": 2,
     "api/time_billing.py": 4,
     "api/time_off_requests.py": 2,
+    "core/business_export.py": 1,  # table and column names read from the database catalog
     "files/__init__.py": 1,
     "reports/metrics.py": 1,
     "secrets_rotation.py": 2,  # table and column names from the COLUMNS constant

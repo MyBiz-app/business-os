@@ -6781,6 +6781,28 @@
     "reset": "Reset settings",
     "statement": "Accessibility statement"
   },
+  "accountDeletion": {
+    "button": "Delete my account",
+    "confirmTitle": "Delete your account?",
+    "confirmBody": "You will be signed out and disconnected from every business. Records a business keeps about you as its client stay with that business; ask the business to erase them. Payroll and accounting records the law requires are kept without your name. This cannot be undone.",
+    "yes": "Delete my account",
+    "no": "Cancel",
+    "ownsBusiness": "You still own an open business. Close it first (CRM, Settings) and then delete your account.",
+    "failed": "Could not delete the account. Please try again."
+  },
+  "dataExport": {
+    "title": "Export all your data",
+    "intro": "Download everything your business holds as one ZIP: a spreadsheet file for each kind of record (clients, bookings, payments, staff, invoices and more) plus your files and your clients' documents. We email you the download link too.",
+    "request": "Prepare the export",
+    "building": "Preparing the export...",
+    "download": "Download",
+    "status": {
+      "building": "Preparing",
+      "ready": "Ready (the link works for 24 hours)",
+      "failed": "Failed, please try again"
+    },
+    "note": "The ZIP is deleted after 24 hours. Passwords, keys of connected services and ID numbers are not included."
+  },
   "closure": {
     "title": "Close this business",
     "intro": "Closing locks the business for your staff and clients, stops billing and automatic reminders. Your data is kept for {days} days. You can reopen the business any time before then; after that everything is deleted for good.",

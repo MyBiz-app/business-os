@@ -239,7 +239,9 @@ def get_tenant_context(
     if allowed is not None and not allowed:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="no_branches")
     if (
-        not request.url.path.startswith("/tenants/current/closure")
+        not request.url.path.startswith(
+            ("/tenants/current/closure", "/tenants/current/data-exports")
+        )
         and session.execute(
             text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = app.current_tenant_id()")
         ).scalar()
