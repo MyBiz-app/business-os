@@ -8,7 +8,11 @@ import { ToastOnChange } from "@/components/toast/toaster";
 import { unwrap } from "@/lib/api";
 
 import { HEALTH_TONE } from "../../clients/[id]/health-section";
-import { bookClient, setBookingStatus } from "../actions";
+import { bookClient, bookClientOverCapacity, setBookingStatus } from "../actions";
+import { OverCapacityButton } from "./over-capacity-button";
+
+// Who may add a client to a full class (the API enforces the same list).
+const OVER_CAPACITY_ROLES = ["owner", "manager", "branch_manager"];
 
 type Booking = components["schemas"]["Booking"];
 type Session = components["schemas"]["ScheduledSession"];
@@ -98,6 +102,8 @@ export async function Roster({ session, context, manageable, search, error }: Pr
     })),
   );
   const full = session.booked >= session.capacity;
+  const over = Math.max(0, session.booked - session.capacity);
+  const canOverbook = full && OVER_CAPACITY_ROLES.includes(context.tenant.role);
 
   const row = (booking: Booking) => (
     <li key={booking.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
@@ -118,6 +124,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
           {booking.client_name}
         </Link>
         <Pill tone={TONE[booking.status]}>{t(`statuses.${booking.status}`)}</Pill>
+        {booking.over_capacity && booking.status !== "cancelled" && (
+          <Pill tone="warning">{t("overCapacity")}</Pill>
+        )}
         {booking.late_cancel && <span className="text-xs text-danger">{t("lateCancel")}</span>}
         {booking.status !== "cancelled" && showHealth(booking.health_state) && (
           <Pill tone={HEALTH_TONE[booking.health_state]}>{tHealth(`states.${booking.health_state}`)}</Pill>
@@ -153,8 +162,9 @@ export async function Roster({ session, context, manageable, search, error }: Pr
         <h2 id="roster-heading" className="text-lg font-semibold">
           {t("roster")}
         </h2>
-        <p className="text-sm text-muted">
+        <p className={`text-sm ${over > 0 ? "font-medium text-warning" : "text-muted"}`}>
           {t("summary", { booked: session.booked, capacity: session.capacity, waitlisted: session.waitlisted })}
+          {over > 0 && ` · ${t("overCapacityNote", { count: over })}`}
         </p>
       </div>
 
@@ -214,15 +224,26 @@ export async function Roster({ session, context, manageable, search, error }: Pr
                         ))}
                       </div>
                     ) : (
-                      <form action={bookClient.bind(null, session.id, client.id, undefined)}>
-                        <button
-                          type="submit"
-                          aria-label={`${label} - ${name}`}
-                          className="btn-primary px-3 py-1 text-xs"
-                        >
-                          {label}
-                        </button>
-                      </form>
+                      <div className="flex flex-wrap gap-2">
+                        {canOverbook && (
+                          <OverCapacityButton
+                            name={name}
+                            booked={session.booked}
+                            capacity={session.capacity}
+                            overAction={bookClientOverCapacity.bind(null, session.id, client.id)}
+                            waitlistAction={bookClient.bind(null, session.id, client.id, undefined)}
+                          />
+                        )}
+                        <form action={bookClient.bind(null, session.id, client.id, undefined)}>
+                          <button
+                            type="submit"
+                            aria-label={`${label} - ${name}`}
+                            className="btn-primary px-3 py-1 text-xs"
+                          >
+                            {label}
+                          </button>
+                        </form>
+                      </div>
                     )}
                   </li>
                 );

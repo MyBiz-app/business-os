@@ -43479,6 +43479,23 @@
             ],
             "title": "Waitlist Position"
           },
+          "over_capacity": {
+            "type": "boolean",
+            "title": "Over Capacity",
+            "description": "Added beyond the class's capacity by a manager"
+          },
+          "over_capacity_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Over Capacity At"
+          },
           "late_cancel": {
             "type": "boolean",
             "title": "Late Cancel"
@@ -43535,6 +43552,7 @@
           "plan_name",
           "status",
           "waitlist_position",
+          "over_capacity",
           "late_cancel",
           "checked_in_at",
           "cancelled_at",
@@ -43562,6 +43580,12 @@
             ],
             "title": "Dependent Id",
             "description": "Which of the client's pets / children comes (#43)"
+          },
+          "over_capacity": {
+            "type": "boolean",
+            "title": "Over Capacity",
+            "description": "Book the client even though the class is full (owners and managers only); ignored while a spot is free",
+            "default": false
           }
         },
         "type": "object",

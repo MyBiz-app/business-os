@@ -9345,6 +9345,13 @@ export interface components {
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
             /** Waitlist Position */
             waitlist_position: number | null;
+            /**
+             * Over Capacity
+             * @description Added beyond the class's capacity by a manager
+             */
+            over_capacity: boolean;
+            /** Over Capacity At */
+            over_capacity_at?: string | null;
             /** Late Cancel */
             late_cancel: boolean;
             /** Checked In At */
@@ -9375,6 +9382,12 @@ export interface components {
              * @description Which of the client's pets / children comes (#43)
              */
             dependent_id?: string | null;
+            /**
+             * Over Capacity
+             * @description Book the client even though the class is full (owners and managers only); ignored while a spot is free
+             * @default false
+             */
+            over_capacity: boolean;
         };
         /** BookingUpdate */
         BookingUpdate: {
