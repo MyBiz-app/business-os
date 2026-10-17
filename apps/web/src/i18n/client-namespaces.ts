@@ -50,6 +50,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "identity",
     "imageCrop",
     "integrations",
+    "invoices",
     "jobs",
     "leads",
     "locales",

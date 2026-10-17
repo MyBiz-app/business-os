@@ -6,6 +6,7 @@ import {
   Inbox,
   Clock,
   FileSignature,
+  FileText,
   FolderOpen,
   Plug,
   ScrollText,
@@ -59,6 +60,7 @@ const ICONS = {
   integrations: Plug,
   broadcasts: Megaphone,
   quotes: FileSignature,
+  invoices: FileText,
   time: Clock,
   files: FolderOpen,
 } as const;

@@ -44,6 +44,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
     { href: "/services", group: g("catalog"), label: t("nav.services"), icon: "services", permission: "catalog.read" },
     { href: "/plans", group: g("catalog"), label: t("nav.plans"), icon: "plans", permission: "catalog.read" },
     { href: "/quotes", group: g("money"), label: t("nav.quotes"), icon: "quotes", permission: "clients.read" },
+    { href: "/invoices", group: g("money"), label: t("nav.invoices"), icon: "invoices", permission: "sales.manage" },
     ...(vertical(tenant.vertical)?.timeBilling
       ? [
           { href: "/time", group: g("work"), label: t("nav.time"), icon: "time" as const, permission: "clients.read" },

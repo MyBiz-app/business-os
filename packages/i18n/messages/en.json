@@ -431,7 +431,8 @@
       "business": "Business"
     },
     "content": "Content & creative",
-    "files": "Files"
+    "files": "Files",
+    "invoices": "Invoices"
   },
   "terms": {
     "fitness": {
@@ -7338,5 +7339,77 @@
       "amount_too_small": "The total is too small to divide between this many people."
     },
     "amountModeLabel": "How to count it"
+  },
+  "invoices": {
+    "title": "Invoices and documents",
+    "subtitle": "Tax invoices, credit notes, quotes and transaction invoices, each with its own running number and a PDF in your brand.",
+    "new": "New document",
+    "newCredit": "New credit note",
+    "back": "All documents",
+    "all": "All",
+    "filter": "Filter by kind",
+    "none": "No documents issued yet.",
+    "nextNumbers": "Next number of each kind",
+    "kinds": {
+      "tax_invoice_receipt": "Tax invoice-receipt",
+      "tax_invoice": "Tax invoice",
+      "credit_note": "Credit note",
+      "quote": "Quote",
+      "transaction_invoice": "Transaction invoice"
+    },
+    "kind": "Kind",
+    "client": "Client",
+    "noClient": "Someone else (type a name)",
+    "clientName": "Name on the document",
+    "clientNameHint": "Needed when you don't pick a client.",
+    "clientEmail": "Email",
+    "clientTaxId": "Client's business or ID number",
+    "clientTaxIdHint": "Optional. Shown on the document.",
+    "lines": "What's included",
+    "pricesWithVat": "Prices include VAT. The document shows the net amount and the VAT.",
+    "pricesNoVat": "This kind of document does not charge VAT.",
+    "lineDescription": "Item {number}",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "amount": "Amount",
+    "addLine": "Add an item",
+    "removeLine": "Remove item {number}",
+    "total": "Total",
+    "net": "Before VAT",
+    "vat": "VAT {rate}%",
+    "paymentMethod": "Payment method",
+    "methods": {
+      "card": "Credit card",
+      "cash": "Cash",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    },
+    "dueDate": "Pay by",
+    "validUntil": "Valid until",
+    "paymentTerms": "Payment terms",
+    "notes": "Notes",
+    "issue": "Issue the document",
+    "issueHint": "Once issued, a document cannot be edited. A mistake is fixed with a credit note.",
+    "creditFor": "A credit note for {number}, issued to {client}.",
+    "issueCredit": "Issue a credit note",
+    "exemptNote": "An exempt dealer issues receipts, quotes and transaction invoices, not tax documents.",
+    "taxNotReady": "Tax documents need the business number and address to be filled in.",
+    "completeDetails": "Complete the details",
+    "reasons": {
+      "exempt_dealer_no_tax_invoice": "An exempt dealer cannot issue a tax document.",
+      "legal_details_missing": "Fill in the business number and address in settings before issuing a tax document.",
+      "credit_exceeds_invoice": "The credit notes together cannot exceed the invoice.",
+      "unknown_invoice": "That invoice was not found.",
+      "unknown_client": "That client was not found."
+    },
+    "issuedAt": "Issued",
+    "downloadOriginal": "Download the original",
+    "downloadCopy": "Download a copy",
+    "sampleNote": "Sample document: the invoicing provider is not connected yet, so this is not a tax document.",
+    "allocationPending": "Allocation number pending",
+    "allocationNumber": "Allocation number",
+    "allocationNote": "This invoice is above the allocation threshold. Its allocation number from the tax authority is still to come.",
+    "fingerprint": "Fingerprint of the stored file (sha256):"
   }
 }

@@ -431,7 +431,8 @@
       "business": "העסק"
     },
     "content": "תוכן וקריאייטיב",
-    "files": "קבצים"
+    "files": "קבצים",
+    "invoices": "חשבוניות"
   },
   "terms": {
     "fitness": {
@@ -7338,5 +7339,77 @@
       "amount_too_small": "הסכום הכולל קטן מדי לחלוקה בין כל כך הרבה אנשים."
     },
     "amountModeLabel": "אופן החישוב"
+  },
+  "invoices": {
+    "title": "חשבוניות ומסמכים",
+    "subtitle": "חשבוניות מס, חשבוניות זיכוי, הצעות מחיר וחשבונות עסקה, לכל סוג מספור רץ משלו וקובץ PDF במיתוג שלכם.",
+    "new": "מסמך חדש",
+    "newCredit": "חשבונית זיכוי חדשה",
+    "back": "כל המסמכים",
+    "all": "הכול",
+    "filter": "סינון לפי סוג",
+    "none": "עדיין לא הופקו מסמכים.",
+    "nextNumbers": "המספר הבא בכל סוג",
+    "kinds": {
+      "tax_invoice_receipt": "חשבונית מס קבלה",
+      "tax_invoice": "חשבונית מס",
+      "credit_note": "חשבונית זיכוי",
+      "quote": "הצעת מחיר",
+      "transaction_invoice": "חשבון עסקה"
+    },
+    "kind": "סוג",
+    "client": "לקוח",
+    "noClient": "אחר (להקליד שם)",
+    "clientName": "שם במסמך",
+    "clientNameHint": "נדרש כשלא בוחרים לקוח.",
+    "clientEmail": "אימייל",
+    "clientTaxId": "מספר עוסק או ת.ז. של הלקוח",
+    "clientTaxIdHint": "לא חובה. מופיע במסמך.",
+    "lines": "מה כלול",
+    "pricesWithVat": "המחירים כוללים מע\"מ. המסמך מציג את הסכום לפני מע\"מ ואת המע\"מ.",
+    "pricesNoVat": "בסוג מסמך זה לא נגבה מע\"מ.",
+    "lineDescription": "פריט {number}",
+    "description": "תיאור",
+    "quantity": "כמות",
+    "unitPrice": "מחיר ליחידה",
+    "amount": "סכום",
+    "addLine": "הוספת פריט",
+    "removeLine": "הסרת פריט {number}",
+    "total": "סה\"כ",
+    "net": "לפני מע\"מ",
+    "vat": "מע\"מ {rate}%",
+    "paymentMethod": "אמצעי תשלום",
+    "methods": {
+      "card": "כרטיס אשראי",
+      "cash": "מזומן",
+      "transfer": "העברה בנקאית",
+      "other": "אחר"
+    },
+    "dueDate": "לתשלום עד",
+    "validUntil": "בתוקף עד",
+    "paymentTerms": "תנאי תשלום",
+    "notes": "הערות",
+    "issue": "הפקת המסמך",
+    "issueHint": "מסמך שהופק אי אפשר לערוך. טעות מתקנים בחשבונית זיכוי.",
+    "creditFor": "חשבונית זיכוי עבור {number}, על שם {client}.",
+    "issueCredit": "הפקת חשבונית זיכוי",
+    "exemptNote": "עוסק פטור מפיק קבלות, הצעות מחיר וחשבונות עסקה, לא מסמכי מס.",
+    "taxNotReady": "להפקת מסמכי מס צריך להשלים את מספר העסק והכתובת.",
+    "completeDetails": "השלמת הפרטים",
+    "reasons": {
+      "exempt_dealer_no_tax_invoice": "עוסק פטור לא יכול להפיק מסמך מס.",
+      "legal_details_missing": "צריך להשלים בהגדרות את מספר העסק והכתובת לפני הפקת מסמך מס.",
+      "credit_exceeds_invoice": "סך חשבוניות הזיכוי לא יכול לעלות על החשבונית.",
+      "unknown_invoice": "החשבונית לא נמצאה.",
+      "unknown_client": "הלקוח לא נמצא."
+    },
+    "issuedAt": "תאריך הפקה",
+    "downloadOriginal": "הורדת המקור",
+    "downloadCopy": "הורדת העתק",
+    "sampleNote": "מסמך לדוגמה: ספק החשבוניות עדיין לא מחובר, ולכן זה לא מסמך מס.",
+    "allocationPending": "ממתין למספר הקצאה",
+    "allocationNumber": "מספר הקצאה",
+    "allocationNote": "החשבונית מעל סף ההקצאה. מספר ההקצאה מרשות המסים עדיין יתקבל.",
+    "fingerprint": "טביעת האצבע של הקובץ השמור (sha256):"
   }
 }
