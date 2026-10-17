@@ -42,14 +42,14 @@ export function BrandColorCard() {
     <Card palette={palette}>
       <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("colors")}</Text>
       <Text style={[styles.muted, { color: palette.muted }]}>{t("colorsHint")}</Text>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+      <View role="radiogroup" aria-label={t("colors")} style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
         {SWATCHES.map((swatch) => {
           const selected = value.toLowerCase() === swatch;
           return (
             <Pressable
               key={swatch}
-              accessibilityRole="radio"
-              accessibilityState={{ selected }}
+              role="radio"
+              aria-checked={selected}
               accessibilityLabel={swatch}
               onPress={() => setDraft(swatch)}
               style={{
