@@ -5,8 +5,8 @@ business that keeps failing is visible without stopping the others. A message th
 sent waits longer after every attempt (`next_attempt_at`), and a partial index keeps the outbox
 scan quick when the table holds millions of sent messages.
 
-Revision ID: 0116
-Revises: 0115
+Revision ID: 0117
+Revises: 0116
 Create Date: 2026-10-17
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0116"
-down_revision: str | None = "0115"
+revision: str = "0117"
+down_revision: str | None = "0116"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

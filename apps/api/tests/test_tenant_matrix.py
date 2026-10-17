@@ -38,6 +38,7 @@ OVERRIDES = {
     "client_social": {"friend_code": "'ABCDEFGHJK'"},
     "business_files": {"content": "'\\x00'", "size": "1"},
     "checkouts": {"plan_id": "gen_random_uuid()"},
+    "consent_events": {"source": "'app_profile'", "action": "'granted'"},
     "contact_emails": {"purpose": "'main'", "email": "'a@b.co'"},
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},
     "document_series": {"kind": "'quote'"},

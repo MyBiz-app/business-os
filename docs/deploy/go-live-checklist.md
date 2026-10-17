@@ -94,6 +94,12 @@ ClamAV daemon (`clamd`), which is a separate service:
 While it is on, an unreachable scanner refuses uploads (`scan_unavailable`) instead of letting them
 through. Switch it off again with `API_FILE_SCAN_PROVIDER=none`.
 
+## Ads and the opt-out link (GL9)
+
+The short opt-out link in SMS and WhatsApp ads is `API_API_URL` + `/u/<token>`, so it follows the
+API's public address. When the real domain is set, change `API_API_URL` first: links already sent
+keep working only on the old address. Have the lawyer read the "פרסומת" mark and the opt-out
+wording (`broadcast.*` in `packages/i18n/messages`) with the other legal texts.
 ## Switching on sign-in removal (account deletion)
 
 "Delete my account" in the apps empties the person's profile and disconnects them. To also delete
