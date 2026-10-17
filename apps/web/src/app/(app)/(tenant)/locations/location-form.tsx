@@ -30,6 +30,7 @@ export function LocationForm({ action, location, submitLabel, readOnly = false, 
       <fieldset key={location?.updated_at ?? "new"} disabled={readOnly} className="grid gap-4 sm:grid-cols-2">
         <Field label={t("locations.name")} name="name" required maxLength={120} defaultValue={location?.name} />
         <Field label={t("locations.address")} name="address" maxLength={300} defaultValue={location?.address ?? ""} />
+        <Field label={t("locations.website")} hint={t("locations.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="off" placeholder="www.example.com" defaultValue={location?.website_url ?? ""} />
         {location && kindOptions.length > 1 && (
           <SelectField label={t("locations.kind")} name="kind" defaultValue={location.kind ?? ""} options={kindOptions} />
         )}

@@ -9345,6 +9345,13 @@ export interface components {
             status: "booked" | "waitlisted" | "checked_in" | "no_show" | "cancelled";
             /** Waitlist Position */
             waitlist_position: number | null;
+            /**
+             * Over Capacity
+             * @description Added beyond the class's capacity by a manager
+             */
+            over_capacity: boolean;
+            /** Over Capacity At */
+            over_capacity_at?: string | null;
             /** Late Cancel */
             late_cancel: boolean;
             /** Checked In At */
@@ -9375,6 +9382,12 @@ export interface components {
              * @description Which of the client's pets / children comes (#43)
              */
             dependent_id?: string | null;
+            /**
+             * Over Capacity
+             * @description Book the client even though the class is full (owners and managers only); ignored while a spot is free
+             * @default false
+             */
+            over_capacity: boolean;
         };
         /** BookingUpdate */
         BookingUpdate: {
@@ -9449,6 +9462,11 @@ export interface components {
              * @description The branch's sub-category (a catalog key); null: as the business
              */
             kind?: string | null;
+            /**
+             * Website Url
+             * @description The branch's own website; empty: the business's
+             */
+            website_url?: string | null;
             /**
              * Copy Hours From
              * @description Start with another branch's opening hours
@@ -9587,6 +9605,11 @@ export interface components {
              * @description Whether the business offers the client app
              */
             client_app: boolean;
+            /**
+             * Website Url
+             * @description The business's website, if any
+             */
+            website_url?: string | null;
             /**
              * Inquiries
              * @description Whether its public inquiry form is open (CRM module)
@@ -10090,6 +10113,11 @@ export interface components {
             primary_color: string | null;
             /** Logo Url */
             logo_url: string | null;
+            /**
+             * Website Url
+             * @description The business's website, if any
+             */
+            website_url?: string | null;
             /** Time Zone */
             time_zone: string;
             /** Currency */
@@ -10340,6 +10368,11 @@ export interface components {
              * @description The branch's confirmed main email, else the business's; none if neither set
              */
             contact_email?: string | null;
+            /**
+             * Website Url
+             * @description The branch's website, else the business's; none if neither set
+             */
+            website_url?: string | null;
         };
         /** ClientNote */
         ClientNote: {
@@ -13445,6 +13478,16 @@ export interface components {
              */
             primary_color: string | null;
             /**
+             * Website Url
+             * @description The branch's own website, if it set one
+             */
+            website_url: string | null;
+            /**
+             * Effective Website Url
+             * @description The branch's website, else the business's, else none
+             */
+            effective_website_url: string | null;
+            /**
              * Logo Url
              * @description The branch's own logo (public path), if it set one
              */
@@ -13471,6 +13514,11 @@ export interface components {
              * @description The branch's sub-category (a catalog key); null: as the business
              */
             kind?: string | null;
+            /**
+             * Website Url
+             * @description The branch's own website; empty: the business's
+             */
+            website_url?: string | null;
         };
         /** LocationGroup */
         LocationGroup: {
@@ -13505,6 +13553,11 @@ export interface components {
              * @description The branch's own accent color; null falls back to the network's
              */
             primary_color?: string | null;
+            /**
+             * Website Url
+             * @description The branch's own website; null: the business's
+             */
+            website_url?: string | null;
         };
         /** LoginDevice */
         LoginDevice: {
@@ -18036,6 +18089,11 @@ export interface components {
              */
             business_number?: string | null;
             /**
+             * Website Url
+             * @description The business's website (its branches may have their own)
+             */
+            website_url?: string | null;
+            /**
              * Address Line
              * @description Settings managers only
              */
@@ -18321,6 +18379,11 @@ export interface components {
             address_line?: string | null;
             /** Address City */
             address_city?: string | null;
+            /**
+             * Website Url
+             * @description The business's website; empty clears it
+             */
+            website_url?: string | null;
             /**
              * Employer File Number
              * @description Deductions file (תיק ניכויים)
