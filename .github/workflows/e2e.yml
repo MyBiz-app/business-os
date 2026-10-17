@@ -70,6 +70,10 @@ jobs:
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
             python e2e/dod.py "$ADMIN_EMAIL"
 
+      - name: Check the Content-Security-Policy in a real browser (marketing pages and the CRM)
+        run: |
+          uv run --with playwright --with "psycopg[binary]" python e2e/csp.py
+
       - name: Run the round 5 walk-through (AI team, content studio, console)
         run: |
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
@@ -80,13 +84,13 @@ jobs:
           uv run --with playwright --with axe-playwright-python --with "psycopg[binary]" \
             python e2e/round6.py
 
-      - name: Check the Content-Security-Policy in a real browser (marketing pages and the CRM)
-        run: |
-          uv run --with playwright --with "psycopg[binary]" python e2e/csp.py
-
       - name: Show the API log
         if: failure()
         run: tail -n 60 api.log || true
+
+      - name: Show the website log (CSP violations and errors)
+        if: failure()
+        run: grep -a -i "csp-violation\|error" web.log | tail -n 40 || true
 
       - name: Keep screenshots and logs
         if: failure()
