@@ -3,7 +3,6 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 
 import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/layout/page-header";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
 import { canManageSettings, canUseAssistant } from "@/lib/permissions";
@@ -21,7 +20,6 @@ export async function generateMetadata(): Promise<Metadata> {
 /** The AI team: every agent of the business on one map, a chat with whichever one is picked. */
 export default async function AiTeamPage({ searchParams }: PageProps<"/ai">) {
   const { agent } = await searchParams;
-  const t = await getTranslations("aiTeam");
   const tModules = await getTranslations("modules");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenant();
@@ -47,10 +45,12 @@ export default async function AiTeamPage({ searchParams }: PageProps<"/ai">) {
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <PageHeader title={t("title")} description={t("subtitle")} />
       <TeamView team={team} branches={branches.map(({ id, name }) => ({ id, name }))} enabled={status.enabled} demo={status.demo} upsells={upsells} canAdd={canManageSettings(tenant)} timeZone={tenant.time_zone} roles={roles} initialAgent={typeof agent === "string" ? agent : null} />
-      <ProactiveSettingsPanel settings={proactive} timeZone={tenant.time_zone} />
-      <TasksBoard board={tasks} agents={Object.fromEntries(team.agents.map((a) => [a.key, a.name]))} timeZone={tenant.time_zone} />
+      {/* The two cards share one width, padding and header, side by side on a wide screen. */}
+      <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
+        <ProactiveSettingsPanel settings={proactive} timeZone={tenant.time_zone} />
+        <TasksBoard board={tasks} agents={Object.fromEntries(team.agents.map((a) => [a.key, a.name]))} timeZone={tenant.time_zone} />
+      </div>
     </Container>
   );
 }

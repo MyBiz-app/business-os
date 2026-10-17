@@ -94,7 +94,6 @@ export default async function TeamPage() {
               title={member.job_title ?? null}
               allPermissions={roles.permissions}
               permissions={member.permissions}
-              payroll={canReadPayroll(tenant)}
             />
           ))}
         </ul>
