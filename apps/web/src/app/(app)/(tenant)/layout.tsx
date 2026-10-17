@@ -1,6 +1,7 @@
 import { ScopedMessages } from "@/components/scoped-messages";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { termsOf, vertical } from "@business-os/verticals";
 
 import { type NavItem, SideNav } from "@/components/side-nav";
@@ -108,6 +109,16 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
                 {tenant.role === "platform" ? t("support.actLeave") : t("support.leave")}
               </button>
             </form>
+          </div>
+        )}
+        {tenant.billing_state === "read_only" && (
+          <div role="status" className="flex flex-wrap items-center justify-between gap-2 border-b border-danger/40 bg-danger/10 px-6 py-2 text-sm font-medium">
+            <span>{t("billing.collection.banner")}</span>
+            {canManageSettings(tenant) && (
+              <Link href="/settings/billing" className="font-semibold text-primary-ink underline-offset-4 hover:underline">
+                {t("billing.collection.bannerOwner")}
+              </Link>
+            )}
           </div>
         )}
         {children}

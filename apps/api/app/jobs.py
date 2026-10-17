@@ -6,6 +6,7 @@
     uv run python -m app.jobs send-emails     (needs API_EMAIL_PROVIDER; see app/messaging/email.py)
     uv run python -m app.jobs message-reminders (WhatsApp copies of today's reminders, simulated)
     uv run python -m app.jobs bill-businesses (simulated platform billing; app/commerce/billing.py)
+    uv run python -m app.jobs dunning         (unpaid MyBiz invoices: reminders, read-only, hold)
     uv run python -m app.jobs notify-shifts    (emails staff new and edited published shifts)
     uv run python -m app.jobs publish-shifts  (hourly: the shifts roster goes out on schedule)
     uv run python -m app.jobs send-messages   (the outbox, through each business's provider)
@@ -39,6 +40,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import Connection, Engine, create_engine, text
 
 from app.commerce.billing import bill_businesses
+from app.commerce.dunning import run_dunning
 from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 from app.core.tenant_scope import Tally, start_tally, tenant_scope
@@ -690,6 +692,7 @@ JOBS = {
     "purge-expired": purge_expired,
     "delete-closed-businesses": delete_closed_businesses,
     "bill-businesses": bill_businesses,
+    "dunning": run_dunning,
     "publish-shifts": publish_shifts,
     "send-messages": send_messages,
     "send-announcements": send_announcements,
@@ -711,6 +714,7 @@ DAILY = [
     "remind-sessions",
     "remind-plans",
     "bill-businesses",
+    "dunning",
     "message-reminders",
     "follow-up-leads",
     "purge-expired",

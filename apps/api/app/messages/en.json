@@ -122,6 +122,24 @@
     "unknownDevice": "Unknown device",
     "when": "When"
   },
+  "dunningEmail": {
+    "greeting": "Hi,",
+    "footer": "The MyBiz team",
+    "subject": {
+      "reminder": "Your MyBiz invoice is unpaid",
+      "readOnly": "{business} is now read-only",
+      "suspended": "{business} is suspended"
+    },
+    "body": {
+      "reminder": "Your MyBiz invoice no. {number} for {amount} is still unpaid.\n\nYou can pay it under Settings, Billing. If it stays unpaid, {business} becomes read-only on {readOnlyDate}: you will still see everything but won't be able to add or change anything.",
+      "readOnly": "Invoice no. {number} for {amount} is still unpaid, so {business} is read-only: you can see everything but can't add or change anything.\n\nPay the invoice under Settings, Billing to restore full access straight away. Otherwise the business is suspended on {suspendDate}. Your data is safe.",
+      "suspended": "Invoice no. {number} for {amount} is still unpaid, so {business} is suspended and nobody can sign in to it.\n\nPay the invoice to bring it back. Your data is kept and nothing has been deleted."
+    },
+    "details": {
+      "invoice": "Invoice",
+      "amount": "Amount"
+    }
+  },
   "pdfDocuments": {
     "receipt": "Receipt",
     "receiptNumber": "Receipt no. {number}",

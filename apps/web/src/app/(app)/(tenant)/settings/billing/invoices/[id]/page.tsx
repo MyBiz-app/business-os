@@ -93,6 +93,20 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
             ))}
           </tbody>
           <tfoot>
+            {invoice.vat_rate_bp > 0 && (
+              <>
+                <tr>
+                  <th scope="row" className="pt-4 text-start font-normal text-muted">{t("subtotal")}</th>
+                  <td className="pt-4 text-end tabular-nums"><bdi>{money(invoice.subtotal)}</bdi></td>
+                </tr>
+                <tr>
+                  <th scope="row" className="pt-1 text-start font-normal text-muted">
+                    {t("vat", { rate: new Intl.NumberFormat(locale).format(invoice.vat_rate_bp / 100) })}
+                  </th>
+                  <td className="pt-1 text-end tabular-nums"><bdi>{money(invoice.vat_amount)}</bdi></td>
+                </tr>
+              </>
+            )}
             <tr>
               <th scope="row" className="pt-4 text-start text-base font-semibold">{t("total")}</th>
               <td className="pt-4 text-end text-xl font-bold tabular-nums"><bdi>{money(invoice.total)}</bdi></td>

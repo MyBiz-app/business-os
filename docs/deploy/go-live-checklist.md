@@ -91,6 +91,19 @@ repository variables `PRODUCTION_WEB_URL`, `PRODUCTION_API_URL`. Same names in t
 environment to use **Roll back** there. After the single final deploy to staging, practise one
 rollback and fill the table in releases.md.
 
+## Subscription billing: VAT and collection (GL20)
+
+Built and running on the simulated card; no real charge exists anywhere. The payment provider (#46)
+stays an off adapter. What waits for you, when the business really operates:
+
+| # | Step | Cost | Click by click |
+|---|---|---|---|
+| 1 | Check the VAT rate and your company details with your accountant | Free | The rate lives in the table `app.vat_rates` (18% for ILS from 2025-01-01). If it changes, tell Claude: a new row with the new `valid_from` date is added, old invoices keep their rate. The company name, number and VAT number printed on invoices come from `packages/i18n/brand.json` (`legal`), currently the fictitious ones |
+| 2 | Decide the collection days | Free | Console → Billing → "Collection steps": reminder days (default 0, 3, 7), read-only (14), suspension (30). The switch turns the whole sequence off |
+| 3 | Switch the daily job on in production | Free | The `dunning` job runs after `bill-businesses` in the daily jobs. In the production jobs setup add `uv run python -m app.jobs dunning` right after `bill-businesses`; check-jobs reports it as late if it stops |
+| 4 | Real card payments | Provider fees | Needs the payment provider (#46): create the account, then ask Claude to turn on the adapter. Until then paying a late invoice only works with the test card |
+| 5 | Allocation numbers for MyBiz's own invoices | Free | Israel's tax authority may require an allocation number on invoices above a threshold; ask your accountant, and if needed connect the invoicing provider (#47) |
+
 ## App stores (GL19)
 
 Built and ready: app config, build profiles, listing texts (Hebrew and English), privacy and Data

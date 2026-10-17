@@ -250,6 +250,10 @@ class Tenant(BaseModel):
     require_mfa_for_staff: bool = Field(
         default=False, description="Every team member must sign in with an authenticator code"
     )
+    billing_state: Literal["active", "read_only"] = Field(
+        default="active",
+        description="read_only: an unpaid MyBiz invoice; everything is visible, nothing changes",
+    )
     network_scope: Literal["network", "branch"] = Field(
         default="network",
         description="network: clients shared by all branches; branch: each branch keeps its own",
