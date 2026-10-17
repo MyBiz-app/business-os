@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
@@ -34,9 +34,15 @@ def ensure_profile(session: Session, user_id: UUID, email: str) -> None:
             INSERT INTO app.users (id, email) VALUES (:id, :email)
             ON CONFLICT (id) DO UPDATE SET email = excluded.email, updated_at = now()
                 WHERE app.users.email IS DISTINCT FROM excluded.email
+                  AND app.users.deleted_at IS NULL
         """),
         {"id": user_id, "email": email},
     )
+    # A deleted account stays deleted even if its sign-in still works at the provider.
+    if session.execute(
+        text("SELECT deleted_at IS NOT NULL FROM app.users WHERE id = :id"), {"id": user_id}
+    ).scalar():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="account_deleted")
 
 
 def load_current_tenant(session: Session) -> Tenant:

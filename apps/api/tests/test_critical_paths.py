@@ -112,6 +112,7 @@ PUBLIC_ROUTES = {
     ("POST", "/public/quotes/{token}/answer"),
     ("POST", "/public/quotes/{token}/deposit"),
     ("GET", "/public/business-files/{token}"),
+    ("GET", "/public/data-exports/{token}"),
     ("GET", "/public/files/{token}"),
     ("POST", "/public/businesses/{code}/inquiries"),
     ("GET", "/public/pricing"),

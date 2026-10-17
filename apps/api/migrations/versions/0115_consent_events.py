@@ -5,8 +5,8 @@
 (`marketing_consent_at`), with its source next to it. An opt-out from one business's message
 (`marketing_opted_out_at`) only affects that business; agreeing again clears it.
 
-Revision ID: 0114
-Revises: 0113
+Revision ID: 0115
+Revises: 0114
 Create Date: 2026-10-17
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0114"
-down_revision: str | None = "0113"
+revision: str = "0115"
+down_revision: str | None = "0114"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
