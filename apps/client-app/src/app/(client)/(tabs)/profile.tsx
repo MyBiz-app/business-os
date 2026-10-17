@@ -5,6 +5,7 @@ import { useTranslations } from "use-intl";
 import { AreaSwitcher } from "@/components/area-switcher";
 import { ProfileHeader } from "@/components/profile-header";
 import { ClientIdentityCard } from "@/components/identity-card";
+import { MarketingConsentCard } from "@/components/marketing-consent";
 import { ProfileForm } from "@/components/profile-form";
 import { Badge, ListRow, SectionTitle } from "@business-os/app-kit/components/rows";
 import { SegmentedControl } from "@business-os/app-kit/components/segmented-control";
@@ -115,6 +116,7 @@ export default function Profile() {
 
       <ProfileForm key={business?.client_id} />
       <ClientIdentityCard key={`id-${business?.client_id}`} />
+      <MarketingConsentCard palette={palette} />
 
       {businesses && businesses.length > 1 && (
         <SegmentedControl

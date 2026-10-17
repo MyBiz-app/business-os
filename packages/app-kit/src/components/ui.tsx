@@ -231,7 +231,8 @@ export function Heading({ children, palette, level = 1 }: { children: React.Reac
 
 export const styles = StyleSheet.create({
   screen: { flex: 1 },
-  content: { padding: 20, gap: 16, paddingBottom: 40 },
+  // On a wide browser the content is one centered column, not stretched across the whole window.
+  content: { padding: 20, gap: 16, paddingBottom: 40, width: "100%", maxWidth: 720, alignSelf: "center" },
   block: { gap: 16 },
   footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12, borderTopWidth: StyleSheet.hairlineWidth, gap: 8 },
   button: { minHeight: 52, borderRadius: 999, paddingHorizontal: 24, alignItems: "center", justifyContent: "center" },

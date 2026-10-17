@@ -13,7 +13,7 @@ type Props = {
   onPress: () => void;
   palette: Palette;
   accessibilityLabel?: string;
-  role?: "radio" | "tab";
+  role?: "radio" | "tab" | "button";
 };
 
 /** A selectable pill: one choice in a row (staff, time, day…). */
