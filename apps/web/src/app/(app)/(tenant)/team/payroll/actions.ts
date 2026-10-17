@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import type { components } from "@business-os/api-client";
+
 import { getTenant } from "@/lib/tenant";
 
 export type RunError =
@@ -13,12 +15,15 @@ export type RunError =
   | "one_stage_at_a_time"
   | "cannot_acknowledge"
   | "period_in_future"
+  | "nothing_to_correct"
+  | "negative_net"
+  | "run_not_approved"
   | "invalid"
   | "generic";
 export type RunResult = { ok?: true; error?: RunError };
 export type RunStage = "hours" | "additions" | "review" | "approved";
 
-const KNOWN: RunError[] = ["run_blocked", "warnings_open", "run_approved", "run_exists", "one_stage_at_a_time", "cannot_acknowledge", "period_in_future"];
+const KNOWN: RunError[] = ["run_blocked", "warnings_open", "run_approved", "run_exists", "one_stage_at_a_time", "cannot_acknowledge", "period_in_future", "nothing_to_correct", "negative_net", "run_not_approved"];
 
 function failure(status: number, body: unknown): { error: RunError } {
   const detail = (body as { detail?: unknown } | null)?.detail;
@@ -79,5 +84,24 @@ export async function markAccountantChecked(period: string): Promise<RunResult> 
   const { api, scope } = await getTenant();
   const response = await api.POST("/payroll/runs/{period}/accountant-check", { params: { ...scope, path: { period } } });
   if (!response.response.ok) return failure(response.response.status, response.error);
+  return done();
+}
+
+export type Correction = components["schemas"]["Correction"];
+
+export async function listCorrections(period: string, userId: string): Promise<Correction[]> {
+  const { api, scope } = await getTenant();
+  const response = await api.GET("/payroll/runs/{period}/payslips/{user_id}/corrections", { params: { ...scope, path: { period, user_id: userId } } });
+  return response.data ?? [];
+}
+
+/** Issues a corrective payslip for an approved month (owner only; the API checks it). */
+export async function issueCorrection(period: string, userId: string, reason: string, items: { label: string; amount_minor: number }[]): Promise<RunResult> {
+  const { api, scope } = await getTenant();
+  const response = await api.POST("/payroll/runs/{period}/payslips/{user_id}/corrections", {
+    params: { ...scope, path: { period, user_id: userId } },
+    body: { reason, items },
+  });
+  if (!response.data) return failure(response.response.status, response.error);
   return done();
 }

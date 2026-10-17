@@ -10,7 +10,7 @@ import type { components } from "@business-os/api-client";
 import { EmptyState } from "@/components/empty-state";
 import { Pill } from "@/components/pill";
 
-import { acknowledgeWarning, markAccountantChecked, moveStage, refreshRun, startRun, type RunError, type RunResult, type RunStage, typeAmount } from "./actions";
+import { acknowledgeWarning, type Correction, issueCorrection, listCorrections, markAccountantChecked, moveStage, refreshRun, startRun, type RunError, type RunResult, type RunStage, typeAmount } from "./actions";
 
 type Run = components["schemas"]["Run"];
 type Line = components["schemas"]["RunLine"];
@@ -260,7 +260,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
         )}
       </section>
 
-      {selected && <PaySheet key={selected.user_id} line={selected} month={month} run={run} locale={locale} canManage={canManage && stage !== "approved"} onClose={() => setOpen(null)} />}
+      {selected && <PaySheet key={selected.user_id} line={selected} month={month} run={run} locale={locale} canManage={canManage && stage !== "approved"} canApprove={canApprove} onClose={() => setOpen(null)} />}
     </div>
   );
 }
@@ -310,7 +310,7 @@ function BankFileForm({ month }: { month: string }) {
   );
 }
 
-function PaySheet({ line, month, run, locale, canManage, onClose }: { line: Line; month: string; run: Run; locale: string; canManage: boolean; onClose: () => void }) {
+function PaySheet({ line, month, run, locale, canManage, canApprove, onClose }: { line: Line; month: string; run: Run; locale: string; canManage: boolean; canApprove: boolean; onClose: () => void }) {
   const t = useTranslations("payRun");
   const dialog = useRef<HTMLDialogElement>(null);
   const { error, pending, run: act } = useAction();
@@ -377,6 +377,8 @@ function PaySheet({ line, month, run, locale, canManage, onClose }: { line: Line
             {t("actions.payslip")}
           </a>
         )}
+
+        {run.stage === "approved" && canApprove && <Corrections month={month} line={line} currency={run.currency} locale={locale} />}
 
         <h3 className="text-base font-semibold">{t("sheet.why")}</h3>
         {line.employment_type !== "global" && (
@@ -475,5 +477,136 @@ function TypedAmount({ currency, initial, disabled, onSave }: { currency: string
         </button>
       )}
     </form>
+  );
+}
+
+type Row = { id: number; label: string; amount: string; deduct: boolean };
+
+/** Corrective payslips of an approved month: the list so far and a form for the next one. The
+ *  approved month itself never changes; the owner adds a numbered correction with the difference. */
+function Corrections({ month, line, currency, locale }: { month: string; line: Line; currency: string; locale: string }) {
+  const t = useTranslations("payRun.corrections");
+  const te = useTranslations("payRun");
+  const id = useId();
+  const { error, pending, run: act } = useAction();
+  const [done, setDone] = useState<Correction[] | null>(null);
+  const [reason, setReason] = useState("");
+  const [rows, setRows] = useState<Row[]>([{ id: 1, label: "", amount: "", deduct: false }]);
+  const [invalid, setInvalid] = useState(false);
+  const money = (amount: number) => formatMoney(amount, currency, locale);
+
+  useEffect(() => {
+    let alive = true;
+    void listCorrections(month, line.user_id).then((found) => alive && setDone(found));
+    return () => {
+      alive = false;
+    };
+  }, [month, line.user_id]);
+
+  const update = (rowId: number, patch: Partial<Row>) => setRows((current) => current.map((row) => (row.id === rowId ? { ...row, ...patch } : row)));
+  const submit = () => {
+    const items = rows.map((row) => {
+      const minor = toMinorUnits(row.amount, currency);
+      return { label: row.label.trim(), minor, deduct: row.deduct };
+    });
+    if (!reason.trim() || items.some((item) => !item.label || item.minor === null || item.minor === 0)) {
+      setInvalid(true);
+      return;
+    }
+    setInvalid(false);
+    act(async () => {
+      const result = await issueCorrection(month, line.user_id, reason.trim(), items.map((item) => ({ label: item.label, amount_minor: item.deduct ? -(item.minor as number) : (item.minor as number) })));
+      if (result.ok) {
+        setReason("");
+        setRows([{ id: Date.now(), label: "", amount: "", deduct: false }]);
+        setDone(await listCorrections(month, line.user_id));
+      }
+      return result;
+    });
+  };
+
+  return (
+    <section aria-labelledby={`${id}-title`} className="flex flex-col gap-3 rounded-lg border border-border p-4">
+      <h3 id={`${id}-title`} className="text-base font-semibold">
+        {t("title")}
+      </h3>
+      <p className="text-sm text-muted">{t("hint")}</p>
+      <a href={`/team/payroll/payslip?month=${month}&user=${line.user_id}&version=0`} download className="btn-ghost self-start px-2 py-1 text-sm">
+        <Download aria-hidden="true" className="size-4" />
+        {t("original")}
+      </a>
+      {done && done.length === 0 && <p className="text-sm text-muted">{t("none")}</p>}
+      {done && done.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {done.map((correction) => (
+            <li key={correction.version} className="flex flex-col gap-1 text-sm">
+              <div className="flex flex-wrap items-center gap-2">
+                <strong>{t("version", { version: correction.version })}</strong>
+                <span className="tabular-nums">
+                  <bdi>{t("difference", { amount: money(correction.difference_minor) })}</bdi>
+                </span>
+              </div>
+              <p dir="auto" className="text-muted">
+                {correction.reason}
+              </p>
+              <a href={`/team/payroll/payslip?month=${month}&user=${line.user_id}&version=${correction.version}`} download className="btn-ghost self-start px-2 py-1 text-sm">
+                <Download aria-hidden="true" className="size-4" />
+                {t("download", { version: correction.version })}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      {(error || invalid) && (
+        <p role="alert" className="text-sm text-danger">
+          {error ? te(`errors.${error}`) : te("errors.invalid")}
+        </p>
+      )}
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
+        }}
+      >
+        <label htmlFor={`${id}-reason`} className="flex flex-col gap-1 text-sm">
+          {t("reason")}
+          <input id={`${id}-reason`} value={reason} maxLength={500} onChange={(event) => setReason(event.target.value)} dir="auto" className="field" />
+        </label>
+        {rows.map((row, index) => (
+          <div key={row.id} className="flex flex-wrap items-end gap-2">
+            <label htmlFor={`${id}-l${row.id}`} className="flex min-w-32 flex-1 flex-col gap-1 text-sm">
+              {t("lineLabel")}
+              <input id={`${id}-l${row.id}`} value={row.label} maxLength={80} onChange={(event) => update(row.id, { label: event.target.value })} dir="auto" className="field" />
+            </label>
+            <label htmlFor={`${id}-d${row.id}`} className="sr-only">
+              {t("add")} / {t("deduct")}
+            </label>
+            <select id={`${id}-d${row.id}`} value={row.deduct ? "deduct" : "add"} onChange={(event) => update(row.id, { deduct: event.target.value === "deduct" })} className="field w-auto">
+              <option value="add">{t("add")}</option>
+              <option value="deduct">{t("deduct")}</option>
+            </select>
+            <label htmlFor={`${id}-a${row.id}`} className="flex w-28 flex-col gap-1 text-sm">
+              {t("amount")}
+              <input id={`${id}-a${row.id}`} inputMode="decimal" dir="ltr" value={row.amount} onChange={(event) => update(row.id, { amount: event.target.value })} className="field" />
+            </label>
+            {rows.length > 1 && (
+              <button type="button" className="btn-ghost size-9" aria-label={t("removeLine")} onClick={() => setRows((current) => current.filter((r) => r.id !== row.id))}>
+                <X aria-hidden="true" className="size-4" />
+              </button>
+            )}
+            {index === rows.length - 1 && rows.length < 5 && (
+              <button type="button" className="btn-ghost px-2 py-2 text-sm" onClick={() => setRows((current) => [...current, { id: Date.now(), label: "", amount: "", deduct: false }])}>
+                <Plus aria-hidden="true" className="size-4" />
+                {t("addLine")}
+              </button>
+            )}
+          </div>
+        ))}
+        <button type="submit" className="btn-primary self-start px-4 py-2" disabled={pending}>
+          {t("submit")}
+        </button>
+      </form>
+    </section>
   );
 }
