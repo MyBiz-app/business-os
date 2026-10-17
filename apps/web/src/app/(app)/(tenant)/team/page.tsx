@@ -52,6 +52,11 @@ export default async function TeamPage() {
           <Link href="/team/shift-swaps" className="btn-secondary px-3 py-2 text-sm">
             {t("shiftSwapQueue.open")}
           </Link>
+          {canReadPayroll(tenant) && (
+            <Link href="/team/payroll" className="btn-secondary px-3 py-2 text-sm">
+              {t("payRun.title")}
+            </Link>
+          )}
           {(canReadPayroll(tenant) || tenant.permissions.includes("payroll.propose")) && (
             <Link href="/team/bonuses" className="btn-secondary px-3 py-2 text-sm">
               {t("payBonuses.title")}

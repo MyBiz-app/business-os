@@ -710,6 +710,12 @@ def reopen_month(user_id: UUID, context: ApproveDep, month: MonthQuery = None) -
     _ensure_member_in_reach(context, user_id)
     db = context.session
     first = _first_of_month(month, _time_zone(db))
+    locked = db.execute(
+        text("SELECT 1 FROM app.payroll_runs WHERE period = :period AND stage <> 'hours'"),
+        {"period": first},
+    ).first()
+    if locked is not None:
+        raise HTTPException(status_code=409, detail="payroll_locked")
     db.execute(
         text("""
             DELETE FROM app.time_clock_approvals
