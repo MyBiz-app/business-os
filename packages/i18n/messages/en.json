@@ -355,12 +355,29 @@
     "planTitle": "Your plan",
     "planHint": "We picked what fits your answers. Change anything; you can also change it later in Settings."
   },
+  "period": {
+    "label": "Period",
+    "loading": "Loading the numbers",
+    "lastDays": "Last {count} days",
+    "custom": "Range...",
+    "customLabel": "{from} - {to}",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "cancel": "Cancel",
+    "invalid": "Pick a start day that is not after the end day, and no later than today.",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "yearToDate": "Year to date",
+    "month": "Calendar month"
+  },
   "dashboard": {
     "welcome": "Welcome to {name}",
     "yourRole": "Your role: {role}",
     "today": "Today",
     "emptyToday": "Your schedule, clients and sales will appear here.",
     "business": "Business",
+    "openDetails": "Open the details",
     "kpis": "Key numbers",
     "period": "Period",
     "lastDays": "Last {count} days",
@@ -662,6 +679,10 @@
     }
   },
   "clients": {
+    "joinedChip": "Joined {range}",
+    "noShowChip": "Missed a class {range}",
+    "activeFilters": "Active filters",
+    "removeFilter": "Remove this filter",
     "firstName": "First name",
     "lastName": "Last name",
     "name": "Name",
@@ -988,6 +1009,8 @@
     "signup": "Create an account"
   },
   "schedule": {
+    "filtered": "Filtered",
+    "removeFilter": "Remove the filter",
     "title": "Schedule",
     "thisWeek": "This week",
     "previousWeek": "Previous week",
@@ -5270,6 +5293,7 @@
     }
   },
   "sales": {
+    "removeFilter": "Remove the filter",
     "title": "Sales",
     "subtitle": "Every payment and its receipt, by month.",
     "previous": "Previous month",

@@ -355,12 +355,29 @@
     "planTitle": "החבילה שלך",
     "planHint": "בחרנו לפי התשובות שלך. אפשר לשנות הכול, גם בהמשך דרך ההגדרות."
   },
+  "period": {
+    "label": "תקופה",
+    "loading": "טוען את הנתונים",
+    "lastDays": "{count} הימים האחרונים",
+    "custom": "טווח...",
+    "customLabel": "{from} - {to}",
+    "from": "מתאריך",
+    "to": "עד תאריך",
+    "apply": "החל",
+    "cancel": "ביטול",
+    "invalid": "בחרו יום התחלה שאינו אחרי יום הסיום, ולא אחרי היום.",
+    "thisMonth": "החודש",
+    "lastMonth": "החודש שעבר",
+    "yearToDate": "מתחילת השנה",
+    "month": "חודש קלנדרי"
+  },
   "dashboard": {
     "welcome": "ברוכים הבאים ל{name}",
     "yourRole": "התפקיד שלך: {role}",
     "today": "היום",
     "emptyToday": "כאן יופיעו לוח הזמנים, הלקוחות והמכירות.",
     "business": "עסק",
+    "openDetails": "לפרטים",
     "kpis": "מספרים מרכזיים",
     "period": "תקופה",
     "lastDays": "{count} ימים אחרונים",
@@ -662,6 +679,10 @@
     }
   },
   "clients": {
+    "joinedChip": "הצטרפו {range}",
+    "noShowChip": "לא הגיעו {range}",
+    "activeFilters": "מסננים פעילים",
+    "removeFilter": "הסרת המסנן",
     "firstName": "שם פרטי",
     "lastName": "שם משפחה",
     "name": "שם",
@@ -988,6 +1009,8 @@
     "signup": "יצירת חשבון"
   },
   "schedule": {
+    "filtered": "מסונן",
+    "removeFilter": "הסרת המסנן",
     "title": "לוח שיעורים",
     "thisWeek": "השבוע",
     "previousWeek": "השבוע הקודם",
@@ -5270,6 +5293,7 @@
     }
   },
   "sales": {
+    "removeFilter": "הסרת המסנן",
     "title": "מכירות",
     "subtitle": "כל תשלום והקבלה שלו, לפי חודש.",
     "previous": "החודש הקודם",
