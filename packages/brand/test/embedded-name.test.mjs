@@ -37,6 +37,7 @@ const ALLOWED = new Map([
   ["apps/api/app/api/migration_notice.py", "OpenAPI descriptions for developers"],
   ["apps/api/app/api/platform.py", "OpenAPI descriptions for developers"],
   ["apps/api/app/api/support.py", "OpenAPI descriptions for developers"],
+  [".github/workflows/rehearsal.yml", "names of temporary files"],
   [".github/workflows/e2e.yml", "step titles"],
   [".github/workflows/jobs-staging.yml", "step titles"],
   [".github/workflows/seed-staging.yml", "step descriptions"],

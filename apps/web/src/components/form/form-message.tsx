@@ -1,5 +1,6 @@
 "use client";
 
+import { BRAND } from "@business-os/i18n/brand";
 import { useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -35,4 +36,4 @@ export function FormNotice({ message }: { message?: string }) {
   return <span ref={marker} hidden />;
 }
 
-export const FORM_SAVED_EVENT = "mybiz:form-saved";
+export const FORM_SAVED_EVENT = `${BRAND.app.storagePrefix}:form-saved`;
