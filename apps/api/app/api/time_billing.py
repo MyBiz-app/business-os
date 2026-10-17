@@ -21,6 +21,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.api.common import ensure_not_erased, not_found, set_clause
 from app.api.deps import TenantContext, require
+from app.api.pagination import FullPageDep
 from app.api.quotes import Quote, _load
 from app.core.permissions import Permission
 from app.messaging.email import load_all_messages
@@ -134,8 +135,10 @@ def time_entries(
     mine: Annotated[bool, Query(description="Only the signed-in user's time")] = False,
     start: Annotated[dt.date | None, Query(alias="from")] = None,
     end: Annotated[dt.date | None, Query(alias="to", description="Inclusive")] = None,
+    *,
+    page: FullPageDep,
 ) -> list[TimeEntry]:
-    """Time entries, newest day first (up to 500)."""
+    """Time entries, newest day first."""
     rows = context.session.execute(
         text(f"""
             {ENTRY_SELECT}
@@ -143,10 +146,17 @@ def time_entries(
               AND (NOT :mine OR e.user_id = app.current_user_id())
               AND (CAST(:start AS date) IS NULL OR e.day >= :start)
               AND (CAST(:end AS date) IS NULL OR e.day <= :end)
-            ORDER BY e.day DESC, e.created_at DESC
-            LIMIT 500
+            ORDER BY e.day DESC, e.created_at DESC, e.id
+            LIMIT :limit OFFSET :offset
         """),
-        {"client": client_id, "mine": mine, "start": start, "end": end},
+        {
+            "client": client_id,
+            "mine": mine,
+            "start": start,
+            "end": end,
+            "limit": page.limit,
+            "offset": page.offset,
+        },
     ).mappings()
     return [TimeEntry.model_validate(dict(row)) for row in rows]
 

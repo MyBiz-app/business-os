@@ -11,8 +11,8 @@
   API enforces, a grace extension from the console, the end of a cancelled subscription (the
   business is kept) and the day a ended one was resumed (earlier months are not billed).
 
-Revision ID: 0118
-Revises: 0117
+Revision ID: 0119
+Revises: 0118
 Create Date: 2026-10-17
 """
 
@@ -20,8 +20,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0118"
-down_revision: str | None = "0117"
+revision: str = "0119"
+down_revision: str | None = "0118"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -37,6 +37,8 @@ def upgrade() -> None:
     """)
     op.execute("INSERT INTO app.vat_rates VALUES ('ILS', '2025-01-01', 1800)")
     op.execute("GRANT SELECT ON app.vat_rates TO app_api")
+    op.execute("ALTER TABLE app.vat_rates ENABLE ROW LEVEL SECURITY")
+    op.execute("CREATE POLICY vat_rates_read ON app.vat_rates FOR SELECT TO app_api USING (true)")
 
     op.execute("""
         ALTER TABLE app.platform_invoices
@@ -52,6 +54,7 @@ def upgrade() -> None:
             last integer NOT NULL
         )
     """)
+    op.execute("ALTER TABLE app.platform_series ENABLE ROW LEVEL SECURITY")  # system only
     op.execute("""
         INSERT INTO app.platform_series
         SELECT 'invoice', greatest(coalesce(max(number), 0), 10000) FROM app.platform_invoices
@@ -87,6 +90,11 @@ def upgrade() -> None:
     """)
     op.execute("INSERT INTO app.dunning_settings DEFAULT VALUES")
     op.execute("GRANT SELECT ON app.dunning_settings TO app_api")
+    op.execute("ALTER TABLE app.dunning_settings ENABLE ROW LEVEL SECURITY")
+    op.execute("""
+        CREATE POLICY dunning_settings_read ON app.dunning_settings FOR SELECT TO app_api
+        USING (true)
+    """)
 
     op.execute("""
         CREATE TABLE app.dunning_events (
@@ -98,6 +106,7 @@ def upgrade() -> None:
         )
     """)
 
+    op.execute("ALTER TABLE app.dunning_events ENABLE ROW LEVEL SECURITY")  # system only
     op.execute("""
         ALTER TABLE app.tenants
             ADD COLUMN billing_state text NOT NULL DEFAULT 'active'

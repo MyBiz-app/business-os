@@ -11,7 +11,7 @@ from app.core.config import get_settings, missing_production_settings
 from app.core.db import get_engine
 from app.core.logging import configure_logging, request_logging
 from app.core.monitoring import init_monitoring
-from app.core.rate_limit import build_store, limiter
+from app.core.rate_limit import TenantQuota, build_store, limiter
 
 
 class HealthResponse(BaseModel):
@@ -48,13 +48,15 @@ def create_app() -> FastAPI:
 
     if settings.rate_limits_on:
         token = settings.internal_token.get_secret_value() if settings.internal_token else None
+        store = build_store(
+            settings.rate_limit_redis_url.get_secret_value()
+            if settings.rate_limit_redis_url
+            else None
+        )
+        app.state.tenant_quota = TenantQuota(store, settings.tenant_rate_limit_per_minute)
         app.middleware("http")(
             limiter(
-                build_store(
-                    settings.rate_limit_redis_url.get_secret_value()
-                    if settings.rate_limit_redis_url
-                    else None
-                ),
+                store,
                 trust_forwarded=settings.trust_forwarded_for,
                 internal_token=token,
             )
@@ -68,7 +70,7 @@ def create_app() -> FastAPI:
         allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
-        expose_headers=["Cache-Control", "X-Request-ID"],
+        expose_headers=["Cache-Control", "X-Request-ID", "X-Next-Cursor"],
         allow_headers=["Authorization", "Content-Type", "X-Tenant-Id", "X-Request-ID"],
     )
 

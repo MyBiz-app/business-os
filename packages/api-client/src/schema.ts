@@ -1991,7 +1991,7 @@ export interface paths {
         };
         /**
          * Time Entries
-         * @description Time entries, newest day first (up to 500).
+         * @description Time entries, newest day first.
          */
         get: operations["time_entries"];
         put?: never;
@@ -4959,7 +4959,7 @@ export interface paths {
         /**
          * List Client Bookings
          * @description A client's bookings, newest session first (a member kept to some branches sees those
-         *     made at their branches).
+         *     made at their branches). The header `X-Next-Cursor`, when present, goes in `after`.
          */
         get: operations["list_client_bookings"];
         put?: never;
@@ -7548,7 +7548,7 @@ export interface paths {
         };
         /**
          * List Issued
-         * @description Newest first.
+         * @description Newest first. The header `X-Next-Cursor`, when present, goes in `after` for the next page.
          */
         get: operations["list_issued"];
         put?: never;
@@ -7646,7 +7646,8 @@ export interface paths {
         };
         /**
          * List Receipts
-         * @description Newest first; for one client when `client_id` is given.
+         * @description Newest first; for one client when `client_id` is given. The header `X-Next-Cursor`, when
+         *     present, goes in `after` for the next page.
          */
         get: operations["list_receipts"];
         put?: never;
@@ -12270,6 +12271,11 @@ export interface components {
              * @description Newest first, one page
              */
             items: components["schemas"]["Notification"][];
+            /**
+             * Next Cursor
+             * @description Pass as `after` for the next (older) page
+             */
+            next_cursor?: string | null;
         };
         /** InboxUpdate */
         InboxUpdate: {
@@ -14041,6 +14047,11 @@ export interface components {
             items: components["schemas"]["Order"][];
             /** Total */
             total: number;
+            /**
+             * Next Cursor
+             * @description Pass as `after` for the next (older) page
+             */
+            next_cursor?: string | null;
         };
         /** OtherIncome */
         OtherIncome: {
@@ -22335,6 +22346,10 @@ export interface operations {
             query?: {
                 client_id?: string | null;
                 status?: ("draft" | "sent" | "accepted" | "declined" | "expired") | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -22726,7 +22741,12 @@ export interface operations {
     };
     my_quotes: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
             };
@@ -22757,7 +22777,12 @@ export interface operations {
     };
     client_documents: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -22938,7 +22963,12 @@ export interface operations {
     };
     my_documents: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
             };
@@ -23283,6 +23313,10 @@ export interface operations {
             query: {
                 folder_id: string;
                 archived?: boolean;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -23353,7 +23387,12 @@ export interface operations {
     };
     my_files: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -23601,6 +23640,10 @@ export interface operations {
                 from?: string | null;
                 /** @description Inclusive */
                 to?: string | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -30965,6 +31008,8 @@ export interface operations {
                 limit?: number;
                 /** @description Rows to skip */
                 offset?: number;
+                /** @description `next_cursor` of the previous page */
+                after?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -32158,7 +32203,12 @@ export interface operations {
     };
     client_entitlements: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -34182,7 +34232,12 @@ export interface operations {
     };
     businesses: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -34196,6 +34251,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlatformBusiness"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -34254,7 +34318,12 @@ export interface operations {
     };
     contact_requests: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -34268,6 +34337,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContactRequest"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
@@ -35511,7 +35589,12 @@ export interface operations {
     };
     my_entitlements: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
             header: {
                 "X-Tenant-Id": string;
             };
@@ -36274,6 +36357,8 @@ export interface operations {
                 limit?: number;
                 /** @description Rows to skip */
                 offset?: number;
+                /** @description `next_cursor` of the previous page */
+                after?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -36384,6 +36469,8 @@ export interface operations {
                 limit?: number;
                 /** @description Rows to skip */
                 offset?: number;
+                /** @description `next_cursor` of the previous page */
+                after?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -36599,6 +36686,8 @@ export interface operations {
                 limit?: number;
                 /** @description Rows to skip */
                 offset?: number;
+                /** @description `next_cursor` of the previous page */
+                after?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;
@@ -36838,6 +36927,8 @@ export interface operations {
                 limit?: number;
                 /** @description Rows to skip */
                 offset?: number;
+                /** @description `next_cursor` of the previous page */
+                after?: string | null;
             };
             header: {
                 "X-Tenant-Id": string;

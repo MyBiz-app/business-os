@@ -431,7 +431,12 @@ def logged_time(ctx: ToolContext, args: dict[str, Any]) -> dict[str, Any]:
     start, end = _date(args["start_date"], "start_date"), _date(args["end_date"], "end_date")
     client_id = _uuid(args["client_id"], "client_id") if args.get("client_id") else None
     entries = time_api.time_entries(
-        context=ctx.tenant, client_id=client_id, mine=False, start=start, end=end
+        context=ctx.tenant,
+        client_id=client_id,
+        mine=False,
+        start=start,
+        end=end,
+        page=Page(limit=500, offset=0),
     )
     visible = visible_clients(ctx.tenant.session, list({e.client_id for e in entries}))
     entries = [e for e in entries if e.client_id in visible]

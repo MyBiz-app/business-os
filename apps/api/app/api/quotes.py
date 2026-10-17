@@ -29,6 +29,7 @@ from app.api.deps import (
     ensure_client_visible,
     require,
 )
+from app.api.pagination import FullPageDep
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.providers.choice import choose
@@ -252,6 +253,8 @@ def list_quotes(
     context: ReadDep,
     client_id: Annotated[UUID | None, Query()] = None,
     quote_status: Annotated[QuoteStatus | None, Query(alias="status")] = None,
+    *,
+    page: FullPageDep,
 ) -> list[QuoteSummary]:
     """Quotes, newest first; by client or status (expired = sent and past its date)."""
     ensure_client_visible(context, client_id)
@@ -262,9 +265,15 @@ def list_quotes(
             WHERE (CAST(:client AS uuid) IS NULL OR q.client_id = :client)
               AND (CAST(:status AS text) IS NULL OR q.status = :status)
             ORDER BY q.number DESC
-            LIMIT 300
+            LIMIT :limit OFFSET :offset
         """),
-        {"client": client_id, "status": quote_status, **visible_params},
+        {
+            "client": client_id,
+            "status": quote_status,
+            "limit": page.limit,
+            "offset": page.offset,
+            **visible_params,
+        },
     ).mappings()
     return [QuoteSummary.model_validate(dict(row)) for row in rows]
 
@@ -551,7 +560,7 @@ class ClientQuote(BaseModel):
 
 
 @client_router.get("/quotes")
-def my_quotes(context: ClientDep) -> list[ClientQuote]:
+def my_quotes(context: ClientDep, page: FullPageDep) -> list[ClientQuote]:
     """The client's quotes in this business (sent ones), newest first."""
     rows = context.session.execute(
         text(f"""
@@ -564,6 +573,8 @@ def my_quotes(context: ClientDep) -> list[ClientQuote]:
             FROM app.quotes q JOIN app.tenants t ON t.id = q.tenant_id
             WHERE q.client_id = app.current_client_id() AND q.status <> 'draft'
             ORDER BY q.number DESC
-        """)
+            LIMIT :limit OFFSET :offset
+        """),
+        {"limit": page.limit, "offset": page.offset},
     ).mappings()
     return [ClientQuote.model_validate(dict(row)) for row in rows]

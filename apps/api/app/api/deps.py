@@ -197,6 +197,13 @@ def set_branch(
     )
 
 
+def count_tenant_request(request: Request, tenant_id: UUID) -> None:
+    """The per-business request ceiling (app/core/rate_limit.py); off when rate limits are off."""
+    quota = getattr(request.app.state, "tenant_quota", None)
+    if quota is not None:
+        quota.check(tenant_id)
+
+
 def get_tenant_context(
     session: SessionDep,
     user: UserDep,
@@ -259,6 +266,7 @@ def get_tenant_context(
         ).scalar()
     ):
         raise mfa_required()
+    count_tenant_request(request, tenant_id)
     set_branch(session, branch_id, allowed)
     return TenantContext(
         session=session,
@@ -328,7 +336,9 @@ class ClientContext:
 
 
 def get_client_context(
-    session: SessionDep, tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")]
+    session: SessionDep,
+    tenant_id: Annotated[UUID, Header(alias="X-Tenant-Id")],
+    request: Request,
 ) -> ClientContext:
     """Scopes the session to a business the user joined as a client (the client app)."""
     set_tenant(session, tenant_id)
@@ -349,6 +359,7 @@ def get_client_context(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="billing_suspended")
     if not has_module(session, "client_app"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+    count_tenant_request(request, tenant_id)
     return ClientContext(session=session, tenant_id=tenant_id, client_id=client_id)
 
 
