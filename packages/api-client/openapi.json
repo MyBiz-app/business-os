@@ -5459,6 +5459,362 @@
         }
       }
     },
+    "/payroll/runs/{period}/payslips/{user_id}/corrections": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "List Corrections",
+        "operationId": "list_corrections",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Correction"
+                  },
+                  "title": "Response List Corrections"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Issue Correction",
+        "description": "A new corrective payslip. Only an approved month can be corrected, and only by the owner.",
+        "operationId": "issue_correction",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Correction"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/annual/{year}": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Annual Summary",
+        "description": "Per person totals of the tax year's approved months, the basis for Form 106.",
+        "operationId": "annual_summary",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
+              "title": "Year"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnnualSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/annual/{year}/export": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Annual Export",
+        "operationId": "annual_export",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 2100,
+              "minimum": 2000,
+              "title": "Year"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "csv",
+                "xlsx"
+              ],
+              "type": "string",
+              "default": "xlsx",
+              "title": "Format"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/payroll/runs/{period}/net": {
       "get": {
         "tags": [
@@ -5543,6 +5899,7 @@
           "payroll"
         ],
         "summary": "Payslip File",
+        "description": "The payslip; by default the latest corrective payslip when the month has one.",
         "operationId": "payslip_file",
         "security": [
           {
@@ -5569,6 +5926,25 @@
               "format": "uuid",
               "title": "User Id"
             }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "0 is the original payslip",
+              "title": "Version"
+            },
+            "description": "0 is the original payslip"
           },
           {
             "name": "X-Tenant-Id",
@@ -5714,6 +6090,25 @@
               "pattern": "^\\d{4}-\\d{2}$",
               "title": "Period"
             }
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "0 is the original payslip",
+              "title": "Version"
+            },
+            "description": "0 is the original payslip"
           },
           {
             "name": "X-Tenant-Id",
@@ -39022,6 +39417,120 @@
         ],
         "title": "AnnouncementBody"
       },
+      "AnnualPerson": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "months": {
+            "type": "integer",
+            "title": "Months"
+          },
+          "corrected_months": {
+            "type": "integer",
+            "title": "Corrected Months"
+          },
+          "gross_minor": {
+            "type": "integer",
+            "title": "Gross Minor"
+          },
+          "income_tax_minor": {
+            "type": "integer",
+            "title": "Income Tax Minor"
+          },
+          "national_insurance_minor": {
+            "type": "integer",
+            "title": "National Insurance Minor"
+          },
+          "health_minor": {
+            "type": "integer",
+            "title": "Health Minor"
+          },
+          "pension_employee_minor": {
+            "type": "integer",
+            "title": "Pension Employee Minor"
+          },
+          "study_fund_employee_minor": {
+            "type": "integer",
+            "title": "Study Fund Employee Minor"
+          },
+          "other_deductions_minor": {
+            "type": "integer",
+            "title": "Other Deductions Minor"
+          },
+          "net_minor": {
+            "type": "integer",
+            "title": "Net Minor"
+          },
+          "employer_minor": {
+            "type": "integer",
+            "title": "Employer Minor",
+            "description": "Pension, severance, study fund and insurance"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "full_name",
+          "months",
+          "corrected_months",
+          "gross_minor",
+          "income_tax_minor",
+          "national_insurance_minor",
+          "health_minor",
+          "pension_employee_minor",
+          "study_fund_employee_minor",
+          "other_deductions_minor",
+          "net_minor",
+          "employer_minor"
+        ],
+        "title": "AnnualPerson"
+      },
+      "AnnualSummary": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "draft": {
+            "type": "boolean",
+            "title": "Draft",
+            "description": "Some month was not yet checked by an accountant"
+          },
+          "people": {
+            "items": {
+              "$ref": "#/components/schemas/AnnualPerson"
+            },
+            "type": "array",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "currency",
+          "draft",
+          "people"
+        ],
+        "title": "AnnualSummary"
+      },
       "Answer-Input": {
         "properties": {
           "accept": {
@@ -44428,6 +44937,103 @@
           "price"
         ],
         "title": "CoreTier"
+      },
+      "Correction": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "title": "Version",
+            "description": "1 is the first correction; the original payslip is 0"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CorrectionItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "previous_net_minor": {
+            "type": "integer",
+            "title": "Previous Net Minor"
+          },
+          "net_minor": {
+            "type": "integer",
+            "title": "Net Minor"
+          },
+          "difference_minor": {
+            "type": "integer",
+            "title": "Difference Minor",
+            "description": "Net now less net before: to pay, or to recover"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "reason",
+          "items",
+          "previous_net_minor",
+          "net_minor",
+          "difference_minor",
+          "created_at"
+        ],
+        "title": "Correction"
+      },
+      "CorrectionBody": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CorrectionItem"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Items"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason",
+          "items"
+        ],
+        "title": "CorrectionBody"
+      },
+      "CorrectionItem": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Label"
+          },
+          "amount_minor": {
+            "type": "integer",
+            "maximum": 100000000.0,
+            "minimum": -100000000.0,
+            "title": "Amount Minor",
+            "description": "Added to the pay; negative takes away"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "amount_minor"
+        ],
+        "title": "CorrectionItem"
       },
       "CoverageGap": {
         "properties": {
@@ -52777,6 +53383,12 @@
             "type": "string",
             "format": "date",
             "title": "Period"
+          },
+          "corrections": {
+            "type": "integer",
+            "title": "Corrections",
+            "description": "Corrective payslips issued for the month",
+            "default": 0
           },
           "net_minor": {
             "type": "integer",
