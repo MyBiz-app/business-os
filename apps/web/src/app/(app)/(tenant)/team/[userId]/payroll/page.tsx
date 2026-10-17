@@ -20,9 +20,10 @@ export default async function PayrollFilePage({ params }: PageProps<"/team/[user
   const member = team.members.find((m) => m.user_id === userId);
   if (!member) notFound();
   const path = { ...scope, path: { user_id: userId } };
-  const [employment, forms] = await Promise.all([
+  const [employment, forms, components] = await Promise.all([
     api.GET("/staff/{user_id}/employment", { params: path }).then(unwrap),
     api.GET("/staff/{user_id}/form101", { params: path }).then(unwrap),
+    api.GET("/staff/{user_id}/pay-components", { params: path }).then(unwrap),
   ]);
   const name = member.full_name ?? member.email;
 
@@ -42,6 +43,7 @@ export default async function PayrollFilePage({ params }: PageProps<"/team/[user
         locale={tenant.locale}
         employment={employment}
         forms={forms}
+        components={components}
         canManage={canManagePayroll(tenant)}
         thisYear={new Date().getFullYear()}
       />

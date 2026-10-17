@@ -7076,7 +7076,55 @@
       "bankKept": "Leave empty to keep the saved account"
     },
     "components": {
-      "soon": "Fixed pay components (travel, meals, phone, car, recurring additions and deductions) are added in the next update."
+      "title": "Fixed pay components",
+      "hint": "Recurring parts of the monthly pay. Each line says whether it is taxable, liable to national insurance and counts towards the pension; the defaults follow the kind, and an accountant can change them per line.",
+      "empty": "No pay components yet.",
+      "add": "Add a component",
+      "adding": "New component",
+      "edit": "Edit",
+      "remove": "Remove",
+      "save": "Save",
+      "cancel": "Cancel",
+      "kinds": {
+        "travel": "Travel",
+        "meals": "Meals",
+        "phone": "Phone",
+        "car": "Car",
+        "fixed_addition": "Fixed addition",
+        "recuperation": "Recuperation",
+        "fixed_deduction": "Fixed deduction"
+      },
+      "calcs": {
+        "per_work_day": "Per work day",
+        "monthly": "Per month",
+        "by_month": "Typed in each month",
+        "automatic": "Automatic (by seniority)"
+      },
+      "fields": {
+        "kind": "Kind",
+        "name": "Name",
+        "calc": "How it is paid",
+        "amount": "Amount",
+        "cap": "Monthly ceiling (optional)",
+        "taxable": "Taxable",
+        "socialSecurity": "National insurance",
+        "pension": "Pension base",
+        "validFrom": "From",
+        "validTo": "Until (optional)"
+      },
+      "summary": {
+        "perWorkDay": "{amount} per work day",
+        "monthly": "{amount} per month",
+        "byMonth": "Typed in each month",
+        "automatic": "Calculated automatically",
+        "cap": "up to {amount} a month"
+      },
+      "flags": {
+        "taxable": "taxable",
+        "socialSecurity": "national insurance",
+        "pension": "pension base",
+        "none": "no deductions"
+      }
     },
     "documents": {
       "title": "Documents",
@@ -7092,7 +7140,86 @@
       "form_exists": "A Form 101 for this year already exists.",
       "forbidden": "You do not have permission for this.",
       "invalid": "Please check the details and try again.",
-      "generic": "Something went wrong. Please try again."
+      "generic": "Something went wrong. Please try again.",
+      "amount_required": "Enter the amount.",
+      "no_recipients": "Nobody in this group can receive it (no payroll file, another branch or your own level).",
+      "amount_too_small": "The total is too small to divide between this many people."
     }
+  },
+  "payBonuses": {
+    "title": "Bonuses and one-off pay",
+    "description": "Add a bonus, a holiday gift, an expense refund or a one-off deduction to the pay of a person, a branch or a group.",
+    "back": "Back to the team",
+    "newTitle": "New one-off amount",
+    "target": {
+      "label": "Who gets it?",
+      "employee": "One person",
+      "location": "A branch",
+      "location_group": "A branch group",
+      "managers": "Managers",
+      "role": "A role",
+      "everyone": "Everyone",
+      "manual": "Pick people"
+    },
+    "pickEmployee": "Person",
+    "pickLocation": "Branch",
+    "pickGroup": "Branch group",
+    "pickRole": "Role",
+    "pickMembers": "People",
+    "roles": {
+      "owner": "Owner",
+      "manager": "Manager",
+      "branch_manager": "Branch manager",
+      "front_desk": "Front desk",
+      "staff": "Staff"
+    },
+    "kind": "Kind",
+    "kinds": {
+      "bonus": "Bonus",
+      "holiday_gift": "Holiday gift",
+      "expense_refund": "Expense refund",
+      "deduction": "Deduction"
+    },
+    "kindHints": {
+      "bonus": "Taxable, like salary.",
+      "holiday_gift": "Not taxable up to the gift ceiling.",
+      "expense_refund": "Not taxable against a receipt.",
+      "deduction": "Taken off the pay of the month."
+    },
+    "month": "Pay month",
+    "amountMode": {
+      "each": "This amount for each person",
+      "split_total": "Divide this total equally"
+    },
+    "amount": "Amount",
+    "note": "Note on the payslip",
+    "preview": "Show who gets it",
+    "previewResult": "{count, plural, one {# person} other {# people}}, {total} in total",
+    "withoutFile": "{count, plural, one {# person has} other {# people have}} no payroll file and will not receive it.",
+    "outOfReach": "{count, plural, one {# person is} other {# people are}} left out (another branch or your own level).",
+    "recipientsLabel": "Who gets what",
+    "submit": "Add to {count, plural, one {# payslip} other {# payslips}}",
+    "propose": "Propose to the owner ({count})",
+    "proposedDone": "Sent to the owner for approval.",
+    "addedDone": "Added.",
+    "listTitle": "This month's one-off amounts",
+    "none": "Nothing added for this month.",
+    "status": {
+      "proposed": "Waiting for the owner",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "approve": "Approve",
+    "reject": "Reject",
+    "remove": "Remove",
+    "errors": {
+      "forbidden": "You do not have permission for this.",
+      "invalid": "Please check the details and try again.",
+      "generic": "Something went wrong. Please try again.",
+      "amount_required": "Enter the amount.",
+      "no_recipients": "Nobody in this group can receive it (no payroll file, another branch or your own level).",
+      "amount_too_small": "The total is too small to divide between this many people."
+    },
+    "amountModeLabel": "How to count it"
   }
 }
