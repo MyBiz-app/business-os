@@ -90,12 +90,18 @@ jobs:
           echo "DUMP_SECONDS=$((dend - dstart))" >> "$GITHUB_ENV"
           echo "RESTORE_SECONDS=$(sed -n 's/^Restore took \([0-9]*\) seconds.*/\1/p' restore.txt)" >> "$GITHUB_ENV"
           # Every table has the same number of rows in both databases.
-          q="select table_name from information_schema.tables where table_schema in ('public','app') and table_type='BASE TABLE' order by 1"
+          dst="postgresql://postgres:postgres@localhost:5432/scratch"
+          q="select format('%I.%I', table_schema, table_name) from information_schema.tables where table_schema in ('public','app') and table_type='BASE TABLE' order by 1"
+          n=0; rows=0
           for t in $(psql "$SRC_URL" -Atc "$q"); do
-            a="$(psql "$SRC_URL" -Atc "select count(*) from \"$t\"" 2>/dev/null || true)"
-            b="$(psql "postgresql://postgres:postgres@localhost:5432/scratch" -Atc "select count(*) from \"$t\"" 2>/dev/null || true)"
+            a="$(psql "$SRC_URL" -Atc "select count(*) from $t")"
+            b="$(psql "$dst" -Atc "select count(*) from $t")"
             [ "$a" = "$b" ] || { echo "Row count differs in $t: $a vs $b"; exit 1; }
+            n=$((n + 1)); rows=$((rows + a))
           done
+          [ "$n" -gt 100 ] || { echo "Only $n tables compared"; exit 1; }
+          echo "TABLES=$n" >> "$GITHUB_ENV"
+          echo "ROWS=$rows" >> "$GITHUB_ENV"
           # The restored copy has the row security policies and the migration head.
           pol_src="$(psql "$SRC_URL" -Atc 'select count(*) from pg_policies')"
           pol_dst="$(psql "postgresql://postgres:postgres@localhost:5432/scratch" -Atc 'select count(*) from pg_policies')"
@@ -137,8 +143,8 @@ jobs:
             echo "| Migrations from empty to head \`${HEAD:-?}\` | ${MIGRATE_SECONDS:-?} s |"
             echo "| Newest migration down and up again | ${HEAD:+ok} |"
             echo "| Encrypted dump | ${DUMP_SECONDS:-?} s |"
-            echo "| Restore (decrypt, restore, smoke checks) | ${RESTORE_SECONDS:-?} s; row counts equal; ${POLICIES:-?} row security policies present |"
+            echo "| Restore (decrypt, restore, smoke checks) | ${RESTORE_SECONDS:-?} s; row counts equal in ${TABLES:-?} tables (${ROWS:-?} rows); ${POLICIES:-?} row security policies present |"
             echo "| Database outage: /health 200, /health/ready | ${OUTAGE_READY_CODE:-?} |"
             echo "| Recovery after the database came back | ${OUTAGE_RECOVERY_SECONDS:-?} s |"
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
           tail -n 20 api.log || true
