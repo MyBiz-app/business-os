@@ -15,6 +15,7 @@ from uuid import UUID, uuid4
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
+from app.core import metrics
 from app.core.monitoring import capture_exception
 
 request_id_var: ContextVar[str | None] = ContextVar("request_id", default=None)
@@ -100,9 +101,11 @@ async def request_logging(request: Request, call_next):
     request_id_var.set(request_id)
     tenant_id_var.set(_tenant_of(request))
     started = time.perf_counter()
+    crash: str | None = None
     try:
         response = await call_next(request)
     except Exception as error:
+        crash = type(error).__name__
         capture_exception(error, request_id, tenant_id_var.get())
         logger.exception(
             "unhandled error",
@@ -112,14 +115,25 @@ async def request_logging(request: Request, call_next):
             {"detail": "Internal server error", "request_id": request_id}, status_code=500
         )
     route = request.scope.get("route")
+    # The route template, not the URL: ids in paths stay out of the logs.
+    path = getattr(route, "path", request.url.path if response.status_code == 404 else None)
+    duration_ms = round((time.perf_counter() - started) * 1000, 1)
     log(
         logging.INFO,
         "request",
         method=request.method,
-        # The route template, not the URL: ids in paths stay out of the logs.
-        path=getattr(route, "path", request.url.path if response.status_code == 404 else None),
+        path=path,
         status=response.status_code,
-        duration_ms=round((time.perf_counter() - started) * 1000, 1),
+        duration_ms=duration_ms,
+    )
+    metrics.record_request(
+        request.method,
+        getattr(route, "path", None),
+        response.status_code,
+        duration_ms,
+        request_id,
+        tenant_id_var.get(),
+        crash,
     )
     response.headers[REQUEST_ID_HEADER] = request_id
     return response

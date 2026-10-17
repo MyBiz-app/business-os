@@ -4,6 +4,7 @@ Privacy first: no personal data is sent. Request bodies, cookies, headers, query
 user details are stripped before an event leaves the process; only the route template, the
 request id and the tenant id travel with the error."""
 
+import os
 from typing import Any
 
 from app.core.config import Settings
@@ -37,6 +38,7 @@ def init_monitoring(settings: Settings) -> bool:
     sentry_sdk.init(
         dsn=settings.sentry_dsn.get_secret_value(),
         environment=settings.environment,
+        release=settings.sentry_release or os.environ.get("RENDER_GIT_COMMIT") or None,
         send_default_pii=False,
         traces_sample_rate=settings.sentry_traces_sample_rate,
         max_request_body_size="never",

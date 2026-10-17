@@ -17,6 +17,7 @@ export function scrubEvent<T extends SentryEventLike>(event: T): T {
 export const sentryOptions = (dsn: string) => ({
   dsn,
   environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? process.env.NODE_ENV,
+  release: process.env.NEXT_PUBLIC_SENTRY_RELEASE || undefined,
   sendDefaultPii: false,
   tracesSampleRate: Number(process.env.NEXT_PUBLIC_SENTRY_TRACES_SAMPLE_RATE ?? 0),
   beforeSend: scrubEvent,
