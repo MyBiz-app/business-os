@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.common import blank_to_none, not_found, set_clause
 from app.api.deps import SessionDep, TenantContext, UserDep, require
 from app.api.routes import ensure_profile
+from app.core.audit import record
 from app.core.permissions import ROLE_PERMISSIONS, Permission, effective_permissions
 from app.schedule.branch_managers import (
     TEAM_ROLES,
@@ -328,6 +329,14 @@ def create_invitation(
         .mappings()
         .one()
     )
+    record(
+        context.session,
+        "staff.invited",
+        entity_type="invitation",
+        entity_id=row["id"],
+        email=body.email,
+        role=body.role,
+    )
     return CreatedInvitation(**row, token=token)
 
 
@@ -346,6 +355,13 @@ def revoke_invitation(invitation_id: UUID, context: ManageDep) -> None:
     _check_can_grant(context, role)
     context.session.execute(
         text("DELETE FROM app.invitations WHERE id = :id"), {"id": invitation_id}
+    )
+    record(
+        context.session,
+        "staff.invitation_revoked",
+        entity_type="invitation",
+        entity_id=invitation_id,
+        role=role,
     )
 
 
@@ -400,6 +416,15 @@ def update_member(user_id: UUID, body: MemberUpdate, user: UserDep, context: Man
     )
     if current == "branch_manager" and new_role != "branch_manager":
         forget_manager(context.session, user_id)
+    record(
+        context.session,
+        "staff.role_changed",
+        entity_type="member",
+        entity_id=user_id,
+        old_role=current,
+        new_role=new_role,
+        custom_role_id=body.custom_role_id,
+    )
     return _load_member(context.session, user_id)
 
 
@@ -432,6 +457,13 @@ def set_member_branches(user_id: UUID, body: MemberBranches, context: ManageDep)
     if role == "branch_manager":  # they manage only the branches they still have
         forget_manager(context.session, user_id, kept=ids)
     suggest_reports_to(context.session, user_id)
+    record(
+        context.session,
+        "staff.branches_set",
+        entity_type="member",
+        entity_id=user_id,
+        location_ids=[str(i) for i in ids],
+    )
     return _load_member(context.session, user_id)
 
 
@@ -553,6 +585,14 @@ def create_role(body: RoleFields, context: ManageDep) -> CustomRole:
         ).scalar_one()
     except IntegrityError as error:
         raise _name_taken(error) from error
+    record(
+        context.session,
+        "role.created",
+        entity_type="role",
+        entity_id=role_id,
+        name=body.name,
+        permissions=sorted(body.permissions),
+    )
     return _load_role(context.session, role_id)
 
 
@@ -572,6 +612,14 @@ def update_role(role_id: UUID, body: RoleUpdate, context: ManageDep) -> CustomRo
             )
         except IntegrityError as error:
             raise _name_taken(error) from error
+    record(
+        context.session,
+        "role.updated",
+        entity_type="role",
+        entity_id=role_id,
+        changed=sorted(changes),
+        permissions=sorted(changes["permissions"]) if "permissions" in changes else None,
+    )
     return _load_role(context.session, role_id)
 
 
@@ -582,6 +630,7 @@ def delete_role(role_id: UUID, context: ManageDep) -> None:
     if role.members:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="role_in_use")
     context.session.execute(text("DELETE FROM app.tenant_roles WHERE id = :id"), {"id": role_id})
+    record(context.session, "role.deleted", entity_type="role", entity_id=role_id, name=role.name)
 
 
 @router.delete("/staff/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -592,6 +641,17 @@ def remove_member(user_id: UUID, user: UserDep, context: ManageDep) -> None:
     _check_can_grant(context, current)
     if current == "owner" and _owner_count(context.session) == 1:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="last_owner")
+    removed = context.session.execute(
+        text("SELECT email FROM app.users WHERE id = :id"), {"id": user_id}
+    ).scalar()
+    record(
+        context.session,
+        "staff.removed",
+        entity_type="member",
+        entity_id=user_id,
+        email=removed,
+        role=current,
+    )
     forget_manager(context.session, user_id)
     # Their ID number goes with them (payslips, once kept, have their own retention).
     context.session.execute(
