@@ -75,6 +75,31 @@ def ensure_branch_allowed(context: TenantContext, location_id: UUID | None) -> N
         )
 
 
+def ensure_client_visible(context: TenantContext, client_id: UUID | None) -> None:
+    """Anything filed under a client (notes, documents, health declarations, dependents,
+    receipts, quotes) follows the client's home branch: a member kept to some branches gets
+    "not found" for another branch's client. A client with no home branch belongs to everyone."""
+    if context.branches is None or client_id is None:
+        return
+    home = context.session.execute(
+        text("SELECT home_location_id FROM app.clients WHERE id = :id"), {"id": client_id}
+    ).first()
+    if home is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_found")
+    ensure_branch_visible(context, home.home_location_id)
+
+
+def client_branch_filter(context: TenantContext, home_column: str) -> tuple[str, dict]:
+    """SQL condition and parameters keeping a list to clients whose home branch the member may
+    reach (`home_column` is the client's `home_location_id`); no condition for everyone else."""
+    if context.branches is None:
+        return "TRUE", {}
+    return (
+        f"({home_column} IS NULL OR {home_column} = ANY(CAST(:visible_branches AS uuid[])))",
+        {"visible_branches": list(context.branches)},
+    )
+
+
 def _audit_platform_visit(session: Session, tenant_id: UUID, action: str, request: Request) -> None:
     """Writes the visit to the business's own audit log, which its owner reads in settings."""
     session.execute(

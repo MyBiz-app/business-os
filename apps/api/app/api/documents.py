@@ -20,7 +20,13 @@ from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import Session
 
 from app.api.common import ensure_not_erased, not_found
-from app.api.deps import AnonymousSessionDep, ClientDep, TenantContext, require
+from app.api.deps import (
+    AnonymousSessionDep,
+    ClientDep,
+    TenantContext,
+    ensure_client_visible,
+    require,
+)
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.core.signed_links import sign, verify
@@ -220,11 +226,22 @@ def _list(db: Session, client_id: UUID) -> list[Document]:
     return [Document.model_validate(dict(row)) for row in rows]
 
 
+def _ensure_document_visible(context: TenantContext, document_id: UUID) -> None:
+    """A member kept to some branches reaches a document only through a visible client."""
+    client_id = context.session.execute(
+        text("SELECT client_id FROM app.client_documents WHERE id = :id"), {"id": document_id}
+    ).scalar()
+    if client_id is None:
+        raise not_found()
+    ensure_client_visible(context, client_id)
+
+
 # --- Staff ------------------------------------------------------------------------------------
 
 
 @router.get("/clients/{client_id}/documents")
 def client_documents(client_id: UUID, context: ReadDep) -> list[Document]:
+    ensure_client_visible(context, client_id)
     return _list(context.session, client_id)
 
 
@@ -238,6 +255,7 @@ def upload_document(
     shared: Annotated[bool, Form()] = False,
     sign_requested: Annotated[bool, Form()] = False,
 ) -> Document:
+    ensure_client_visible(context, client_id)
     content, content_type = _read(file)
     return _store(
         context.session,
@@ -255,11 +273,13 @@ def upload_document(
 
 @router.get("/documents/{document_id}/file")
 def document_file(document_id: UUID, context: ReadDep) -> Response:
+    _ensure_document_visible(context, document_id)
     return _file(context.session, document_id)
 
 
 @router.patch("/documents/{document_id}")
 def update_document(document_id: UUID, body: DocumentUpdate, context: WriteDep) -> Document:
+    _ensure_document_visible(context, document_id)
     changes = {k: v for k, v in body.model_dump(exclude_unset=True).items() if v is not None}
     if changes.get("sign_requested"):
         changes["shared"] = True  # asking to sign shares it
@@ -285,6 +305,7 @@ def update_document(document_id: UUID, body: DocumentUpdate, context: WriteDep) 
 
 @router.delete("/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_document(document_id: UUID, context: WriteDep) -> None:
+    _ensure_document_visible(context, document_id)
     db = context.session
     key = db.execute(
         text("DELETE FROM app.client_documents WHERE id = :id RETURNING storage_key"),

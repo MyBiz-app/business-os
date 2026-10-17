@@ -1,14 +1,18 @@
 """Branch-scoped access (#64): a member kept to some branches reaches only those, by id as well
 as in lists, and can't file anything under another branch. Owners and managers see them all."""
 
+from dataclasses import replace
 from datetime import timedelta
 from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine
+from sqlalchemy import Engine, text
 
+from app.catalog.verticals import CATALOG
 from tests.conftest import AuthHeaders, add_member, local_today
+from tests.test_quotes import new_quote, quote_body
+from tests.test_receipts import sell
 from tests.test_workspace import at
 
 
@@ -351,3 +355,90 @@ def test_managers_and_owners_are_never_kept_to_branches(
     )
     assert moved.status_code == 200, moved.text
     assert UUID(moved.json()["location_id"]) == UUID(branches["north"])
+
+
+def test_everything_filed_under_a_client_follows_the_clients_branch(
+    client: TestClient,
+    auth: AuthHeaders,
+    engine: Engine,
+    studio: dict,
+    branches: dict,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Notes, documents, health declarations, dependents, receipts and quotes (GL2)."""
+    monkeypatch.setitem(CATALOG, "fitness", replace(CATALOG["fitness"], dependents="pet"))
+    owner = branches["owner"]
+    mine = member_at_north(client, auth, engine, studio, branches)
+    north, south = branches["north_client"], branches["south_client"]
+
+    # One of each under the other branch's client, made by the owner.
+    note = client.post(f"/clients/{south}/notes", json={"body": "hi"}, headers=owner)
+    assert note.status_code == 201, note.text
+    document = client.post(
+        f"/clients/{south}/documents",
+        files={"file": ("a.txt", b"hello", "text/plain")},
+        headers=owner,
+    )
+    assert document.status_code == 201, document.text
+    dependent = client.post(f"/clients/{south}/dependents", json={"name": "Rex"}, headers=owner)
+    assert dependent.status_code == 201, dependent.text
+    sale = sell(client, studio, south)
+    quote = new_quote(client, owner, south)
+    with engine.begin() as connection:
+        declaration = connection.execute(
+            text("""
+                INSERT INTO app.health_declarations
+                    (tenant_id, client_id, form_key, locale, answers, statement, all_clear,
+                     signed_name, valid_until, status)
+                VALUES (:t, :c, 'par_q', 'en', '{}', 's', false, 'Sam South',
+                        current_date + 30, 'needs_review')
+                RETURNING id
+            """),
+            {"t": studio["tenant_id"], "c": south},
+        ).scalar_one()
+
+    hidden = [
+        client.get(f"/clients/{south}/notes", headers=mine),
+        client.post(f"/clients/{south}/notes", json={"body": "x"}, headers=mine),
+        client.delete(f"/clients/{south}/notes/{note.json()['id']}", headers=mine),
+        client.get(f"/clients/{south}/documents", headers=mine),
+        client.post(
+            f"/clients/{south}/documents",
+            files={"file": ("b.txt", b"x", "text/plain")},
+            headers=mine,
+        ),
+        client.get(f"/documents/{document.json()['id']}/file", headers=mine),
+        client.patch(f"/documents/{document.json()['id']}", json={"shared": True}, headers=mine),
+        client.delete(f"/documents/{document.json()['id']}", headers=mine),
+        client.get(f"/clients/{south}/health-declarations", headers=mine),
+        client.post(
+            f"/health-declarations/{declaration}/review", json={"approve": True}, headers=mine
+        ),
+        client.get(f"/clients/{south}/dependents", headers=mine),
+        client.post(f"/clients/{south}/dependents", json={"name": "Max"}, headers=mine),
+        client.patch(f"/dependents/{dependent.json()['id']}", json={"name": "Z"}, headers=mine),
+        client.get(f"/receipts/{sale['receipt_id']}", headers=mine),
+        client.get("/receipts", params={"client_id": south}, headers=mine),
+        client.get(f"/quotes/{quote['id']}", headers=mine),
+        client.put(f"/quotes/{quote['id']}", json=quote_body(south), headers=mine),
+        client.post(f"/quotes/{quote['id']}/send", headers=mine),
+        client.post(f"/quotes/{quote['id']}/copy", headers=mine),
+        client.get("/quotes", params={"client_id": south}, headers=mine),
+        client.post("/quotes", json=quote_body(south), headers=mine),
+    ]
+    assert [r.status_code for r in hidden] == [404] * len(hidden), [r.text for r in hidden]
+
+    # Unfiltered lists leave the other branch's rows out.
+    assert client.get("/receipts", headers=mine).json() == []
+    assert client.get("/quotes", headers=mine).json() == []
+    # ... but the member's own branch works throughout.
+    assert (
+        client.post(f"/clients/{north}/notes", json={"body": "ok"}, headers=mine).status_code == 201
+    )
+    assert client.get(f"/clients/{north}/dependents", headers=mine).status_code == 200
+    assert client.post("/quotes", json=quote_body(north), headers=mine).status_code == 201
+    assert len(client.get("/quotes", headers=mine).json()) == 1
+
+    # The owner still sees everything.
+    assert client.get(f"/receipts/{sale['receipt_id']}", headers=owner).status_code == 200
+    assert len(client.get("/quotes", headers=owner).json()) == 2
