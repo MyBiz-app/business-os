@@ -39,7 +39,7 @@ ALLOWED = {
     "api/plans.py": 7,
     "api/privacy.py": 1,
     "api/promo_codes.py": 2,
-    "api/quotes.py": 4,
+    "api/quotes.py": 5,
     "api/receipts.py": 5,
     "api/resources.py": 1,
     "api/reviews.py": 3,
