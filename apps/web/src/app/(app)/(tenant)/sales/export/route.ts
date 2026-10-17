@@ -3,6 +3,8 @@ import type { NextRequest } from "next/server";
 
 import { unwrap } from "@/lib/api";
 import { minorDigits, toMajor } from "@/lib/money";
+import { isDay, todayIn } from "@/lib/dates";
+import { MAX_RANGE_DAYS } from "@/lib/range";
 import { getTenantFor } from "@/lib/tenant";
 
 import { monthRange } from "../month";
@@ -19,7 +21,15 @@ export async function GET(request: NextRequest) {
   const { tenant, api, scope } = await getTenantFor("reports.read");
   const t = await getTranslations("sales");
   const tReceipts = await getTranslations("receipts");
-  const { month, start, end } = monthRange(request.nextUrl.searchParams.get("month"), tenant.time_zone);
+  const params = request.nextUrl.searchParams;
+  const months = monthRange(params.get("month"), tenant.time_zone);
+  // A free range (`from` and `to`) replaces the month, like on the page.
+  const from = params.get("from");
+  const to = params.get("to");
+  const free =
+    isDay(from) && isDay(to) && from <= to && to <= todayIn(tenant.time_zone) && (Date.parse(to) - Date.parse(from)) / 86_400_000 < MAX_RANGE_DAYS;
+  const { start, end } = free ? { start: from, end: to } : months;
+  const month = free ? `${from}_${to}` : months.month;
   const sales = unwrap(await api.GET("/sales", { params: { ...scope, query: { start, end } } }));
   const dateOf = (instant: string) =>
     new Intl.DateTimeFormat("en-CA", { timeZone: tenant.time_zone, year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(instant));

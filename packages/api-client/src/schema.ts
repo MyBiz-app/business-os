@@ -19789,6 +19789,13 @@ export interface operations {
                 plan?: ("valid" | "none") | null;
                 /** @description No check-in in this many days */
                 absent_days?: number | null;
+                /** @description Joined on or after this day (business time zone) */
+                joined_from?: string | null;
+                /** @description Joined on or before this day (business time zone) */
+                joined_to?: string | null;
+                /** @description With no_show_to: missed a class in this range */
+                no_show_from?: string | null;
+                no_show_to?: string | null;
                 /** @description Rows per page */
                 limit?: number;
                 /** @description Rows to skip */

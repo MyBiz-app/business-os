@@ -38,11 +38,11 @@ export default async function PayrollRunPage({ searchParams }: PageProps<"/team/
       <BackLink href="/team" label={t("back")} />
       <PageHeader title={t("title")} description={t("subtitle")} />
       <nav aria-label={t("monthNav")} className="flex items-center gap-3">
-        <Link href={step(-1)} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={step(-1)} className="btn-secondary px-3 py-2 text-sm">
           {t("previous")}
         </Link>
         <h2 className="text-lg font-semibold">{label}</h2>
-        <Link href={step(1)} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={step(1)} className="btn-secondary px-3 py-2 text-sm">
           {t("next")}
         </Link>
         {permissions.includes("payroll.approve") && (

@@ -48,18 +48,18 @@ with sync_playwright() as p:
     print("1. registered, verified, created business: ok")
 
     # Logo and colors.
-    owner.goto(f"{h.BASE}/settings"); h.ready(owner)
+    owner.goto(f"{h.BASE}/settings/branding"); h.ready(owner)
     owner.get_by_label("שימוש בצבע ברירת המחדל").uncheck()
-    owner.get_by_label("צבע המותג").fill("#0f766e")
-    with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
-        owner.locator("form").filter(has=owner.get_by_label("צבע המותג")).get_by_role("button", name="שמירה").click()
-    h.ready(owner)  # the save refreshes the page; a file chosen before that is lost
-    owner.get_by_label("לוגו", exact=True).set_input_files("e2e/logo.png")
+    owner.get_by_label("צבע מותאם").fill("#0f766e")
+    owner.get_by_label("העלאת לוגו", exact=True).set_input_files("e2e/logo.png")
     use = owner.get_by_role("button", name="להשתמש בתמונה")  # the crop dialog opens first
     expect(use).to_be_enabled(timeout=30000)
     use.click()
-    owner.get_by_role("button", name="העלאת לוגו").click()
-    expect(owner.get_by_role("img", name="תצוגה מקדימה")).to_be_visible()
+    # Color and logo are saved together with one button.
+    with owner.expect_response(lambda r: r.request.method == "POST" and "/settings" in r.url):
+        owner.get_by_role("button", name="שמירה").click()
+    h.ready(owner)
+    expect(owner.get_by_role("img", name="תצוגה מקדימה").first).to_be_visible()
     owner.goto(f"{h.BASE}/dashboard"); h.ready(owner)
     expect(owner.get_by_role("heading", level=1)).to_contain_text("סטודיו DoD")
     print("2. logo + colors, dashboard: ok")
@@ -190,7 +190,8 @@ with sync_playwright() as p:
         "/locations", "/locations/new", "/resources", "/assistant", "/content", "/ai",
         "/team", "/team/shifts", "/team/time-clock", "/team/time-off", "/team/payroll", "/team/roles",
         "/team/organization", "/team/bonuses", "/team/shift-swaps",
-        "/settings", "/settings/modules", "/settings/billing", "/settings/integrations",
+        "/settings/business", "/settings/branding", "/settings/modules", "/settings/billing", "/settings/integrations",
+        "/settings/audit", "/settings/data", "/settings/help",
         "/account", "/migration",
     ]  # fmt: skip
     for path in pages:

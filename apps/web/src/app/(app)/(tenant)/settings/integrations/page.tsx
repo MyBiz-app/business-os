@@ -1,6 +1,5 @@
-import { CreditCard, FileText, MessageCircle, Plug } from "lucide-react";
+import { CreditCard, FileText, MessageCircle } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Pill } from "@/components/pill";
@@ -8,8 +7,7 @@ import { unwrap } from "@/lib/api";
 import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
-import { Container } from "@/components/layout/container";
-import { PageHeader } from "@/components/layout/page-header";
+import { TopicHeader } from "../topic-header";
 
 import { disconnectProvider } from "./actions";
 import { ProviderForm } from "./provider-form";
@@ -20,7 +18,6 @@ const ICONS = { payments: CreditCard, invoicing: FileText, messaging: MessageCir
  * Switching provider is choosing another one here; nothing else in the business changes. */
 export default async function IntegrationsPage() {
   const t = await getTranslations("integrations");
-  const tSettings = await getTranslations("settings");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenant();
   if (!canManageSettings(tenant)) redirect("/dashboard");
@@ -28,19 +25,8 @@ export default async function IntegrationsPage() {
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/settings" className="text-sm text-primary-ink underline-offset-4 hover:underline">
-        {tSettings("title")}
-      </Link>
-      <PageHeader
-        title={
-          <span className="flex items-center gap-3">
-            <Plug aria-hidden="true" className="size-8 shrink-0 text-primary-ink" />
-            {t("title")}
-          </span>
-        }
-        description={t("subtitle")}
-      />
+    <div className="flex flex-col gap-6">
+      <TopicHeader title={t("title")} description={t("subtitle")} />
       {integrations.map((integration) => {
         const Icon = ICONS[integration.capability];
         const heading = `integration-${integration.capability}`;
@@ -75,6 +61,6 @@ export default async function IntegrationsPage() {
           </section>
         );
       })}
-    </Container>
+    </div>
   );
 }

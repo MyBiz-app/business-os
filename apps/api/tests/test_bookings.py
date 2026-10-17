@@ -342,3 +342,25 @@ def test_only_managers_book_over_capacity(
     response = book_over(client, auth(user, studio["tenant_id"]), session_id, extra)
 
     assert response.status_code == (201 if allowed else 403)
+
+
+def test_clients_filter_by_join_day_and_no_show_range(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    on = local_today() + timedelta(days=20)
+    session_id = new_session(client, studio, on=on)
+    missed = new_client(client, headers, "Dana")
+    set_status(client, headers, book(client, headers, session_id, missed).json()["id"], "no_show")
+    new_client(client, headers, "Noa")
+
+    def listed(**query: str) -> list[str]:
+        response = client.get("/clients", params=query, headers=headers)
+        assert response.status_code == 200
+        return [c["id"] for c in response.json()["items"]]
+
+    today = local_today().isoformat()
+    assert len(listed(joined_from=today, joined_to=today)) == 2
+    assert listed(joined_to=(local_today() - timedelta(days=1)).isoformat()) == []
+    assert listed(joined_from=(local_today() + timedelta(days=1)).isoformat()) == []
+    assert listed(no_show_from=on.isoformat(), no_show_to=on.isoformat()) == [missed]
+    assert listed(no_show_to=(on - timedelta(days=1)).isoformat()) == []
+    assert listed(no_show_from=(on + timedelta(days=1)).isoformat()) == []

@@ -12,7 +12,7 @@ export function DateJump({ value, href, label }: { value: string; href: string; 
       title={label}
       value={value}
       onChange={(event) => {
-        if (event.target.value) router.push(href.replace("__day__", event.target.value));
+        if (event.target.value) router.push(href.replace("__day__", event.target.value), { scroll: false });
       }}
       className="control h-9 w-auto px-2 py-1 text-sm"
     />

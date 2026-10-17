@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { branchColor } from "@/lib/calendar";
 import { formatMoney } from "@/lib/money";
 
+import { BranchLink } from "./branch-link";
+
 type BranchMetrics = components["schemas"]["BranchMetrics"];
 
 /** Branches side by side, metric by metric: a bar per branch, scaled to the best of them, with
@@ -55,8 +57,8 @@ export async function BranchComparison({ rows, currency, locale }: { rows: Branc
                   const value = values[i].value;
                   return (
                     <li key={row.location_id} className="grid grid-cols-[minmax(5rem,9rem)_1fr_auto] items-center gap-3 text-sm">
-                      <span dir="auto" className="truncate text-muted">
-                        {row.name}
+                      <span dir="auto" className="flex min-w-0 text-muted">
+                        <BranchLink id={row.location_id}>{row.name}</BranchLink>
                       </span>
                       <span aria-hidden="true" className="h-2.5 overflow-hidden rounded-full bg-foreground/6">
                         <span className="block h-full rounded-full" style={{ width: `${max > 0 && value ? (value / max) * 100 : 0}%`, background: branchColor(i) }} />

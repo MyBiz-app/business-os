@@ -107,7 +107,7 @@ with sync_playwright() as p:
     biz.get_by_role("button", name="המשך").click()
     biz.get_by_role("button", name="יצירת העסק").click()
     biz.wait_for_url("**/dashboard")
-    biz.goto(f"{h.BASE}/settings"); h.ready(biz)
+    biz.goto(f"{h.BASE}/settings/help"); h.ready(biz)
     biz.get_by_label("מה קורה?").fill("היומן מציג שעה לא נכונה, אפשר לעזור?")
     biz.get_by_role("button", name="שליחה ל-MyBiz").click()
     expect(biz.get_by_role("status").filter(has_text="נשלח")).to_be_visible()
