@@ -41,7 +41,7 @@ export function SubpageHero({ eyebrow, title, description, children, aside, lead
 export function BandText({ eyebrow, title, text, id, children }: { eyebrow?: string; title: string; text?: string; id?: string; children?: ReactNode }) {
   return (
     <div className="flex max-w-[44rem] flex-col gap-4">
-      {eyebrow && <p className="text-sm font-semibold uppercase tracking-wide text-primary">{eyebrow}</p>}
+      {eyebrow && <p className="text-sm font-semibold uppercase tracking-wide text-primary-ink">{eyebrow}</p>}
       <h2 id={id} className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
         {title}
       </h2>

@@ -35,7 +35,7 @@ export function LineChart({
   const first = days[0];
   const last = days[days.length - 1];
   return (
-    <figure className="flex flex-col gap-3">
+    <figure className="flex min-w-0 flex-col gap-3">
       <figcaption className="font-semibold">{title}</figcaption>
       <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
         {series.map((s, index) => (
@@ -73,7 +73,7 @@ export function LineChart({
         </text>
       </svg>
       <details className="text-sm">
-        <summary className="cursor-pointer font-medium text-primary">{tableLabel}</summary>
+        <summary className="cursor-pointer font-medium text-primary-ink">{tableLabel}</summary>
         <div className="mt-2 max-h-64 overflow-auto">
           <table className="w-full text-start">
             <thead>

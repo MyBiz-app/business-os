@@ -433,7 +433,9 @@
     "content": "Content & creative",
     "files": "Files",
     "migration": "Move to MyBiz",
-    "invoices": "Invoices"
+    "invoices": "Invoices",
+    "sidebarLight": "Use a light sidebar",
+    "sidebarDark": "Use a dark sidebar"
   },
   "terms": {
     "fitness": {
@@ -722,7 +724,16 @@
       "today": "Today",
       "daysAgo": "{days, plural, one {Yesterday} other {# days ago}}"
     },
-    "pageOf": "Page {page} of {pages}"
+    "pageOf": "Page {page} of {pages}",
+    "consent": {
+      "title": "Marketing messages",
+      "on": "Agreed to receive marketing messages",
+      "off": "Has not agreed to marketing messages",
+      "hint": "Service messages (reminders, receipts) are sent either way. Record consent only when the client gave it.",
+      "toggleOn": "Record consent",
+      "toggleOff": "Withdraw consent",
+      "error": "Could not save. Try again."
+    }
   },
   "common": {
     "dismiss": "Close notification",
@@ -1156,7 +1167,8 @@
       "noApp": "This business doesn't offer the app yet. Ask them about it.",
       "firstName": "First name",
       "lastName": "Last name",
-      "nameRequired": "Please enter your first name, so the business knows who you are."
+      "nameRequired": "Please enter your first name, so the business knows who you are.",
+      "marketing": "Send me offers and news from this business (optional). You can change this any time in your profile."
     },
     "home": {
       "greeting": "Hi {name}",
@@ -1251,7 +1263,16 @@
       "quotesAndBills": "Quotes and bills",
       "receipts": "My receipts",
       "receiptsHint": "Every payment, with its receipt",
-      "noReceipts": "No payments yet."
+      "noReceipts": "No payments yet.",
+      "marketing": {
+        "title": "Offers and news",
+        "on": "Yes, send me",
+        "off": "No",
+        "hint": "Messages about your bookings and account always reach you. Offers and news are sent only if you say yes, and every one has an opt-out.",
+        "saidYes": "You will get offers and news",
+        "saidNo": "No more offers and news",
+        "failed": "Could not save your choice. Try again."
+      }
     },
     "spotsLeft": "{count, plural, one {# spot left} other {# spots left}}",
     "full": "Full{count, plural, =0 {} one { · # waiting} other { · # waiting}}",
@@ -7763,7 +7784,10 @@
       "cannot_acknowledge": "An error has to be fixed, it can't be acknowledged.",
       "period_in_future": "This month is too far ahead.",
       "invalid": "Check the details.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "nothing_to_correct": "The lines add up to nothing. Enter an amount that changes the pay.",
+      "negative_net": "This would make the net pay negative. Recover the amount with a deduction in the next run instead.",
+      "run_not_approved": "Only an approved month can be corrected."
     },
     "bankFile": {
       "title": "Bank transfer file",
@@ -7774,6 +7798,46 @@
       "payDate": "Payment date",
       "submit": "Create the bank file",
       "problem": "The file could not be created. Check that every employee has an ID number and a bank account."
+    },
+    "corrections": {
+      "title": "Corrective payslips",
+      "hint": "An approved month is locked. A correction adds a new numbered payslip with the difference to pay (or to recover). It stays marked as a draft for your accountant.",
+      "none": "No corrections for this month.",
+      "version": "Correction {version}",
+      "difference": "Difference: {amount}",
+      "reason": "Reason",
+      "lineLabel": "What changes",
+      "amount": "Amount",
+      "add": "Adds to pay",
+      "deduct": "Takes from pay",
+      "addLine": "Add a line",
+      "removeLine": "Remove the line",
+      "submit": "Issue the corrective payslip",
+      "download": "Payslip, correction {version} (PDF)",
+      "original": "Original payslip (PDF)"
+    },
+    "annual": {
+      "link": "Yearly summary",
+      "title": "Yearly payroll summary",
+      "subtitle": "Each person's approved months of the tax year, the data behind Form 106. Your accountant files the form.",
+      "back": "Payroll run",
+      "previous": "Previous year",
+      "next": "Next year",
+      "yearNav": "Year",
+      "empty": "No approved months in this year yet.",
+      "draft": "Some months are not yet checked by an accountant, or include corrections.",
+      "person": "Person",
+      "months": "Months",
+      "gross": "Gross",
+      "tax": "Income tax",
+      "ni": "National insurance",
+      "health": "Health tax",
+      "pension": "Pension",
+      "net": "Net",
+      "employer": "Employer contributions",
+      "corrected": "{count} corrected",
+      "exportXlsx": "Export to Excel",
+      "exportCsv": "Export CSV"
     }
   },
   "invoices": {

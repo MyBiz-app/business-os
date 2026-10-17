@@ -24,7 +24,7 @@ export default async function IndustriesPage() {
   const soon = categories().filter((c) => c.status === "planned");
 
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <SubpageHero title={t("title")} description={t("subtitle")} />
       <Section spacing="compact" innerClassName="flex flex-col gap-10">
       <IndustryPicker
@@ -39,7 +39,7 @@ export default async function IndustriesPage() {
                 <VerticalIcon icon={icon} className="size-6" />
               </span>
               <span className="flex flex-col">
-                <span className="text-lg font-semibold group-hover:text-primary">{text(key, "name")}</span>
+                <span className="text-lg font-semibold group-hover:text-primary-ink">{text(key, "name")}</span>
                 <span className="text-sm text-muted">{text(key, "tagline")}</span>
               </span>
             </Link>

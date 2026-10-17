@@ -43,7 +43,7 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
 
   if (Object.keys(catalogs).length === 0) {
     return (
-      <main className="enter mx-auto flex max-w-xl flex-col items-center gap-4 px-6 py-24 text-center">
+      <main id="main" className="enter mx-auto flex max-w-xl flex-col items-center gap-4 px-6 py-24 text-center">
         <h1 className="text-3xl font-bold">{t("meta.title")}</h1>
         <p className="text-muted">{t("finish.errors.generic")}</p>
         <Link href="/contact" className="btn-primary px-5 py-3">
@@ -69,7 +69,7 @@ export default async function StartPage({ searchParams }: PageProps<"/start">) {
   ).toString();
 
   return (
-    <main className="flex flex-col">
+    <main id="main" className="flex flex-col">
       <StartWizard
         catalogs={catalogs}
         initial={{

@@ -53,7 +53,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href={`/schedule?week=${day}`} className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href={`/schedule?week=${day}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("back")}
       </Link>
       <div className="flex flex-col gap-2">
@@ -82,7 +82,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           <h2 id="payment-heading" className="text-lg font-semibold">
             {session.room_name} · {formatMoney(session.price_amount, session.price_currency ?? tenant.currency, locale)}
           </h2>
-          <p className={session.paid ? "font-medium text-success" : "text-muted"}>{session.paid ? tResources("paid") : tResources("notPaid")}</p>
+          <p className={session.paid ? "font-medium text-success-ink" : "text-muted"}>{session.paid ? tResources("paid") : tResources("notPaid")}</p>
           {!session.paid && reservedBy && tenant.permissions.includes("sales.manage") && (
             <form action={recordVenuePayment.bind(null, session.id, reservedBy.id)} className="flex flex-wrap items-end gap-3">
               <label className="flex flex-col gap-1.5 text-sm font-medium">
@@ -142,7 +142,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
 
       {writable && session.series_id && session.series_open_ended && (
         <form action={endSeries.bind(null, session.series_id, session.id, day)}>
-          <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+          <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
             {t("endSeries")}
           </button>
         </form>
@@ -150,7 +150,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
 
       {writable && !reservation && (
         <form action={setSessionStatus.bind(null, session.id, cancelled ? "scheduled" : "cancelled")}>
-          <button type="submit" className={`text-sm underline-offset-4 hover:underline ${cancelled ? "text-primary" : "text-danger"}`}>
+          <button type="submit" className={`btn-link text-sm underline-offset-4 hover:underline ${cancelled ? "text-primary-ink" : "text-danger"}`}>
             {cancelled ? t("restoreSession") : t("cancelSession")}
           </button>
         </form>

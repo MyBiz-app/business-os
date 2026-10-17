@@ -263,7 +263,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
           {(["map", "list"] as const).map((mode) => {
             const Icon = mode === "map" ? Network : LayoutGrid;
             return (
-              <button key={mode} type="button" aria-pressed={view === mode} onClick={() => setView(mode)} className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm ${view === mode ? "bg-primary text-on-primary" : "text-muted hover:text-foreground"}`}>
+              <button key={mode} type="button" aria-pressed={view === mode} onClick={() => setView(mode)} className={`btn-plain inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm ${view === mode ? "bg-primary text-on-primary" : "text-muted hover:text-foreground"}`}>
                 <Icon aria-hidden="true" className="size-4" />
                 {t(`views.${mode}`)}
               </button>
@@ -282,7 +282,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
               aria-keyshortcuts="M"
               title={t(wide ? "map.shrink" : "map.expand")}
               aria-label={t(wide ? "map.shrink" : "map.expand")}
-              className="absolute end-3 top-3 z-20 hidden rounded-full border border-border bg-background/90 p-2 text-muted shadow-sm backdrop-blur hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary md:block"
+              className="btn-plain absolute end-3 top-3 z-20 hidden rounded-full border border-border bg-background/90 p-2 text-muted shadow-sm backdrop-blur hover:text-foreground focus-visible:outline-2 focus-visible:outline-primary md:block"
             >
               {wide ? <Minimize2 aria-hidden="true" className="size-4" /> : <Maximize2 aria-hidden="true" className="size-4" />}
             </button>
@@ -352,7 +352,7 @@ export function TeamView({ team, branches, enabled, demo, upsells, canAdd, timeZ
         <button
           type="button"
           onClick={() => changeMapWide(false)}
-          className="ai-panel-in fixed bottom-4 end-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-border bg-background p-3 text-start shadow-lg hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary"
+          className="btn-plain ai-panel-in fixed bottom-4 end-4 z-40 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-border bg-background p-3 text-start shadow-lg hover:bg-surface focus-visible:outline-2 focus-visible:outline-primary"
         >
           <span className="relative">
             <AgentAvatar agent={agent} className="size-10" />

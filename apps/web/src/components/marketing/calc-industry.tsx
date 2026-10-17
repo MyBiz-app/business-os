@@ -15,7 +15,7 @@ export function CalcIndustry({ value, onChange }: { value: string | null; onChan
   return (
     <fieldset className="flex flex-col gap-3">
       <legend className="font-bold">
-        <span aria-hidden="true" className="me-2 text-primary">①</span>
+        <span aria-hidden="true" className="me-2 text-primary-ink">①</span>
         {t("industry")}
       </legend>
       <div className="flex flex-wrap gap-2">
@@ -27,8 +27,8 @@ export function CalcIndustry({ value, onChange }: { value: string | null; onChan
               type="button"
               aria-pressed={pressed}
               onClick={() => onChange(pressed ? null : category.key)}
-              className={`flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors ${
-                pressed ? "border-primary bg-primary/10 text-primary ring-1 ring-primary" : "border-border hover:bg-foreground/5"
+              className={`btn-plain flex items-center gap-2 rounded-full border px-3.5 py-2 text-sm font-semibold transition-colors ${
+                pressed ? "border-primary bg-primary/10 text-primary-ink ring-1 ring-primary" : "border-border hover:bg-foreground/5"
               }`}
             >
               <span aria-hidden="true" className={`flex size-6 items-center justify-center rounded-full bg-gradient-to-br text-white ${category.color}`}>

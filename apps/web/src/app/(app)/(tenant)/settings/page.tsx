@@ -43,7 +43,7 @@ export default async function SettingsPage() {
               <span className="text-lg font-semibold">{link.title}</span>
               <span className="text-sm text-muted">{link.hint}</span>
             </span>
-            <span aria-hidden="true" className="text-primary rtl:rotate-180">→</span>
+            <span aria-hidden="true" className="text-primary-ink rtl:rotate-180">→</span>
           </Link>
         ))}
       </div>
@@ -98,7 +98,7 @@ export default async function SettingsPage() {
             )}
             {logo && (
               <form action={removeLogo}>
-                <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+                <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                   {t("removeLogo")}
                 </button>
               </form>

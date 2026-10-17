@@ -14,7 +14,7 @@ import { ThemeToggle } from "./theme-toggle";
 export function AuthShell({ children, themeToggle = true }: { children: React.ReactNode; themeToggle?: boolean }) {
   const { palette } = useTheme();
   return (
-    <View style={[styles.fill, { backgroundColor: palette.background }]}>
+    <View style={[styles.root, { backgroundColor: palette.background }]}>
       <AuthBackdrop />
       <SafeAreaView edges={["top", "bottom", "left", "right"]} style={styles.fill}>
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
@@ -49,6 +49,8 @@ export function AuthCard({ children }: { children: React.ReactNode }) {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
+  // Clips the drifting backdrop circles (they start past the edge) so the page never scrolls sideways, in either direction.
+  root: { flex: 1, width: "100%", overflow: "hidden" },
   content: { flexGrow: 1, justifyContent: "center", padding: 20 },
   corner: { position: "absolute", top: 8, end: 12, zIndex: 2 },
   column: { width: "100%", maxWidth: 440, alignSelf: "center", gap: 20, alignItems: "stretch" },

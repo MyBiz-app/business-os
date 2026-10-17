@@ -32,7 +32,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/team" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/team" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
       <PageHeader title={t("hours.title")} description={t("hours.subtitle", { name: isolate(member.full_name ?? member.email) })} />
@@ -56,7 +56,7 @@ export default async function StaffHoursPage({ params }: PageProps<"/team/[userI
                   {entry.reason && <span dir="auto" className="text-muted"> · {entry.reason}</span>}
                 </span>
                 <form action={removeTimeOff.bind(null, userId, entry.id)}>
-                  <button type="submit" className="text-danger underline-offset-4 hover:underline">
+                  <button type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
                     {t("timeOff.remove")}
                   </button>
                 </form>

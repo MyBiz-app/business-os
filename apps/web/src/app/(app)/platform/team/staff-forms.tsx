@@ -143,7 +143,7 @@ export function StaffRow({ member, actor, manageable }: { member: Member; actor:
             </span>
           )}
         </span>
-        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">{t(`levels.${member.level}`)}</span>
+        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary-ink">{t(`levels.${member.level}`)}</span>
         {member.level === "primary_owner" && (
           <span className="flex items-center gap-1 text-xs text-muted">
             <Lock aria-hidden="true" className="size-3.5" />
@@ -188,7 +188,7 @@ export function StaffRow({ member, actor, manageable }: { member: Member; actor:
                 startTransition(async () => setRowState(await removeStaff(member.email)));
               }
             }}
-            className="flex items-center gap-1 rounded-lg px-3 py-1.5 font-medium text-danger hover:bg-danger/10"
+            className="btn-plain flex items-center gap-1 rounded-lg px-3 py-1.5 font-medium text-danger hover:bg-danger/10"
           >
             <Trash2 aria-hidden="true" className="size-4" />
             {t("team.remove")}

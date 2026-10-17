@@ -5,6 +5,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Chip } from "@business-os/app-kit/components/chip";
@@ -143,7 +144,7 @@ export default function Court() {
       <Screen palette={palette}>
         <View style={local.done}>
           <View style={[local.check, { backgroundColor: palette.success }]}>
-            <Ionicons name="checkmark" size={52} color="#ffffff" />
+            <Ionicons name="checkmark" size={52} color={fixedColors.white} />
           </View>
           <Text accessibilityRole="header" accessibilityLiveRegion="polite" style={[local.doneTitle, { color: palette.foreground }]}>
             {t("booked")}

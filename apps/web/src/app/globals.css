@@ -15,13 +15,18 @@
   --foreground: #111827;
   --surface: #ffffff;
   --border: #e2e8f0;
-  --muted: #5a6a80;
+  --muted: #52627a;
   --palette-primary: #2563eb;
+  --palette-primary-ink: #1d4ed8;
   --palette-on-primary: #ffffff;
   --primary: var(--palette-primary);
+  --primary-ink: var(--palette-primary-ink);
   --on-primary: var(--palette-on-primary);
+  /* Bright green for fills and dots; the ink is the AA-safe one for text (5:1 on white and on its tint). */
   --success: #16a34a;
+  --success-ink: #166534;
   --danger: #b91c1c;
+  --on-danger: #ffffff;
   --warning: #b45309;
   --shadow-color: 222 30% 18%;
   --elevation:
@@ -47,9 +52,12 @@
   --border: #263247;
   --muted: #94a3b8;
   --palette-primary: #3b82f6;
+  --palette-primary-ink: #60a5fa;
   --palette-on-primary: #0b1020;
   --success: #22c55e;
+  --success-ink: #4ade80;
   --danger: #f87171;
+  --on-danger: #0b1020;
   --warning: #fbbf24;
   --shadow-color: 222 40% 2%;
   --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
@@ -63,6 +71,7 @@
   --border: #dde5ea;
   --muted: #4b5563;
   --palette-primary: #0e7490;
+  --palette-primary-ink: #0e7490;
   --shadow-color: 200 30% 18%;
 }
 [data-palette="ocean"].dark {
@@ -71,6 +80,7 @@
   --border: #1f2e38;
   --muted: #9ca8b3;
   --palette-primary: #22d3ee;
+  --palette-primary-ink: #22d3ee;
   --palette-on-primary: #04141a;
   --shadow-color: 200 40% 2%;
 }
@@ -79,6 +89,7 @@
   --border: #dfe5dc;
   --muted: #4b524a;
   --palette-primary: #166534;
+  --palette-primary-ink: #166534;
   --shadow-color: 120 15% 16%;
 }
 [data-palette="forest"].dark {
@@ -87,6 +98,7 @@
   --border: #233026;
   --muted: #a3ada3;
   --palette-primary: #4ade80;
+  --palette-primary-ink: #4ade80;
   --palette-on-primary: #052e14;
   --shadow-color: 120 30% 2%;
 }
@@ -95,11 +107,13 @@
  * one, the person's palette. */
 .brand {
   --primary: var(--brand, var(--palette-primary));
+  --primary-ink: var(--brand, var(--palette-primary-ink));
   --on-primary: var(--on-brand, var(--palette-on-primary));
 }
 
 .dark .brand {
   --primary: var(--brand-dark, var(--palette-primary));
+  --primary-ink: var(--brand-dark, var(--palette-primary-ink));
   --on-primary: var(--on-brand-dark, var(--palette-on-primary));
 }
 
@@ -110,9 +124,12 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
   --color-on-primary: var(--on-primary);
   --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
   --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
   --color-warning: var(--warning);
   --color-brand-from: var(--brand-from);
   --color-brand-via: var(--brand-via);
@@ -211,7 +228,7 @@ h3,
   flex-shrink: 0;
   border-radius: 0.75rem;
   background: color-mix(in oklab, var(--primary) 12%, transparent);
-  color: var(--primary);
+  color: var(--primary-ink);
 }
 
 /* ---- Controls ---------------------------------------------------------------------------- */
@@ -326,6 +343,52 @@ h3,
 }
 
 /* A menu or popover under its button: fades and scales in from it. */
+/* Bare buttons: no fill of their own, but the same focus ring, cursor and touch behavior as the
+ * buttons above, so a text action, an icon button or a clickable card never looks or behaves
+ * differently from the rest. Color, padding and radius come from the element's own classes. */
+@utility btn-link {
+  cursor: pointer;
+  text-underline-offset: 4px;
+  border-radius: 0.25rem;
+  &:hover:not(:disabled) {
+    text-decoration-line: underline;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+@utility btn-icon {
+  cursor: pointer;
+  touch-action: manipulation;
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+@utility btn-plain {
+  cursor: pointer;
+  touch-action: manipulation;
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
 @utility popover {
   border-radius: 1rem;
   border: 1px solid var(--border);
@@ -697,6 +760,7 @@ html[data-motion="reduce"] *::after {
   --border: rgb(255 255 255 / 0.1);
   --muted: #a3b2c8;
   --primary: color-mix(in oklab, var(--brand, var(--palette-primary)) 55%, white);
+  --primary-ink: var(--primary);
   --on-primary: #0b1020;
   --shadow-color: 222 40% 2%;
   background: var(--frame);
@@ -713,12 +777,14 @@ html[data-motion="reduce"] *::after {
   --foreground: #111827;
   --surface: #ffffff;
   --border: #e2e8f0;
-  --muted: #5a6a80;
+  --muted: #52627a;
   --palette-primary: #2563eb;
   --palette-on-primary: #ffffff;
   --primary: #2563eb;
+  --primary-ink: #1d4ed8;
   --on-primary: #ffffff;
   --success: #16a34a;
+  --success-ink: #166534;
   --shadow-color: 222 30% 18%;
   --brand-from: #2563eb;
   --brand-via: #7c3aed;
@@ -742,8 +808,10 @@ html[data-motion="reduce"] *::after {
   --palette-primary: #3b82f6;
   --palette-on-primary: #0b1020;
   --primary: #3b82f6;
+  --primary-ink: #60a5fa;
   --on-primary: #0b1020;
   --success: #22c55e;
+  --success-ink: #4ade80;
   --shadow-color: 222 40% 2%;
   --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
   --elevation-hover: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 12px 28px -8px hsl(var(--shadow-color) / 0.8);

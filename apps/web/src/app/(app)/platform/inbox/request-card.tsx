@@ -16,12 +16,12 @@ import { type InboxState, saveNotes, updateRequest } from "./actions";
 type Request = components["schemas"]["ContactRequest"];
 
 const TONE = {
-  new: "bg-primary/10 text-primary",
+  new: "bg-primary/10 text-primary-ink",
   in_progress: "bg-warning/15",
   done: "bg-success/15",
 } as const;
 
-const TIER_TONE = { priority: "bg-warning/15", vip: "bg-primary/10 text-primary" } as const;
+const TIER_TONE = { priority: "bg-warning/15", vip: "bg-primary/10 text-primary-ink" } as const;
 
 /** One request: who wrote, what they wrote, and the buttons that move it along. */
 export function RequestCard({ request, when }: { request: Request; when: string }) {
@@ -68,7 +68,7 @@ export function RequestCard({ request, when }: { request: Request; when: string 
       </div>
 
       <p className="flex flex-wrap gap-3 text-sm" dir="ltr">
-        <a href={`mailto:${request.email}`} className="text-primary underline-offset-4 hover:underline">
+        <a href={`mailto:${request.email}`} className="text-primary-ink underline-offset-4 hover:underline">
           {request.email}
         </a>
         {request.phone && <span>{request.phone}</span>}
@@ -110,7 +110,7 @@ export function RequestCard({ request, when }: { request: Request; when: string 
           </button>
         )}
         {request.tenant_id && (
-          <Link href={`/platform/businesses/${request.tenant_id}`} className="font-medium text-primary underline-offset-4 hover:underline">
+          <Link href={`/platform/businesses/${request.tenant_id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline">
             {t("openBusiness")}
           </Link>
         )}
@@ -118,7 +118,7 @@ export function RequestCard({ request, when }: { request: Request; when: string 
 
       {/* Internal notes stay folded until someone needs them (open when there are some). */}
       <details open={Boolean(request.notes) || state.saved} className="group">
-        <summary className="cursor-pointer text-sm font-medium text-primary">{t("notes")}</summary>
+        <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("notes")}</summary>
         <form action={action} className="mt-2 flex flex-col gap-2">
           <FormNotice message={state.saved ? tCommon("saved") : undefined} />
           <label className="flex flex-col gap-1.5 text-sm">

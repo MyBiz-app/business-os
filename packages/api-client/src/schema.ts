@@ -351,6 +351,26 @@ export interface paths {
         patch: operations["update_client"];
         trace?: never;
     };
+    "/clients/{client_id}/marketing-consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Client Marketing Consent
+         * @description Record that the client agreed to (or stopped) marketing messages, e.g. at the desk.
+         */
+        put: operations["set_client_marketing_consent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff/{user_id}/identity": {
         parameters: {
             query?: never;
@@ -9313,6 +9333,12 @@ export interface components {
              * @description Personal data erased on request (privacy)
              */
             erased_at: string | null;
+            /**
+             * Marketing Consent
+             * @description Agreed to marketing messages; service messages are sent either way
+             * @default false
+             */
+            marketing_consent: boolean;
         };
         /** ClientAppointmentCreate */
         ClientAppointmentCreate: {
@@ -9468,6 +9494,11 @@ export interface components {
             /** Phone */
             phone: string | null;
         };
+        /** ClientConsentBody */
+        ClientConsentBody: {
+            /** Consent */
+            consent: boolean;
+        };
         /** ClientCreate */
         ClientCreate: {
             /** Last Name */
@@ -9601,6 +9632,12 @@ export interface components {
              * @description Personal data erased on request (privacy)
              */
             erased_at: string | null;
+            /**
+             * Marketing Consent
+             * @description Agreed to marketing messages; service messages are sent either way
+             * @default false
+             */
+            marketing_consent: boolean;
             /**
              * Plan Name
              * @description The plan valid today, if any
@@ -12527,6 +12564,12 @@ export interface components {
              * @default true
              */
             email_roster: boolean;
+            /**
+             * Marketing Consent
+             * @description Agreed to marketing messages (service messages are sent anyway)
+             * @default false
+             */
+            marketing_consent: boolean;
             /**
              * Palette
              * @description The person's color palette (none: the MyBiz default)
@@ -18689,6 +18732,45 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ClientUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Client"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_client_marketing_consent: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClientConsentBody"];
             };
         };
         responses: {

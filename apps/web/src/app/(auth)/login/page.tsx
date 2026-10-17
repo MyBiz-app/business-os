@@ -22,7 +22,7 @@ export default async function LoginPage({ searchParams }: PageProps<"/login">) {
       </Link>
       <p className="text-sm text-muted">
         {t("login.noAccount")}{" "}
-        <Link href={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"} className="text-primary underline underline-offset-4">
+        <Link href={nextPath ? `/signup?next=${encodeURIComponent(nextPath)}` : "/signup"} className="text-primary-ink underline underline-offset-4">
           {t("login.signupLink")}
         </Link>
       </p>

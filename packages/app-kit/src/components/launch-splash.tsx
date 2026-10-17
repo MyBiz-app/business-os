@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, Platform, StyleSheet, View } from "react-native";
 
 import { tint } from "../lib/brand";
+import { colors } from "../lib/theme";
 import { useTheme } from "../providers/theme-provider";
 import { AuthBackdrop } from "./auth-backdrop";
 import { useReducedMotion } from "./motion";
@@ -19,7 +20,9 @@ const POINTS: [number, number][] = [
   [46, 22],
   [46, 43],
 ];
-const TILE_COLOR = "#3B82F6";
+// The mark is the same in both themes: white strokes on the brand blue tile.
+const TILE_COLOR = colors.dark.primary;
+const MARK_COLOR = colors.light.surface;
 const LINE_WIDTH = 5.5 * UNIT;
 const NODE = 8.4 * UNIT;
 
@@ -39,7 +42,7 @@ function Segment({ from, to }: { from: [number, number]; to: [number, number] })
         width: length,
         height: LINE_WIDTH,
         borderRadius: LINE_WIDTH / 2,
-        backgroundColor: "#fff",
+        backgroundColor: MARK_COLOR,
         left: cx - length / 2,
         top: cy - LINE_WIDTH / 2,
         transform: [{ rotate: `${Math.atan2(dy, dx)}rad` }],
@@ -63,7 +66,7 @@ export function LogoMark() {
             width: NODE,
             height: NODE,
             borderRadius: NODE / 2,
-            backgroundColor: "#fff",
+            backgroundColor: MARK_COLOR,
             left: x * UNIT - NODE / 2,
             top: y * UNIT - NODE / 2,
           }}
@@ -132,7 +135,7 @@ export function DepthLogo({ size = 1, still = false }: { size?: number; still?: 
         style={{
           width: box,
           height: box,
-          boxShadow: `0px ${14 * size}px ${34 * size}px ${tint("#2563EB", 0.45)}`,
+          boxShadow: `0px ${14 * size}px ${34 * size}px ${tint(colors.light.primary, 0.45)}`,
           borderRadius: 22 * size,
           transform: [
             { perspective: 700 },

@@ -13,7 +13,7 @@ export default async function ForgotPasswordPage() {
     <>
       <AuthHeading title={t("title")} subtitle={t("body")} icon={<KeyRound className="size-6" />} />
       <ForgotForm />
-      <Link href="/login" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/login" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("backToLogin")}
       </Link>
     </>

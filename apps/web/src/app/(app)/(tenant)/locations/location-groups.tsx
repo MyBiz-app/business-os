@@ -72,7 +72,7 @@ export function LocationGroups({ branches, groups, saveGroup, removeGroup }: Pro
         />
       ))}
       <details className="rounded-xl">
-        <summary className="cursor-pointer text-sm font-medium text-primary">{t("new")}</summary>
+        <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("new")}</summary>
         <div className="mt-3">
           <GroupForm branches={branches} group={null} action={saveGroup.bind(null, null)} />
         </div>

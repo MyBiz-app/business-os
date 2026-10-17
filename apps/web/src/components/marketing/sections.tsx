@@ -115,12 +115,12 @@ export async function IndustryCards() {
                 <ul className="flex flex-col gap-1.5 text-sm">
                   {points(key).map((point) => (
                     <li key={point} className="flex items-start gap-2">
-                      <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                      <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
                       {point}
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary-ink">
                   {t("more")}
                   <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
                 </span>
@@ -142,7 +142,7 @@ export async function IndustryCards() {
                     </li>
                   ))}
                 </ul>
-                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary-ink">
                   {t("all")}
                   <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
                 </span>
@@ -169,7 +169,7 @@ export async function Faq() {
             <details key={item.q} className="card group p-5 open:shadow-md">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold">
                 {item.q}
-                <span aria-hidden="true" className="text-xl text-primary transition-transform group-open:rotate-45">
+                <span aria-hidden="true" className="text-xl text-primary-ink transition-transform group-open:rotate-45">
                   +
                 </span>
               </summary>
@@ -210,7 +210,7 @@ export async function BranchesSection() {
     <Section tone="surface" aria-labelledby="branches-heading" innerClassName="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
       <>
         <Reveal className="flex flex-col gap-5">
-          <p className="text-sm font-semibold text-primary">{t("eyebrow")}</p>
+          <p className="text-sm font-semibold text-primary-ink">{t("eyebrow")}</p>
           <h2 id="branches-heading" className="text-3xl font-bold tracking-tight sm:text-4xl">
             {t("title")}
           </h2>
@@ -218,7 +218,7 @@ export async function BranchesSection() {
           <ul className="flex flex-col gap-2">
             {(t.raw("points") as string[]).map((point) => (
               <li key={point} className="flex items-start gap-2 font-medium">
-                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success" />
+                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success-ink" />
                 {point}
               </li>
             ))}
@@ -253,7 +253,7 @@ export async function AddOnsStrip() {
           ))}
         </ul>
       </Reveal>
-      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary">
+      <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
         {t("cta")}
         <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
       </Link>
@@ -280,7 +280,7 @@ export async function SafetySection() {
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SAFETY.map(({ key, Icon }) => (
             <li key={key} className="card flex flex-col gap-3 p-6">
-              <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-sm">
+              <span aria-hidden="true" className="flex size-11 items-center justify-center rounded-xl bg-gradient-to-br from-success to-electric text-white shadow-sm">
                 <Icon className="size-5" />
               </span>
               <h3 className="font-semibold">{t(`items.${key}.title`)}</h3>

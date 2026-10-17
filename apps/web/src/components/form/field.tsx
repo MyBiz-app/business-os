@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import { useId } from "react";
 
 import { inputDir } from "@/lib/bidi";
@@ -67,7 +68,8 @@ export function SelectField({ label, options, ...selectProps }: SelectFieldProps
       <label htmlFor={id} className="text-sm font-medium">
         {label}
       </label>
-      <select id={id} className={CONTROL} {...selectProps}>
+      <div className="relative">
+      <select id={id} className={`${CONTROL} appearance-none pe-9`} {...selectProps}>
         {grouped(options).map(({ group, options: run }) => {
           const items = run.map((option) => (
             <option key={option.value} value={option.value}>
@@ -83,6 +85,8 @@ export function SelectField({ label, options, ...selectProps }: SelectFieldProps
           );
         })}
       </select>
+      <ChevronDown aria-hidden="true" className="pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+      </div>
     </div>
   );
 }

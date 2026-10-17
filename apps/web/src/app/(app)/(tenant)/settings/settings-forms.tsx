@@ -10,7 +10,7 @@ import { FileField } from "@/components/form/file-field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
 import { ImageCropDialog } from "@/components/image-crop-dialog";
-import { brandStyle } from "@/lib/brand";
+import { brandStyle, DEFAULT_BRAND_COLOR } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
 import { locales } from "@/i18n/config";
 
@@ -19,7 +19,6 @@ import { type IdentityState, type LogoState, updateBrandColor, updateDetails, up
 type Tenant = components["schemas"]["Tenant"];
 
 const CURRENCIES = ["ILS", "USD", "EUR"] as const;
-const DEFAULT_COLOR = "#2563eb";
 const CANCELLATION_WINDOWS = [0, 60, 120, 180, 360, 720, 1440, 2880];
 const HORIZON_DAYS = [3, 7, 10, 14, 21, 28];
 
@@ -153,7 +152,7 @@ export function BrandColorForm({ color }: { color: string | null }) {
   const t = useTranslations("settings");
   const tCommon = useTranslations("common");
   const [state, action] = useActionState<FormState, FormData>(updateBrandColor, {});
-  const [preview, setPreview] = useState(color ?? DEFAULT_COLOR);
+  const [preview, setPreview] = useState(color ?? DEFAULT_BRAND_COLOR);
   const [useDefault, setUseDefault] = useState(color === null);
 
   return (
@@ -180,7 +179,7 @@ export function BrandColorForm({ color }: { color: string | null }) {
         <span className="text-sm font-medium">{t("preview")}</span>
         <div style={brandStyle(useDefault ? null : preview)} className="brand flex items-center gap-3">
           <span className="btn-primary px-4 py-2.5">{t("previewButton")}</span>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">{t("color")}</span>
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary-ink">{t("color")}</span>
         </div>
       </div>
       <div>

@@ -159,14 +159,14 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
               <p className="text-2xl font-extrabold">
                 <bdi>{display(key, kpi.value)}</bdi>
               </p>
-              {note && <p className={`text-xs font-medium ${up === null ? "text-muted" : up ? "text-success" : "text-danger"}`}>{note}</p>}
+              {note && <p className={`text-xs font-medium ${up === null ? "text-muted" : up ? "text-success-ink" : "text-danger"}`}>{note}</p>}
             </div>
           );
         })}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="card p-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section className="card min-w-0 p-6">
           {dashboard.followers_series.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -180,7 +180,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             />
           )}
         </section>
-        <section className="card p-6">
+        <section className="card min-w-0 p-6">
           {dashboard.video_views_weekly.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -193,7 +193,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             />
           )}
         </section>
-        <section className="card p-6">
+        <section className="card min-w-0 p-6">
           <h2 className="mb-3 font-semibold">{t("charts.kindTitle")}</h2>
           {dashboard.engagement_by_kind.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
@@ -216,7 +216,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             </ul>
           )}
         </section>
-        <section className="card p-6">
+        <section className="card min-w-0 p-6">
           {dashboard.heatmap.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -225,14 +225,14 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
         </section>
       </div>
 
-      <section aria-labelledby="top-posts" className="card flex flex-col gap-4 p-6">
+      <section aria-labelledby="top-posts" className="card min-w-0 flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="top-posts" className="text-lg font-bold">
             {t("posts.title")}
           </h2>
           <nav aria-label={t("posts.title")} className="flex gap-2 text-sm print:hidden">
             {(["views", "engagement"] as const).map((value) => (
-              <a key={value} href={sortHref(value)} aria-current={sort === value ? "true" : undefined} className={`rounded-full px-3 py-1 font-medium ring-1 ring-border ${sort === value ? "bg-primary text-white" : "bg-surface"}`}>
+              <a key={value} href={sortHref(value)} aria-current={sort === value ? "true" : undefined} className={`rounded-full px-3 py-1 font-medium ring-1 ring-border ${sort === value ? "bg-primary text-on-primary" : "bg-surface"}`}>
                 {t(value === "views" ? "posts.sortViews" : "posts.sortEngagement")}
               </a>
             ))}
@@ -268,7 +268,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
                   )}
                 </dl>
                 {post.permalink && (
-                  <a href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary underline-offset-4 hover:underline print:hidden">
+                  <a href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary-ink underline-offset-4 hover:underline print:hidden">
                     {t("posts.open")}
                   </a>
                 )}
@@ -278,8 +278,8 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
         )}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section aria-labelledby="audience" className="card flex flex-col gap-4 p-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section aria-labelledby="audience" className="card min-w-0 flex flex-col gap-4 p-6">
           <h2 id="audience" className="text-lg font-bold">
             {t("audience.title")}
           </h2>
@@ -305,7 +305,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           )}
         </section>
         {dashboard.google_business && (
-          <section aria-labelledby="google" className="card flex flex-col gap-4 p-6">
+          <section aria-labelledby="google" className="card min-w-0 flex flex-col gap-4 p-6">
             <div className="flex items-center gap-3">
               <NetworkIcon network="google_business" size="sm" />
               <h2 id="google" className="text-lg font-bold">
@@ -363,7 +363,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           ))}
         </ul>
         <details>
-          <summary className="cursor-pointer text-sm font-semibold text-primary">{t("accounts.addMore")}</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-primary-ink">{t("accounts.addMore")}</summary>
           <div className="mt-4">
             <ConnectCards networks={providers.networks} canManage={canManage} withDemo={false} />
           </div>

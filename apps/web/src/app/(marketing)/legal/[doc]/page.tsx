@@ -37,7 +37,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
   const sections = t.raw(`${doc as Doc}.sections`) as Section[];
   const updated = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(UPDATED_ON));
   return (
-    <main className="enter section-y">
+    <main id="main" className="enter section-y">
       <Container className="grid items-start gap-10 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
         <div className="flex flex-col gap-8 print:hidden lg:sticky lg:top-24">
           <nav aria-label={t("navLabel")}>
@@ -48,7 +48,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
                     href={`/legal/${item}`}
                     aria-current={item === doc ? "page" : undefined}
                     className={`block rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                      item === doc ? "bg-primary/10 text-primary" : "text-muted hover:bg-foreground/5 hover:text-foreground"
+                      item === doc ? "bg-primary/10 text-primary-ink" : "text-muted hover:bg-foreground/5 hover:text-foreground"
                     }`}
                   >
                     {t(`${item}.title`)}
@@ -88,7 +88,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
             <ol className="flex flex-col gap-1 text-sm">
               {sections.map((section, index) => (
                 <li key={section.id}>
-                  <a href={`#${section.id}`} className="text-primary hover:underline">
+                  <a href={`#${section.id}`} className="text-primary-ink hover:underline">
                     {index + 1}. {section.title}
                   </a>
                 </li>
@@ -106,7 +106,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
                 </p>
               ))}
               {section.items ? (
-                <ul className="list-disc space-y-1.5 ps-6 text-base leading-relaxed marker:text-primary">
+                <ul className="list-disc space-y-1.5 ps-6 text-base leading-relaxed marker:text-primary-ink">
                   {section.items.map((item) => (
                     <li key={item}>{item}</li>
                   ))}

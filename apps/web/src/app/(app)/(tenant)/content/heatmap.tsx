@@ -19,18 +19,18 @@ export function Heatmap({
   const hours = Array.from({ length: 24 }, (_, hour) => hour);
   const byKey = new Map(cells.map((c) => [`${c.weekday}-${c.hour}`, c.value]));
   return (
-    <figure className="flex flex-col gap-3">
+    <figure className="flex min-w-0 flex-col gap-3">
       <figcaption className="font-semibold">{title}</figcaption>
       <p className="text-sm text-muted">{hint}</p>
-      {best && <p className="text-sm font-semibold text-primary">{best}</p>}
-      <div className="overflow-x-auto" dir="ltr">
+      {best && <p className="text-sm font-semibold text-primary-ink">{best}</p>}
+      <div className="overflow-x-auto" dir="ltr" role="group" aria-label={title} tabIndex={0}>
         <table className="min-w-[36rem] border-separate border-spacing-0.5 text-[11px]">
           <thead>
             <tr>
               <td />
               {hours.map((hour) => (
                 <th key={hour} scope="col" className="w-5 text-center font-normal text-muted">
-                  {hour % 3 === 0 ? hour : ""}
+                  <span className={hour % 3 === 0 ? undefined : "sr-only"}>{hour}</span>
                 </th>
               ))}
             </tr>

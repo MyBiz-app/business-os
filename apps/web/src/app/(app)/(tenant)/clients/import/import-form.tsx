@@ -70,13 +70,13 @@ export function ImportForm() {
           <p className="text-sm text-muted">{t("doneSkipped", { count: result.duplicates + result.invalid })}</p>
         )}
         <div className="flex flex-wrap gap-4">
-          <Link href="/clients" className="text-primary underline-offset-4 hover:underline">
+          <Link href="/clients" className="text-primary-ink underline-offset-4 hover:underline">
             {t("viewClients")}
           </Link>
           <button
             type="button"
             onClick={() => choose(null)}
-            className="text-primary underline-offset-4 hover:underline"
+            className="btn-link text-primary-ink underline-offset-4 hover:underline"
           >
             {t("importMore")}
           </button>

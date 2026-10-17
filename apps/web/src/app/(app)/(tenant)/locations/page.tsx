@@ -59,13 +59,13 @@ export default async function LocationsPage() {
                 href={`/locations/${location.id}`}
                 className={`flex h-full items-start gap-3 card card-hover p-5 ${location.active ? "" : "opacity-60"}`}
               >
-                <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary-ink">
                   <MapPin className="size-5" />
                 </span>
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
                   <span dir="auto" className="font-semibold">{location.name}</span>
                   {location.address && <span dir="auto" className="text-sm text-muted">{location.address}</span>}
-                  {location.kind && <span className="w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">{text(location.kind, "name")}</span>}
+                  {location.kind && <span className="w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary-ink">{text(location.kind, "name")}</span>}
                   <span className="inline-flex items-center gap-1.5 text-sm text-muted">
                     <DoorOpen aria-hidden="true" className="size-4" />
                     {t("locations.roomsCount", { count: location.rooms.length })}

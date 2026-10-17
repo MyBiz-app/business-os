@@ -51,7 +51,7 @@ export function VariablePicker({ groups, onPick }: { groups: VariableGroup[]; on
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 font-medium text-foreground transition-colors hover:bg-primary/20 focus-visible:ring-2 focus-visible:ring-primary"
+        className="btn-plain flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 font-medium text-foreground transition-colors hover:bg-primary/20 focus-visible:ring-2 focus-visible:ring-primary"
       >
         <Braces aria-hidden="true" className="size-3.5" />
         {t("addVariable")}
@@ -84,7 +84,7 @@ export function VariablePicker({ groups, onPick }: { groups: VariableGroup[]; on
                     key={name}
                     type="button"
                     onClick={() => pick(name)}
-                    className="rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:border-primary/60 hover:bg-primary/10"
+                    className="btn-plain rounded-full border border-border px-2.5 py-1 text-xs font-medium transition-colors hover:border-primary/60 hover:bg-primary/10"
                   >
                     {t(`variables.${name as VariableName}`)}
                   </button>

@@ -58,7 +58,7 @@ export function CalcReceipt({ catalog, locale, lines, once, total, onceTotal, cl
     line.key === "core" ? t("coreLine", { tier: tierName }) : `${tModules(`names.${line.key as ModuleKey}` as "names.client_app")}${line.quantity > 1 ? ` ×${line.quantity}` : ""}`;
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm font-semibold text-primary">{t("receiptTitle")}</p>
+      <p className="text-sm font-semibold text-primary-ink">{t("receiptTitle")}</p>
       <ul className="flex flex-col gap-1.5 border-y border-dashed border-border py-3 text-sm tabular-nums">
         {lines.map((line) => (
           <li key={line.key} className="flex justify-between gap-3">

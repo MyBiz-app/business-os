@@ -87,7 +87,7 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
             {businesses.map((business) => (
               <tr key={business.id} className="border-t border-border transition-colors hover:bg-primary/4">
                 <td className="px-3 py-2">
-                  <Link href={`/platform/businesses/${business.id}`} className="font-medium text-primary underline-offset-4 hover:underline" dir="auto">
+                  <Link href={`/platform/businesses/${business.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline" dir="auto">
                     {business.name}
                   </Link>
                   <div className="text-xs text-muted">{isVertical(business.vertical) ? text(business.vertical, "name") : business.vertical}</div>
@@ -116,9 +116,9 @@ export default async function PlatformBusinessesPage({ searchParams }: PageProps
       </ScrollRegion>
       {pages > 1 && (
         <nav aria-label={t("platform.list.count", { count: found.length })} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary">{t("platform.list.previous")}</Link> : <span />}
+          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary-ink">{t("platform.list.previous")}</Link> : <span />}
           <span className="text-muted">{t("platform.list.pageOf", { page, pages })}</span>
-          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary">{t("platform.list.next")}</Link> : <span />}
+          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary-ink">{t("platform.list.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

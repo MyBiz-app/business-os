@@ -30,7 +30,7 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, st
               {(shift.position || shift.isCover) && (
                 <span className="flex items-center gap-1 truncate text-xs text-muted">
                   {shift.isCover && (
-                    <span className="inline-flex items-center gap-1 text-primary">
+                    <span className="inline-flex items-center gap-1 text-primary-ink">
                       <ArrowRightLeft aria-hidden="true" className="size-3" />
                       {t("coverFrom", { branch: shift.homeName ?? "" })}
                     </span>
@@ -52,7 +52,7 @@ export function BranchRoster({ days, today, locale, branches, shifts, people, st
         const isToday = day === today;
         return (
           <section key={day} aria-label={formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })} className="card overflow-hidden p-0">
-            <h2 className={`flex items-center gap-2 border-b border-border px-4 py-2.5 text-sm font-semibold ${isToday ? "bg-primary/10 text-primary" : "bg-surface-2"}`}>
+            <h2 className={`flex items-center gap-2 border-b border-border px-4 py-2.5 text-sm font-semibold ${isToday ? "bg-primary/10 text-primary-ink" : "bg-surface-2"}`}>
               {formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" })}
               {isToday && <span className="rounded-full bg-primary px-2 py-0.5 text-[0.6875rem] font-medium text-on-primary">{t("today")}</span>}
             </h2>

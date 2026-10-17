@@ -57,7 +57,7 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
                 className={`flex h-full flex-col gap-4 card card-hover p-5 ${plan.active ? "" : "opacity-60"}`}
               >
                 <span className="flex items-start gap-3">
-                  <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <span aria-hidden="true" className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary-ink">
                     {plan.kind === "membership" ? <BadgeCheck className="size-5" /> : <Ticket className="size-5" />}
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -92,7 +92,7 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
       <section aria-labelledby="promo-heading" className="card flex flex-col gap-4 p-6">
         <div className="flex flex-col gap-1">
           <h2 id="promo-heading" className="flex items-center gap-2 text-lg font-semibold">
-            <TicketPercent aria-hidden="true" className="size-5 text-primary" />
+            <TicketPercent aria-hidden="true" className="size-5 text-primary-ink" />
             {t("promo.title")}
           </h2>
           <p className="text-sm text-muted">{t("promo.subtitle")}</p>
@@ -124,13 +124,13 @@ export default async function PlansPage({ searchParams }: PageProps<"/plans">) {
                 {writable && (
                   <span className="flex items-center gap-3 text-sm">
                     <form action={setPromoActive.bind(null, code.id, !code.active)}>
-                      <button type="submit" className="text-primary underline-offset-4 hover:underline">
+                      <button type="submit" className="btn-link text-primary-ink underline-offset-4 hover:underline">
                         {code.active ? t("promo.pause") : t("promo.resume")}
                       </button>
                     </form>
                     {code.uses === 0 && (
                       <form action={deletePromoCode.bind(null, code.id)}>
-                        <button type="submit" className="text-danger underline-offset-4 hover:underline">
+                        <button type="submit" className="btn-link text-danger underline-offset-4 hover:underline">
                           {t("promo.delete")}
                         </button>
                       </form>

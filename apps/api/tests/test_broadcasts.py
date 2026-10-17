@@ -100,8 +100,10 @@ def test_marketing_reaches_only_those_who_agreed(
         == 204
     )
     assert total("marketing") == 1
+    assert client.get("/me", headers=studio["headers"]).json()["marketing_consent"] is True
     client.put("/me/marketing-consent", json={"consent": False}, headers=studio["headers"])
     assert total("marketing") == 0
+    assert client.get("/me", headers=studio["headers"]).json()["marketing_consent"] is False
 
 
 def test_filters_narrow_the_businesses(

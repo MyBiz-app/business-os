@@ -20,11 +20,11 @@ export default async function EventsPage() {
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/quotes" className="text-sm text-primary underline-offset-4 hover:underline">{t("title")}</Link>
+      <Link href="/quotes" className="text-sm text-primary-ink underline-offset-4 hover:underline">{t("title")}</Link>
       <PageHeader
         title={
           <span className="flex items-center gap-2">
-            <CalendarHeart aria-hidden="true" className="size-7 text-primary" />
+            <CalendarHeart aria-hidden="true" className="size-7 text-primary-ink" />
             {t("eventsTitle")}
           </span>
         }
@@ -44,7 +44,7 @@ export default async function EventsPage() {
                 </span>
                 <span className="flex flex-col items-end text-sm">
                   <span className="font-semibold tabular-nums">{formatMoney(event.total, event.currency, locale)}</span>
-                  <span className={event.total - event.paid > 0 ? "text-warning" : "text-success"}>
+                  <span className={event.total - event.paid > 0 ? "text-warning" : "text-success-ink"}>
                     {event.total - event.paid > 0 ? t("leftToPay", { amount: formatMoney(event.total - event.paid, event.currency, locale) }) : t("fullyPaid")}
                   </span>
                 </span>

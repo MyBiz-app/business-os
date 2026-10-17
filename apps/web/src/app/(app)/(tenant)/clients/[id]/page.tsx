@@ -18,6 +18,7 @@ import { updateClient } from "../actions";
 import { ClientForm } from "../client-form";
 import { StatusBadge } from "../status-badge";
 import { AddressesSection } from "./addresses-section";
+import { ConsentSection } from "./consent-section";
 import { DependentsSection } from "./dependents-section";
 import { HealthSection } from "./health-section";
 import { IdentitySection } from "./identity-section";
@@ -140,7 +141,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <AiScreen label={tBubble("screenClient", { name })} />
-      <Link href="/clients" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/clients" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("back")}
       </Link>
 
@@ -230,7 +231,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
                 {bookingList(past.slice(0, RECENT))}
                 {past.length > RECENT && (
                   <details>
-                    <summary className="cursor-pointer py-2 text-sm text-primary">{tBookings("showAll", { count: past.length })}</summary>
+                    <summary className="cursor-pointer py-2 text-sm text-primary-ink">{tBookings("showAll", { count: past.length })}</summary>
                     {bookingList(past.slice(RECENT))}
                   </details>
                 )}
@@ -274,6 +275,8 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
           <AddressesSection clientId={client.id} context={context} locked={erased} />
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
+
+          {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} canWrite={canWriteClients(tenant)} />}
 
           {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
 

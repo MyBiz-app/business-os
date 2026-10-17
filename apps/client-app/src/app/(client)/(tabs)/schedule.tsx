@@ -113,7 +113,7 @@ export default function Schedule() {
     >
       <Heading palette={palette}>{t("title")}</Heading>
       {businesses && businesses.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+        <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
           {businesses.map((b) => (
             <Chip
               key={b.id}
@@ -164,7 +164,7 @@ export default function Schedule() {
           labels={{ day: t("viewDay"), week: t("viewWeek"), month: t("viewMonth") }}
         />
         {day !== today && (
-          <Chip label={t("today")} selected={false} onPress={() => setDay(today)} palette={palette} role="tab" />
+          <Chip label={t("today")} selected={false} onPress={() => setDay(today)} palette={palette} role="button" />
         )}
       </View>
       {view === "month" ? (
@@ -214,7 +214,7 @@ export default function Schedule() {
       {!availability && options.instructors.length + options.services.length > 1 && (
         <View style={local.filters}>
           {options.instructors.length > 1 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+            <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
               <Chip
                 role="tab"
                 label={t("allInstructors")}
@@ -235,7 +235,7 @@ export default function Schedule() {
             </ScrollView>
           )}
           {options.services.length > 1 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+            <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
               <Chip
                 role="tab"
                 label={t("allClasses")}

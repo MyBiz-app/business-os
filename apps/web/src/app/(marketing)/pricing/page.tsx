@@ -51,7 +51,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
   const inPreset = (preset: (typeof PRESETS)[number], key: string) => (catalog?.presets[preset] ?? []).includes(key as never);
 
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       {/* The starting price is the base tier, the same number the cards show. */}
       <OrganizationData price={toMajor(base, currency)} currency={currency} />
       <FaqData />
@@ -59,7 +59,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
         <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-white/90">
           {(th.raw("points") as string[]).map((point) => (
             <li key={point} className="flex items-center gap-2">
-              <Check aria-hidden="true" className="size-4 text-cyan-300" />
+              <Check aria-hidden="true" className="size-4 text-electric" />
               {point}
             </li>
           ))}
@@ -99,12 +99,12 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                   </p>
                   <ul className="flex flex-col gap-2 text-sm">
                     <li className="flex items-start gap-2">
-                      <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                      <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
                       {t("coreText")}
                     </li>
                     {(catalog.presets[preset] ?? []).map((key) => (
                       <li key={key} className="flex items-start gap-2">
-                        <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                        <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
                         {tModules(`names.${key}` as "names.client_app")}
                       </li>
                     ))}
@@ -177,7 +177,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                             const has = "core" in row || inPreset(preset, key);
                             return (
                               <td key={preset} className={`px-4 py-3 text-center ${preset === "growing" ? "bg-primary/5" : ""}`}>
-                                {has ? <Check aria-label={t("included")} className="mx-auto size-5 text-success" /> : <Minus aria-label={t("notIncluded")} className="mx-auto size-4 text-muted" />}
+                                {has ? <Check aria-label={t("included")} className="mx-auto size-5 text-success-ink" /> : <Minus aria-label={t("notIncluded")} className="mx-auto size-4 text-muted" />}
                               </td>
                             );
                           })}

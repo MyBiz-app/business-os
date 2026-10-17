@@ -18,7 +18,7 @@ export default async function CheckEmailPage({ searchParams }: PageProps<"/check
       {devMailbox && (
         <p className="rounded-xl border border-border bg-surface px-3 py-2 text-sm">
           {t("devMailbox")}:{" "}
-          <a href={devMailbox} target="_blank" rel="noreferrer" className="text-primary underline" dir="ltr">
+          <a href={devMailbox} target="_blank" rel="noreferrer" className="text-primary-ink underline" dir="ltr">
             {devMailbox}
           </a>
         </p>

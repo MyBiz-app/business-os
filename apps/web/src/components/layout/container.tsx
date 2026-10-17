@@ -26,7 +26,7 @@ type ContainerProps = {
 /** The page's one width rule: centered, capped at `size`, with gutters that grow with the screen. */
 export function Container({ size = "wide", as: Tag = "div", className = "", children, ...rest }: ContainerProps) {
   return (
-    <Tag className={`mx-auto w-full page-gutter ${SIZES[size]} ${className}`.trim()} {...rest}>
+    <Tag id={Tag === "main" ? "main" : undefined} className={`mx-auto w-full page-gutter ${SIZES[size]} ${className}`.trim()} {...rest}>
       {children}
     </Tag>
   );

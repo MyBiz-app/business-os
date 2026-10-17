@@ -87,7 +87,7 @@ export default async function PlatformPage() {
               <h2 id="new-businesses" className="font-semibold">
                 {t("platform.newestBusinesses")}
               </h2>
-              <Link href="/platform/businesses" className="flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline">
+              <Link href="/platform/businesses" className="flex items-center gap-1 text-sm font-medium text-primary-ink underline-offset-4 hover:underline">
                 {t("platform.seeAll")} <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
               </Link>
             </div>
@@ -97,7 +97,7 @@ export default async function PlatformPage() {
                 .slice(0, 5)
                 .map((b) => (
                   <li key={b.id} className="flex items-center justify-between gap-3 py-2 text-sm">
-                    <Link href={`/platform/businesses/${b.id}`} dir="auto" className="font-medium text-primary underline-offset-4 hover:underline">
+                    <Link href={`/platform/businesses/${b.id}`} dir="auto" className="font-medium text-primary-ink underline-offset-4 hover:underline">
                       {b.name}
                     </Link>
                     <span className="text-muted">{date.format(new Date(b.created_at))}</span>
@@ -112,7 +112,7 @@ export default async function PlatformPage() {
               <h2 id="new-requests" className="font-semibold">
                 {t("platform.latestRequests")}
               </h2>
-              <Link href="/platform/inbox" className="flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline">
+              <Link href="/platform/inbox" className="flex items-center gap-1 text-sm font-medium text-primary-ink underline-offset-4 hover:underline">
                 {t("platform.seeAll")} <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
               </Link>
             </div>

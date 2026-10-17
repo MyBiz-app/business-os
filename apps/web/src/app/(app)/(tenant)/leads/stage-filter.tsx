@@ -57,7 +57,7 @@ export function StageFilter({ stages, selected, label, allLabel, countLabel }: P
             <input type="checkbox" name="stage" value={value} defaultChecked={selected.includes(value)} className="peer sr-only" />
             <span
               aria-hidden="true"
-              className="grid size-4 place-items-center rounded border border-border text-transparent peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white"
+              className="grid size-4 place-items-center rounded border border-border text-transparent peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary"
             >
               <Check className="size-3" />
             </span>

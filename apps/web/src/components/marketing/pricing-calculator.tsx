@@ -59,7 +59,7 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
   const slider = (
     <div className="flex flex-col gap-3">
       <label htmlFor="calc-clients" className="font-bold">
-        <span aria-hidden="true" className="me-2 text-primary">②</span>
+        <span aria-hidden="true" className="me-2 text-primary-ink">②</span>
         {t("size")}
       </label>
       <input
@@ -92,7 +92,7 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
       </div>
       <div className="flex flex-wrap gap-1.5 text-xs text-muted" aria-hidden="true">
         {CLIENT_SIZES.map((size) => (
-          <span key={size} className={`rounded-full border px-2 py-0.5 ${size === tier ? "border-primary text-primary" : "border-border"}`}>
+          <span key={size} className={`rounded-full border px-2 py-0.5 ${size === tier ? "border-primary text-primary-ink" : "border-border"}`}>
             {size === 1500 ? tp("custom") : tp("upTo", { count: size.toLocaleString(locale) })}
           </span>
         ))}
@@ -137,7 +137,7 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
 
         <div className="flex items-center justify-between gap-3">
           <span className="font-bold">
-            <span aria-hidden="true" className="me-2 text-primary">③</span>
+            <span aria-hidden="true" className="me-2 text-primary-ink">③</span>
             {t("locations")}
           </span>
           <span className="flex items-center gap-3">
@@ -153,7 +153,7 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
 
         <div className="flex flex-col gap-3">
           <p className="font-bold">
-            <span aria-hidden="true" className="me-2 text-primary">④</span>
+            <span aria-hidden="true" className="me-2 text-primary-ink">④</span>
             {t("addons")}
           </p>
           <ul className="grid gap-3 sm:grid-cols-2">
@@ -215,12 +215,12 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
           </div>
         )}
         <div className="flex items-center justify-between gap-3 px-4 py-3">
-          <button type="button" aria-expanded={sheet} aria-controls="calc-sheet" onClick={() => setSheet((open) => !open)} className="flex flex-col text-start">
+          <button type="button" aria-expanded={sheet} aria-controls="calc-sheet" onClick={() => setSheet((open) => !open)} className="btn-plain flex flex-col text-start">
             <span className="text-xl font-extrabold tabular-nums">
               <bdi>{money(total)}</bdi>
               <span className="ms-1 text-sm font-normal text-muted">{tp("perMonth")}</span>
             </span>
-            <span className="text-xs font-semibold text-primary">{sheet ? t("hideDetails") : t("showDetails")}</span>
+            <span className="text-xs font-semibold text-primary-ink">{sheet ? t("hideDetails") : t("showDetails")}</span>
           </button>
           <Link href={href} className="btn-primary rounded-full px-5 py-2.5">
             {t("startWithThis")}

@@ -30,7 +30,7 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
   return (
     <section aria-labelledby="documents-heading" className="flex flex-col gap-4 card p-6">
       <h2 id="documents-heading" className="flex items-center gap-2 text-lg font-semibold">
-        <FileText aria-hidden="true" className="size-5 text-primary" />
+        <FileText aria-hidden="true" className="size-5 text-primary-ink" />
         {t("title")}
       </h2>
       {documents.length === 0 && <p className="text-sm text-muted">{t("none")}</p>}
@@ -38,7 +38,7 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
         {documents.map((document) => (
           <li key={document.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
             <div className="flex min-w-0 flex-col gap-0.5">
-              <a href={`/documents/${document.id}/file`} className="truncate font-medium text-primary underline-offset-4 hover:underline" dir="auto">
+              <a href={`/documents/${document.id}/file`} className="truncate font-medium text-primary-ink underline-offset-4 hover:underline" dir="auto">
                 {document.name}
               </a>
               <span className="text-xs text-muted">
@@ -61,7 +61,7 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
               )}
               {writable && (
                 <form action={deleteDocument.bind(null, clientId, document.id)}>
-                  <button type="submit" aria-label={t("delete", { name: document.name })} className="rounded-lg p-1 text-muted hover:bg-danger/10 hover:text-danger">
+                  <button type="submit" aria-label={t("delete", { name: document.name })} className="btn-icon rounded-lg p-1 text-muted hover:bg-danger/10 hover:text-danger">
                     <Trash2 aria-hidden="true" className="size-4" />
                   </button>
                 </form>
@@ -72,7 +72,7 @@ export async function DocumentsSection({ clientId, context, locked }: Props) {
       </ul>
       {writable && (
         <details className="rounded-xl bg-foreground/[0.03] p-3">
-          <summary className="cursor-pointer text-sm font-medium text-primary">{t("add")}</summary>
+          <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("add")}</summary>
           <div className="pt-3">
             <DocumentForm clientId={clientId} />
           </div>
@@ -108,7 +108,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
     <section aria-labelledby="time-heading" className="flex flex-col gap-4 card p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="time-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <Clock aria-hidden="true" className="size-5 text-primary" />
+          <Clock aria-hidden="true" className="size-5 text-primary-ink" />
           {t("title")}
         </h2>
         <span className="text-sm text-muted">{t("unbilled", { hours: hours(unbilled, locale) })}</span>
@@ -134,7 +134,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
               <span className="flex items-center gap-2">
                 <span className="tabular-nums">{t("hoursShort", { hours: hours(entry.minutes, locale) })}</span>
                 {entry.bill_id ? (
-                  <Link href={`/quotes/${entry.bill_id}`} className="text-xs text-primary underline-offset-4 hover:underline">{t("billed", { number: entry.bill_number ?? 0 })}</Link>
+                  <Link href={`/quotes/${entry.bill_id}`} className="text-xs text-primary-ink underline-offset-4 hover:underline">{t("billed", { number: entry.bill_number ?? 0 })}</Link>
                 ) : !entry.billable ? (
                   <Pill tone="muted">{t("notBillable")}</Pill>
                 ) : null}
@@ -147,7 +147,7 @@ export async function TimeSection({ clientId, context, locked }: Props) {
         <div className="flex flex-col gap-4 border-t border-border pt-4">
           <BillForm clientId={clientId} months={months} />
           <details>
-            <summary className="cursor-pointer text-sm font-medium text-primary">{t("retainer.edit")}</summary>
+            <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("retainer.edit")}</summary>
             <div className="pt-3">
               <RetainerForm
                 clientId={clientId}

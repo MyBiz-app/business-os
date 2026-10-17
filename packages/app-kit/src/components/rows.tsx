@@ -29,8 +29,8 @@ export function BackBar({ label, onPress, palette }: { label: string; onPress: (
       hitSlop={8}
       style={({ pressed }) => [local.back, { opacity: pressed ? 0.6 : 1 }]}
     >
-      <Ionicons name={back} size={20} color={palette.primary} />
-      <Text style={[local.backText, { color: palette.primary }]}>{label}</Text>
+      <Ionicons name={back} size={20} color={palette.primaryInk} />
+      <Text style={[local.backText, { color: palette.primaryInk }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -128,7 +128,7 @@ export function SectionTitle({
       </Text>
       {action && onAction && (
         <Pressable accessibilityRole="button" onPress={onAction} hitSlop={8}>
-          <Text style={[local.sectionAction, { color: palette.primary }]}>{action}</Text>
+          <Text style={[local.sectionAction, { color: palette.primaryInk }]}>{action}</Text>
         </Pressable>
       )}
     </View>

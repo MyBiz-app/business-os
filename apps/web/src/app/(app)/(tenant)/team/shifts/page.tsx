@@ -63,7 +63,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           <section key={branch.id} className="card flex flex-col gap-4 p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="flex items-center gap-2 font-semibold">
-                <MapPin aria-hidden="true" className="size-4 text-primary" />
+                <MapPin aria-hidden="true" className="size-4 text-primary-ink" />
                 {t("openingHours.title")} · <span dir="auto">{branch.name}</span>
               </h2>
               <Link href={`/locations/${branch.id}`} className="btn-secondary px-3 py-1.5 text-sm">
@@ -75,14 +75,14 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         ))}
         <div className="grid gap-4 sm:grid-cols-2">
           <Link href={`/team/${me.id}/hours`} className="card card-hover flex items-center gap-3 p-5">
-            <Clock aria-hidden="true" className="size-5 text-primary" />
+            <Clock aria-hidden="true" className="size-5 text-primary-ink" />
             <span className="flex flex-col">
               <span className="font-semibold">{t("shifts.soloAvailability")}</span>
               <span className="text-sm text-muted">{t("shifts.soloAvailabilityHint")}</span>
             </span>
           </Link>
           <Link href="/schedule/closed" className="card card-hover flex items-center gap-3 p-5">
-            <CalendarCog aria-hidden="true" className="size-5 text-primary" />
+            <CalendarCog aria-hidden="true" className="size-5 text-primary-ink" />
             <span className="flex flex-col">
               <span className="font-semibold">{t("schedule.closedDays")}</span>
               <span className="text-sm text-muted">{t("shifts.soloClosedHint")}</span>
@@ -272,7 +272,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
               <Link
                 key={b.id}
                 href={href({ b: nextIds.length === 0 || nextIds.length === branches.length ? (savedBranches.length ? "all" : undefined) : nextIds.join(",") })}
-                aria-pressed={on}
+                aria-current={on ? "true" : undefined}
                 className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors ${on ? "border-transparent font-medium text-foreground" : "border-border text-muted hover:text-foreground"}`}
                 style={on ? { background: `color-mix(in oklab, ${b.color} 16%, var(--surface))`, boxShadow: `inset 0 0 0 1.5px ${b.color}` } : undefined}
               >

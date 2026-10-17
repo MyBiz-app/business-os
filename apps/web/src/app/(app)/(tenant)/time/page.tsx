@@ -27,7 +27,7 @@ export default async function MyTimePage() {
       <PageHeader
         title={
           <span className="flex items-center gap-2">
-            <Clock aria-hidden="true" className="size-7 text-primary" />
+            <Clock aria-hidden="true" className="size-7 text-primary-ink" />
             {t("myTitle")}
           </span>
         }

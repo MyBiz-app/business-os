@@ -65,7 +65,7 @@ export async function BentoFeatures() {
                   className={`card card-hover flex h-full flex-col gap-4 p-7 ${ai ? "border-ai/25 bg-gradient-to-br from-ai/[0.07] to-surface" : ""}`}
                 >
                   <span
-                    className={`inline-flex size-12 items-center justify-center rounded-2xl ${ai ? "bg-ai text-white shadow-lg shadow-ai/30" : "bg-primary/10 text-primary"}`}
+                    className={`inline-flex size-12 items-center justify-center rounded-2xl ${ai ? "bg-ai text-white shadow-lg shadow-ai/30" : "bg-primary/10 text-primary-ink"}`}
                   >
                     <Icon aria-hidden="true" className="size-6" />
                   </span>
@@ -83,7 +83,7 @@ export async function BentoFeatures() {
         <ul className="flex flex-wrap justify-center gap-2">
           {rest.map(({ key, Icon }) => (
             <li key={key} className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium shadow-sm">
-              <Icon aria-hidden="true" className="size-4 text-primary" />
+              <Icon aria-hidden="true" className="size-4 text-primary-ink" />
               {t(`items.${key}.title`)}
             </li>
           ))}
@@ -117,7 +117,7 @@ export async function PricingTeaser() {
           <ul className="mx-auto flex flex-wrap justify-center gap-3 text-sm font-semibold">
             {(th.raw("points") as string[]).map((point) => (
               <li key={point} className="flex items-center gap-2 rounded-full bg-surface px-4 py-2 shadow-sm ring-1 ring-border">
-                <Check aria-hidden="true" className="size-4 text-success" />
+                <Check aria-hidden="true" className="size-4 text-success-ink" />
                 {point}
               </li>
             ))}
@@ -143,12 +143,12 @@ export async function PricingTeaser() {
                       </p>
                       <ul className="flex flex-col gap-2 text-sm">
                         <li className="flex items-start gap-2">
-                          <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                          <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
                           {t("coreText")}
                         </li>
                         {(catalog.presets[preset] ?? []).map((key) => (
                           <li key={key} className="flex items-start gap-2">
-                            <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                            <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
                             {tModules(`names.${key}` as "names.client_app")}
                           </li>
                         ))}
@@ -169,7 +169,7 @@ export async function PricingTeaser() {
             <PricingCalculator catalog={catalog} compact />
           </Reveal>
         )}
-        <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary">
+        <Link href="/pricing" className="group mx-auto inline-flex items-center gap-1 font-semibold text-primary-ink">
           {t("seeAll")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>
@@ -186,12 +186,12 @@ export async function AboutTeaser() {
   return (
     <Section aria-labelledby="about-heading" innerClassName="grid gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
       <Reveal className="flex flex-col items-start gap-5">
-        <p className="text-sm font-semibold text-primary">{th("eyebrow")}</p>
+        <p className="text-sm font-semibold text-primary-ink">{th("eyebrow")}</p>
         <h2 id="about-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">
           {t("title")}
         </h2>
         <p className="text-lg text-muted">{t("intro")}</p>
-        <Link href="/about" className="group inline-flex items-center gap-1 font-semibold text-primary">
+        <Link href="/about" className="group inline-flex items-center gap-1 font-semibold text-primary-ink">
           {th("more")}
           <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
         </Link>

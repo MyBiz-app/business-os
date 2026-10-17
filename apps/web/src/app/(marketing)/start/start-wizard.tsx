@@ -70,7 +70,7 @@ function StepDot({ done, current, index }: { done: boolean; current: boolean; in
   return (
     <span
       className={`flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors ${
-        done ? "bg-primary text-on-primary" : current ? "bg-primary/10 text-primary ring-2 ring-primary" : "bg-foreground/8 text-muted"
+        done ? "bg-primary text-on-primary" : current ? "bg-primary/10 text-primary-ink ring-2 ring-primary" : "bg-foreground/8 text-muted"
       }`}
     >
       {done ? <Check aria-hidden="true" className="size-4" /> : index + 1}
@@ -254,7 +254,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                 <button type="submit" className={classes}>{label}</button>
               </form>
             ) : (
-              <button key={provider} type="button" disabled aria-disabled="true" className={`${classes} opacity-60`}>{label}</button>
+              <button key={provider} type="button" disabled aria-disabled="true" className={`btn-plain ${classes} opacity-60`}>{label}</button>
             );
           })}
           <p className="flex items-center gap-3 text-xs text-muted before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border">
@@ -265,7 +265,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           </button>
           <p className="text-center text-sm text-muted">
             {t("account.haveAccount")}{" "}
-            <Link href={`/login?next=${encodeURIComponent(returnTo)}`} className="font-semibold text-primary underline-offset-4 hover:underline">
+            <Link href={`/login?next=${encodeURIComponent(returnTo)}`} className="font-semibold text-primary-ink underline-offset-4 hover:underline">
               {t("account.login")}
             </Link>
           </p>
@@ -285,7 +285,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           type="button"
           aria-pressed={chosen}
           onClick={onClick}
-          className={`card card-hover flex w-full items-center gap-4 p-5 text-start ${chosen ? "ring-2 ring-primary" : ""}`}
+          className={`btn-plain card card-hover flex w-full items-center gap-4 p-5 text-start ${chosen ? "ring-2 ring-primary" : ""}`}
         >
           <span aria-hidden="true" className={`flex size-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md ${color}`}>
             <VerticalIcon icon={icon} className="size-7" />
@@ -301,7 +301,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
       <>
         <StepHeading
           eyebrow={
-            <button type="button" onClick={() => setCategory(null)} className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+            <button type="button" onClick={() => setCategory(null)} className="btn-link text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
               {t("industry.allIndustries")}
             </button>
           }
@@ -340,7 +340,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         </ul>
         <p className="text-sm text-muted">
           {t("industry.missing")}{" "}
-          <Link href="/industries" className="font-semibold text-primary underline-offset-4 hover:underline">
+          <Link href="/industries" className="font-semibold text-primary-ink underline-offset-4 hover:underline">
             {t("industry.seeAll")}
           </Link>
         </p>
@@ -454,10 +454,10 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                   type="button"
                   aria-pressed={chosen}
                   onClick={() => update({ clients: size })}
-                  className={`relative flex h-full w-full flex-col gap-1 p-4 text-start transition-transform ${chosen ? "card-accent ring-2 ring-primary" : "card card-hover"}`}
+                  className={`btn-plain relative flex h-full w-full flex-col gap-1 p-4 text-start transition-transform ${chosen ? "card-accent ring-2 ring-primary" : "card card-hover"}`}
                 >
                   {chosen && (
-                    <span className="flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
+                    <span className="flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary-ink">
                       <Check aria-hidden="true" className="size-3" /> {t("base.current")}
                     </span>
                   )}
@@ -473,11 +473,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
           })}
         </ul>
         <div className="card-accent flex flex-col gap-4 p-6">
-          <p className="text-sm font-semibold text-primary">{t("base.subtitle")}</p>
+          <p className="text-sm font-semibold text-primary-ink">{t("base.subtitle")}</p>
           <ul className="grid gap-2 sm:grid-cols-2">
             {(t.raw("base.included") as string[]).map((item) => (
               <li key={item} className="flex items-start gap-2">
-                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success" />
+                <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success-ink" />
                 {item}
               </li>
             ))}
@@ -565,11 +565,11 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             type="button"
             aria-pressed={declined.includes(offer)}
             onClick={() => setTier(offer, null)}
-            className={`flex w-fit items-center gap-1.5 text-sm font-semibold underline-offset-4 hover:text-foreground ${
+            className={`btn-link flex w-fit items-center gap-1.5 text-sm font-semibold underline-offset-4 hover:text-foreground ${
               declined.includes(offer) ? "text-foreground" : "text-muted underline"
             }`}
           >
-            {declined.includes(offer) && <Check aria-hidden="true" className="size-4 text-success" />}
+            {declined.includes(offer) && <Check aria-hidden="true" className="size-4 text-success-ink" />}
             {t("tier.noThanks", { name: offerName(offer) })}
           </button>
         )}
@@ -596,7 +596,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             <p className="font-bold">
               {t("summary.business", { name: isolate(draft.name), vertical: draft.vertical ? text(draft.vertical, "name") : "" })}
             </p>
-            <button type="button" onClick={() => goTo("business")} className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+            <button type="button" onClick={() => goTo("business")} className="btn-link text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
               {t("summary.edit")}
             </button>
           </div>
@@ -614,7 +614,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                 <SummaryLines lines={once} label={label} money={money} onRemove={removeModule} removeLabel={t("offer.remove")} />
               </>
             )}
-            <p className="flex items-baseline justify-between gap-3 text-success">
+            <p className="flex items-baseline justify-between gap-3 text-success-ink">
               <span className="font-semibold">{t("summary.today")}</span>
               <span className="text-xl font-extrabold">
                 <bdi>{money(0)}</bdi>
@@ -640,12 +640,12 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
             <span>
               {t.rich("summary.terms", {
                 terms: (chunks) => (
-                  <Link href="/legal/terms" target="_blank" className="font-semibold text-primary underline underline-offset-4">
+                  <Link href="/legal/terms" target="_blank" className="font-semibold text-primary-ink underline underline-offset-4">
                     {chunks}
                   </Link>
                 ),
                 privacy: (chunks) => (
-                  <Link href="/legal/privacy" target="_blank" className="font-semibold text-primary underline underline-offset-4">
+                  <Link href="/legal/privacy" target="_blank" className="font-semibold text-primary-ink underline underline-offset-4">
                     {chunks}
                   </Link>
                 ),
@@ -661,7 +661,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
         <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-muted">
           {(t.raw("summary.guarantee") as string[]).map((item) => (
             <li key={item} className="flex items-center gap-1.5">
-              <ShieldCheck aria-hidden="true" className="size-4 text-success" />
+              <ShieldCheck aria-hidden="true" className="size-4 text-success-ink" />
               {item}
             </li>
           ))}
@@ -762,7 +762,7 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
                   setTermsError(true);
                 }
               }}
-              className="font-semibold text-primary underline-offset-4 hover:underline"
+              className="font-semibold text-primary-ink underline-offset-4 hover:underline"
             >
               {t("summary.login")}
             </Link>

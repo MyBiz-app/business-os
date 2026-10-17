@@ -281,7 +281,7 @@ function FileCard({
               <option key={kind} value={kind}>{t(`kinds.${kind}`)}</option>
             ))}
           </select>
-          <button type="button" className="text-sm text-danger underline-offset-4 hover:underline" disabled={pending} onClick={onRemove}>
+          <button type="button" className="btn-link text-sm text-danger underline-offset-4 hover:underline" disabled={pending} onClick={onRemove}>
             {t("files.remove")}
           </button>
         </div>
@@ -397,7 +397,7 @@ function Done({ report, onAgain }: { report: MoveReport; onAgain: () => void }) 
       )}
       <p className="text-sm text-muted">{t("done.undoHint")}</p>
       <div>
-        <button type="button" className="text-primary underline-offset-4 hover:underline" onClick={onAgain}>
+        <button type="button" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={onAgain}>
           {t("done.again")}
         </button>
       </div>

@@ -125,7 +125,7 @@ export function OnboardingForm({ timeZones, catalogs }: Props) {
           />
           <div className="flex items-center gap-4">
             <SubmitButton>{t("onboarding.submit")}</SubmitButton>
-            <button type="button" onClick={() => setStep(1)} className="text-sm text-muted underline-offset-4 hover:underline">
+            <button type="button" onClick={() => setStep(1)} className="btn-link text-sm text-muted underline-offset-4 hover:underline">
               {t("onboarding.back")}
             </button>
           </div>

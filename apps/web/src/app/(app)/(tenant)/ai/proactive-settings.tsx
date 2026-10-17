@@ -18,7 +18,7 @@ export function ProactiveSettingsPanel({ settings, timeZone }: { settings: Proac
     <section aria-labelledby="proactive-title" className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <h2 id="proactive-title" className="flex items-center gap-2 text-xl font-semibold">
-          <Sunrise aria-hidden="true" className="size-5 text-primary" />
+          <Sunrise aria-hidden="true" className="size-5 text-primary-ink" />
           {t("tasks.proactive.title")}
         </h2>
         <p className="max-w-3xl text-sm text-muted">{t("tasks.proactive.subtitle")}</p>
@@ -58,7 +58,7 @@ function ProactiveRow({ setting, canManage, timeZone, t }: { setting: ProactiveS
           <h3 className="font-semibold">{t(`tasks.proactive.${key}.name`)}</h3>
           <p className="text-sm text-muted">{t(`tasks.proactive.${key}.description`)}</p>
         </div>
-        <span className={`text-sm font-medium ${setting.enabled ? "text-success" : "text-muted"}`}>
+        <span className={`text-sm font-medium ${setting.enabled ? "text-success-ink" : "text-muted"}`}>
           {setting.enabled ? (setting.weekday === null ? t("tasks.proactive.onAt", { time: setting.time }) : t("tasks.proactive.onWeekly", { day: days[setting.weekday], time: setting.time })) : t("tasks.proactive.off")}
         </span>
       </div>

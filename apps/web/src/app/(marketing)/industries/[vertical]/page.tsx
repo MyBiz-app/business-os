@@ -36,7 +36,7 @@ export default async function IndustryPage({ params }: PageProps<"/industries/[v
   const kinds = childrenOf(match.depth === 0 ? key : match.category);
 
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <SubpageHero
         lead={
           <span aria-hidden="true" className={`flex size-16 items-center justify-center rounded-3xl bg-gradient-to-br ${color} text-white shadow-xl`}>
@@ -237,7 +237,7 @@ async function ReadySection({ match }: { match: Vertical }) {
       </div>
       <div className={`grid gap-4 ${columns.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>{columns}</div>
       <p className="flex items-center gap-2 text-sm text-muted">
-        <Check aria-hidden="true" className="size-4 text-success" />
+        <Check aria-hidden="true" className="size-4 text-success-ink" />
         {t("note")}
       </p>
     </Section>

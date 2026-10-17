@@ -1672,6 +1672,94 @@
         }
       }
     },
+    "/clients/{client_id}/marketing-consent": {
+      "put": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Set Client Marketing Consent",
+        "description": "Record that the client agreed to (or stopped) marketing messages, e.g. at the desk.",
+        "operationId": "set_client_marketing_consent",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClientConsentBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff/{user_id}/identity": {
       "get": {
         "tags": [
@@ -42444,6 +42532,12 @@
             ],
             "title": "Erased At",
             "description": "Personal data erased on request (privacy)"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "description": "Agreed to marketing messages; service messages are sent either way",
+            "default": false
           }
         },
         "type": "object",
@@ -42793,6 +42887,19 @@
           "phone"
         ],
         "title": "ClientBusiness"
+      },
+      "ClientConsentBody": {
+        "properties": {
+          "consent": {
+            "type": "boolean",
+            "title": "Consent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "consent"
+        ],
+        "title": "ClientConsentBody"
       },
       "ClientCreate": {
         "properties": {
@@ -43213,6 +43320,12 @@
             ],
             "title": "Erased At",
             "description": "Personal data erased on request (privacy)"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "description": "Agreed to marketing messages; service messages are sent either way",
+            "default": false
           },
           "plan_name": {
             "anyOf": [
@@ -51138,6 +51251,12 @@
             "title": "Email Roster",
             "description": "Email the person when their roster is published",
             "default": true
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "description": "Agreed to marketing messages (service messages are sent anyway)",
+            "default": false
           },
           "palette": {
             "anyOf": [

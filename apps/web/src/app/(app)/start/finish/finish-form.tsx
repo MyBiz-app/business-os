@@ -27,7 +27,7 @@ export function FinishForm({ plan }: { plan: string }) {
       <input type="hidden" name="time_zone" value={timeZone} />
       <input type="hidden" name="brand" value="visa" />
       <FormError message={state.error && t(`errors.${state.error}`)} />
-      <p role="note" className="flex items-start gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-sm font-medium text-amber-800 dark:text-amber-300">
+      <p role="note" className="flex items-start gap-2 rounded-xl bg-warning/10 px-3 py-2 text-sm font-medium text-warning">
         <CreditCard aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
         {t("simulated")}
       </p>

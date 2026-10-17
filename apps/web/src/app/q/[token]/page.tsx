@@ -53,7 +53,7 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
       <AppHeader />
       <Container as="main" size="narrow" className="enter flex max-w-3xl flex-1 flex-col gap-6 py-8 sm:py-10">
         <div className="flex flex-col gap-1">
-          <p dir="auto" className="text-sm font-semibold text-primary">{found.business_name}</p>
+          <p dir="auto" className="text-sm font-semibold text-primary-ink">{found.business_name}</p>
           <div className="flex flex-wrap items-center gap-3">
             <h1 dir="auto" className="text-3xl font-bold">{found.title}</h1>
             {found.kind === "bill" ? (
@@ -109,7 +109,7 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
             <p className="text-sm">{t("depositOf", { percent: found.deposit_percent, amount: money(deposit) })}</p>
           )}
           {found.paid > 0 && (
-            <p className="text-sm font-medium text-success">
+            <p className="text-sm font-medium text-success-ink">
               {t("paidSoFar", { amount: money(found.paid) })} · {t("balance", { amount: money(found.total - found.paid) })}
             </p>
           )}
@@ -136,7 +136,7 @@ export default async function PublicQuotePage({ params, searchParams }: PageProp
                 </button>
               </form>
             ) : (
-              <p className="text-sm text-success">{t(found.kind === "bill" ? "public.billThanks" : "public.depositPaid")}</p>
+              <p className="text-sm text-success-ink">{t(found.kind === "bill" ? "public.billThanks" : "public.depositPaid")}</p>
             )}
           </section>
         )}

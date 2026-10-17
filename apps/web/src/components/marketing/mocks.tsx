@@ -28,7 +28,7 @@ export async function DashboardMock() {
             </span>
             <p className="truncate text-[11px] text-muted">{label}</p>
             <p className="text-lg font-bold tabular-nums">{value}</p>
-            <p className="text-[11px] font-semibold text-success">{delta}</p>
+            <p className="text-[11px] font-semibold text-success-ink">{delta}</p>
           </div>
         ))}
       </div>

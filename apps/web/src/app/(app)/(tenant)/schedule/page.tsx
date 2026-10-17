@@ -180,7 +180,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         description={
           <span className="flex items-center gap-2 text-base">
             <span>{range}</span>
-            {includesToday && <span className="rounded-full bg-primary/12 px-2 py-0.5 text-xs font-semibold text-primary">{t("today")}</span>}
+            {includesToday && <span className="rounded-full bg-primary/12 px-2 py-0.5 text-xs font-semibold text-primary-ink">{t("today")}</span>}
           </span>
         }
         actions={
@@ -246,7 +246,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                 key={option}
                 href={viewLink(option)}
                 aria-current={view === option ? "page" : undefined}
-                className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors sm:flex-none ${view === option ? "bg-primary/12 text-primary" : "text-muted hover:text-foreground"}`}
+                className={`flex-1 rounded-lg px-3 py-1.5 text-center font-medium transition-colors sm:flex-none ${view === option ? "bg-primary/12 text-primary-ink" : "text-muted hover:text-foreground"}`}
               >
                 {t(option === "day" ? "dayView" : option === "week" ? "weekView" : "monthView")}
               </Link>
@@ -274,11 +274,11 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
                 </>
               );
               return href ? (
-                <Link key={b.id} href={href} aria-pressed={on} className={className}>
+                <Link key={b.id} href={href} aria-current={on ? "true" : undefined} className={className}>
                   {content}
                 </Link>
               ) : (
-                <span key={b.id} aria-disabled="true" title={t("branchLimit", { count: limit })} className={className}>
+                <span key={b.id} role="link" aria-disabled="true" title={t("branchLimit", { count: limit })} className={className}>
                   {content}
                 </span>
               );

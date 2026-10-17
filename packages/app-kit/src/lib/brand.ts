@@ -32,7 +32,13 @@ function readableOn(hex: string, surface: string): string {
   const toward = luminance(surface) > 0.5 ? "#000000" : "#ffffff";
   for (let t = 0; t <= 1; t += 0.05) {
     const color = mix(hex, toward, t);
-    if (contrastRatio(color, surface) >= 4.5 && contrastRatio(color, textOn(color)) >= 4.5) return color;
+    // Also on a 12% tint of itself (chips and badges) and on the page background behind the surface.
+    if (
+      contrastRatio(color, surface) >= 4.5 &&
+      contrastRatio(color, mix(surface, color, 0.12)) >= 4.5 &&
+      contrastRatio(color, textOn(color)) >= 4.5
+    )
+      return color;
   }
   return toward;
 }
@@ -41,7 +47,8 @@ function readableOn(hex: string, surface: string): string {
 export function brandPalette(palette: Palette, color: string | null | undefined): Palette {
   if (!color) return palette;
   const primary = readableOn(color, palette.surface);
-  return { ...palette, primary, onPrimary: textOn(primary) };
+  // The brand color is already AA-safe as text (readableOn), so it is its own ink.
+  return { ...palette, primary, primaryInk: primary, onPrimary: textOn(primary) };
 }
 
 /** The color at the given opacity, for soft tints (`#rrggbb` only; anything else is returned as is). */

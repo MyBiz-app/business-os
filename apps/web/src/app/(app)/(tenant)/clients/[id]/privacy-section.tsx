@@ -41,7 +41,7 @@ export function PrivacySection({ clientId, name }: { clientId: string; name: str
               type="submit"
               disabled={pending}
               aria-busy={pending}
-              className="rounded-lg border border-danger px-4 py-2.5 font-semibold text-danger disabled:opacity-60"
+              className="btn-plain rounded-lg border border-danger px-4 py-2.5 font-semibold text-danger disabled:opacity-60"
             >
               {t("eraseButton")}
             </button>

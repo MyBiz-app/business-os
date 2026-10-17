@@ -28,7 +28,7 @@ export function ServiceRooms({
     return (
       <p className="text-sm text-muted">
         {t("noBookableRooms")}{" "}
-        <Link href="/locations" className="text-primary underline-offset-4 hover:underline">
+        <Link href="/locations" className="text-primary-ink underline-offset-4 hover:underline">
           {t("toLocations")}
         </Link>
       </p>

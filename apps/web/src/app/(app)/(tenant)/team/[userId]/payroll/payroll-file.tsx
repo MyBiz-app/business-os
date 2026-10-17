@@ -54,8 +54,8 @@ export function PayrollFile(props: {
             aria-selected={tab === key}
             aria-controls={`payroll-panel-${key}`}
             onClick={() => setTab(key)}
-            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium ${
-              tab === key ? "border-primary text-primary" : "border-transparent text-muted hover:text-foreground"
+            className={`btn-plain -mb-px border-b-2 px-4 py-2 text-sm font-medium ${
+              tab === key ? "border-primary text-primary-ink" : "border-transparent text-muted hover:text-foreground"
             }`}
           >
             {t(`tabs.${key}`)}
@@ -104,7 +104,7 @@ function Personal({ userId, name, employment, forms, canManage, thisYear }: Para
             {employment.can_reveal_bank && (
               <button
                 type="button"
-                className="text-primary underline-offset-4 hover:underline"
+                className="btn-link text-primary-ink underline-offset-4 hover:underline"
                 disabled={pending}
                 onClick={() =>
                   bank
@@ -178,7 +178,7 @@ function FormRow({ userId, form, canManage }: { userId: string; form: FormSummar
     <li className="flex flex-col gap-2 py-3 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-medium">{t("form101.year", { year: form.tax_year })}</span>
-        <span className={submitted ? "text-success" : "text-muted"}>{t(`form101.status.${form.status}`)}</span>
+        <span className={submitted ? "text-success-ink" : "text-muted"}>{t(`form101.status.${form.status}`)}</span>
         {submitted && (
           <span>
             {t("form101.points")}: <bdi>{form.credit_points}</bdi>
@@ -188,11 +188,11 @@ function FormRow({ userId, form, canManage }: { userId: string; form: FormSummar
         {submitted && (
           <span className="flex items-center gap-3">
             {canManage && (
-              <button type="button" className="text-primary underline-offset-4 hover:underline" onClick={() => setEditing(!editing)}>
+              <button type="button" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={() => setEditing(!editing)}>
                 {t("form101.adjust")}
               </button>
             )}
-            <a className="text-primary underline-offset-4 hover:underline" href={`/team/${userId}/payroll/form101/${form.tax_year}/pdf`} download>
+            <a className="text-primary-ink underline-offset-4 hover:underline" href={`/team/${userId}/payroll/form101/${form.tax_year}/pdf`} download>
               {t("form101.pdf")}
             </a>
           </span>
@@ -325,7 +325,7 @@ function Terms({ userId, currency, locale, employment, canManage }: Parameters<t
       </fieldset>
 
       <ErrorLine error={error} />
-      {saved && <p role="status" className="text-sm text-success">{t("saved")}</p>}
+      {saved && <p role="status" className="text-sm text-success-ink">{t("saved")}</p>}
       {canManage && (
         <div>
           <button type="submit" className="btn-primary px-4 py-2" disabled={pending}>
@@ -347,7 +347,7 @@ function Documents({ userId, forms, employment }: Parameters<typeof PayrollFile>
         {signed.map((form) => (
           <li key={form.tax_year} className="flex items-center justify-between gap-3 py-2.5">
             <span>{t("form101.year", { year: form.tax_year })}</span>
-            <a className="text-primary underline-offset-4 hover:underline" href={`/team/${userId}/payroll/form101/${form.tax_year}/pdf`} download>
+            <a className="text-primary-ink underline-offset-4 hover:underline" href={`/team/${userId}/payroll/form101/${form.tax_year}/pdf`} download>
               {t("form101.pdf")}
             </a>
           </li>
@@ -435,12 +435,12 @@ function Components({ userId, currency, locale, components: lines, canManage }: 
               </div>
               {canManage && (
                 <span className="flex items-center gap-3">
-                  <button type="button" className="text-primary underline-offset-4 hover:underline" onClick={() => setEditing(line.id)}>
+                  <button type="button" className="btn-link text-primary-ink underline-offset-4 hover:underline" onClick={() => setEditing(line.id)}>
                     {t("edit")}
                   </button>
                   <button
                     type="button"
-                    className="text-danger underline-offset-4 hover:underline"
+                    className="btn-link text-danger underline-offset-4 hover:underline"
                     disabled={pending}
                     onClick={() =>
                       startTransition(async () => {

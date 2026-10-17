@@ -29,13 +29,13 @@ export default async function IntegrationsPage() {
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/settings" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/settings" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {tSettings("title")}
       </Link>
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            <Plug aria-hidden="true" className="size-8 shrink-0 text-primary" />
+            <Plug aria-hidden="true" className="size-8 shrink-0 text-primary-ink" />
             {t("title")}
           </span>
         }
@@ -48,7 +48,7 @@ export default async function IntegrationsPage() {
           <section key={integration.capability} aria-labelledby={heading} className="flex flex-col gap-4 card p-6">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 id={heading} className="flex items-center gap-2 text-lg font-semibold">
-                <Icon aria-hidden="true" className="size-5 text-primary" />
+                <Icon aria-hidden="true" className="size-5 text-primary-ink" />
                 {t(`capabilities.${integration.capability}.title`)}
               </h2>
               <Pill tone={integration.builtin ? "muted" : "success"}>{integration.provider_label}</Pill>
@@ -60,14 +60,14 @@ export default async function IntegrationsPage() {
                 : t("platformDefault")}
             </p>
             <details>
-              <summary className="cursor-pointer text-sm font-medium text-primary">{t("change")}</summary>
+              <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("change")}</summary>
               <div className="pt-4">
                 <ProviderForm integration={integration} />
               </div>
             </details>
             {integration.own && (
               <form action={disconnectProvider.bind(null, integration.capability)}>
-                <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+                <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                   {t("disconnect")}
                 </button>
               </form>

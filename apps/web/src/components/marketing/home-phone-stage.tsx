@@ -155,7 +155,7 @@ export function HomePhoneStage({ labels }: { labels: HomePhoneLabels }) {
                   </li>
                 ))}
               </ul>
-              <p className="mt-3 rounded-xl bg-primary/10 px-3 py-2 text-[11px] font-semibold text-primary">{labels.friendsNote}</p>
+              <p className="mt-3 rounded-xl bg-primary/10 px-3 py-2 text-[11px] font-semibold text-primary-ink">{labels.friendsNote}</p>
             </div>
             {/* Screen 3: invite */}
             <div className={pane(2)}>

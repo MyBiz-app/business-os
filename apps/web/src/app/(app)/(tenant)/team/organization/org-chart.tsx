@@ -68,7 +68,7 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
         type="button"
         onClick={() => setSelected(node.id === selected ? null : node.id)}
         aria-pressed={node.id === selected}
-        className={`flex w-48 items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
+        className={`btn-plain flex w-48 items-center gap-2.5 rounded-xl border bg-surface px-2.5 py-2 text-start shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
           node.id === selected ? "border-primary ring-2 ring-primary/25" : "border-border"
         }`}
       >
@@ -96,7 +96,7 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
             type="button"
             onClick={() => setSelected(node.id === selected ? null : node.id)}
             aria-pressed={node.id === selected}
-            className={`flex w-48 flex-col items-center gap-2 rounded-2xl border bg-surface px-3 pb-3 pt-4 text-center shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
+            className={`btn-plain flex w-48 flex-col items-center gap-2 rounded-2xl border bg-surface px-3 pb-3 pt-4 text-center shadow-[var(--elevation)] transition-[border-color,box-shadow] duration-200 hover:shadow-[var(--elevation-hover)] ${
               node.id === selected ? "border-primary ring-2 ring-primary/25" : "border-border"
             }`}
           >
@@ -110,7 +110,7 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
               </span>
             </span>
             {node.branches.length > 0 && (
-              <span className="flex max-w-full items-center gap-1 truncate rounded-full bg-primary/8 px-2 py-0.5 text-[0.6875rem] font-medium text-primary">
+              <span className="flex max-w-full items-center gap-1 truncate rounded-full bg-primary/8 px-2 py-0.5 text-[0.6875rem] font-medium text-primary-ink">
                 <MapPin aria-hidden="true" className="size-3 shrink-0" />
                 <span className="truncate">{node.branches.join(", ")}</span>
               </span>
@@ -122,7 +122,7 @@ export function OrgChart({ people, canEdit }: { people: OrgPerson[]; canEdit: bo
               onClick={() => toggle(node.id)}
               aria-expanded={open}
               aria-label={open ? t("fold", { name: node.name }) : t("unfold", { name: node.name })}
-              className="relative z-10 -mt-3 flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted shadow-sm hover:text-foreground"
+              className="btn-plain relative z-10 -mt-3 flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs font-medium text-muted shadow-sm hover:text-foreground"
             >
               {reports.length}
               <ChevronDown

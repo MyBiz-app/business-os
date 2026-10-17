@@ -168,7 +168,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
       hourCycle: "h23",
       timeZone: "UTC",
     }).format(new Date(Date.UTC(2000, 0, 1, hour)));
-  const minWidth = laned ? (days.length > 1 ? "7.5rem" : "10rem") : days.length > 1 ? "8.5rem" : "0";
+  const minWidth = laned ? (days.length > 1 ? "9rem" : "10rem") : days.length > 1 ? "8.5rem" : "0";
   const dayHeader = "h-11";
   const nowVisible = (day: string) => now?.day === day && now.minutes >= range.from && now.minutes <= range.to;
 
@@ -183,7 +183,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
             return (
               <div
                 key={day}
-                className={`sticky top-0 z-20 flex ${dayHeader} items-center justify-center gap-2 border-s-2 border-border bg-surface px-2 text-sm ${laned ? "" : "border-b"} ${isToday ? "text-primary" : ""}`}
+                className={`sticky top-0 z-20 flex ${dayHeader} items-center justify-center gap-2 border-s-2 border-border bg-surface px-2 text-sm ${laned ? "" : "border-b"} ${isToday ? "text-primary-ink" : ""}`}
                 style={{ gridColumn: `span ${columns.length}` }}
               >
                 <span className="text-muted">{formatDay(day, locale, { weekday: laned && days.length === 1 ? "long" : "short" })}</span>
@@ -224,7 +224,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
             ))}
             {now && days.includes(now.day) && nowVisible(now.day) && (
               <span
-                className="absolute end-1 z-10 -translate-y-1/2 rounded-full bg-danger px-1.5 py-px text-[0.625rem] font-semibold tabular-nums text-white"
+                className="absolute end-1 z-10 -translate-y-1/2 rounded-full bg-danger px-1.5 py-px text-[0.625rem] font-semibold tabular-nums text-on-danger"
                 style={{ top: y(now.minutes) }}
                 dir="ltr"
               >
@@ -296,7 +296,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                             {event.branch && <span aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: event.branch.color }} />}
                             <span className="truncate">{event.time}</span>
                           </span>
-                          <span className={`truncate font-medium ${event.cancelled ? "line-through" : ""}`} dir="auto">
+                          <span className={`font-medium break-words ${tall > 44 ? "line-clamp-2" : "truncate"} ${event.cancelled ? "line-through" : ""}`} dir="auto" title={event.title}>
                             {event.title}
                           </span>
                           {tall > 52 && event.detail && (
@@ -322,7 +322,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                       const className = "absolute z-[1] flex items-start justify-center rounded-lg border border-dashed border-border bg-surface pt-1 text-xs font-semibold text-muted";
                       const text = labels.more.replace("{count}", String(block.count));
                       return dayHref ? (
-                        <Link key={block.id} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary`} style={style}>
+                        <Link key={block.id} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary-ink`} style={style}>
                           {text}
                         </Link>
                       ) : (
@@ -334,7 +334,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                   </div>
                   {/* Who works when: a narrow strip at the end of the column (this branch only). */}
                   {hasShifts && (
-                    <div aria-label={labels.shifts} className="absolute inset-y-0 end-0 w-8 border-s border-dashed border-border/80">
+                    <div role="group" aria-label={labels.shifts} className="absolute inset-y-0 end-0 w-8 border-s border-dashed border-border/80">
                       {crowded(dayShifts)
                         ? coverage(dayShifts).map((segment) => {
                             const block = y(segment.end) - y(segment.start);
@@ -345,7 +345,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                                 key={segment.start}
                                 onClick={(event) => openPeek(event.currentTarget, dayShifts.filter((x) => x.start < segment.end && x.end > segment.start))}
                                 title={`${segment.count} · ${labels.onShift}`}
-                                className="absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
+                                className="btn-plain absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
                                 style={{
                                   top: y(segment.start) + 1,
                                   height: Math.max(block - 2, 14),
@@ -365,7 +365,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                               key={shift.id}
                               onClick={(event) => openPeek(event.currentTarget, [shift])}
                               aria-label={`${shift.name} ${shift.label}`}
-                              className={`group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
+                              className={`btn-plain group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
                               style={{
                                 top: y(shift.start) + 1,
                                 height: Math.max(y(shift.end) - y(shift.start) - 2, 16),

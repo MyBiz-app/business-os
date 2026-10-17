@@ -81,7 +81,7 @@ export function MonthGrid({ start, days, month, today, locale, events, closed, l
                 ))}
               </ul>
               {own.length > CHIPS && (
-                <Link href={dayHref.replace("__day__", day)} className="px-1 text-[0.6875rem] font-semibold text-muted hover:text-primary">
+                <Link href={dayHref.replace("__day__", day)} className="px-1 text-[0.6875rem] font-semibold text-muted hover:text-primary-ink">
                   {labels.more.replace("{count}", String(own.length - CHIPS))}
                 </Link>
               )}

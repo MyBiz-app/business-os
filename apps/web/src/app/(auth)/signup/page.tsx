@@ -18,7 +18,7 @@ export default async function SignupPage({ searchParams }: PageProps<"/signup">)
       <SignupForm next={nextPath} />
       <p className="text-sm text-muted">
         {t("signup.haveAccount")}{" "}
-        <Link href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"} className="text-primary underline underline-offset-4">
+        <Link href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"} className="text-primary-ink underline underline-offset-4">
           {t("signup.loginLink")}
         </Link>
       </p>

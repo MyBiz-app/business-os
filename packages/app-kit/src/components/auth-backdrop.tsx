@@ -47,7 +47,7 @@ export function AuthBackdrop() {
   const { palette, scheme } = useTheme();
   const strength = scheme === "dark" ? 0.3 : 0.16;
   return (
-    <View pointerEvents="none" aria-hidden style={StyleSheet.absoluteFill} importantForAccessibility="no-hide-descendants">
+    <View pointerEvents="none" aria-hidden style={[StyleSheet.absoluteFill, { overflow: "hidden" }]} importantForAccessibility="no-hide-descendants">
       <Orb color={tint(palette.primary, strength)} size={340} top="-8%" start="-25%" dx={40} dy={30} duration={7000} />
       <Orb color={tint(palette.ai, strength * 0.9)} size={300} top="55%" start="55%" dx={-36} dy={-28} duration={8500} />
       <Orb color={tint(palette.accent, strength * 0.8)} size={220} top="30%" start="62%" dx={-24} dy={34} duration={6500} />

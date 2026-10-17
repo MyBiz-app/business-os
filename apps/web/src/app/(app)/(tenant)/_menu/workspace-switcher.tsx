@@ -76,7 +76,7 @@ export function WorkspaceSwitcher({ name, logo, initial, current, memberships, b
             requestAnimationFrame(() => document.getElementById(panelId)?.querySelector<HTMLElement>("input, button, a")?.focus());
           }
         }}
-        className="flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-start transition-colors hover:bg-background/70 aria-expanded:bg-background/70"
+        className="btn-plain flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-start transition-colors hover:bg-background/70 aria-expanded:bg-background/70"
       >
         {logo ? (
           <Image src={logo} alt="" width={40} height={40} unoptimized className="size-10 shrink-0 rounded-xl object-contain shadow-sm" />
@@ -145,7 +145,7 @@ export function WorkspaceSwitcher({ name, logo, initial, current, memberships, b
                     <button type="button" data-item aria-current={branch === null} onClick={() => run(switchBranch, "branch_id", "")} className={option}>
                       <Layers aria-hidden="true" className="relative size-4 shrink-0 bg-surface text-muted" />
                       <span className="flex-1">{t("allBranches")}</span>
-                      {branch === null && <Check aria-hidden="true" className="size-4 text-primary" />}
+                      {branch === null && <Check aria-hidden="true" className="size-4 text-primary-ink" />}
                     </button>
                   </li>
                 )}
@@ -164,7 +164,7 @@ export function WorkspaceSwitcher({ name, logo, initial, current, memberships, b
                       <span dir="auto" className="flex-1 truncate">
                         {b.name}
                       </span>
-                      {b.id === branch && <Check aria-hidden="true" className="size-4 text-primary" />}
+                      {b.id === branch && <Check aria-hidden="true" className="size-4 text-primary-ink" />}
                     </button>
                   </li>
                 ))}
@@ -199,7 +199,7 @@ export function WorkspaceSwitcher({ name, logo, initial, current, memberships, b
             <LayoutGrid aria-hidden="true" className="size-4 text-muted" />
             {t("allBusinesses")}
           </Link>
-          <Link href="/onboarding" data-item onClick={close} className={`${option} font-medium text-primary`}>
+          <Link href="/onboarding" data-item onClick={close} className={`${option} font-medium text-primary-ink`}>
             <Plus aria-hidden="true" className="size-4" />
             {t("newBusiness")}
           </Link>

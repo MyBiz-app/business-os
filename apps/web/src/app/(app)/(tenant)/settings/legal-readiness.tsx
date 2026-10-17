@@ -38,7 +38,7 @@ export function LegalReadiness({ tenant, readiness }: { tenant: Tenant; readines
       <ul className="flex flex-col gap-2">
         {readiness.items.map((item) => (
           <li key={item.key} className="flex items-start gap-3 text-sm">
-            <span aria-hidden="true" className={`mt-0.5 ${item.done ? "text-success" : "text-muted"}`}>
+            <span aria-hidden="true" className={`mt-0.5 ${item.done ? "text-success-ink" : "text-muted"}`}>
               {item.done ? <Check className="size-4" /> : <Circle className="size-4" />}
             </span>
             <span className="flex flex-col gap-0.5">
@@ -64,11 +64,11 @@ export function LegalReadiness({ tenant, readiness }: { tenant: Tenant; readines
 
       <ul className="flex flex-wrap gap-2" aria-label={t("capabilities")}>
         {capabilities.map(({ key, on, label }) => (
-          <li key={key} className={`rounded-full px-3 py-1 text-xs font-medium ${on ? "bg-success/10 text-success" : "bg-muted/10 text-muted"}`}>
+          <li key={key} className={`rounded-full px-3 py-1 text-xs font-medium ${on ? "bg-success/10 text-success-ink" : "bg-muted/10 text-muted"}`}>
             {label}
           </li>
         ))}
-        {readiness.receipts_only && <li className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">{t("receiptsOnly")}</li>}
+        {readiness.receipts_only && <li className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary-ink">{t("receiptsOnly")}</li>}
       </ul>
 
       <form action={action} className="flex flex-col gap-4 border-t border-border pt-6">

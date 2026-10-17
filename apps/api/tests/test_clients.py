@@ -76,6 +76,25 @@ def test_update_client(client: TestClient, auth: AuthHeaders, studio: dict[str, 
     assert response.json()["first_name"] == "Dana R."
 
 
+def test_marketing_consent_is_recorded_and_withdrawn(
+    client: TestClient, auth: AuthHeaders, studio: dict[str, UUID]
+) -> None:
+    headers = auth(studio["owner"], studio["tenant_id"])
+    client_id = client.post("/clients", json={"first_name": "Dana"}, headers=headers).json()["id"]
+    assert client.get(f"/clients/{client_id}", headers=headers).json()["marketing_consent"] is False
+
+    agreed = client.put(
+        f"/clients/{client_id}/marketing-consent", json={"consent": True}, headers=headers
+    )
+    assert agreed.status_code == 200
+    assert agreed.json()["marketing_consent"] is True
+
+    withdrawn = client.put(
+        f"/clients/{client_id}/marketing-consent", json={"consent": False}, headers=headers
+    )
+    assert withdrawn.json()["marketing_consent"] is False
+
+
 def test_email_is_unique_per_business(
     client: TestClient, auth: AuthHeaders, studio: dict[str, UUID]
 ) -> None:

@@ -30,7 +30,7 @@ export type T = ReturnType<typeof useTranslations<"start">>;
 export function StepHeading({ eyebrow, title, subtitle }: { eyebrow: ReactNode; title: ReactNode; subtitle: string }) {
   return (
     <div className="flex flex-col gap-2">
-      {eyebrow && <div className="text-sm font-semibold text-primary">{eyebrow}</div>}
+      {eyebrow && <div className="text-sm font-semibold text-primary-ink">{eyebrow}</div>}
       {title}
       <p className="max-w-2xl text-base text-muted sm:text-lg lg:short:text-base">{subtitle}</p>
     </div>
@@ -94,7 +94,7 @@ export function TierCard({
       <ul className="flex flex-1 flex-col gap-2 text-sm">
         {points.map((point) => (
           <li key={point} className="flex items-start gap-2">
-            <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+            <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
             {point}
           </li>
         ))}
@@ -297,7 +297,7 @@ export function ChoiceGroup({
             key={option.value}
             className={`flex cursor-pointer items-center justify-center rounded-xl border px-3 py-3 text-center font-semibold transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-primary ${
               value === option.value
-                ? "border-primary bg-primary/10 text-primary"
+                ? "border-primary bg-primary/10 text-primary-ink"
                 : "border-border bg-surface hover:border-primary/50"
             }`}
           >
