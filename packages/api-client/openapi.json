@@ -51252,6 +51252,12 @@
             "description": "Email the person when their roster is published",
             "default": true
           },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "description": "Agreed to marketing messages (service messages are sent anyway)",
+            "default": false
+          },
           "palette": {
             "anyOf": [
               {

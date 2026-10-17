@@ -12565,6 +12565,12 @@ export interface components {
              */
             email_roster: boolean;
             /**
+             * Marketing Consent
+             * @description Agreed to marketing messages (service messages are sent anyway)
+             * @default false
+             */
+            marketing_consent: boolean;
+            /**
              * Palette
              * @description The person's color palette (none: the MyBiz default)
              */

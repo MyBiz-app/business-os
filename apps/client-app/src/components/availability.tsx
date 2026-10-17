@@ -29,7 +29,7 @@ export function Availability({ kind, days, courts, visits }: { kind: "courts" | 
   return (
     <View style={local.block}>
       {options.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+        <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
           {options.map((o) => (
             <Chip key={o.id} role="tab" label={o.name} selected={o.id === pick.id} onPress={() => setChosen(o.id)} palette={palette} />
           ))}

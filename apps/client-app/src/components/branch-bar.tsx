@@ -25,8 +25,9 @@ type Props = {
   palette: Palette;
 };
 
-/** The branch switcher on top of the calendar: a kind quick filter, then chips for up to four
- * branches or a menu for more. Shows nothing for a single branch. */
+/** The branch switcher on top of the calendar: one row of chips for up to four branches, or for
+ * more a kind quick filter and a menu (a kind row next to a short branch row would say the same
+ * thing twice). Shows nothing for a single branch. */
 export function BranchBar({ branches, filter, onChange, palette }: Props) {
   const t = useTranslations("client.schedule");
   const tKinds = useTranslations("verticals");
@@ -40,8 +41,8 @@ export function BranchBar({ branches, filter, onChange, palette }: Props) {
 
   return (
     <View style={local.wrap}>
-      {kinds.length > 1 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+      {kinds.length > 1 && branches.length > MAX_BRANCH_CHIPS && (
+        <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
           <Chip
             role="tab"
             label={t("allBranches")}
@@ -62,7 +63,7 @@ export function BranchBar({ branches, filter, onChange, palette }: Props) {
         </ScrollView>
       )}
       {branches.length <= MAX_BRANCH_CHIPS ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
+        <ScrollView horizontal role="tablist" showsHorizontalScrollIndicator={false} contentContainerStyle={local.chips}>
           <Chip
             role="tab"
             label={t("allBranches")}
