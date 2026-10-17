@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, X } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { termsOf } from "@business-os/verticals";
@@ -74,7 +74,18 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const avatarOf = new Map(team.map((m) => [m.user_id, avatarSrc(m.user_id, m.avatar_url)]));
 
   const mergedBranches = !multi && shown.length > 1;
-  const events: GridEvent[] = sessions.map((session) => {
+  // From the reports: one service or one instructor only.
+  const serviceId = typeof query.service === "string" ? query.service : null;
+  const instructorId = typeof query.instructor === "string" ? query.instructor : null;
+  const shownSessions = sessions.filter(
+    (session) => (!serviceId || session.service.id === serviceId) && (!instructorId || session.instructor_user_id === instructorId),
+  );
+  const filterName = serviceId
+    ? sessions.find((session) => session.service.id === serviceId)?.service.name
+    : instructorId
+      ? team.find((member) => member.user_id === instructorId)?.full_name
+      : null;
+  const events: GridEvent[] = shownSessions.map((session) => {
     const location = session.location_id ?? null;
     const day = dayOf(session.starts_at, tenant.time_zone);
     const startsAt = minutesIn(session.starts_at, tenant.time_zone);
@@ -149,7 +160,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
         : formatDay(monthStart(anchor), locale, { month: "long", year: "numeric" });
   const link = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams();
-    const merged = { view: isBoardRange(query.view) ? query.view : null, date: anchor === today ? null : anchor, branches: explicit ? String(query.branches) : null, ...changes };
+    const merged = { view: isBoardRange(query.view) ? query.view : null, date: anchor === today ? null : anchor, branches: explicit ? String(query.branches) : null, service: serviceId, instructor: instructorId, ...changes };
     for (const [key, value] of Object.entries(merged)) if (value) next.set(key, value);
     const text = next.toString();
     return text ? `/schedule?${text}` : "/schedule";
@@ -171,7 +182,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
   const next = view === "month" ? addMonths(anchor, 1) : addDays(start, branchStep);
   const stepName = t(view === "day" ? "stepDay" : view === "week" ? "stepWeek" : "stepMonth");
   const includesToday = days.includes(today) && (view !== "month" || today.startsWith(anchor.slice(0, 7)));
-  const customized = isBoardRange(query.view) || explicit || isDay(query.date) || isDay(query.week);
+  const customized = isBoardRange(query.view) || explicit || serviceId !== null || instructorId !== null || isDay(query.date) || isDay(query.week);
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-5 py-8 sm:py-10">
@@ -252,6 +263,17 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
             }))}
           />
         </nav>
+        {(serviceId || instructorId) && (
+          <Link
+            href={link({ service: null, instructor: null })}
+            scroll={false}
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary-ink transition-colors hover:bg-primary/15"
+          >
+            <bdi>{filterName ?? t("filtered")}</bdi>
+            <X aria-hidden="true" className="size-3.5" />
+            <span className="sr-only">{t("removeFilter")}</span>
+          </Link>
+        )}
         {customized && (
           <Link href="/schedule" className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline">
             {t("resetView")}

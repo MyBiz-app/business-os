@@ -1217,6 +1217,80 @@
             "description": "No check-in in this many days"
           },
           {
+            "name": "joined_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Joined on or after this day (business time zone)",
+              "title": "Joined From"
+            },
+            "description": "Joined on or after this day (business time zone)"
+          },
+          {
+            "name": "joined_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Joined on or before this day (business time zone)",
+              "title": "Joined To"
+            },
+            "description": "Joined on or before this day (business time zone)"
+          },
+          {
+            "name": "no_show_from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "With no_show_to: missed a class in this range",
+              "title": "No Show From"
+            },
+            "description": "With no_show_to: missed a class in this range"
+          },
+          {
+            "name": "no_show_to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "No Show To"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,

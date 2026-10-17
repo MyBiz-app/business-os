@@ -230,6 +230,16 @@ def list_clients(
     absent_days: Annotated[
         int | None, Query(ge=1, le=365, description="No check-in in this many days")
     ] = None,
+    joined_from: Annotated[
+        date | None, Query(description="Joined on or after this day (business time zone)")
+    ] = None,
+    joined_to: Annotated[
+        date | None, Query(description="Joined on or before this day (business time zone)")
+    ] = None,
+    no_show_from: Annotated[
+        date | None, Query(description="With no_show_to: missed a class in this range")
+    ] = None,
+    no_show_to: Annotated[date | None, Query()] = None,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
     # The current branch's clients, and those without a home branch (they belong to all).
@@ -267,6 +277,30 @@ def list_clients(
               AND s.starts_at > now() - make_interval(days => :absent_days)
         )"""
         params["absent_days"] = absent_days
+    if joined_from or joined_to:
+        # The day the client was added, in the business's time zone.
+        day = (
+            "(created_at AT TIME ZONE "
+            "(SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()))::date"
+        )
+        if joined_from:
+            where += f" AND {day} >= :joined_from"
+            params["joined_from"] = joined_from
+        if joined_to:
+            where += f" AND {day} <= :joined_to"
+            params["joined_to"] = joined_to
+    if no_show_from or no_show_to:
+        where += """ AND EXISTS (
+            SELECT 1 FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id
+            JOIN app.tenants t ON t.id = s.tenant_id
+            WHERE b.client_id = app.clients.id AND b.status = 'no_show'
+              AND (CAST(:no_show_from AS date) IS NULL
+                   OR (s.starts_at AT TIME ZONE t.time_zone)::date >= :no_show_from)
+              AND (CAST(:no_show_to AS date) IS NULL
+                   OR (s.starts_at AT TIME ZONE t.time_zone)::date <= :no_show_to)
+        )"""
+        params["no_show_from"] = no_show_from
+        params["no_show_to"] = no_show_to
 
     session = context.session
     total = session.execute(text(f"SELECT count(*) FROM app.clients {where}"), params).scalar_one()
