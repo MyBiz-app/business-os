@@ -61,7 +61,7 @@ with sync_playwright() as p:
     page.get_by_label("איך מזמינים").select_option("resource")
     page.get_by_label("מחיר לשעה", exact=False).fill("140")
     page.get_by_role("button", name="יצירה").click()
-    page.wait_for_url("**/services"); h.ready(page)
+    page.wait_for_url(re.compile(r".*/catalog\?tab=services")); h.ready(page)
     page.get_by_role("link", name=SERVICE).first.click()
     page.get_by_role("heading", name="מגרשים וחדרים").wait_for(timeout=30000)
     page.get_by_label(COURT).check()

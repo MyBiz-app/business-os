@@ -86,7 +86,7 @@ with sync_playwright() as p:
     owner.get_by_label("שם").fill("פילאטיס")
     owner.get_by_label("משך (בדקות)").fill("55")
     owner.get_by_label("משתתפים בכל מפגש").fill("8")
-    owner.get_by_role("button", name="יצירה").click(); owner.wait_for_url("**/services")
+    owner.get_by_role("button", name="יצירה").click(); owner.wait_for_url(re.compile(r".*/catalog\?tab=services"))
     owner.goto(f"{h.BASE}/schedule/new"); h.ready(owner)
     owner.get_by_label("תאריך", exact=True).fill(tomorrow)
     owner.get_by_label("שעת התחלה").fill("18:00")
@@ -184,8 +184,8 @@ with sync_playwright() as p:
     # Accessibility (axe) in Hebrew/light and English/dark.
     pages = [
         "/dashboard", "/schedule", "/schedule/new", "/schedule/appointment", "/schedule/closed",
-        "/clients", "/clients/new", "/clients/join", "/leads", "/leads/new", "/plans", "/plans/new",
-        "/services", "/services/new", "/quotes", "/quotes/new", "/invoices", "/invoices/new",
+        "/clients", "/clients/new", "/clients/join", "/leads", "/leads/new", "/catalog?tab=plans", "/catalog/plans/new", "/catalog?tab=codes",
+        "/catalog", "/catalog/services/new", "/quotes", "/quotes/new", "/invoices", "/invoices/new",
         "/sales", "/sales/orders", "/bills", "/reports", "/messages", "/events", "/files",
         "/locations", "/locations/new", "/resources", "/assistant", "/content", "/ai",
         "/team", "/team/shifts", "/team/time-clock", "/team/time-off", "/team/payroll", "/team/roles",
