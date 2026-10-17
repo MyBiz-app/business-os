@@ -44,6 +44,9 @@ def create_app() -> FastAPI:
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "no-referrer")
+        # Answers carry one person's or one business's data: no browser or proxy keeps a copy.
+        # Routes that choose their own policy (downloads, logos) keep it.
+        response.headers.setdefault("Cache-Control", "no-store")
         return response
 
     if settings.rate_limits_on:
