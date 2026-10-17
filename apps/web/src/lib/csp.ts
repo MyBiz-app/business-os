@@ -1,12 +1,10 @@
-/** Content-Security-Policy for the web app. Two policies run side by side:
- *
- * - the enforced one (next.config.ts) still allows inline scripts, so nothing can break;
- * - a strict, nonce-based one, sent per request by the proxy as Report-Only. Browsers report what
- *   it would block to /api/csp-report. Once the reports are clean it replaces the enforced one.
+/** Content-Security-Policy for the web app: a strict, nonce-based policy set per request by the proxy
+ * (src/proxy.ts). Scripts run only with this request's nonce ('strict-dynamic' lets Next.js load its
+ * own chunks); violations are reported to /api/csp-report.
  *
  * The browser never calls the API or Supabase directly (every call goes through the Next.js
  * server), so connect-src stays 'self', which is tighter than listing those origins.
- * Keep this file free of "@/" imports: next.config.ts and the node test runner load it directly. */
+ * Keep this file free of "@/" imports: the node test runner loads it directly. */
 
 export const CSP_REPORT_PATH = "/api/csp-report";
 
@@ -58,12 +56,7 @@ function directives(scriptSrc: string, { dev }: Options): string[] {
   ];
 }
 
-/** The enforced policy: inline scripts are still allowed (see the file comment). */
-export function enforcedCsp(options: Options): string {
-  return directives("'self' 'unsafe-inline'", options).join("; ");
-}
-
-/** The strict policy: only scripts carrying this request's nonce, plus what they load
+/** The policy: only scripts carrying this request's nonce, plus what they load
  * ('strict-dynamic' lets Next.js load its own chunks). */
 export function strictCsp(nonce: string, options: Options): string {
   return [
