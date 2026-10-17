@@ -67,13 +67,14 @@ def decrypt_number(blob: bytes) -> str:
 
 
 def _hmac_key() -> bytes:
+    """Keyed by `API_ID_HASH_KEY`, else the oldest of the secret keys: a hash cannot follow a key
+    rotation without being recomputed, so the key behind it stays put while newer keys come in
+    front (docs/runbooks/key-rotation.md)."""
     settings = get_settings()
-    if settings.secrets_key is not None:
-        base = settings.secrets_key.get_secret_value().encode()
-    elif settings.environment in ("local", "test"):
-        base = secrets.DEV_KEY
+    if settings.id_hash_key is not None:
+        base = settings.id_hash_key.get_secret_value().encode()
     else:
-        raise secrets.SecretsKeyMissing("API_SECRETS_KEY is required to store ID numbers")
+        base = secrets.secret_keys()[-1].encode()
     return hmac.new(base, _HMAC_LABEL, hashlib.sha256).digest()
 
 

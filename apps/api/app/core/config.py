@@ -86,6 +86,12 @@ class Settings(BaseSettings):
     file_scan_port: int = 3310
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
+    # Key rotation (GL6): a comma-separated list, newest first. The first key encrypts, every
+    # key decrypts. When set it replaces `secrets_key`.
+    secrets_keys: SecretStr | None = None
+    # Pins the key behind the ID-number hashes (they cannot be re-keyed without recomputing, see
+    # docs/runbooks/key-rotation.md). While unset the oldest of the secret keys is used.
+    id_hash_key: SecretStr | None = None
 
     # Meta connector (content studio): the Meta app's id and secret, and the Threads app's own
     # pair. While missing, the networks stay "coming soon" and nothing breaks.
@@ -170,6 +176,16 @@ class Settings(BaseSettings):
             )
         return self
 
+    def secret_keys(self) -> list[str]:
+        """The encryption keys, newest first: `API_SECRETS_KEYS`, else `API_SECRETS_KEY`."""
+        if self.secrets_keys is not None:
+            return [
+                key.strip()
+                for key in self.secrets_keys.get_secret_value().split(",")
+                if key.strip()
+            ]
+        return [self.secrets_key.get_secret_value()] if self.secrets_key is not None else []
+
     @field_validator("database_url")
     @classmethod
     def use_psycopg_driver(cls, value: str) -> str:
@@ -190,7 +206,7 @@ def missing_production_settings(settings: Settings) -> list[str]:
     missing: list[str] = []
     if urlparse(settings.jwks_url).hostname in local:
         missing.append("API_JWKS_URL")
-    if settings.secrets_key is None:
+    if not settings.secret_keys():
         missing.append("API_SECRETS_KEY")
     if settings.internal_token is None:
         missing.append("API_INTERNAL_TOKEN")
