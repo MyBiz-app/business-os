@@ -45,6 +45,11 @@ export default async function PayrollRunPage({ searchParams }: PageProps<"/team/
         <Link href={step(1)} className="btn-secondary px-3 py-2 text-sm">
           {t("next")}
         </Link>
+        {permissions.includes("payroll.approve") && (
+          <Link href={`/team/payroll/annual?year=${first.slice(0, 4)}`} className="btn-ghost ms-auto px-3 py-2 text-sm">
+            {t("annual.link")}
+          </Link>
+        )}
       </nav>
       {run ? (
         <RunBoard run={run} month={month} locale={locale} canManage={permissions.includes("payroll.manage")} canApprove={permissions.includes("payroll.approve")} />
