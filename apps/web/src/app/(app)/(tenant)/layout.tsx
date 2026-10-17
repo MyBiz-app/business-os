@@ -1,6 +1,7 @@
 import { ScopedMessages } from "@/components/scoped-messages";
 import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { termsOf, vertical } from "@business-os/verticals";
 
@@ -19,7 +20,7 @@ import { AiBubble } from "./ai-bubble/ai-bubble";
 import { ScreenContextProvider } from "./ai-bubble/screen-context";
 import "./crm-shell.css";
 
-export default async function TenantLayout({ children }: LayoutProps<"/">) {
+export default async function TenantLayout({ children, modal }: LayoutProps<"/"> & { modal?: ReactNode }) {
   const { tenant, me, branch } = await getTenant();
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
@@ -125,6 +126,8 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
       </div>
     </div>
     {aiBubble && <AiBubble />}
+    {/* Forms that open as a window over the page (round 7); the slot is empty otherwise. */}
+    {modal}
     </ScreenContextProvider>
     </ScopedMessages>
   );

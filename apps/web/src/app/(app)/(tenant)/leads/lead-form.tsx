@@ -8,6 +8,7 @@ import { useActionState } from "react";
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ModalMarker } from "@/components/ui/route-modal";
 import type { FormState } from "@/lib/form-state";
 
 import { SOURCES } from "./sources";
@@ -31,6 +32,7 @@ export function LeadForm({ action, owners, lead, submitLabel, readOnly = false }
   return (
     <form action={formAction} className="flex flex-col gap-4">
       <FormFeedback state={state} />
+      <ModalMarker saved={state.saved} />
       {/* Keyed by the saved version so the fields show the stored values after a save. */}
       <fieldset key={lead?.updated_at ?? "new"} disabled={readOnly} className="grid gap-4 sm:grid-cols-2">
         <Field label={t("firstName")} name="first_name" required maxLength={100} defaultValue={lead?.first_name} />
@@ -59,7 +61,7 @@ export function LeadForm({ action, owners, lead, submitLabel, readOnly = false }
         </div>
       </fieldset>
       {!readOnly && (
-        <div className="flex items-center gap-4">
+        <div className="form-actions flex items-center gap-4">
           <SubmitButton>{submitLabel}</SubmitButton>
           {!lead && (
             <Link href="/leads" className="text-sm text-muted underline-offset-4 hover:underline">

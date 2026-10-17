@@ -64,6 +64,10 @@ with sync_playwright() as p:
     owner.screenshot(path=f"{h.OUT}/leads-board.png", full_page=True)
     new_column.get_by_role("link", name=re.compile("רוני אלון")).click()
     owner.wait_for_url(re.compile(r".*/leads/[0-9a-f-]{36}$")); h.ready(owner)
+    # From the board the lead opens in a window over it; the same address reloaded is the page.
+    expect(owner.get_by_role("dialog", name=re.compile("רוני אלון"))).to_be_visible()
+    owner.reload(); h.ready(owner)
+    expect(owner.get_by_role("dialog")).to_have_count(0)
     owner.get_by_role("button", name=re.compile("נוצר קשר")).click()
     expect(owner.get_by_role("button", name=re.compile("נוצר קשר"))).to_have_attribute("aria-current", "step")
     owner.get_by_label("מה קרה?").fill("קבענו שיעור ניסיון ליום ראשון")
@@ -84,6 +88,17 @@ with sync_playwright() as p:
     owner.goto(f"{h.BASE}/leads"); h.ready(owner)
     expect(owner.get_by_role("region", name="הצלחה").get_by_role("link", name=re.compile("רוני"))).to_be_visible()
     print("4. converted into a client: ok")
+
+    # A new lead opens as a window over the board and closes itself on save.
+    owner.get_by_role("link", name="ליד חדש").first.click()
+    window = owner.get_by_role("dialog", name="ליד חדש")
+    expect(window).to_be_visible()
+    window.get_by_label("שם פרטי").fill("מיכל")
+    window.get_by_role("button", name="שמירת הליד").click()
+    expect(window).to_have_count(0)
+    owner.wait_for_url("**/leads"); h.ready(owner)
+    expect(owner.get_by_role("link", name=re.compile("מיכל")).first).to_be_visible()
+    print("4b. new lead from a window: ok")
     b.close()
 
 print("5. accessibility:", "; ".join(a11y) if a11y else "no serious issues")

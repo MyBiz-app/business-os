@@ -78,6 +78,14 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   page or a jump to the top). Every transition is 200ms or less, never blocks an action and is off
   under "reduce motion". Styles are the `modal-*`, `section-*`, `segmented-pill`, `content-swap`,
   `loading-dots`, `progress-bar` and `pending-*` blocks at the end of `globals.css`.
+- Forms as windows (R10): a form that should open over the list it came from gets a page body
+  component (for example `leads/new/new-lead-body.tsx`) used by the normal page and by an
+  intercepting page in `app/(app)/(tenant)/@modal/(.)leads/new/`, wrapped in `RouteModal`
+  (`components/ui/route-modal.tsx`). A link to the address opens the window; a reload or a shared
+  link opens the page. Put `<ModalMarker saved={state.saved} next={state.next} />` in the form and
+  have its create action return `{ saved: true }` (plus `next` to open another page) instead of
+  redirecting when `formData.get("_modal")` is set. Give the save row the `form-actions` class so it
+  stays visible while the fields scroll. Any address without a window closes it (`@modal/[...catchAll]`).
 - Toasts: `useToast()` in `components/toast/toaster.tsx` (web) and `components/toast.tsx` in
   app-kit (apps), same API: `toast("success" | "error" | "info", message, { action })`. A dark
   card in the corner at the reading start (top on a phone), several stack as a pile that opens on
