@@ -34,7 +34,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(executable_path=h.chromium())
     page = b.new_context(locale="he-IL", viewport={"width": 1280, "height": 900}).new_page()
     h.login(page, OWNER)
-    page.goto(f"{h.BASE}/settings"); h.ready(page)
+    page.goto(f"{h.BASE}/settings/business"); h.ready(page)
     page.get_by_role("link", name="חיבורים לספקים").click()
     page.wait_for_url("**/settings/integrations"); h.ready(page)
     for title in ("סליקה", "חשבוניות וקבלות", "וואטסאפ ו-SMS"):

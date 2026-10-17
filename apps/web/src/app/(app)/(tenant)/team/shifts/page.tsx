@@ -74,7 +74,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           </section>
         ))}
         <div className="grid gap-4 sm:grid-cols-2">
-          <Link href={`/team/${me.id}/hours`} className="card card-hover flex items-center gap-3 p-5">
+          <Link href={`/team/${me.id}?tab=availability`} className="card card-hover flex items-center gap-3 p-5">
             <Clock aria-hidden="true" className="size-5 text-primary-ink" />
             <span className="flex flex-col">
               <span className="font-semibold">{t("shifts.soloAvailability")}</span>

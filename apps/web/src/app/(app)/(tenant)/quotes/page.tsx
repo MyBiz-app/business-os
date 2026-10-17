@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Container } from "@/components/layout/container";
 import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
+import { SummaryTiles } from "@/components/ui/summary-tiles";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
 import { formatMoney } from "@/lib/money";
@@ -23,9 +24,21 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
   const { tenant, api, scope } = await getTenantFor("clients.read");
   const raw = (await searchParams).status;
   const filter = FILTERS.find((f) => f === raw) ?? "all";
-  const quotes = unwrap(
-    await api.GET("/quotes", { params: { ...scope, query: filter === "all" ? {} : { status: filter } } }),
-  );
+  // The tiles count every quote; the list below is the same set narrowed to the chosen status.
+  const everything = unwrap(await api.GET("/quotes", { params: scope }));
+  const quotes = filter === "all" ? everything : everything.filter((quote) => quote.status === filter);
+  const tiles = (["draft", "sent", "accepted", "declined"] as const).map((status) => {
+    const rows = everything.filter((quote) => (status === "declined" ? ["declined", "expired"].includes(quote.status) : quote.status === status));
+    const currencies = new Set(rows.map((quote) => quote.currency));
+    return {
+      key: status,
+      label: t(`tiles.${status}`),
+      value: rows.length,
+      hint: rows.length > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, quote) => sum + quote.total, 0), [...currencies][0], locale) : undefined,
+      href: `/quotes?status=${status}`,
+      active: filter === status,
+    };
+  });
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
   const canSell = tenant.permissions.includes("sales.manage");
 
@@ -57,6 +70,7 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
         active={filter}
         options={FILTERS.map((f) => ({ key: f, label: t(`filters.${f}`), href: f === "all" ? "/quotes" : `/quotes?status=${f}` }))}
       />
+      <SummaryTiles label={t("tiles.label")} tiles={tiles} />
       {quotes.length === 0 ? (
         <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (

@@ -1,11 +1,12 @@
 import type { components } from "@business-os/api-client";
-import { CalendarClock, Inbox, Plus, Target, TrendingUp, Trophy } from "lucide-react";
+import { CalendarClock, Plus, Target } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 
 import { Avatar } from "@/components/avatar";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { SummaryTiles } from "@/components/ui/summary-tiles";
 import { unwrap } from "@/lib/api";
 import { formatDay, todayIn } from "@/lib/dates";
 import { siteOrigin } from "@/lib/origin";
@@ -21,6 +22,10 @@ type Stage = Lead["stage"];
 const PAGE_SIZE = 200; // the API's page limit
 const MAX_PAGES = 50; // the API's offset limit (100,000 rows) is the real ceiling
 const STAGES: Stage[] = ["new", "contacted", "trial", "offer", "won", "lost"];
+/** The summary tiles open the board narrowed to what they count. */
+const VIEWS = ["new30", "won30", "due"] as const;
+type View = (typeof VIEWS)[number];
+const DAY_MS = 86_400_000;
 const STAGE_BAR: Record<Stage, string> = {
   new: "bg-electric",
   contacted: "bg-ai",
@@ -40,6 +45,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
   // Which pipeline columns to show: none chosen (or all) means every column.
   const chosen = (Array.isArray(params.stage) ? params.stage : [params.stage]).filter((s): s is Stage => STAGES.includes(s as Stage));
   const shownStages = chosen.length > 0 ? STAGES.filter((s) => chosen.includes(s)) : STAGES;
+  const view = VIEWS.find((v) => v === params.view);
 
   // "Show more" asks for one more page of leads: page `pages` is fetched along with those before it.
   const pages = Math.min(MAX_PAGES, Math.max(1, Number(params.pages) || 1));
@@ -52,24 +58,32 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
       ),
     ),
   );
-  const board = { ...boards[0], items: boards.flatMap((b) => b.items) };
+  const all = { ...boards[0], items: boards.flatMap((b) => b.items) };
+  const today = todayIn(tenant.time_zone);
+  const monthAgo = new Date(`${today}T00:00:00Z`).getTime() - 30 * DAY_MS;
+  const inView: Record<View, (lead: Lead) => boolean> = {
+    new30: (lead) => new Date(lead.created_at).getTime() >= monthAgo,
+    won30: (lead) => lead.stage === "won" && new Date(lead.stage_changed_at).getTime() >= monthAgo,
+    due: (lead) => !!lead.follow_up_on && lead.follow_up_on <= today && !["won", "lost"].includes(lead.stage),
+  };
+  const board = { ...all, items: view ? all.items.filter(inView[view]) : all.items };
   const moreHref = (() => {
     const query = new URLSearchParams();
     if (search) query.set("q", search);
     if (source) query.set("source", source);
     if (chosen.length > 0) for (const stage of chosen) query.append("stage", stage);
+    if (view) query.set("view", view);
     query.set("pages", String(pages + 1));
     return `/leads?${query}`;
   })();
-  const today = todayIn(tenant.time_zone);
   const inquiryLink = `${await siteOrigin()}/inquiry/${tenant.join_code}`;
   const rate = board.conversion_rate === null ? "-" : `${Math.round(board.conversion_rate * 100)}%`;
-  const stats = [
-    { label: t("stats.new30"), value: board.new_last_30_days, icon: Inbox },
-    { label: t("stats.won30"), value: board.won_last_30_days, icon: Trophy },
-    { label: t("stats.conversion"), value: rate, icon: TrendingUp },
-    { label: t("stats.followUps"), value: board.follow_ups_due, icon: CalendarClock },
-  ];
+  const tiles = [
+    { key: "new30", label: t("stats.new30"), value: board.new_last_30_days, href: "/leads?view=new30" },
+    { key: "won30", label: t("stats.won30"), value: board.won_last_30_days, href: "/leads?view=won30" },
+    { key: "conversion", label: t("stats.conversion"), value: rate, href: "/leads?stage=won&stage=lost", active: !view && chosen.length === 2 && chosen.includes("won") && chosen.includes("lost") },
+    { key: "due", label: t("stats.followUps"), value: board.follow_ups_due, href: "/leads?view=due" },
+  ].map((tile) => ({ ...tile, active: tile.active ?? view === tile.key }));
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
@@ -93,22 +107,19 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
         }
       />
 
-      <ul className="enter-items grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map(({ label, value, icon: Icon }) => (
-          <li key={label} className="card flex items-center gap-3 p-4">
-            <span className="icon-tile size-10">
-              <Icon aria-hidden="true" className="size-5" />
-            </span>
-            <div className="flex flex-col">
-              <span className="text-2xl font-bold tabular-nums">{value}</span>
-              <span className="text-xs text-muted">{label}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <SummaryTiles label={t("stats.label")} tiles={tiles} />
+      {view && (
+        <p className="flex flex-wrap items-center gap-3 text-sm text-muted">
+          {t("viewShowing", { view: t(`stats.${view === "due" ? "followUps" : view}`), count: board.items.length })}
+          <Link href="/leads" scroll={false} className="btn-link underline-offset-4 hover:underline">
+            {t("viewClear")}
+          </Link>
+        </p>
+      )}
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <form role="search" className="flex flex-wrap items-end gap-3">
+          {view && <input type="hidden" name="view" value={view} />}
           <label className="flex min-w-56 flex-col gap-1.5 text-sm font-medium">
             {t("search")}
             <input type="search" name="q" defaultValue={search} className="control px-3 py-2 font-normal" />
@@ -138,9 +149,9 @@ export default async function LeadsPage({ searchParams }: PageProps<"/leads">) {
         <CopyLink link={inquiryLink} label={t("inquiryLink")} copy={t("copy")} copied={t("copied")} />
       </div>
 
-      {board.total > board.items.length && (
+      {all.total > all.items.length && (
         <p role="status" className="flex flex-wrap items-center gap-3 text-sm text-muted">
-          {t("truncated", { shown: board.items.length, total: board.total })}
+          {t("truncated", { shown: all.items.length, total: all.total })}
           {pages < MAX_PAGES && (
             <Link href={moreHref} scroll={false} className="btn-secondary px-3 py-1.5">
               {t("showMore")}

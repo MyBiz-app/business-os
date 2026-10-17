@@ -20,7 +20,7 @@ export async function saveAvailability(userId: string, blocks: Block[]): Promise
     const detail = JSON.stringify((new ApiError(response.status, error).body as { detail?: unknown } | null)?.detail ?? "");
     return { error: response.status === 422 ? (detail.includes("overlap") ? "overlapping_hours" : "invalid") : "generic" };
   }
-  revalidatePath(`/team/${userId}/availability`);
+  revalidatePath(`/team/${userId}`);
   revalidatePath("/team/shifts");
   return { saved: true };
 }
