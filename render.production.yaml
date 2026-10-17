@@ -1,12 +1,78 @@
-# Render Blueprint for the PRODUCTION background jobs. Nothing here runs until you create a
-# Blueprint from this file (Render → New → Blueprint → pick this file name); a cron service is a
-# paid service (Starter), so this is switched on only when production is approved
-# (docs/deploy/go-live-checklist.md). Staging runs the same jobs from GitHub Actions
-# (jobs-staging.yml, jobs-hourly-staging.yml, emails-staging.yml); stop those schedules for the
-# same database first so jobs don't run twice. Each run is recorded in app.job_runs, and
-# check-jobs (check-jobs-staging.yml) alerts when one is late.
-# Secrets are marked `sync: false`; Render asks for them once.
+# Render Blueprint for PRODUCTION: the API web service and the background jobs. Nothing here runs
+# until you create a Blueprint from this file (Render -> New -> Blueprint -> pick this file name);
+# every service is a paid one (Starter, about $7 a month each), so this is switched on only when
+# production is approved. The step-by-step is docs/deploy/production.md and the cost table is
+# docs/deploy/go-live-checklist.md.
+#
+# Rules this file keeps (tests/test_production_as_code.py checks them):
+# - No secret value is written here; secrets are `sync: false` and Render asks for them once.
+# - The API migrates in a pre-deploy step, never on start (RUN_MIGRATIONS_ON_START=false).
+# - Deploys are never automatic (autoDeploy: false): a release is promoted on purpose (GL16 hooks
+#   in docs/deploy/production.md, "Releases").
+# - The owner (migration) database connection lives only on Render, never in GitHub.
+#
+# Staging runs the same jobs from GitHub Actions (jobs-staging.yml, jobs-hourly-staging.yml,
+# emails-staging.yml); stop those schedules for the same database first so jobs don't run twice.
+# Each run is recorded in app.job_runs, and check-jobs (check-jobs-staging.yml) alerts when one is
+# late.
 services:
+  - type: web
+    name: business-os-api
+    runtime: docker
+    rootDir: apps/api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    branch: main
+    autoDeploy: false
+    # Ready, not only alive: also checks the database, so a release that cannot reach it is not
+    # promoted and the previous one keeps serving.
+    healthCheckPath: /health/ready
+    # One migration run per release, before the new version starts (the old one keeps serving).
+    preDeployCommand: alembic upgrade head
+    envVars:
+      - key: API_ENVIRONMENT
+        value: production
+      - key: RUN_MIGRATIONS_ON_START
+        value: "false"
+      - key: WEB_CONCURRENCY
+        value: "2"
+      # Render's proxy appends the caller's address last in X-Forwarded-For (rate limits).
+      - key: API_TRUST_FORWARDED_FOR
+        value: "true"
+      # The API will not start without these (missing_production_settings in app/core/config.py).
+      - key: API_DATABASE_URL  # Supabase session pooler string, the owner connection (also for migrations)
+        sync: false
+      - key: API_JWKS_URL
+        sync: false
+      - key: API_SECRETS_KEY
+        sync: false
+      - key: API_INTERNAL_TOKEN  # the same value as on the Vercel project
+        sync: false
+      - key: API_WEB_URL
+        sync: false
+      - key: API_API_URL
+        sync: false
+      - key: API_CORS_ORIGINS  # JSON list of the real web and app origins
+        sync: false
+      # Key rotation (docs/runbooks/key-rotation.md): the list, newest first, and the pinned ID hash key.
+      - key: API_SECRETS_KEYS
+        sync: false
+      - key: API_ID_HASH_KEY
+        sync: false
+      # Two-step sign-in for owners and managers starts on this date (YYYY-MM-DD).
+      - key: API_MFA_REQUIRED_FROM
+        sync: false
+      # Optional until wanted (docs/deploy/go-live-checklist.md).
+      - key: API_ANTHROPIC_API_KEY
+        sync: false
+      - key: API_SUPABASE_URL
+        sync: false
+      - key: API_SUPABASE_SERVICE_KEY
+        sync: false
+      - key: API_SENTRY_DSN
+        sync: false
   - type: cron
     name: business-os-jobs-daily
     runtime: docker
@@ -25,6 +91,10 @@ services:
         sync: false
       - key: API_SECRETS_KEY
         sync: false
+      - key: API_SECRETS_KEYS
+        sync: false
+      - key: API_ID_HASH_KEY
+        sync: false
   - type: cron
     name: business-os-jobs-hourly
     runtime: docker
@@ -42,4 +112,8 @@ services:
       - key: API_DATABASE_URL
         sync: false
       - key: API_SECRETS_KEY
+        sync: false
+      - key: API_SECRETS_KEYS
+        sync: false
+      - key: API_ID_HASH_KEY
         sync: false
