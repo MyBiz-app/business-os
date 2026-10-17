@@ -2215,7 +2215,8 @@
       "audit": "Audit log",
       "integrations": "Integrations",
       "broadcasts": "Broadcasts",
-      "ai": "AI"
+      "ai": "AI",
+      "growth": "Growth"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2631,6 +2632,37 @@
         "ai_busy": "The AI is busy. Try again in a moment.",
         "ai_unavailable": "The AI is not answering right now.",
         "ai_not_configured": "AI is not set up on this server."
+      }
+    },
+    "growth": {
+      "title": "Growth",
+      "hint": "Where sign-ups stop, how many businesses are active and who uses the most. The last {days} days.",
+      "funnel": "Sign-up funnel",
+      "funnelHint": "People who reached each step of the sign-up. A visit counts once per step; \"Finished\" counts businesses created.",
+      "steps": {
+        "started": "Started",
+        "account": "Account",
+        "industry": "Industry",
+        "business": "Business",
+        "base": "Plan",
+        "extras": "Add-ons",
+        "services": "Services",
+        "summary": "Summary",
+        "completed": "Finished"
+      },
+      "lost": "{count} stopped here",
+      "active": "Active businesses",
+      "activeToday": "Active today",
+      "activeWeek": "Active in the last 7 days",
+      "activePerDay": "Active businesses per day",
+      "showTable": "Show as a table",
+      "consumers": "Biggest users",
+      "consumersHint": "Messages and AI credits in the last {days} days, space as kept now.",
+      "columns": {
+        "business": "Business",
+        "messages": "Messages",
+        "storage": "Space",
+        "ai": "AI credits"
       }
     }
   },

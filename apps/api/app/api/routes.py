@@ -20,6 +20,7 @@ from app.api.schemas import (
 )
 from app.catalog.verticals import VERTICAL_PACKS
 from app.commerce.modules import PRESETS
+from app.core import events
 from app.core.db import set_tenant
 from app.core.permissions import Permission, effective_permissions
 from app.legal.documents import check_versions, pending_documents, record_acceptance
@@ -294,6 +295,12 @@ def create_tenant(
     set_modules(session, tenant_id, modules)
     create_first_branches(session, tenant_id, body.locale, 1 + modules.get("extra_location", 0))
     apply_vertical_rooms(session, tenant_id, body.vertical, body.locale)
+    events.record(
+        session,
+        "signup_completed",
+        vertical=body.vertical,
+        modules=len(modules),
+    )
     return load_current_tenant(session)
 
 

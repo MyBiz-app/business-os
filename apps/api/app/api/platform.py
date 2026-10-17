@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import SessionDep, UserDep
 from app.api.modules import check_selection
 from app.api.pagination import MAX_LIMIT, FullPageDep, Page, PageDep
+from app.core import events
 from app.core.config import get_settings
 from app.core.mfa import require_aal2
 
@@ -126,6 +127,58 @@ def usage(
         {"tenant_id": tenant_id, "days": days},
     ).mappings()
     return [UsagePoint.model_validate(dict(row)) for row in rows]
+
+
+class FunnelStep(BaseModel):
+    key: str = Field(description="started, a wizard step, or completed")
+    visitors: int
+
+
+@router.get("/funnel")
+def signup_funnel(db: UsageDep, days: Annotated[int, Query(ge=1, le=365)] = 30) -> list[FunnelStep]:
+    """People who reached each step of the sign-up journey, in order, and how many finished."""
+    counts = {
+        (row.event, row.step): row.visitors
+        for row in db.execute(text("SELECT * FROM app.platform_funnel(:days)"), {"days": days})
+    }
+    steps = [("started", counts.get(("signup_started", ""), 0))]
+    steps += [(step, counts.get(("signup_step", step), 0)) for step in events.SIGNUP_STEPS]
+    steps.append(("completed", counts.get(("signup_completed", ""), 0)))
+    return [FunnelStep(key=key, visitors=visitors) for key, visitors in steps]
+
+
+class ActivityDay(BaseModel):
+    day: dt.date
+    active_day: int = Field(description="Businesses with any activity that day")
+    active_week: int = Field(description="Businesses with any activity in the 7 days up to it")
+
+
+@router.get("/activity")
+def activity(db: UsageDep, days: Annotated[int, Query(ge=1, le=90)] = 30) -> list[ActivityDay]:
+    rows = db.execute(text("SELECT * FROM app.platform_activity(:days)"), {"days": days}).mappings()
+    return [ActivityDay.model_validate(dict(row)) for row in rows]
+
+
+class Consumer(BaseModel):
+    tenant_id: UUID
+    name: str
+    messages: float
+    ai_credits: float
+    storage_bytes: int
+
+
+@router.get("/top-consumers")
+def top_consumers(
+    db: UsageDep,
+    days: Annotated[int, Query(ge=1, le=365)] = 30,
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
+) -> list[Consumer]:
+    """The businesses using the most messages, space and AI."""
+    rows = db.execute(
+        text("SELECT * FROM app.platform_top_consumers(:days, :limit)"),
+        {"days": days, "limit": limit},
+    ).mappings()
+    return [Consumer.model_validate(dict(row)) for row in rows]
 
 
 class AISpend(BaseModel):

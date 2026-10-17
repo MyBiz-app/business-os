@@ -57,6 +57,7 @@ from app.api import (
     platform,
     platform_ai,
     privacy,
+    product_events,
     promo_codes,
     push_tokens,
     quotes,
@@ -188,4 +189,5 @@ ROUTERS: list[APIRouter] = [
     health_declarations.client_router,
     business_settings.router,
     business_settings.public_router,
+    product_events.public_router,
 ]
