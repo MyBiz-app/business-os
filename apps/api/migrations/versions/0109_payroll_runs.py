@@ -11,7 +11,7 @@
   Net pay, payslips and the bank file come later (P5).
 
 Revision ID: 0109
-Revises: 0108
+Revises: 0110
 Create Date: 2026-10-17
 """
 
@@ -20,7 +20,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0109"
-down_revision: str | None = "0108"
+down_revision: str | None = "0110"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

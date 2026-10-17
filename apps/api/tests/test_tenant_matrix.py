@@ -42,6 +42,7 @@ OVERRIDES = {
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},
     "document_series": {"kind": "'quote'"},
     "form101_forms": {"tax_year": "2026"},
+    "import_batch_items": {"entity": "'client'"},
     "invitations": {"role": "'staff'"},
     "issued_documents": {"kind": "'quote'", "language": "'he'", "content_hash": "repeat('a', 64)"},
     "notifications": {"kind": "'session_cancelled'"},

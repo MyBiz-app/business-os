@@ -137,6 +137,8 @@ UNINDEXED_USER_KEYS = {
     ("file_folders", "created_by"),
     ("health_declarations", "reviewed_by"),
     ("health_declarations", "signed_by"),
+    ("import_batches", "created_by"),
+    ("import_sessions", "created_by"),
     ("invitations", "invited_by"),
     ("messages", "created_by"),
     ("payments", "created_by"),
