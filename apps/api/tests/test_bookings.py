@@ -268,6 +268,82 @@ def test_a_session_roster_can_be_paged(client: TestClient, studio: dict) -> None
     assert [b["id"] for b in first + rest] == [b["id"] for b in everyone]
 
 
+def book_over(client: TestClient, headers: dict, session_id: str, client_id: str):
+    return client.post(
+        f"/sessions/{session_id}/bookings",
+        json={"client_id": client_id, "over_capacity": True},
+        headers=headers,
+    )
+
+
+def test_owner_books_over_capacity_and_the_booking_is_marked(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    session_id = new_session(client, studio, capacity=1)
+    plain = book(client, headers, session_id, new_client(client, headers, "Dana")).json()
+    waiting = book(client, headers, session_id, new_client(client, headers, "Noa")).json()
+
+    extra = book_over(client, headers, session_id, new_client(client, headers, "Yael"))
+
+    assert extra.status_code == 201
+    assert extra.json()["status"] == "booked"
+    assert extra.json()["over_capacity"] is True
+    assert extra.json()["over_capacity_at"] is not None
+    assert plain["over_capacity"] is False
+    assert waiting["status"] == "waitlisted"
+    assert counts(client, headers, session_id) == (2, 1)  # 2 of 1, one still waiting
+
+
+def test_over_capacity_is_a_plain_booking_while_a_spot_is_free(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    session_id = new_session(client, studio, capacity=2)
+
+    booked = book_over(client, headers, session_id, new_client(client, headers, "Dana"))
+
+    assert booked.json()["status"] == "booked"
+    assert booked.json()["over_capacity"] is False
+
+
+def test_waitlist_stays_put_while_the_class_is_over_capacity(
+    client: TestClient, studio: dict
+) -> None:
+    headers = studio["headers"]
+    session_id = new_session(client, studio, capacity=1)
+    first = book(client, headers, session_id, new_client(client, headers, "Dana")).json()
+    book_over(client, headers, session_id, new_client(client, headers, "Noa"))
+    waiting = book(client, headers, session_id, new_client(client, headers, "Yael")).json()
+
+    # 2 of 1: cancelling one still leaves the class full, so nobody is promoted.
+    assert set_status(client, headers, first["id"], "cancelled").status_code == 200
+
+    roster = {
+        b["id"]: b for b in client.get(f"/sessions/{session_id}/bookings", headers=headers).json()
+    }
+    assert roster[waiting["id"]]["status"] == "waitlisted"
+    assert counts(client, headers, session_id) == (1, 1)
+
+
+@pytest.mark.parametrize(
+    ("role", "allowed"),
+    [("manager", True), ("front_desk", False), ("staff", False)],
+)
+def test_only_managers_book_over_capacity(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine, role: str, allowed: bool
+) -> None:
+    user = uuid4()
+    add_member(engine, studio["tenant_id"], user, role)
+    session_id = new_session(client, studio, capacity=1)
+    book(client, studio["headers"], session_id, new_client(client, studio["headers"], "Dana"))
+    extra = new_client(client, studio["headers"], "Noa")
+
+    response = book_over(client, auth(user, studio["tenant_id"]), session_id, extra)
+
+    assert response.status_code == (201 if allowed else 403)
+
+
 def test_clients_filter_by_join_day_and_no_show_range(client: TestClient, studio: dict) -> None:
     headers = studio["headers"]
     on = local_today() + timedelta(days=20)

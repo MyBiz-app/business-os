@@ -27,21 +27,21 @@ export function TasksBoard({ board, agents, timeZone }: { board: TaskBoard; agen
   const locale = useLocale();
   const when = (iso: string | null) => (iso ? new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone }).format(new Date(iso)) : "");
   return (
-    <section aria-labelledby="tasks-title" className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div className="flex flex-col gap-1">
-          <h2 id="tasks-title" className="flex items-center gap-2 text-xl font-semibold">
+    <section aria-labelledby="tasks-title" className="card flex flex-col gap-4 p-5">
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 id="tasks-title" className="flex items-center gap-2 text-lg font-semibold">
             <CalendarClock aria-hidden="true" className="size-5 text-primary-ink" />
             {t("tasks.title")}
           </h2>
-          <p className="max-w-3xl text-sm text-muted">{t("tasks.subtitle")}</p>
+          <p className="text-sm text-muted">{t("tasks.usage", { active: board.active, limit: board.limit })}</p>
         </div>
-        <p className="text-sm text-muted">{t("tasks.usage", { active: board.active, limit: board.limit })}</p>
+        <p className="text-sm text-muted">{t("tasks.subtitle")}</p>
       </div>
       {board.tasks.length === 0 ? (
-        <p className="card p-6 text-center text-muted">{t("tasks.empty")}</p>
+        <p className="rounded-xl border border-dashed border-border p-6 text-center text-muted">{t("tasks.empty")}</p>
       ) : (
-        <ul className="grid gap-3">
+        <ul className="flex flex-col gap-3">
           {board.tasks.map((task) => (
             <TaskRow key={task.id} task={task} agentName={agents[task.agent_key] ?? task.agent_key} when={when} />
           ))}
@@ -82,7 +82,7 @@ function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string;
   };
 
   return (
-    <li className="card flex flex-col gap-3 p-4">
+    <li className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 flex-col gap-1">
           <p className="font-semibold" dir="auto">
