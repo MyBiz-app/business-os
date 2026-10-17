@@ -18154,6 +18154,139 @@
         }
       }
     },
+    "/me/devices/check": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Check Device",
+        "description": "Called once after each sign-in. A device the account has not signed in from before is\nemailed to the person, unless it is the first one ever (a new account).",
+        "operationId": "check_device",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceCheck"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceCheckResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/me/devices": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "List Devices",
+        "description": "The devices signed in from recently, newest first.",
+        "operationId": "list_devices",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Device-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Device-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoginDevice"
+                  },
+                  "title": "Response List Devices"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/security": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Security Policy",
+        "description": "What the apps tell people about two-step sign-in (the banner for owners and managers).",
+        "operationId": "security_policy",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecurityPolicy"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/me/push-tokens": {
       "put": {
         "tags": [
@@ -46272,6 +46405,49 @@
         ],
         "title": "DepositResult"
       },
+      "DeviceCheck": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 16,
+            "title": "Device Id",
+            "description": "Random, kept on the device"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Label",
+            "description": "E.g. 'Chrome on Windows'",
+            "default": ""
+          },
+          "locale": {
+            "type": "string",
+            "pattern": "^(he|en)$",
+            "title": "Locale",
+            "default": "he"
+          }
+        },
+        "type": "object",
+        "required": [
+          "device_id"
+        ],
+        "title": "DeviceCheck"
+      },
+      "DeviceCheckResult": {
+        "properties": {
+          "new_device": {
+            "type": "boolean",
+            "title": "New Device",
+            "description": "First time this device signs in to the account"
+          }
+        },
+        "type": "object",
+        "required": [
+          "new_device"
+        ],
+        "title": "DeviceCheckResult"
+      },
       "DirectMessage": {
         "properties": {
           "client_id": {
@@ -51125,6 +51301,43 @@
         },
         "type": "object",
         "title": "LocationUpdate"
+      },
+      "LoginDevice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "first_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Seen At"
+          },
+          "last_seen_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Seen At"
+          },
+          "current": {
+            "type": "boolean",
+            "title": "Current",
+            "description": "The device that asked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "first_seen_at",
+          "last_seen_at",
+          "current"
+        ],
+        "title": "LoginDevice"
       },
       "MarkRead": {
         "properties": {
@@ -59167,6 +59380,40 @@
         ],
         "title": "ScheduledSession"
       },
+      "SecurityPolicy": {
+        "properties": {
+          "mfa_enforced": {
+            "type": "boolean",
+            "title": "Mfa Enforced",
+            "description": "Two-step sign-in is enforced on this server"
+          },
+          "mfa_required_from": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mfa Required From",
+            "description": "From this day owners and managers need a code for sensitive actions"
+          },
+          "mfa_required_now": {
+            "type": "boolean",
+            "title": "Mfa Required Now",
+            "description": "Owners and managers need a code already"
+          }
+        },
+        "type": "object",
+        "required": [
+          "mfa_enforced",
+          "mfa_required_from",
+          "mfa_required_now"
+        ],
+        "title": "SecurityPolicy"
+      },
       "SelectAccounts": {
         "properties": {
           "external_ids": {
@@ -62415,6 +62662,12 @@
             "title": "Online Sales",
             "description": "Clients can buy plans in the app"
           },
+          "require_mfa_for_staff": {
+            "type": "boolean",
+            "title": "Require Mfa For Staff",
+            "description": "Every team member must sign in with an authenticator code",
+            "default": false
+          },
           "network_scope": {
             "type": "string",
             "enum": [
@@ -62867,6 +63120,17 @@
               }
             ],
             "title": "Online Sales"
+          },
+          "require_mfa_for_staff": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Require Mfa For Staff"
           },
           "resource_payment": {
             "anyOf": [

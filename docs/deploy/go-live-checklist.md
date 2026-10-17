@@ -31,8 +31,20 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | `API_WEB_URL`, `API_API_URL` | The public addresses (not localhost) |
 | `API_CORS_ORIGINS` | JSON list of the real web and app origins (not localhost) |
 | `API_TRUST_FORWARDED_FOR` | `true` behind Render's proxy |
+| `API_MFA_REQUIRED_FROM` | A date (`YYYY-MM-DD`) 14 days after go-live: from then owners and managers need an authenticator code for sensitive actions (settings, pay, ID numbers, team roles, closing the business). The MyBiz team always needs one. Without it, required from the start |
+| `API_MFA_ENFORCED` | Leave unset (on everywhere but local development) |
 | `API_RATE_LIMIT_REDIS_URL` | Optional; only when running more than one API instance (**off**) |
 | `API_ANTHROPIC_API_KEY`, `API_EMAIL_*` | Optional until the AI assistant and real email are wanted |
+
+## Switch-on steps that need a paid plan (GL1)
+
+| Item | State | To switch on |
+|---|---|---|
+| Leaked-password check (Supabase) | Built, **off** (needs the Pro plan) | Upgrade the Supabase project, then run the workflow "Apply Supabase auth settings" with "apply" and "paid_plan" ticked. Checks the password against known leaks on sign-up and password change |
+| Server-side session timeouts (Supabase `[auth.sessions]`) | Not used | The web app signs out after 12 hours idle and the app after 30 days by itself. A server-side limit is a Pro setting if wanted later |
+
+Two-step sign-in is free and on: turn it on for your own account first (Account → Account security),
+and for every provider account (GitHub, Supabase, Render, Vercel, Google, Apple).
 
 ## Switching on virus scanning
 

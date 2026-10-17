@@ -16,6 +16,7 @@ export function apiMessages(locale) {
   const all = JSON.parse(readFileSync(join(root, "messages", `${locale}.json`), "utf8"));
   return {
     email: all.email,
+    securityEmail: all.security.email,
     pdfDocuments: { ...all.pdfDocuments, methods: all.receipts.methods },
     modules: { names: all.modules.names },
     locations: { mainBranch: all.locations.mainBranch, branchNumber: all.locations.branchNumber },

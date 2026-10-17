@@ -1,18 +1,22 @@
 import { KeyRound } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { BRAND } from "@business-os/i18n/brand";
 
 import { avatarSrc } from "@/components/avatar";
 import { PalettePicker } from "@/components/palette";
 import { AccessibilitySettings } from "@/components/accessibility";
+import { getApi } from "@/lib/api";
 import { codeChannels } from "@/lib/auth-providers";
+import { DEVICE_COOKIE } from "@/lib/mfa";
 import { createClient } from "@/lib/supabase/server";
 import { getActiveMembership } from "@/lib/tenant";
 
 import { savePalette } from "./actions";
 import { PhoneLogin } from "./phone-login";
+import { SecuritySettings } from "./security-settings";
 import { NotificationsForm, PictureForm, ProfileForm } from "./profile-form";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
@@ -23,12 +27,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** The signed-in person's own profile, whatever their role. */
-export default async function AccountPage() {
+export default async function AccountPage({ searchParams }: PageProps<"/account">) {
   const t = await getTranslations();
   const { me } = await getActiveMembership();
   const name = me.full_name || me.email;
   // A phone code needs an SMS provider on the project; until then the section stays hidden.
   const phoneCodes = (await codeChannels()).includes("sms");
+  const { mfa } = await searchParams;
+  const supabase = await createClient();
+  const { data: factorList } = await supabase.auth.mfa.listFactors();
+  const deviceId = (await cookies()).get(DEVICE_COOKIE)?.value;
+  const api = await getApi();
+  const { data: devices } = await api.GET("/me/devices", { headers: deviceId ? { "X-Device-Id": deviceId } : {} });
   const { data: auth } = phoneCodes ? await (await createClient()).auth.getUser() : { data: null };
 
   return (
@@ -84,6 +94,19 @@ export default async function AccountPage() {
           <p className="text-sm text-muted">{t("appearance.subtitle")}</p>
         </div>
         <PalettePicker current={me.palette ?? null} currentColors={me.palette_colors ?? null} save={savePalette} />
+      </section>
+      <section id="security" aria-labelledby="security-heading" className="card flex scroll-mt-24 flex-col gap-5 p-6">
+        <div className="flex flex-col gap-1">
+          <h2 id="security-heading" className="font-semibold">
+            {t("security.title")}
+          </h2>
+          <p className="text-sm text-muted">{t("security.subtitle")}</p>
+        </div>
+        <SecuritySettings
+          factors={(factorList?.totp ?? []).map((f) => ({ id: f.id, createdAt: f.created_at }))}
+          devices={(devices ?? []).map((d) => ({ id: d.id, label: d.label, lastSeenAt: d.last_seen_at, current: d.current }))}
+          required={mfa === "required" ? (me.platform_admin ? "team" : "business") : null}
+        />
       </section>
       <section aria-labelledby="password-heading" className="card flex flex-wrap items-center justify-between gap-3 p-6">
         <h2 id="password-heading" className="flex items-center gap-2 font-semibold">

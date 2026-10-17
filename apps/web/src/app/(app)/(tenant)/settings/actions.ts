@@ -31,6 +31,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           requires_health_declaration: formData.get("requires_health_declaration") === "on",
           client_id_number: ["optional", "required"].includes(value("client_id_number")) ? (value("client_id_number") as "optional" | "required") : "off",
           online_sales: formData.get("online_sales") === "on",
+          require_mfa_for_staff: formData.get("require_mfa_for_staff") === "on",
           resource_payment: value("resource_payment") === "venue" ? "venue" : "app",
         },
       }),

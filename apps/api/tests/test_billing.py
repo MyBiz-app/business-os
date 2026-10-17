@@ -215,6 +215,7 @@ def test_test_cards_are_refused_in_production(
     from app.core.config import get_settings
 
     monkeypatch.setenv("API_ENVIRONMENT", "production")
+    monkeypatch.setenv("API_MFA_ENFORCED", "false")  # this test is about the card, not the code
     get_settings.cache_clear()
     try:
         refused = client.post(
