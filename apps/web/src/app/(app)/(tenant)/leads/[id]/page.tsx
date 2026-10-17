@@ -31,7 +31,7 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
 
   return (
     <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/leads" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/leads" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("back")}
       </Link>
 
@@ -62,7 +62,7 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
 
       {lead.client_id ? (
         <p role="status" className="card flex flex-wrap items-center gap-3 p-4">
-          <UserCheck aria-hidden="true" className="size-5 text-success" />
+          <UserCheck aria-hidden="true" className="size-5 text-success-ink" />
           <span className="flex-1">{t("isClient")}</span>
           <Link href={`/clients/${lead.client_id}`} className="btn-secondary px-3 py-2 text-sm">
             {t("openClient")}
@@ -109,7 +109,7 @@ export default async function LeadPage({ params }: PageProps<"/leads/[id]">) {
               <summary className="cursor-pointer text-danger">{t("delete")}</summary>
               <form action={deleteLead.bind(null, lead.id)} className="mt-3 flex flex-wrap items-center gap-3">
                 <span>{t("deleteConfirm")}</span>
-                <button type="submit" className="rounded-xl bg-danger px-3 py-2 font-semibold text-white dark:text-zinc-950">
+                <button type="submit" className="btn-danger">
                   {t("deleteYes")}
                 </button>
               </form>

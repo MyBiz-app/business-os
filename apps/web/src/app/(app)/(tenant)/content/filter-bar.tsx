@@ -111,7 +111,7 @@ export function FilterBar({
   const count = (chosen.length > 0 ? 1 : 0) + (range !== "30" ? 1 : 0) + (compare ? 1 : 0);
 
   const optionClass = "flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-normal transition-colors hover:bg-foreground/5 has-[:focus-visible]:bg-foreground/5";
-  const box = "grid size-4 shrink-0 place-items-center rounded border border-border text-transparent peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white";
+  const box = "grid size-4 shrink-0 place-items-center rounded border border-border text-transparent peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary";
   const dot = "grid size-4 shrink-0 place-items-center rounded-full border border-border peer-checked:border-[5px] peer-checked:border-primary";
 
   return (
@@ -119,13 +119,13 @@ export function FilterBar({
       <button type="button" aria-expanded={sheet} onClick={() => setSheet((value) => !value)} className="btn-secondary flex items-center justify-center gap-2 px-4 py-2 sm:hidden">
         <SlidersHorizontal aria-hidden="true" className="size-4" />
         {labels.filtersButton}
-        {count > 0 && <span className="rounded-full bg-primary px-2 text-xs font-bold text-white">{count}</span>}
+        {count > 0 && <span className="rounded-full bg-primary px-2 text-xs font-bold text-on-primary">{count}</span>}
       </button>
       <div className={`${sheet ? "flex" : "hidden"} flex-col gap-3 sm:flex`}>
         <div className="flex flex-wrap items-center gap-2">
           <Popover label={labels.networks} summary={networkSummary} icon={<span aria-hidden="true" className="size-2 rounded-full bg-primary" />} width="w-72">
             <div className="px-2 pb-1">
-              <button type="button" onClick={() => apply({ chosen: [] })} className="text-xs font-semibold text-primary hover:underline">
+              <button type="button" onClick={() => apply({ chosen: [] })} className="btn-link text-xs font-semibold text-primary-ink hover:underline">
                 {labels.selectAll}
               </button>
             </div>
@@ -169,14 +169,14 @@ export function FilterBar({
             aria-checked={compare}
             aria-label={labels.compare}
             onClick={() => apply({ compare: !compare })}
-            className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ring-1 transition-colors ${compare ? "bg-primary/10 text-primary ring-primary" : "bg-surface ring-border hover:bg-foreground/5"}`}
+            className={`btn-plain flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ring-1 transition-colors ${compare ? "bg-primary/10 text-primary-ink ring-primary" : "bg-surface ring-border hover:bg-foreground/5"}`}
           >
             <GitCompareArrows aria-hidden="true" className="size-4" />
             {labels.compareShort}
           </button>
 
           {dirty && (
-            <button type="button" onClick={() => apply({ chosen: [], range: "30", compare: false })} className="ms-auto flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-muted hover:text-foreground">
+            <button type="button" onClick={() => apply({ chosen: [], range: "30", compare: false })} className="btn-plain ms-auto flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium text-muted hover:text-foreground">
               <RotateCcw aria-hidden="true" className="size-4" />
               {labels.reset}
             </button>
@@ -191,7 +191,7 @@ export function FilterBar({
                   type="button"
                   aria-label={`${labels.remove}: ${label}`}
                   onClick={() => toggleNetwork(value)}
-                  className="flex items-center gap-2 rounded-full bg-surface py-1 ps-1.5 pe-2.5 text-sm font-medium ring-1 ring-border transition-colors hover:bg-foreground/5"
+                  className="btn-plain flex items-center gap-2 rounded-full bg-surface py-1 ps-1.5 pe-2.5 text-sm font-medium ring-1 ring-border transition-colors hover:bg-foreground/5"
                 >
                   <NetworkIcon network={value} size="sm" />
                   {label}

@@ -81,7 +81,7 @@ export function ShiftBoard(props: {
       type="button"
       disabled={!canEdit}
       onClick={() => setEditing({ shift, userId: person.id, day })}
-      className={`flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default ${shift.draft ? "border border-dashed border-border" : ""}`}
+      className={`btn-plain flex w-full flex-col items-start rounded-lg border-s-[3px] px-2 py-1 text-start text-xs max-md:min-h-11 transition-shadow hover:shadow-sm disabled:cursor-default ${shift.draft ? "border border-dashed border-border" : ""}`}
       style={{ borderInlineStartColor: shift.color, background: `color-mix(in oklab, ${shift.color} ${shift.draft ? 5 : 12}%, var(--surface))` }}
       aria-label={`${person.name}: ${shift.starts}-${shift.ends} ${shift.locationName}${shift.stationName ? `, ${shift.stationName}` : ""}${shift.position ? `, ${shift.position}` : ""}`}
     >
@@ -96,7 +96,7 @@ export function ShiftBoard(props: {
       )}
       {shift.draft && <span className="mt-0.5 rounded-full bg-warning/15 px-1.5 text-[0.6875rem] font-medium text-warning">{t("publish.draft")}</span>}
       {shift.isCover && (
-        <span className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 px-1.5 text-[0.6875rem] font-medium text-primary">
+        <span className="mt-0.5 inline-flex max-w-full items-center gap-1 rounded-full bg-primary/10 px-1.5 text-[0.6875rem] font-medium text-primary-ink">
           <ArrowRightLeft aria-hidden="true" className="size-3 shrink-0" />
           <span dir="auto" className="truncate">{shift.locationName}</span>
         </span>
@@ -171,7 +171,7 @@ export function ShiftBoard(props: {
                 {t("person")}
               </th>
               {days.map((day) => (
-                <th key={day} scope="col" className={`px-2 py-3 text-center font-medium ${day === today ? "text-primary" : "text-muted"}`}>
+                <th key={day} scope="col" className={`px-2 py-3 text-center font-medium ${day === today ? "text-primary-ink" : "text-muted"}`}>
                   <span className="block">{formatDay(day, locale, { weekday: "short" })}</span>
                   <span className={`mx-auto mt-0.5 flex size-7 items-center justify-center rounded-full text-sm font-semibold tabular-nums ${day === today ? "bg-primary text-on-primary" : "text-foreground"}`}>
                     {formatDay(day, locale, { day: "numeric" })}
@@ -216,7 +216,7 @@ export function ShiftBoard(props: {
                             type="button"
                             onClick={() => setEditing({ shift: null, userId: person.id, day })}
                             aria-label={t("addFor", { name: person.name, day: formatDay(day, locale, { weekday: "long", day: "numeric" }) })}
-                            className={`flex flex-1 items-center justify-center rounded-lg border border-dashed border-transparent text-muted transition-colors hover:border-border hover:text-foreground focus-visible:border-border ${mine.length ? "min-h-6 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" : "min-h-12 opacity-40 group-hover:opacity-100"}`}
+                            className={`btn-plain flex flex-1 items-center justify-center rounded-lg border border-dashed border-transparent text-muted transition-colors hover:border-border hover:text-foreground focus-visible:border-border ${mine.length ? "min-h-6 opacity-0 group-hover:opacity-100 focus-visible:opacity-100" : "min-h-12 opacity-40 group-hover:opacity-100"}`}
                           >
                             <Plus aria-hidden="true" className="size-4" />
                           </button>
@@ -236,7 +236,7 @@ export function ShiftBoard(props: {
           const label = formatDay(day, locale, { weekday: "long", day: "numeric", month: "long" });
           return (
             <section key={day} aria-label={label} className="card overflow-hidden p-0">
-              <h3 className={`flex items-center justify-between gap-2 border-b border-border px-4 py-2.5 text-sm font-semibold ${day === today ? "bg-primary/10 text-primary" : "bg-surface-2"}`}>
+              <h3 className={`flex items-center justify-between gap-2 border-b border-border px-4 py-2.5 text-sm font-semibold ${day === today ? "bg-primary/10 text-primary-ink" : "bg-surface-2"}`}>
                 {label}
                 <span className="text-xs font-normal text-muted">{t("onShift", { count: covered(day) })}</span>
               </h3>
@@ -266,7 +266,7 @@ export function ShiftBoard(props: {
                   type="button"
                   onClick={() => setEditing({ shift: null, userId: people[0].id, day })}
                   aria-label={t("dayCardAdd", { day: formatDay(day, locale, { weekday: "long", day: "numeric" }) })}
-                  className="flex min-h-11 w-full items-center justify-center border-t border-dashed border-border text-muted transition-colors hover:text-foreground"
+                  className="btn-plain flex min-h-11 w-full items-center justify-center border-t border-dashed border-border text-muted transition-colors hover:text-foreground"
                 >
                   <Plus aria-hidden="true" className="size-4" />
                 </button>
@@ -425,10 +425,10 @@ function TemplatePicker({ templates, onApply }: { templates: BoardTemplate[]; on
       <ul className="flex flex-wrap gap-2">
         {templates.map((tpl) => (
           <li key={tpl.id} className="flex items-center rounded-full border border-border bg-surface-2 text-sm">
-            <button type="button" onClick={() => onApply(tpl)} className="rounded-s-full px-3 py-1 font-medium transition-colors hover:text-primary">
+            <button type="button" onClick={() => onApply(tpl)} className="btn-plain rounded-s-full px-3 py-1 font-medium transition-colors hover:text-primary-ink">
               <span dir="auto">{tpl.name}</span> <span dir="ltr" className="tabular-nums text-muted">{tpl.starts}-{tpl.ends}</span>
             </button>
-            <button type="button" onClick={() => startDelete(() => deleteTemplate(tpl.id))} aria-label={t("templates.remove", { name: tpl.name })} className="rounded-e-full px-2 py-1 text-muted transition-colors hover:text-danger">
+            <button type="button" onClick={() => startDelete(() => deleteTemplate(tpl.id))} aria-label={t("templates.remove", { name: tpl.name })} className="btn-plain rounded-e-full px-2 py-1 text-muted transition-colors hover:text-danger">
               <X aria-hidden="true" className="size-3.5" />
             </button>
           </li>

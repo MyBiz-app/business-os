@@ -102,7 +102,7 @@ export function Toaster({ children }: { children: React.ReactNode }) {
               <CircleCheck aria-hidden="true" className="toast-icon size-5" />
             )}
             <p className="toast-message">{item.message}</p>
-            <button type="button" className="toast-close" aria-label={t("dismiss")} onClick={() => remove(item.id)}>
+            <button type="button" className="btn-plain toast-close" aria-label={t("dismiss")} onClick={() => remove(item.id)}>
               <X aria-hidden="true" className="size-4" />
             </button>
             <span aria-hidden="true" className="toast-bar" />

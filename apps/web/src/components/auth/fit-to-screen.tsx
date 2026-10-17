@@ -35,7 +35,7 @@ export function FitToScreen({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <main ref={box} className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-5">
+    <main id="main" ref={box} className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-5">
       <div className="enter m-auto w-full max-w-md shrink-0 py-3" style={fit.height === undefined ? undefined : { height: fit.height + 24 }}>
         <div ref={content} className="origin-top" style={fit.scale < 1 ? { transform: `scale(${fit.scale})` } : undefined}>
           {children}

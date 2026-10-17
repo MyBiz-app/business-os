@@ -87,7 +87,7 @@ export default async function AccountPage() {
       </section>
       <section aria-labelledby="password-heading" className="card flex flex-wrap items-center justify-between gap-3 p-6">
         <h2 id="password-heading" className="flex items-center gap-2 font-semibold">
-          <KeyRound aria-hidden="true" className="size-5 text-primary" />
+          <KeyRound aria-hidden="true" className="size-5 text-primary-ink" />
           {t("account.password")}
         </h2>
         <Link href="/reset-password" className="btn-secondary px-4 py-2 text-sm">

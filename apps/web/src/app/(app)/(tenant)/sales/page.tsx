@@ -99,7 +99,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
 
       <section aria-labelledby="receipts-heading" className="flex flex-col gap-3">
         <h2 id="receipts-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <Receipt aria-hidden="true" className="size-5 text-primary" />
+          <Receipt aria-hidden="true" className="size-5 text-primary-ink" />
           {t("receipts")}
         </h2>
         {sales.simulated && <p className="rounded-xl bg-warning/10 px-3 py-2 text-sm">{t("simulated")}</p>}
@@ -122,7 +122,7 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
                 {sales.receipts.map((r) => (
                   <tr key={r.id} className="border-t border-border transition-colors hover:bg-primary/4">
                     <td className="px-4 py-2.5">
-                      <Link href={`/receipts/${r.id}`} className="font-medium text-primary underline-offset-4 hover:underline">
+                      <Link href={`/receipts/${r.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline">
                         <Ltr>{r.number}</Ltr>
                       </Link>
                     </td>

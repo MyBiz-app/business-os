@@ -20,7 +20,7 @@ export default async function ClosedDaysPage() {
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/schedule" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/schedule" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("back")}
       </Link>
       <PageHeader title={t("closedDays")} />
@@ -50,7 +50,7 @@ export default async function ClosedDaysPage() {
                   )}
                 </span>
                 <form action={reopenDay.bind(null, day.id)}>
-                  <button type="submit" className="text-sm text-primary underline-offset-4 hover:underline">
+                  <button type="submit" className="btn-link text-sm text-primary-ink underline-offset-4 hover:underline">
                     {t("reopenDay")}
                   </button>
                 </form>

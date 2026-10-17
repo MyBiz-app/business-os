@@ -168,12 +168,12 @@ export default function Bookings() {
                 <Text
                   accessibilityRole="link"
                   onPress={() => router.push(`/receipt/${entitlement.receipt_id}`)}
-                  style={[local.meta, { color: palette.primary, textDecorationLine: "underline" }]}
+                  style={[local.meta, { color: palette.primaryInk, textDecorationLine: "underline" }]}
                 >
                   {tReceipts("short", { number: entitlement.receipt_number ?? "" })}
                 </Text>
               )}
-              <Text style={[local.status, { color: palette.primary }]}>
+              <Text style={[local.status, { color: palette.primaryInk }]}>
                 {entitlement.state !== "active"
                   ? tPlans(`states.${entitlement.state}`)
                   : entitlement.credits_remaining === null
@@ -228,7 +228,7 @@ export default function Bookings() {
               <Text
                 accessibilityRole={purchase.ok ? undefined : "alert"}
                 accessibilityLiveRegion="polite"
-                style={[local.meta, { color: purchase.ok ? palette.primary : palette.danger }]}
+                style={[local.meta, { color: purchase.ok ? palette.primaryInk : palette.danger }]}
               >
                 {purchase.message}
               </Text>

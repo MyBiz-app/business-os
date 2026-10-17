@@ -22,7 +22,7 @@ export function Heatmap({
     <figure className="flex min-w-0 flex-col gap-3">
       <figcaption className="font-semibold">{title}</figcaption>
       <p className="text-sm text-muted">{hint}</p>
-      {best && <p className="text-sm font-semibold text-primary">{best}</p>}
+      {best && <p className="text-sm font-semibold text-primary-ink">{best}</p>}
       <div className="overflow-x-auto" dir="ltr" role="group" aria-label={title} tabIndex={0}>
         <table className="min-w-[36rem] border-separate border-spacing-0.5 text-[11px]">
           <thead>

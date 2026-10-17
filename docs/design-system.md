@@ -39,3 +39,51 @@ same value in several files, it should become a token here first.
 4. **Shared building blocks.** A pattern used twice becomes a component or a `@utility`
    (web) or moves to `packages/app-kit` (apps).
 5. **Data-driven variety.** Industries and modules are catalog entries, not `if` branches.
+
+## Text-safe color tokens (WCAG AA)
+
+Fills and text have different contrast needs, so each accent has a bright fill color and an "ink"
+for text. Use the ink whenever the color is text (or a thin icon) on a card, the page or a tint.
+
+| Token (CSS / Tailwind) | App (`theme.ts`) | Use for | Light | Dark |
+|---|---|---|---|---|
+| `--primary` / `bg-primary` | `primary` | Fills, rings, focus outlines | #2563EB | #3B82F6 |
+| `--primary-ink` / `text-primary-ink` | `primaryInk` | Links, eyebrows, text on `bg-primary/10` | #1D4ED8 | #60A5FA |
+| `--success` / `bg-success` | `success` | Dots, bars, fills | #16A34A | #22C55E |
+| `--success-ink` / `text-success-ink` | `successInk` | Check marks, deltas, "paid" text | #166534 | #4ADE80 |
+| `--on-danger` / `text-on-danger` | `onDanger` | Text on a `bg-danger` fill (white in light, navy in dark: the dark red is too light for white) | #FFFFFF | #0B1020 |
+| `--muted` / `text-muted` | `muted` | Secondary text (4.5:1 even on a 12% primary tint) | #52627A | #94A3B8 |
+
+Never write `text-primary` or `text-success` for text: the bright colors are 3.3 to 4.4:1 on white
+and on their own tint. A business's brand color is already made AA-safe by `lib/brand.ts`
+(web) and `packages/app-kit/src/lib/brand.ts` (apps): it must reach 4.5:1 on the surface, on a
+12% tint of itself, and for the text placed on it. Inside `.brand`, `--primary-ink` is that color.
+
+## Components
+
+- Buttons: `btn-primary`, `btn-secondary`, `btn-danger` (visible buttons), `btn-ghost` (quiet
+  button), `btn-lg` (size). Three bare variants keep focus ring, cursor and disabled behavior
+  identical when the element is not a filled button: `btn-link` (text action, underlines on hover),
+  `btn-icon` (icon only; also give it an `aria-label`), `btn-plain` (a card, chip or row that is a
+  button). Inputs and selects use `control`.
+- Loading: every route group has a `loading.tsx` rendering `components/layout/page-skeleton.tsx`
+  (marketing, auth, the business area, the platform console, and the signed-in shell). Copy the
+  pattern for a heavy page: a `loading.tsx` next to it with a skeleton of its shape.
+- Skip link: every page has one `<main id="main">`. `Container as="main"` sets the id for you;
+  a bare `<main>` needs `id="main"`.
+
+## Lint rules (CI: `pnpm turbo run lint`)
+
+`apps/web/eslint-rules/design-system.mjs`, wired in `apps/web/eslint.config.mjs`:
+
+- `design-system/no-raw-colors`: no hex value and no Tailwind palette class (`bg-amber-500`,
+  `text-red-600`...) in `src/**`. Use tokens. Allowed only in the allow-list in `eslint.config.mjs`
+  (each entry has a reason: color math, swatches, logos, product mock-ups, the hero band). Add a
+  file there only for content whose color *is* the content.
+- `design-system/no-raw-button`: a `<button>` needs `btn-primary`, `btn-secondary`, `btn-ghost`,
+  `btn-danger`, `btn-link`, `btn-icon`, `btn-plain` or `control` in its `className`.
+
+For the Expo apps, `no-restricted-syntax` in `apps/client-app/eslint.config.js` and
+`packages/app-kit/eslint.config.js` bans hex literals outside `lib/theme.ts` and `lib/brand.ts`.
+Colors that never change with theme or brand (white on a brand fill, the rating star) are
+`fixedColors` in `theme.ts`. Allowed: the launch splash and the brand color swatches (their colors are the content).

@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function FeaturesPage() {
   const t = await getTranslations("marketing");
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <SubpageHero title={t("features.title")} description={t("features.subtitle")} aside={<DashboardMock />} />
       <FeatureGrid inFeaturesPage />
       <Section tone="surface" innerClassName="grid items-center gap-12 lg:grid-cols-2">

@@ -69,7 +69,7 @@ export function AuthHeading({ title, subtitle, icon }: { title: string; subtitle
   return (
     <div className="flex flex-col gap-2">
       {icon && (
-        <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+        <span aria-hidden="true" className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary-ink">
           {icon}
         </span>
       )}

@@ -36,7 +36,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[id]"
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/services" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/services" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
       <PageHeader title={<bdi dir="auto">{service.name}</bdi>} />

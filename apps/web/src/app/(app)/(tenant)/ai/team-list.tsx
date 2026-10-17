@@ -19,7 +19,7 @@ export function TeamList({ agents, selected, compact = false, onPick }: { agents
               type="button"
               onClick={() => onPick(agent)}
               aria-pressed={selected === agent.key}
-              className="card flex w-full items-center gap-3 p-3 text-start transition hover:-translate-y-0.5"
+              className="btn-plain card flex w-full items-center gap-3 p-3 text-start transition hover:-translate-y-0.5"
               style={{ boxShadow: selected === agent.key ? `0 0 0 2px ${agent.color}` : undefined }}
             >
               <span className="relative flex shrink-0">
@@ -37,7 +37,7 @@ export function TeamList({ agents, selected, compact = false, onPick }: { agents
                 <span className="truncate text-sm text-muted" dir="auto">
                   {agent.role_title}
                 </span>
-                <span className={`text-xs ${agent.state === "active" ? "text-success" : "text-muted"}`}>{t(`state.${agent.state}`)}</span>
+                <span className={`text-xs ${agent.state === "active" ? "text-success-ink" : "text-muted"}`}>{t(`state.${agent.state}`)}</span>
               </span>
             </button>
           </li>

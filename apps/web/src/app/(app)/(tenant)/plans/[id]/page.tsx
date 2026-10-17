@@ -20,7 +20,7 @@ export default async function PlanPage({ params }: PageProps<"/plans/[id]">) {
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/plans" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/plans" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
       <PageHeader title={<bdi dir="auto">{plan.name}</bdi>} />

@@ -45,7 +45,7 @@ export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) 
             requestAnimationFrame(() => document.getElementById(menuId)?.querySelector<HTMLElement>("[role=menuitem]")?.focus());
           }
         }}
-        className="flex items-center gap-2 rounded-full p-0.5 pe-2 transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
+        className="btn-plain flex items-center gap-2 rounded-full p-0.5 pe-2 transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
       >
         <Avatar id={id} name={name} src={avatar} size="sm" />
         <span dir="auto" className="hidden max-w-36 truncate text-sm font-medium sm:inline">
@@ -88,7 +88,7 @@ export function UserMenu({ id, name, email, avatar, platform, signOut }: Props) 
           )}
         </div>
         <form action={signOut} className="border-t border-border p-1.5">
-          <button role="menuitem" type="submit" className={`${item} w-full text-danger`}>
+          <button role="menuitem" type="submit" className={`btn-plain ${item} w-full text-danger`}>
             <LogOut aria-hidden="true" className="size-4" />
             {t("auth.signOut")}
           </button>

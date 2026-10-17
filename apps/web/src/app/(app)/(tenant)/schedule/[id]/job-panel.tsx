@@ -27,7 +27,7 @@ export async function JobPanel({ session, manageable }: { session: Session; mana
     <section aria-labelledby="job-heading" className="card flex flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="job-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <MapPin aria-hidden="true" className="size-5 text-primary" />
+          <MapPin aria-hidden="true" className="size-5 text-primary-ink" />
           {t("title")}
         </h2>
         <Pill tone={TONE[status]}>{t(`statuses.${status}`)}</Pill>

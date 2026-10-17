@@ -36,7 +36,7 @@ export function StageControl({ leadId, stage, lostReason }: { leadId: string; st
                   value={step}
                   disabled={pending || active}
                   aria-current={active ? "step" : undefined}
-                  className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-start text-sm font-medium transition ${
+                  className={`btn-plain flex w-full items-center gap-2 rounded-xl border px-3 py-2.5 text-start text-sm font-medium transition ${
                     active
                       ? "border-primary bg-primary text-on-primary"
                       : done
@@ -65,12 +65,12 @@ export function StageControl({ leadId, stage, lostReason }: { leadId: string; st
             <input name="lost_reason" maxLength={500} className="control px-3 py-2 font-normal" />
           </label>
           <SubmitButton>{t("markLost")}</SubmitButton>
-          <button type="button" onClick={() => setLosing(false)} className="text-sm text-muted underline-offset-4 hover:underline">
+          <button type="button" onClick={() => setLosing(false)} className="btn-link text-sm text-muted underline-offset-4 hover:underline">
             {t("cancel")}
           </button>
         </form>
       ) : (
-        <button type="button" onClick={() => setLosing(true)} className="self-start text-sm text-muted underline-offset-4 hover:underline">
+        <button type="button" onClick={() => setLosing(true)} className="btn-link self-start text-sm text-muted underline-offset-4 hover:underline">
           {t("markLost")}
         </button>
       )}

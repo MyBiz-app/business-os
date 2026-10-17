@@ -16,7 +16,7 @@ export default async function AboutPage() {
   const t = await getTranslations("marketing.about");
   const values = t.raw("values") as { title: string; text: string }[];
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <SubpageHero title={t("title")} description={t("intro")} />
       <Section aria-labelledby="values-heading" innerClassName="flex flex-col gap-10">
         <h2 id="values-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">

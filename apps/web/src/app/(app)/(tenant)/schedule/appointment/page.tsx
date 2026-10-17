@@ -79,7 +79,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/s
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/schedule" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/schedule" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
       <PageHeader title={t("appointments.title")} />

@@ -36,7 +36,7 @@ export function PasswordField({ label, hint, ...inputProps }: PasswordFieldProps
           aria-pressed={visible}
           title={toggle}
           onClick={() => setVisible((v) => !v)}
-          className="absolute inset-y-0 end-0 flex w-10 items-center justify-center text-muted hover:text-foreground"
+          className="btn-plain absolute inset-y-0 end-0 flex w-10 items-center justify-center text-muted hover:text-foreground"
         >
           {visible ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
         </button>

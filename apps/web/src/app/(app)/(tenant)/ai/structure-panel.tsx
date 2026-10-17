@@ -142,7 +142,7 @@ export function StructurePanel({ agents, draft, saving, error, onChange, onRelay
                   ))}
               </select>
             </label>
-            <button type="button" onClick={() => onChange(removeTeam(draft, team.id))} aria-label={t("removeTeam", { name: team.name })} className="rounded-lg p-2 text-muted hover:text-danger">
+            <button type="button" onClick={() => onChange(removeTeam(draft, team.id))} aria-label={t("removeTeam", { name: team.name })} className="btn-plain rounded-lg p-2 text-muted hover:text-danger">
               <Trash2 aria-hidden="true" className="size-4" />
             </button>
           </div>

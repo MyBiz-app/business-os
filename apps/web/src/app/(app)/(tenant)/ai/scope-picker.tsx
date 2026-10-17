@@ -46,9 +46,9 @@ export function ScopePicker({ branches, value, onChange }: { branches: Branch[];
       </button>
       <div ref={popover} id={id} popover="auto" onToggle={(e) => (e as unknown as ToggleEvent).newState === "open" && place()} role="group" aria-label={t("scope.label")} className="scope-popover m-0 flex w-64 flex-col gap-1 rounded-2xl border border-border bg-background p-2 text-foreground shadow-lg">
         <p className="px-2 pt-1 text-xs text-muted">{t("scope.hint")}</p>
-        <button type="button" onClick={() => onChange(null)} aria-pressed={value === null} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-start text-sm font-medium hover:bg-surface">
+        <button type="button" onClick={() => onChange(null)} aria-pressed={value === null} className="btn-plain flex items-center justify-between rounded-lg px-2 py-1.5 text-start text-sm font-medium hover:bg-surface">
           {t("scope.all")}
-          {value === null && <Check aria-hidden="true" className="size-4 text-primary" />}
+          {value === null && <Check aria-hidden="true" className="size-4 text-primary-ink" />}
         </button>
         <ul className="max-h-60 overflow-y-auto" aria-label={t("scope.branches")}>
           {branches.map((branch) => (

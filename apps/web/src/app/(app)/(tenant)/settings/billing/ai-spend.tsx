@@ -19,7 +19,7 @@ export async function AiSpend({ spend }: { spend: Spend }) {
   return (
     <section aria-labelledby="ai-spend-heading" className="card flex flex-col gap-4 p-6">
       <h2 id="ai-spend-heading" className="flex items-center gap-2 text-lg font-semibold">
-        <Coins aria-hidden="true" className="size-5 text-primary" />
+        <Coins aria-hidden="true" className="size-5 text-primary-ink" />
         {t("title")}
       </h2>
       <p className="text-sm text-muted">

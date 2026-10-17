@@ -1,3 +1,6 @@
+/** MyBiz blue: the color a service or business starts with before the person picks one. */
+export const DEFAULT_BRAND_COLOR = "#2563eb";
+
 /** Relative luminance of a #rrggbb color (WCAG 2.x). */
 function luminance(hex: string): number {
   const channels = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
@@ -12,9 +15,10 @@ export function contrastRatio(a: string, b: string): number {
 
 const WHITE = "#ffffff";
 const NEAR_BLACK = "#18181b";
-// The surfaces the brand color sits on (globals.css --surface, light and dark).
-const LIGHT_SURFACE = "#f4f4f5";
-const DARK_SURFACE = "#18181b";
+// The harshest surfaces the brand color sits on (globals.css --background in light, --surface in
+// dark), so a color that passes here passes on the cards too.
+const LIGHT_SURFACE = "#f8fafc";
+const DARK_SURFACE = "#111827";
 const AA = 4.5;
 
 /** Text color for content placed on a brand color: whichever of white/near-black reads better. */
@@ -32,13 +36,13 @@ export function mix(from: string, to: string, t: number): string {
 }
 
 /** The brand color, darkened (light theme) or lightened (dark theme) just enough to be readable
- * as text on the surface and on a 10% tint of itself, and for text on it (buttons) to be
+ * as text on the surface and on a 12% tint of itself, and for text on it (buttons) to be
  * readable too (WCAG AA). A mid-tone (a purple, say) can pass the first two and fail the last. */
 export function readableOn(hex: string, surface: string): string {
   const toward = luminance(surface) > 0.5 ? "#000000" : WHITE;
   for (let t = 0; t <= 1; t += 0.05) {
     const color = mix(hex, toward, t);
-    const tint = mix(surface, color, 0.1);
+    const tint = mix(surface, color, 0.12);
     if (
       contrastRatio(color, surface) >= AA &&
       contrastRatio(color, tint) >= AA &&

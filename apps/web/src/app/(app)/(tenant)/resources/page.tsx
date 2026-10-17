@@ -101,7 +101,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/resour
       {rooms.length === 0 ? (
         <p className="card p-6 text-muted">
           {t("resources.noBookableRooms")}{" "}
-          <Link href="/locations" className="text-primary underline underline-offset-4 hover:no-underline">
+          <Link href="/locations" className="text-primary-ink underline underline-offset-4 hover:no-underline">
             {t("resources.toLocations")}
           </Link>
         </p>
@@ -194,7 +194,7 @@ export default async function ResourcesPage({ searchParams }: PageProps<"/resour
           {!service ? (
             <p className="text-muted">
               {t("resources.noServices")}{" "}
-              <Link href="/services/new" className="text-primary underline underline-offset-4 hover:no-underline">
+              <Link href="/services/new" className="text-primary-ink underline underline-offset-4 hover:no-underline">
                 {t("resources.addService")}
               </Link>
             </p>

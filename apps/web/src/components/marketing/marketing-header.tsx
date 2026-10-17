@@ -40,7 +40,7 @@ export function MarketingHeader() {
         aria-current={active ? "page" : undefined}
         onClick={() => setOpen(false)}
         className={`rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
-          active ? "text-primary" : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+          active ? "text-primary-ink" : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
         }`}
       >
         {t(link.key)}
@@ -75,7 +75,7 @@ export function MarketingHeader() {
           <button
             ref={button}
             type="button"
-            className="flex size-10 items-center justify-center rounded-xl border border-border transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
+            className="btn-icon flex size-10 items-center justify-center rounded-xl border border-border transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5"
             aria-expanded={open}
             aria-controls="marketing-menu"
             aria-label={open ? t("close") : t("menu")}

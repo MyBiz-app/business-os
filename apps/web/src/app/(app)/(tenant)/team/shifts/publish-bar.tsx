@@ -22,7 +22,7 @@ export function PublishBar({ drafts, start, days, branches, summary }: { drafts:
           <span className="font-medium">{t("drafts", { count: drafts })}</span>
         ) : (
           <span className="flex items-center gap-1.5 text-muted">
-            <CheckCircle2 aria-hidden="true" className="size-4 text-success" />
+            <CheckCircle2 aria-hidden="true" className="size-4 text-success-ink" />
             {state.published ? t("done", { count: state.published }) : t("allPublished")}
           </span>
         )}

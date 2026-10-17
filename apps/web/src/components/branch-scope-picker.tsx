@@ -49,7 +49,7 @@ export function BranchScopePicker({ branches, groups, value, onChange, name, bra
               disabled={shortcut.ids.length === 0}
               onClick={() => onChange(shortcut.ids)}
               dir="auto"
-              className="rounded-full border border-border px-3 py-1 text-sm aria-pressed:border-primary aria-pressed:bg-primary/10 aria-pressed:text-primary disabled:opacity-50"
+              className="btn-plain rounded-full border border-border px-3 py-1 text-sm aria-pressed:border-primary aria-pressed:bg-primary/10 aria-pressed:text-primary-ink disabled:opacity-50"
             >
               {shortcut.label}
             </button>

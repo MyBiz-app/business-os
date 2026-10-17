@@ -8,6 +8,7 @@ import { useActionState, useState } from "react";
 import { CheckboxField, Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
+import { DEFAULT_BRAND_COLOR } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
 import { toMajorUnits } from "@/lib/money";
 
@@ -140,7 +141,7 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
             defaultValue={service ? toMajorUnits(service.price_amount, currency) : ""}
           />
         )}
-        <Field label={t("services.color")} name="color" type="color" defaultValue={service?.color ?? "#2563eb"} className="control h-11 w-20 cursor-pointer p-1" />
+        <Field label={t("services.color")} name="color" type="color" defaultValue={service?.color ?? DEFAULT_BRAND_COLOR} className="control h-11 w-20 cursor-pointer p-1" />
         <div className="sm:col-span-2">
           <TextAreaField label={t("services.description")} name="description" maxLength={2000} defaultValue={service?.description ?? ""} />
         </div>

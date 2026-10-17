@@ -27,7 +27,7 @@ export default async function NewSessionPage({ searchParams }: PageProps<"/sched
       {options.services.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-border p-8 text-center text-muted">
           {t("needService")}{" "}
-          <Link href="/services/new" className="text-primary underline">
+          <Link href="/services/new" className="text-primary-ink underline">
             →
           </Link>
         </p>

@@ -25,7 +25,7 @@ export default async function NewQuotePage({ searchParams }: PageProps<"/quotes/
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/quotes" className="text-sm text-primary underline-offset-4 hover:underline">{t("back")}</Link>
+      <Link href="/quotes" className="text-sm text-primary-ink underline-offset-4 hover:underline">{t("back")}</Link>
       <PageHeader title={t("new")} />
       <section className="card p-6">
         <QuoteForm

@@ -169,7 +169,7 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
                   <td className="px-4 py-2.5">
                     <Link href={`/clients/${client.id}`} className="group flex items-center gap-3 font-medium">
                       <Avatar id={client.id} name={[client.first_name, client.last_name].filter(Boolean).join(" ")} />
-                      <span dir="auto" className="text-primary underline-offset-4 group-hover:underline">
+                      <span dir="auto" className="text-primary-ink underline-offset-4 group-hover:underline">
                         {[client.first_name, client.last_name].filter(Boolean).join(" ")}
                       </span>
                     </Link>
@@ -203,9 +203,9 @@ export default async function ClientsPage({ searchParams }: PageProps<"/clients"
 
       {pages > 1 && (
         <nav aria-label={t("clients.total", { count: result.total })} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary">{t("clients.previous")}</Link> : <span />}
+          {page > 1 ? <Link href={pageHref(page - 1)} className="text-primary-ink">{t("clients.previous")}</Link> : <span />}
           <span className="text-muted">{t("clients.pageOf", { page, pages })}</span>
-          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary">{t("clients.next")}</Link> : <span />}
+          {page < pages ? <Link href={pageHref(page + 1)} className="text-primary-ink">{t("clients.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

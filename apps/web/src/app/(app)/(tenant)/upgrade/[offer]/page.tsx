@@ -86,7 +86,7 @@ export default async function UpgradePage({ params }: PageProps<"/upgrade/[offer
             <ul className="flex flex-col gap-2">
               {points.map((point) => (
                 <li key={point} className="flex items-start gap-2 font-medium">
-                  <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success" />
+                  <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success-ink" />
                   {point}
                 </li>
               ))}
@@ -133,14 +133,14 @@ export default async function UpgradePage({ params }: PageProps<"/upgrade/[offer
                 </div>
                 <div className="flex items-baseline justify-between gap-3 border-t border-border pt-2">
                   <dt className="text-muted">{t("difference")}</dt>
-                  <dd className="font-semibold text-primary">
+                  <dd className="font-semibold text-primary-ink">
                     + <bdi>{money(priceOf(firstKey))}</bdi>
                   </dd>
                 </div>
               </dl>
               <p className="text-sm text-muted">{trialEnds ? t("inTrial", { date: trialEnds }) : t("afterTrial")}</p>
               {offer !== "ai" && addButton(firstKey)}
-              <Link href="/settings/modules" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+              <Link href="/settings/modules" className="text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
                 {t("manage")}
               </Link>
             </section>
@@ -153,7 +153,7 @@ export default async function UpgradePage({ params }: PageProps<"/upgrade/[offer
 
         <figure className="relative">
           <figcaption className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-muted">
-            <Sparkles aria-hidden="true" className="size-4 text-primary" />
+            <Sparkles aria-hidden="true" className="size-4 text-primary-ink" />
             {t("peek")}
           </figcaption>
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-from/10 to-brand-to/10 p-6">

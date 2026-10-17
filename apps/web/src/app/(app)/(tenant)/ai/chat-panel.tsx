@@ -16,8 +16,8 @@ import type { Agent } from "./types";
 type PendingAction = Conversation["turns"][number]["pending_actions"][number];
 
 const STATUS_TONE: Record<PendingAction["status"], string> = {
-  pending: "text-primary",
-  executed: "text-success",
+  pending: "text-primary-ink",
+  executed: "text-success-ink",
   rejected: "text-muted",
   expired: "text-muted",
   failed: "text-danger",
@@ -216,7 +216,7 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
             {history.length === 0 && <li className="px-2 py-1.5 text-sm text-muted">{t("noHistory")}</li>}
             {history.map((item) => (
               <li key={item.id}>
-                <button type="button" onClick={() => onOpen(item.id)} aria-current={item.id === conversation?.id ? "true" : undefined} className={`flex w-full flex-col rounded-lg px-2 py-1.5 text-start text-sm hover:bg-surface ${item.id === conversation?.id ? "bg-surface font-medium" : ""}`}>
+                <button type="button" onClick={() => onOpen(item.id)} aria-current={item.id === conversation?.id ? "true" : undefined} className={`btn-plain flex w-full flex-col rounded-lg px-2 py-1.5 text-start text-sm hover:bg-surface ${item.id === conversation?.id ? "bg-surface font-medium" : ""}`}>
                   <span className="truncate" dir="auto">
                     {item.title || tAssistant("untitled")}
                   </span>
@@ -243,7 +243,7 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
               aria-current={other.key === agent.key ? "true" : undefined}
               aria-label={`${other.name}, ${other.role_title}`}
               title={`${other.name} · ${other.role_title}`}
-              className={`shrink-0 rounded-full p-0.5 transition ${other.key === agent.key ? "" : "opacity-60 hover:opacity-100"}`}
+              className={`btn-plain shrink-0 rounded-full p-0.5 transition ${other.key === agent.key ? "" : "opacity-60 hover:opacity-100"}`}
               style={{ boxShadow: other.key === agent.key ? `0 0 0 2px ${other.color}` : undefined }}
             >
               <AgentAvatar agent={other} className="size-8" />
@@ -284,7 +284,7 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
                       <ActionCard key={action.id} action={action} onDecide={onDecide} />
                     ))}
                     {turn.suggestions.map((suggestion) => (
-                      <button key={suggestion.agent_key} type="button" onClick={() => onHandoff(suggestion.agent_key)} className="flex flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-3 text-start text-sm hover:bg-surface">
+                      <button key={suggestion.agent_key} type="button" onClick={() => onHandoff(suggestion.agent_key)} className="btn-plain flex flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-3 text-start text-sm hover:bg-surface">
                         <span className="font-medium" dir="auto">
                           {t("handoff", { name: nameOf(suggestion.agent_key) })}
                         </span>
@@ -326,7 +326,7 @@ export function ChatPanel({ agent, agents, conversation, waitingFor, error, enab
         {suggestions.length > 0 && enabled && (
           <div className="flex flex-wrap gap-2">
             {suggestions.map((suggestion) => (
-              <button key={suggestion} type="button" onClick={() => submit(suggestion)} className="rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-surface" dir="auto">
+              <button key={suggestion} type="button" onClick={() => submit(suggestion)} className="btn-plain rounded-full border border-border bg-background px-3 py-1.5 text-sm hover:bg-surface" dir="auto">
                 {suggestion}
               </button>
             ))}

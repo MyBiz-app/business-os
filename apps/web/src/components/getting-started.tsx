@@ -26,7 +26,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
     <section aria-labelledby="setup-heading" className={`${welcome ? "card-accent" : "card"} flex flex-col gap-5 p-6`}>
       {welcome && (
         <div className="flex flex-col gap-2">
-          <p className="flex items-center gap-2 text-sm font-semibold text-primary">
+          <p className="flex items-center gap-2 text-sm font-semibold text-primary-ink">
             <Sparkles aria-hidden="true" className="size-4" />
             {t("title")}
           </p>
@@ -39,7 +39,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
           {t("title")}
         </h2>
         <p className="text-sm font-medium text-muted">{t("progress", { done: setup.done, total: setup.total })}</p>
-        <Link href="/getting-started" className="flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline">
+        <Link href="/getting-started" className="flex items-center gap-1.5 text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
           <BookOpen aria-hidden="true" className="size-4" />
           {t("guide")}
         </Link>
@@ -67,7 +67,7 @@ export async function GettingStartedCard({ setup, welcome, business }: { setup: 
               >
                 <span
                   aria-hidden="true"
-                  className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${step.done ? "bg-success text-white dark:text-zinc-950" : "icon-tile"}`}
+                  className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${step.done ? "bg-success text-white dark:text-background" : "icon-tile"}`}
                 >
                   {step.done ? <Check className="size-5" /> : <Icon className="size-5" />}
                 </span>

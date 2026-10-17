@@ -70,7 +70,7 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                   </span>
                   <span className="flex items-center gap-3 text-sm">
                     {entitlement.receipt_id && (
-                      <Link href={`/receipts/${entitlement.receipt_id}`} className="text-primary underline-offset-4 hover:underline">
+                      <Link href={`/receipts/${entitlement.receipt_id}`} className="text-primary-ink underline-offset-4 hover:underline">
                         {tReceipts("short", { number: entitlement.receipt_number ?? "" })}
                       </Link>
                     )}
@@ -93,11 +93,11 @@ export async function PlansSection({ clientId, context, locked = false }: Props)
                 {selling && open && (
                   <div className="flex flex-wrap items-start gap-4">
                     <details className="flex-1">
-                      <summary className="cursor-pointer text-sm text-primary">{t("freeze")}</summary>
+                      <summary className="cursor-pointer text-sm text-primary-ink">{t("freeze")}</summary>
                       <FreezeForm action={freezeEntitlement.bind(null, clientId, entitlement.id)} today={today} />
                     </details>
                     <form action={cancelEntitlement.bind(null, clientId, entitlement.id)}>
-                      <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+                      <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                         {t("cancelPlan")}
                       </button>
                     </form>

@@ -82,7 +82,7 @@ export function IdentityEditor({ subject, initial }: { subject: IdentitySubject;
             <button
               type="button"
               disabled={pending}
-              className="text-sm text-primary underline-offset-4 hover:underline"
+              className="btn-link text-sm text-primary-ink underline-offset-4 hover:underline"
               onClick={() =>
                 revealed
                   ? setRevealed(null)
@@ -114,7 +114,7 @@ export function IdentityEditor({ subject, initial }: { subject: IdentitySubject;
             <button
               type="button"
               disabled={pending}
-              className="text-sm text-danger underline-offset-4 hover:underline"
+              className="btn-link text-sm text-danger underline-offset-4 hover:underline"
               onClick={() => {
                 if (!window.confirm(t("removeConfirm"))) return;
                 startTransition(async () => apply(await removeIdentity(subject), () => setRevealed(null)));

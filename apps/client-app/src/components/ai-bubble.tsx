@@ -6,6 +6,7 @@ import { useTranslations } from "use-intl";
 
 import { agentForTab } from "@business-os/app-kit/lib/ai-agents";
 import { useStaff } from "@/providers/staff-provider";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 
 const WIDE = 900; // the tabs move to a side rail from this width (see tab-options)
 const SIZE = 56;
@@ -40,7 +41,7 @@ export function AiBubble() {
         boxShadow: "0px 4px 12px rgba(17, 24, 39, 0.28)",
       })}
     >
-      <Ionicons name="sparkles" size={26} color="#ffffff" />
+      <Ionicons name="sparkles" size={26} color={fixedColors.white} />
     </Pressable>
   );
 }

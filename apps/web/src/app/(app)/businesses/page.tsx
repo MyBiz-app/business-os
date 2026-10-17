@@ -64,7 +64,7 @@ export default async function BusinessesPage() {
                   ) : (
                     <span
                       aria-hidden="true"
-                      className={`flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md ${industry?.color ?? "from-slate-500 to-slate-700"}`}
+                      className={`flex size-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br text-white shadow-md ${industry?.color ?? "from-navy to-brand-strong-from"}`}
                     >
                       {industry ? <VerticalIcon icon={industry.icon} className="size-6" /> : business.name.slice(0, 1)}
                     </span>
@@ -78,7 +78,7 @@ export default async function BusinessesPage() {
                       <span className="rounded-full bg-background px-2 py-0.5 text-xs font-medium ring-1 ring-border">
                         {tAll(`roles.${business.role}`)}
                       </span>
-                      {current && <span className="text-xs font-semibold text-primary">{t("open")}</span>}
+                      {current && <span className="text-xs font-semibold text-primary-ink">{t("open")}</span>}
                     </p>
                   </div>
                 </div>
@@ -112,7 +112,7 @@ export default async function BusinessesPage() {
 
                 <form action={switchBusiness} className="border-t border-border">
                   <input type="hidden" name="tenant_id" value={business.tenant_id} />
-                  <button type="submit" className="group flex w-full items-center justify-between px-6 py-3 text-sm font-semibold text-primary hover:bg-background/60">
+                  <button type="submit" className="btn-plain group flex w-full items-center justify-between px-6 py-3 text-sm font-semibold text-primary-ink hover:bg-background/60">
                     {t("enter", { name: business.name })}
                     <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-1 ltr:rotate-180 ltr:group-hover:translate-x-1" />
                   </button>
@@ -124,7 +124,7 @@ export default async function BusinessesPage() {
         <li>
           <Link
             href="/onboarding"
-            className="flex h-full min-h-56 flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-border p-6 text-center text-muted transition-colors hover:border-primary hover:text-primary"
+            className="flex h-full min-h-56 flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-border p-6 text-center text-muted transition-colors hover:border-primary hover:text-primary-ink"
           >
             <Plus aria-hidden="true" className="size-8" />
             <span className="font-semibold">{t("add")}</span>

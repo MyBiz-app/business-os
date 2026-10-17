@@ -67,7 +67,7 @@ function Stepper({ stage }: { stage: RunStage }) {
           <li key={step} className="flex items-center gap-2" aria-current={active ? "step" : undefined}>
             <span
               className={`inline-flex size-6 items-center justify-center rounded-full text-xs font-semibold ring-1 ${
-                done ? "bg-success text-white ring-success" : active ? "bg-primary text-white ring-primary" : "bg-surface text-muted ring-border"
+                done ? "bg-success text-white ring-success" : active ? "bg-primary text-on-primary ring-primary" : "bg-surface text-muted ring-border"
               }`}
             >
               {done ? <Check aria-hidden="true" className="size-3.5" /> : index + 1}
@@ -233,7 +233,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
               const left = line.warnings.filter((w) => !w.acknowledged).length;
               return (
                 <li key={line.user_id}>
-                  <button type="button" onClick={() => setOpen(line.user_id)} className="card flex w-full flex-col gap-1 p-4 text-start transition hover:shadow-md focus-visible:outline-2">
+                  <button type="button" onClick={() => setOpen(line.user_id)} className="btn-plain card flex w-full flex-col gap-1 p-4 text-start transition hover:shadow-md focus-visible:outline-2">
                     <span dir="auto" className="font-medium">
                       {line.full_name}
                     </span>

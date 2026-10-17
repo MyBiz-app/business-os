@@ -34,7 +34,7 @@ export async function MessagesSection({ target, phone, path, context, locked = f
     <section aria-labelledby="messages-heading" className="card flex flex-col gap-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 id="messages-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <MessageCircle aria-hidden="true" className="size-5 text-primary" />
+          <MessageCircle aria-hidden="true" className="size-5 text-primary-ink" />
           {t("sectionTitle")}
         </h2>
         {link && !locked && (

@@ -41,7 +41,7 @@ export function RunForm({ month, rows }: { month: string; rows: Row[] }) {
         <ul className="flex flex-col divide-y divide-border text-sm">
           {state.billed.map((bill) => (
             <li key={bill.id} className="flex justify-between gap-3 py-2">
-              <Link href={`/quotes/${bill.id}`} className="font-medium text-primary underline-offset-4 hover:underline" dir="auto">
+              <Link href={`/quotes/${bill.id}`} className="font-medium text-primary-ink underline-offset-4 hover:underline" dir="auto">
                 {t("billFor", { number: bill.number, name: bill.client })}
               </Link>
               <span className="tabular-nums">{bill.total}</span>

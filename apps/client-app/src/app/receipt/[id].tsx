@@ -2,6 +2,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { Button, Card, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
@@ -36,7 +37,7 @@ export default function Receipt() {
       {receipt && (
         <Card palette={palette}>
           {receipt.simulated && (
-            <Text style={[local.sample, { color: palette.foreground, backgroundColor: tint("#b45309", 0.12) }]}>{t("sample")}</Text>
+            <Text style={[local.sample, { color: palette.foreground, backgroundColor: tint(fixedColors.amber, 0.12) }]}>{t("sample")}</Text>
           )}
           <Text style={[local.business, { color: palette.foreground }]}>{receipt.business_name}</Text>
           <Text style={[styles.muted, { color: palette.muted }]}>{t("title", { number: receipt.number })}</Text>

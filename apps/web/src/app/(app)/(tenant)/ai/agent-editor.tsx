@@ -117,7 +117,7 @@ export function AgentEditor({ agent, branches, roles, onClose, onSaved, onDelete
             </h2>
             <p className="text-sm text-muted">{tEdit("usage", { used: number.format(agent.credits_used_month ?? 0) })}</p>
           </div>
-          <button type="button" onClick={() => dialog.current?.close()} className="rounded-full p-2 hover:bg-surface" aria-label={tTeam("close")}>
+          <button type="button" onClick={() => dialog.current?.close()} className="btn-plain rounded-full p-2 hover:bg-surface" aria-label={tTeam("close")}>
             <X aria-hidden="true" className="size-5" />
           </button>
         </header>

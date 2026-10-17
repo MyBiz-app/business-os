@@ -44,7 +44,7 @@ export default async function Home() {
   const steps = t.raw("steps.items") as { title: string; text: string }[];
 
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <OrganizationData />
       <FaqData />
       <HeroIntro />
@@ -128,7 +128,7 @@ export default async function Home() {
             <li key={item} className="flex items-center gap-2">
               <ShieldCheck
                 aria-hidden="true"
-                className="size-5 shrink-0 text-success"
+                className="size-5 shrink-0 text-success-ink"
               />
               {item}
             </li>
@@ -189,7 +189,7 @@ export default async function Home() {
           <HomePhone />
         </Reveal>
         <Reveal className="flex max-w-xl flex-col gap-5">
-          <p className="text-sm font-semibold text-primary">
+          <p className="text-sm font-semibold text-primary-ink">
             {t("app.eyebrow")}
           </p>
           <h2
@@ -202,7 +202,7 @@ export default async function Home() {
           <ul className="flex flex-col gap-2">
             {(t.raw("app.points") as string[]).map((point) => (
               <li key={point} className="flex items-center gap-2 font-medium">
-                <Check aria-hidden="true" className="size-5 text-success" />
+                <Check aria-hidden="true" className="size-5 text-success-ink" />
                 {point}
               </li>
             ))}

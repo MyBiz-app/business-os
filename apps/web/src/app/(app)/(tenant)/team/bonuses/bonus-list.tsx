@@ -43,11 +43,11 @@ export function BonusList({
           {t("listTitle")}
         </h2>
         <nav aria-label={t("month")} className="flex gap-3 text-sm">
-          <Link className="text-primary underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, -1)}`}>
+          <Link className="text-primary-ink underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, -1)}`}>
             {shift(month, -1)}
           </Link>
           <bdi>{month}</bdi>
-          <Link className="text-primary underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, 1)}`}>
+          <Link className="text-primary-ink underline-offset-4 hover:underline" href={`/team/bonuses?month=${shift(month, 1)}`}>
             {shift(month, 1)}
           </Link>
         </nav>
@@ -92,9 +92,9 @@ export function BonusList({
               </div>
               <span className="flex items-center gap-4">
                 <bdi className={row.kind === "deduction" ? "text-danger" : undefined}>{formatMoney(row.amount_minor, row.currency || currency, locale)}</bdi>
-                <span className={row.status === "approved" ? "text-success" : "text-muted"}>{t(`status.${row.status}`)}</span>
+                <span className={row.status === "approved" ? "text-success-ink" : "text-muted"}>{t(`status.${row.status}`)}</span>
                 {(canManage || row.status === "proposed") && (
-                  <button type="button" className="text-danger underline-offset-4 hover:underline" disabled={pending} onClick={() => run(() => removeAdjustment(row.id))}>
+                  <button type="button" className="btn-link text-danger underline-offset-4 hover:underline" disabled={pending} onClick={() => run(() => removeAdjustment(row.id))}>
                     {t("remove")}
                   </button>
                 )}

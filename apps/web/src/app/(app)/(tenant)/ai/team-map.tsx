@@ -175,7 +175,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
             </g>
           );
         })}
-        {drag?.mode === "link" && <line x1={spotOf(drag.key).x} y1={spotOf(drag.key).y} x2={drag.x} y2={drag.y} stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" vectorEffect="non-scaling-stroke" className="text-primary" />}
+        {drag?.mode === "link" && <line x1={spotOf(drag.key).x} y1={spotOf(drag.key).y} x2={drag.x} y2={drag.y} stroke="currentColor" strokeWidth="2" strokeDasharray="4 3" vectorEffect="non-scaling-stroke" className="text-primary-ink" />}
       </svg>
 
       {agents.map((agent, index) => {
@@ -198,7 +198,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
             aria-pressed={active}
             aria-label={`${agent.name}, ${agent.role_title}${dim ? `, ${t(`state.${agent.state}`)}` : ""}`}
             title={compact ? `${agent.name} · ${agent.role_title}` : undefined}
-            className={`group absolute z-10 flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-2xl outline-none ${editing && connectable(agent) ? "cursor-grab touch-none" : ""} ${drag?.key === agent.key && drag.moved ? "!transition-none" : ""} transition-[left,top] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 focus-visible:ring-primary`}
+            className={`btn-plain group absolute z-10 flex w-32 -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1 rounded-2xl outline-none ${editing && connectable(agent) ? "cursor-grab touch-none" : ""} ${drag?.key === agent.key && drag.moved ? "!transition-none" : ""} transition-[left,top] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 focus-visible:ring-primary`}
             style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
           >
             <span className={`relative flex ${dim || reduced ? "" : "ai-bob"}`} style={{ animationDelay: `${index * -0.6}s` }}>
@@ -240,7 +240,7 @@ export function TeamMap({ agents, selected, compact, onPick, draft, editing = fa
               onPointerDown={(event) => start(event, agent, "link")}
               aria-label={t("structure.handle", { name: agent.name })}
               title={t("structure.handle", { name: agent.name })}
-              className="absolute z-20 size-5 -translate-x-1/2 cursor-crosshair touch-none rounded-full border-2 border-primary bg-background shadow hover:bg-primary"
+              className="btn-plain absolute z-20 size-5 -translate-x-1/2 cursor-crosshair touch-none rounded-full border-2 border-primary bg-background shadow hover:bg-primary"
               style={{ left: `${spot.x}%`, top: `calc(${spot.y}% - 3rem)` }}
             />
           );

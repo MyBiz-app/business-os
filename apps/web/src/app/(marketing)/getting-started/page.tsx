@@ -22,7 +22,7 @@ export default async function GettingStartedPage() {
   const sections = t.raw("page.sections") as Section[];
 
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <SubpageHero eyebrow={t("page.eyebrow")} title={t("page.title")} description={t("page.subtitle")} />
 
       <Section spacing="compact">
@@ -52,12 +52,12 @@ export default async function GettingStartedPage() {
                 <ul className="flex flex-col gap-2">
                   {section.tips.map((tip) => (
                     <li key={tip} className="flex items-start gap-2">
-                      <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success" />
+                      <Check aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success-ink" />
                       {tip}
                     </li>
                   ))}
                 </ul>
-                <Link href={href} className="flex items-center gap-1.5 self-start font-semibold text-primary underline-offset-4 hover:underline">
+                <Link href={href} className="flex items-center gap-1.5 self-start font-semibold text-primary-ink underline-offset-4 hover:underline">
                   {t("page.openInApp")}
                   <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
                 </Link>

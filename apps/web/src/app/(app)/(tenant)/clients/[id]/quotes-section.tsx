@@ -24,7 +24,7 @@ export async function QuotesSection({ clientId, context, locked }: { clientId: s
     <section aria-labelledby="quotes-heading" className="flex flex-col gap-3 card p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="quotes-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <FileSignature aria-hidden="true" className="size-5 text-primary" />
+          <FileSignature aria-hidden="true" className="size-5 text-primary-ink" />
           {t("title")}
         </h2>
         {canSell && (

@@ -29,12 +29,12 @@ export function CalcAddonCard({ offer, tier, catalog, locale, recommended, onCha
   const money = (key: string) => formatMoney(tierPrice(offer, key, catalog), catalog.currency, locale);
   return (
     <li className={`flex flex-col gap-3 rounded-2xl border p-4 transition-colors ${on ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border"}`}>
-      <button type="button" aria-pressed={on} onClick={() => onChange(on ? null : first.key)} className="flex items-start gap-3 text-start">
+      <button type="button" aria-pressed={on} onClick={() => onChange(on ? null : first.key)} className="btn-plain flex items-start gap-3 text-start">
         <ModuleIcon module={first.modules[0]} size="sm" />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="flex flex-wrap items-center gap-2 font-bold">
             {name}
-            {recommended && <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success">{t("recommended")}</span>}
+            {recommended && <span className="rounded-full bg-success/15 px-2 py-0.5 text-xs font-semibold text-success-ink">{t("recommended")}</span>}
           </span>
           <span className="text-sm text-muted">{t(`offers.${offer}` as "offers.client_app")}</span>
         </span>
@@ -54,7 +54,7 @@ export function CalcAddonCard({ offer, tier, catalog, locale, recommended, onCha
               type="button"
               aria-pressed={option.key === tier}
               onClick={() => onChange(option.key)}
-              className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${option.key === tier ? "bg-primary text-on-primary" : "hover:bg-foreground/5"}`}
+              className={`btn-plain rounded-full px-3 py-1 text-sm font-medium transition-colors ${option.key === tier ? "bg-primary text-on-primary" : "hover:bg-foreground/5"}`}
             >
               {t(`tier.${option.key}` as "tier.basic")}
               <bdi className="ms-1 opacity-80">+{money(option.key)}</bdi>

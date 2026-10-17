@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Animated, Linking, Platform, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { useReducedMotion } from "@business-os/app-kit/components/motion";
@@ -182,10 +183,10 @@ export default function Pay() {
                 </Text>
               </View>
               <View style={local.line}>
-                <Text style={[styles.muted, { color: palette.success }]}>
+                <Text style={[styles.muted, { color: palette.successInk }]}>
                   {tPromo("applied", { code: checkout.promo_code ?? "" })}
                 </Text>
-                <Text style={[local.value, { color: palette.success }]}>
+                <Text style={[local.value, { color: palette.successInk }]}>
                   {formatMoney(-checkout.discount, checkout.currency, locale)}
                 </Text>
               </View>

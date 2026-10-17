@@ -33,7 +33,7 @@ export default async function BroadcastPage({ params }: PageProps<"/platform/bro
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/platform/broadcasts" className="text-sm font-medium text-primary hover:underline">
+      <Link href="/platform/broadcasts" className="text-sm font-medium text-primary-ink hover:underline">
         {t("back")}
       </Link>
       <PageHeader title={subject || t("title")} description={`${item.audience.groups.map((g) => t(`groups.${g}`)).join(" · ")} | ${item.channels.map((c) => t(`channels.${c}`)).join(" · ")}`} />

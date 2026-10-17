@@ -23,7 +23,7 @@ export default async function ModulesPage() {
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/settings" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/settings" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {tSettings("title")}
       </Link>
       <PageHeader title={t("title")} description={t("subtitle", { count: current.active_clients })} />

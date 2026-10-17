@@ -111,7 +111,7 @@ export default async function MessagesPage() {
                       <button
                         type="submit"
                         aria-label={t("deleteTemplate", { name: isolate(template.name) })}
-                        className="rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
+                        className="btn-icon rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
                       >
                         <Trash2 aria-hidden="true" className="size-4" />
                       </button>

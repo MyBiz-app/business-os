@@ -183,7 +183,7 @@ export function BonusForm({
         </p>
       )}
       {done && (
-        <p role="status" className="text-sm text-success">
+        <p role="status" className="text-sm text-success-ink">
           {done === "proposed" ? t("proposedDone") : t("addedDone")}
         </p>
       )}

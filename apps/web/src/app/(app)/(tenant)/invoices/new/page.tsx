@@ -57,13 +57,13 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/invo
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/invoices" className="text-sm text-primary underline-offset-4 hover:underline">{t("back")}</Link>
+      <Link href="/invoices" className="text-sm text-primary-ink underline-offset-4 hover:underline">{t("back")}</Link>
       <PageHeader title={credit ? t("newCredit") : t("new")} />
       {!credit && kinds.length < 4 && (
         <p role="note" className="rounded-xl border border-warning/50 bg-warning/10 px-4 py-3 text-sm">
           {tenant.legal_entity_type === "exempt_dealer" ? t("exemptNote") : t("taxNotReady")}{" "}
           {tenant.legal_entity_type !== "exempt_dealer" && (
-            <Link href="/settings" className="font-semibold text-primary underline-offset-4 hover:underline">{t("completeDetails")}</Link>
+            <Link href="/settings" className="font-semibold text-primary-ink underline-offset-4 hover:underline">{t("completeDetails")}</Link>
           )}
         </p>
       )}

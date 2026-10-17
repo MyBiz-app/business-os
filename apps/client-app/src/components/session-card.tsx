@@ -236,7 +236,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
           )}
           <Text
             accessibilityLiveRegion="polite"
-            style={[styles.meta, { color: mine ? palette.primary : palette.muted }, mine && styles.bold]}
+            style={[styles.meta, { color: mine ? palette.primaryInk : palette.muted }, mine && styles.bold]}
           >
             {status}
           </Text>
@@ -272,7 +272,7 @@ export function SessionCard({ session, onChange, showDay = false, dependents = [
           const action = booking.status === "waitlisted" ? t("leaveWaitlist") : t("cancelBooking");
           return (
             <View key={booking.id} style={styles.mineRow}>
-              <Text style={[styles.meta, styles.bold, { color: palette.primary, flex: 1 }]}>
+              <Text style={[styles.meta, styles.bold, { color: palette.primaryInk, flex: 1 }]}>
                 {name}
                 {booking.status === "waitlisted" ? ` · ${t("waitlistPosition", { position: booking.waitlist_position ?? 1 })}` : ""}
               </Text>

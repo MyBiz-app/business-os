@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { AuthImage } from "@business-os/app-kit/components/auth-image";
 import { initialOf } from "@business-os/app-kit/lib/ai-agents";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 
 export type Agent = components["schemas"]["AgentCard"];
 
@@ -22,7 +23,7 @@ export function AgentFace({ agent, size = 40 }: { agent: Pick<Agent, "name" | "c
         backgroundColor: agent.color,
       }}
     >
-      <Text style={{ color: "#ffffff", fontWeight: "700", fontSize: size * 0.42 }}>{initialOf(agent.name)}</Text>
+      <Text style={{ color: fixedColors.white, fontWeight: "700", fontSize: size * 0.42 }}>{initialOf(agent.name)}</Text>
       <AuthImage
         path={agent.avatar_url}
         style={{ position: "absolute", width: size, height: size, borderRadius: size / 2 }}

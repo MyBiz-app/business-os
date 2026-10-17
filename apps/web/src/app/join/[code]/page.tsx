@@ -21,7 +21,7 @@ export default async function JoinPage({ params }: PageProps<"/join/[code]">) {
   return (
     <div className="brand flex flex-1 flex-col" style={brandStyle(business.primary_color)}>
       <AppHeader />
-      <main className="enter mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-6 py-12 text-center">
+      <main id="main" className="enter mx-auto flex w-full max-w-md flex-1 flex-col items-center gap-6 px-6 py-12 text-center">
         {logo ? (
           <Image src={logo} alt="" width={80} height={80} unoptimized className="size-20 rounded-2xl border border-border object-contain" />
         ) : (

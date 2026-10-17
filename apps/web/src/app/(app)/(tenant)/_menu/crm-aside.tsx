@@ -25,7 +25,7 @@ export function CrmAside({ initial, labels, children }: { initial: NavTone; labe
       <button
         type="button"
         onClick={choose}
-        className="nav-tone-switch mx-3 mb-3 mt-auto hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-muted transition-colors hover:text-foreground md:flex dark:md:hidden"
+        className="btn-plain nav-tone-switch mx-3 mb-3 mt-auto hidden items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-muted transition-colors hover:text-foreground md:flex dark:md:hidden"
       >
         <PanelLeft aria-hidden="true" className="size-4" />
         {tone === "dark" ? labels.light : labels.dark}

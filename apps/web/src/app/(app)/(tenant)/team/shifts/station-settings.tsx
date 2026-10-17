@@ -16,7 +16,7 @@ export function StationSettings({ branches }: { branches: Branch[] }) {
   return (
     <details className="card group p-0">
       <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-3 font-medium [&::-webkit-details-marker]:hidden">
-        <DoorOpen aria-hidden="true" className="size-4 text-primary" />
+        <DoorOpen aria-hidden="true" className="size-4 text-primary-ink" />
         {t("stations.title")}
         <span className="ms-2 text-sm font-normal text-muted">{t("stations.hint")}</span>
       </summary>

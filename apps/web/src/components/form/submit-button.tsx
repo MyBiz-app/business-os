@@ -15,7 +15,7 @@ type Props = {
 export function SubmitButton({ children, disabled = false, variant = "primary", className = "px-4 py-2.5" }: Props) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending || disabled} aria-busy={pending} className={`btn-${variant} relative ${className}`}>
+    <button type="submit" disabled={pending || disabled} aria-busy={pending} className={`btn-plain btn-${variant} relative ${className}`}>
       <span className={`inline-flex items-center gap-2 ${pending ? "invisible" : ""}`}>{children}</span>
       {pending && <LoaderCircle aria-hidden="true" className="absolute size-4 animate-spin motion-reduce:animate-none" />}
     </button>

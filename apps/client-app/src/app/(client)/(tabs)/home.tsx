@@ -3,6 +3,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { HOME_CARDS, type HomeData } from "@/components/home-cards";

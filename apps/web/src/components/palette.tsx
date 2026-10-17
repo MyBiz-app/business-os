@@ -195,7 +195,7 @@ export function PalettePicker({
               </span>
               <span className="flex items-center justify-between gap-2 text-sm font-semibold">
                 {t(`palettes.${palette}`)}
-                {checked && <Check aria-hidden="true" className="size-4 text-primary" />}
+                {checked && <Check aria-hidden="true" className="size-4 text-primary-ink" />}
               </span>
               <span className="text-xs text-muted">{t(`paletteHints.${palette}`)}</span>
             </label>

@@ -126,7 +126,7 @@ export default async function TeamPage() {
                 </span>
                 {(isOwner || invitation.role !== "owner") && (
                   <form action={revokeInvitation.bind(null, invitation.id)}>
-                    <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+                    <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                       {t("team.revoke")}
                     </button>
                   </form>

@@ -70,7 +70,7 @@ export function RoleForm({ role, permissions, grantable }: Props) {
           className="flex items-center gap-3 border-t border-border pt-3"
         >
           <span className="flex-1 text-sm text-muted">{t("team.roleMembers", { count: role.members })}</span>
-          <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+          <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
             {t("team.deleteRole")}
           </button>
         </form>

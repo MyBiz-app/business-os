@@ -41,7 +41,7 @@ export default async function InvoicePage({ params }: PageProps<"/invoices/[id]"
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/invoices" className="text-sm text-primary underline-offset-4 hover:underline">{t("back")}</Link>
+      <Link href="/invoices" className="text-sm text-primary-ink underline-offset-4 hover:underline">{t("back")}</Link>
       <PageHeader
         title={
           <span>

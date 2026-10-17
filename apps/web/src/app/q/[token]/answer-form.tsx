@@ -25,7 +25,7 @@ export function AnswerForm({ token }: { token: string }) {
         </div>
       </form>
       <form action={decline}>
-        <button type="submit" className="text-sm text-muted underline-offset-4 hover:underline">
+        <button type="submit" className="btn-link text-sm text-muted underline-offset-4 hover:underline">
           {t("decline")}
         </button>
       </form>

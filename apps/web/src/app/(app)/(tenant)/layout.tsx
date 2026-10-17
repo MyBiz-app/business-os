@@ -104,7 +104,7 @@ export default async function TenantLayout({ children }: LayoutProps<"/">) {
           >
             <span>{tenant.role === "platform" ? t("support.actBanner", { name: isolate(tenant.name) }) : t("support.banner")}</span>
             <form action={leaveSupport}>
-              <button type="submit" className="font-medium text-primary underline-offset-4 hover:underline">
+              <button type="submit" className="btn-link font-medium text-primary-ink underline-offset-4 hover:underline">
                 {tenant.role === "platform" ? t("support.actLeave") : t("support.leave")}
               </button>
             </form>

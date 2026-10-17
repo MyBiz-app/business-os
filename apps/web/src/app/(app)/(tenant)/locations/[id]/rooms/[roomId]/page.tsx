@@ -24,7 +24,7 @@ export default async function RoomHoursPage({ params }: PageProps<"/locations/[i
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href={`/locations/${id}`} className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href={`/locations/${id}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("common.back")}
       </Link>
       <PageHeader title={t("locations.openingHours", { name: isolate(room.name) })} description={t("resources.hoursHint", { branch: isolate(location.name) })} />

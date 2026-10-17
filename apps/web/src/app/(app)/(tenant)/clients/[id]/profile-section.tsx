@@ -68,7 +68,7 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
   return (
     <section aria-labelledby="notes-heading" className="flex flex-col gap-4 card p-6">
       <h2 id="notes-heading" className="flex items-center gap-2 text-lg font-semibold">
-        <NotebookPen aria-hidden="true" className="size-5 text-primary" />
+        <NotebookPen aria-hidden="true" className="size-5 text-primary-ink" />
         {t(`terms.${termsOf(tenant.vertical)}.visitNotes` as "terms.fitness.visitNotes")}
       </h2>
       {canWrite && <NoteForm clientId={clientId} bookings={recentVisits} />}
@@ -92,7 +92,7 @@ export async function NotesSection({ clientId, bookings, context, locked }: Note
                       <button
                         type="submit"
                         aria-label={t("visitNotes.delete")}
-                        className="rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
+                        className="btn-icon rounded-lg p-1 text-muted transition-colors hover:bg-danger/10 hover:text-danger"
                       >
                         <Trash2 aria-hidden="true" className="size-4" />
                       </button>

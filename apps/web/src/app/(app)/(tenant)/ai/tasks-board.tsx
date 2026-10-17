@@ -12,8 +12,8 @@ import { deleteTask, runTaskNow, type TaskBoard, type TaskCard, type TaskResult,
 
 type Translate = ReturnType<typeof useTranslations<"aiTeam">>;
 
-const STATUS_TONE: Record<TaskCard["status"], string> = { active: "text-success", paused: "text-muted", done: "text-muted", failed: "text-danger" };
-const RUN_TONE: Record<TaskRun["status"], string> = { running: "text-primary", ok: "text-success", failed: "text-danger", skipped: "text-muted" };
+const STATUS_TONE: Record<TaskCard["status"], string> = { active: "text-success-ink", paused: "text-muted", done: "text-muted", failed: "text-danger" };
+const RUN_TONE: Record<TaskRun["status"], string> = { running: "text-primary-ink", ok: "text-success-ink", failed: "text-danger", skipped: "text-muted" };
 
 function errorText(t: Translate, code: string | null | undefined): string {
   if (!code) return "";
@@ -31,7 +31,7 @@ export function TasksBoard({ board, agents, timeZone }: { board: TaskBoard; agen
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div className="flex flex-col gap-1">
           <h2 id="tasks-title" className="flex items-center gap-2 text-xl font-semibold">
-            <CalendarClock aria-hidden="true" className="size-5 text-primary" />
+            <CalendarClock aria-hidden="true" className="size-5 text-primary-ink" />
             {t("tasks.title")}
           </h2>
           <p className="max-w-3xl text-sm text-muted">{t("tasks.subtitle")}</p>
@@ -115,7 +115,7 @@ function TaskRow({ task, agentName, when }: { task: TaskCard; agentName: string;
           {errorText(t, task.last_error)}
         </p>
       )}
-      {task.waiting_for_approval > 0 && <p className="text-sm font-medium text-primary">{t("tasks.waiting", { count: task.waiting_for_approval })}</p>}
+      {task.waiting_for_approval > 0 && <p className="text-sm font-medium text-primary-ink">{t("tasks.waiting", { count: task.waiting_for_approval })}</p>}
       {message && (
         <p role="alert" className="text-sm text-danger">
           {message}
@@ -247,7 +247,7 @@ function History({ runs, when }: { runs: TaskRun[]; when: (iso: string | null) =
             <span className={`font-medium ${RUN_TONE[run.status]}`}>{t(`tasks.run.${run.status}`)}</span>
             <span className="text-muted">{when(run.started_at)}</span>
             {run.credits > 0 && <span className="text-muted">{t("tasks.credits", { credits: Math.round(run.credits * 10) / 10 })}</span>}
-            {run.pending_action_ids.length > 0 && <span className="text-primary">{t("tasks.waiting", { count: run.pending_action_ids.length })}</span>}
+            {run.pending_action_ids.length > 0 && <span className="text-primary-ink">{t("tasks.waiting", { count: run.pending_action_ids.length })}</span>}
           </p>
           {run.summary && (
             <p className="whitespace-pre-line" dir="auto">
