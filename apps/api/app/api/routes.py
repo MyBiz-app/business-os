@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from pydantic import BaseModel, Field, field_validator, model_validator
 from sqlalchemy import Connection, text
 from sqlalchemy.orm import Session
@@ -22,6 +22,7 @@ from app.catalog.verticals import VERTICAL_PACKS
 from app.commerce.modules import PRESETS
 from app.core.db import set_tenant
 from app.core.permissions import Permission, effective_permissions
+from app.legal.documents import check_versions, pending_documents, record_acceptance
 from app.messaging.email import load_all_messages
 
 router = APIRouter()
@@ -257,14 +258,19 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
     ).mappings()
     return Me(
         **profile,
+        legal_pending=pending_documents(session, user.id),
         memberships=[Membership.model_validate(dict(m)) for m in memberships],
         support_access=[SupportAccess.model_validate(dict(g)) for g in support],
     )
 
 
 @router.post("/tenants", status_code=status.HTTP_201_CREATED, tags=["tenants"])
-def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Tenant:
+def create_tenant(
+    body: TenantCreate, request: Request, user: UserDep, session: SessionDep
+) -> Tenant:
     ensure_profile(session, user.id, user.email)
+    if body.accepted_legal:
+        check_versions(body.accepted_legal)
     modules = (
         body.modules
         if body.modules is not None
@@ -273,8 +279,10 @@ def create_tenant(body: TenantCreate, user: UserDep, session: SessionDep) -> Ten
     check_selection(modules)
     tenant_id: UUID = session.execute(
         text("SELECT app.create_tenant(:name, :vertical, :locale, :time_zone, :currency)"),
-        body.model_dump(exclude={"modules"}),
+        body.model_dump(exclude={"modules", "accepted_legal"}),
     ).scalar_one()
+    if body.accepted_legal:
+        record_acceptance(session, request, user.id, body.accepted_legal, "signup", tenant_id)
     set_tenant(session, tenant_id)
     apply_vertical_pack(session, tenant_id, body.vertical, body.locale, body.currency)
     set_modules(session, tenant_id, modules)

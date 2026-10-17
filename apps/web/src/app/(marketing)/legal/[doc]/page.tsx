@@ -7,11 +7,12 @@ import { BRAND } from "@business-os/i18n/brand";
 import { Container } from "@/components/layout/container";
 import { PrintButton } from "@/components/marketing/print-button";
 
-const DOCS = ["terms", "privacy", "accessibility"] as const;
+const DOCS = ["terms", "privacy", "dpa", "subprocessors", "accessibility"] as const;
 type Doc = (typeof DOCS)[number];
 
-/** Date of the last content change of the legal copy (ISO). Bump it whenever the texts change. */
-const UPDATED_ON = "2026-10-16";
+/** Date of the last content change of each document: `legal.versions` in brand.json, which also
+ * holds the version people accept. Bump it there whenever a text changes. */
+const updatedOn = (doc: Doc) => BRAND.legal.versions[doc].date;
 
 type Section = { id: string; title: string; p: string[]; items?: string[] };
 
@@ -35,7 +36,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
   const title = t(`${doc as Doc}.title`);
   const intro = t(`${doc as Doc}.intro`);
   const sections = t.raw(`${doc as Doc}.sections`) as Section[];
-  const updated = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(UPDATED_ON));
+  const updated = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(updatedOn(doc as Doc)));
   return (
     <main id="main" className="enter section-y">
       <Container className="grid items-start gap-10 lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-16">
@@ -105,6 +106,14 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
                   {paragraph}
                 </p>
               ))}
+              {doc === "accessibility" && section.id === "coordinator" && (
+                <p className="text-base font-medium leading-relaxed">
+                  {t("accessibility.coordinatorLine", {
+                    name: BRAND.legal.accessibilityCoordinator.name[locale === "en" ? "en" : "he"],
+                    email: BRAND.legal.accessibilityCoordinator.email,
+                  })}
+                </p>
+              )}
               {section.items ? (
                 <ul className="list-disc space-y-1.5 ps-6 text-base leading-relaxed marker:text-primary-ink">
                   {section.items.map((item) => (

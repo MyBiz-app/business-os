@@ -2834,6 +2834,47 @@ export interface paths {
         patch: operations["update_service"];
         trace?: never;
     };
+    "/legal/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Current Versions
+         * @description The current version of every legal document (public).
+         */
+        get: operations["current_versions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/legal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Pending Documents */
+        get: operations["my_pending_documents"];
+        put?: never;
+        /**
+         * Accept Documents
+         * @description Accepts the current version of the given documents (the banner after a document changed).
+         */
+        post: operations["accept_documents"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/location-groups": {
         parameters: {
             query?: never;
@@ -7770,6 +7811,16 @@ export interface components {
             /** Token */
             token: string;
         };
+        /** AcceptRequest */
+        AcceptRequest: {
+            /**
+             * Documents
+             * @description Document -> the version being accepted (must be the current)
+             */
+            documents: {
+                [key: string]: string;
+            };
+        };
         /** Accepted */
         Accepted: {
             /**
@@ -12265,6 +12316,13 @@ export interface components {
         JoinRequest: {
             /** Code */
             code: string;
+            /**
+             * Accepted Legal
+             * @description Legal documents accepted when joining (document -> version)
+             */
+            accepted_legal?: {
+                [key: string]: string;
+            } | null;
         };
         /** KindEngagement */
         KindEngagement: {
@@ -12473,6 +12531,13 @@ export interface components {
             first_name?: string | null;
             /** Source */
             source?: ("manual" | "form" | "walk_in" | "referral" | "instagram" | "facebook" | "google" | "website" | "other") | null;
+        };
+        /** LegalPending */
+        LegalPending: {
+            /** Document */
+            document: string;
+            /** Version */
+            version: string;
         };
         /** LimitsUpdate */
         LimitsUpdate: {
@@ -12684,6 +12749,11 @@ export interface components {
              * @default false
              */
             marketing_consent: boolean;
+            /**
+             * Legal Pending
+             * @description Legal documents whose current version the person has not accepted yet
+             */
+            legal_pending?: components["schemas"]["LegalPending"][];
             /**
              * Palette
              * @description The person's color palette (none: the MyBiz default)
@@ -13660,6 +13730,19 @@ export interface components {
             provider: string;
             /** Candidates */
             candidates: components["schemas"]["app__api__social__Candidate"][];
+        };
+        /** PendingDocument */
+        PendingDocument: {
+            /**
+             * Document
+             * @description terms, privacy or dpa
+             */
+            document: string;
+            /**
+             * Version
+             * @description The current version, which is also its date
+             */
+            version: string;
         };
         /** PendingReview */
         PendingReview: {
@@ -17173,6 +17256,13 @@ export interface components {
              */
             modules?: {
                 [key: string]: number;
+            } | null;
+            /**
+             * Accepted Legal
+             * @description Legal documents accepted at sign-up (document -> version)
+             */
+            accepted_legal?: {
+                [key: string]: string;
             } | null;
         };
         /** TenantModules */
@@ -25155,6 +25245,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Service"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    current_versions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+        };
+    };
+    my_pending_documents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingDocument"][];
+                };
+            };
+        };
+    };
+    accept_documents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AcceptRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingDocument"][];
                 };
             };
             /** @description Validation Error */

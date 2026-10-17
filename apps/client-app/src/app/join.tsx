@@ -115,6 +115,7 @@ export default function Join() {
                 </View>
                 <Text style={[local.consentText, { color: palette.foreground }]}>{t("marketing")}</Text>
               </Pressable>
+              <Text style={[styles.muted, { color: palette.muted }]}>{t("legal")}</Text>
             </>
           )}
           <ErrorText message={error} palette={palette} />
