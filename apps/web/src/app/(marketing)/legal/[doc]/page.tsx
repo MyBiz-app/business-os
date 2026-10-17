@@ -11,7 +11,7 @@ const DOCS = ["terms", "privacy", "accessibility"] as const;
 type Doc = (typeof DOCS)[number];
 
 /** Date of the last content change of the legal copy (ISO). Bump it whenever the texts change. */
-const UPDATED_ON = "2026-10-16";
+const UPDATED_ON = "2026-10-17";
 
 type Section = { id: string; title: string; p: string[]; items?: string[] };
 
