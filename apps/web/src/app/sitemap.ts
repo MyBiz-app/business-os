@@ -7,6 +7,7 @@ const PAGES = [
   "/",
   "/features",
   "/pricing",
+  "/websites",
   "/start",
   "/getting-started",
   "/industries",

@@ -3278,7 +3278,8 @@
       "menu": "Menu",
       "close": "Close",
       "dashboard": "Go to dashboard",
-      "guide": "Getting started guide"
+      "guide": "Getting started guide",
+      "websites": "Websites"
     },
     "intro": {
       "eyebrow": "Everything in one place",
@@ -3582,7 +3583,8 @@
         "clients": "Your clients' experience",
         "ai": "AI assistant and agents",
         "growth": "Growth and sales"
-      }
+      },
+      "websiteAddon": "Add a website to your plan: from setup price shown on the websites page."
     },
     "faq": {
       "title": "Frequently asked questions",
@@ -4136,7 +4138,8 @@
       "pricing": "Pricing",
       "about": "About",
       "contact": "Contact",
-      "industries": "Industries"
+      "industries": "Industries",
+      "websites": "Websites"
     },
     "branches": {
       "eyebrow": "Chains and branches",
@@ -4233,6 +4236,153 @@
           "ai": "Ask in plain language and the assistant prepares an action for your approval.",
           "reports": "Revenue and occupancy without opening a spreadsheet."
         }
+      },
+      "websitesTeaser": {
+        "title": "Need a website too?",
+        "text": "We build it for you and wire it into MyBiz.",
+        "link": "See websites"
+      }
+    },
+    "websites": {
+      "title": "Your business's website. Built for you.",
+      "subtitle": "Tell us about your business once. We build the site, and it plugs straight into your MyBiz.",
+      "start": "Get started",
+      "seePrices": "See prices",
+      "showcase": "One site for every kind of business",
+      "showcaseCaption": "Sample sites",
+      "sites": {
+        "barber": {
+          "label": "Barbershop",
+          "name": "Bar & Blade",
+          "line": "A sharp cut, booked in ten seconds",
+          "button": "Book a chair",
+          "items": [
+            "Haircut",
+            "Beard",
+            "Kids"
+          ]
+        },
+        "gym": {
+          "label": "Fitness studio",
+          "name": "Core Studio",
+          "line": "Your first class is on us",
+          "button": "Join a class",
+          "items": [
+            "Pilates",
+            "Strength",
+            "Yoga"
+          ]
+        },
+        "pizza": {
+          "label": "Pizzeria",
+          "name": "Forno",
+          "line": "Hot from the oven, to your door",
+          "button": "Order now",
+          "items": [
+            "Margherita",
+            "Seasonal",
+            "Dessert"
+          ]
+        }
+      },
+      "steps": {
+        "title": "Three steps to a live site.",
+        "items": [
+          {
+            "title": "You tell us",
+            "text": "A short guided form: your goal, your style, your photos. Saved as you go."
+          },
+          {
+            "title": "We build it",
+            "text": "Your site is built to your brief, fast, accessible and ready for search."
+          },
+          {
+            "title": "You are live",
+            "text": "Online and connected to MyBiz: enquiries, bookings and visits in one place."
+          }
+        ]
+      },
+      "combo": {
+        "eyebrow": "Site + system",
+        "title": "A site that talks to your business.",
+        "text": "A visitor fills in the form and the enquiry is already a lead in your CRM, with its source. No copying, nothing lost.",
+        "site": "Your website",
+        "crm": "Your CRM",
+        "name": "Name",
+        "phone": "Phone",
+        "send": "Send",
+        "sent": "Sent",
+        "lead": "New lead",
+        "source": "Source",
+        "fromSite": "Website",
+        "person": "Dana Levi"
+      },
+      "prices": {
+        "title": "Simple prices. Cheaper together.",
+        "subtitle": "Choose a website, a system, or both.",
+        "currency": "Currency",
+        "recommended": "Best value",
+        "once": "one time",
+        "perMonth": "/month",
+        "from": "From",
+        "note": "Monthly price covers hosting, upkeep and small changes. Prices exclude VAT.",
+        "saving": "You save {amount} on the setup",
+        "siteOnly": {
+          "name": "Website only",
+          "text": "A professional site, without the system.",
+          "points": [
+            "Built to your brief",
+            "Mobile, accessible, ready for search",
+            "Contact form to your email"
+          ],
+          "cta": "Order a website"
+        },
+        "systemOnly": {
+          "name": "System only",
+          "text": "Calendar, clients, payments and the AI team.",
+          "points": [
+            "Everything to run the business",
+            "Client app included",
+            "Add a website any time"
+          ],
+          "cta": "See system plans"
+        },
+        "both": {
+          "name": "Site and system",
+          "text": "The site is wired into the system.",
+          "points": [
+            "Enquiries become leads automatically",
+            "Book appointments straight from the site",
+            "Visits and sources in your dashboard"
+          ],
+          "cta": "Start with both"
+        }
+      },
+      "gallery": {
+        "title": "Made for your field",
+        "subtitle": "Three styles, any industry.",
+        "note": "Sample designs. Your site is built to your own brand."
+      },
+      "faq": {
+        "title": "Questions about websites",
+        "items": [
+          {
+            "q": "How long does it take?",
+            "a": "It depends on the content you send. We confirm a date once you submit the brief."
+          },
+          {
+            "q": "Can I use my own domain?",
+            "a": "Yes. Bring a domain you own, buy one, or start on a temporary address."
+          },
+          {
+            "q": "Do I need MyBiz to get a website?",
+            "a": "No. A website alone works, and you can add the system later."
+          },
+          {
+            "q": "Can I ask for changes later?",
+            "a": "Yes. Request a change from your account and the monthly price covers small updates."
+          }
+        ]
       }
     }
   },
@@ -5367,7 +5517,9 @@
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
     },
-    "nav": { "label": "Profile sections" },
+    "nav": {
+      "label": "Profile sections"
+    },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
     "birthDate": "Date of birth",
