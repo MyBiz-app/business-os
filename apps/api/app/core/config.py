@@ -67,6 +67,8 @@ class Settings(BaseSettings):
     expo_access_token: SecretStr | None = None  # optional; only if Expo enhanced security is on
     email_api_key: SecretStr | None = None  # Resend API key, or the SMTP (Gmail app) password
     email_from: str = "MyBiz <no-reply@example.com>"
+    # Resend's signing secret ("whsec_...") for /webhooks/email/resend (bounces, complaints).
+    email_webhook_secret: SecretStr | None = None
     email_smtp_host: str = "smtp.gmail.com"  # smtp only; gmail always uses Gmail's server
     email_smtp_port: int = 465
     email_smtp_user: str | None = None  # defaults to the address in email_from

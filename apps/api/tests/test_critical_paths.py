@@ -108,6 +108,7 @@ PUBLIC_ROUTES = {
     ("GET", "/health/ready"),
     ("POST", "/webhooks/payments/{provider}/{tenant_id}"),
     ("POST", "/webhooks/whatsapp/{provider}/{tenant_id}"),
+    ("POST", "/webhooks/email/resend"),
     ("GET", "/public/quotes/{token}"),
     ("POST", "/public/quotes/{token}/answer"),
     ("POST", "/public/quotes/{token}/deposit"),

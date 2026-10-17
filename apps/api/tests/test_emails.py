@@ -94,7 +94,7 @@ def test_every_notification_kind_has_email_text() -> None:
 
 def test_gmail_sender_signs_in_with_the_from_address(monkeypatch) -> None:
     from app.core.config import get_settings
-    from app.messaging.email import Email, SmtpSender, sender_from_settings
+    from app.messaging.email import Email, SmtpSender, SuppressingSender, sender_from_settings
 
     monkeypatch.setenv("API_EMAIL_PROVIDER", "gmail")
     monkeypatch.setenv("API_EMAIL_API_KEY", "app-password")
@@ -105,6 +105,8 @@ def test_gmail_sender_signs_in_with_the_from_address(monkeypatch) -> None:
     finally:
         get_settings.cache_clear()
 
+    assert isinstance(sender, SuppressingSender)
+    sender = sender.inner
     assert isinstance(sender, SmtpSender)
     assert (sender.host, sender.port, sender.username) == (
         "smtp.gmail.com",

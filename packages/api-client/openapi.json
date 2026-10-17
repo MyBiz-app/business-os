@@ -7716,6 +7716,21 @@
         }
       }
     },
+    "/webhooks/email/resend": {
+      "post": {
+        "tags": [
+          "webhooks"
+        ],
+        "summary": "Email Webhook",
+        "description": "Hard bounces and spam complaints from Resend: the address is never mailed again.\nClosed (404) until `API_EMAIL_WEBHOOK_SECRET` is set.",
+        "operationId": "email_webhook",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
     "/quotes": {
       "get": {
         "tags": [
@@ -45054,6 +45069,12 @@
             ],
             "title": "Marketing Opted Out At",
             "description": "Stopped ads with the opt-out link; only the client can undo it"
+          },
+          "email_suppressed": {
+            "type": "boolean",
+            "title": "Email Suppressed",
+            "description": "The address bounced or reported spam: no emails are sent to it",
+            "default": false
           }
         },
         "type": "object",
@@ -45906,6 +45927,12 @@
             ],
             "title": "Marketing Opted Out At",
             "description": "Stopped ads with the opt-out link; only the client can undo it"
+          },
+          "email_suppressed": {
+            "type": "boolean",
+            "title": "Email Suppressed",
+            "description": "The address bounced or reported spam: no emails are sent to it",
+            "default": false
           },
           "plan_name": {
             "anyOf": [
