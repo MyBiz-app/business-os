@@ -363,12 +363,16 @@ class SuppressingSender:
 
 
 def _is_suppressed(address: str) -> bool:
+    """Fails open: a database hiccup must not stop sign-in codes and receipts."""
     from app.core.db import get_engine
 
-    with get_engine().connect() as conn:
-        return bool(
-            conn.execute(text("SELECT app.email_is_suppressed(:a)"), {"a": address}).scalar()
-        )
+    try:
+        with get_engine().connect() as conn:
+            query = text("SELECT app.email_is_suppressed(:a)")
+            return bool(conn.execute(query, {"a": address}).scalar())
+    except Exception as error:
+        print(f"suppression check failed, sending anyway: {error}")
+        return False
 
 
 def sender_from_settings() -> Sender | None:

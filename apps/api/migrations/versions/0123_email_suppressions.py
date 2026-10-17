@@ -56,6 +56,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # contract: only a rollback drops these, and the previous release never reads them.
     op.execute("DROP FUNCTION app.email_is_suppressed(text)")
     op.execute("DROP FUNCTION app.suppress_email(text, text, text)")
     op.execute("DROP TABLE app.email_suppressions")
