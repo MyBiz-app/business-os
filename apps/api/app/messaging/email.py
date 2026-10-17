@@ -40,6 +40,11 @@ class Email:
     kind: str | None = None  # picks the icon in the layout (a notification kind, "roster", ...)
     reply_to: str | None = None  # where replies go (the business's or branch's own address)
     from_name: str | None = None  # the business or branch shown as the sender's name
+    list_unsubscribe: str | None = None  # the opt-out link of an ad (List-Unsubscribe header)
+
+
+def _unsubscribe_headers(link: str) -> dict[str, str]:
+    return {"List-Unsubscribe": f"<{link}>", "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"}
 
 
 def _html(email: Email) -> str:
@@ -108,6 +113,8 @@ class ResendSender:
         }
         if email.reply_to:
             payload["reply_to"] = email.reply_to
+        if email.list_unsubscribe:
+            payload["headers"] = _unsubscribe_headers(email.list_unsubscribe)
         body = json.dumps(payload).encode()
         request = urllib.request.Request(
             "https://api.resend.com/emails",
@@ -138,6 +145,9 @@ class SmtpSender:
         if email.reply_to:
             message["Reply-To"] = email.reply_to
         message["Subject"] = email.subject
+        if email.list_unsubscribe:
+            for name, value in _unsubscribe_headers(email.list_unsubscribe).items():
+                message[name] = value
         message.set_content(email.text)
         message.add_alternative(_html(email), subtype="html")
         return message

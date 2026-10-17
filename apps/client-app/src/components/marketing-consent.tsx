@@ -34,7 +34,7 @@ export function MarketingConsentCard({ palette }: { palette: Palette }) {
     const before = consent;
     setConsent(next);
     try {
-      unwrap(await apiClient().PUT("/me/marketing-consent", { body: { consent: next } }));
+      unwrap(await apiClient().PUT("/me/marketing-consent", { body: { consent: next, source: "app_profile" } }));
       toast("success", t(next ? "saidYes" : "saidNo"));
     } catch {
       setConsent(before);
