@@ -539,7 +539,25 @@
     "migration": "עוברים ל-MyBiz",
     "invoices": "חשבוניות",
     "sidebarLight": "סרגל צד בהיר",
-    "sidebarDark": "סרגל צד כהה"
+    "sidebarDark": "סרגל צד כהה",
+    "expand": "פתיחת תפריט {name}",
+    "collapse": "סגירת תפריט {name}",
+    "sub": {
+      "people": "אנשים",
+      "organization": "מבנה ארגוני",
+      "shifts": "משמרות",
+      "timeOff": "חופשות",
+      "shiftSwaps": "החלפות משמרות",
+      "timeClock": "שעון נוכחות",
+      "payroll": "שכר",
+      "bonuses": "בונוסים",
+      "roles": "תפקידים",
+      "clientList": "רשימה",
+      "clientImport": "ייבוא",
+      "orders": "הזמנות",
+      "aiTeam": "צוות",
+      "aiTasks": "משימות"
+    }
   },
   "terms": {
     "fitness": {

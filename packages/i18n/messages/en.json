@@ -539,7 +539,25 @@
     "migration": "Move to MyBiz",
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
-    "sidebarDark": "Use a dark sidebar"
+    "sidebarDark": "Use a dark sidebar",
+    "expand": "Open {name} menu",
+    "collapse": "Close {name} menu",
+    "sub": {
+      "people": "People",
+      "organization": "Organization",
+      "shifts": "Shifts",
+      "timeOff": "Time off",
+      "shiftSwaps": "Shift swaps",
+      "timeClock": "Time clock",
+      "payroll": "Payroll",
+      "bonuses": "Bonuses",
+      "roles": "Roles",
+      "clientList": "List",
+      "clientImport": "Import",
+      "orders": "Orders",
+      "aiTeam": "Team",
+      "aiTasks": "Tasks"
+    }
   },
   "terms": {
     "fitness": {
