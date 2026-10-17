@@ -8,7 +8,7 @@ type GettingStarted = components["schemas"]["GettingStarted"];
 export type SetupStep = GettingStarted["steps"][number]["key"];
 
 export const SETUP_STEPS: Record<SetupStep, { href: string; Icon: typeof Palette }> = {
-  branding: { href: "/settings", Icon: Palette },
+  branding: { href: "/settings/branding", Icon: Palette },
   services: { href: "/services", Icon: Tags },
   schedule: { href: "/schedule", Icon: CalendarDays },
   team: { href: "/team", Icon: UsersRound },
