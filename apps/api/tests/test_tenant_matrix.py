@@ -39,6 +39,7 @@ OVERRIDES = {
     "checkouts": {"plan_id": "gen_random_uuid()"},
     "contact_emails": {"purpose": "'main'", "email": "'a@b.co'"},
     "coverage_rules": {"ends_minute": "60", "min_staff": "1"},
+    "form101_forms": {"tax_year": "2026"},
     "invitations": {"role": "'staff'"},
     "notifications": {"kind": "'session_cancelled'"},
     "pending_actions": {"risk_level": "'low'"},

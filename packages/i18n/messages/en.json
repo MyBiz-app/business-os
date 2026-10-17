@@ -2628,7 +2628,13 @@
     "files_read": "Open the files area",
     "files_read_hint": "Business files; some folders also need their own permission",
     "files_manage": "Manage files",
-    "files_manage_hint": "Add, archive and organize files and folders"
+    "files_manage_hint": "Add, archive and organize files and folders",
+    "payroll_read": "See payroll files",
+    "payroll_read_hint": "Employment terms and Form 101 of the team",
+    "payroll_manage": "Manage payroll files",
+    "payroll_manage_hint": "Set employment terms, request and correct Form 101",
+    "payroll_approve": "Approve payroll",
+    "payroll_approve_hint": "Approve and lock pay runs (owners only)"
   },
   "health": {
     "title": "Health declaration",
@@ -5252,6 +5258,54 @@
       "none": "Nothing here yet.",
       "openFile": "Open",
       "failed": "Couldn't open the file. Try again."
+    },
+    "form101": {
+      "open": "Fill in Form 101 (tax credits)",
+      "back": "Back",
+      "title": "Form 101 for {year}",
+      "intro": "Your employer uses this to compute your income tax. Answer once a year; you can sign again if something changes.",
+      "signedNow": "Signed and sent. Thank you.",
+      "signedBefore": "Already signed by {name}. Signing again replaces your answers.",
+      "personal": "Personal details",
+      "fullName": "Full name",
+      "birthDate": "Date of birth",
+      "dateHint": "Format: YYYY-MM-DD",
+      "gender": "Gender",
+      "genders": {
+        "female": "Female",
+        "male": "Male",
+        "other": "Other"
+      },
+      "address": "Address",
+      "phone": "Phone",
+      "marital": "Marital status",
+      "maritals": {
+        "single": "Single",
+        "married": "Married",
+        "divorced": "Divorced",
+        "widowed": "Widowed",
+        "separated": "Separated"
+      },
+      "credits": "Tax credits",
+      "resident": "Israeli resident",
+      "children": "Children's birth years",
+      "childrenHint": "For example: 2018, 2021. Leave empty if none.",
+      "singleParent": "Single parent",
+      "immigrant": "New immigrant since (if relevant)",
+      "soldier": "Discharged from service on (if relevant)",
+      "degree": "Year you finished an academic degree (if relevant)",
+      "disability": "Disability percentage (if relevant)",
+      "yes": "Yes",
+      "no": "No",
+      "sign": "Signature",
+      "declaration": "I declare that the details above are correct and complete.",
+      "signedName": "Type your full name to sign",
+      "signSubmit": "Sign and send",
+      "signAgain": "Sign again",
+      "errors": {
+        "invalid": "Please check the details: names, dates (YYYY-MM-DD) and years.",
+        "generic": "Something went wrong. Please try again."
+      }
     }
   },
   "staffApp": {
@@ -6240,7 +6294,35 @@
     "stagingMark": "Sample document",
     "issuedWith": "Issued with {brand}",
     "thanks": "Thank you!",
-    "page": "Page {page} of {pages}"
+    "page": "Page {page} of {pages}",
+    "form101": "Form 101 for {year}",
+    "form101Intro": "Employee's tax-credit declaration",
+    "form101Draft": "Credit points are computed by the system and are subject to the accountant's review.",
+    "fullName": "Full name",
+    "idLast4": "ID number (last 4)",
+    "birthDate": "Date of birth",
+    "gender": "Gender",
+    "genders": {
+      "female": "Female",
+      "male": "Male",
+      "other": "Other"
+    },
+    "address": "Address",
+    "maritalStatus": "Marital status",
+    "maritalStatuses": {
+      "single": "Single",
+      "married": "Married",
+      "divorced": "Divorced",
+      "widowed": "Widowed",
+      "separated": "Separated"
+    },
+    "children": "Children (birth year)",
+    "noChildren": "None",
+    "creditPoints": "Tax credit points",
+    "overrideNote": "Adjusted by payroll: {note}",
+    "declaration": "I declare that the details above are correct and complete.",
+    "signedBy": "Signed by",
+    "signedOn": "Signed on"
   },
   "time": {
     "title": "Time and billing",
@@ -6929,5 +7011,88 @@
     "folderName": "Folder name",
     "createFolder": "Create folder",
     "deleteFolder": "Delete this empty folder"
+  },
+  "payroll": {
+    "open": "Payroll file",
+    "title": "Payroll file: {name}",
+    "subtitle": "Employment terms and tax forms",
+    "tabsLabel": "Payroll file sections",
+    "tabs": {
+      "personal": "Personal details",
+      "terms": "Employment terms",
+      "components": "Pay components",
+      "documents": "Documents"
+    },
+    "save": "Save",
+    "saved": "Saved",
+    "personal": {
+      "idTitle": "ID number",
+      "bankTitle": "Bank account",
+      "noBank": "No bank account saved yet. Add it under Employment terms.",
+      "show": "Show",
+      "hide": "Hide"
+    },
+    "form101": {
+      "title": "Form 101 (tax credits)",
+      "hint": "The employee fills in Form 101 in the app and signs it with their name. Credit points are computed from the answers and can be corrected here. They are a draft until your accountant confirms them.",
+      "request": "Ask {name} to fill in Form 101 for {year}",
+      "none": "No Form 101 requested yet.",
+      "year": "Form 101 for {year}",
+      "status": {
+        "requested": "Waiting for the employee",
+        "submitted": "Signed"
+      },
+      "points": "Credit points",
+      "adjusted": "adjusted",
+      "adjust": "Adjust",
+      "note": "Reason for the change",
+      "clear": "Use computed points",
+      "pdf": "Download PDF",
+      "signedBy": "Signed by {name}"
+    },
+    "terms": {
+      "type": "Type of employment",
+      "types": {
+        "global": "Global (monthly)",
+        "hourly": "Hourly",
+        "global_overtime": "Global plus overtime"
+      },
+      "jobTitle": "Job title",
+      "monthly": "Monthly amount ({currency})",
+      "hourly": "Hourly rate ({currency})",
+      "scope": "Scope of position (%)",
+      "days": "Work days per week",
+      "start": "Start date",
+      "notice": "Employment notice sent on",
+      "pension": "Pension",
+      "fund": "Fund name",
+      "employeePct": "Employee (%)",
+      "employerPct": "Employer (%)",
+      "severancePct": "Severance (%)",
+      "bank": "Bank account",
+      "bankCode": "Bank number",
+      "branch": "Branch",
+      "account": "Account number",
+      "bankKept": "Leave empty to keep the saved account"
+    },
+    "components": {
+      "soon": "Fixed pay components (travel, meals, phone, car, recurring additions and deductions) are added in the next update."
+    },
+    "documents": {
+      "title": "Documents",
+      "notice": "Employment notice",
+      "notSent": "Not sent yet",
+      "none": "No signed documents yet.",
+      "more": "The files area will also hold payslips and the employment contract."
+    },
+    "errors": {
+      "hourly_rate_required": "Enter an hourly rate for hourly employment.",
+      "monthly_amount_required": "Enter the monthly amount.",
+      "invalid_reference": "That branch does not exist.",
+      "form_exists": "A Form 101 for this year already exists.",
+      "forbidden": "You do not have permission for this.",
+      "invalid": "Please check the details and try again.",
+      "generic": "Something went wrong. Please try again."
+    }
   }
 }

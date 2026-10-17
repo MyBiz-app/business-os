@@ -1,0 +1,22 @@
+{% extends "_frame.html" %}
+{% block title %}{{ doc_title }}{% endblock %}
+{% block body %}
+<p class="note">{{ t.form101Intro }}</p>
+<table class="meta">
+  <tr><th>{{ t.fullName }}</th><td>{{ answers.full_name }}</td></tr>
+  <tr><th>{{ t.idLast4 }}</th><td class="ltr">{{ id_last4 or "-" }}</td></tr>
+  <tr><th>{{ t.birthDate }}</th><td>{{ birth }}</td></tr>
+  <tr><th>{{ t.gender }}</th><td>{{ t.genders[answers.gender] }}</td></tr>
+  <tr><th>{{ t.address }}</th><td>{{ answers.address }}</td></tr>
+  <tr><th>{{ t.maritalStatus }}</th><td>{{ t.maritalStatuses[answers.marital_status] }}</td></tr>
+  <tr><th>{{ t.children }}</th><td>{% if answers.children %}{% for child in answers.children %}{{ child.birth_year }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}{{ t.noChildren }}{% endif %}</td></tr>
+</table>
+<div class="total-row"><span class="label">{{ t.creditPoints }}</span><span class="total"><bdi>{{ points }}</bdi></span></div>
+{% if override_note %}<p class="note">{{ t.overrideNote.replace("{note}", override_note) }}</p>{% endif %}
+<p class="note">{{ t.declaration }}</p>
+<table class="meta">
+  <tr><th>{{ t.signedBy }}</th><td>{{ signed_name }}</td></tr>
+  <tr><th>{{ t.signedOn }}</th><td>{{ signed_on }}</td></tr>
+</table>
+<p class="note">{{ t.form101Draft }}</p>
+{% endblock %}

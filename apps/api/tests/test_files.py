@@ -46,8 +46,9 @@ def test_system_folders_and_permissions(
         add_member(engine, studio["tenant_id"], user, role)
     tenant = studio["tenant_id"]
     assert folders(client, auth(desk, tenant)) == {}
-    # Managers hold business.settings and staff.manage but payroll.read does not exist yet.
+    # Managers hold payroll.read, business.settings and staff.manage, so they see every folder.
     assert set(folders(client, auth(manager, tenant))) == {
+        "payroll",
         "employees",
         "business_docs",
         "imports",
