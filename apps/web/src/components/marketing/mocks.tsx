@@ -61,7 +61,7 @@ export async function ChatMock({ question, answer, tone = "primary" }: { questio
   const ai = tone === "ai";
   return (
     <div aria-hidden="true" className="card flex flex-col gap-3 p-5 shadow-xl">
-      <div className={`self-end rounded-2xl rounded-ee-md px-4 py-2.5 text-sm text-white ${ai ? "bg-ai" : "bg-primary"}`}>{question}</div>
+      <div className={`self-end rounded-2xl rounded-ee-md px-4 py-2.5 text-sm ${ai ? "bg-ai text-white" : "bg-primary text-on-primary"}`}>{question}</div>
       <div className="flex items-start gap-2">
         <span className={`flex size-8 shrink-0 items-center justify-center rounded-xl ${ai ? "bg-ai/10 text-ai" : "icon-tile"}`}>
           <Sparkles className="size-4" />
