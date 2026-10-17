@@ -27,6 +27,7 @@ class Permission(StrEnum):
     BUSINESS_SETTINGS = "business.settings"
     FILES_READ = "files.read"  # open the business's files area (some folders need more)
     FILES_MANAGE = "files.manage"  # add, archive and organize files and folders
+    MIGRATION_MANAGE = "migration.manage"  # move an existing business onto MyBiz (and undo it)
     IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
     TIME_APPROVE = "time.approve"  # correct clocked hours and approve a person's month
     PAYROLL_READ = "payroll.read"  # see employment terms and Form 101 of the team
@@ -61,6 +62,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.PAYROLL_MANAGE,
             Permission.FILES_READ,
             Permission.FILES_MANAGE,
+            Permission.MIGRATION_MANAGE,
             Permission.PAYROLL_PROPOSE,
         }
     ),

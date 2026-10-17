@@ -431,7 +431,8 @@
       "business": "Business"
     },
     "content": "Content & creative",
-    "files": "Files"
+    "files": "Files",
+    "migration": "Move to MyBiz"
   },
   "terms": {
     "fitness": {
@@ -2636,7 +2637,9 @@
     "payroll_approve": "Approve payroll",
     "payroll_approve_hint": "Approve and lock pay runs (owners only)",
     "time_approve": "Approve hours",
-    "time_approve_hint": "Correct clocked hours and approve a person's month"
+    "time_approve_hint": "Correct clocked hours and approve a person's month",
+    "migration_manage": "Move to MyBiz",
+    "migration_manage_hint": "Bring an existing business over from another system, and undo it"
   },
   "health": {
     "title": "Health declaration",
@@ -7338,5 +7341,146 @@
       "amount_too_small": "The total is too small to divide between this many people."
     },
     "amountModeLabel": "How to count it"
+  },
+  "migration": {
+    "title": "Move to MyBiz",
+    "intro": "Already running a business? Bring your clients, memberships, services, team and upcoming appointments over from your previous system. You see exactly what will be created before anything changes, and you can undo the whole import for 14 days.",
+    "start": {
+      "title": "Start a move",
+      "origin": "Where do you come from?",
+      "origins": {
+        "spreadsheet": "A spreadsheet (Excel or CSV)",
+        "google": "Google Contacts or Calendar export",
+        "other_system": "Another management system",
+        "notebook": "No system (WhatsApp and a notebook)"
+      },
+      "rights": "I confirm I have the right to transfer this information to MyBiz.",
+      "privacy": "Your business owns this data and MyBiz only holds it for you. The files you upload are deleted after 30 days. ID numbers in a file go straight to encrypted storage.",
+      "begin": "Start"
+    },
+    "files": {
+      "title": "Your files",
+      "hint": "Add the files you exported (CSV or Excel, up to 10 MB each, 20 MB in total). Say what each file holds and which column is which field.",
+      "add": "Add a file",
+      "fileHint": "CSV or Excel. One file per kind of record.",
+      "rows": "{count, plural, one {# row} other {# rows}}",
+      "kind": "What this file holds",
+      "unknownKind": "Choose what it holds",
+      "remove": "Remove",
+      "noHeader": "Column {number}",
+      "example": "For example: {value}",
+      "fieldFor": "Field for {column}",
+      "ignore": "Ignore this column"
+    },
+    "kinds": {
+      "clients": "Clients",
+      "memberships": "Memberships and punch cards with balances",
+      "services": "Services and classes",
+      "staff": "Team (invited, not created)",
+      "appointments": "Upcoming appointments"
+    },
+    "fields": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "full_name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "date_of_birth": "Date of birth",
+      "notes": "Notes",
+      "status": "Status",
+      "client_name": "Client name",
+      "client_email": "Client email",
+      "client_phone": "Client phone",
+      "plan_name": "Membership or card",
+      "credits_left": "Entries left",
+      "starts_on": "Starts on",
+      "ends_on": "Valid until",
+      "price": "Price",
+      "name": "Name",
+      "description": "Description",
+      "duration_minutes": "Duration (minutes)",
+      "capacity": "Capacity",
+      "role": "Role",
+      "service_name": "Service",
+      "starts_at": "Date and time",
+      "date": "Date",
+      "time": "Time"
+    },
+    "check": {
+      "title": "Check before importing",
+      "hint": "A dry run shows exactly what the import would create. Nothing changes until you press Import.",
+      "run": "Check what will be created",
+      "working": "Checking",
+      "chooseKinds": "Choose what each file holds first.",
+      "rows": "{count, plural, one {# row} other {# rows}}",
+      "ready": "{count} to create",
+      "duplicates": "{count, plural, one {# duplicate} other {# duplicates}}",
+      "invalid": "{count, plural, one {# with a problem} other {# with problems}}",
+      "skipped": "{count} left out",
+      "issue": "Row {line}: {problem}",
+      "import": "Import {count, plural, one {# record} other {# records}}"
+    },
+    "problems": {
+      "missing_name": "The name is missing",
+      "invalid_email": "The email is not valid",
+      "invalid_date": "The date is not valid",
+      "invalid_status": "The status is not recognized",
+      "duplicate": "Already exists",
+      "client_not_found": "No client with this name, phone or email",
+      "client_ambiguous": "More than one client has this name",
+      "expired": "Already expired",
+      "empty_balance": "No entries left",
+      "past": "In the past (kept out of the calendar)",
+      "service_not_found": "No service with this name",
+      "session_full": "The session is full",
+      "missing_client": "Needs a client name, phone or email",
+      "missing_plan": "The membership or card name is missing",
+      "missing_service": "The service is missing",
+      "invalid_number": "The number is not valid",
+      "invalid_price": "The price is not valid",
+      "invalid_role": "Role not recognized (use staff, front desk or manager)",
+      "file_expired": "The uploaded file was already deleted",
+      "unreadable_file": "The file could not be read",
+      "empty_file": "The file has no rows",
+      "file_too_large": "The file is too large",
+      "too_many_rows": "Too many rows"
+    },
+    "done": {
+      "title": "Moved {count, plural, one {# record} other {# records}} to MyBiz",
+      "invitations": "Team invitations",
+      "inviteHint": "Each person accepts their own invitation. Copy a link and send it to them; it is shown only now.",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "undoHint": "Changed your mind? You can undo this import below for 14 days.",
+      "again": "Start another move"
+    },
+    "undo": {
+      "title": "Imports you can undo",
+      "hint": "An undo removes only what the import created and nobody touched since. Anything with later data on it (a note, a payment, a booking) always stays.",
+      "batch": "Import of {date}: {count} records",
+      "until": "You can undo until {date}",
+      "closed": "The undo period has ended",
+      "preview": "Undo this import",
+      "removes": "{count, plural, one {# record will be removed.} other {# records will be removed.}}",
+      "keeps": "{count, plural, one {# stays.} other {# stay.}}",
+      "includeEdited": "Also remove records that were edited after the import",
+      "confirm": "Remove them"
+    },
+    "errors": {
+      "generic": "Something went wrong. Try again.",
+      "rights_not_confirmed": "Confirm that you may transfer this information.",
+      "empty_file": "The file has no rows.",
+      "unreadable_file": "The file could not be read.",
+      "file_too_large": "The file is larger than 10 MB.",
+      "too_many_rows": "A file can hold up to 5,000 rows.",
+      "move_too_large": "A move can hold up to 20 MB of files.",
+      "no_files": "Add at least one file.",
+      "unmapped_file": "Choose what each file holds.",
+      "nothing_to_import": "There is nothing to import.",
+      "session_closed": "This move was already imported.",
+      "undo_closed": "This import can no longer be undone.",
+      "invalid_mapping": "Each field can be used by one column only.",
+      "kind_required": "Choose what the file holds."
+    }
   }
 }
