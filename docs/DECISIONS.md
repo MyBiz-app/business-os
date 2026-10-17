@@ -267,6 +267,15 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - The sample payroll run stays at the hours stage rather than approved: approving needs file storage and bank details the staging seed does not have, and an approved month is locked, which would stop the owner from trying the flow.
 - The sample move is a draft that is never imported by the seed, and its fictitious clients use reserved addresses; nothing is sent to anyone.
 
+### Corrective payslips, yearly summary and deferred payroll items (2026-10-17, round 6 P6, migration 0112)
+
+- An approved month is never edited. A correction is a numbered version (`payslip_corrections`) for one person and month: reason, signed adjustment lines, the net worked out again from the dated rates table, and the difference to pay or recover. Only the owner issues one.
+- Adjustments are treated as ordinary taxable pay that is liable to insurance and pension. Anything special (back pay across tax years, exempt amounts) is for the accountant; corrective payslips are always marked draft for accountant review, even when the month was already checked.
+- A correction that would make the net negative is refused (recover it with a deduction in the next run instead).
+- The yearly summary per person is the data behind Form 106 (the latest correction of a month replaces its original). Filing 106, 102 and 126 stays with the accountant.
+- Deferred: leave balances on the payslip (the product has no leave ledger or accrual rules yet; it needs its own slice with the work-days-per-week and seniority rules from spec 3.9) and the pension tax credit (not in the spec; the accountant applies it).
+- Web screen for issuing corrections is not built yet; the API is complete and tested.
+
 ## Open
 
 | # | Question |

@@ -1002,6 +1002,64 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll/runs/{period}/payslips/{user_id}/corrections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Corrections */
+        get: operations["list_corrections"];
+        put?: never;
+        /**
+         * Issue Correction
+         * @description A new corrective payslip. Only an approved month can be corrected, and only by the owner.
+         */
+        post: operations["issue_correction"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/annual/{year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Annual Summary
+         * @description Per person totals of the tax year's approved months, the basis for Form 106.
+         */
+        get: operations["annual_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/annual/{year}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Annual Export */
+        get: operations["annual_export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/payroll/runs/{period}/net": {
         parameters: {
             query?: never;
@@ -1029,7 +1087,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Payslip File */
+        /**
+         * Payslip File
+         * @description The payslip; by default the latest corrective payslip when the month has one.
+         */
         get: operations["payslip_file"];
         put?: never;
         post?: never;
@@ -8010,6 +8071,55 @@ export interface components {
                 [key: string]: components["schemas"]["Texts"];
             };
         };
+        /** AnnualPerson */
+        AnnualPerson: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Months */
+            months: number;
+            /** Corrected Months */
+            corrected_months: number;
+            /** Gross Minor */
+            gross_minor: number;
+            /** Income Tax Minor */
+            income_tax_minor: number;
+            /** National Insurance Minor */
+            national_insurance_minor: number;
+            /** Health Minor */
+            health_minor: number;
+            /** Pension Employee Minor */
+            pension_employee_minor: number;
+            /** Study Fund Employee Minor */
+            study_fund_employee_minor: number;
+            /** Other Deductions Minor */
+            other_deductions_minor: number;
+            /** Net Minor */
+            net_minor: number;
+            /**
+             * Employer Minor
+             * @description Pension, severance, study fund and insurance
+             */
+            employer_minor: number;
+        };
+        /** AnnualSummary */
+        AnnualSummary: {
+            /** Year */
+            year: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Draft
+             * @description Some month was not yet checked by an accountant
+             */
+            draft: boolean;
+            /** People */
+            people: components["schemas"]["AnnualPerson"][];
+        };
         /** Answer */
         "Answer-Input": {
             /** Accept */
@@ -10110,6 +10220,49 @@ export interface components {
             up_to_clients: number | null;
             /** Price */
             price: number;
+        };
+        /** Correction */
+        Correction: {
+            /**
+             * Version
+             * @description 1 is the first correction; the original payslip is 0
+             */
+            version: number;
+            /** Reason */
+            reason: string;
+            /** Items */
+            items: components["schemas"]["CorrectionItem"][];
+            /** Previous Net Minor */
+            previous_net_minor: number;
+            /** Net Minor */
+            net_minor: number;
+            /**
+             * Difference Minor
+             * @description Net now less net before: to pay, or to recover
+             */
+            difference_minor: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** CorrectionBody */
+        CorrectionBody: {
+            /** Reason */
+            reason: string;
+            /** Items */
+            items: components["schemas"]["CorrectionItem"][];
+        };
+        /** CorrectionItem */
+        CorrectionItem: {
+            /** Label */
+            label: string;
+            /**
+             * Amount Minor
+             * @description Added to the pay; negative takes away
+             */
+            amount_minor: number;
         };
         /** CoverageGap */
         CoverageGap: {
@@ -13298,6 +13451,12 @@ export interface components {
              * Format: date
              */
             period: string;
+            /**
+             * Corrections
+             * @description Corrective payslips issued for the month
+             * @default 0
+             */
+            corrections: number;
             /** Net Minor */
             net_minor: number;
             /** Currency */
@@ -20296,6 +20455,154 @@ export interface operations {
             };
         };
     };
+    list_corrections: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Correction"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issue_correction: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CorrectionBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Correction"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annual_summary: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                year: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnualSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    annual_export: {
+        parameters: {
+            query?: {
+                format?: "csv" | "xlsx";
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                year: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_run_net: {
         parameters: {
             query?: never;
@@ -20333,7 +20640,10 @@ export interface operations {
     };
     payslip_file: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 0 is the original payslip */
+                version?: number | null;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
@@ -20402,7 +20712,10 @@ export interface operations {
     };
     my_payslip_file: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description 0 is the original payslip */
+                version?: number | null;
+            };
             header: {
                 "X-Tenant-Id": string;
                 /** @description The current branch (none: all branches) */
