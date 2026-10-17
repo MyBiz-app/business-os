@@ -1,0 +1,24 @@
+name: Restore drill reminder (quarterly)
+
+# GL15. Opens one issue on the first day of every quarter asking for a restore drill. Active only
+# once the second backup is switched on (repository variable OFFSITE_BACKUP_ENABLED).
+on:
+  schedule:
+    - cron: "0 6 1 1,4,7,10 *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  remind:
+    if: vars.OFFSITE_BACKUP_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open the reminder issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Quarterly restore drill ($(date -u +%Y-%m))"
+          gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" \
+            --body "Run the Restore drill workflow (or docs/deploy/restore-runbook.md, 'The restore drill'), add a row to the drill table with the real restore time, then close this issue."

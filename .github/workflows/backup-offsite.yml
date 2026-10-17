@@ -1,0 +1,73 @@
+name: Second backup (database and files to Cloudflare R2)
+
+# GL15. Daily encrypted copy of the database and the files bucket to storage that does not depend
+# on Supabase. OFF until the repository variable OFFSITE_BACKUP_ENABLED is "true" (set it only
+# after go-live checklist item A2: R2 bucket, age key, secrets). Nothing here costs money (R2 free
+# tier: 10 GB). Setup and restore: docs/deploy/restore-runbook.md.
+on:
+  schedule:
+    - cron: "40 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: offsite-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Back up to R2
+    if: vars.OFFSITE_BACKUP_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: backup
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pg_dump 17 and age
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common age
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+          echo "/usr/lib/postgresql/17/bin" >> "$GITHUB_PATH"
+
+      - name: Database dump, encrypted, to R2
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_AGE_RECIPIENT: ${{ vars.BACKUP_AGE_RECIPIENT }}
+          R2_ENDPOINT: ${{ vars.R2_ENDPOINT }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: scripts/backup/backup-db.sh
+
+      - name: Files bucket to R2
+        # Only when the files bucket keys are set (files may still be in the database).
+        if: vars.FILES_S3_ENDPOINT != ''
+        env:
+          FILES_S3_ENDPOINT: ${{ vars.FILES_S3_ENDPOINT }}
+          FILES_S3_ACCESS_KEY_ID: ${{ secrets.FILES_S3_ACCESS_KEY_ID }}
+          FILES_S3_SECRET_ACCESS_KEY: ${{ secrets.FILES_S3_SECRET_ACCESS_KEY }}
+          FILES_BUCKET: ${{ vars.FILES_BUCKET }}
+          R2_ENDPOINT: ${{ vars.R2_ENDPOINT }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: scripts/backup/copy-files.sh
+
+      - name: Open an issue when the backup fails
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Second backup failed"
+          open="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$title\" in:title" --json number --jq 'length')"
+          if [ "$open" = "0" ]; then
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" \
+              --body "The daily offsite backup failed: $RUN_URL. Fix it today; see docs/deploy/restore-runbook.md."
+          fi
