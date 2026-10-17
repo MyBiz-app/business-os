@@ -38,8 +38,6 @@ export function ServiceForm({ action, service, currency, submitLabel, readOnly =
   return (
     <CatalogFormFrame
       modal={modal}
-      size="lg"
-      title={service ? service.name : t("services.new")}
       backHref="/catalog?tab=services"
       formAction={formAction}
       state={state}

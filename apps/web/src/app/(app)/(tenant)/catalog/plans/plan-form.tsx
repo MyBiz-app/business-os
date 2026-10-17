@@ -32,7 +32,6 @@ export function PlanForm({ action, plan, currency, submitLabel, readOnly = false
   return (
     <CatalogFormFrame
       modal={modal}
-      title={plan ? plan.name : t("plans.new")}
       backHref="/catalog?tab=plans"
       formAction={formAction}
       state={state}

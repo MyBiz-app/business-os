@@ -7,10 +7,10 @@ import { formatMoney } from "@/lib/money";
 import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
+import { RouteModal } from "@/components/ui/route-modal";
 import { CatalogPage } from "../page-shell";
 import { PromoActions } from "./promo-actions-bar";
 import { PromoForm } from "./promo-form";
-import { PromoDialog } from "./promo-dialog";
 import { removePromoCode, setPromoActive } from "./actions";
 
 const BACK = "/catalog?tab=codes";
@@ -27,7 +27,7 @@ export async function NewPromo({ modal }: { modal: boolean }) {
       .formatToParts(0)
       .find((part) => part.type === "currency")?.value ?? tenant.currency;
   const form = <PromoForm modal={modal} plans={plans.filter((p) => p.active).map((p) => ({ id: p.id, name: p.name }))} currencySymbol={currencySymbol} />;
-  return modal ? form : <CatalogPage title={t("new")} backHref={BACK}>{form}</CatalogPage>;
+  return modal ? <RouteModal title={t("new")}>{form}</RouteModal> : <CatalogPage title={t("new")} backHref={BACK}>{form}</CatalogPage>;
 }
 
 /** One code: what it gives, where it applies and how it was used, with pause / resume / delete. */
@@ -74,7 +74,16 @@ export async function PromoEditor({ id, modal }: { id: string; modal: boolean })
     />
   ) : null;
   const title = <span dir="ltr" className="font-mono">{code.code}</span>;
-  if (modal) return <PromoDialog code={code.code} actions={actions}>{body}</PromoDialog>;
+  if (modal) {
+    return (
+      <RouteModal title={code.code} size="sm">
+        <div className="flex flex-col gap-5">
+          {body}
+          {actions}
+        </div>
+      </RouteModal>
+    );
+  }
   return (
     <CatalogPage title={title} backHref={BACK}>
       <div className="card flex flex-col gap-5 p-6">

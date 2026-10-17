@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { canDeleteCatalog, canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
+import { RouteModal } from "@/components/ui/route-modal";
 import { DeleteButton } from "../delete-button";
 import { CatalogPage } from "../page-shell";
 import { deletePlan, createPlan, updatePlan } from "./actions";
@@ -17,7 +18,7 @@ export async function NewPlan({ modal }: { modal: boolean }) {
   const { tenant } = await getTenantFor("catalog.read");
   if (!canWriteCatalog(tenant)) redirect("/catalog?tab=plans");
   const form = <PlanForm modal={modal} action={createPlan} currency={tenant.currency} submitLabel={t("common.create")} />;
-  return modal ? form : <CatalogPage title={t("plans.new")} backHref={BACK}>{form}</CatalogPage>;
+  return modal ? <RouteModal title={t("plans.new")}>{form}</RouteModal> : <CatalogPage title={t("plans.new")} backHref={BACK}>{form}</CatalogPage>;
 }
 
 /** One plan to view or edit (read-only for people who may not change the catalog). */
@@ -41,5 +42,5 @@ export async function PlanEditor({ id, modal }: { id: string; modal: boolean }) 
       }
     />
   );
-  return modal ? form : <CatalogPage title={<bdi dir="auto">{plan.name}</bdi>} backHref={BACK}>{form}</CatalogPage>;
+  return modal ? <RouteModal title={plan.name}>{form}</RouteModal> : <CatalogPage title={<bdi dir="auto">{plan.name}</bdi>} backHref={BACK}>{form}</CatalogPage>;
 }

@@ -19,7 +19,6 @@ export function PromoForm({ plans, currencySymbol, modal = false }: Props) {
   return (
     <CatalogFormFrame
       modal={modal}
-      title={t("new")}
       backHref="/catalog?tab=codes"
       formAction={action}
       state={{ saved: state.saved }}

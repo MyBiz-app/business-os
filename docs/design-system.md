@@ -78,12 +78,6 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   page or a jump to the top). Every transition is 200ms or less, never blocks an action and is off
   under "reduce motion". Styles are the `modal-*`, `section-*`, `segmented-pill`, `content-swap`,
   `loading-dots`, `progress-bar` and `pending-*` blocks at the end of `globals.css`.
-- Windows over a list (round 7, R9): put the window in a parallel route next to the list
-  (`catalog/layout.tsx` renders `children` and `modal`; `catalog/@modal/(.)plans/[id]/page.tsx`
-  intercepts the same address as `catalog/plans/[id]/page.tsx`). Both render the same server
-  component with `modal` true or false, and the form goes through `CatalogFormFrame`
-  (`catalog/form-frame.tsx`): a `Modal` that is one form, or a plain page form. Copy that folder for
-  the next area. A delete button inside such a form uses `formAction`, because forms cannot nest.
 - Toasts: `useToast()` in `components/toast/toaster.tsx` (web) and `components/toast.tsx` in
   app-kit (apps), same API: `toast("success" | "error" | "info", message, { action })`. A dark
   card in the corner at the reading start (top on a phone), several stack as a pile that opens on

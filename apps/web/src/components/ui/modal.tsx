@@ -18,10 +18,8 @@ export function Modal({
   description,
   children,
   footer,
-  cancelLabel,
   dirty = false,
   size = "lg",
-  form,
 }: {
   open?: boolean;
   onClose: () => void;
@@ -29,14 +27,9 @@ export function Modal({
   description?: string;
   children: ReactNode;
   footer?: ReactNode;
-  /** Adds a secondary button before `footer` that closes like the X (asking first when `dirty`). */
-  cancelLabel?: string;
   /** True while the form holds changes that are not saved yet. */
   dirty?: boolean;
   size?: "sm" | "md" | "lg";
-  /** Makes the window one `<form>` (body and footer inside it), so the submit button in `footer`
-   * works and shows its saving state. `onChange` fires on any field change. */
-  form?: { action: (formData: FormData) => void; onChange?: () => void };
 }) {
   const t = useTranslations("common");
   const dialog = useRef<HTMLDialogElement>(null);
@@ -72,21 +65,6 @@ export function Modal({
   }, [dirty, finish]);
 
   if (!open) return null;
-  const body = (
-    <>
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
-      {footer || cancelLabel ? (
-        <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-border bg-surface px-5 py-3 sm:px-6">
-          {cancelLabel ? (
-            <button type="button" className="btn-secondary px-4 py-2.5" onClick={requestClose}>
-              {cancelLabel}
-            </button>
-          ) : null}
-          {footer}
-        </footer>
-      ) : null}
-    </>
-  );
   return (
     <dialog
       ref={dialog}
@@ -119,13 +97,12 @@ export function Modal({
             <X aria-hidden="true" className="size-5" />
           </button>
         </header>
-        {form ? (
-          <form action={form.action} onChange={form.onChange} className="flex min-h-0 flex-1 flex-col">
-            {body}
-          </form>
-        ) : (
-          body
-        )}
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>
+        {footer ? (
+          <footer className="flex flex-wrap items-center justify-end gap-3 border-t border-border bg-surface px-5 py-3 sm:px-6">
+            {footer}
+          </footer>
+        ) : null}
         {asking ? (
           <div className="modal-ask" role="alertdialog" aria-modal="true" aria-labelledby={`${titleId}-ask`}>
             <div className="card flex max-w-sm flex-col gap-4 p-6">
