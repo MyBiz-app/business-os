@@ -53,6 +53,7 @@ OVERRIDES = {
     },
     "pay_components": {"kind": "'travel'", "calc": "'by_month'"},
     "payroll_runs": {"period": "date_trunc('month', current_date)::date"},
+    "payslip_corrections": {"version": "1", "net": "'{}'::jsonb"},
     "pending_actions": {"risk_level": "'low'"},
     "person_identities": {"user_id": "gen_random_uuid()", "id_type": "'il_id'", "country": "'IL'"},
     "promo_codes": {"amount_off": "1", "code": "'TESTCODE'"},

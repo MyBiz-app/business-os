@@ -9,6 +9,7 @@ table.lines td, table.lines th { font-size: 9.5pt; padding: 2mm 0; }
 {% endblock %}
 {% block body %}
 {% if draft_note %}<p class="draft">{{ draft_note }}</p>{% endif %}
+{% if correction %}<p class="draft">{{ correction.note }}</p>{% endif %}
 <table class="meta">
   <tr><th>{{ t.employeeName }}</th><td>{{ employee }}</td><th>{{ t.idLast4 }}</th><td class="ltr">{{ id_last4 or "-" }}</td></tr>
   <tr><th>{{ t.jobTitle }}</th><td>{{ job_title or "-" }}</td><th>{{ t.employmentStart }}</th><td>{{ start or "-" }}</td></tr>
@@ -35,6 +36,7 @@ table.lines td, table.lines th { font-size: 9.5pt; padding: 2mm 0; }
   </div>
 </div>
 <div class="total-row"><span class="label">{{ t.netPay }}</span><span class="total"><bdi>{{ net }}</bdi></span></div>
+{% if correction %}<p class="note">{{ correction.previous_net_label }}: <bdi>{{ correction.previous_net }}</bdi> &middot; <strong>{{ correction.difference_label }}: <bdi>{{ correction.difference }}</bdi></strong></p>{% endif %}
 <p class="note">{{ t.employerContributions }}: {% for row in employer %}{{ row.label }} <bdi>{{ row.amount }}</bdi>{% if not loop.last %} &middot; {% endif %}{% endfor %}</p>
 <p class="ytd">{{ t.yearToDate }}: {{ t.ytdGross }} <bdi>{{ ytd.gross }}</bdi> &middot; {{ t.ytdTax }} <bdi>{{ ytd.tax }}</bdi> &middot; {{ t.ytdNationalInsurance }} <bdi>{{ ytd.national_insurance }}</bdi> &middot; {{ t.ytdHealth }} <bdi>{{ ytd.health }}</bdi></p>
 <p class="note">{{ t.payslipDisclaimer }}</p>

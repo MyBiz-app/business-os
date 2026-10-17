@@ -13,7 +13,7 @@ from decimal import Decimal
 from typing import Annotated, Any
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -78,6 +78,7 @@ class RunNet(BaseModel):
 
 class PayslipRow(BaseModel):
     period: dt.date
+    corrections: int = Field(default=0, description="Corrective payslips issued for the month")
     net_minor: int
     currency: str
     draft: bool
@@ -254,7 +255,11 @@ def _year_to_date(session: Session, user_id: UUID, run: Any, net: dict) -> dict[
     from their frozen net; a month nobody approved has none and counts its gross only."""
     rows = session.execute(
         text("""
-            SELECT l.gross_minor, l.inputs -> 'net' AS net
+            SELECT l.gross_minor, coalesce(
+                (SELECT c.net FROM app.payslip_corrections c
+                 WHERE c.run_id = l.run_id AND c.user_id = l.user_id
+                 ORDER BY c.version DESC LIMIT 1),
+                l.inputs -> 'net') AS net
             FROM app.payroll_run_lines l JOIN app.payroll_runs r ON r.id = l.run_id
             WHERE l.user_id = :user AND r.period < :period
               AND r.period >= make_date(CAST(:year AS int), 1, 1)
@@ -268,7 +273,7 @@ def _year_to_date(session: Session, user_id: UUID, run: Any, net: dict) -> dict[
         "health": net["health_minor"],
     }
     for row in rows:
-        totals["gross"] += row["gross_minor"]
+        totals["gross"] += row["net"]["gross_minor"] if row["net"] else row["gross_minor"]
         if row["net"]:
             totals["tax"] += row["net"]["tax_minor"]
             totals["national_insurance"] += row["net"]["national_insurance_minor"]
@@ -276,11 +281,33 @@ def _year_to_date(session: Session, user_id: UUID, run: Any, net: dict) -> dict[
     return totals
 
 
-def payslip_pdf(session: Session, tenant_id: UUID, run: Any, user_id: UUID) -> bytes:
+def correction_row(
+    session: Session, run_id: UUID, user_id: UUID, version: int | None = None
+) -> Any:
+    """A corrective payslip of the month: the given version, or the latest one (None if none)."""
+    return (
+        session.execute(
+            text("""
+                SELECT * FROM app.payslip_corrections
+                WHERE run_id = :run AND user_id = :user AND (CAST(:version AS int) IS NULL
+                                                          OR version = :version)
+                ORDER BY version DESC LIMIT 1
+            """),
+            {"run": run_id, "user": user_id, "version": version},
+        )
+        .mappings()
+        .first()
+    )
+
+
+def payslip_pdf(
+    session: Session, tenant_id: UUID, run: Any, user_id: UUID, correction: Any = None
+) -> bytes:
+    """The payslip of a month; with `correction` the corrective payslip of that version."""
     line = next((row for row in _line_rows(session, run["id"]) if row["user_id"] == user_id), None)
     if line is None:
         raise not_found()
-    net = _all_nets(session, tenant_id, run)[user_id][0]
+    net = correction["net"] if correction else _all_nets(session, tenant_id, run)[user_id][0]
     tenant = (
         session.execute(
             text("""
@@ -334,6 +361,28 @@ def payslip_pdf(session: Session, tenant_id: UUID, run: Any, user_id: UUID) -> b
         for item in line["items"]
         if item["section"] != "deduction"
     ]
+    correction_note = None
+    if correction:
+        for earlier in _correction_items(session, run["id"], user_id, correction["version"]):
+            payments.append(
+                {
+                    "label": f"{t['payslipCorrectionLine']}: {earlier['label']}",
+                    "quantity": "",
+                    "rate": "",
+                    "amount": money(earlier["amount_minor"]),
+                }
+            )
+        correction_note = {
+            "note": render.fill(
+                t["payslipCorrectionNote"],
+                previous=correction["version"] - 1,
+                reason=correction["reason"],
+            ),
+            "previous_net_label": t["payslipPreviousNet"],
+            "previous_net": money(correction["previous_net_minor"]),
+            "difference_label": t["payslipDifference"],
+            "difference": money(correction["difference_minor"]),
+        }
     deductions = [
         {
             "label": t["payslipDeductions"][d["code"]]
@@ -347,7 +396,7 @@ def payslip_pdf(session: Session, tenant_id: UUID, run: Any, user_id: UUID) -> b
         for d in net["employer"]
     ]
     ytd = _year_to_date(session, user_id, run, net)
-    draft = run["accountant_checked_at"] is None
+    draft = run["accountant_checked_at"] is None or correction is not None
     logo = (
         render.data_uri(bytes(tenant["logo"]), tenant["logo_content_type"])
         if tenant["logo"] and tenant["logo_content_type"]
@@ -368,7 +417,12 @@ def payslip_pdf(session: Session, tenant_id: UUID, run: Any, user_id: UUID) -> b
                 "logo": logo,
                 "lines": [part for part in issuer_lines if part],
             },
-            "doc_title": render.fill(t["payslip"], month=f"{first.month:02d}/{first.year}"),
+            "doc_title": render.fill(
+                t["payslipCorrective"] if correction else t["payslip"],
+                month=f"{first.month:02d}/{first.year}",
+                version=correction["version"] if correction else 0,
+            ),
+            "correction": correction_note,
             "doc_number": "",
             "sample_note": None,
             "watermark": t["payslipDraft"] if draft else None,
@@ -395,9 +449,31 @@ def payslip_pdf(session: Session, tenant_id: UUID, run: Any, user_id: UUID) -> b
     )
 
 
+def _correction_items(session: Session, run_id: UUID, user_id: UUID, upto: int) -> list[dict]:
+    """The adjustment lines of every correction up to a version, oldest first."""
+    rows = session.execute(
+        text("""
+            SELECT items FROM app.payslip_corrections
+            WHERE run_id = :run AND user_id = :user AND version <= :upto ORDER BY version
+        """),
+        {"run": run_id, "user": user_id, "upto": upto},
+    ).scalars()
+    return [item for items in rows for item in items]
+
+
 def _visible_run(context: TenantContext, period: str) -> Any:
     _ensure_unscoped(context)
     return _run_row(context.session, _first(period))
+
+
+def _chosen_correction(session: Session, run: Any, user_id: UUID, version: int | None) -> Any:
+    """None for the original payslip (version 0); else the asked or the latest correction."""
+    if version == 0:
+        return None
+    found = correction_row(session, run["id"], user_id, version)
+    if version is not None and found is None:
+        raise not_found()
+    return found
 
 
 @router.get(
@@ -405,7 +481,13 @@ def _visible_run(context: TenantContext, period: str) -> Any:
     response_class=Response,
     responses=PDF_RESPONSES,
 )
-def payslip_file(period: PeriodPath, user_id: UUID, context: ReadDep) -> Response:
+def payslip_file(
+    period: PeriodPath,
+    user_id: UUID,
+    context: ReadDep,
+    version: Annotated[int | None, Query(ge=0, description="0 is the original payslip")] = None,
+) -> Response:
+    """The payslip; by default the latest corrective payslip when the month has one."""
     run = _visible_run(context, period)
     role = context.session.execute(
         text("SELECT role FROM app.tenant_members WHERE user_id = :user"), {"user": user_id}
@@ -413,7 +495,11 @@ def payslip_file(period: PeriodPath, user_id: UUID, context: ReadDep) -> Respons
     if role is None or not _below(context, role):
         raise not_found()
     _audit(context.session, context.tenant_id, "payroll.payslip_viewed", "member", user_id)
-    return _pdf(payslip_pdf(context.session, context.tenant_id, run, user_id), f"payslip-{period}")
+    correction = _chosen_correction(context.session, run, user_id, version)
+    return _pdf(
+        payslip_pdf(context.session, context.tenant_id, run, user_id, correction),
+        f"payslip-{period}" + (f"-v{correction['version']}" if correction else ""),
+    )
 
 
 @router.get("/me/payslips")
@@ -421,7 +507,14 @@ def my_payslips(context: TenantDep, user: UserDep) -> list[PayslipRow]:
     """The signed-in team member's own approved months, newest first."""
     rows = context.session.execute(
         text("""
-            SELECT r.period, r.currency, r.accountant_checked_at, l.inputs -> 'net' AS net
+            SELECT r.period, r.currency, r.accountant_checked_at,
+                   coalesce(
+                       (SELECT c.net FROM app.payslip_corrections c
+                        WHERE c.run_id = l.run_id AND c.user_id = l.user_id
+                        ORDER BY c.version DESC LIMIT 1),
+                       l.inputs -> 'net') AS net,
+                   (SELECT count(*) FROM app.payslip_corrections c
+                    WHERE c.run_id = l.run_id AND c.user_id = l.user_id) AS corrections
             FROM app.payroll_run_lines l JOIN app.payroll_runs r ON r.id = l.run_id
             WHERE l.user_id = :user AND r.stage = 'approved' ORDER BY r.period DESC
         """),
@@ -430,6 +523,7 @@ def my_payslips(context: TenantDep, user: UserDep) -> list[PayslipRow]:
     return [
         PayslipRow(
             period=row["period"],
+            corrections=row["corrections"],
             net_minor=row["net"]["net_minor"] if row["net"] else 0,
             currency=row["currency"],
             draft=row["accountant_checked_at"] is None,
@@ -439,12 +533,21 @@ def my_payslips(context: TenantDep, user: UserDep) -> list[PayslipRow]:
 
 
 @router.get("/me/payslips/{period}/pdf", response_class=Response, responses=PDF_RESPONSES)
-def my_payslip_file(period: PeriodPath, context: TenantDep, user: UserDep) -> Response:
+def my_payslip_file(
+    period: PeriodPath,
+    context: TenantDep,
+    user: UserDep,
+    version: Annotated[int | None, Query(ge=0, description="0 is the original payslip")] = None,
+) -> Response:
     run = _run_row(context.session, _first(period))
     if run["stage"] != "approved":
         raise not_found()
     _audit(context.session, context.tenant_id, "payroll.payslip_viewed", "member", user.id)
-    return _pdf(payslip_pdf(context.session, context.tenant_id, run, user.id), f"payslip-{period}")
+    correction = _chosen_correction(context.session, run, user.id, version)
+    return _pdf(
+        payslip_pdf(context.session, context.tenant_id, run, user.id, correction),
+        f"payslip-{period}" + (f"-v{correction['version']}" if correction else ""),
+    )
 
 
 # -- the bank file ------------------------------------------------------------------------------
