@@ -85,4 +85,4 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
 For the Expo apps, `no-restricted-syntax` in `apps/client-app/eslint.config.js` and
 `packages/app-kit/eslint.config.js` bans hex literals outside `lib/theme.ts` and `lib/brand.ts`.
 Colors that never change with theme or brand (white on a brand fill, the rating star) are
-`fixedColors` in `theme.ts`.
+`fixedColors` in `theme.ts`. Allowed: the launch splash and the brand color swatches (their colors are the content).

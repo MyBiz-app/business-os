@@ -10,7 +10,7 @@ module.exports = defineConfig([
     // Design system: colors come from the palette (@business-os/design-tokens, app-kit lib/theme.ts)
     // or `fixedColors`; a hex literal anywhere else is an error.
     files: ["**/*.{ts,tsx}"],
-    ignores: ["**/*.test.*", "**/lib/theme.ts", "**/lib/brand.ts"],
+    ignores: ["**/*.test.*", "**/lib/theme.ts", "**/lib/brand.ts", "**/launch-splash.tsx", "**/brand-color-card.tsx"],
     rules: {
       "no-restricted-syntax": [
         "error",
