@@ -1,0 +1,51 @@
+/* The business app's shell: the lighter touches that make it feel like the landing page. Kept in
+ * its own file; the shared tokens live in app/globals.css. */
+
+/* A light navigation column (light mode only; night mode keeps the navy one). It keeps the page's
+ * own tokens, so everything inside reads correctly without extra colors. */
+.nav-light {
+  background: var(--surface);
+  color: var(--foreground);
+  border-inline-end: 1px solid var(--border);
+}
+.dark .nav-light {
+  background: var(--frame, #0f172a);
+}
+
+/* The page title area: a soft band in the brand gradient, like the landing's hero. */
+.crm-content main > header:first-child {
+  position: relative;
+  padding: 1.5rem 1.75rem;
+  border-radius: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 16%, var(--border));
+  background:
+    radial-gradient(520px 220px at 100% 0%, color-mix(in oklab, var(--color-ai, #7c3aed) 12%, transparent), transparent 70%),
+    linear-gradient(135deg, color-mix(in oklab, var(--primary) 12%, var(--surface)), var(--surface) 65%);
+}
+@media (max-width: 40rem) {
+  .crm-content main > header:first-child {
+    padding: 1.1rem 1.15rem;
+    border-radius: 1.25rem;
+  }
+}
+@media print {
+  .crm-content main > header:first-child {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+}
+
+/* Softer cards: a hairline border and a gentle, wide shadow instead of a tight dark one. */
+.crm-content {
+  --elevation: 0 1px 2px hsl(var(--shadow-color) / 0.05), 0 8px 24px -12px hsl(var(--shadow-color) / 0.14);
+}
+.dark .crm-content {
+  --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
+}
+
+/* Page titles are extra bold with either navigation column (globals.css covers the dark one). */
+:has(> .nav-light) main h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}

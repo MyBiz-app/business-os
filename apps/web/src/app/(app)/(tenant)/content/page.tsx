@@ -165,8 +165,8 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
         })}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="card p-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section className="card min-w-0 p-6">
           {dashboard.followers_series.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -180,7 +180,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             />
           )}
         </section>
-        <section className="card p-6">
+        <section className="card min-w-0 p-6">
           {dashboard.video_views_weekly.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -193,7 +193,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             />
           )}
         </section>
-        <section className="card p-6">
+        <section className="card min-w-0 p-6">
           <h2 className="mb-3 font-semibold">{t("charts.kindTitle")}</h2>
           {dashboard.engagement_by_kind.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
@@ -216,7 +216,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
             </ul>
           )}
         </section>
-        <section className="card p-6">
+        <section className="card min-w-0 p-6">
           {dashboard.heatmap.length === 0 ? (
             <p className="text-muted">{t("charts.noData")}</p>
           ) : (
@@ -225,7 +225,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
         </section>
       </div>
 
-      <section aria-labelledby="top-posts" className="card flex flex-col gap-4 p-6">
+      <section aria-labelledby="top-posts" className="card min-w-0 flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="top-posts" className="text-lg font-bold">
             {t("posts.title")}
@@ -278,8 +278,8 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
         )}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section aria-labelledby="audience" className="card flex flex-col gap-4 p-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section aria-labelledby="audience" className="card min-w-0 flex flex-col gap-4 p-6">
           <h2 id="audience" className="text-lg font-bold">
             {t("audience.title")}
           </h2>
@@ -305,7 +305,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           )}
         </section>
         {dashboard.google_business && (
-          <section aria-labelledby="google" className="card flex flex-col gap-4 p-6">
+          <section aria-labelledby="google" className="card min-w-0 flex flex-col gap-4 p-6">
             <div className="flex items-center gap-3">
               <NetworkIcon network="google_business" size="sm" />
               <h2 id="google" className="text-lg font-bold">

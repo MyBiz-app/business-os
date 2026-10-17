@@ -32,13 +32,22 @@ export function sentryIngestOrigin(dsn: string | undefined = process.env.NEXT_PU
   }
 }
 
+/** The API's origin: business logos and other public images are served from it. */
+export function apiOrigin(url: string | undefined = process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000"): string | undefined {
+  try {
+    return new URL(url).origin;
+  } catch {
+    return undefined;
+  }
+}
+
 function directives(scriptSrc: string, { dev }: Options): string[] {
   return [
     "default-src 'self'",
     `script-src ${scriptSrc}${dev ? " 'unsafe-eval'" : ""}`,
     // React and next/font set inline style attributes; a style nonce cannot cover those.
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
+    ["img-src 'self' data: blob:", apiOrigin()].filter(Boolean).join(" "),
     "font-src 'self' data:",
     ["connect-src 'self'", sentryIngestOrigin()].filter(Boolean).join(" "),
     "object-src 'none'",
