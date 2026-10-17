@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from app.api.deps import TenantContext, get_tenant_context
+from app.core.mfa import mfa_required, sensitive_action_needs_mfa
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
 
 router = APIRouter(prefix="/tenants/current/closure", tags=["settings"])
@@ -21,6 +22,8 @@ CLOSURE_PATH = "/tenants/current/closure"
 def require_owner(context: Annotated[TenantContext, Depends(get_tenant_context)]) -> TenantContext:
     if context.role != "owner":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="owner_only")
+    if sensitive_action_needs_mfa(context.aal):
+        raise mfa_required()
     return context
 
 

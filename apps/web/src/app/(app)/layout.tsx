@@ -1,5 +1,8 @@
 import { ScopedMessages } from "@/components/scoped-messages";
 import { signOut } from "@/app/(auth)/actions";
+import { ActivityGuard } from "@/components/activity-guard";
+import { DeviceCheck } from "@/components/device-check";
+import { MfaBanner } from "@/components/mfa-banner";
 import { AnnouncementsPopup, type PopupItem } from "@/components/announcements-popup";
 import { AppHeader } from "@/components/app-header";
 import { avatarSrc } from "@/components/avatar";
@@ -45,7 +48,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           signOut={signOut}
         />
       </AppHeader>
+      <MfaBanner memberships={me.memberships.map((m) => m.role)} platform={me.platform_admin} />
       {children}
+      <ActivityGuard />
+      <DeviceCheck />
       {announcements.length > 0 && <AnnouncementsPopup items={announcements} />}
     </div>
     </ScopedMessages>

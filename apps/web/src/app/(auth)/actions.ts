@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { appleEnabled, OAUTH_PROVIDERS, type OAuthProvider, whatsappEnabled } from "@/lib/auth-providers";
+import { isCode } from "@/lib/mfa";
 import { AUTH_NEXT_COOKIE, safeNext } from "@/lib/navigation";
 import { OTP_LENGTH, type OtpChannel, toE164 } from "@/lib/otp";
 import { siteOrigin } from "@/lib/origin";
@@ -159,4 +160,18 @@ export async function verifyLoginCode(_state: CodeState, formData: FormData): Pr
   );
   if (error) return { error: "invalid_code", channel, target };
   redirect(safeNext(formData.get("next")) ?? "/dashboard");
+}
+
+/** After the password (or a link or code): the six digits from the authenticator app. A person
+ * with a second authenticator as a backup can use either. */
+export async function verifyMfa(_state: FormState, formData: FormData): Promise<FormState> {
+  const code = field(formData, "code");
+  if (!isCode(code)) return { error: "invalid_code" };
+  const supabase = await createClient();
+  const { data } = await supabase.auth.mfa.listFactors();
+  for (const factor of data?.totp ?? []) {
+    const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+    if (!error) redirect(safeNext(formData.get("next")) ?? "/dashboard");
+  }
+  return { error: "invalid_code" };
 }

@@ -25,6 +25,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "auth",
     "common",
     "locales",
+    "security",
     "settings"
   ],
   "tenant": [
@@ -117,6 +118,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "modules",
     "onboarding",
     "platform",
+    "security",
     "settings",
     "start",
     "terms",
