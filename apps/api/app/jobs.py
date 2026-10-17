@@ -43,6 +43,7 @@ from app.commerce.billing import bill_businesses
 from app.commerce.dunning import run_dunning
 from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
+from app.core.tenant_scope import Tally, start_tally, tenant_scope
 from app.files import forget, purge_expired_files
 from app.messaging import outbox
 from app.messaging.alerts import AlertResult, alert_team
@@ -62,6 +63,7 @@ from app.providers.storage import tenant_key
 from app.schedule.scheduling import weekly_occurrences
 from app.secrets_rotation import rotate_secrets
 
+LOCK_PREFIX = "mybiz-job:"  # advisory-lock key of a job: one run of each at a time
 HORIZON_DAYS = 12 * 7  # open-ended series always have this much schedule ahead
 
 
@@ -85,54 +87,55 @@ def extend_series(conn: Connection, now: datetime | None = None) -> int:
 
     added = 0
     for row in series:
-        local_today: date = now.astimezone(ZoneInfo(row["time_zone"])).date()
-        target = local_today + timedelta(days=HORIZON_DAYS)
-        if row["ends_on"] >= target:
-            continue
-        closed = set(
-            conn.execute(
-                text("SELECT day FROM app.closed_days WHERE tenant_id = :t AND day > :after"),
-                {"t": row["tenant_id"], "after": row["ends_on"]},
-            ).scalars()
-        )
-        starts = list(
-            weekly_occurrences(
-                row["ends_on"] + timedelta(days=1),
-                target,
-                set(row["weekdays"]),
-                row["start_time"],
-                row["time_zone"],
-                skip=closed,
+        with tenant_scope(conn, row["tenant_id"]):
+            local_today: date = now.astimezone(ZoneInfo(row["time_zone"])).date()
+            target = local_today + timedelta(days=HORIZON_DAYS)
+            if row["ends_on"] >= target:
+                continue
+            closed = set(
+                conn.execute(
+                    text("SELECT day FROM app.closed_days WHERE tenant_id = :t AND day > :after"),
+                    {"t": row["tenant_id"], "after": row["ends_on"]},
+                ).scalars()
             )
-        )
-        if starts:
-            added += conn.execute(
-                text("""
-                    INSERT INTO app.sessions
-                        (tenant_id, series_id, service_id, location_id, room_id,
-                         instructor_user_id, capacity, starts_at, ends_at)
-                    SELECT :tenant_id, :series_id, :service_id, :location_id, :room_id,
-                           :instructor_user_id, :capacity, start_at,
-                           start_at + make_interval(mins => :duration)
-                    FROM unnest(CAST(:starts AS timestamptz[])) AS start_at
-                    ON CONFLICT (series_id, starts_at) DO NOTHING
-                """),
-                {
-                    "tenant_id": row["tenant_id"],
-                    "series_id": row["id"],
-                    "service_id": row["service_id"],
-                    "location_id": row["location_id"],
-                    "room_id": row["room_id"],
-                    "instructor_user_id": row["instructor_user_id"],
-                    "capacity": row["capacity"],
-                    "duration": row["duration_minutes"],
-                    "starts": starts,
-                },
-            ).rowcount
-        conn.execute(
-            text("UPDATE app.session_series SET ends_on = :target WHERE id = :id"),
-            {"target": target, "id": row["id"]},
-        )
+            starts = list(
+                weekly_occurrences(
+                    row["ends_on"] + timedelta(days=1),
+                    target,
+                    set(row["weekdays"]),
+                    row["start_time"],
+                    row["time_zone"],
+                    skip=closed,
+                )
+            )
+            if starts:
+                added += conn.execute(
+                    text("""
+                        INSERT INTO app.sessions
+                            (tenant_id, series_id, service_id, location_id, room_id,
+                             instructor_user_id, capacity, starts_at, ends_at)
+                        SELECT :tenant_id, :series_id, :service_id, :location_id, :room_id,
+                               :instructor_user_id, :capacity, start_at,
+                               start_at + make_interval(mins => :duration)
+                        FROM unnest(CAST(:starts AS timestamptz[])) AS start_at
+                        ON CONFLICT (series_id, starts_at) DO NOTHING
+                    """),
+                    {
+                        "tenant_id": row["tenant_id"],
+                        "series_id": row["id"],
+                        "service_id": row["service_id"],
+                        "location_id": row["location_id"],
+                        "room_id": row["room_id"],
+                        "instructor_user_id": row["instructor_user_id"],
+                        "capacity": row["capacity"],
+                        "duration": row["duration_minutes"],
+                        "starts": starts,
+                    },
+                ).rowcount
+            conn.execute(
+                text("UPDATE app.session_series SET ends_on = :target WHERE id = :id"),
+                {"target": target, "id": row["id"]},
+            )
     return added
 
 
@@ -236,33 +239,34 @@ def message_reminders(
     per_tenant: dict[object, int] = {}
     simulated: dict[object, tuple[bool, str]] = {}
     for row in rows:
-        if row["tenant_id"] not in simulated:  # the business's messaging provider (X13)
-            chosen = choose(conn, row["tenant_id"], "messaging")
-            simulated[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
-        is_simulated, provider = simulated[row["tenant_id"]]
-        locale = row["locale"] if row["locale"] in ("he", "en") else "en"
-        texts.setdefault(locale, load_messages(locale, messages_dir))
-        _subject, body = render(texts[locale], row["kind"], row["payload"], row)
-        conn.execute(
-            text("""
-                INSERT INTO app.messages
-                    (tenant_id, client_id, channel, to_phone, body, status, notification_id,
-                     simulated, provider, sent_at)
-                VALUES (:t, :c, 'whatsapp', :phone, :body, :status, :n, :simulated, :provider,
-                        CASE WHEN :simulated THEN now() END)
-            """),
-            {
-                "t": row["tenant_id"],
-                "c": row["client_id"],
-                "phone": row["phone"].strip(),
-                "body": body[:1100],
-                "n": row["id"],
-                "status": "sent" if is_simulated else "queued",
-                "simulated": is_simulated,
-                "provider": provider,
-            },
-        )
-        per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
+        with tenant_scope(conn, row["tenant_id"]):
+            if row["tenant_id"] not in simulated:  # the business's messaging provider (X13)
+                chosen = choose(conn, row["tenant_id"], "messaging")
+                simulated[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
+            is_simulated, provider = simulated[row["tenant_id"]]
+            locale = row["locale"] if row["locale"] in ("he", "en") else "en"
+            texts.setdefault(locale, load_messages(locale, messages_dir))
+            _subject, body = render(texts[locale], row["kind"], row["payload"], row)
+            conn.execute(
+                text("""
+                    INSERT INTO app.messages
+                        (tenant_id, client_id, channel, to_phone, body, status, notification_id,
+                         simulated, provider, sent_at)
+                    VALUES (:t, :c, 'whatsapp', :phone, :body, :status, :n, :simulated, :provider,
+                            CASE WHEN :simulated THEN now() END)
+                """),
+                {
+                    "t": row["tenant_id"],
+                    "c": row["client_id"],
+                    "phone": row["phone"].strip(),
+                    "body": body[:1100],
+                    "n": row["id"],
+                    "status": "sent" if is_simulated else "queued",
+                    "simulated": is_simulated,
+                    "provider": provider,
+                },
+            )
+            per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
     for tenant_id, count in per_tenant.items():
         conn.execute(
             text("""
@@ -271,7 +275,7 @@ def message_reminders(
             """),
             {"t": tenant_id, "n": count, "details": AUTOMATED_DETAILS},
         )
-    return len(rows)
+    return sum(per_tenant.values())
 
 
 FOLLOW_UP_AFTER_DAYS = 2  # a lead nobody has touched for this long gets one follow-up
@@ -314,45 +318,46 @@ def follow_up_leads(
     per_tenant: dict[object, int] = {}
     providers: dict[object, tuple[bool, str]] = {}
     for row in rows:
-        if row["tenant_id"] not in providers:  # the business's messaging provider (X13)
-            chosen = choose(conn, row["tenant_id"], "messaging")
-            providers[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
-        simulated, provider = providers[row["tenant_id"]]
-        locale = row["locale"] if row["locale"] in ("he", "en") else "en"
-        texts.setdefault(locale, load_messages(locale, messages_dir))
-        interest = (row["interest"] or "").strip()
-        template = texts[locale]["leadFollowUp"]["withInterest" if interest else "plain"]
-        body = (
-            template.replace("{name}", row["first_name"])
-            .replace("{business}", row["business"])
-            .replace("{interest}", interest[:200])
-        )[:1100]
-        conn.execute(
-            text("""
-                INSERT INTO app.messages
-                    (tenant_id, lead_id, channel, to_phone, body, status, simulated, provider,
-                     sent_at)
-                VALUES (:t, :l, 'whatsapp', :phone, :body, :status, :simulated, :provider,
-                        CASE WHEN :simulated THEN now() END)
-            """),
-            {
-                "t": row["tenant_id"],
-                "l": row["id"],
-                "phone": row["phone"].strip(),
-                "body": body,
-                "status": "sent" if simulated else "queued",
-                "simulated": simulated,
-                "provider": provider,
-            },
-        )
-        conn.execute(
-            text("""
-                INSERT INTO app.lead_activities (tenant_id, lead_id, kind, note)
-                VALUES (:t, :l, 'message', :note)
-            """),
-            {"t": row["tenant_id"], "l": row["id"], "note": body[:2000]},
-        )
-        per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
+        with tenant_scope(conn, row["tenant_id"]):
+            if row["tenant_id"] not in providers:  # the business's messaging provider (X13)
+                chosen = choose(conn, row["tenant_id"], "messaging")
+                providers[row["tenant_id"]] = (chosen.instance.simulated, chosen.info.name)
+            simulated, provider = providers[row["tenant_id"]]
+            locale = row["locale"] if row["locale"] in ("he", "en") else "en"
+            texts.setdefault(locale, load_messages(locale, messages_dir))
+            interest = (row["interest"] or "").strip()
+            template = texts[locale]["leadFollowUp"]["withInterest" if interest else "plain"]
+            body = (
+                template.replace("{name}", row["first_name"])
+                .replace("{business}", row["business"])
+                .replace("{interest}", interest[:200])
+            )[:1100]
+            conn.execute(
+                text("""
+                    INSERT INTO app.messages
+                        (tenant_id, lead_id, channel, to_phone, body, status, simulated, provider,
+                         sent_at)
+                    VALUES (:t, :l, 'whatsapp', :phone, :body, :status, :simulated, :provider,
+                            CASE WHEN :simulated THEN now() END)
+                """),
+                {
+                    "t": row["tenant_id"],
+                    "l": row["id"],
+                    "phone": row["phone"].strip(),
+                    "body": body,
+                    "status": "sent" if simulated else "queued",
+                    "simulated": simulated,
+                    "provider": provider,
+                },
+            )
+            conn.execute(
+                text("""
+                    INSERT INTO app.lead_activities (tenant_id, lead_id, kind, note)
+                    VALUES (:t, :l, 'message', :note)
+                """),
+                {"t": row["tenant_id"], "l": row["id"], "note": body[:2000]},
+            )
+            per_tenant[row["tenant_id"]] = per_tenant.get(row["tenant_id"], 0) + 1
     for tenant_id, count in per_tenant.items():
         conn.execute(
             text("""
@@ -361,7 +366,7 @@ def follow_up_leads(
             """),
             {"t": tenant_id, "n": count, "details": FOLLOW_UP_DETAILS},
         )
-    return len(rows)
+    return sum(per_tenant.values())
 
 
 # How long data is kept (decision X20). A business that closed its account is deleted after
@@ -377,6 +382,9 @@ RETENTION_MONTHS = {
 }
 
 
+PURGE_BATCH = 5000  # rows per DELETE
+
+
 def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, int]:
     """Deletes what has passed its time: leads that never became clients and nobody touched,
     website and in-app requests, the AI's conversations (in the app and on WhatsApp) with the
@@ -386,29 +394,64 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
     def before(kind: str) -> datetime:
         return now - timedelta(days=round(RETENTION_MONTHS[kind] * 30.44))
 
+    # Each statement deletes at most PURGE_BATCH rows; _delete_in_batches repeats it.
     statements = {
         "leads": """
-            DELETE FROM app.leads l
-            WHERE l.client_id IS NULL
-              AND greatest(l.updated_at, coalesce((SELECT max(a.occurred_at)
-                  FROM app.lead_activities a WHERE a.lead_id = l.id), l.updated_at)) < :before
+            DELETE FROM app.leads WHERE ctid = ANY(ARRAY(
+                SELECT l.ctid FROM app.leads l
+                WHERE l.client_id IS NULL
+                  AND greatest(l.updated_at, coalesce((SELECT max(a.occurred_at)
+                      FROM app.lead_activities a WHERE a.lead_id = l.id), l.updated_at)) < :before
+                LIMIT :batch))
         """,
-        "contact_requests": "DELETE FROM app.contact_requests WHERE created_at < :before",
-        "ai_conversations": "DELETE FROM app.ai_conversations WHERE updated_at < :before",
-        "whatsapp_conversations": (
-            "DELETE FROM app.whatsapp_conversations WHERE updated_at < :before"
-        ),
-        "whatsapp_inbox": "DELETE FROM app.whatsapp_inbox WHERE received_at < :before",
-        "messages": "DELETE FROM app.messages WHERE created_at < :before",
-        "audit_log": "DELETE FROM app.audit_log WHERE occurred_at < :before",
+        "contact_requests": """
+            DELETE FROM app.contact_requests WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.contact_requests
+                WHERE created_at < :before LIMIT :batch))
+        """,
+        "ai_conversations": """
+            DELETE FROM app.ai_conversations WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.ai_conversations
+                WHERE updated_at < :before LIMIT :batch))
+        """,
+        "whatsapp_conversations": """
+            DELETE FROM app.whatsapp_conversations WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.whatsapp_conversations
+                WHERE updated_at < :before LIMIT :batch))
+        """,
+        "whatsapp_inbox": """
+            DELETE FROM app.whatsapp_inbox WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.whatsapp_inbox
+                WHERE received_at < :before LIMIT :batch))
+        """,
+        "messages": """
+            DELETE FROM app.messages WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.messages
+                WHERE created_at < :before LIMIT :batch))
+        """,
+        "audit_log": """
+            DELETE FROM app.audit_log WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.audit_log
+                WHERE occurred_at < :before LIMIT :batch))
+        """,
     }
     deleted = {
-        kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
-        for kind, sql in statements.items()
+        kind: _delete_in_batches(conn, sql, before(kind)) for kind, sql in statements.items()
     }
     deleted["data_exports"] = purge_expired_exports(conn)
     deleted["files"] = purge_expired_files(conn)  # e.g. the imports folder keeps files 30 days
     return deleted
+
+
+def _delete_in_batches(conn: Connection, sql: str, before: datetime) -> int:
+    """Runs a statement that deletes up to :batch rows until it deletes fewer, so no single
+    statement holds millions of rows (and their locks) at once."""
+    total = 0
+    while True:
+        count = conn.execute(text(sql), {"before": before, "batch": PURGE_BATCH}).rowcount
+        total += count
+        if count < PURGE_BATCH:
+            return total
 
 
 def purge_expired_exports(conn: Connection) -> int:
@@ -448,33 +491,34 @@ def delete_closed_businesses(
     )
     if apply:
         for business in due:
-            conn.execute(
-                text("""
-                    INSERT INTO app.platform_audit (actor_email, action, details)
-                    VALUES ('system', 'business.deleted', jsonb_build_object(
-                        'business_id', CAST(:id AS text), 'name', CAST(:name AS text),
-                        'closed_at', CAST(:closed_at AS text)))
-                """),
-                {
-                    "id": business["id"],
-                    "name": business["name"],
-                    "closed_at": business["closed_at"],
-                },
-            )
-            # The files in the storage provider are not under the tenant row, so they go first.
-            keys = conn.execute(
-                text("""
-                    SELECT storage_key FROM app.client_documents
-                        WHERE tenant_id = :id AND storage_key IS NOT NULL
-                    UNION ALL SELECT storage_key FROM app.business_files
-                        WHERE tenant_id = :id AND storage_key IS NOT NULL
-                    UNION ALL SELECT storage_key FROM app.data_exports
-                        WHERE tenant_id = :id AND storage_key IS NOT NULL
-                """),
-                {"id": business["id"]},
-            ).scalars()
-            _forget_keys(conn, list(keys))
-            conn.execute(text("DELETE FROM app.tenants WHERE id = :id"), {"id": business["id"]})
+            with tenant_scope(conn, business["id"]):
+                conn.execute(
+                    text("""
+                        INSERT INTO app.platform_audit (actor_email, action, details)
+                        VALUES ('system', 'business.deleted', jsonb_build_object(
+                            'business_id', CAST(:id AS text), 'name', CAST(:name AS text),
+                            'closed_at', CAST(:closed_at AS text)))
+                    """),
+                    {
+                        "id": business["id"],
+                        "name": business["name"],
+                        "closed_at": business["closed_at"],
+                    },
+                )
+                # The files in the storage provider are not under the tenant row, so they go first.
+                keys = conn.execute(
+                    text("""
+                        SELECT storage_key FROM app.client_documents
+                            WHERE tenant_id = :id AND storage_key IS NOT NULL
+                        UNION ALL SELECT storage_key FROM app.business_files
+                            WHERE tenant_id = :id AND storage_key IS NOT NULL
+                        UNION ALL SELECT storage_key FROM app.data_exports
+                            WHERE tenant_id = :id AND storage_key IS NOT NULL
+                    """),
+                    {"id": business["id"]},
+                ).scalars()
+                _forget_keys(conn, list(keys))
+                conn.execute(text("DELETE FROM app.tenants WHERE id = :id"), {"id": business["id"]})
     return {
         "dry_run": 0 if apply else 1,
         "businesses": len(due),
@@ -528,21 +572,22 @@ def publish_shifts(conn: Connection, now: datetime | None = None) -> int:
         """)
     ).mappings()
     for row in list(rows):
-        due, end = _publish_moment(dict(row), now)
-        last = row["shifts_last_auto_published_at"]
-        if last is not None and last >= due:
-            continue
-        published += conn.execute(
-            text("""
-                UPDATE app.shifts SET published_at = :now
-                WHERE tenant_id = :tenant AND published_at IS NULL AND starts_at < :end
-            """),
-            {"now": now, "tenant": row["id"], "end": end},
-        ).rowcount
-        conn.execute(
-            text("UPDATE app.tenants SET shifts_last_auto_published_at = :now WHERE id = :id"),
-            {"now": now, "id": row["id"]},
-        )
+        with tenant_scope(conn, row["id"]):
+            due, end = _publish_moment(dict(row), now)
+            last = row["shifts_last_auto_published_at"]
+            if last is not None and last >= due:
+                continue
+            published += conn.execute(
+                text("""
+                    UPDATE app.shifts SET published_at = :now
+                    WHERE tenant_id = :tenant AND published_at IS NULL AND starts_at < :end
+                """),
+                {"now": now, "tenant": row["id"], "end": end},
+            ).rowcount
+            conn.execute(
+                text("UPDATE app.tenants SET shifts_last_auto_published_at = :now WHERE id = :id"),
+                {"now": now, "id": row["id"]},
+            )
     return published
 
 
@@ -628,15 +673,12 @@ def sync_social(conn: Connection) -> dict[str, int]:
             WHERE a.status = 'connected' AND t.closed_at IS NULL ORDER BY a.tenant_id
         """)
     ).all()
-    synced = failed = 0
+    synced = 0
     for account_id, tenant_id in rows:
-        try:
-            with conn.begin_nested():
-                sync_account(conn, tenant_id, account_id)
+        with tenant_scope(conn, tenant_id):
+            sync_account(conn, tenant_id, account_id)
             synced += 1
-        except Exception:  # a provider can fail in any way
-            failed += 1
-    return {"synced": synced, "failed": failed}
+    return {"synced": synced, "failed": len(rows) - synced}
 
 
 JOBS = {
@@ -692,14 +734,51 @@ OPTIONAL = {"send-emails", "notify-shifts"}
 
 def run_job(engine: Engine, name: str, apply: bool = False) -> object:
     """Runs one job in its own transaction and records the run in app.job_runs, failed runs
-    included (the record is written apart from the job, so a rollback doesn't lose it)."""
+    included (the record is written apart from the job, so a rollback doesn't lose it).
+
+    A job never runs twice at once: it holds an advisory lock for its whole run, and a second
+    start (a delayed cron overlapping the next one) records itself as skipped and returns. The
+    run also records how many businesses were handled and how many failed (see tenant_scope)."""
+    with engine.connect() as lock:
+        got = lock.execute(
+            text("SELECT pg_try_advisory_lock(hashtextextended(:key, 0))"),
+            {"key": f"{LOCK_PREFIX}{name}"},
+        ).scalar_one()
+        lock.commit()  # the lock belongs to the session, not to this transaction
+        if not got:
+            return _record_skip(engine, name)
+        try:
+            return _run_locked(engine, name, apply)
+        finally:
+            lock.execute(
+                text("SELECT pg_advisory_unlock(hashtextextended(:key, 0))"),
+                {"key": f"{LOCK_PREFIX}{name}"},
+            )
+            lock.commit()
+
+
+def _record_skip(engine: Engine, name: str) -> str:
+    result = "skipped: the previous run of this job is still going"
+    with engine.begin() as conn:
+        conn.execute(
+            text("""
+                INSERT INTO app.job_runs (job, finished_at, ok, result)
+                VALUES (:job, now(), false, :result)
+            """),
+            {"job": name, "result": result},
+        )
+    return result
+
+
+def _run_locked(engine: Engine, name: str, apply: bool) -> object:
     with engine.begin() as conn:
         run_id = conn.execute(
             text("INSERT INTO app.job_runs (job) VALUES (:job) RETURNING id"), {"job": name}
         ).scalar_one()
-    ok, result = False, None
+    ok, result, tally = False, None, Tally()
     try:
         with engine.begin() as conn:
+            tally = start_tally(conn)
             job = JOBS[name]
             result = job(conn, apply=apply) if job in APPLY_JOBS else job(conn)
         ok = True
@@ -709,13 +788,25 @@ def run_job(engine: Engine, name: str, apply: bool = False) -> object:
         _alert_failure(engine, name, run_id, result)
         raise
     finally:
+        recorded = str(result)
+        if tally.failed:
+            recorded = f"{recorded} | {tally.summary()}"
+            print(f"{name}: {tally.summary()}", file=sys.stderr)
         with engine.begin() as conn:
             conn.execute(
                 text("""
-                UPDATE app.job_runs SET finished_at = now(), ok = :ok, result = :result
+                UPDATE app.job_runs
+                SET finished_at = now(), ok = :ok, result = :result,
+                    succeeded = :succeeded, failed = :failed
                 WHERE id = :id
             """),
-                {"id": run_id, "ok": ok, "result": str(result)[:2000]},
+                {
+                    "id": run_id,
+                    "ok": ok,
+                    "result": recorded[:2000],
+                    "succeeded": tally.succeeded,
+                    "failed": len(tally.failed),
+                },
             )
 
 
