@@ -54,6 +54,18 @@ def manager_headers(
 # --- the catalog and the tools ---------------------------------------------------------------
 
 
+def test_each_screen_route_belongs_to_one_agent() -> None:
+    """The bubble in the web app reads this map, so a route must not be claimed twice."""
+    seen: dict[str, str] = {}
+    for spec in agent_catalog.CATALOG.values():
+        for route in spec.routes:
+            assert route.startswith("/") and not route.endswith("/")
+            assert route not in seen, f"{route} is listed for {seen[route]} and {spec.key}"
+            seen[route] = spec.key
+    # Screens added in round 7 are covered too.
+    assert {"/files", "/migration", "/settings", "/quotes", "/time"} <= set(seen)
+
+
 def test_customer_care_agent_is_leo() -> None:
     assert agent_catalog.CATALOG["care"].name == {"he": "ליאו", "en": "Leo"}
 
