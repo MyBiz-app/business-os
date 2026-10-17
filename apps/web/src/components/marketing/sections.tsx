@@ -74,7 +74,7 @@ export async function FeatureGrid({ inFeaturesPage = false }: { inFeaturesPage?:
       />
       </Reveal>
       <Reveal delay={80}>
-        <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
+        <ul tabIndex={0} aria-labelledby="features-heading" className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-6">
           {FEATURES.map(({ key, Icon }) => (
             <li key={key} className="card card-hover flex flex-col gap-3 p-6">
               <span className="icon-tile size-11">
@@ -101,7 +101,7 @@ export async function IndustryCards() {
         <SectionHeading id="industries-heading" title={t("title")} subtitle={t("subtitle")} />
       </Reveal>
       <Reveal delay={80}>
-        <ul className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+        <ul tabIndex={0} aria-labelledby="industries-heading" className="swipe gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-3">
           {open.map(({ key, icon, color }) => (
             <li key={key}>
               <Link href={`/industries/${key}`} className="card card-hover group flex h-full flex-col gap-4 p-6">

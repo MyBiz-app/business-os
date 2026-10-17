@@ -5,6 +5,7 @@ import { unwrap } from "@/lib/api";
 import { formatDay } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { getPlatformFor } from "@/lib/platform";
+import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
@@ -31,7 +32,7 @@ export default async function PlatformBillingPage() {
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader titleId="billing-heading" title={t("billing")} description={t("billingHint")} />
       {billing.length === 0 ? (
-        <p className="text-muted">{t("noBilling")}</p>
+        <EmptyState variant="list">{t("noBilling")}</EmptyState>
       ) : (
         <>
         {summaries.map((summary) => (

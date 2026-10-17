@@ -80,7 +80,8 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
 
       {catalog && (
         <>
-          <Section aria-label={t("presetsTitle")} innerClassName="swipe gap-6 sm:grid md:grid-cols-3">
+          <Section aria-label={t("presetsTitle")}>
+            <div tabIndex={0} role="group" aria-label={t("presetsTitle")} className="swipe gap-6 sm:grid md:grid-cols-3">
             {PRESETS.map((preset) => {
               const popular = preset === "growing";
               return (
@@ -115,6 +116,7 @@ export default async function PricingPage({ searchParams }: PageProps<"/pricing"
                 </article>
               );
             })}
+            </div>
           </Section>
 
           <Section tone="muted" aria-labelledby="tiers-heading" innerClassName="flex flex-col gap-8">

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useSyncExternalStore } from "react";
 
+import { SegmentedControl } from "@/components/segmented-control";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 
@@ -67,21 +68,7 @@ function Choice<T extends string>({
 }) {
   return (
     <Row label={label} hint={hint}>
-      <div role="group" aria-label={label} className="flex items-center gap-0.5 rounded-xl border border-border bg-surface p-0.5">
-        {options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={value === option.value}
-            onClick={() => onChange(option.value)}
-            className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
-              value === option.value ? "bg-primary/12 font-medium text-primary" : "text-muted hover:text-foreground"
-            }`}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl label={label} value={value} options={options} onChange={onChange} />
     </Row>
   );
 }

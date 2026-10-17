@@ -11,6 +11,7 @@ import { getPlatformFor } from "@/lib/platform";
 import { openAsSupport } from "../../actions";
 
 import { BusinessActions } from "./business-actions";
+import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { Ltr, UserText } from "@/components/bidi";
@@ -119,7 +120,7 @@ export default async function PlatformBusinessPage({ params }: PageProps<"/platf
       </section>
       <section className="card p-6">
         {credits.length === 0 ? (
-          <p className="text-muted">{t("platform.noUsage")}</p>
+          <EmptyState variant="chart">{t("platform.noUsage")}</EmptyState>
         ) : (
           <ColumnChart
             title={t("platform.aiCreditsPerDay")}
