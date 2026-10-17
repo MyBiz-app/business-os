@@ -1,5 +1,7 @@
 # Architecture review after phase 4 (#40)
 
+> **Status (go-live, October 2026):** items fixed since this review are tracked with ✅ / 🟡 / 🔴 and their pull request in the [go-live scorecard](go-live-readiness-2026-10.md). Where the two disagree, the scorecard is current.
+
 _2026-10-05_ · Whole-system review: database security, API surface, principles, shared
 packages, performance, tests. Fixed items landed with migration 0043; the rest are tracked as
 issues.
