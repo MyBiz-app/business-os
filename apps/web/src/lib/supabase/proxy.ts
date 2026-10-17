@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 import { CSP_REPORT_PATH } from "@/lib/csp";
-import { ACTIVITY_COOKIE, isInactive, MFA_PAGE, needsCodeStep } from "@/lib/mfa";
+import { ACTIVITY_COOKIE, isInactive, isMfaExempt, MFA_PAGE, needsCodeStep } from "@/lib/mfa";
 import { safeNext } from "@/lib/navigation";
 
 import { supabaseConfig } from "./env";
@@ -65,7 +65,7 @@ export async function updateSession(request: NextRequest) {
 
   // Someone with an authenticator must enter a code before anything else (the API refuses the
   // sensitive requests of a session without one anyway).
-  if (signedIn && data?.claims?.aal !== "aal2" && !isPublic(pathname) && pathname !== MFA_PAGE && !pathname.startsWith("/api/")) {
+  if (signedIn && data?.claims?.aal !== "aal2" && !isMfaExempt(data?.claims?.email) && !isPublic(pathname) && pathname !== MFA_PAGE && !pathname.startsWith("/api/")) {
     const { data: level } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (needsCodeStep(level?.currentLevel, level?.nextLevel)) {
       const back = pathname === "/dashboard" ? "" : `?next=${encodeURIComponent(pathname + request.nextUrl.search)}`;
