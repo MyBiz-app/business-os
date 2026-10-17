@@ -2146,6 +2146,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/migration/sessions/{session_id}/follow-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Follow Up
+         * @description Where a move stands after the import: who can be told, what went out, what MyBiz got.
+         */
+        get: operations["follow_up"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}/notice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send Notice
+         * @description Tells the clients of the move that the business has moved (a service message, so it needs
+         *     no marketing consent). The text may use the variables of the messages editor; `{join_code}`
+         *     and `{app_link}` take the client to the app.
+         */
+        post: operations["send_notice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/migration/sessions/{session_id}/concierge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask Concierge
+         * @description "Do it for me": opens a task in the MyBiz console's inbox for this move and lets MyBiz
+         *     support look in for a limited time (ended early from the support settings). The business keeps
+         *     the last word: it still approves the dry run itself.
+         */
+        post: operations["ask_concierge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/whatsapp-ai/conversations": {
         parameters: {
             query?: never;
@@ -8892,6 +8956,32 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** ConciergeOut */
+        ConciergeOut: {
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Included */
+            included: boolean;
+            /**
+             * Support Until
+             * Format: date-time
+             */
+            support_until: string;
+        };
+        /** ConciergeRequest */
+        ConciergeRequest: {
+            /** Note */
+            note?: string | null;
+            /**
+             * Support Hours
+             * @description How long MyBiz may look in
+             * @default 72
+             */
+            support_hours: number;
+        };
         /** ConnectResult */
         ConnectResult: {
             /** Accounts */
@@ -9908,6 +9998,34 @@ export interface components {
         FolderRename: {
             /** Name */
             name: string;
+        };
+        /** FollowUpOut */
+        FollowUpOut: {
+            /**
+             * Clients
+             * @description Clients the move created
+             */
+            clients: number;
+            /** With Email */
+            with_email: number;
+            /** With Phone Only */
+            with_phone_only: number;
+            /** Notice Sent At */
+            notice_sent_at: string | null;
+            /** Notice Recipients */
+            notice_recipients: number | null;
+            /** Concierge Requested At */
+            concierge_requested_at: string | null;
+            /**
+             * Concierge Included
+             * @description The business bought the done-for-you setup
+             */
+            concierge_included: boolean;
+            /**
+             * Support Until
+             * @description MyBiz support may look in until then
+             */
+            support_until: string | null;
         };
         /** FollowerPoint */
         FollowerPoint: {
@@ -11716,6 +11834,57 @@ export interface components {
             /** Booking Id */
             booking_id?: string | null;
         };
+        /** NoticeOut */
+        NoticeOut: {
+            /**
+             * Recipients
+             * @description Clients of the move that can be reached on a chosen channel
+             */
+            recipients: number;
+            /**
+             * Clients
+             * @description Everyone the move created
+             */
+            clients: number;
+            /** By Channel */
+            by_channel: {
+                [key: string]: number;
+            };
+            /** Preview */
+            preview: string | null;
+            /** Warnings */
+            warnings: components["schemas"]["PlaceholderWarning"][];
+            /** Sent */
+            sent: boolean;
+            /**
+             * Phone Only
+             * @description Clients with a phone number and no email: the owner sends these from WhatsApp
+             */
+            phone_only: components["schemas"]["PhoneOnlyClient"][];
+            /** Phone Only Total */
+            phone_only_total: number;
+        };
+        /** NoticeRequest */
+        NoticeRequest: {
+            /** Subject */
+            subject: string;
+            /** Body */
+            body: string;
+            /** Channels */
+            channels: ("email" | "push" | "popup")[];
+            /**
+             * Dry Run
+             * @description Only count and preview; send nothing
+             * @default true
+             */
+            dry_run: boolean;
+            /**
+             * Resend
+             * @description Send again after a notice already went out
+             * @default false
+             */
+            resend: boolean;
+        };
         /** Notification */
         Notification: {
             /**
@@ -12085,6 +12254,28 @@ export interface components {
              * @description Shared classes per class type (friends only)
              */
             by_service: components["schemas"]["SharedByService"][];
+        };
+        /** PhoneOnlyClient */
+        PhoneOnlyClient: {
+            /**
+             * Client Id
+             * Format: uuid
+             */
+            client_id: string;
+            /** First Name */
+            first_name: string;
+            /** Phone */
+            phone: string;
+            /**
+             * Text
+             * @description The notice as this client gets it
+             */
+            text: string;
+            /**
+             * Whatsapp Link
+             * @description Opens WhatsApp with the text; null if no usable number
+             */
+            whatsapp_link: string | null;
         };
         /** PlaceholderGroup */
         PlaceholderGroup: {
@@ -21334,6 +21525,119 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MigrationUndoReport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    follow_up: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FollowUpOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_notice: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoticeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NoticeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ask_concierge: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConciergeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConciergeOut"];
                 };
             };
             /** @description Validation Error */
