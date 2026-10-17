@@ -1,0 +1,50 @@
+{% extends "_frame.html" %}
+{# Shared body of the documents a business issues: who, what, how much. Each kind sets the
+   blocks it differs in (stamp, style, before_lines, after_total). #}
+{% block title %}{{ doc_title }} {{ doc_number }}{% endblock %}
+{% block stamp %}<div class="stamp neutral">{{ version_label }}</div>{% endblock %}
+{% block extra_style %}
+.stamp.neutral { border-color: var(--muted); color: var(--muted); }
+.callout { margin: 0 0 6mm; padding: 2.5mm 4mm; border: 1px solid var(--line); background: var(--tint); font-weight: 700; border-radius: 2mm; }
+.sums { margin-top: 5mm; margin-inline-start: auto; width: 80mm; border-collapse: collapse; }
+.sums td { padding: 1mm 0; }
+.sums td.num { font-variant-numeric: tabular-nums; }
+.sign { margin-top: 16mm; display: flex; gap: 12mm; }
+.sign div { flex: 1; border-top: 1px solid var(--ink); padding-top: 1.5mm; color: var(--muted); font-size: 9pt; }
+{% block kind_style %}{% endblock %}
+{% endblock %}
+{% block body %}
+{% block before_meta %}{% endblock %}
+<table class="meta">
+  <tr><th>{{ t.issuedAt }}</th><td>{{ issued }}</td></tr>
+  <tr><th>{{ t.to }}</th><td>{{ client_name }}</td></tr>
+  {% if client_tax_id %}<tr><th>{{ t.taxId }}</th><td class="ltr">{{ client_tax_id }}</td></tr>{% endif %}
+  {% if client_email %}<tr><th></th><td class="ltr">{{ client_email }}</td></tr>{% endif %}
+  {% if reference %}<tr><th></th><td>{{ reference }}</td></tr>{% endif %}
+  {% if payment_method %}<tr><th>{{ t.method }}</th><td>{{ payment_method }}</td></tr>{% endif %}
+</table>
+<table class="lines">
+  <thead><tr><th>{{ t.item }}</th><th class="num">{{ t.quantity }}</th><th class="num">{{ t.unitPrice }}</th><th class="num">{{ t.amount }}</th></tr></thead>
+  <tbody>
+  {% for line in lines %}
+    <tr>
+      <td style="unicode-bidi: plaintext">{{ line.description }}</td>
+      <td class="num"><bdi>{{ line.quantity }}</bdi></td>
+      <td class="num"><bdi>{{ line.unit_price }}</bdi></td>
+      <td class="num"><bdi>{{ line.amount }}</bdi></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% if show_vat %}
+<table class="sums">
+  <tr><td>{{ t.subtotal }}</td><td class="num"><bdi>{{ net }}</bdi></td></tr>
+  <tr><td>{{ vat_label }}</td><td class="num"><bdi>{{ vat }}</bdi></td></tr>
+</table>
+{% endif %}
+<div class="total-row"><span class="label">{{ total_label or t.total }}</span><span class="total"><bdi>{{ total }}</bdi></span></div>
+{% if allocation %}<p class="note"><b>{{ t.allocation }}:</b> <bdi>{{ allocation }}</bdi></p>{% endif %}
+{% if allocation_pending %}<p class="note">{{ t.allocationPending }}</p>{% endif %}
+{% if notes %}<p class="note"><b>{{ t.notes }}:</b> <span style="unicode-bidi: plaintext">{{ notes }}</span></p>{% endif %}
+{% block after_total %}{% endblock %}
+{% endblock %}

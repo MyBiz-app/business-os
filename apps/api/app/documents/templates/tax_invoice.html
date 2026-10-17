@@ -1,0 +1,7 @@
+{% extends "_document.html" %}
+{% block kind_style %}
+@page { border: 0.6mm solid #9ca3af; }
+.due { font-size: 13pt; }
+{% endblock %}
+{% block before_meta %}{% if due_text %}<div class="callout due">{{ due_text }}</div>{% endif %}{% endblock %}
+{% block after_total %}{% if payment_terms %}<p class="note"><b>{{ t.paymentTerms }}:</b> <span style="unicode-bidi: plaintext">{{ payment_terms }}</span></p>{% endif %}{% endblock %}

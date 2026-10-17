@@ -44,6 +44,11 @@ export default async function TeamPage() {
           <Link href="/team/time-off" className="btn-secondary px-3 py-2 text-sm">
             {t("timeOffQueue.open")}
           </Link>
+          {tenant.permissions.includes("time.approve") && (
+            <Link href="/team/time-clock" className="btn-secondary px-3 py-2 text-sm">
+              {t("timeClock.open")}
+            </Link>
+          )}
           <Link href="/team/shift-swaps" className="btn-secondary px-3 py-2 text-sm">
             {t("shiftSwapQueue.open")}
           </Link>

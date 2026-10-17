@@ -28,6 +28,7 @@ class Permission(StrEnum):
     FILES_READ = "files.read"  # open the business's files area (some folders need more)
     FILES_MANAGE = "files.manage"  # add, archive and organize files and folders
     IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
+    TIME_APPROVE = "time.approve"  # correct clocked hours and approve a person's month
     PAYROLL_READ = "payroll.read"  # see employment terms and Form 101 of the team
     PAYROLL_MANAGE = "payroll.manage"  # set employment terms, request and correct Form 101
     PAYROLL_APPROVE = "payroll.approve"  # approve and lock pay runs; owners only
@@ -55,6 +56,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.BUSINESS_SETTINGS,
+            Permission.TIME_APPROVE,
             Permission.PAYROLL_READ,
             Permission.PAYROLL_MANAGE,
             Permission.FILES_READ,
@@ -79,6 +81,7 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.STAFF_READ,
             Permission.STAFF_MANAGE,
             Permission.PAYROLL_PROPOSE,
+            Permission.TIME_APPROVE,
         }
     ),
     "front_desk": frozenset(

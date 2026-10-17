@@ -79,6 +79,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "team",
     "terms",
     "time",
+    "timeClock",
     "timeOff",
     "timeOffQueue",
     "verticals",

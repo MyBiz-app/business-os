@@ -18,6 +18,7 @@ EXPECTED = {
         "staff.read",
         "staff.manage",
         "payroll.propose",
+        "time.approve",
     },
     "front_desk": {
         "clients.read",
