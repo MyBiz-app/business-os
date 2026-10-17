@@ -29,6 +29,7 @@ from app.api.deps import TenantContext, require
 from app.catalog.importing import ImportFileError
 from app.core.permissions import Permission
 from app.files import store_file, system_folder_id
+from app.files.content import detect_import_type
 from app.migration.ai_mapping import ask, merge
 from app.migration.fields import (
     FIELDS,
@@ -240,7 +241,7 @@ def add_move_file(session_id: UUID, file: UploadFile, context: ManageDep) -> Mig
         system_folder_id(db, context.tenant_id, "imports"),
         name=filename,
         content=data,
-        content_type=file.content_type or "application/octet-stream",
+        content_type=detect_import_type(data),
     )
     row = db.execute(
         text("""

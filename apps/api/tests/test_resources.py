@@ -9,6 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
+from app.ai.untrusted import unwrap
 from app.api.resources import price_of
 from tests.conftest import AuthHeaders, local_today
 from tests.test_appointments import at, local_times
@@ -381,7 +382,7 @@ def test_the_assistant_finds_free_courts(
 
     ask(client, headers, conversation(client, headers), "Is a court free on that day?")
 
-    result = json.loads(provider.calls[1]["messages"][-1]["content"][0]["content"])
+    result = json.loads(unwrap(provider.calls[1]["messages"][-1]["content"][0]["content"]))
     [padel] = result["services"]
     assert padel["minutes"] == 90 and padel["lengths_minutes"] == [60, 90, 120]
     first = next(slot for slot in padel["free"] if slot["room"] == "Court 1")

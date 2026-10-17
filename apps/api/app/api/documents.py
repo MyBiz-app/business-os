@@ -31,6 +31,8 @@ from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.core.signed_links import sign, verify
 from app.files import check_space
+from app.files.content import ensure_matches
+from app.files.scan import ensure_clean
 from app.providers.choice import choose
 from app.providers.storage import StorageError, StorageProvider, tenant_key
 
@@ -124,6 +126,8 @@ def _read(file: UploadFile) -> tuple[bytes, str]:
         raise _unprocessable("empty_file")
     if len(content) > MAX_SIZE:
         raise _unprocessable("too_large")
+    ensure_matches(content, content_type)  # the bytes, not the claim
+    ensure_clean(content)
     return content, content_type
 
 
