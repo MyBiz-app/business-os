@@ -29,7 +29,10 @@ def test_the_role_works_across_businesses_but_cannot_change_the_schema(as_jobs: 
             "DROP TABLE app.users",
             "TRUNCATE app.audit_log",
             "ALTER TABLE app.tenants DISABLE ROW LEVEL SECURITY",
-            "CREATE TRIGGER t BEFORE INSERT ON app.tenants EXECUTE FUNCTION app.check_reporting_line()",
+            (
+                "CREATE TRIGGER t BEFORE INSERT ON app.tenants "
+                "EXECUTE FUNCTION app.check_reporting_line()"
+            ),
         ):
             with pytest.raises(ProgrammingError):
                 conn.execute(text(statement))
