@@ -21,6 +21,7 @@ export default function Me() {
   const tRoles = useTranslations("roles");
   const tSchedule = useTranslations("business.schedule");
   const tAvailability = useTranslations("business.availability");
+  const tClock = useTranslations("business.timeClock");
   const tForm = useTranslations("business.form101");
   const tDocuments = useTranslations("business.myDocuments");
   const { palette, tenant, api, refresh, branches, branch, selectBranch, can } = useStaff();
@@ -100,6 +101,9 @@ export default function Me() {
           palette={palette}
           onPress={() => router.push("/staff-schedule")}
         />
+      )}
+      {can("schedule.read") && (
+        <Button label={tClock("open")} variant="secondary" palette={palette} onPress={() => router.push("/time-clock")} />
       )}
       {can("schedule.read") && (
         <Button

@@ -13,14 +13,12 @@ export default async function MigrationPage() {
   const { tenant, api, scope } = await getTenantFor("migration.manage");
   const sessions = unwrap(await api.GET("/migration/sessions", { params: scope }));
   const draft = sessions.find((s) => s.status === "draft") ?? null;
-  // The latest move that was imported and still stands: its clients can still be told.
-  const moved = sessions.find((s) => s.status === "imported" && s.batches.some((b) => b.status === "done")) ?? null;
   const batches = sessions.flatMap((s) => s.batches).filter((b) => b.status === "done");
 
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("intro")} />
-      <MigrationHub draft={draft} movedId={moved?.id ?? null} batches={batches} timeZone={tenant.time_zone} />
+      <MigrationHub draft={draft} batches={batches} timeZone={tenant.time_zone} />
     </Container>
   );
 }

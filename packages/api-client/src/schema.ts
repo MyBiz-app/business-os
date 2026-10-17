@@ -675,6 +675,333 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{user_id}/pay-components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Pay Components */
+        get: operations["list_pay_components"];
+        put?: never;
+        /** Add Pay Component */
+        post: operations["add_pay_component"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/pay-components": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Pay Components
+         * @description The signed-in team member's own components.
+         */
+        get: operations["my_pay_components"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/pay-components/{component_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Pay Component */
+        delete: operations["delete_pay_component"];
+        options?: never;
+        head?: never;
+        /** Update Pay Component */
+        patch: operations["update_pay_component"];
+        trace?: never;
+    };
+    "/payroll/rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Payroll Rates
+         * @description The rate in force on a date (today by default) for each rate key.
+         */
+        get: operations["list_payroll_rates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/bonuses/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview Bonus
+         * @description Who would get what, without saving anything.
+         */
+        post: operations["preview_bonus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/bonuses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Bonuses
+         * @description Payroll readers see the amounts within their reach and below their level; someone who can
+         *     only propose sees just their own proposals.
+         */
+        get: operations["list_bonuses"];
+        put?: never;
+        /**
+         * Add Bonus
+         * @description Adds a one-off amount to every person of a group. With `payroll.manage` it is approved
+         *     straight away; a branch manager (`payroll.propose`) only proposes, for the owner to decide.
+         */
+        post: operations["add_bonus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/bonuses/{batch_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Decide Bonus
+         * @description The owner approves or rejects a branch manager's proposal (all of its people at once).
+         */
+        post: operations["decide_bonus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/adjustments/{adjustment_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Adjustment
+         * @description Removes one person's line. A payroll manager can remove any line below their level; a
+         *     proposer only their own proposal that is still waiting.
+         */
+        delete: operations["delete_adjustment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Payroll Runs
+         * @description The last two years of runs, newest first (everyone's lines add up here).
+         */
+        get: operations["list_payroll_runs"];
+        put?: never;
+        /**
+         * Create Payroll Run
+         * @description Starts the month's run (once) and works out everyone's lines.
+         */
+        post: operations["create_payroll_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Payroll Run */
+        get: operations["get_payroll_run"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Payroll Run
+         * @description Works the lines out again from the latest hours, components and one-off amounts.
+         */
+        post: operations["refresh_payroll_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/lines/{user_id}/typed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Type Payroll Amount
+         * @description Types in the amount of a component for this month (counted "by month", or without an
+         *     automatic rate yet). Only for the person's own active components.
+         */
+        put: operations["type_payroll_amount"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/lines/{user_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge Payroll Warning
+         * @description Marks a warning as seen and accepted (errors cannot be acknowledged: they must be fixed).
+         */
+        post: operations["acknowledge_payroll_warning"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move Payroll Stage
+         * @description Moves the run one stage forward (checked) or back (until it is approved). Approving is for
+         *     the owner only and locks the month.
+         */
+        post: operations["move_payroll_stage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/accountant-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Payroll Accountant Check
+         * @description The owner records that an accountant checked the approved run; payslips stop being drafts.
+         */
+        post: operations["payroll_accountant_check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Payroll Run
+         * @description The month for the accountant: a neutral table, a row per person (payslips marked draft until
+         *     an accountant checks the run).
+         */
+        get: operations["export_payroll_run"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dependents/settings": {
         parameters: {
             query?: never;
@@ -2146,70 +2473,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/migration/sessions/{session_id}/follow-up": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Follow Up
-         * @description Where a move stands after the import: who can be told, what went out, what MyBiz got.
-         */
-        get: operations["follow_up"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/migration/sessions/{session_id}/notice": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Send Notice
-         * @description Tells the clients of the move that the business has moved (a service message, so it needs
-         *     no marketing consent). The text may use the variables of the messages editor; `{join_code}`
-         *     and `{app_link}` take the client to the app.
-         */
-        post: operations["send_notice"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/migration/sessions/{session_id}/concierge": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Ask Concierge
-         * @description "Do it for me": opens a task in the MyBiz console's inbox for this move and lets MyBiz
-         *     support look in for a limited time (ended early from the support settings). The business keeps
-         *     the last word: it still approves the dry run itself.
-         */
-        post: operations["ask_concierge"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/whatsapp-ai/conversations": {
         parameters: {
             query?: never;
@@ -3323,6 +3586,178 @@ export interface paths {
         put?: never;
         /** Decline Swap */
         post: operations["decline_swap"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/time-clock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Clock */
+        get: operations["my_clock"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/time-clock/clock-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clock In */
+        post: operations["clock_in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/time-clock/clock-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clock Out */
+        post: operations["clock_out"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/month": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Month Overview
+         * @description Everyone with shifts or clocked time in the month: planned against worked.
+         */
+        get: operations["month_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/people/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Person Month
+         * @description One person's month: totals, hours per day and every entry.
+         */
+        get: operations["person_month"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add Entry
+         * @description A manager records time that was not clocked (forgot to clock in, no phone).
+         */
+        post: operations["add_entry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/entries/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Entry */
+        delete: operations["delete_entry"];
+        options?: never;
+        head?: never;
+        /**
+         * Correct Entry
+         * @description Changes the times of an entry (closing a forgotten clock-out is a correction too). The
+         *     reason is kept on the entry and the old and new times go to the audit log.
+         */
+        patch: operations["correct_entry"];
+        trace?: never;
+    };
+    "/time-clock/people/{user_id}/approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Approve Month
+         * @description Approves the person's month and locks it. A clock still running blocks it.
+         */
+        put: operations["approve_month"];
+        post?: never;
+        /** Reopen Month */
+        delete: operations["reopen_month"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/time-clock/rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Rules */
+        get: operations["get_rules"];
+        /** Set Rules */
+        put: operations["set_rules"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6511,6 +6946,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/issued-documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Issued
+         * @description Newest first.
+         */
+        get: operations["list_issued"];
+        put?: never;
+        /**
+         * Issue
+         * @description Takes the next number of the kind, renders the PDF and stores both in one transaction.
+         */
+        post: operations["issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issued-documents/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Series
+         * @description The number each kind will get next.
+         */
+        get: operations["series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issued-documents/{document_id}.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Issued File
+         * @description The stored original, byte for byte; `copy=true` renders a copy marked as such.
+         */
+        get: operations["issued_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issued-documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Issued */
+        get: operations["get_issued"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/receipts/{receipt_id}.pdf": {
         parameters: {
             query?: never;
@@ -6960,6 +7476,16 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** Acknowledge */
+        Acknowledge: {
+            /** Key */
+            key: string;
+            /**
+             * Acknowledged
+             * @default true
+             */
+            acknowledged: boolean;
+        };
         /** Activity */
         Activity: {
             /**
@@ -7060,6 +7586,57 @@ export interface components {
             notes?: string | null;
             /** Active */
             active?: boolean | null;
+        };
+        /** Adjustment */
+        Adjustment: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Batch Id
+             * Format: uuid
+             */
+            batch_id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Full Name */
+            full_name: string | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "bonus" | "holiday_gift" | "expense_refund" | "deduction";
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /** Amount Minor */
+            amount_minor: number;
+            /** Currency */
+            currency: string;
+            /** Note */
+            note: string | null;
+            /** Taxable */
+            taxable: boolean;
+            /** Social Security Liable */
+            social_security_liable: boolean;
+            /** Pension Base */
+            pension_base: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "proposed" | "approved" | "rejected";
+            /** Proposed By */
+            proposed_by: string | null;
+            /** Created At */
+            created_at: string;
         };
         /** AgentCard */
         AgentCard: {
@@ -7704,6 +8281,104 @@ export interface components {
             file: string;
             /** Name */
             name?: string | null;
+        };
+        /** BonusBatch */
+        BonusBatch: {
+            /**
+             * Batch Id
+             * Format: uuid
+             */
+            batch_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "proposed" | "approved";
+            /** Count */
+            count: number;
+            /** Total Minor */
+            total_minor: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "bonus" | "holiday_gift" | "expense_refund" | "deduction";
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+        };
+        /** BonusBody */
+        BonusBody: {
+            target: components["schemas"]["Target"];
+            /**
+             * Kind
+             * @default bonus
+             * @enum {string}
+             */
+            kind: "bonus" | "holiday_gift" | "expense_refund" | "deduction";
+            /**
+             * Period
+             * Format: date
+             * @description Any day of the pay month
+             */
+            period: string;
+            /**
+             * Amount Mode
+             * @description each: this amount for everyone; split_total: divide it
+             * @default each
+             * @enum {string}
+             */
+            amount_mode: "each" | "split_total";
+            /** Amount Minor */
+            amount_minor: number;
+            /**
+             * Currency
+             * @default ILS
+             */
+            currency: string;
+            /**
+             * Note
+             * @description Shown on the payslip
+             */
+            note?: string | null;
+            /**
+             * Taxable
+             * @description Default by kind
+             */
+            taxable?: boolean | null;
+            /**
+             * Social Security Liable
+             * @description Default by kind
+             */
+            social_security_liable?: boolean | null;
+            /**
+             * Pension Base
+             * @description Default by kind
+             */
+            pension_base?: boolean | null;
+        };
+        /** BonusPreview */
+        BonusPreview: {
+            /** Recipients */
+            recipients: components["schemas"]["Recipient"][];
+            /** Total Minor */
+            total_minor: number;
+            /** Currency */
+            currency: string;
+            /**
+             * Without Payroll File
+             * @description People in the group with no employment terms yet: they get nothing
+             */
+            without_payroll_file: number;
+            /**
+             * Out Of Reach
+             * @description People left out: other branches, or at your level
+             */
+            out_of_reach: number;
         };
         /** Booking */
         Booking: {
@@ -8881,6 +9556,25 @@ export interface components {
             /** Status */
             status?: ("active" | "inactive" | "lead") | null;
         };
+        /** ClockIn */
+        ClockIn: {
+            /**
+             * Location Id
+             * @description Defaults to the planned shift's branch, else the only branch
+             */
+            location_id?: string | null;
+        };
+        /**
+         * ClockState
+         * @description What the clock screen shows: the open entry (if clocked in), the shift planned around now
+         *     and this week's entries.
+         */
+        ClockState: {
+            open_entry: components["schemas"]["Entry"] | null;
+            planned_shift: components["schemas"]["PlannedShift"] | null;
+            /** Recent */
+            recent: components["schemas"]["Entry"][];
+        };
         /** CloseRequest */
         CloseRequest: {
             /**
@@ -8956,31 +9650,70 @@ export interface components {
             /** Message */
             message: string;
         };
-        /** ConciergeOut */
-        ConciergeOut: {
+        /** ComponentFields */
+        ComponentFields: {
             /**
-             * Requested At
-             * Format: date-time
+             * Kind
+             * @enum {string}
              */
-            requested_at: string;
-            /** Included */
-            included: boolean;
+            kind: "travel" | "meals" | "phone" | "car" | "fixed_addition" | "recuperation" | "fixed_deduction";
+            /** Name */
+            name: string;
             /**
-             * Support Until
-             * Format: date-time
+             * Calc
+             * @description per_work_day: amount x work days; monthly: fixed; by_month: typed in each month; automatic: from the rates table (recuperation by seniority). Default by kind.
              */
-            support_until: string;
+            calc?: ("per_work_day" | "monthly" | "by_month" | "automatic") | null;
+            /** Amount Minor */
+            amount_minor?: number | null;
+            /**
+             * Cap Minor
+             * @description A ceiling on the monthly sum
+             */
+            cap_minor?: number | null;
+            /**
+             * Currency
+             * @default ILS
+             */
+            currency: string;
+            /**
+             * Taxable
+             * @description Default by kind
+             */
+            taxable?: boolean | null;
+            /**
+             * Social Security Liable
+             * @description Default by kind
+             */
+            social_security_liable?: boolean | null;
+            /**
+             * Pension Base
+             * @description Default by kind
+             */
+            pension_base?: boolean | null;
+            /** Valid From */
+            valid_from?: string | null;
+            /** Valid To */
+            valid_to?: string | null;
         };
-        /** ConciergeRequest */
-        ConciergeRequest: {
-            /** Note */
-            note?: string | null;
-            /**
-             * Support Hours
-             * @description How long MyBiz may look in
-             * @default 72
-             */
-            support_hours: number;
+        /** ComponentUpdate */
+        ComponentUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Calc */
+            calc?: ("per_work_day" | "monthly" | "by_month" | "automatic") | null;
+            /** Amount Minor */
+            amount_minor?: number | null;
+            /** Cap Minor */
+            cap_minor?: number | null;
+            /** Taxable */
+            taxable?: boolean | null;
+            /** Social Security Liable */
+            social_security_liable?: boolean | null;
+            /** Pension Base */
+            pension_base?: boolean | null;
+            /** Valid To */
+            valid_to?: string | null;
         };
         /** ConnectResult */
         ConnectResult: {
@@ -9389,14 +10122,6 @@ export interface components {
             permissions: string[];
             /** Members */
             members: number;
-        };
-        /** Decision */
-        Decision: {
-            /**
-             * Note
-             * @description Shown to the requester
-             */
-            note?: string | null;
         };
         /** Declaration */
         Declaration: {
@@ -9889,6 +10614,80 @@ export interface components {
             receipt_id: string | null;
             /** Receipt Number */
             receipt_number: number | null;
+        };
+        /** Entry */
+        Entry: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /** Shift Id */
+            shift_id: string | null;
+            /**
+             * Clock In
+             * Format: date-time
+             */
+            clock_in: string;
+            /** Clock Out */
+            clock_out: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "clock" | "manual";
+            /** Correction Reason */
+            correction_reason: string | null;
+            /** Corrected By Name */
+            corrected_by_name: string | null;
+        };
+        /** EntryCorrection */
+        EntryCorrection: {
+            /** Clock In */
+            clock_in?: string | null;
+            /** Clock Out */
+            clock_out?: string | null;
+            /** Reason */
+            reason: string;
+        };
+        /** EntryCreate */
+        EntryCreate: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /**
+             * Clock In
+             * Format: date-time
+             */
+            clock_in: string;
+            /**
+             * Clock Out
+             * Format: date-time
+             */
+            clock_out: string;
+            /** Reason */
+            reason: string;
         };
         /** EraseRequest */
         EraseRequest: {
@@ -10809,6 +11608,124 @@ export interface components {
             /** Paid At */
             paid_at: string | null;
         };
+        /** IssueRequest */
+        IssueRequest: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice";
+            /** Client Id */
+            client_id?: string | null;
+            /** Client Name */
+            client_name?: string | null;
+            /** Client Email */
+            client_email?: string | null;
+            /** Client Tax Id */
+            client_tax_id?: string | null;
+            /** Lines */
+            lines: components["schemas"]["LineIn"][];
+            /** Payment Method */
+            payment_method?: ("card" | "cash" | "transfer" | "other") | null;
+            /** Due Date */
+            due_date?: string | null;
+            /** Valid Until */
+            valid_until?: string | null;
+            /** Payment Terms */
+            payment_terms?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Reference Id
+             * @description The invoice a credit note credits
+             */
+            reference_id?: string | null;
+            /**
+             * Allocation Number
+             * @description From the tax authority, via the provider
+             */
+            allocation_number?: string | null;
+        };
+        /** IssuedDocument */
+        IssuedDocument: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice";
+            /** Number */
+            number: number;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "he" | "en";
+            /** Client Id */
+            client_id: string | null;
+            /** Client Name */
+            client_name: string;
+            /** Client Email */
+            client_email: string | null;
+            /** Client Tax Id */
+            client_tax_id: string | null;
+            /** Currency */
+            currency: string;
+            /** Lines */
+            lines: components["schemas"]["IssuedLine"][];
+            /** Vat Rate Bp */
+            vat_rate_bp: number;
+            /** Net */
+            net: number;
+            /** Vat */
+            vat: number;
+            /**
+             * Total
+             * @description Minor units, VAT included
+             */
+            total: number;
+            /** Payment Method */
+            payment_method: ("card" | "cash" | "transfer" | "other") | null;
+            /** Due Date */
+            due_date: string | null;
+            /** Valid Until */
+            valid_until: string | null;
+            /** Payment Terms */
+            payment_terms: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Reference Id */
+            reference_id: string | null;
+            /** Allocation Required */
+            allocation_required: boolean;
+            /** Allocation Number */
+            allocation_number: string | null;
+            /**
+             * Content Hash
+             * @description sha256 of the stored PDF
+             */
+            content_hash: string;
+        };
+        /** IssuedLine */
+        IssuedLine: {
+            /** Description */
+            description: string;
+            /** Quantity */
+            quantity: number;
+            /** Unit Price */
+            unit_price: number;
+            /** Amount */
+            amount: number;
+        };
         /**
          * Job
          * @description One on-site job in a technician's day.
@@ -11080,6 +11997,21 @@ export interface components {
         LimitsUpdate: {
             /** Limits */
             limits: components["schemas"]["CreditLimit"][];
+        };
+        /** LineIn */
+        LineIn: {
+            /** Description */
+            description: string;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
+            /**
+             * Unit Price
+             * @description Minor units, VAT included
+             */
+            unit_price: number;
         };
         /** Location */
         Location: {
@@ -11628,6 +12560,16 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** Month */
+        Month: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /** People */
+            people: components["schemas"]["PersonMonth"][];
+        };
         /** MoveFileReport */
         MoveFileReport: {
             /**
@@ -12057,6 +12999,50 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** PayComponent */
+        PayComponent: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "travel" | "meals" | "phone" | "car" | "fixed_addition" | "recuperation" | "fixed_deduction";
+            /** Name */
+            name: string;
+            /**
+             * Calc
+             * @enum {string}
+             */
+            calc: "per_work_day" | "monthly" | "by_month" | "automatic";
+            /** Amount Minor */
+            amount_minor: number | null;
+            /** Cap Minor */
+            cap_minor: number | null;
+            /** Currency */
+            currency: string;
+            /** Taxable */
+            taxable: boolean;
+            /** Social Security Liable */
+            social_security_liable: boolean;
+            /** Pension Base */
+            pension_base: boolean;
+            /**
+             * Valid From
+             * Format: date
+             */
+            valid_from: string;
+            /** Valid To */
+            valid_to: string | null;
+        };
         /** PaymentMethod */
         PaymentMethod: {
             /**
@@ -12073,6 +13059,24 @@ export interface components {
             exp: string;
             /** Simulated */
             simulated: boolean;
+        };
+        /** PayrollRate */
+        PayrollRate: {
+            /** Rate Key */
+            rate_key: string;
+            /**
+             * Valid From
+             * Format: date
+             */
+            valid_from: string;
+            /** Value */
+            value: {
+                [key: string]: unknown;
+            };
+            /** Source */
+            source: string;
+            /** Verified */
+            verified: boolean;
         };
         /** PendingAction */
         PendingAction: {
@@ -12210,6 +13214,58 @@ export interface components {
              * @description Classes the two of us did together
              */
             shared_classes: number;
+        };
+        /** PersonDetail */
+        PersonDetail: {
+            /**
+             * Month
+             * Format: date
+             */
+            month: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /** Approved */
+            approved: boolean;
+            /** Planned Hours */
+            planned_hours: number;
+            worked: components["schemas"]["app__api__time_clock__Hours"];
+            /** Days */
+            days: {
+                [key: string]: number;
+            };
+            /** Entries */
+            entries: components["schemas"]["Entry"][];
+        };
+        /** PersonMonth */
+        PersonMonth: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** User Name */
+            user_name: string;
+            /** Planned Hours */
+            planned_hours: number;
+            worked: components["schemas"]["app__api__time_clock__Hours"];
+            /**
+             * Missing Shifts
+             * @description Past shifts with no clocked time
+             */
+            missing_shifts: number;
+            /** Open Entries */
+            open_entries: number;
+            /** Corrections */
+            corrections: number;
+            /** Approved */
+            approved: boolean;
+            /** Approved At */
+            approved_at: string | null;
         };
         /** PersonProfile */
         PersonProfile: {
@@ -12452,6 +13508,33 @@ export interface components {
             validity_days?: number | null;
             /** Active */
             active?: boolean | null;
+        };
+        /** PlannedShift */
+        PlannedShift: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Location Id
+             * Format: uuid
+             */
+            location_id: string;
+            /** Location Name */
+            location_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Position */
+            position: string | null;
         };
         /**
          * Planning
@@ -13238,6 +14321,22 @@ export interface components {
             /** Document Url */
             document_url?: string | null;
         };
+        /** Recipient */
+        Recipient: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Email */
+            email: string;
+            /** Role */
+            role: string;
+            /** Amount Minor */
+            amount_minor: number;
+        };
         /** Recommendation */
         Recommendation: {
             /**
@@ -13583,14 +14682,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "migration.manage" | "identity.read" | "payroll.read" | "payroll.manage" | "payroll.approve")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "migration.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve" | "payroll.propose")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "migration.manage" | "identity.read" | "payroll.read" | "payroll.manage" | "payroll.approve")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "migration.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve" | "payroll.propose")[] | null;
         };
         /** Roles */
         Roles: {
@@ -13673,6 +14772,85 @@ export interface components {
             /** Bookable */
             bookable?: boolean | null;
         };
+        /** Rules */
+        Rules: {
+            /**
+             * Work Days Per Week
+             * @default 5
+             * @enum {integer}
+             */
+            work_days_per_week: 5 | 6;
+            /**
+             * Week Hours
+             * @default 42
+             */
+            week_hours: number;
+            /**
+             * Day Hours 5
+             * @default 8.6
+             */
+            day_hours_5: number;
+            /**
+             * Day Hours 6
+             * @default 8
+             */
+            day_hours_6: number;
+            /**
+             * Tier1 Hours
+             * @default 2
+             */
+            tier1_hours: number;
+            /**
+             * Tier1 Percent
+             * @default 125
+             */
+            tier1_percent: number;
+            /**
+             * Tier2 Percent
+             * @default 150
+             */
+            tier2_percent: number;
+            /**
+             * Rest Day Percent
+             * @default 150
+             */
+            rest_day_percent: number;
+            /**
+             * Rest Weekday
+             * @description 0 = Monday, 5 = Saturday
+             * @default 5
+             */
+            rest_weekday: number;
+        };
+        /** Run */
+        Run: {
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "hours" | "additions" | "review" | "approved";
+            /** Currency */
+            currency: string;
+            /**
+             * Payslips Draft
+             * @description Payslips stay drafts until an accountant has checked the run
+             */
+            payslips_draft: boolean;
+            /** Approved At */
+            approved_at: string | null;
+            /** Accountant Checked At */
+            accountant_checked_at: string | null;
+            summary: components["schemas"]["RunSummary"];
+            /** Notes */
+            notes: components["schemas"]["RunNote"][];
+            /** Lines */
+            lines: components["schemas"]["RunLine"][];
+        };
         /** RunCard */
         RunCard: {
             /** Id */
@@ -13699,6 +14877,152 @@ export interface components {
             conversation_id: string | null;
             /** Pending Action Ids */
             pending_action_ids: string[];
+        };
+        /** RunCreate */
+        RunCreate: {
+            /**
+             * Period
+             * @description YYYY-MM
+             */
+            period: string;
+        };
+        /** RunItem */
+        RunItem: {
+            /**
+             * Section
+             * @enum {string}
+             */
+            section: "base" | "overtime" | "component" | "adjustment" | "deduction";
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /** Amount Minor */
+            amount_minor: number;
+            /** Quantity */
+            quantity?: string | null;
+            /** Unit Minor */
+            unit_minor?: number | null;
+            /** Percent */
+            percent?: number | null;
+            /** Source */
+            source?: string | null;
+            /** Taxable */
+            taxable: boolean;
+            /** Social Security Liable */
+            social_security_liable: boolean;
+            /** Pension Base */
+            pension_base: boolean;
+        };
+        /** RunLine */
+        RunLine: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Employment Type */
+            employment_type: string;
+            hours: components["schemas"]["app__api__payroll_runs__Hours"];
+            /** Work Days */
+            work_days: number;
+            /** Base Minor */
+            base_minor: number;
+            /** Overtime Minor */
+            overtime_minor: number;
+            /** Components Minor */
+            components_minor: number;
+            /** Adjustments Minor */
+            adjustments_minor: number;
+            /** Deductions Minor */
+            deductions_minor: number;
+            /** Gross Minor */
+            gross_minor: number;
+            /** Taxable Minor */
+            taxable_minor: number;
+            /** Social Security Minor */
+            social_security_minor: number;
+            /** Pension Base Minor */
+            pension_base_minor: number;
+            /** Items */
+            items: components["schemas"]["RunItem"][];
+            /** Warnings */
+            warnings: components["schemas"]["RunWarning"][];
+            /**
+             * Typed
+             * @description Amounts typed in for this month, by component
+             */
+            typed: {
+                [key: string]: number;
+            };
+            /**
+             * Ready
+             * @description No error and every warning acknowledged
+             */
+            ready: boolean;
+        };
+        /** RunNote */
+        RunNote: {
+            /** Code */
+            code: string;
+            /** Names */
+            names: string[];
+        };
+        /** RunRow */
+        RunRow: {
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "hours" | "additions" | "review" | "approved";
+            /** Gross Minor */
+            gross_minor: number;
+            /** People */
+            people: number;
+        };
+        /** RunSummary */
+        RunSummary: {
+            /** People */
+            people: number;
+            /** Gross Minor */
+            gross_minor: number;
+            /** Deductions Minor */
+            deductions_minor: number;
+            /** Previous Gross Minor */
+            previous_gross_minor: number | null;
+            /** Open Errors */
+            open_errors: number;
+            /** Open Warnings */
+            open_warnings: number;
+        };
+        /** RunWarning */
+        RunWarning: {
+            /**
+             * Key
+             * @description `code`, or `code:ref` when it concerns one component
+             */
+            key: string;
+            /** Code */
+            code: string;
+            /** Ref */
+            ref?: string | null;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "error" | "warning";
+            /**
+             * Acknowledged
+             * @default false
+             */
+            acknowledged: boolean;
         };
         /** Sale */
         Sale: {
@@ -13933,6 +15257,16 @@ export interface components {
              * @description Later sessions kept because clients are booked
              */
             kept: number;
+        };
+        /** SeriesRow */
+        SeriesRow: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice";
+            /** Next Number */
+            next_number: number;
         };
         /** SeriesUpdate */
         SeriesUpdate: {
@@ -14660,6 +15994,14 @@ export interface components {
              */
             disabled: boolean;
         };
+        /** StageBody */
+        StageBody: {
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "hours" | "additions" | "review" | "approved";
+        };
         /** StageChange */
         StageChange: {
             /**
@@ -14855,6 +16197,22 @@ export interface components {
             key: "owner" | "manager" | "branch_manager" | "staff" | "front_desk";
             /** Permissions */
             permissions: string[];
+        };
+        /** Target */
+        Target: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "employee" | "location" | "location_group" | "managers" | "role" | "everyone" | "manual";
+            /** User Ids */
+            user_ids?: string[];
+            /** Location Id */
+            location_id?: string | null;
+            /** Group Id */
+            group_id?: string | null;
+            /** Role */
+            role?: ("owner" | "manager" | "branch_manager" | "front_desk" | "staff") | null;
         };
         /** TaskCard */
         TaskCard: {
@@ -15575,6 +16933,19 @@ export interface components {
             /** Offer Id */
             offer_id: string | null;
         };
+        /** TypedAmount */
+        TypedAmount: {
+            /**
+             * Component Id
+             * Format: uuid
+             */
+            component_id: string;
+            /**
+             * Amount Minor
+             * @description The amount for this month; null takes the typed amount away
+             */
+            amount_minor: number | null;
+        };
         /** UsagePoint */
         UsagePoint: {
             /**
@@ -15915,6 +17286,39 @@ export interface components {
             /** Phone */
             phone?: string | null;
         };
+        /** Decision */
+        app__api__pay_components__Decision: {
+            /** Approve */
+            approve: boolean;
+        };
+        /** Hours */
+        app__api__payroll_runs__Hours: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Regular
+             * @default 0
+             */
+            regular: number;
+            /**
+             * Tier1
+             * @default 0
+             */
+            tier1: number;
+            /**
+             * Tier2
+             * @default 0
+             */
+            tier2: number;
+            /**
+             * Rest Day
+             * @default 0
+             */
+            rest_day: number;
+        };
         /** Turn */
         app__api__platform_ai__Turn: {
             /**
@@ -15964,6 +17368,50 @@ export interface components {
             members: components["schemas"]["Member"][];
             /** Invitations */
             invitations: components["schemas"]["Invitation"][];
+        };
+        /**
+         * Hours
+         * @description Hours worked, by pay rate (see `app.schedule.time_clock.Breakdown`).
+         */
+        app__api__time_clock__Hours: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Regular
+             * @default 0
+             */
+            regular: number;
+            /**
+             * Tier1
+             * @default 0
+             */
+            tier1: number;
+            /**
+             * Tier2
+             * @default 0
+             */
+            tier2: number;
+            /**
+             * Rest Day
+             * @default 0
+             */
+            rest_day: number;
+            /**
+             * Weighted
+             * @default 0
+             */
+            weighted: number;
+        };
+        /** Decision */
+        app__api__time_off_requests__Decision: {
+            /**
+             * Note
+             * @description Shown to the requester
+             */
+            note?: string | null;
         };
         /** Conversation */
         app__api__whatsapp_ai__Conversation: {
@@ -17829,6 +19277,735 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_pay_components: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayComponent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_pay_component: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComponentFields"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayComponent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_pay_components: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayComponent"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_pay_component: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                component_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_pay_component: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                component_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComponentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayComponent"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_payroll_rates: {
+        parameters: {
+            query?: {
+                as_of?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PayrollRate"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    preview_bonus: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BonusBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BonusPreview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_bonuses: {
+        parameters: {
+            query?: {
+                /** @description Any day of the pay month */
+                period?: string | null;
+                user_id?: string | null;
+                status?: ("proposed" | "approved" | "rejected") | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Adjustment"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_bonus: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BonusBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BonusBatch"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_bonus: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                batch_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["app__api__pay_components__Decision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_adjustment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                adjustment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_payroll_runs: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_payroll_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_payroll_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_payroll_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    type_payroll_amount: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypedAmount"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledge_payroll_warning: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Acknowledge"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    move_payroll_stage: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    payroll_accountant_check: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_payroll_run: {
+        parameters: {
+            query?: {
+                format?: "csv" | "xlsx";
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
@@ -21538,119 +23715,6 @@ export interface operations {
             };
         };
     };
-    follow_up: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Tenant-Id": string;
-                /** @description The current branch (none: all branches) */
-                "X-Location-Id"?: string | null;
-            };
-            path: {
-                session_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["FollowUpOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    send_notice: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Tenant-Id": string;
-                /** @description The current branch (none: all branches) */
-                "X-Location-Id"?: string | null;
-            };
-            path: {
-                session_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["NoticeRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["NoticeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    ask_concierge: {
-        parameters: {
-            query?: never;
-            header: {
-                "X-Tenant-Id": string;
-                /** @description The current branch (none: all branches) */
-                "X-Location-Id"?: string | null;
-            };
-            path: {
-                session_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ConciergeRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ConciergeOut"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
     list_whatsapp_conversations: {
         parameters: {
             query?: never;
@@ -24533,6 +26597,436 @@ export interface operations {
             };
         };
     };
+    my_clock: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClockState"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clock_in: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clock_out: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    month_overview: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Month"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    person_month: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PersonDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_entry: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_entry: {
+        parameters: {
+            query: {
+                reason: string;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    correct_entry: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntryCorrection"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Entry"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    approve_month: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_month: {
+        parameters: {
+            query?: {
+                /** @description YYYY-MM, default this month */
+                month?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_rules: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Rules"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Rules"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_time_off_requests: {
         parameters: {
             query?: {
@@ -24655,7 +27149,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Decision"];
+                "application/json": components["schemas"]["app__api__time_off_requests__Decision"];
             };
         };
         responses: {
@@ -24694,7 +27188,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["Decision"];
+                "application/json": components["schemas"]["app__api__time_off_requests__Decision"];
             };
         };
         responses: {
@@ -31394,6 +33888,189 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_issued: {
+        parameters: {
+            query?: {
+                kind?: ("tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice") | null;
+                client_id?: string | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedDocument"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issue: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedDocument"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issued_file: {
+        parameters: {
+            query?: {
+                /** @description A copy, rendered again from the stored data */
+                copy?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_issued: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedDocument"];
                 };
             };
             /** @description Validation Error */

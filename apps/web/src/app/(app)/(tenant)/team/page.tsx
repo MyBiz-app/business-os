@@ -44,9 +44,24 @@ export default async function TeamPage() {
           <Link href="/team/time-off" className="btn-secondary px-3 py-2 text-sm">
             {t("timeOffQueue.open")}
           </Link>
+          {tenant.permissions.includes("time.approve") && (
+            <Link href="/team/time-clock" className="btn-secondary px-3 py-2 text-sm">
+              {t("timeClock.open")}
+            </Link>
+          )}
           <Link href="/team/shift-swaps" className="btn-secondary px-3 py-2 text-sm">
             {t("shiftSwapQueue.open")}
           </Link>
+          {canReadPayroll(tenant) && (
+            <Link href="/team/payroll" className="btn-secondary px-3 py-2 text-sm">
+              {t("payRun.title")}
+            </Link>
+          )}
+          {(canReadPayroll(tenant) || tenant.permissions.includes("payroll.propose")) && (
+            <Link href="/team/bonuses" className="btn-secondary px-3 py-2 text-sm">
+              {t("payBonuses.title")}
+            </Link>
+          )}
           <Link href="/team/roles" className="btn-ghost px-3 py-2 text-sm">
             {t("team.manageRoles")}
           </Link>

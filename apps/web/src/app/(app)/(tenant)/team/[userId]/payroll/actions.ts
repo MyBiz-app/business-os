@@ -10,12 +10,19 @@ export type PayrollError =
   | "monthly_amount_required"
   | "invalid_reference"
   | "form_exists"
+  | "amount_required"
   | "forbidden"
   | "invalid"
   | "generic";
 export type PayrollResult<T = undefined> = { ok?: true; data?: T; error?: PayrollError };
 
-const KNOWN: PayrollError[] = ["hourly_rate_required", "monthly_amount_required", "invalid_reference", "form_exists"];
+const KNOWN: PayrollError[] = [
+  "hourly_rate_required",
+  "monthly_amount_required",
+  "invalid_reference",
+  "form_exists",
+  "amount_required",
+];
 
 function failure(status: number, body: unknown): { error: PayrollError } {
   const detail = (body as { detail?: unknown } | null)?.detail;
@@ -94,4 +101,54 @@ export async function loadForm101(userId: string, taxYear: number) {
   });
   if (!response.data) throw new ApiError(response.response.status, response.error);
   return response.data;
+}
+
+export type ComponentInput = {
+  kind: "travel" | "meals" | "phone" | "car" | "fixed_addition" | "recuperation" | "fixed_deduction";
+  name: string;
+  calc: "per_work_day" | "monthly" | "by_month" | "automatic";
+  amount_minor: number | null;
+  cap_minor: number | null;
+  currency: string;
+  taxable: boolean;
+  social_security_liable: boolean;
+  pension_base: boolean;
+  valid_from: string | null;
+  valid_to: string | null;
+};
+
+export async function addPayComponent(userId: string, input: ComponentInput): Promise<PayrollResult> {
+  const { api, scope } = await getTenantFor("payroll.manage");
+  const response = await api.POST("/staff/{user_id}/pay-components", {
+    params: { ...scope, path: { user_id: userId } },
+    body: input,
+  });
+  if (!response.response.ok) return failure(response.response.status, response.error);
+  revalidatePath(`/team/${userId}/payroll`);
+  return { ok: true };
+}
+
+export async function updatePayComponent(
+  userId: string,
+  componentId: string,
+  input: Pick<ComponentInput, "name" | "calc" | "amount_minor" | "cap_minor" | "taxable" | "social_security_liable" | "pension_base" | "valid_to">,
+): Promise<PayrollResult> {
+  const { api, scope } = await getTenantFor("payroll.manage");
+  const response = await api.PATCH("/pay-components/{component_id}", {
+    params: { ...scope, path: { component_id: componentId } },
+    body: input,
+  });
+  if (!response.response.ok) return failure(response.response.status, response.error);
+  revalidatePath(`/team/${userId}/payroll`);
+  return { ok: true };
+}
+
+export async function removePayComponent(userId: string, componentId: string): Promise<PayrollResult> {
+  const { api, scope } = await getTenantFor("payroll.manage");
+  const response = await api.DELETE("/pay-components/{component_id}", {
+    params: { ...scope, path: { component_id: componentId } },
+  });
+  if (!response.response.ok) return failure(response.response.status, response.error);
+  revalidatePath(`/team/${userId}/payroll`);
+  return { ok: true };
 }

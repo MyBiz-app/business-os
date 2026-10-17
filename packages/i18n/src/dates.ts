@@ -69,3 +69,30 @@ export function monthGrid(day: string): { start: string; days: number } {
   const offset = weekdayOf(first);
   return { start: weekStart(first), days: Math.ceil((offset + length) / 7) * 7 };
 }
+
+/** The wall-clock reading of an instant in a time zone, as "YYYY-MM-DDTHH:mm" (what a
+ * `datetime-local` input holds). */
+export function localValue(instant: string, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(instant));
+  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? "00";
+  return `${part("year")}-${part("month")}-${part("day")}T${part("hour")}:${part("minute")}`;
+}
+
+/** The instant (ISO, UTC) at which a time zone's clock reads `local` ("YYYY-MM-DDTHH:mm"). */
+export function localToInstant(local: string, timeZone: string): string {
+  const wanted = Date.parse(`${local}:00Z`);
+  let guess = wanted;
+  // The zone's offset depends on the instant; two passes settle it across a clock change.
+  for (let pass = 0; pass < 2; pass++) {
+    guess = wanted - (Date.parse(`${localValue(new Date(guess).toISOString(), timeZone)}:00Z`) - guess);
+  }
+  return new Date(guess).toISOString();
+}
