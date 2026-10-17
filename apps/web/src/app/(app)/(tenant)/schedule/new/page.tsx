@@ -1,46 +1,20 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { redirect } from "next/navigation";
 import { termsOf } from "@business-os/verticals";
 
-import { unwrap } from "@/lib/api";
-import { isDay, todayIn } from "@/lib/dates";
-import { canWriteSchedule } from "@/lib/permissions";
-import { getTenantFor } from "@/lib/tenant";
-
-import { createSessions } from "../actions";
-import { SessionForm } from "../session-form";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
+import { getTenantFor } from "@/lib/tenant";
+
+import { NewSessionBody } from "./new-session-body";
 
 export default async function NewSessionPage({ searchParams }: PageProps<"/schedule/new">) {
-  const t = await getTranslations("schedule");
-  const tAll = await getTranslations();
-  const { tenant, api, scope, branch } = await getTenantFor("schedule.read");
-  if (!canWriteSchedule(tenant)) redirect("/schedule");
+  const t = await getTranslations();
+  const { tenant } = await getTenantFor("schedule.read");
   const { date } = await searchParams;
-  const options = unwrap(await api.GET("/sessions/options", { params: scope }));
-
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <PageHeader title={tAll(`terms.${termsOf(tenant.vertical)}.newSession` as "terms.fitness.newSession")} />
-      {options.services.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-border p-8 text-center text-muted">
-          {t("needService")}{" "}
-          <Link href="/catalog/services/new" className="text-primary-ink underline">
-            →
-          </Link>
-        </p>
-      ) : (
-        <SessionForm
-          action={createSessions}
-          options={options}
-          // New sessions start in the current branch.
-          defaults={{ date: isDay(date) ? date : todayIn(tenant.time_zone), place: branch ? `${branch}:` : "" }}
-          submitLabel={t("create")}
-          allowRepeat
-        />
-      )}
+      <PageHeader title={t(`terms.${termsOf(tenant.vertical)}.newSession` as "terms.fitness.newSession")} />
+      <NewSessionBody date={date} />
     </Container>
   );
 }

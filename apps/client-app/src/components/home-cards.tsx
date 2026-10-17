@@ -325,6 +325,9 @@ function BusinessInfo({ data }: { data: HomeData }) {
             {location.address ? (
               <ActionPill label={t("navigate")} icon="navigate-outline" palette={palette} onPress={() => void Linking.openURL(googleMapsLink(location.address!))} />
             ) : null}
+            {location.website_url ? (
+              <ActionPill label={t("website")} icon="globe-outline" palette={palette} onPress={() => void Linking.openURL(location.website_url!)} />
+            ) : null}
           </View>
         ))}
       </Card>
