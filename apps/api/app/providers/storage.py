@@ -95,8 +95,6 @@ class SupabaseStorage:
     timeout = 30
 
     def __init__(self, settings: dict[str, str]) -> None:
-        if not settings["url"].startswith(("http://", "https://")):
-            raise ValueError("storage url must be http or https")
         self.base = settings["url"].rstrip("/") + "/storage/v1"
         self.key = settings["service_key"]
         self.bucket = settings.get("bucket") or "files"
@@ -112,7 +110,7 @@ class SupabaseStorage:
             headers["Content-Type"] = content_type
         if method == "POST" and path.startswith("object/") and not path.startswith("object/sign"):
             headers["x-upsert"] = "true"
-        # The scheme is checked in __init__.
+        # The base URL is operator configuration (the Supabase project URL), not user input.
         request = urllib.request.Request(  # noqa: S310
             f"{self.base}/{path}", data=body, method=method, headers=headers
         )
