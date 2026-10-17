@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { apiOrigin, createNonce, enforcedCsp, parseCspReports, strictCsp } from "./csp.ts";
+import { apiOrigin, createNonce, parseCspReports, strictCsp } from "./csp.ts";
 
 test("nonces are fresh 128-bit base64 values", () => {
   const a = createNonce();
@@ -9,7 +9,7 @@ test("nonces are fresh 128-bit base64 values", () => {
   assert.notEqual(a, createNonce());
 });
 
-test("the strict policy allows scripts only by nonce and reports violations", () => {
+test("the policy allows scripts only by nonce and reports violations", () => {
   const policy = strictCsp("abc", { dev: false });
   assert.match(policy, /script-src 'self' 'nonce-abc' 'strict-dynamic'(;|$)/);
   assert.doesNotMatch(policy, /script-src[^;]*'unsafe-(inline|eval)'/);
@@ -22,17 +22,12 @@ test("the strict policy allows scripts only by nonce and reports violations", ()
 test("images may load from the API origin (business logos)", () => {
   assert.equal(apiOrigin("https://api.example.com/v1"), "https://api.example.com");
   assert.equal(apiOrigin("not a url"), undefined);
-  assert.match(enforcedCsp({ dev: false }), /img-src 'self' data: blob: http[^;]*(;|$)/);
+  assert.match(strictCsp("abc", { dev: false }), /img-src 'self' data: blob: http[^;]*(;|$)/);
 });
 
 test("dev mode allows eval (React refresh)", () => {
   const policy = strictCsp("abc", { dev: true });
   assert.match(policy, /script-src [^;]*'unsafe-eval'/);
-});
-
-test("the enforced policy keeps inline scripts working until the strict one is clean", () => {
-  assert.match(enforcedCsp({ dev: false }), /script-src 'self' 'unsafe-inline'(;|$)/);
-  assert.doesNotMatch(enforcedCsp({ dev: false }), /nonce|report/);
 });
 
 test("parses legacy report-uri reports and drops query strings", () => {
