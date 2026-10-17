@@ -389,43 +389,61 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
     def before(kind: str) -> datetime:
         return now - timedelta(days=round(RETENTION_MONTHS[kind] * 30.44))
 
-    # (table, alias, condition) of what is past its time.
+    # Each statement deletes at most PURGE_BATCH rows; _delete_in_batches repeats it.
     statements = {
-        "leads": (
-            "leads",
-            "l",
-            """l.client_id IS NULL
-              AND greatest(l.updated_at, coalesce((SELECT max(a.occurred_at)
-                  FROM app.lead_activities a WHERE a.lead_id = l.id), l.updated_at)) < :before""",
-        ),
-        "contact_requests": ("contact_requests", "x", "x.created_at < :before"),
-        "ai_conversations": ("ai_conversations", "x", "x.updated_at < :before"),
-        "whatsapp_conversations": ("whatsapp_conversations", "x", "x.updated_at < :before"),
-        "whatsapp_inbox": ("whatsapp_inbox", "x", "x.received_at < :before"),
-        "messages": ("messages", "x", "x.created_at < :before"),
-        "audit_log": ("audit_log", "x", "x.occurred_at < :before"),
+        "leads": """
+            DELETE FROM app.leads WHERE ctid = ANY(ARRAY(
+                SELECT l.ctid FROM app.leads l
+                WHERE l.client_id IS NULL
+                  AND greatest(l.updated_at, coalesce((SELECT max(a.occurred_at)
+                      FROM app.lead_activities a WHERE a.lead_id = l.id), l.updated_at)) < :before
+                LIMIT :batch))
+        """,
+        "contact_requests": """
+            DELETE FROM app.contact_requests WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.contact_requests
+                WHERE created_at < :before LIMIT :batch))
+        """,
+        "ai_conversations": """
+            DELETE FROM app.ai_conversations WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.ai_conversations
+                WHERE updated_at < :before LIMIT :batch))
+        """,
+        "whatsapp_conversations": """
+            DELETE FROM app.whatsapp_conversations WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.whatsapp_conversations
+                WHERE updated_at < :before LIMIT :batch))
+        """,
+        "whatsapp_inbox": """
+            DELETE FROM app.whatsapp_inbox WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.whatsapp_inbox
+                WHERE received_at < :before LIMIT :batch))
+        """,
+        "messages": """
+            DELETE FROM app.messages WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.messages
+                WHERE created_at < :before LIMIT :batch))
+        """,
+        "audit_log": """
+            DELETE FROM app.audit_log WHERE ctid = ANY(ARRAY(
+                SELECT ctid FROM app.audit_log
+                WHERE occurred_at < :before LIMIT :batch))
+        """,
     }
     deleted = {
-        kind: _delete_in_batches(conn, table, alias, condition, before(kind))
-        for kind, (table, alias, condition) in statements.items()
+        kind: _delete_in_batches(conn, sql, before(kind)) for kind, sql in statements.items()
     }
     deleted["data_exports"] = purge_expired_exports(conn)
     deleted["files"] = purge_expired_files(conn)  # e.g. the imports folder keeps files 30 days
     return deleted
 
 
-def _delete_in_batches(
-    conn: Connection, table: str, alias: str, condition: str, before: datetime
-) -> int:
-    """Deletes the rows matching `condition` PURGE_BATCH at a time, so no single statement holds
-    millions of rows (and their locks) at once."""
-    sql = text(f"""
-        DELETE FROM app.{table} WHERE ctid = ANY(ARRAY(
-            SELECT {alias}.ctid FROM app.{table} {alias} WHERE {condition} LIMIT :batch))
-    """)
+def _delete_in_batches(conn: Connection, sql: str, before: datetime) -> int:
+    """Runs a statement that deletes up to :batch rows until it deletes fewer, so no single
+    statement holds millions of rows (and their locks) at once."""
     total = 0
     while True:
-        count = conn.execute(sql, {"before": before, "batch": PURGE_BATCH}).rowcount
+        count = conn.execute(text(sql), {"before": before, "batch": PURGE_BATCH}).rowcount
         total += count
         if count < PURGE_BATCH:
             return total
