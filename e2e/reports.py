@@ -40,8 +40,8 @@ with sync_playwright() as p:
     expect(at_risk.locator("ul").first.get_by_role("listitem")).to_have_count(10)
     serious = [v["id"] for v in Axe().run(page).response["violations"] if v["impact"] in ("serious", "critical")]
     page.screenshot(path=f"{h.OUT}/reports.png", full_page=True)
-    page.get_by_role("link", name="90 הימים האחרונים").click(); page.wait_for_url("**period=90"); h.ready(page)
-    expect(page.get_by_role("link", name="90 הימים האחרונים")).to_have_attribute("aria-current", "page")
+    page.get_by_role("button", name="90 הימים האחרונים").click(); page.wait_for_url("**period=90"); h.ready(page)
+    expect(page.get_by_role("button", name="90 הימים האחרונים")).to_have_attribute("aria-pressed", "true")
     print("reports: ok | a11y:", serious or "ok")
 
     page.goto(f"{h.BASE}/clients"); h.ready(page)

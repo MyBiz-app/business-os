@@ -10,6 +10,7 @@ import { RequestCard } from "./request-card";
 import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/empty-state";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 
 const FILTERS = ["open", "all", "business", "site"] as const;
 type Filter = (typeof FILTERS)[number];
@@ -22,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** The console's inbox: requests from the website and messages from businesses. */
 export default async function PlatformInboxPage({ searchParams }: PageProps<"/platform/inbox">) {
   const t = await getTranslations("platform.inbox");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   const { api } = await getPlatformFor("inbox.manage");
   const requested = (await searchParams).show;
@@ -41,18 +43,14 @@ export default async function PlatformInboxPage({ searchParams }: PageProps<"/pl
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("subtitle")} />
-      <nav aria-label={t("filter")} className="flex flex-wrap gap-1 rounded-xl border border-border bg-surface p-1 text-sm shadow-sm">
-        {FILTERS.map((value) => (
-          <Link
-            key={value}
-            href={`/platform/inbox?show=${value}`}
-            aria-current={value === filter ? "page" : undefined}
-            className={`rounded-lg px-3 py-1.5 font-medium ${value === filter ? "bg-primary text-on-primary" : "hover:bg-foreground/5"}`}
-          >
-            {labels[value]}
-          </Link>
-        ))}
-      </nav>
+      <div>
+        <LinkSegmented
+          label={t("filter")}
+          loadingLabel={tc("loading")}
+          active={filter}
+          options={FILTERS.map((value) => ({ key: value, label: labels[value], href: `/platform/inbox?show=${value}` }))}
+        />
+      </div>
       <p className="text-sm text-muted">{t("count", { count: requests.length })}</p>
       {requests.length === 0 ? (
         <EmptyState variant="inbox">{t("empty")}</EmptyState>

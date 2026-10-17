@@ -1,10 +1,12 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { toMajor } from "@/lib/money";
 
-export type Column = { key: string; label: string; value: number; display: string };
+/** `href`: where the column leads (the list this bar counts), when it is clickable. */
+export type Column = { key: string; label: string; value: number; display: string; href?: string };
 
 type Props = {
   title: string;
@@ -31,6 +33,7 @@ function niceMax(value: number): number {
  * table view. One series, so the title names it and there is no legend. */
 export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props) {
   const id = useId();
+  const router = useRouter();
   const gradient = `${id.replace(/:/g, "")}-fill`;
   const locale = useLocale();
   const compact = new Intl.NumberFormat(locale, {
@@ -85,13 +88,15 @@ export function ColumnChart({ title, columns, unit, tableLabel, headers }: Props
               <g
                 key={column.key}
                 tabIndex={0}
-                role="graphics-symbol"
+                role={column.href ? "link" : "graphics-symbol"}
                 aria-label={`${column.label}: ${column.display}`}
+                onClick={column.href ? () => router.push(column.href!) : undefined}
+                onKeyDown={column.href ? (event) => event.key === "Enter" && router.push(column.href!) : undefined}
                 onMouseEnter={() => setActive(index)}
                 onMouseLeave={() => setActive(null)}
                 onFocus={() => setActive(index)}
                 onBlur={() => setActive(null)}
-                className="outline-none"
+                className={column.href ? "cursor-pointer outline-none focus-visible:[&_path]:stroke-primary" : "outline-none"}
               >
                 {/* Hit target: the whole slot, taller than the mark. */}
                 <rect x={AXIS + slot * index} y={0} width={slot} height={HEIGHT} fill="transparent" />

@@ -3,6 +3,7 @@ import { RefreshCw, Star } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/components/layout/container";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
 import { ColumnChart } from "@/components/charts/column-chart";
 import { ConfirmDelete } from "@/components/form/confirm-delete";
@@ -33,6 +34,7 @@ function pick<T extends string>(value: string | string[] | undefined, allowed: r
 export default async function ContentPage({ searchParams }: PageProps<"/content">) {
   const t = await getTranslations("content");
   const tDash = await getTranslations("dashboard");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   const { tenant, api, scope } = await getStudio();
   const canManage = tenant.permissions.includes("social.manage");
@@ -230,13 +232,14 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           <h2 id="top-posts" className="text-lg font-bold">
             {t("posts.title")}
           </h2>
-          <nav aria-label={t("posts.title")} className="flex gap-2 text-sm print:hidden">
-            {(["views", "engagement"] as const).map((value) => (
-              <a key={value} href={sortHref(value)} aria-current={sort === value ? "true" : undefined} className={`rounded-full px-3 py-1 font-medium ring-1 ring-border ${sort === value ? "bg-primary text-on-primary" : "bg-surface"}`}>
-                {t(value === "views" ? "posts.sortViews" : "posts.sortEngagement")}
-              </a>
-            ))}
-          </nav>
+          <div className="print:hidden">
+            <LinkSegmented
+              label={t("posts.title")}
+              loadingLabel={tc("loading")}
+              active={sort}
+              options={(["views", "engagement"] as const).map((value) => ({ key: value, label: t(value === "views" ? "posts.sortViews" : "posts.sortEngagement"), href: sortHref(value) }))}
+            />
+          </div>
         </div>
         {posts.length === 0 ? (
           <p className="text-muted">{t("posts.empty")}</p>

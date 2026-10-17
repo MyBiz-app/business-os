@@ -39,7 +39,12 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.{ts,tsx}"],
     ignores: ["**/*.test.ts"],
     plugins: { "design-system": designSystem },
-    rules: { "design-system/no-raw-colors": "error", "design-system/no-raw-button": "error" },
+    rules: { "design-system/no-raw-colors": "error", "design-system/no-raw-button": "error", "design-system/no-scroll-jump": "error" },
+  },
+  // R4 (dashboard and reports) fixes its own period links; drop this block when it lands.
+  {
+    files: ["src/app/(app)/(tenant)/dashboard/**", "src/app/(app)/(tenant)/reports/**"],
+    rules: { "design-system/no-scroll-jump": "off" },
   },
   // The allow-list for raw colors: the token source, brand marks and illustrations, where a color
   // is the content itself (a logo, a palette swatch, a mock-up of the product). Everything else
