@@ -1,4 +1,4 @@
-"""AI replies on WhatsApp (module `whatsapp_ai`, app/messaging/whatsapp_ai.py): the business sees
+"""AI replies on WhatsApp (module `whatsapp_ai`, app/messaging/whatsapp_ai/): the business sees
 its clients' conversations with the AI (`clients.read`) and can try the bot as one of its
 clients (`business.settings`). A try runs the real flow on a test conversation: nothing is sent
 and an accepted offer books nothing."""
