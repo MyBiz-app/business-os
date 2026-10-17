@@ -5367,6 +5367,7 @@
       "image_too_large": "התמונה גדולה מ-512KB. כדאי לבחור תמונה קטנה יותר.",
       "unsupported_image": "יש לבחור תמונה בפורמט PNG,‏ JPEG או WebP."
     },
+    "nav": { "label": "סעיפי הפרופיל" },
     "profileTitle": "פרופיל",
     "detailsTitle": "פרטים אישיים",
     "birthDate": "תאריך לידה",
