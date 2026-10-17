@@ -8,9 +8,13 @@
 - `product_events`: what the owner needs to see where businesses drop out of sign-up. No personal
   data: an event name, a step, a random visitor id from the browser (before the business exists)
   and the business once it does. Visitors write sign-up steps through one function; a business's
-  own events go in under row level security.
+  own events go in through one function (row level security would not see a client's session).
 - Console functions (platform admins only): the sign-up funnel, active businesses per day and
   week, and the biggest consumers.
+
+# contract: only the downgrade drops anything (the two new tables and the new functions); the
+# upgrade adds tables and functions and replaces storage_used() under the same name and
+# signature, so the previous API version keeps working on this database.
 
 Revision ID: 0121
 Revises: 0120
