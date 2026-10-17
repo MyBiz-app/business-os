@@ -4,6 +4,8 @@ import { ChevronDown } from "lucide-react";
 import { type ReactNode, useEffect, useId, useState } from "react";
 
 const PREFIX = "section:";
+/** Fired with a section id to open that section (used by section menus). */
+export const OPEN_EVENT = "open-section";
 
 function remembered(key: string | undefined): boolean | null {
   if (!key) return null;
@@ -25,6 +27,7 @@ export function CollapsibleSection({
   defaultOpen = false,
   storageKey,
   actions,
+  id,
 }: {
   title: string;
   description?: string;
@@ -33,6 +36,8 @@ export function CollapsibleSection({
   storageKey?: string;
   /** Buttons shown at the end of the header line (not part of the fold button). */
   actions?: ReactNode;
+  /** Anchor of the section: a link to `#id` (or the section menu) opens it and scrolls to it. */
+  id?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const panel = useId();
@@ -43,6 +48,23 @@ export function CollapsibleSection({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved !== null) setOpen(saved);
   }, [storageKey]);
+
+  useEffect(() => {
+    if (!id) return;
+    const openIfTarget = () => {
+      if (window.location.hash === `#${id}`) setOpen(true);
+    };
+    const openById = (event: Event) => {
+      if ((event as CustomEvent<string>).detail === id) setOpen(true);
+    };
+    openIfTarget();
+    window.addEventListener("hashchange", openIfTarget);
+    window.addEventListener(OPEN_EVENT, openById);
+    return () => {
+      window.removeEventListener("hashchange", openIfTarget);
+      window.removeEventListener(OPEN_EVENT, openById);
+    };
+  }, [id]);
 
   function toggle() {
     const next = !open;
@@ -56,7 +78,7 @@ export function CollapsibleSection({
   }
 
   return (
-    <section className="card overflow-hidden">
+    <section id={id} className="card scroll-mt-24 overflow-hidden">
       <div className="flex items-center gap-3 pe-4">
         <button
           type="button"

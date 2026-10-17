@@ -5360,6 +5360,7 @@
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
     },
+    "nav": { "label": "Profile sections" },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
     "birthDate": "Date of birth",
