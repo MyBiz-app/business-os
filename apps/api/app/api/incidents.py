@@ -1,4 +1,4 @@
-"""Incident banners (go-live, GL23; migration 0120): the MyBiz console opens a banner for an
+"""Incident banners (go-live, GL23; migration 0121): the MyBiz console opens a banner for an
 incident, planned maintenance or a security event, and every page of the web app and the mobile app
 shows it until the team resolves it. The open banners are public (no personal data), so the sign-in
 page can show them too. The response playbook is docs/deploy/on-call.md."""

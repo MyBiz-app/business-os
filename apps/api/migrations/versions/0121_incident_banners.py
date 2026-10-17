@@ -9,8 +9,8 @@ sign-in) reads the open ones through `app.active_incidents()`, which holds no pe
 # contract: the only DROP is in downgrade() and removes the table and functions this migration
 # added; no earlier API version reads them, so a rollback of the code never touches them.
 
-Revision ID: 0120
-Revises: 0119
+Revision ID: 0121
+Revises: 0120
 Create Date: 2026-10-17
 """
 
@@ -18,8 +18,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0120"
-down_revision: str | None = "0119"
+revision: str = "0121"
+down_revision: str | None = "0120"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
