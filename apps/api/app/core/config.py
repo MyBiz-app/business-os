@@ -75,6 +75,10 @@ class Settings(BaseSettings):
     messaging_settings: SecretStr | None = None
     storage_provider: str = "database"
     storage_settings: SecretStr | None = None
+    # Virus scanning of uploads (GL3): "none" (off) or "clamav" (a clamd daemon at host:port).
+    file_scan_provider: str = "none"
+    file_scan_host: str = "127.0.0.1"
+    file_scan_port: int = 3310
     # Encrypts the businesses' provider secrets in the database (a Fernet key).
     secrets_key: SecretStr | None = None
 

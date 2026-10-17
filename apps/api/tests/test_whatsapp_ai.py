@@ -11,6 +11,7 @@ from uuid import uuid4
 from fastapi.testclient import TestClient
 from sqlalchemy import Engine, text
 
+from app.ai.untrusted import unwrap
 from app.messaging.email import load_all_messages
 from app.messaging.whatsapp_ai import answer_inbox
 from app.providers.messaging import IncomingMessage, OutgoingMessage, SendResult
@@ -112,7 +113,7 @@ def test_a_client_books_a_slot_by_replying_1(
         "my_bookings",
         "offer_booking",
     }
-    slots = json.loads(provider.calls[1]["messages"][-1]["content"][0]["content"])["free"]
+    slots = json.loads(unwrap(provider.calls[1]["messages"][-1]["content"][0]["content"]))["free"]
     assert [s["session_id"] for s in slots] == [session_id]
     with engine.connect() as connection:
         sent = connection.execute(
@@ -237,7 +238,8 @@ def test_the_ai_cannot_offer_what_is_not_bookable(
     assert response.status_code == 200, response.text
     assert response.json() == {"reply": "Sorry, that one is not available.", "offer_id": None}
     errors = [
-        json.loads(call["messages"][-1]["content"][0]["content"]) for call in provider.calls[1:]
+        json.loads(unwrap(call["messages"][-1]["content"][0]["content"]))
+        for call in provider.calls[1:]
     ]
     assert all("error" in e for e in errors)
     with engine.connect() as connection:

@@ -35882,7 +35882,7 @@
           "client"
         ],
         "summary": "Simulate Payment",
-        "description": "Completes a simulated checkout: records a test payment and creates the plan. Calling it\nagain returns the same plan.",
+        "description": "Completes a simulated checkout: records a test payment and creates the plan. Calling it\nagain returns the same plan. It does not exist in production: no real checkout is ever\ncompleted by the client.",
         "operationId": "simulate_payment",
         "security": [
           {
