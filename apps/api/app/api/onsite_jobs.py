@@ -20,7 +20,7 @@ from sqlalchemy.orm import Session
 
 from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clause
 from app.api.deps import ClientDep, TenantContext, require
-from app.api.schedule import JobStatus
+from app.api.schedule_models import JobStatus
 from app.core.permissions import Permission
 from app.schedule.scheduling import local_to_utc
 
