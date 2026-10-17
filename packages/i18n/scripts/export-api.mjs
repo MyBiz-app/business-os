@@ -17,6 +17,7 @@ export function apiMessages(locale) {
   return {
     email: all.email,
     securityEmail: all.security.email,
+    dunningEmail: all.billing.dunningEmail,
     pdfDocuments: { ...all.pdfDocuments, methods: all.receipts.methods },
     modules: { names: all.modules.names },
     locations: { mainBranch: all.locations.mainBranch, branchNumber: all.locations.branchNumber },

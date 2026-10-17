@@ -376,3 +376,74 @@ def void_invoice(invoice_id: UUID, body: VoidInvoice, db: BillingDep) -> list[Bi
         {"id": invoice_id, "reason": body.reason},
     )
     return billing_summary(db)
+
+
+# --- Collecting unpaid invoices (GL20) --------------------------------------------------------
+
+
+class OverdueBusiness(BaseModel):
+    tenant_id: UUID
+    name: str
+    owner_email: str | None
+    currency: str
+    open_invoices: int
+    open_amount: int = Field(description="Minor units, VAT included")
+    oldest_issued_at: dt.datetime
+    billing_state: Literal["active", "read_only", "suspended"]
+    grace_until: dt.datetime | None
+
+
+@router.get("/billing/overdue")
+def overdue_businesses(db: BillingDep) -> list[OverdueBusiness]:
+    """Businesses with an unpaid invoice, the oldest first."""
+    rows = db.execute(text("SELECT * FROM app.platform_overdue_businesses()")).mappings()
+    return [OverdueBusiness.model_validate(dict(row)) for row in rows]
+
+
+class GraceExtension(BaseModel):
+    days: int = Field(ge=1, le=90)
+
+
+@router.post("/businesses/{tenant_id}/billing/grace")
+def extend_grace(tenant_id: UUID, body: GraceExtension, db: BillingDep) -> list[OverdueBusiness]:
+    """Gives a business more time to pay: lifts read-only or suspension now and holds off the
+    next one for `days` days (reminders still go out)."""
+    run_rule(
+        db,
+        "SELECT app.platform_extend_grace(:t, :days)",
+        {"t": tenant_id, "days": body.days},
+    )
+    return overdue_businesses(db)
+
+
+class DunningSettings(BaseModel):
+    enabled: bool = Field(description="Off: no reminders, no read-only, no suspension")
+    reminder_days: list[Annotated[int, Field(ge=0, le=60)]] = Field(
+        max_length=6, description="Days after the invoice is issued that a reminder goes out"
+    )
+    read_only_after_days: int = Field(ge=1, le=120)
+    suspend_after_days: int = Field(ge=2, le=180)
+
+
+@router.get("/billing/dunning")
+def get_dunning(db: BillingDep) -> DunningSettings:
+    row = db.execute(text("SELECT * FROM app.dunning_settings")).mappings().one()
+    return DunningSettings.model_validate(dict(row))
+
+
+@router.put("/billing/dunning")
+def set_dunning(body: DunningSettings, db: BillingDep) -> DunningSettings:
+    if body.suspend_after_days <= body.read_only_after_days:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="bad_order")
+    run_rule(
+        db,
+        "SELECT app.platform_dunning_update("
+        ":enabled, CAST(:days AS integer[]), :read_only, :suspend)",
+        {
+            "enabled": body.enabled,
+            "days": sorted(set(body.reminder_days)),
+            "read_only": body.read_only_after_days,
+            "suspend": body.suspend_after_days,
+        },
+    )
+    return get_dunning(db)

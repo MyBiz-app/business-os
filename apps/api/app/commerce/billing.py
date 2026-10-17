@@ -46,6 +46,26 @@ def periods_due(anchor: date, last_start: date | None, today: date) -> list[Peri
     return due
 
 
+def vat_rate_bp(conn: Connection, currency: str, day: date) -> int:
+    """The VAT rate (basis points, 1800 = 18%) in force on `day`; 0 for a currency with none."""
+    return (
+        conn.execute(
+            text("""
+                SELECT rate_bp FROM app.vat_rates
+                WHERE currency = :currency AND valid_from <= :day
+                ORDER BY valid_from DESC LIMIT 1
+            """),
+            {"currency": currency, "day": day},
+        ).scalar()
+        or 0
+    )
+
+
+def vat_of(subtotal: int, rate_bp: int) -> int:
+    """VAT on `subtotal`, rounded half up to a minor unit."""
+    return (subtotal * rate_bp + 5000) // 10000
+
+
 def active_clients_on(conn: Connection, tenant_id: UUID, day: date) -> int:
     return conn.execute(
         text("""
@@ -64,7 +84,8 @@ def bill_businesses(
     now = now or datetime.now(UTC)
     tenants = conn.execute(
         text("""
-            SELECT t.id, t.time_zone, t.currency, t.trial_ends_at,
+            SELECT t.id, t.time_zone, t.currency, t.trial_ends_at, t.cancel_at,
+                   t.billing_resumed_on,
                    (SELECT max(period_start) FROM app.platform_invoices i
                     WHERE i.tenant_id = t.id) AS last_start,
                    a.card_last4
@@ -86,6 +107,11 @@ def bill_businesses(
             ).all()
         )
         for period in periods_due(anchor, tenant.last_start, today):
+            if tenant.billing_resumed_on and period.end < tenant.billing_resumed_on:
+                continue  # the subscription had ended then
+            # A cancelled subscription is not billed for periods that start after it ended.
+            if tenant.cancel_at and period.start >= tenant.cancel_at.astimezone(zone).date():
+                break
             clients = active_clients_on(conn, tenant.id, period.end)
             priced = quote(modules, clients, tenant.currency)
             lines = [{"key": "core", "quantity": 1, "amount": priced.core}] + [
@@ -101,23 +127,42 @@ def bill_businesses(
                 ]
                 total += sum(priced.once.values())
             charged = tenant.card_last4 is not None
+            rate = vat_rate_bp(conn, tenant.currency, today)
+            vat = vat_of(total, rate)
+            # Numbers are consecutive: taken only for an invoice that is really written, in
+            # this transaction (a rolled-back run gives its numbers back).
+            exists = conn.execute(
+                text(
+                    "SELECT 1 FROM app.platform_invoices "
+                    "WHERE tenant_id = :t AND period_start = :start"
+                ),
+                {"t": tenant.id, "start": period.start},
+            ).first()
+            if exists:
+                continue
+            number = conn.execute(text("SELECT app.next_platform_invoice_number()")).scalar_one()
             inserted = conn.execute(
                 text("""
                     INSERT INTO app.platform_invoices
-                        (tenant_id, period_start, period_end, currency, active_clients, lines,
-                         total, status, issued_at, paid_at, card_last4)
-                    VALUES (:t, :start, :end, :currency, :clients, CAST(:lines AS jsonb), :total,
-                            :status, :now, :paid_at, :last4)
+                        (tenant_id, number, period_start, period_end, currency, active_clients,
+                         lines, subtotal, vat_rate_bp, vat_amount, total, status, issued_at,
+                         paid_at, card_last4)
+                    VALUES (:t, :number, :start, :end, :currency, :clients, CAST(:lines AS jsonb),
+                            :subtotal, :rate, :vat, :total, :status, :now, :paid_at, :last4)
                     ON CONFLICT (tenant_id, period_start) DO NOTHING
                 """),
                 {
                     "t": tenant.id,
+                    "number": number,
+                    "subtotal": total,
+                    "rate": rate,
+                    "vat": vat,
                     "start": period.start,
                     "end": period.end,
                     "currency": tenant.currency,
                     "clients": clients,
                     "lines": json.dumps(lines),
-                    "total": total,
+                    "total": total + vat,
                     "status": "paid" if charged else "open",
                     "now": now,
                     "paid_at": now if charged else None,

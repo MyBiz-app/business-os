@@ -20,6 +20,14 @@
   {% endfor %}
   </tbody>
 </table>
+{% if vat %}
+<table class="lines">
+  <tbody>
+    <tr><td>{{ vat.subtotal_label }}</td><td class="num"><bdi>{{ vat.subtotal }}</bdi></td></tr>
+    <tr><td>{{ vat.label }}</td><td class="num"><bdi>{{ vat.amount }}</bdi></td></tr>
+  </tbody>
+</table>
+{% endif %}
 <div class="total-row"><span class="label">{{ t.total }}</span><span class="total"><bdi>{{ total }}</bdi></span></div>
 {% if payment_note %}<p class="note">{{ payment_note }}</p>{% endif %}
 {% endblock %}

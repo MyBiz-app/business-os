@@ -72,9 +72,10 @@ export const getTenant = cache(async () => {
   let scope = scopeOf(membership.tenant_id, branch);
   let response = await fetchCurrent(membership.tenant_id, branch);
   // A closed business is locked for everyone; its owner lands on the page that reopens it.
-  if (response.response.status === 403 && (response.error as { detail?: string } | undefined)?.detail === "business_closed") {
-    redirect("/closed");
-  }
+  const refusal = response.response.status === 403 ? (response.error as { detail?: string } | undefined)?.detail : undefined;
+  if (refusal === "business_closed") redirect("/closed");
+  // An unpaid MyBiz invoice (30 days) or an ended subscription: only the billing page works.
+  if (refusal === "billing_suspended") redirect("/suspended");
   if (response.error && branch) {
     // A branch that no longer belongs to the business: fall back to all branches.
     scope = scopeOf(membership.tenant_id);

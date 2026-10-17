@@ -122,6 +122,24 @@
     "unknownDevice": "מכשיר לא מוכר",
     "when": "מתי"
   },
+  "dunningEmail": {
+    "greeting": "שלום,",
+    "footer": "צוות MyBiz",
+    "subject": {
+      "reminder": "חשבונית MyBiz שלך טרם שולמה",
+      "readOnly": "{business} במצב קריאה בלבד",
+      "suspended": "{business} הושהה"
+    },
+    "body": {
+      "reminder": "חשבונית MyBiz מספר {number} על סך {amount} טרם שולמה.\n\nאפשר לשלם אותה בהגדרות, חיוב. אם היא תישאר פתוחה, {business} יעבור למצב קריאה בלבד ב-{readOnlyDate}: תוכלו לראות הכול, אבל לא להוסיף או לשנות.",
+      "readOnly": "חשבונית מספר {number} על סך {amount} עדיין לא שולמה, ולכן {business} במצב קריאה בלבד: אפשר לראות הכול, אבל אי אפשר להוסיף או לשנות.\n\nתשלום החשבונית בהגדרות, חיוב, מחזיר את הגישה המלאה מיד. אחרת העסק יושהה ב-{suspendDate}. המידע שלכם שמור.",
+      "suspended": "חשבונית מספר {number} על סך {amount} עדיין לא שולמה, ולכן {business} הושהה ואי אפשר להתחבר אליו.\n\nתשלום החשבונית יחזיר אותו לפעילות. המידע נשמר ושום דבר לא נמחק."
+    },
+    "details": {
+      "invoice": "חשבונית",
+      "amount": "סכום"
+    }
+  },
   "pdfDocuments": {
     "receipt": "קבלה",
     "receiptNumber": "קבלה מס׳ {number}",

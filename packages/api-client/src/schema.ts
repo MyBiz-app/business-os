@@ -6150,6 +6150,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/billing/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel Subscription
+         * @description Ends the subscription at the end of the paid period (or the trial). The business and its
+         *     data are kept; nothing is billed after that, and the owner can resume until it ends or later.
+         */
+        post: operations["cancel_subscription"];
+        /**
+         * Resume Subscription
+         * @description Takes a cancellation back, and brings a business back whose subscription had ended.
+         */
+        delete: operations["resume_subscription"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/billing/usage": {
         parameters: {
             query?: never;
@@ -6594,6 +6619,65 @@ export interface paths {
          * @description Credits an invoice: it stops counting as due or paid, with the reason in both logs.
          */
         post: operations["void_invoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/billing/overdue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Overdue Businesses
+         * @description Businesses with an unpaid invoice, the oldest first.
+         */
+        get: operations["overdue_businesses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/businesses/{tenant_id}/billing/grace": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Extend Grace
+         * @description Gives a business more time to pay: lifts read-only or suspension now and holds off the
+         *     next one for `days` days (reminders still go out).
+         */
+        post: operations["extend_grace"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/platform/billing/dunning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Dunning */
+        get: operations["get_dunning"];
+        /** Set Dunning */
+        put: operations["set_dunning"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -8760,6 +8844,7 @@ export interface components {
              * @description Sum of open invoices, minor units
              */
             balance_due: number;
+            collection: components["schemas"]["Collection"];
             usage: components["schemas"]["app__api__billing__Usage"];
         };
         /** BillingDetails */
@@ -10314,6 +10399,40 @@ export interface components {
             /** Name */
             name: string;
         };
+        /**
+         * Collection
+         * @description Where the subscription stands when an invoice is unpaid or the subscription is ending.
+         */
+        Collection: {
+            /**
+             * State
+             * @description read_only: everything visible, nothing can be changed; suspended: no access
+             * @enum {string}
+             */
+            state: "active" | "read_only" | "suspended";
+            /**
+             * Overdue Since
+             * @description When the oldest unpaid invoice was issued
+             */
+            overdue_since: string | null;
+            /**
+             * Read Only On
+             * @description Null when nothing is overdue or dunning is off
+             */
+            read_only_on: string | null;
+            /** Suspend On */
+            suspend_on: string | null;
+            /**
+             * Grace Until
+             * @description A grace extension from MyBiz, if any
+             */
+            grace_until: string | null;
+            /**
+             * Cancel At
+             * @description The subscription ends then; the business stays
+             */
+            cancel_at: string | null;
+        };
         /** Complaint */
         Complaint: {
             /**
@@ -11301,6 +11420,23 @@ export interface components {
             /** Sign Requested */
             sign_requested?: boolean | null;
         };
+        /** DunningSettings */
+        DunningSettings: {
+            /**
+             * Enabled
+             * @description Off: no reminders, no read-only, no suspension
+             */
+            enabled: boolean;
+            /**
+             * Reminder Days
+             * @description Days after the invoice is issued that a reminder goes out
+             */
+            reminder_days: number[];
+            /** Read Only After Days */
+            read_only_after_days: number;
+            /** Suspend After Days */
+            suspend_after_days: number;
+        };
         /** Employment */
         Employment: {
             /** Exists */
@@ -11929,6 +12065,11 @@ export interface components {
             /** Rating */
             rating: number | null;
         };
+        /** GraceExtension */
+        GraceExtension: {
+            /** Days */
+            days: number;
+        };
         /** Grant */
         Grant: {
             /**
@@ -12379,7 +12520,22 @@ export interface components {
             period_end: string;
             /** Currency */
             currency: string;
-            /** Total */
+            /**
+             * Subtotal
+             * @description Before VAT, minor units
+             */
+            subtotal: number;
+            /**
+             * Vat Rate Bp
+             * @description VAT rate in basis points (1800 = 18%); 0 for no VAT
+             */
+            vat_rate_bp: number;
+            /** Vat Amount */
+            vat_amount: number;
+            /**
+             * Total
+             * @description Including VAT
+             */
             total: number;
             /**
              * Status
@@ -12438,7 +12594,22 @@ export interface components {
             period_end: string;
             /** Currency */
             currency: string;
-            /** Total */
+            /**
+             * Subtotal
+             * @description Before VAT, minor units
+             */
+            subtotal: number;
+            /**
+             * Vat Rate Bp
+             * @description VAT rate in basis points (1800 = 18%); 0 for no VAT
+             */
+            vat_rate_bp: number;
+            /** Vat Amount */
+            vat_amount: number;
+            /**
+             * Total
+             * @description Including VAT
+             */
             total: number;
             /**
              * Status
@@ -13884,6 +14055,39 @@ export interface components {
              * @default false
              */
             tax_coordination: boolean;
+        };
+        /** OverdueBusiness */
+        OverdueBusiness: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /** Owner Email */
+            owner_email: string | null;
+            /** Currency */
+            currency: string;
+            /** Open Invoices */
+            open_invoices: number;
+            /**
+             * Open Amount
+             * @description Minor units, VAT included
+             */
+            open_amount: number;
+            /**
+             * Oldest Issued At
+             * Format: date-time
+             */
+            oldest_issued_at: string;
+            /**
+             * Billing State
+             * @enum {string}
+             */
+            billing_state: "active" | "read_only" | "suspended";
+            /** Grace Until */
+            grace_until: string | null;
         };
         /**
          * PaletteColors
@@ -17452,6 +17656,13 @@ export interface components {
              * @default false
              */
             require_mfa_for_staff: boolean;
+            /**
+             * Billing State
+             * @description read_only: an unpaid MyBiz invoice; everything is visible, nothing changes
+             * @default active
+             * @enum {string}
+             */
+            billing_state: "active" | "read_only";
             /**
              * Network Scope
              * @description network: clients shared by all branches; branch: each branch keeps its own
@@ -33528,6 +33739,72 @@ export interface operations {
             };
         };
     };
+    cancel_subscription: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Collection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resume_subscription: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Collection"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_usage: {
         parameters: {
             query?: never;
@@ -34313,6 +34590,114 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BillingMonth"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overdue_businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverdueBusiness"][];
+                };
+            };
+        };
+    };
+    extend_grace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GraceExtension"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverdueBusiness"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_dunning: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DunningSettings"];
+                };
+            };
+        };
+    };
+    set_dunning: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DunningSettings"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DunningSettings"];
                 };
             };
             /** @description Validation Error */
