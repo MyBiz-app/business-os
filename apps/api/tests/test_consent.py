@@ -79,7 +79,8 @@ def test_the_profile_toggle_records_the_app_as_source(
     with engine.begin() as connection:
         mine = connection.execute(
             text(
-                "SELECT action, source FROM app.consent_events WHERE user_id = :u AND client_id IS NULL"
+                "SELECT action, source FROM app.consent_events "
+                "WHERE user_id = :u AND client_id IS NULL"
             ),
             {"u": user},
         ).all()
