@@ -1,19 +1,30 @@
-"""MyBiz's own company details, printed on documents MyBiz issues to a business.
+"""The company's own details, printed on documents it issues to a business.
 
-The fictitious placeholder details live in packages/i18n/brand.json (`legal`); the API image is
-built from apps/api alone, so this is the checked-in copy. A test fails when they differ.
-Replacing them with the real company's details is one change to brand.json plus this file."""
+They come from `legal` in packages/i18n/brand.json (through the copy in app/core/brand.json, see
+app/core/brand.py). The details there are fictitious placeholders until the real company's are
+filled in: that is one change to brand.json, then `pnpm brand:sync`."""
 
 from typing import Final
 
-NAME: Final = "MyBiz"
-COMPANY_NAME: Final = {"he": 'מייביז טכנולוגיות בע"מ', "en": "MyBiz Technologies Ltd."}
-COMPANY_NUMBER: Final = "516000106"
-VAT_NUMBER: Final = "516000106"
-ADDRESS: Final = {
-    "he": "רחוב הדוגמה 1, תל אביב-יפו 6100001",
-    "en": "1 Hadugma St., Tel Aviv-Yafo 6100001",
-}
-EMAIL: Final = "billing@mybizapp.click"
-WEBSITE: Final = "mybizapp.click"
-FICTITIOUS: Final = True
+from app.core.brand import BRAND, NAME
+
+LEGAL: Final = BRAND["legal"]
+
+COMPANY_NAME: Final[dict[str, str]] = LEGAL["companyName"]
+COMPANY_NUMBER: Final[str] = LEGAL["companyNumber"]
+VAT_NUMBER: Final[str] = LEGAL["vatNumber"]
+ADDRESS: Final[dict[str, str]] = LEGAL["address"]
+EMAIL: Final[str] = LEGAL["email"]
+WEBSITE: Final[str] = LEGAL["website"]
+FICTITIOUS: Final[bool] = LEGAL["fictitious"]
+
+__all__ = [
+    "ADDRESS",
+    "COMPANY_NAME",
+    "COMPANY_NUMBER",
+    "EMAIL",
+    "FICTITIOUS",
+    "NAME",
+    "VAT_NUMBER",
+    "WEBSITE",
+]

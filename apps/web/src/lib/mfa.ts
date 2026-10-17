@@ -2,10 +2,12 @@
 
 /** The web app signs people out after this long without activity. */
 export const INACTIVITY_LIMIT_MS = 12 * 60 * 60 * 1000;
+/** The cookie names carry `app.cookiePrefix` of brand.json; a brand test checks they still match
+ * (this file is also run by plain Node tests, which cannot import the JSON file). */
 /** A timestamp (ms) of the person's last click or key press; read by the proxy. */
-export const ACTIVITY_COOKIE = "mybiz_active";
+export const ACTIVITY_COOKIE = "bos_active";
 /** A random id of this browser, kept so a sign-in from a new one can be emailed to the person. */
-export const DEVICE_COOKIE = "mybiz_device";
+export const DEVICE_COOKIE = "bos_device";
 export const MFA_PAGE = "/login/mfa";
 export const CODE_LENGTH = 6;
 

@@ -1,5 +1,28 @@
 {
   "name": "MyBiz",
+  "shortName": "MyBiz",
+  "domain": "mybizapp.click",
+  "appUrl": "https://mybiz-client-app.vercel.app",
+  "app": {
+    "scheme": "mybiz",
+    "legacySchemes": [],
+    "cookiePrefix": "bos",
+    "storagePrefix": "bos",
+    "defaultPalette": "brand"
+  },
+  "emails": {
+    "support": "support@mybizapp.click",
+    "billing": "billing@mybizapp.click",
+    "sender": "no-reply@example.com",
+    "noReply": "no-reply@example.com"
+  },
+  "social": {
+    "linkedin": "https://www.linkedin.com/company/mybiz",
+    "facebook": "https://www.facebook.com/mybiz",
+    "instagram": "https://www.instagram.com/mybiz",
+    "youtube": "https://www.youtube.com/@mybiz",
+    "x": "https://x.com/mybiz"
+  },
   "legal": {
     "companyName": {
       "he": "מייביז טכנולוגיות בע\"מ",
@@ -15,14 +38,32 @@
     "website": "mybizapp.click",
     "fictitious": true,
     "versions": {
-      "terms": { "version": "2026-10-16", "date": "2026-10-16" },
-      "privacy": { "version": "2026-10-16", "date": "2026-10-16" },
-      "dpa": { "version": "2026-10-17", "date": "2026-10-17" },
-      "subprocessors": { "version": "2026-10-17", "date": "2026-10-17" },
-      "accessibility": { "version": "2026-10-17", "date": "2026-10-17" }
+      "terms": {
+        "version": "2026-10-16",
+        "date": "2026-10-16"
+      },
+      "privacy": {
+        "version": "2026-10-16",
+        "date": "2026-10-16"
+      },
+      "dpa": {
+        "version": "2026-10-17",
+        "date": "2026-10-17"
+      },
+      "subprocessors": {
+        "version": "2026-10-17",
+        "date": "2026-10-17"
+      },
+      "accessibility": {
+        "version": "2026-10-17",
+        "date": "2026-10-17"
+      }
     },
     "accessibilityCoordinator": {
-      "name": { "he": "רכז הנגישות של מייביז", "en": "MyBiz accessibility coordinator" },
+      "name": {
+        "he": "רכז הנגישות של מייביז",
+        "en": "MyBiz accessibility coordinator"
+      },
       "email": "accessibility@mybizapp.click"
     }
   }

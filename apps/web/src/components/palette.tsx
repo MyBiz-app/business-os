@@ -7,7 +7,7 @@ import { useEffect, useState, useSyncExternalStore, useTransition } from "react"
 
 import { type DerivedTheme, deriveTheme, DEFAULT_COLORS, HEX, type PaletteColors } from "@/lib/palette-colors";
 
-export const PALETTES = ["mybiz", "ocean", "forest", "custom"] as const;
+export const PALETTES = ["brand", "ocean", "forest", "custom"] as const;
 export type Palette = (typeof PALETTES)[number];
 export const PALETTE_KEY = "palette";
 /** The derived colors of "my own colors", kept so the next page paints with them at once. */
@@ -49,7 +49,7 @@ function apply(palette: Palette, colors: PaletteColors | null, setTheme: (theme:
     remember(CUSTOM_KEY, JSON.stringify({ scheme: derived.scheme, tokens: derived.tokens }));
   } else {
     clearCustom(root);
-    if (palette === "mybiz") delete root.dataset.palette;
+    if (palette === "brand") delete root.dataset.palette;
     else root.dataset.palette = palette;
     remember(CUSTOM_KEY, null);
     if (wasCustom) {
@@ -84,7 +84,7 @@ export function useCustomPalette(): boolean {
 
 // The swatches show each palette's own colors, whatever the current one is.
 const SWATCHES: Record<Exclude<Palette, "custom">, { light: string; ink: string; accent: string }> = {
-  mybiz: { light: "#ffffff", ink: "#0a0a0a", accent: "#2563eb" },
+  brand: { light: "#ffffff", ink: "#0a0a0a", accent: "#2563eb" },
   ocean: { light: "#f4f7f9", ink: "#0b1a22", accent: "#0e7490" },
   forest: { light: "#f5f7f4", ink: "#0f1611", accent: "#166534" },
 };
@@ -137,7 +137,7 @@ export function PalettePicker({
 }) {
   const t = useTranslations("appearance");
   const { setTheme } = useTheme();
-  const [selected, setSelected] = useState<Palette>(current ?? "mybiz");
+  const [selected, setSelected] = useState<Palette>(current ?? "brand");
   const [colors, setColors] = useState<PaletteColors>(currentColors ?? DEFAULT_COLORS);
   const [dirty, setDirty] = useState(false);
   const [, start] = useTransition();

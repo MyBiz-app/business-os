@@ -190,7 +190,7 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
             ))}
             {todayTotal > 0 && (
               <p aria-live="polite" className="rounded-lg bg-foreground/5 p-3 text-sm font-semibold">
-                {t("todayCompare", { today: money(todayTotal), mybiz: money(total) })}
+                {t("todayCompare", { today: money(todayTotal), total: money(total) })}
                 <span className="mt-1 block font-normal text-muted">
                   {total <= todayTotal ? t("todaySave", { amount: money(todayTotal - total) }) : t("todayMore", { amount: money(total - todayTotal) })}
                 </span>

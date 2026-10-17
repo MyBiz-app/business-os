@@ -96,7 +96,7 @@ def seed_platform(
     _seed_announcements(conn, len(tenants))
     print(
         f"Platform demo: {len(tenants)} businesses, {len(PLATFORM_REQUESTS)} requests, "
-        f"{staff_email} is a MyBiz owner."
+        f"{staff_email} is a platform team owner."
     )
     return tenants
 

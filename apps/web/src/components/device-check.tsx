@@ -1,11 +1,12 @@
 "use client";
 
+import { BRAND } from "@business-os/i18n/brand";
 import { useLocale } from "next-intl";
 import { useEffect } from "react";
 
 import { registerDevice } from "@/app/(app)/account/security-actions";
 
-const FLAG = "mybiz-device-checked";
+const FLAG = `${BRAND.app.storagePrefix}-device-checked`;
 
 /** Once per browser session: lets the API know which browser this is (see registerDevice). */
 export function DeviceCheck() {

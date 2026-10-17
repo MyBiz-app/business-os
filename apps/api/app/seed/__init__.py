@@ -79,7 +79,7 @@ def main() -> None:
         "businesses the owner alone owns; "
         "profiles: add logos, portraits and the crossfit branch to the owner's existing demo "
         "businesses (adds only, deletes nothing); "
-        "platform: the owner email becomes a MyBiz team owner and the "
+        "platform: the owner email becomes a platform team owner and the "
         "platform gets small businesses, invoices and requests",
     )
     parser.add_argument("--owner-name", default=None, help="Sets the owner's display name")
