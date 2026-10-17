@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { SelectField } from "@/components/form/field";
 import { Pill } from "@/components/pill";
 import { SubmitButton } from "@/components/form/submit-button";
 import { unwrap } from "@/lib/api";
@@ -192,16 +193,12 @@ export default async function BillingPage() {
           ) : (
             <form action={addTestCard} className="flex flex-col gap-3">
               <p className="text-sm text-muted">{t("noCard")}</p>
-              <label className="flex flex-col gap-1.5 text-sm font-medium">
-                {t("brand")}
-                <select name="brand" defaultValue="visa" className="control px-3 py-2 font-normal">
-                  {BRANDS.map((brand) => (
-                    <option key={brand} value={brand}>
-                      {t(`brands.${brand}`)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <SelectField
+                label={t("brand")}
+                name="brand"
+                defaultValue="visa"
+                options={BRANDS.map((brand) => ({ value: brand, label: t(`brands.${brand}`) }))}
+              />
               <div>
                 <SubmitButton>{t("addTestCard")}</SubmitButton>
               </div>

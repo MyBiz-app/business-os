@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState, useTransition } from "react";
 
 import type { components } from "@business-os/api-client";
+import { EmptyState } from "@/components/empty-state";
 import { Pill } from "@/components/pill";
 
 import { acknowledgeWarning, type Correction, issueCorrection, listCorrections, markAccountantChecked, moveStage, refreshRun, startRun, type RunError, type RunResult, type RunStage, typeAmount } from "./actions";
@@ -66,7 +67,7 @@ function Stepper({ stage }: { stage: RunStage }) {
           <li key={step} className="flex items-center gap-2" aria-current={active ? "step" : undefined}>
             <span
               className={`inline-flex size-6 items-center justify-center rounded-full text-xs font-semibold ring-1 ${
-                done ? "bg-success text-white ring-success" : active ? "bg-primary text-white ring-primary" : "bg-surface text-muted ring-border"
+                done ? "bg-success text-white ring-success" : active ? "bg-primary text-on-primary ring-primary" : "bg-surface text-muted ring-border"
               }`}
             >
               {done ? <Check aria-hidden="true" className="size-3.5" /> : index + 1}
@@ -199,7 +200,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
           {t("warningsTitle")}
         </h3>
         {checks.length === 0 ? (
-          <p className="text-sm text-muted">{t("warningsNone")}</p>
+          <EmptyState variant="list">{t("warningsNone")}</EmptyState>
         ) : (
           <ul className="card divide-y divide-border">
             {checks.map(([code, entry]) => (
@@ -225,7 +226,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
           <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} aria-label={t("list.search")} placeholder={t("list.search")} className="field max-w-60" />
         </div>
         {visible.length === 0 ? (
-          <p className="text-sm text-muted">{t("list.none")}</p>
+          <EmptyState variant="people">{t("list.none")}</EmptyState>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {visible.map((line) => {

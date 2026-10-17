@@ -21,6 +21,7 @@ export const palette = {
     successInk: "#166534",
     warning: "#b45309",
     danger: "#b91c1c",
+    onDanger: "#ffffff",
   },
   dark: {
     background: "#0b1020",
@@ -37,6 +38,7 @@ export const palette = {
     successInk: "#4ade80",
     warning: "#fbbf24",
     danger: "#f87171",
+    onDanger: "#0b1020",
   },
 } as const;
 

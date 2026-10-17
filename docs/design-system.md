@@ -51,6 +51,7 @@ for text. Use the ink whenever the color is text (or a thin icon) on a card, the
 | `--primary-ink` / `text-primary-ink` | `primaryInk` | Links, eyebrows, text on `bg-primary/10` | #1D4ED8 | #60A5FA |
 | `--success` / `bg-success` | `success` | Dots, bars, fills | #16A34A | #22C55E |
 | `--success-ink` / `text-success-ink` | `successInk` | Check marks, deltas, "paid" text | #166534 | #4ADE80 |
+| `--on-danger` / `text-on-danger` | `onDanger` | Text on a `bg-danger` fill (white in light, navy in dark: the dark red is too light for white) | #FFFFFF | #0B1020 |
 | `--muted` / `text-muted` | `muted` | Secondary text (4.5:1 even on a 12% primary tint) | #52627A | #94A3B8 |
 
 Never write `text-primary` or `text-success` for text: the bright colors are 3.3 to 4.4:1 on white

@@ -168,7 +168,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
       hourCycle: "h23",
       timeZone: "UTC",
     }).format(new Date(Date.UTC(2000, 0, 1, hour)));
-  const minWidth = laned ? (days.length > 1 ? "7.5rem" : "10rem") : days.length > 1 ? "8.5rem" : "0";
+  const minWidth = laned ? (days.length > 1 ? "9rem" : "10rem") : days.length > 1 ? "8.5rem" : "0";
   const dayHeader = "h-11";
   const nowVisible = (day: string) => now?.day === day && now.minutes >= range.from && now.minutes <= range.to;
 
@@ -224,7 +224,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
             ))}
             {now && days.includes(now.day) && nowVisible(now.day) && (
               <span
-                className="absolute end-1 z-10 -translate-y-1/2 rounded-full bg-danger px-1.5 py-px text-[0.625rem] font-semibold tabular-nums text-white"
+                className="absolute end-1 z-10 -translate-y-1/2 rounded-full bg-danger px-1.5 py-px text-[0.625rem] font-semibold tabular-nums text-on-danger"
                 style={{ top: y(now.minutes) }}
                 dir="ltr"
               >
@@ -296,7 +296,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                             {event.branch && <span aria-hidden="true" className="size-2 shrink-0 rounded-full" style={{ background: event.branch.color }} />}
                             <span className="truncate">{event.time}</span>
                           </span>
-                          <span className={`truncate font-medium ${event.cancelled ? "line-through" : ""}`} dir="auto">
+                          <span className={`font-medium break-words ${tall > 44 ? "line-clamp-2" : "truncate"} ${event.cancelled ? "line-through" : ""}`} dir="auto" title={event.title}>
                             {event.title}
                           </span>
                           {tall > 52 && event.detail && (
@@ -334,7 +334,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                   </div>
                   {/* Who works when: a narrow strip at the end of the column (this branch only). */}
                   {hasShifts && (
-                    <div aria-label={labels.shifts} className="absolute inset-y-0 end-0 w-8 border-s border-dashed border-border/80">
+                    <div role="group" aria-label={labels.shifts} className="absolute inset-y-0 end-0 w-8 border-s border-dashed border-border/80">
                       {crowded(dayShifts)
                         ? coverage(dayShifts).map((segment) => {
                             const block = y(segment.end) - y(segment.start);

@@ -26,6 +26,7 @@
   --success: #16a34a;
   --success-ink: #166534;
   --danger: #b91c1c;
+  --on-danger: #ffffff;
   --warning: #b45309;
   --shadow-color: 222 30% 18%;
   --elevation:
@@ -56,6 +57,7 @@
   --success: #22c55e;
   --success-ink: #4ade80;
   --danger: #f87171;
+  --on-danger: #0b1020;
   --warning: #fbbf24;
   --shadow-color: 222 40% 2%;
   --elevation: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 3px hsl(var(--shadow-color) / 0.5);
@@ -127,6 +129,7 @@
   --color-success: var(--success);
   --color-success-ink: var(--success-ink);
   --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
   --color-warning: var(--warning);
   --color-brand-from: var(--brand-from);
   --color-brand-via: var(--brand-via);

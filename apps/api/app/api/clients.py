@@ -27,7 +27,8 @@ WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
-    "custom_fields, home_location_id, created_at, updated_at, erased_at"
+    "custom_fields, home_location_id, created_at, updated_at, erased_at, "
+    "marketing_consent_at IS NOT NULL AS marketing_consent"
 )
 
 
@@ -88,6 +89,10 @@ class Client(BaseModel):
     created_at: datetime
     updated_at: datetime
     erased_at: datetime | None = Field(description="Personal data erased on request (privacy)")
+    marketing_consent: bool = Field(
+        default=False,
+        description="Agreed to marketing messages; service messages are sent either way",
+    )
 
 
 class ClientListItem(Client):
@@ -347,6 +352,30 @@ def get_client(client_id: UUID, context: ReadDep) -> Client:
         raise not_found()
     ensure_branch_visible(context, row["home_location_id"])
     return Client.model_validate(dict(row))
+
+
+class ClientConsentBody(BaseModel):
+    consent: bool
+
+
+@router.put("/{client_id}/marketing-consent")
+def set_client_marketing_consent(
+    client_id: UUID, body: ClientConsentBody, context: WriteDep
+) -> Client:
+    """Record that the client agreed to (or stopped) marketing messages, e.g. at the desk."""
+    ensure_not_erased(context.session, client_id)
+    updated = context.session.execute(
+        text("""
+            UPDATE app.clients
+            SET marketing_consent_at =
+                CASE WHEN :consent THEN COALESCE(marketing_consent_at, now()) END
+            WHERE id = :id
+        """),
+        {"consent": body.consent, "id": client_id},
+    )
+    if updated.rowcount == 0:
+        raise not_found()
+    return get_client(client_id, context)
 
 
 @router.patch("/{client_id}")
