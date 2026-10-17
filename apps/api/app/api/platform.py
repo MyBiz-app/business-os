@@ -16,10 +16,11 @@ from sqlalchemy import text
 from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, UserDep
 from app.api.modules import check_selection
 from app.api.pagination import PageDep
 from app.core.config import get_settings
+from app.core.mfa import require_aal2
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/platform", tags=["platform"])
@@ -41,7 +42,7 @@ Level = Literal["primary_owner", "owner", "manager", "employee"]
 def require_platform(permission: PlatformPermission | None = None) -> Callable[[Session], Session]:
     """Any active MyBiz team member, or one holding `permission`."""
 
-    def check(session: SessionDep) -> Session:
+    def check(session: SessionDep, user: UserDep) -> Session:
         allowed = session.execute(
             text("SELECT app.platform_can(:p)")
             if permission
@@ -50,6 +51,7 @@ def require_platform(permission: PlatformPermission | None = None) -> Callable[[
         ).scalar_one()
         if not allowed:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="forbidden")
+        require_aal2(user.aal)
         return session
 
     return check

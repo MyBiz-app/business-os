@@ -12,7 +12,9 @@ import { SegmentedControl } from "../components/segmented-control";
 import { Button, ErrorText, Field, Heading, styles } from "../components/ui";
 import { SUPABASE_KEY, SUPABASE_URL } from "../lib/env";
 import { availableChannels, OTP_LENGTH, toE164, type OtpChannel } from "../lib/otp";
+import { CODE_LENGTH, needsCodeStep } from "../lib/session-rules";
 import { supabase } from "../lib/supabase";
+import { useSession } from "../providers/session-provider";
 import { useTheme } from "../providers/theme-provider";
 
 // WhatsApp codes also need the SMS provider; this switch keeps the option hidden until the
@@ -53,6 +55,31 @@ export function SignInScreen() {
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The second step: a code from the authenticator app. Also when the app was reopened half-way.
+  const tSecurity = useTranslations("security");
+  const { mfaPending } = useSession();
+  const [stepTwo, setStepTwo] = useState(false);
+  const needsCode = stepTwo || mfaPending;
+
+  const finish = () => router.replace(joinCode ? { pathname: "/join", params: { code: joinCode } } : "/");
+
+  const verifyAuthenticator = async (entered = code) => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    const { data: factors } = await supabase.auth.mfa.listFactors();
+    // Any of the person's authenticators will do (a second device can be a backup).
+    for (const factor of factors?.totp ?? []) {
+      const { error: failed } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code: entered.trim() });
+      if (!failed) {
+        setBusy(false);
+        return finish();
+      }
+    }
+    setBusy(false);
+    setCode("");
+    setError(tSecurity("errors.invalid_code"));
+  };
 
   const sendCode = async () => {
     setError(null);
@@ -93,18 +120,39 @@ export function SignInScreen() {
     );
     setBusy(false);
     if (failed) return setError(t("invalidCode"));
-    router.replace(joinCode ? { pathname: "/join", params: { code: joinCode } } : "/");
+    const { data: level } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (needsCodeStep(level?.currentLevel, level?.nextLevel)) {
+      setStepTwo(true);
+      setCode("");
+      return;
+    }
+    finish();
   };
 
   return (
     <AuthShell>
       <FadeIn index={0} style={{ alignItems: "center", gap: 6 }}>
         <DepthLogo size={0.8} />
-        <Heading palette={palette}>{t("title")}</Heading>
-        <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{sentTo ? t(channel === "email" ? "codeSent" : "codeSentPhone", { target: ltr(sentTo) }) : t("subtitle")}</Text>
+        <Heading palette={palette}>{needsCode ? tSecurity("challenge.title") : t("title")}</Heading>
+        <Text style={[styles.muted, { color: palette.muted, textAlign: "center" }]}>{needsCode ? tSecurity("challenge.subtitle") : sentTo ? t(channel === "email" ? "codeSent" : "codeSentPhone", { target: ltr(sentTo) }) : t("subtitle")}</Text>
       </FadeIn>
       <AuthCard>
-        {sentTo ? (
+        {needsCode ? (
+          <>
+            <OtpInput
+              value={code}
+              onChange={setCode}
+              length={CODE_LENGTH}
+              palette={palette}
+              label={tSecurity("mfa.code")}
+              invalid={!!error}
+              onComplete={(full) => void verifyAuthenticator(full)}
+            />
+            <ErrorText message={error} palette={palette} />
+            <Button label={tSecurity("challenge.submit")} palette={palette} busy={busy} disabled={code.length < CODE_LENGTH} onPress={() => void verifyAuthenticator()} />
+            <Button label={tSecurity("challenge.signOut")} variant="secondary" palette={palette} onPress={() => void supabase.auth.signOut().then(() => { setStepTwo(false); setSentTo(null); setCode(""); setError(null); })} />
+          </>
+        ) : sentTo ? (
           <>
             <OtpInput
               value={code}

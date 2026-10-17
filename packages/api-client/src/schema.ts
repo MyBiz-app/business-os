@@ -3304,6 +3304,67 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/devices/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check Device
+         * @description Called once after each sign-in. A device the account has not signed in from before is
+         *     emailed to the person, unless it is the first one ever (a new account).
+         */
+        post: operations["check_device"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Devices
+         * @description The devices signed in from recently, newest first.
+         */
+        get: operations["list_devices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/security": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Security Policy
+         * @description What the apps tell people about two-step sign-in (the banner for owners and managers).
+         */
+        get: operations["security_policy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/push-tokens": {
         parameters: {
             query?: never;
@@ -10781,6 +10842,33 @@ export interface components {
              */
             pay_url?: string | null;
         };
+        /** DeviceCheck */
+        DeviceCheck: {
+            /**
+             * Device Id
+             * @description Random, kept on the device
+             */
+            device_id: string;
+            /**
+             * Label
+             * @description E.g. 'Chrome on Windows'
+             * @default
+             */
+            label: string;
+            /**
+             * Locale
+             * @default he
+             */
+            locale: string;
+        };
+        /** DeviceCheckResult */
+        DeviceCheckResult: {
+            /**
+             * New Device
+             * @description First time this device signs in to the account
+             */
+            new_device: boolean;
+        };
         /** DirectMessage */
         DirectMessage: {
             /** Client Id */
@@ -12522,6 +12610,31 @@ export interface components {
              * @description The branch's own accent color; null falls back to the network's
              */
             primary_color?: string | null;
+        };
+        /** LoginDevice */
+        LoginDevice: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /**
+             * First Seen At
+             * Format: date-time
+             */
+            first_seen_at: string;
+            /**
+             * Last Seen At
+             * Format: date-time
+             */
+            last_seen_at: string;
+            /**
+             * Current
+             * @description The device that asked
+             */
+            current: boolean;
         };
         /** MarkRead */
         MarkRead: {
@@ -15704,6 +15817,24 @@ export interface components {
              */
             travel_minutes: number;
         };
+        /** SecurityPolicy */
+        SecurityPolicy: {
+            /**
+             * Mfa Enforced
+             * @description Two-step sign-in is enforced on this server
+             */
+            mfa_enforced: boolean;
+            /**
+             * Mfa Required From
+             * @description From this day owners and managers need a code for sensitive actions
+             */
+            mfa_required_from: string | null;
+            /**
+             * Mfa Required Now
+             * @description Owners and managers need a code already
+             */
+            mfa_required_now: boolean;
+        };
         /** SelectAccounts */
         SelectAccounts: {
             /** External Ids */
@@ -16912,6 +17043,12 @@ export interface components {
              */
             online_sales: boolean;
             /**
+             * Require Mfa For Staff
+             * @description Every team member must sign in with an authenticator code
+             * @default false
+             */
+            require_mfa_for_staff: boolean;
+            /**
              * Network Scope
              * @description network: clients shared by all branches; branch: each branch keeps its own
              * @default network
@@ -17074,6 +17211,8 @@ export interface components {
             requires_health_declaration?: boolean | null;
             /** Online Sales */
             online_sales?: boolean | null;
+            /** Require Mfa For Staff */
+            require_mfa_for_staff?: boolean | null;
             /** Resource Payment */
             resource_payment?: ("app" | "venue") | null;
             /** Schedule Default View */
@@ -26369,6 +26508,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    check_device: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeviceCheck"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeviceCheckResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_devices: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Device-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LoginDevice"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    security_policy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecurityPolicy"];
                 };
             };
         };

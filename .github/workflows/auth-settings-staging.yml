@@ -10,6 +10,10 @@ on:
         description: "Change the project (otherwise only show the differences)"
         type: boolean
         default: false
+      paid_plan:
+        description: "The project is on a paid Supabase plan: also switch on the leaked-password check"
+        type: boolean
+        default: false
 
 jobs:
   auth-settings:
@@ -30,4 +34,5 @@ jobs:
           SITE_URL: https://business-os-alpha-drab.vercel.app
           REDIRECT_URLS: https://business-os-alpha-drab.vercel.app/**,https://mybizapp.click/**,mybiz://**
           APPLY: ${{ inputs.apply && '--apply' || '' }}
+          PAID_AUTH: ${{ inputs.paid_plan && '1' || '0' }}
         run: python supabase/apply_auth_settings.py $APPLY

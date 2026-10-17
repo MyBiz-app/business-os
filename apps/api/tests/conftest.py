@@ -99,7 +99,9 @@ TokenFactory = Callable[..., str]
 
 @pytest.fixture
 def make_token(signing_key: ec.EllipticCurvePrivateKey) -> TokenFactory:
-    def factory(user_id: UUID, email: str = "", key: object = signing_key) -> str:
+    def factory(
+        user_id: UUID, email: str = "", key: object = signing_key, aal: str | None = None
+    ) -> str:
         now = int(time.time())
         claims = {
             "sub": str(user_id),
@@ -109,6 +111,8 @@ def make_token(signing_key: ec.EllipticCurvePrivateKey) -> TokenFactory:
             "iat": now,
             "exp": now + 300,
         }
+        if aal:
+            claims["aal"] = aal
         return jwt.encode(claims, key, algorithm="ES256")
 
     return factory
@@ -128,8 +132,10 @@ AuthHeaders = Callable[..., dict[str, str]]
 
 @pytest.fixture
 def auth(make_token: TokenFactory) -> AuthHeaders:
-    def headers(user_id: UUID, tenant_id: UUID | str | None = None) -> dict[str, str]:
-        result = {"Authorization": f"Bearer {make_token(user_id)}"}
+    def headers(
+        user_id: UUID, tenant_id: UUID | str | None = None, aal: str | None = None
+    ) -> dict[str, str]:
+        result = {"Authorization": f"Bearer {make_token(user_id, aal=aal)}"}
         if tenant_id:
             result["X-Tenant-Id"] = str(tenant_id)
         return result

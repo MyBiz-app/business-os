@@ -9,6 +9,7 @@ export async function proxy(request: NextRequest) {
   const nonce = createNonce();
   const policy = strictCsp(nonce, { dev: process.env.NODE_ENV !== "production" });
   request.headers.set(NONCE_HEADER, nonce);
+  request.headers.set("x-pathname", request.nextUrl.pathname);
   request.headers.set("content-security-policy-report-only", policy);
 
   const response = await updateSession(request);
