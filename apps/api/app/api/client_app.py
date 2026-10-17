@@ -22,6 +22,7 @@ from app.api.bookings import (
     lock_session,
     place_booking,
 )
+from app.api.clients import join_as_member, member_join_code
 from app.api.closed_days import ClosedDay
 from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
@@ -272,6 +273,33 @@ def join_business(
     )
     if body.accepted_legal:
         record_acceptance(session, request, user.id, body.accepted_legal, "client_join", row["id"])
+    return _business(row)
+
+
+class MemberJoinRequest(BaseModel):
+    tenant_id: UUID
+
+
+@router.post("/businesses/self", status_code=status.HTTP_201_CREATED)
+def join_own_business(
+    body: MemberJoinRequest, user: UserDep, session: SessionDep
+) -> ClientBusiness:
+    """ "Sign up as a client too": a team member joins their own business without a code (R36)."""
+    ensure_profile(session, user.id, user.email)
+    code = member_join_code(session, body.tenant_id)
+    if code is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not_a_team_member")
+    offers_app = session.execute(
+        text("SELECT client_app FROM app.business_by_join_code(:code)"), {"code": code}
+    ).scalar()
+    if offers_app is False:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
+    client_id = join_as_member(session, body.tenant_id)
+    row = (
+        session.execute(text(f"{BUSINESS_SELECT} AND c.id = :id"), {"id": client_id})
+        .mappings()
+        .one()
+    )
     return _business(row)
 
 

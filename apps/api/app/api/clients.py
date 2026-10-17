@@ -43,7 +43,9 @@ COLUMNS = (
     "custom_fields, home_location_id, created_at, updated_at, erased_at, "
     "marketing_consent_at IS NOT NULL AS marketing_consent, marketing_consent_at, "
     "marketing_consent_source, marketing_opted_out_at, "
-    "(email IS NOT NULL AND app.email_is_suppressed(email)) AS email_suppressed"
+    "(email IS NOT NULL AND app.email_is_suppressed(email)) AS email_suppressed, "
+    "(user_id IS NOT NULL AND EXISTS (SELECT 1 FROM app.tenant_members m "
+    "WHERE m.tenant_id = app.clients.tenant_id AND m.user_id = app.clients.user_id)) AS is_staff"
 )
 
 
@@ -119,6 +121,9 @@ class Client(BaseModel):
     )
     email_suppressed: bool = Field(
         default=False, description="The address bounced or reported spam: no emails are sent to it"
+    )
+    is_staff: bool = Field(
+        default=False, description="Also a team member of this business (shown as a badge)"
     )
 
 
@@ -240,6 +245,10 @@ def list_clients(
         date | None, Query(description="With no_show_to: missed a class in this range")
     ] = None,
     no_show_to: Annotated[date | None, Query()] = None,
+    staff: Annotated[
+        Literal["only", "exclude"] | None,
+        Query(description="only: team members who are also clients; exclude: leave them out"),
+    ] = None,
 ) -> ClientPage:
     # RLS limits rows to the current tenant; the filters below narrow further.
     # The current branch's clients, and those without a home branch (they belong to all).
@@ -262,6 +271,10 @@ def list_clients(
     if client_status:
         where += " AND status = :status"
         params["status"] = client_status
+    if staff:
+        where += f""" AND {"" if staff == "only" else "NOT "}(user_id IS NOT NULL AND EXISTS (
+            SELECT 1 FROM app.tenant_members m
+            WHERE m.tenant_id = app.clients.tenant_id AND m.user_id = app.clients.user_id))"""
     if plan:
         # "Today" in the business's time zone, like everywhere plans are checked.
         valid = """EXISTS (
@@ -366,6 +379,41 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
     _join_home_branch(context.session, row["id"], row["home_location_id"])
     events.record(context.session, "first_client", once=True)
     return Client.model_validate(dict(row))
+
+
+def member_join_code(session: Session, tenant_id: UUID) -> str | None:
+    """The join code of a business the signed-in user is a team member of, else None."""
+    return session.execute(
+        text("""
+            SELECT t.join_code FROM app.tenants t
+            JOIN app.tenant_members m ON m.tenant_id = t.id
+            WHERE t.id = :tenant_id AND m.user_id = app.current_user_id()
+        """),
+        {"tenant_id": tenant_id},
+    ).scalar()
+
+
+def join_as_member(session: Session, tenant_id: UUID) -> UUID | None:
+    """Gives the signed-in team member a client card of their own business (R36).
+
+    Goes through the same function as joining with the code, so a card already linked to the
+    user, or an unlinked one with the same email, is reused and nothing is duplicated. None
+    when the user is not on this business's team."""
+    code = member_join_code(session, tenant_id)
+    if code is None:
+        return None
+    return session.execute(text("SELECT app.join_business(:code)"), {"code": code}).scalar()
+
+
+@router.post("/me", status_code=status.HTTP_201_CREATED)
+def add_me_as_client(context: WriteDep) -> Client:
+    """ "Add me": the signed-in team member becomes a client of this business (an owner can book
+    a table for themselves, a coach can join a class)."""
+    client_id = join_as_member(context.session, context.tenant_id)
+    if client_id is None:
+        # Platform staff and support sessions have no card to add.
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_team_member")
+    return get_client(client_id, context)
 
 
 @router.get("/{client_id}/branches")

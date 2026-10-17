@@ -33,6 +33,14 @@ PAST_SESSIONS = """
 """
 
 
+def _not_staff(client_column: str) -> str:
+    """True unless `:exclude_staff` is set and the client is also a team member (R36)."""
+    return f"""(NOT CAST(:exclude_staff AS boolean) OR NOT EXISTS (
+            SELECT 1 FROM app.clients sc JOIN app.tenant_members sm
+                ON sm.tenant_id = sc.tenant_id AND sm.user_id = sc.user_id
+            WHERE sc.id = {client_column}))"""
+
+
 @dataclass(frozen=True)
 class Metric:
     key: str
@@ -57,11 +65,13 @@ REVENUE = Metric(
         SELECT coalesce(sum(p.amount), 0) FROM app.payments p, period
         WHERE p.status = 'succeeded' AND p.created_at >= period.from_at
           AND p.created_at < period.to_at AND app.in_branch(p.location_id)
+          AND {_not_staff("p.client_id")}
     """,
     bucket_sql=f"""{PERIOD}
         SELECT {{bucket}} AS bucket, sum(p.amount) AS value FROM app.payments p, period
         WHERE p.status = 'succeeded' AND p.created_at >= period.from_at
           AND p.created_at < period.to_at AND app.in_branch(p.location_id)
+          AND {_not_staff("p.client_id")}
         GROUP BY 1 ORDER BY 1
     """,
 )
@@ -73,7 +83,7 @@ PLANS_SOLD = Metric(
     sql=f"""{PERIOD}
         SELECT count(*) FROM app.entitlements e, period
         WHERE e.created_at >= period.from_at AND e.created_at < period.to_at
-          AND app.in_branch(e.location_id)
+          AND app.in_branch(e.location_id) AND {_not_staff("e.client_id")}
     """,
 )
 
@@ -81,10 +91,10 @@ ACTIVE_CLIENTS = Metric(
     key="active_clients",
     unit="count",
     description="Clients holding a valid (not cancelled) plan on the last day of the period.",
-    sql="""
+    sql=f"""
         SELECT count(DISTINCT e.client_id) FROM app.entitlements e
         WHERE e.status = 'active' AND CAST(:end AS date) BETWEEN e.starts_on AND e.ends_on
-          AND app.in_branch(e.location_id)
+          AND app.in_branch(e.location_id) AND {_not_staff("e.client_id")}
     """,
 )
 
@@ -95,7 +105,7 @@ NEW_CLIENTS = Metric(
     sql=f"""{PERIOD}
         SELECT count(*) FROM app.clients c, period
         WHERE c.created_at >= period.from_at AND c.created_at < period.to_at
-          AND app.in_branch(c.home_location_id)
+          AND app.in_branch(c.home_location_id) AND {_not_staff("c.id")}
     """,
 )
 
@@ -107,12 +117,14 @@ ATTENDANCE = Metric(
         SELECT count(*) FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id, period
         WHERE b.status = 'checked_in' AND s.starts_at >= period.from_at
           AND s.starts_at < period.to_at AND app.in_branch(s.location_id)
+          AND {_not_staff("b.client_id")}
     """,
     bucket_sql=f"""{PERIOD}
         SELECT {{bucket}} AS bucket, count(*) AS value
         FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id, period
         WHERE b.status = 'checked_in' AND s.starts_at >= period.from_at
           AND s.starts_at < period.to_at AND app.in_branch(s.location_id)
+          AND {_not_staff("b.client_id")}
         GROUP BY 1 ORDER BY 1
     """,
 )
@@ -125,7 +137,8 @@ OCCUPANCY = Metric(
     sql=f"""{PERIOD}, past AS ({PAST_SESSIONS})
         SELECT CASE WHEN sum(past.capacity) > 0 THEN
             100.0 * (SELECT count(*) FROM app.bookings b JOIN past ON past.id = b.session_id
-                     WHERE b.status IN ('booked', 'checked_in', 'no_show'))
+                     WHERE b.status IN ('booked', 'checked_in', 'no_show')
+                       AND {_not_staff("b.client_id")})
             / sum(past.capacity) END
         FROM past
     """,
@@ -139,7 +152,7 @@ NO_SHOW_RATE = Metric(
         SELECT CASE WHEN count(*) > 0 THEN
             100.0 * count(*) FILTER (WHERE b.status = 'no_show') / count(*) END
         FROM app.bookings b JOIN past ON past.id = b.session_id
-        WHERE b.status IN ('checked_in', 'no_show')
+        WHERE b.status IN ('checked_in', 'no_show') AND {_not_staff("b.client_id")}
     """,
     higher_is_better=False,
 )
@@ -154,6 +167,7 @@ LATE_CANCEL_RATE = Metric(
         FROM app.bookings b JOIN app.sessions s ON s.id = b.session_id, period
         WHERE b.status <> 'waitlisted' AND s.starts_at >= period.from_at
           AND s.starts_at < period.to_at AND app.in_branch(s.location_id)
+          AND {_not_staff("b.client_id")}
     """,
     higher_is_better=False,
 )
@@ -193,8 +207,11 @@ MetricKey = Literal[
 ]
 
 
-def compute(db: Session, key: str, start: date, end: date) -> float | None:
-    value = db.execute(text(METRICS[key].sql), {"start": start, "end": end}).scalar()
+def compute(
+    db: Session, key: str, start: date, end: date, exclude_staff: bool = False
+) -> float | None:
+    params = {"start": start, "end": end, "exclude_staff": exclude_staff}
+    value = db.execute(text(METRICS[key].sql), params).scalar()
     return None if value is None else round(float(value), 1)
 
 
@@ -204,13 +221,19 @@ def previous_period(start: date, end: date) -> tuple[date, date]:
     return start - timedelta(days=length), start - timedelta(days=1)
 
 
-def series(db: Session, key: str, start: date, end: date, grain: Grain) -> list[tuple[date, float]]:
+def series(
+    db: Session, key: str, start: date, end: date, grain: Grain, exclude_staff: bool = False
+) -> list[tuple[date, float]]:
     """Values per day / week (starting Monday, ISO) / month; empty buckets are zero."""
     metric = METRICS[key]
     if metric.bucket_sql is None:
         raise ValueError(f"{key} has no series")
     sql = _bucketed(metric.bucket_sql, _TIMESTAMP[key])
-    rows = dict(db.execute(text(sql), {"start": start, "end": end, "grain": grain}).all())
+    rows = dict(
+        db.execute(
+            text(sql), {"start": start, "end": end, "grain": grain, "exclude_staff": exclude_staff}
+        ).all()
+    )
     return [(bucket, float(rows.get(bucket, 0))) for bucket in _buckets(start, end, grain)]
 
 

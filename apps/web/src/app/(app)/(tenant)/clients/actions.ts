@@ -51,6 +51,14 @@ export async function createClient(
   redirect(`/clients/${id}`);
 }
 
+/** "Add me": the signed-in team member becomes a client of this business, then opens the card. */
+export async function addMeAsClient(): Promise<void> {
+  const { api, scope } = await getTenant();
+  const id = unwrap(await api.POST("/clients/me", { params: scope })).id;
+  revalidatePath("/clients");
+  redirect(`/clients/${id}`);
+}
+
 export async function updateClient(
   clientId: string,
   _state: ClientFormState,
