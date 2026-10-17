@@ -139,12 +139,26 @@ function refreshSession(sessionId: string) {
 }
 
 export async function bookClient(sessionId: string, clientId: string, dependentId: string | undefined): Promise<void> {
+  await placeBooking(sessionId, clientId, dependentId, false);
+}
+
+/** Adds a client to a full class beyond its capacity (owners and managers; the API checks). */
+export async function bookClientOverCapacity(sessionId: string, clientId: string): Promise<void> {
+  await placeBooking(sessionId, clientId, undefined, true);
+}
+
+async function placeBooking(
+  sessionId: string,
+  clientId: string,
+  dependentId: string | undefined,
+  overCapacity: boolean,
+): Promise<void> {
   const { api, scope } = await getTenant();
   try {
     unwrap(
       await api.POST("/sessions/{session_id}/bookings", {
         params: { ...scope, path: { session_id: sessionId } },
-        body: { client_id: clientId, dependent_id: dependentId ?? null },
+        body: { client_id: clientId, dependent_id: dependentId ?? null, over_capacity: overCapacity },
       }),
     );
   } catch (error) {

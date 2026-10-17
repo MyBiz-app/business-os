@@ -36,6 +36,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "auth",
     "billing",
     "billingRun",
+    "bookings",
     "businessMenu",
     "clientFields",
     "clientImport",

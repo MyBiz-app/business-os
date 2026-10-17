@@ -164,7 +164,11 @@ export default function SessionScreen() {
       const booking = unwrap(
         await api.POST("/sessions/{session_id}/bookings", {
           params: { ...scope, path: { session_id: id } },
-          body: { client_id: client.id, dependent_id: dependentId && dependentId !== WITHOUT ? dependentId : null },
+          body: {
+            client_id: client.id,
+            dependent_id: dependentId && dependentId !== WITHOUT ? dependentId : null,
+            over_capacity: false,
+          },
         }),
       );
       setPicking(null);
