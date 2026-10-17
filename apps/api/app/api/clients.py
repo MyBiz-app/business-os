@@ -364,23 +364,18 @@ def set_client_marketing_consent(
 ) -> Client:
     """Record that the client agreed to (or stopped) marketing messages, e.g. at the desk."""
     ensure_not_erased(context.session, client_id)
-    row = (
-        context.session.execute(
-            text(f"""
-                UPDATE app.clients
-                SET marketing_consent_at =
-                    CASE WHEN :consent THEN COALESCE(marketing_consent_at, now()) END
-                WHERE id = :id RETURNING {COLUMNS}
-            """),
-            {"consent": body.consent, "id": client_id},
-        )
-        .mappings()
-        .first()
+    updated = context.session.execute(
+        text("""
+            UPDATE app.clients
+            SET marketing_consent_at =
+                CASE WHEN :consent THEN COALESCE(marketing_consent_at, now()) END
+            WHERE id = :id
+        """),
+        {"consent": body.consent, "id": client_id},
     )
-    if row is None:
+    if updated.rowcount == 0:
         raise not_found()
-    ensure_branch_visible(context, row["home_location_id"])
-    return Client.model_validate(dict(row))
+    return get_client(client_id, context)
 
 
 @router.patch("/{client_id}")
