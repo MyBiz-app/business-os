@@ -7338,5 +7338,153 @@
       "amount_too_small": "The total is too small to divide between this many people."
     },
     "amountModeLabel": "How to count it"
+  },
+  "payRun": {
+    "title": "Payroll run",
+    "subtitle": "The month's pay up to gross: hours, fixed components and one-off amounts, checked step by step before the owner approves.",
+    "back": "Team",
+    "previous": "Previous month",
+    "next": "Next month",
+    "monthNav": "Month",
+    "empty": {
+      "title": "No run for this month yet",
+      "body": "Start the run to work out everyone's gross pay from their employment terms, the approved hours and the pay components.",
+      "start": "Start the run for {month}",
+      "noRights": "Only a payroll manager can start the run."
+    },
+    "steps": {
+      "hours": "Hours",
+      "additions": "Additions",
+      "review": "Review",
+      "approval": "Approval",
+      "issue": "Issue"
+    },
+    "issueSoon": "Net pay, payslips and the bank file arrive in the next version.",
+    "draftNote": "Payslips stay drafts until an accountant has checked the run.",
+    "accountantDone": "Checked by an accountant.",
+    "accountantMark": "Mark as checked by an accountant",
+    "summary": {
+      "gross": "Gross pay",
+      "deductions": "Deductions",
+      "people": "People",
+      "vsPrevious": "{percent} against last month",
+      "noPrevious": "No earlier month to compare"
+    },
+    "stageHint": {
+      "hours": "Check that everyone's hours are approved in the time clock, then lock them.",
+      "additions": "Add bonuses and one-off amounts, and type in amounts that change each month.",
+      "review": "Fix every error and acknowledge every warning, then the owner approves.",
+      "approved": "Approved and locked. A correction is a new correcting payslip (coming with payslips)."
+    },
+    "actions": {
+      "lock": "Lock the hours and continue",
+      "toReview": "Continue to review",
+      "approve": "Approve the run",
+      "back": "Back one step",
+      "refresh": "Refresh the numbers",
+      "bonus": "Add a one-off amount",
+      "exportXlsx": "Export to Excel",
+      "exportCsv": "Export CSV",
+      "ownerOnly": "Only the owner approves the run."
+    },
+    "warningsTitle": "To check",
+    "warningsNone": "Nothing to check.",
+    "error": "Must be fixed",
+    "warning": "Worth a look",
+    "acknowledge": "Acknowledge",
+    "acknowledged": "Acknowledged",
+    "undo": "Undo",
+    "codes": {
+      "missing_terms": "Pay terms are missing (no amount or hourly rate in the payroll file).",
+      "hours_not_approved": "The month's hours are not approved in the time clock.",
+      "open_clock": "A clock is still running.",
+      "pending_adjustments": "A proposed one-off amount waits for the owner.",
+      "typed_amount_missing": "An amount to type in for this month is missing.",
+      "no_form101": "No signed Form 101 for this year.",
+      "no_bank": "No bank account in the payroll file.",
+      "no_hours": "No hours at all this month.",
+      "partial_month": "Starts during this month; the pay is not prorated.",
+      "below_min_wage": "Below the minimum wage in the rates table.",
+      "derived_hourly_rate": "The hourly rate for overtime is derived from the monthly amount.",
+      "automatic_rate_missing": "Recuperation has no automatic rate yet: type the amount."
+    },
+    "notes": {
+      "no_payroll_file": "Clocked time but no payroll file, so they are not in the run: {names}"
+    },
+    "list": {
+      "search": "Search people",
+      "grid": "Cards",
+      "table": "List",
+      "none": "Nobody matches.",
+      "hours": "{hours} hours",
+      "gross": "Gross",
+      "ready": "Ready",
+      "toCheck": "{count, plural, one {# thing to check} other {# things to check}}"
+    },
+    "types": {
+      "global": "Global",
+      "hourly": "Hourly",
+      "global_overtime": "Global plus overtime"
+    },
+    "sheet": {
+      "title": "Pay of {name}",
+      "close": "Close",
+      "why": "Why this amount?",
+      "hours": "Hours",
+      "hoursLine": "{regular} regular, {tier1} at the first overtime rate, {tier2} at the second, {rest} on the rest day",
+      "days": "Work days",
+      "gross": "Gross",
+      "deductions": "Deductions (off the net pay)",
+      "taxable": "Taxable",
+      "socialSecurity": "National insurance",
+      "pension": "Pension base",
+      "typedLabel": "Amount for this month",
+      "save": "Save",
+      "clear": "Clear",
+      "none": "No lines."
+    },
+    "sections": {
+      "base": "Base pay",
+      "overtime": "Overtime",
+      "component": "Fixed components",
+      "adjustment": "One-off amounts",
+      "deduction": "Deductions"
+    },
+    "items": {
+      "monthly": "Monthly pay",
+      "hourly": "Hourly pay",
+      "overtime_tier1": "Overtime, first rate",
+      "overtime_tier2": "Overtime, second rate",
+      "rest_day": "Work on the rest day",
+      "travel": "Travel",
+      "meals": "Meals",
+      "phone": "Phone",
+      "car": "Car",
+      "fixed_addition": "Fixed addition",
+      "recuperation": "Recuperation",
+      "fixed_deduction": "Fixed deduction",
+      "bonus": "Bonus",
+      "holiday_gift": "Holiday gift",
+      "expense_refund": "Expense refund",
+      "deduction": "Deduction"
+    },
+    "explain": {
+      "hours": "{quantity} hours x {unit}",
+      "hoursPercent": "{quantity} hours x {unit} x {percent}%",
+      "days": "{quantity} days x {unit}",
+      "scope": "{unit} x {percent}% scope"
+    },
+    "errors": {
+      "run_blocked": "Something still blocks the next step. See the list to check.",
+      "warnings_open": "Acknowledge every warning before approving.",
+      "forbidden": "You can't do this.",
+      "run_approved": "The run is approved and locked.",
+      "run_exists": "This month already has a run.",
+      "one_stage_at_a_time": "Move one step at a time.",
+      "cannot_acknowledge": "An error has to be fixed, it can't be acknowledged.",
+      "period_in_future": "This month is too far ahead.",
+      "invalid": "Check the details.",
+      "generic": "Something went wrong. Try again."
+    }
   }
 }

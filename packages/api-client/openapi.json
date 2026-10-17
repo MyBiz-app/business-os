@@ -4711,6 +4711,754 @@
         }
       }
     },
+    "/payroll/runs": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "List Payroll Runs",
+        "description": "The last two years of runs, newest first (everyone's lines add up here).",
+        "operationId": "list_payroll_runs",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RunRow"
+                  },
+                  "title": "Response List Payroll Runs"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Create Payroll Run",
+        "description": "Starts the month's run (once) and works out everyone's lines.",
+        "operationId": "create_payroll_run",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Get Payroll Run",
+        "operationId": "get_payroll_run",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/refresh": {
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Refresh Payroll Run",
+        "description": "Works the lines out again from the latest hours, components and one-off amounts.",
+        "operationId": "refresh_payroll_run",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/lines/{user_id}/typed": {
+      "put": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Type Payroll Amount",
+        "description": "Types in the amount of a component for this month (counted \"by month\", or without an\nautomatic rate yet). Only for the person's own active components.",
+        "operationId": "type_payroll_amount",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TypedAmount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/lines/{user_id}/acknowledge": {
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Acknowledge Payroll Warning",
+        "description": "Marks a warning as seen and accepted (errors cannot be acknowledged: they must be fixed).",
+        "operationId": "acknowledge_payroll_warning",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Acknowledge"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/stage": {
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Move Payroll Stage",
+        "description": "Moves the run one stage forward (checked) or back (until it is approved). Approving is for\nthe owner only and locks the month.",
+        "operationId": "move_payroll_stage",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StageBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Run"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/accountant-check": {
+      "post": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Payroll Accountant Check",
+        "description": "The owner records that an accountant checked the approved run; payslips stop being drafts.",
+        "operationId": "payroll_accountant_check",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/payroll/runs/{period}/export": {
+      "get": {
+        "tags": [
+          "payroll"
+        ],
+        "summary": "Export Payroll Run",
+        "description": "The month for the accountant: a neutral table, a row per person (payslips marked draft until\nan accountant checks the run).",
+        "operationId": "export_payroll_run",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "period",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}$",
+              "title": "Period"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "csv",
+                "xlsx"
+              ],
+              "type": "string",
+              "default": "xlsx",
+              "title": "Format"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/dependents/settings": {
       "get": {
         "tags": [
@@ -35526,6 +36274,25 @@
         ],
         "title": "Accepted"
       },
+      "Acknowledge": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Key"
+          },
+          "acknowledged": {
+            "type": "boolean",
+            "title": "Acknowledged",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "key"
+        ],
+        "title": "Acknowledge"
+      },
       "Activity": {
         "properties": {
           "id": {
@@ -45172,43 +45939,6 @@
         ],
         "title": "HomeBranch"
       },
-      "Hours": {
-        "properties": {
-          "total": {
-            "type": "number",
-            "title": "Total",
-            "default": 0
-          },
-          "regular": {
-            "type": "number",
-            "title": "Regular",
-            "default": 0
-          },
-          "tier1": {
-            "type": "number",
-            "title": "Tier1",
-            "default": 0
-          },
-          "tier2": {
-            "type": "number",
-            "title": "Tier2",
-            "default": 0
-          },
-          "rest_day": {
-            "type": "number",
-            "title": "Rest Day",
-            "default": 0
-          },
-          "weighted": {
-            "type": "number",
-            "title": "Weighted",
-            "default": 0
-          }
-        },
-        "type": "object",
-        "title": "Hours",
-        "description": "Hours worked, by pay rate (see `app.schedule.time_clock.Breakdown`)."
-      },
       "HoursBlock": {
         "properties": {
           "weekday": {
@@ -49954,7 +50684,7 @@
             "title": "Planned Hours"
           },
           "worked": {
-            "$ref": "#/components/schemas/Hours"
+            "$ref": "#/components/schemas/app__api__time_clock__Hours"
           },
           "days": {
             "additionalProperties": {
@@ -50003,7 +50733,7 @@
             "title": "Planned Hours"
           },
           "worked": {
-            "$ref": "#/components/schemas/Hours"
+            "$ref": "#/components/schemas/app__api__time_clock__Hours"
           },
           "missing_shifts": {
             "type": "integer",
@@ -54032,6 +54762,88 @@
         "type": "object",
         "title": "Rules"
       },
+      "Run": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "format": "date",
+            "title": "Period"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "hours",
+              "additions",
+              "review",
+              "approved"
+            ],
+            "title": "Stage"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "payslips_draft": {
+            "type": "boolean",
+            "title": "Payslips Draft",
+            "description": "Payslips stay drafts until an accountant has checked the run"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "accountant_checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accountant Checked At"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/RunSummary"
+          },
+          "notes": {
+            "items": {
+              "$ref": "#/components/schemas/RunNote"
+            },
+            "type": "array",
+            "title": "Notes"
+          },
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/RunLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "stage",
+          "currency",
+          "payslips_draft",
+          "approved_at",
+          "accountant_checked_at",
+          "summary",
+          "notes",
+          "lines"
+        ],
+        "title": "Run"
+      },
       "RunCard": {
         "properties": {
           "id": {
@@ -54125,6 +54937,381 @@
           "pending_action_ids"
         ],
         "title": "RunCard"
+      },
+      "RunCreate": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}$",
+            "title": "Period",
+            "description": "YYYY-MM"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period"
+        ],
+        "title": "RunCreate"
+      },
+      "RunItem": {
+        "properties": {
+          "section": {
+            "type": "string",
+            "enum": [
+              "base",
+              "overtime",
+              "component",
+              "adjustment",
+              "deduction"
+            ],
+            "title": "Section"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "amount_minor": {
+            "type": "integer",
+            "title": "Amount Minor"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "unit_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit Minor"
+          },
+          "percent": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percent"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "taxable": {
+            "type": "boolean",
+            "title": "Taxable"
+          },
+          "social_security_liable": {
+            "type": "boolean",
+            "title": "Social Security Liable"
+          },
+          "pension_base": {
+            "type": "boolean",
+            "title": "Pension Base"
+          }
+        },
+        "type": "object",
+        "required": [
+          "section",
+          "code",
+          "label",
+          "amount_minor",
+          "taxable",
+          "social_security_liable",
+          "pension_base"
+        ],
+        "title": "RunItem"
+      },
+      "RunLine": {
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "employment_type": {
+            "type": "string",
+            "title": "Employment Type"
+          },
+          "hours": {
+            "$ref": "#/components/schemas/app__api__payroll_runs__Hours"
+          },
+          "work_days": {
+            "type": "integer",
+            "title": "Work Days"
+          },
+          "base_minor": {
+            "type": "integer",
+            "title": "Base Minor"
+          },
+          "overtime_minor": {
+            "type": "integer",
+            "title": "Overtime Minor"
+          },
+          "components_minor": {
+            "type": "integer",
+            "title": "Components Minor"
+          },
+          "adjustments_minor": {
+            "type": "integer",
+            "title": "Adjustments Minor"
+          },
+          "deductions_minor": {
+            "type": "integer",
+            "title": "Deductions Minor"
+          },
+          "gross_minor": {
+            "type": "integer",
+            "title": "Gross Minor"
+          },
+          "taxable_minor": {
+            "type": "integer",
+            "title": "Taxable Minor"
+          },
+          "social_security_minor": {
+            "type": "integer",
+            "title": "Social Security Minor"
+          },
+          "pension_base_minor": {
+            "type": "integer",
+            "title": "Pension Base Minor"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/RunWarning"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "typed": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "propertyNames": {
+              "format": "uuid"
+            },
+            "type": "object",
+            "title": "Typed",
+            "description": "Amounts typed in for this month, by component"
+          },
+          "ready": {
+            "type": "boolean",
+            "title": "Ready",
+            "description": "No error and every warning acknowledged"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "full_name",
+          "employment_type",
+          "hours",
+          "work_days",
+          "base_minor",
+          "overtime_minor",
+          "components_minor",
+          "adjustments_minor",
+          "deductions_minor",
+          "gross_minor",
+          "taxable_minor",
+          "social_security_minor",
+          "pension_base_minor",
+          "items",
+          "warnings",
+          "typed",
+          "ready"
+        ],
+        "title": "RunLine"
+      },
+      "RunNote": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Names"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "names"
+        ],
+        "title": "RunNote"
+      },
+      "RunRow": {
+        "properties": {
+          "period": {
+            "type": "string",
+            "format": "date",
+            "title": "Period"
+          },
+          "stage": {
+            "type": "string",
+            "enum": [
+              "hours",
+              "additions",
+              "review",
+              "approved"
+            ],
+            "title": "Stage"
+          },
+          "gross_minor": {
+            "type": "integer",
+            "title": "Gross Minor"
+          },
+          "people": {
+            "type": "integer",
+            "title": "People"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period",
+          "stage",
+          "gross_minor",
+          "people"
+        ],
+        "title": "RunRow"
+      },
+      "RunSummary": {
+        "properties": {
+          "people": {
+            "type": "integer",
+            "title": "People"
+          },
+          "gross_minor": {
+            "type": "integer",
+            "title": "Gross Minor"
+          },
+          "deductions_minor": {
+            "type": "integer",
+            "title": "Deductions Minor"
+          },
+          "previous_gross_minor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Gross Minor"
+          },
+          "open_errors": {
+            "type": "integer",
+            "title": "Open Errors"
+          },
+          "open_warnings": {
+            "type": "integer",
+            "title": "Open Warnings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "people",
+          "gross_minor",
+          "deductions_minor",
+          "previous_gross_minor",
+          "open_errors",
+          "open_warnings"
+        ],
+        "title": "RunSummary"
+      },
+      "RunWarning": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "`code`, or `code:ref` when it concerns one component"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "ref": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warning"
+            ],
+            "title": "Severity"
+          },
+          "acknowledged": {
+            "type": "boolean",
+            "title": "Acknowledged",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "code",
+          "severity"
+        ],
+        "title": "RunWarning"
       },
       "Sale": {
         "properties": {
@@ -56708,6 +57895,25 @@
         ],
         "title": "StaffSave"
       },
+      "StageBody": {
+        "properties": {
+          "stage": {
+            "type": "string",
+            "enum": [
+              "hours",
+              "additions",
+              "review",
+              "approved"
+            ],
+            "title": "Stage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "stage"
+        ],
+        "title": "StageBody"
+      },
       "StageChange": {
         "properties": {
           "stage": {
@@ -59252,6 +60458,34 @@
         ],
         "title": "TryReply"
       },
+      "TypedAmount": {
+        "properties": {
+          "component_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Component Id"
+          },
+          "amount_minor": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount Minor",
+            "description": "The amount for this month; null takes the typed amount away"
+          }
+        },
+        "type": "object",
+        "required": [
+          "component_id",
+          "amount_minor"
+        ],
+        "title": "TypedAmount"
+      },
       "UsagePoint": {
         "properties": {
           "day": {
@@ -59979,6 +61213,37 @@
         ],
         "title": "Decision"
       },
+      "app__api__payroll_runs__Hours": {
+        "properties": {
+          "total": {
+            "type": "number",
+            "title": "Total",
+            "default": 0
+          },
+          "regular": {
+            "type": "number",
+            "title": "Regular",
+            "default": 0
+          },
+          "tier1": {
+            "type": "number",
+            "title": "Tier1",
+            "default": 0
+          },
+          "tier2": {
+            "type": "number",
+            "title": "Tier2",
+            "default": 0
+          },
+          "rest_day": {
+            "type": "number",
+            "title": "Rest Day",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "Hours"
+      },
       "app__api__platform_ai__Turn": {
         "properties": {
           "role": {
@@ -60188,6 +61453,43 @@
           "invitations"
         ],
         "title": "Team"
+      },
+      "app__api__time_clock__Hours": {
+        "properties": {
+          "total": {
+            "type": "number",
+            "title": "Total",
+            "default": 0
+          },
+          "regular": {
+            "type": "number",
+            "title": "Regular",
+            "default": 0
+          },
+          "tier1": {
+            "type": "number",
+            "title": "Tier1",
+            "default": 0
+          },
+          "tier2": {
+            "type": "number",
+            "title": "Tier2",
+            "default": 0
+          },
+          "rest_day": {
+            "type": "number",
+            "title": "Rest Day",
+            "default": 0
+          },
+          "weighted": {
+            "type": "number",
+            "title": "Weighted",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "Hours",
+        "description": "Hours worked, by pay rate (see `app.schedule.time_clock.Breakdown`)."
       },
       "app__api__time_off_requests__Decision": {
         "properties": {

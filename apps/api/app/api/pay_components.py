@@ -82,6 +82,16 @@ def _first_of_month(day: date) -> date:
     return day.replace(day=1)
 
 
+def ensure_period_open(session: Session, period: date) -> None:
+    """One-off amounts stop once the owner has approved the month's pay run (P4)."""
+    locked = session.execute(
+        text("SELECT 1 FROM app.payroll_runs WHERE period = :period AND stage = 'approved'"),
+        {"period": _first_of_month(period)},
+    ).first()
+    if locked is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="period_locked")
+
+
 # Pay components ------------------------------------------------------------------------------
 
 
@@ -523,6 +533,7 @@ def add_bonus(body: BonusBody, context: TenantDep, user: UserDep) -> BonusBatch:
     """Adds a one-off amount to every person of a group. With `payroll.manage` it is approved
     straight away; a branch manager (`payroll.propose`) only proposes, for the owner to decide."""
     preview = _resolve(context, body)
+    ensure_period_open(context.session, body.period)
     approved = Permission.PAYROLL_MANAGE in context.permissions
     flags = ADJUSTMENT_FLAGS[body.kind]
     batch_id = uuid4()
@@ -632,6 +643,12 @@ def list_bonuses(
 @router.post("/payroll/bonuses/{batch_id}/decision")
 def decide_bonus(batch_id: UUID, body: Decision, context: PayrollApproveDep, user: UserDep) -> dict:
     """The owner approves or rejects a branch manager's proposal (all of its people at once)."""
+    period = context.session.execute(
+        text("SELECT period FROM app.pay_adjustments WHERE batch_id = :batch_id LIMIT 1"),
+        {"batch_id": batch_id},
+    ).scalar()
+    if period is not None:
+        ensure_period_open(context.session, period)
     changed = context.session.execute(
         text("""
             UPDATE app.pay_adjustments
@@ -661,7 +678,7 @@ def delete_adjustment(adjustment_id: UUID, context: TenantDep, user: UserDep) ->
     row = (
         context.session.execute(
             text("""
-                SELECT a.user_id, a.status, a.proposed_by, a.batch_id
+                SELECT a.user_id, a.status, a.proposed_by, a.batch_id, a.period
                 FROM app.pay_adjustments a WHERE a.id = :id
             """),
             {"id": adjustment_id},
@@ -671,6 +688,7 @@ def delete_adjustment(adjustment_id: UUID, context: TenantDep, user: UserDep) ->
     )
     if row is None:
         raise not_found()
+    ensure_period_open(context.session, row["period"])
     if Permission.PAYROLL_MANAGE in context.permissions:
         _ensure_below(context, row["user_id"])
     elif not (row["status"] == "proposed" and row["proposed_by"] == user.id):
