@@ -136,13 +136,7 @@ def list_audit_log(
     if cursor:
         params["after_at"], params["after_id"] = _decode(cursor)
         keyset = " AND (a.occurred_at, a.id) < (:after_at, :after_id)"
-    rows = (
-        context.session.execute(
-            text(SELECT + keyset + ORDER_LIMIT), params
-        )
-        .mappings()
-        .all()
-    )
+    rows = context.session.execute(text(SELECT + keyset + ORDER_LIMIT), params).mappings().all()
     entries = [AuditLogEntry.model_validate(dict(row)) for row in rows[:limit]]
     return AuditLogPage(
         entries=entries, next_cursor=_encode(entries[-1]) if len(rows) > limit else None
