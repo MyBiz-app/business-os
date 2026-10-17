@@ -22,9 +22,9 @@ const PAGE_SIZE = 200; // the API's page limit
 const MAX_PAGES = 50; // the API's offset limit (100,000 rows) is the real ceiling
 const STAGES: Stage[] = ["new", "contacted", "trial", "offer", "won", "lost"];
 const STAGE_BAR: Record<Stage, string> = {
-  new: "bg-sky-500",
-  contacted: "bg-violet-500",
-  trial: "bg-amber-500",
+  new: "bg-electric",
+  contacted: "bg-ai",
+  trial: "bg-warning",
   offer: "bg-primary",
   won: "bg-success",
   lost: "bg-muted",

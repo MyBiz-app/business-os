@@ -60,7 +60,7 @@ export function LocaleSwitcher() {
             requestAnimationFrame(() => document.getElementById(menuId)?.querySelector<HTMLElement>("[role=menuitemradio]")?.focus());
           }
         }}
-        className="flex h-9 items-center gap-1.5 rounded-full px-2.5 text-sm font-medium transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5 disabled:opacity-60"
+        className="btn-plain flex h-9 items-center gap-1.5 rounded-full px-2.5 text-sm font-medium transition-colors hover:bg-foreground/5 aria-expanded:bg-foreground/5 disabled:opacity-60"
       >
         <Languages aria-hidden="true" className="size-4 text-muted" />
         <span aria-hidden="true">{t(`locales.${current}`)}</span>
@@ -82,10 +82,10 @@ export function LocaleSwitcher() {
             role="menuitemradio"
             aria-checked={locale === current}
             onClick={() => choose(locale)}
-            className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-sm outline-none transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 aria-checked:font-semibold"
+            className="btn-plain flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-2 text-sm outline-none transition-colors hover:bg-foreground/5 focus-visible:bg-foreground/5 aria-checked:font-semibold"
           >
             {t(`locales.${locale}`)}
-            {locale === current && <Check aria-hidden="true" className="size-4 text-primary" />}
+            {locale === current && <Check aria-hidden="true" className="size-4 text-primary-ink" />}
           </button>
         ))}
       </div>

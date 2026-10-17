@@ -31,7 +31,7 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href={`/clients/${receipt.client_id}`} className="text-sm text-primary underline-offset-4 hover:underline">
+        <Link href={`/clients/${receipt.client_id}`} className="text-sm text-primary-ink underline-offset-4 hover:underline">
           {t("back")}
         </Link>
         <div className="flex flex-wrap items-center gap-2">
@@ -52,7 +52,7 @@ export default async function ReceiptPage({ params }: PageProps<"/receipts/[id]"
             {receipt.document_url && (
               <>
                 {" · "}
-                <a href={receipt.document_url} target="_blank" rel="noreferrer" className="font-semibold text-primary underline-offset-4 hover:underline">
+                <a href={receipt.document_url} target="_blank" rel="noreferrer" className="font-semibold text-primary-ink underline-offset-4 hover:underline">
                   {t("openDocument")}
                 </a>
               </>

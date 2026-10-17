@@ -38,7 +38,7 @@ export function SummaryLines({
                 type="button"
                 onClick={() => onRemove(line.key as ModuleKey)}
                 aria-label={`${removeLabel}: ${label(line.key)}`}
-                className="flex size-8 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
+                className="btn-icon flex size-8 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X aria-hidden="true" className="size-4" />
               </button>
@@ -85,8 +85,8 @@ export function AddOnRail({
                 aria-current={isCurrent ? "step" : undefined}
                 aria-label={isAdded ? `${label(offer)} · ${addedLabel}` : label(offer)}
                 title={label(offer)}
-                className={`flex w-full items-center gap-2 rounded-2xl border py-1.5 ps-1.5 pe-3 text-sm font-semibold transition-colors sm:justify-center sm:pe-1.5 ${
-                  isCurrent ? "border-primary bg-primary/10 text-primary sm:justify-start sm:pe-3" : "border-border bg-surface hover:border-primary/50"
+                className={`btn-plain flex w-full items-center gap-2 rounded-2xl border py-1.5 ps-1.5 pe-3 text-sm font-semibold transition-colors sm:justify-center sm:pe-1.5 ${
+                  isCurrent ? "border-primary bg-primary/10 text-primary-ink sm:justify-start sm:pe-3" : "border-border bg-surface hover:border-primary/50"
                 }`}
               >
                 <ModuleIcon module={OFFER_ICON[offer]} size="sm" />
@@ -157,7 +157,7 @@ export function Cart({
                 type="button"
                 onClick={() => onRemove(line.key as ModuleKey)}
                 aria-label={`${t("offer.remove")}: ${line.label}`}
-                className="flex size-7 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
+                className="btn-icon flex size-7 items-center justify-center rounded-lg text-muted hover:bg-foreground/5 hover:text-foreground"
               >
                 <X aria-hidden="true" className="size-3.5" />
               </button>
@@ -184,7 +184,7 @@ export function Cart({
           <bdi>{money(total)}</bdi>
         </span>
       </p>
-      <p className="flex items-baseline justify-between gap-2 text-success">
+      <p className="flex items-baseline justify-between gap-2 text-success-ink">
         <span className="text-sm font-semibold">{t("cart.today")}</span>
         <span className="font-bold">{t("cart.free")}</span>
       </p>
@@ -197,14 +197,14 @@ export function Cart({
         {steps}
         <div className="card flex flex-col gap-4 p-5">
           <h2 className="flex items-center gap-2 font-bold">
-            <ShoppingBag aria-hidden="true" className="size-5 text-primary" />
+            <ShoppingBag aria-hidden="true" className="size-5 text-primary-ink" />
             {t("cart.title")}
           </h2>
           {list(lines)}
           {lines.length === 1 && once.length === 0 && <p className="text-sm text-muted">{t("cart.emptyHint")}</p>}
           {onceBlock}
           {totals}
-          <p className="rounded-xl bg-primary/10 px-3 py-2 text-center text-sm font-semibold text-primary">{t("cart.trial")}</p>
+          <p className="rounded-xl bg-primary/10 px-3 py-2 text-center text-sm font-semibold text-primary-ink">{t("cart.trial")}</p>
         </div>
       </aside>
 
@@ -213,7 +213,7 @@ export function Cart({
           <div id="cart-sheet" className="flex max-h-[50vh] flex-col gap-3 overflow-y-auto border-b border-border px-4 py-4">
             {list(lines)}
             {onceBlock}
-            <p className="text-center text-sm font-semibold text-primary">{t("cart.trial")}</p>
+            <p className="text-center text-sm font-semibold text-primary-ink">{t("cart.trial")}</p>
           </div>
         )}
         <div className="flex items-center gap-2 px-3 py-2.5 sm:px-4">
@@ -223,10 +223,10 @@ export function Cart({
             aria-expanded={open}
             aria-controls="cart-sheet"
             aria-label={`${open ? t("cart.hide") : t("cart.show")} · ${t("cart.items", { count: lines.length + once.length })}`}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-xl py-1.5 text-start"
+            className="btn-plain flex min-w-0 flex-1 items-center gap-2 rounded-xl py-1.5 text-start"
           >
             <span className="relative shrink-0">
-              <ShoppingBag aria-hidden="true" className="size-6 text-primary" />
+              <ShoppingBag aria-hidden="true" className="size-6 text-primary-ink" />
               <span aria-hidden="true" className="absolute -end-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-primary text-[0.625rem] font-bold text-on-primary">
                 {lines.length + once.length}
               </span>

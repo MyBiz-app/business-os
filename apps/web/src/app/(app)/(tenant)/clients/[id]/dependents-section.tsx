@@ -50,7 +50,7 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
   return (
     <section aria-labelledby="dependents-heading" className="flex flex-col gap-4 card p-6">
       <h2 id="dependents-heading" className="flex items-center gap-2 text-lg font-semibold">
-        <Icon aria-hidden="true" className="size-5 text-primary" />
+        <Icon aria-hidden="true" className="size-5 text-primary-ink" />
         {t(`title.${kind}`)}
       </h2>
       {dependents.length === 0 && <p className="text-sm text-muted">{t(`none.${kind}`)}</p>}
@@ -83,7 +83,7 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
               {dependent.notes && <p dir="auto" className="whitespace-pre-line text-sm">{dependent.notes}</p>}
               {writable && (
                 <details>
-                  <summary className="cursor-pointer text-sm text-primary">{t("edit", { name: dependent.name })}</summary>
+                  <summary className="cursor-pointer text-sm text-primary-ink">{t("edit", { name: dependent.name })}</summary>
                   <div className="pt-3">
                     <DependentForm clientId={clientId} kind={kind} fields={settings.fields} dependent={dependent} />
                   </div>
@@ -95,7 +95,7 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
       </ul>
       {writable && (
         <details className="rounded-xl bg-foreground/[0.03] p-3">
-          <summary className="flex cursor-pointer items-center gap-1 text-sm font-medium text-primary">
+          <summary className="flex cursor-pointer items-center gap-1 text-sm font-medium text-primary-ink">
             <Plus aria-hidden="true" className="size-4" /> {t(`add.${kind}`)}
           </summary>
           <div className="pt-3">

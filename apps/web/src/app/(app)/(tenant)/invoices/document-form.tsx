@@ -115,7 +115,7 @@ export function DocumentForm({ action, kinds, kind: initialKind, currency, clien
               aria-label={t("removeLine", { number: index + 1 })}
               disabled={lines.length === 1}
               onClick={() => setLines((current) => current.filter((l) => l.key !== line.key))}
-              className="mb-1 rounded-lg p-2 text-muted hover:bg-danger/10 hover:text-danger disabled:opacity-40"
+              className="btn-plain mb-1 rounded-lg p-2 text-muted hover:bg-danger/10 hover:text-danger disabled:opacity-40"
             >
               <Trash2 aria-hidden="true" className="size-4" />
             </button>

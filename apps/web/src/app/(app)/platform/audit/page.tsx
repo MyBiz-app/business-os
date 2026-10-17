@@ -62,7 +62,7 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
                   <td className="px-4 py-2.5 font-medium">{label(entry.action)}</td>
                   <td className="px-4 py-2.5" dir="auto">
                     {entry.tenant_id ? (
-                      <Link href={`/platform/businesses/${entry.tenant_id}`} className="text-primary underline-offset-4 hover:underline">
+                      <Link href={`/platform/businesses/${entry.tenant_id}`} className="text-primary-ink underline-offset-4 hover:underline">
                         {entry.tenant_name}
                       </Link>
                     ) : (
@@ -78,8 +78,8 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       )}
       {(page > 1 || entries.length === PAGE_SIZE) && (
         <nav aria-label={t("audit.title")} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={`/platform/audit?page=${page - 1}`} className="text-primary">{t("audit.previous")}</Link> : <span />}
-          {entries.length === PAGE_SIZE ? <Link href={`/platform/audit?page=${page + 1}`} className="text-primary">{t("audit.next")}</Link> : <span />}
+          {page > 1 ? <Link href={`/platform/audit?page=${page - 1}`} className="text-primary-ink">{t("audit.previous")}</Link> : <span />}
+          {entries.length === PAGE_SIZE ? <Link href={`/platform/audit?page=${page + 1}`} className="text-primary-ink">{t("audit.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

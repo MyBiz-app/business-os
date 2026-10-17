@@ -20,7 +20,7 @@ export default async function ContactPage({ searchParams }: PageProps<"/contact"
   const { vertical } = await searchParams;
   const points = t.raw("points") as string[];
   return (
-    <main className="enter flex flex-col">
+    <main id="main" className="enter flex flex-col">
       <SubpageHero title={t("title")} description={t("subtitle")}>
         <ul className="flex flex-col gap-3">
           {points.map((point, index) => (

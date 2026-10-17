@@ -23,7 +23,7 @@ export function ContactForm({ vertical }: { vertical?: string }) {
   if (state.sent) {
     return (
       <div role="status" className="flex flex-col items-center gap-3 py-10 text-center">
-        <CheckCircle2 aria-hidden="true" className="size-14 text-success" />
+        <CheckCircle2 aria-hidden="true" className="size-14 text-success-ink" />
         <p className="text-lg font-semibold">{t("sent")}</p>
       </div>
     );

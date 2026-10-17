@@ -83,7 +83,7 @@ export function HoursForm({
                       type="button"
                       aria-label={`${t("remove")} - ${names[day]} ${block.starts}-${block.ends}`}
                       onClick={() => setBlocks((current) => current.filter((_, i) => i !== index))}
-                      className="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-danger/10 hover:text-danger"
+                      className="btn-icon flex size-9 items-center justify-center rounded-lg text-muted hover:bg-danger/10 hover:text-danger"
                     >
                       <Trash2 aria-hidden="true" className="size-4" />
                     </button>

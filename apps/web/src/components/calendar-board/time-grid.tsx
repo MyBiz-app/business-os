@@ -183,7 +183,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
             return (
               <div
                 key={day}
-                className={`sticky top-0 z-20 flex ${dayHeader} items-center justify-center gap-2 border-s-2 border-border bg-surface px-2 text-sm ${laned ? "" : "border-b"} ${isToday ? "text-primary" : ""}`}
+                className={`sticky top-0 z-20 flex ${dayHeader} items-center justify-center gap-2 border-s-2 border-border bg-surface px-2 text-sm ${laned ? "" : "border-b"} ${isToday ? "text-primary-ink" : ""}`}
                 style={{ gridColumn: `span ${columns.length}` }}
               >
                 <span className="text-muted">{formatDay(day, locale, { weekday: laned && days.length === 1 ? "long" : "short" })}</span>
@@ -322,7 +322,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                       const className = "absolute z-[1] flex items-start justify-center rounded-lg border border-dashed border-border bg-surface pt-1 text-xs font-semibold text-muted";
                       const text = labels.more.replace("{count}", String(block.count));
                       return dayHref ? (
-                        <Link key={block.id} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary`} style={style}>
+                        <Link key={block.id} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary-ink`} style={style}>
                           {text}
                         </Link>
                       ) : (
@@ -345,7 +345,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                                 key={segment.start}
                                 onClick={(event) => openPeek(event.currentTarget, dayShifts.filter((x) => x.start < segment.end && x.end > segment.start))}
                                 title={`${segment.count} · ${labels.onShift}`}
-                                className="absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
+                                className="btn-plain absolute inset-x-0.5 flex flex-col items-center justify-center gap-px rounded-md text-[0.6875rem] font-semibold tabular-nums transition-colors hover:ring-2 hover:ring-primary/50"
                                 style={{
                                   top: y(segment.start) + 1,
                                   height: Math.max(block - 2, 14),
@@ -365,7 +365,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                               key={shift.id}
                               onClick={(event) => openPeek(event.currentTarget, [shift])}
                               aria-label={`${shift.name} ${shift.label}`}
-                              className={`group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
+                              className={`btn-plain group/chip absolute flex justify-center rounded-md pt-0.5 transition-colors hover:ring-2 hover:ring-primary/50 focus-visible:ring-2 focus-visible:ring-primary ${shift.warn ? "bg-warning/20" : "bg-primary/10"}`}
                               style={{
                                 top: y(shift.start) + 1,
                                 height: Math.max(y(shift.end) - y(shift.start) - 2, 16),

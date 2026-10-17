@@ -39,7 +39,7 @@ export async function SupportSection({ context }: { context: Awaited<ReturnType<
       )}
       {status.visits.length > 0 && (
         <details className="text-sm">
-          <summary className="cursor-pointer text-primary">{t("visitsTitle")} · {t("visits", { count: status.visits.length })}</summary>
+          <summary className="cursor-pointer text-primary-ink">{t("visitsTitle")} · {t("visits", { count: status.visits.length })}</summary>
           <ul className="mt-2 flex flex-col gap-1 text-muted">
             {status.visits.map((visit, i) => (
               <li key={i}>

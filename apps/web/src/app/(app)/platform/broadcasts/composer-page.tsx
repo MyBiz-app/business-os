@@ -34,7 +34,7 @@ export async function ComposerPage({ announcement }: { announcement?: Announceme
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/platform/broadcasts" className="text-sm font-medium text-primary hover:underline">
+      <Link href="/platform/broadcasts" className="text-sm font-medium text-primary-ink hover:underline">
         {t("platform.broadcasts.back")}
       </Link>
       <PageHeader title={t("platform.broadcasts.title")} description={t("platform.broadcasts.subtitle")} />

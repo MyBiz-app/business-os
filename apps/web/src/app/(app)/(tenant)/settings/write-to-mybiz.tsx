@@ -18,7 +18,7 @@ export function WriteToMyBiz() {
     <section aria-labelledby="write-heading" className="flex flex-col gap-4 card p-6">
       <div className="flex flex-col gap-1">
         <h2 id="write-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <LifeBuoy aria-hidden="true" className="size-5 text-primary" />
+          <LifeBuoy aria-hidden="true" className="size-5 text-primary-ink" />
           {t("writeTitle")}
         </h2>
         <p className="text-sm text-muted">{t("writeIntro")}</p>

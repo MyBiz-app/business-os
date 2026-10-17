@@ -73,7 +73,7 @@ export function LineChart({
         </text>
       </svg>
       <details className="text-sm">
-        <summary className="cursor-pointer font-medium text-primary">{tableLabel}</summary>
+        <summary className="cursor-pointer font-medium text-primary-ink">{tableLabel}</summary>
         <div className="mt-2 max-h-64 overflow-auto">
           <table className="w-full text-start">
             <thead>

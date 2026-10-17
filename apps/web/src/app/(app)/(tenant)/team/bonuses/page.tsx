@@ -34,7 +34,7 @@ export default async function BonusesPage({ searchParams }: PageProps<"/team/bon
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
-      <Link href="/team" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/team" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {common("back")}
       </Link>
       <PageHeader title={t("title")} description={t("description")} />

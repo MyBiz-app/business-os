@@ -43,7 +43,7 @@ export default async function BillsPage({ searchParams }: PageProps<"/bills">) {
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            <Receipt aria-hidden="true" className="size-8 shrink-0 text-primary" />
+            <Receipt aria-hidden="true" className="size-8 shrink-0 text-primary-ink" />
             {t("title")}
           </span>
         }

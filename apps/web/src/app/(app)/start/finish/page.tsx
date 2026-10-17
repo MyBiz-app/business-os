@@ -47,7 +47,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
         <Link href="/start" className="btn-primary px-5 py-3">
           {t("finish.rebuild")}
         </Link>
-        <Link href="/welcome?fresh=1" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+        <Link href="/welcome?fresh=1" className="text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
           {t("finish.later")}
         </Link>
       </Container>
@@ -85,7 +85,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
           {lines.map((line) => (
             <li key={line.key} className="flex items-center justify-between gap-3 text-sm">
               <span className="flex items-center gap-1.5">
-                <Check aria-hidden="true" className="size-4 shrink-0 text-success" />
+                <Check aria-hidden="true" className="size-4 shrink-0 text-success-ink" />
                 {line.key === "core" ? tModules("core") : tModules(`names.${line.key}`)}
                 {line.quantity > 1 && <span className="text-muted" dir="ltr">× {line.quantity}</span>}
               </span>
@@ -100,7 +100,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
               <bdi>{money(total)}</bdi>
             </span>
           </p>
-          <p className="flex items-baseline justify-between gap-2 text-success">
+          <p className="flex items-baseline justify-between gap-2 text-success-ink">
             <span className="text-sm font-semibold">{t("summary.today")}</span>
             <span className="font-bold">
               <bdi>{money(0)}</bdi>
@@ -108,7 +108,7 @@ export default async function FinishPage({ searchParams }: PageProps<"/start/fin
           </p>
         </div>
         <p className="text-sm text-muted">{t("summary.trialEnds", { date: trialEnds })}</p>
-        <Link href="/start" className="text-sm font-semibold text-primary underline-offset-4 hover:underline">
+        <Link href="/start" className="text-sm font-semibold text-primary-ink underline-offset-4 hover:underline">
           {t("summary.edit")}
         </Link>
       </aside>

@@ -40,7 +40,7 @@ export default async function QuotePage({ params }: PageProps<"/quotes/[id]">) {
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/quotes" className="text-sm text-primary underline-offset-4 hover:underline">{t("back")}</Link>
+      <Link href="/quotes" className="text-sm text-primary-ink underline-offset-4 hover:underline">{t("back")}</Link>
       <PageHeader
         title={
           <>
@@ -84,7 +84,7 @@ export default async function QuotePage({ params }: PageProps<"/quotes/[id]">) {
           </div>
           {quote.status === "draft" && <p className="text-sm text-muted">{t("draftHint")}</p>}
           {quote.status === "accepted" && (
-            <p className="text-sm text-success">{t("acceptedBy", { name: quote.accepted_name ?? "", date: when.format(new Date(quote.accepted_at!)) })}</p>
+            <p className="text-sm text-success-ink">{t("acceptedBy", { name: quote.accepted_name ?? "", date: when.format(new Date(quote.accepted_at!)) })}</p>
           )}
         </section>
       )}

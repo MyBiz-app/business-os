@@ -35,7 +35,7 @@ export default async function PlatformInvoicePage({ params }: PageProps<"/settin
   return (
     <Container as="main" size="narrow" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href="/settings/billing" className="text-sm text-primary underline-offset-4 hover:underline">
+        <Link href="/settings/billing" className="text-sm text-primary-ink underline-offset-4 hover:underline">
           {t("back")}
         </Link>
         <div className="flex flex-wrap items-center gap-2">

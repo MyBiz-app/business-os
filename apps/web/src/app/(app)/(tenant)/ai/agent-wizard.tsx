@@ -173,7 +173,7 @@ export function AgentWizard({ branches, roles, limit, count, onClose, onDone }: 
               {t("stepOf", { step: step + 1, total: STEPS.length, name: t(`steps.${STEPS[step]}`) })}
             </p>
           </div>
-          <button type="button" onClick={() => dialog.current?.close()} className="rounded-full p-2 hover:bg-surface" aria-label={tTeam("close")}>
+          <button type="button" onClick={() => dialog.current?.close()} className="btn-plain rounded-full p-2 hover:bg-surface" aria-label={tTeam("close")}>
             <X aria-hidden="true" className="size-5" />
           </button>
         </header>

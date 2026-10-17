@@ -213,10 +213,10 @@ export function AccessibilityWidget() {
           </div>
           <AccessibilitySettings />
           <div className="flex items-center justify-between gap-3 border-t border-border pt-4 text-sm">
-            <button type="button" onClick={resetAccessibility} className="font-semibold text-primary hover:underline">
+            <button type="button" onClick={resetAccessibility} className="btn-link font-semibold text-primary-ink hover:underline">
               {t("reset")}
             </button>
-            <Link href="/legal/accessibility" className="font-semibold text-primary hover:underline">
+            <Link href="/legal/accessibility" className="font-semibold text-primary-ink hover:underline">
               {t("statement")}
             </Link>
           </div>
@@ -237,7 +237,7 @@ export function AccessibilityWidget() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         style={{ touchAction: "none" }}
-        className="flex size-14 cursor-grab touch-none items-center justify-center rounded-full bg-primary text-on-primary shadow-lg shadow-primary/30 ring-4 ring-white/70 transition-transform duration-200 hover:scale-105 active:scale-95 active:cursor-grabbing dark:ring-black/40"
+        className="btn-plain flex size-14 cursor-grab touch-none items-center justify-center rounded-full bg-primary text-on-primary shadow-lg shadow-primary/30 ring-4 ring-white/70 transition-transform duration-200 hover:scale-105 active:scale-95 active:cursor-grabbing dark:ring-black/40"
       >
         <Accessibility aria-hidden="true" className="size-7" />
       </button>
@@ -246,7 +246,7 @@ export function AccessibilityWidget() {
         onClick={dismiss}
         aria-label={t("widgetHide")}
         title={t("widgetHide")}
-        className="absolute -end-1 -top-1 flex size-6 items-center justify-center rounded-full bg-black text-white shadow-md ring-2 ring-white/80 hover:bg-neutral-800"
+        className="btn-icon absolute -end-1 -top-1 flex size-6 items-center justify-center rounded-full bg-black text-white shadow-md ring-2 ring-white/80 hover:bg-navy"
       >
         <X aria-hidden="true" className="size-3.5" />
       </button>

@@ -63,7 +63,7 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
           <section key={branch.id} className="card flex flex-col gap-4 p-6">
             <div className="flex items-center justify-between gap-3">
               <h2 className="flex items-center gap-2 font-semibold">
-                <MapPin aria-hidden="true" className="size-4 text-primary" />
+                <MapPin aria-hidden="true" className="size-4 text-primary-ink" />
                 {t("openingHours.title")} · <span dir="auto">{branch.name}</span>
               </h2>
               <Link href={`/locations/${branch.id}`} className="btn-secondary px-3 py-1.5 text-sm">
@@ -75,14 +75,14 @@ export default async function ShiftsPage({ searchParams }: PageProps<"/team/shif
         ))}
         <div className="grid gap-4 sm:grid-cols-2">
           <Link href={`/team/${me.id}/hours`} className="card card-hover flex items-center gap-3 p-5">
-            <Clock aria-hidden="true" className="size-5 text-primary" />
+            <Clock aria-hidden="true" className="size-5 text-primary-ink" />
             <span className="flex flex-col">
               <span className="font-semibold">{t("shifts.soloAvailability")}</span>
               <span className="text-sm text-muted">{t("shifts.soloAvailabilityHint")}</span>
             </span>
           </Link>
           <Link href="/schedule/closed" className="card card-hover flex items-center gap-3 p-5">
-            <CalendarCog aria-hidden="true" className="size-5 text-primary" />
+            <CalendarCog aria-hidden="true" className="size-5 text-primary-ink" />
             <span className="flex flex-col">
               <span className="font-semibold">{t("schedule.closedDays")}</span>
               <span className="text-sm text-muted">{t("shifts.soloClosedHint")}</span>

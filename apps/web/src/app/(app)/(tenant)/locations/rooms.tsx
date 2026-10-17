@@ -45,7 +45,7 @@ function RoomRow({ room, readOnly }: { room: Room; readOnly: boolean }) {
       {room.bookable && (
         <Link
           href={`/locations/${room.location_id}/rooms/${room.id}`}
-          className="mt-1 inline-block text-sm text-primary underline-offset-4 hover:underline"
+          className="mt-1 inline-block text-sm text-primary-ink underline-offset-4 hover:underline"
         >
           {t("locations.openingHours", { name: room.name })}
         </Link>

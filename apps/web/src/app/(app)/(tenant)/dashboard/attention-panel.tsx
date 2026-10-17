@@ -44,12 +44,12 @@ export async function AttentionPanel({ context }: { context: Pick<Awaited<Return
                   </span>
                   {t(`kinds.${list.kind}`)}
                 </h3>
-                <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-bold text-primary">{list.count}</span>
+                <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-sm font-bold text-primary-ink">{list.count}</span>
               </div>
               <ul className="flex flex-col divide-y divide-border">
                 {list.items.map((entry) => (
                   <li key={entry.id}>
-                    <Link href={item(entry.id)} className="flex items-center justify-between gap-3 py-2 text-sm hover:text-primary">
+                    <Link href={item(entry.id)} className="flex items-center justify-between gap-3 py-2 text-sm hover:text-primary-ink">
                       <span className="truncate font-medium">{entry.name}</span>
                       <span className="shrink-0 text-muted">
                         {entry.date ? t(`dates.${list.kind}`, { date: date.format(new Date(entry.date)) }) : t("never")}
@@ -59,7 +59,7 @@ export async function AttentionPanel({ context }: { context: Pick<Awaited<Return
                 ))}
               </ul>
               {list.count > list.items.length && (
-                <Link href={all} className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-4 hover:underline">
+                <Link href={all} className="mt-auto inline-flex items-center gap-1 text-sm font-medium text-primary-ink underline-offset-4 hover:underline">
                   {t("all", { count: list.count })}
                   <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
                 </Link>

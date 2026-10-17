@@ -51,7 +51,7 @@ export function BusinessActions({
 
       <form action={trialAction} className="flex flex-col gap-3 border-t border-border pt-4">
         <h3 className="flex items-center gap-2 font-medium">
-          <CalendarPlus aria-hidden="true" className="size-4 text-primary" />
+          <CalendarPlus aria-hidden="true" className="size-4 text-primary-ink" />
           {t("trial")}
         </h3>
         <FormError message={error(trial)} />
@@ -69,7 +69,7 @@ export function BusinessActions({
 
       <form action={planAction} className="flex flex-col gap-3 border-t border-border pt-4">
         <h3 className="flex items-center gap-2 font-medium">
-          <Sparkles aria-hidden="true" className="size-4 text-primary" />
+          <Sparkles aria-hidden="true" className="size-4 text-primary-ink" />
           {t("modules")}
         </h3>
         <p className="text-sm text-muted">{t("modulesHint")}</p>
@@ -83,7 +83,7 @@ export function BusinessActions({
 
       <form action={creditAction} className="flex flex-col gap-3 border-t border-border pt-4">
         <h3 className="flex items-center gap-2 font-medium">
-          <Receipt aria-hidden="true" className="size-4 text-primary" />
+          <Receipt aria-hidden="true" className="size-4 text-primary-ink" />
           {t("voidTitle")}
         </h3>
         <p className="text-sm text-muted">{t("voidHint")}</p>

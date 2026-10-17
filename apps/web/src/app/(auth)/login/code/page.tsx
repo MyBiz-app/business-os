@@ -17,7 +17,7 @@ export default async function CodeLoginPage({ searchParams }: PageProps<"/login/
     <>
       <AuthHeading title={t("codeLogin.title")} subtitle={t("codeLogin.subtitle")} />
       <CodeLoginForm channels={channels} next={nextPath} />
-      <Link href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"} className="text-sm text-primary underline underline-offset-4">
+      <Link href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"} className="text-sm text-primary-ink underline underline-offset-4">
         {t("codeLogin.usePassword")}
       </Link>
     </>

@@ -52,7 +52,7 @@ export function FaceChooser({ agent, face, onChange }: { agent: Pick<Agent, "key
           const checked = !face.preview && face.preset === preset;
           return (
             <li key={preset}>
-              <button type="button" role="radio" aria-checked={checked} aria-label={preset} onClick={() => onChange({ preset, file: null, preview: null })} className={`block w-full rounded-full p-0.5 focus-visible:ring-2 focus-visible:ring-primary ${checked ? "ring-2 ring-primary" : "opacity-80 hover:opacity-100"}`}>
+              <button type="button" role="radio" aria-checked={checked} aria-label={preset} onClick={() => onChange({ preset, file: null, preview: null })} className={`btn-plain block w-full rounded-full p-0.5 focus-visible:ring-2 focus-visible:ring-primary ${checked ? "ring-2 ring-primary" : "opacity-80 hover:opacity-100"}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element -- small fingerprinted files from our own package */}
                 {src && <img src={src} alt="" draggable={false} className="aspect-square w-full rounded-full object-cover" />}
               </button>
@@ -82,7 +82,7 @@ export function ColorChoice({ value, onChange }: { value: string; onChange: (col
   return (
     <div role="radiogroup" aria-label={t("color")} className="flex flex-wrap items-center gap-2">
       {COLORS.map((color) => (
-        <button key={color} type="button" role="radio" aria-checked={value.toLowerCase() === color.toLowerCase()} aria-label={color} onClick={() => onChange(color)} className={`size-8 rounded-full border-2 focus-visible:ring-2 focus-visible:ring-primary ${value.toLowerCase() === color.toLowerCase() ? "border-foreground" : "border-transparent"}`} style={{ backgroundColor: color }} />
+        <button key={color} type="button" role="radio" aria-checked={value.toLowerCase() === color.toLowerCase()} aria-label={color} onClick={() => onChange(color)} className={`btn-plain size-8 rounded-full border-2 focus-visible:ring-2 focus-visible:ring-primary ${value.toLowerCase() === color.toLowerCase() ? "border-foreground" : "border-transparent"}`} style={{ backgroundColor: color }} />
       ))}
     </div>
   );

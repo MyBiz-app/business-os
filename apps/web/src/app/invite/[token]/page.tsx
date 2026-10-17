@@ -60,7 +60,7 @@ export default async function InvitePage({ params }: PageProps<"/invite/[token]"
         <>
           <p>{t("invite.body", { business: isolate(invite.tenant_name), role: t(`roles.${invite.role}`) })}</p>
           <form action={acceptInvitation.bind(null, token)}>
-            <button type="submit" className={`${BUTTON} w-full`}>
+            <button type="submit" className={`btn-plain ${BUTTON} w-full`}>
               {t("invite.accept", { business: isolate(invite.tenant_name) })}
             </button>
           </form>

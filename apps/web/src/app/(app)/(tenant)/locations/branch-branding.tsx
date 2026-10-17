@@ -10,6 +10,7 @@ import { FileField } from "@/components/form/file-field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { DEFAULT_BRAND_COLOR } from "@/lib/brand";
 import { ImageCropDialog } from "@/components/image-crop-dialog";
 import { brandStyle } from "@/lib/brand";
 import type { FormState } from "@/lib/form-state";
@@ -18,7 +19,7 @@ import { type BrandingState, removeBranchLogo, updateBranchColor, uploadBranchLo
 
 type Location = components["schemas"]["Location"];
 
-const FALLBACK_COLOR = "#2563eb";
+const FALLBACK_COLOR = DEFAULT_BRAND_COLOR;
 
 /** A branch's own logo and color; without them it shows the network's (the business's). */
 export function BranchBranding({ location, logo, networkColor }: { location: Location; logo: string | null; networkColor: string | null }) {
@@ -55,7 +56,7 @@ export function BranchBranding({ location, logo, networkColor }: { location: Loc
           )}
           {logo && (
             <form action={removeBranchLogo.bind(null, location.id)}>
-              <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+              <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                 {t("logoRemove")}
               </button>
             </form>

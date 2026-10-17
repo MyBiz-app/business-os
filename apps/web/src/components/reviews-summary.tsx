@@ -13,7 +13,7 @@ export function Stars({ rating, label }: { rating: number; label: string }) {
         <Star
           key={n}
           aria-hidden="true"
-          className={`size-4 ${n <= Math.round(rating) ? "fill-amber-400 text-amber-500" : "text-foreground/20"}`}
+          className={`size-4 ${n <= Math.round(rating) ? "fill-warning text-warning" : "text-foreground/20"}`}
         />
       ))}
     </span>
@@ -77,7 +77,7 @@ export async function ReviewsSummary({ summary, locale, timeZone, title, withCli
                   <li key={stars} className="flex items-center gap-2 text-xs">
                     <span className="w-14 shrink-0 tabular-nums">{t("starsShort", { count: stars })}</span>
                     <span aria-hidden="true" className="h-2 flex-1 overflow-hidden rounded-full bg-foreground/8">
-                      <span className="block h-full rounded-full bg-amber-400" style={{ width: `${(count / most) * 100}%` }} />
+                      <span className="block h-full rounded-full bg-warning" style={{ width: `${(count / most) * 100}%` }} />
                     </span>
                     <span className="w-8 shrink-0 text-end tabular-nums text-muted">{count}</span>
                   </li>

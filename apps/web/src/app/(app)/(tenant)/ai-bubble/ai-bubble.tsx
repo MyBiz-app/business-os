@@ -217,7 +217,7 @@ export function AiBubble() {
                       {turn.suggestions.map((suggestion) => {
                         const target = available.find((a) => a.key === suggestion.agent_key);
                         return (
-                          <button key={suggestion.agent_key} type="button" onClick={() => handoff(suggestion.agent_key)} className="flex flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-2.5 text-start text-sm hover:bg-surface">
+                          <button key={suggestion.agent_key} type="button" onClick={() => handoff(suggestion.agent_key)} className="btn-plain flex flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-2.5 text-start text-sm hover:bg-surface">
                             <span className="font-medium" dir="auto">
                               {tTeam("handoff", { name: target?.name ?? suggestion.agent_key })}
                             </span>
@@ -262,7 +262,7 @@ export function AiBubble() {
             {suggestions.length > 0 && team.enabled && (
               <div className="flex flex-wrap gap-1.5">
                 {suggestions.map((suggestion) => (
-                  <button key={suggestion} type="button" onClick={() => submit(suggestion)} className="rounded-full border border-border bg-background px-2.5 py-1 text-xs hover:bg-surface" dir="auto">
+                  <button key={suggestion} type="button" onClick={() => submit(suggestion)} className="btn-plain rounded-full border border-border bg-background px-2.5 py-1 text-xs hover:bg-surface" dir="auto">
                     {suggestion}
                   </button>
                 ))}
@@ -311,7 +311,7 @@ export function AiBubble() {
         aria-haspopup="dialog"
         aria-label={t("open", { name: shown.name })}
         title={t("open", { name: shown.name })}
-        className="ai-bubble relative block size-14 rounded-full shadow-lg ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
+        className="btn-plain ai-bubble relative block size-14 rounded-full shadow-lg ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4"
         style={{ ["--tw-ring-color" as string]: shown.color }}
         onPointerEnter={(event) => event.pointerType === "mouse" && setFan(true)}
         onPointerDown={(event) => {
@@ -351,7 +351,7 @@ export function AiBubble() {
                 onClick={() => choose(agent)}
                 aria-label={`${agent.name}, ${agent.role_title}`}
                 title={`${agent.name} · ${agent.role_title}`}
-                className="block size-11 rounded-full shadow-md ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-110"
+                className="btn-plain block size-11 rounded-full shadow-md ring-2 ring-offset-2 ring-offset-background transition-transform hover:scale-110"
                 style={{ ["--tw-ring-color" as string]: agent.color }}
               >
                 <AgentAvatar agent={agent} className="size-full" />

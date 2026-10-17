@@ -47,7 +47,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            <FolderOpen aria-hidden="true" className="size-8 shrink-0 text-primary" />
+            <FolderOpen aria-hidden="true" className="size-8 shrink-0 text-primary-ink" />
             {t("title")}
           </span>
         }
@@ -61,7 +61,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
               href={`/files?folder=${folder.id}`}
               aria-current={folder.id === open?.id ? "page" : undefined}
               style={{ paddingInlineStart: `${0.75 + depthOf(folder.parent_id) * 1}rem` }}
-              className={`flex items-center justify-between gap-2 rounded-lg py-2 pe-3 text-sm ${folder.id === open?.id ? "bg-primary/10 font-semibold text-primary" : "hover:bg-foreground/[0.04]"}`}
+              className={`flex items-center justify-between gap-2 rounded-lg py-2 pe-3 text-sm ${folder.id === open?.id ? "bg-primary/10 font-semibold text-primary-ink" : "hover:bg-foreground/[0.04]"}`}
             >
               <span className="flex min-w-0 items-center gap-2">
                 <Folder aria-hidden="true" className="size-4 shrink-0" />
@@ -105,7 +105,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
                 {files.map((file) => (
                   <li key={file.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5">
                     <div className="flex min-w-0 flex-col gap-0.5">
-                      <a href={`/files/${file.id}/file`} className="flex items-center gap-2 truncate font-medium text-primary underline-offset-4 hover:underline" dir="auto">
+                      <a href={`/files/${file.id}/file`} className="flex items-center gap-2 truncate font-medium text-primary-ink underline-offset-4 hover:underline" dir="auto">
                         <FileText aria-hidden="true" className="size-4 shrink-0" />
                         {file.name}
                       </a>
@@ -125,7 +125,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
                         </form>
                         {!open.retain && (
                           <form action={deleteFile.bind(null, file.id)}>
-                            <button type="submit" aria-label={t("delete", { name: file.name })} className="rounded-lg p-1 text-muted hover:bg-danger/10 hover:text-danger">
+                            <button type="submit" aria-label={t("delete", { name: file.name })} className="btn-plain rounded-lg p-1 text-muted hover:bg-danger/10 hover:text-danger">
                               <Trash2 aria-hidden="true" className="size-4" />
                             </button>
                           </form>
@@ -139,7 +139,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
 
             {open.can_upload && (
               <details className="rounded-xl bg-foreground/[0.03] p-3">
-                <summary className="cursor-pointer text-sm font-medium text-primary">{t("add")}</summary>
+                <summary className="cursor-pointer text-sm font-medium text-primary-ink">{t("add")}</summary>
                 <div className="pt-3">
                   <UploadForm folderId={open.id} />
                 </div>
@@ -147,7 +147,7 @@ export default async function FilesPage({ searchParams }: PageProps<"/files">) {
             )}
             {canManage && open.can_upload && (
               <details className="rounded-xl bg-foreground/[0.03] p-3">
-                <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary">
+                <summary className="flex cursor-pointer items-center gap-2 text-sm font-medium text-primary-ink">
                   <FolderPlus aria-hidden="true" className="size-4" /> {t("newFolder")}
                 </summary>
                 <div className="pt-3">

@@ -159,7 +159,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
               <p className="text-2xl font-extrabold">
                 <bdi>{display(key, kpi.value)}</bdi>
               </p>
-              {note && <p className={`text-xs font-medium ${up === null ? "text-muted" : up ? "text-success" : "text-danger"}`}>{note}</p>}
+              {note && <p className={`text-xs font-medium ${up === null ? "text-muted" : up ? "text-success-ink" : "text-danger"}`}>{note}</p>}
             </div>
           );
         })}
@@ -268,7 +268,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
                   )}
                 </dl>
                 {post.permalink && (
-                  <a href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary underline-offset-4 hover:underline print:hidden">
+                  <a href={post.permalink} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary-ink underline-offset-4 hover:underline print:hidden">
                     {t("posts.open")}
                   </a>
                 )}
@@ -363,7 +363,7 @@ export default async function ContentPage({ searchParams }: PageProps<"/content"
           ))}
         </ul>
         <details>
-          <summary className="cursor-pointer text-sm font-semibold text-primary">{t("accounts.addMore")}</summary>
+          <summary className="cursor-pointer text-sm font-semibold text-primary-ink">{t("accounts.addMore")}</summary>
           <div className="mt-4">
             <ConnectCards networks={providers.networks} canManage={canManage} withDemo={false} />
           </div>

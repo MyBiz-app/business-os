@@ -167,7 +167,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
               if (!window.confirm(t("team.removeConfirm", { email }))) event.preventDefault();
             }}
           >
-            <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+            <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
               {t("team.remove")}
             </button>
           </form>
@@ -232,7 +232,7 @@ function MemberPermissions({ email, all, allowed }: { email: string; all: string
         </p>
         <PermissionList all={all} allowed={allowed} />
         <p className="text-xs text-muted">{t("permissionsHint")}</p>
-        <Link href="/team/roles" className="text-sm text-primary underline-offset-4 hover:underline">
+        <Link href="/team/roles" className="text-sm text-primary-ink underline-offset-4 hover:underline">
           {t("manageRoles")}
         </Link>
       </div>

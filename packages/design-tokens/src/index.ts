@@ -9,13 +9,16 @@ export const palette = {
     foreground: "#111827", // Midnight Navy
     surface: "#ffffff", // Pure White
     border: "#e2e8f0",
-    muted: "#64748b", // Slate Gray
+    muted: "#55657c", // Slate Gray, darkened a step so it stays AA on tinted surfaces
     primary: "#2563eb", // Primary Blue
+    // Text-safe blue: primary text on its own tint is 4.4:1, the ink is 5.3:1 (WCAG AA).
+    primaryInk: "#1d4ed8",
     onPrimary: "#ffffff",
     accent: "#06b6d4", // Electric Cyan: highlights only, never text
     ai: "#7c3aed", // AI Purple: AI features only
     // Darker than the brand's #16a34a so it reads as text on white (WCAG AA).
     success: "#15803d",
+    successInk: "#166534",
     warning: "#b45309",
     danger: "#b91c1c",
   },
@@ -26,10 +29,12 @@ export const palette = {
     border: "#263247",
     muted: "#94a3b8",
     primary: "#3b82f6",
+    primaryInk: "#60a5fa",
     onPrimary: "#0b1020",
     accent: "#22d3ee",
     ai: "#a78bfa",
     success: "#22c55e",
+    successInk: "#4ade80",
     warning: "#fbbf24",
     danger: "#f87171",
   },

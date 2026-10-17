@@ -75,7 +75,7 @@ export async function HealthSection({ clientId, context }: Props) {
             </p>
           )}
           <details className="text-sm">
-            <summary className="cursor-pointer text-primary">{t("showAll")}</summary>
+            <summary className="cursor-pointer text-primary-ink">{t("showAll")}</summary>
             <ul className="mt-2 flex flex-col gap-1" dir="auto">
               {latest.answers.map((answer) => (
                 <li key={answer.id} className="flex justify-between gap-4">

@@ -180,7 +180,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         )}
         <div className={`relative flex w-full flex-wrap items-end justify-between gap-6 p-6 sm:p-8 ${tenant.cover_url ? "min-h-56 sm:min-h-64" : ""}`}>
         <div className="relative flex flex-col gap-2">
-          <p className="text-sm font-medium text-primary">
+          <p className="text-sm font-medium text-primary-ink">
             {t(`dashboard.greeting.${partOfDay(tenant.time_zone)}`)} ·{" "}
             {formatDay(today, locale, { weekday: "long", day: "numeric", month: "long" })}
           </p>
@@ -191,10 +191,10 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
           {canSeeSchedule && (
             <p className="mt-2 flex flex-wrap items-center gap-2 text-sm">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 font-medium shadow-sm ring-1 ring-border">
-                <CalendarCheck aria-hidden="true" className="size-4 text-primary" />
+                <CalendarCheck aria-hidden="true" className="size-4 text-primary-ink" />
                 {t(`terms.${termsOf(tenant.vertical)}.sessionsToday` as "terms.fitness.sessionsToday", { count: todays.filter((s) => s.status !== "cancelled").length })}
               </span>
-              <Link href="/schedule" className="inline-flex items-center gap-1 font-medium text-primary underline-offset-4 hover:underline">
+              <Link href="/schedule" className="inline-flex items-center gap-1 font-medium text-primary-ink underline-offset-4 hover:underline">
                 {t("dashboard.openSchedule")}
                 <ArrowRight aria-hidden="true" className="size-4 rtl:rotate-180" />
               </Link>
@@ -277,7 +277,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                       >
                         <DeltaIcon
                           aria-hidden="true"
-                          className={`size-3.5 ${better === null ? "text-muted" : better ? "text-success" : "text-danger"}`}
+                          className={`size-3.5 ${better === null ? "text-muted" : better ? "text-success-ink" : "text-danger"}`}
                         />
                         <span>{deltaText}</span>
                       </span>

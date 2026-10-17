@@ -41,7 +41,7 @@ function PurposeForm({ locationId, item }: { locationId: string | null; item: Pu
         </SubmitButton>
       </form>
       <FormError message={state.error && (state.error === "invalid" ? t("invalid") : tCommon(`errors.${state.error}`))} />
-      {item.email !== null && item.verified && <p className="text-sm text-success">{t("verified")}</p>}
+      {item.email !== null && item.verified && <p className="text-sm text-success-ink">{t("verified")}</p>}
       {pending && (
         <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
           <span>{t("pending", { email: isolate(item.email ?? "") })}</span>

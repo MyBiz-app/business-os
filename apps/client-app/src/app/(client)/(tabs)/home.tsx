@@ -3,6 +3,7 @@ import { router, useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import { Image, Linking, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useLocale, useTranslations } from "use-intl";
 
 import { HOME_CARDS, type HomeData } from "@/components/home-cards";
@@ -82,8 +83,8 @@ export default function Home() {
     >
       <View style={[local.hero, elevation.raised, { backgroundColor: palette.primary }]}>
         {/* Soft light circles give the brand color depth. */}
-        <View aria-hidden style={[local.orb, local.orbLarge, { backgroundColor: tint(palette.onPrimary === "#ffffff" ? "#ffffff" : "#000000", 0.12) }]} />
-        <View aria-hidden style={[local.orb, local.orbSmall, { backgroundColor: tint(palette.onPrimary === "#ffffff" ? "#ffffff" : "#000000", 0.08) }]} />
+        <View aria-hidden style={[local.orb, local.orbLarge, { backgroundColor: tint(palette.onPrimary === fixedColors.white ? fixedColors.white : fixedColors.black, 0.12) }]} />
+        <View aria-hidden style={[local.orb, local.orbSmall, { backgroundColor: tint(palette.onPrimary === fixedColors.white ? fixedColors.white : fixedColors.black, 0.08) }]} />
         {logo && <Image source={{ uri: logo }} style={local.logo} accessibilityIgnoresInvertColors />}
         <Text accessibilityRole="header" style={[local.business, { color: palette.onPrimary }]}>
           {business.name}
@@ -183,7 +184,7 @@ const local = StyleSheet.create({
   orb: { position: "absolute", borderRadius: 999 },
   orbLarge: { width: 220, height: 220, top: -90, end: -60 },
   orbSmall: { width: 120, height: 120, bottom: -50, end: 70 },
-  logo: { width: 48, height: 48, borderRadius: 12, backgroundColor: "#ffffff" },
+  logo: { width: 48, height: 48, borderRadius: 12, backgroundColor: fixedColors.white },
   business: { fontSize: 28, fontWeight: "700", textAlign: "left" },
   greeting: { fontSize: 16, textAlign: "left" },
   reviewTitle: { fontSize: 17, fontWeight: "700", textAlign: "left" },

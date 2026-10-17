@@ -214,7 +214,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/reports"
         )}
         {atRisk.length > SHOWN && (
           <details>
-            <summary className="cursor-pointer text-sm text-primary">{t("showAll", { count: atRisk.length })}</summary>
+            <summary className="cursor-pointer text-sm text-primary-ink">{t("showAll", { count: atRisk.length })}</summary>
             <ul className="mt-2 flex flex-col divide-y divide-border">{atRisk.slice(SHOWN).map(memberRow)}</ul>
           </details>
         )}

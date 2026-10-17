@@ -5,7 +5,7 @@ export function CurrencyBadge({ currency, className = "" }: { currency: string; 
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex size-[1.4em] shrink-0 items-center justify-center rounded-full bg-primary/10 text-[0.7em] font-bold text-primary motion-safe:transition-transform motion-safe:duration-300 group-hover:motion-safe:scale-110 ${className}`}
+      className={`inline-flex size-[1.4em] shrink-0 items-center justify-center rounded-full bg-primary/10 text-[0.7em] font-bold text-primary-ink motion-safe:transition-transform motion-safe:duration-300 group-hover:motion-safe:scale-110 ${className}`}
     >
       {SYMBOLS[currency] ?? currency}
     </span>

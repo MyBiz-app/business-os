@@ -52,7 +52,7 @@ export default async function BillingPage() {
 
   return (
     <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
-      <Link href="/settings" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/settings" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {tSettings("title")}
       </Link>
       <PageHeader
@@ -75,7 +75,7 @@ export default async function BillingPage() {
       <section aria-labelledby="status-heading" className="card-accent flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="status-heading" className="flex items-center gap-2 text-xl font-bold">
-            <Sparkles aria-hidden="true" className="size-5 text-primary" />
+            <Sparkles aria-hidden="true" className="size-5 text-primary-ink" />
             {billing.in_trial ? t("trialLeft", { days: billing.trial_days_left }) : t("active")}
           </h2>
           <span className="text-sm text-muted">
@@ -109,7 +109,7 @@ export default async function BillingPage() {
       <section aria-labelledby="usage-heading" className="card flex flex-col gap-4 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 id="usage-heading" className="flex items-center gap-2 text-lg font-semibold">
-            <Luggage aria-hidden="true" className="size-5 text-primary" />
+            <Luggage aria-hidden="true" className="size-5 text-primary-ink" />
             {t("usage.title", { pack: t(`usage.packs.${usage.pack ?? "included"}`) })}
           </h2>
           <span className="text-sm text-muted">{t("usage.since", { date: day(usage.month_start) })}</span>
@@ -135,7 +135,7 @@ export default async function BillingPage() {
           text={t("usage.of", { used: bytes(usage.storage_bytes), included: bytes(usage.storage_included_bytes) })}
         />
         {usage.pack !== "pack_max" && (
-          <Link href="/settings/modules" className="self-start text-sm font-medium text-primary underline-offset-4 hover:underline">
+          <Link href="/settings/modules" className="self-start text-sm font-medium text-primary-ink underline-offset-4 hover:underline">
             {t("usage.more")}
           </Link>
         )}
@@ -147,7 +147,7 @@ export default async function BillingPage() {
         <section aria-labelledby="plan-heading" className="card flex flex-col gap-4 p-6">
           <div className="flex items-center justify-between gap-3">
             <h2 id="plan-heading" className="text-lg font-semibold">{t("plan")}</h2>
-            <Link href="/settings/modules" className="text-sm text-primary underline-offset-4 hover:underline">
+            <Link href="/settings/modules" className="text-sm text-primary-ink underline-offset-4 hover:underline">
               {t("changeModules")}
             </Link>
           </div>
@@ -171,20 +171,20 @@ export default async function BillingPage() {
             <>
               <div
                 dir="ltr"
-                className="relative flex aspect-[1.7] max-w-xs flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-950 p-5 text-white shadow-lg"
+                className="relative flex aspect-[1.7] max-w-xs flex-col justify-between overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-black p-5 text-white shadow-lg"
               >
                 <span aria-hidden="true" className="absolute -end-10 -top-10 size-36 rounded-full bg-white/10" />
                 <span className="flex items-center justify-between">
                   <span className="text-sm font-semibold uppercase tracking-wide">{t(`brands.${method.brand}`)}</span>
                   {method.simulated && (
-                    <span className="rounded-full bg-amber-300 px-2 py-0.5 text-xs font-bold text-zinc-950">{t("testCard")}</span>
+                    <span className="rounded-full bg-warning px-2 py-0.5 text-xs font-bold text-background">{t("testCard")}</span>
                   )}
                 </span>
                 <span className="font-mono text-lg tracking-widest">•••• •••• •••• {method.last4}</span>
                 <span className="text-xs opacity-80">{method.exp}</span>
               </div>
               <form action={removeCard}>
-                <button type="submit" className="text-sm text-danger underline-offset-4 hover:underline">
+                <button type="submit" className="btn-link text-sm text-danger underline-offset-4 hover:underline">
                   {t("removeCard")}
                 </button>
               </form>
@@ -217,7 +217,7 @@ export default async function BillingPage() {
 
       <section aria-labelledby="invoices-heading" className="card flex flex-col gap-4 p-6">
         <h2 id="invoices-heading" className="flex items-center gap-2 text-lg font-semibold">
-          <Receipt aria-hidden="true" className="size-5 text-primary" />
+          <Receipt aria-hidden="true" className="size-5 text-primary-ink" />
           {t("invoices")}
         </h2>
         {billing.invoices.length === 0 ? (
@@ -252,14 +252,14 @@ export default async function BillingPage() {
                       <span className="inline-flex items-center gap-3">
                         {invoice.status === "open" && method && (
                           <form action={payInvoice.bind(null, invoice.id)}>
-                            <button type="submit" className="font-semibold text-primary underline-offset-4 hover:underline">
+                            <button type="submit" className="btn-link font-semibold text-primary-ink underline-offset-4 hover:underline">
                               {t("pay")}
                             </button>
                           </form>
                         )}
                         <Link
                           href={`/settings/billing/invoices/${invoice.id}`}
-                          className="text-primary underline-offset-4 hover:underline"
+                          className="text-primary-ink underline-offset-4 hover:underline"
                           aria-label={t("viewInvoice", { number: invoice.number })}
                         >
                           {t("view")}

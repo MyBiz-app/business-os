@@ -35,7 +35,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       aria-label={label}
       title={label}
       onClick={() => setTheme(dark ? "light" : "dark")}
-      className={`flex size-10 items-center justify-center rounded-full border border-border bg-surface text-foreground/80 transition-colors hover:bg-foreground/5 hover:text-foreground ${className}`.trim()}
+      className={`btn-icon flex size-10 items-center justify-center rounded-full border border-border bg-surface text-foreground/80 transition-colors hover:bg-foreground/5 hover:text-foreground ${className}`.trim()}
     >
       {/* Both icons render until hydration; CSS shows the right one (no flash on first paint). */}
       <Sun aria-hidden="true" className="size-[1.15rem] hidden dark:block" />

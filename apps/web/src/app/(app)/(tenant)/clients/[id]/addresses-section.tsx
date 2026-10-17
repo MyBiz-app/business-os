@@ -28,7 +28,7 @@ export async function AddressesSection({ clientId, context, locked }: { clientId
   return (
     <section aria-labelledby="addresses-heading" className="flex flex-col gap-4 card p-6">
       <h2 id="addresses-heading" className="flex items-center gap-2 text-lg font-semibold">
-        <MapPin aria-hidden="true" className="size-5 text-primary" />
+        <MapPin aria-hidden="true" className="size-5 text-primary-ink" />
         {t("title")}
       </h2>
       {addresses.length === 0 && <p className="text-sm text-muted">{t("none")}</p>}
@@ -56,7 +56,7 @@ export async function AddressesSection({ clientId, context, locked }: { clientId
             {address.notes && <p dir="auto" className="text-sm text-muted">{address.notes}</p>}
             {writable && (
               <details>
-                <summary className="cursor-pointer text-sm text-primary">{t("edit")}</summary>
+                <summary className="cursor-pointer text-sm text-primary-ink">{t("edit")}</summary>
                 <div className="pt-3">
                   <AddressForm clientId={clientId} address={address} />
                 </div>
@@ -67,7 +67,7 @@ export async function AddressesSection({ clientId, context, locked }: { clientId
       </ul>
       {writable && (
         <details className="rounded-xl bg-foreground/[0.03] p-3">
-          <summary className="flex cursor-pointer items-center gap-1 text-sm font-medium text-primary">
+          <summary className="flex cursor-pointer items-center gap-1 text-sm font-medium text-primary-ink">
             <Plus aria-hidden="true" className="size-4" /> {t("add")}
           </summary>
           <div className="pt-3">

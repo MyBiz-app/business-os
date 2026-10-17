@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
+import { fixedColors } from "@business-os/app-kit/lib/theme";
 import { useTranslations } from "use-intl";
 
 import { Button, Card, ErrorText, Field, Heading, Screen, styles } from "@business-os/app-kit/components/ui";
@@ -63,7 +64,7 @@ export default function Review() {
                   hitSlop={6}
                   style={local.star}
                 >
-                  <Ionicons name={n <= rating ? "star" : "star-outline"} size={40} color={n <= rating ? "#f59e0b" : palette.muted} />
+                  <Ionicons name={n <= rating ? "star" : "star-outline"} size={40} color={n <= rating ? fixedColors.star : palette.muted} />
                 </Pressable>
               ))}
             </View>

@@ -43,7 +43,7 @@ export default async function ClosedPage() {
         )}
       </section>
       <form action={signOutToLogin} className="text-center">
-        <button type="submit" className="text-sm text-primary underline">
+        <button type="submit" className="btn-link text-sm text-primary-ink underline">
           {t("signOut")}
         </button>
       </form>

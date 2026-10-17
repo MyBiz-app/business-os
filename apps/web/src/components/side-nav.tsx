@@ -90,7 +90,7 @@ export function SideNav({ items, label }: { items: NavItem[]; label?: string }) 
         aria-expanded={open}
         aria-controls={listId}
         onClick={() => setOpen((value) => !value)}
-        className="mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold text-foreground md:hidden"
+        className="btn-plain mx-3 mb-3 flex w-[calc(100%-1.5rem)] items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-sm font-semibold text-foreground md:hidden"
       >
         <CurrentIcon aria-hidden="true" className="size-[18px] text-electric" />
         <span className="flex-1 text-start">{current?.label ?? t("menu")}</span>

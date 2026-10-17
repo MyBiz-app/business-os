@@ -74,8 +74,8 @@ function Choice<T extends string>({
             type="button"
             aria-pressed={value === option.value}
             onClick={() => onChange(option.value)}
-            className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${
-              value === option.value ? "bg-primary/12 font-medium text-primary" : "text-muted hover:text-foreground"
+            className={`btn-plain rounded-lg px-3 py-1.5 text-sm transition-colors ${
+              value === option.value ? "bg-primary/12 font-medium text-primary-ink" : "text-muted hover:text-foreground"
             }`}
           >
             {option.label}

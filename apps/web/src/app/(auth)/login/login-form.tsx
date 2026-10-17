@@ -21,7 +21,7 @@ export function LoginForm({ initialError, next }: { initialError?: string; next?
       <FormError message={state.error && t(`errors.${state.error}` as "errors.generic")} />
       <Field label={t("email")} name="email" type="email" autoComplete="email" required defaultValue={state.email} />
       <PasswordField label={t("password")} name="password" autoComplete="current-password" required />
-      <Link href="/forgot-password" className="text-sm text-primary underline-offset-4 hover:underline">
+      <Link href="/forgot-password" className="text-sm text-primary-ink underline-offset-4 hover:underline">
         {t("login.forgot")}
       </Link>
       <SubmitButton>{t("login.submit")}</SubmitButton>

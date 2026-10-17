@@ -20,7 +20,7 @@ export function AgentDialog({ agent, upsell, canAdd, onEdit, onClose }: { agent:
   return (
     <dialog ref={dialog} onClose={onClose} onClick={(event) => event.target === dialog.current && onClose()} aria-labelledby="agent-dialog-title" className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-3xl border border-border bg-background p-0 text-foreground backdrop:bg-black/50 backdrop:backdrop-blur-sm">
       <div className="relative flex flex-col items-center gap-4 p-6 text-center">
-        <button type="button" onClick={onClose} className="absolute end-3 top-3 rounded-full p-2 hover:bg-surface" aria-label={t("close")}>
+        <button type="button" onClick={onClose} className="btn-plain absolute end-3 top-3 rounded-full p-2 hover:bg-surface" aria-label={t("close")}>
           <X aria-hidden="true" className="size-5" />
         </button>
         <span className="relative flex">
@@ -41,7 +41,7 @@ export function AgentDialog({ agent, upsell, canAdd, onEdit, onClose }: { agent:
             <ul className="flex flex-col gap-2 text-start text-sm">
               {(["p1", "p2", "p3"] as const).map((point) => (
                 <li key={point} className="flex items-start gap-2">
-                  <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success" />
+                  <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-success-ink" />
                   {t(`upsell.${point}`)}
                 </li>
               ))}

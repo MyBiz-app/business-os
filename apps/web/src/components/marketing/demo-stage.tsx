@@ -67,7 +67,7 @@ export function DemoStage() {
                       <span className="font-semibold tabular-nums" dir="ltr">{["07:00", "09:30", "18:00"][index]}</span>
                       <span className="h-6 w-1 rounded-full" style={{ backgroundColor: ["#2563eb", "#06b6d4", "#7c3aed"][index] }} />
                       <span className="flex-1 truncate font-medium">{name}</span>
-                      <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${index === 1 ? "mk-rise bg-success/15 text-[#15803d] dark:text-success" : "bg-primary/10 text-primary"}`} style={index === 1 ? { animationDelay: "1400ms" } : undefined}>
+                      <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${index === 1 ? "mk-rise bg-success/15 text-[#15803d] dark:text-success-ink" : "bg-primary/10 text-primary-ink"}`} style={index === 1 ? { animationDelay: "1400ms" } : undefined}>
                         {index === 1 && <CalendarCheck className="size-3.5" />}
                         {index === 1 ? t("booked") : t("open")}
                       </span>
@@ -94,7 +94,7 @@ export function DemoStage() {
               <>
                 <div className="mk-rise flex items-baseline justify-between">
                   <p className="text-sm font-semibold text-muted">{tm("mock.revenue")}</p>
-                  <p className="text-3xl font-extrabold tabular-nums sm:text-4xl"><bdi>{revenue}</bdi> <span className="text-base font-bold text-success">+18%</span></p>
+                  <p className="text-3xl font-extrabold tabular-nums sm:text-4xl"><bdi>{revenue}</bdi> <span className="text-base font-bold text-success-ink">+18%</span></p>
                 </div>
                 <div className="flex h-40 items-end gap-2 rounded-xl border border-border bg-background p-4 sm:h-48" dir="ltr">
                   {BARS.map((height, index) => (
@@ -117,7 +117,7 @@ export function DemoStage() {
                 type="button"
                 aria-pressed={index === scene}
                 onClick={() => setScene(index)}
-                className="relative h-10 overflow-hidden rounded-full border border-border bg-surface px-4 text-sm font-semibold transition-colors hover:border-primary aria-pressed:border-primary aria-pressed:text-primary"
+                className="btn-plain relative h-10 overflow-hidden rounded-full border border-border bg-surface px-4 text-sm font-semibold transition-colors hover:border-primary aria-pressed:border-primary aria-pressed:text-primary-ink"
               >
                 {t(`tabs.${key}`)}
                 {index === scene && playing && (
@@ -126,7 +126,7 @@ export function DemoStage() {
               </button>
             ))}
           </div>
-          <button type="button" onClick={() => setManual(!playing)} aria-label={playing ? t("pause") : t("play")} title={playing ? t("pause") : t("play")} className="flex size-10 items-center justify-center rounded-full bg-primary text-on-primary">
+          <button type="button" onClick={() => setManual(!playing)} aria-label={playing ? t("pause") : t("play")} title={playing ? t("pause") : t("play")} className="btn-icon flex size-10 items-center justify-center rounded-full bg-primary text-on-primary">
             {playing ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}
           </button>
         </div>

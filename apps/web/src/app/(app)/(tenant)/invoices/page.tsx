@@ -31,7 +31,7 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
       <PageHeader
         title={
           <span className="flex items-center gap-3">
-            <FileText aria-hidden="true" className="size-8 shrink-0 text-primary" />
+            <FileText aria-hidden="true" className="size-8 shrink-0 text-primary-ink" />
             {t("title")}
           </span>
         }

@@ -232,7 +232,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
               const left = line.warnings.filter((w) => !w.acknowledged).length;
               return (
                 <li key={line.user_id}>
-                  <button type="button" onClick={() => setOpen(line.user_id)} className="card flex w-full flex-col gap-1 p-4 text-start transition hover:shadow-md focus-visible:outline-2">
+                  <button type="button" onClick={() => setOpen(line.user_id)} className="btn-plain card flex w-full flex-col gap-1 p-4 text-start transition hover:shadow-md focus-visible:outline-2">
                     <span dir="auto" className="font-medium">
                       {line.full_name}
                     </span>
