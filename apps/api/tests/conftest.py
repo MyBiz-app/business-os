@@ -79,7 +79,7 @@ def clean_tables(engine: Engine) -> None:
                 VALUES ('adire7399@gmail.com', 'primary_owner', 'migration')
             """)
         )
-        # So are the billing settings of migration 0122: VAT, the invoice counter, dunning days.
+        # So are the billing settings of migration 0123: VAT, the invoice counter, dunning days.
         connection.execute(text("INSERT INTO app.vat_rates VALUES ('ILS', '2025-01-01', 1800)"))
         connection.execute(text("INSERT INTO app.platform_series VALUES ('invoice', 10000)"))
         connection.execute(text("INSERT INTO app.dunning_settings DEFAULT VALUES"))

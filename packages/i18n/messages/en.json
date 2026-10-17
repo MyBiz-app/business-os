@@ -2225,7 +2225,8 @@
       "broadcasts": "Broadcasts",
       "ai": "AI",
       "health": "System health",
-      "incidents": "Incident banners"
+      "incidents": "Incident banners",
+      "growth": "Growth"
     },
     "levels": {
       "primary_owner": "Primary owner",
@@ -2706,6 +2707,37 @@
       "errors": {
         "generic": "Could not save. Check that a title is filled in and try again.",
         "forbidden": "You are not allowed to do this."
+      }
+    },
+    "growth": {
+      "title": "Growth",
+      "hint": "Where sign-ups stop, how many businesses are active and who uses the most. The last {days} days.",
+      "funnel": "Sign-up funnel",
+      "funnelHint": "People who reached each step of the sign-up. A visit counts once per step; \"Finished\" counts businesses created.",
+      "steps": {
+        "started": "Started",
+        "account": "Account",
+        "industry": "Industry",
+        "business": "Business",
+        "base": "Plan",
+        "extras": "Add-ons",
+        "services": "Services",
+        "summary": "Summary",
+        "completed": "Finished"
+      },
+      "lost": "{count} stopped here",
+      "active": "Active businesses",
+      "activeToday": "Active today",
+      "activeWeek": "Active in the last 7 days",
+      "activePerDay": "Active businesses per day",
+      "showTable": "Show as a table",
+      "consumers": "Biggest users",
+      "consumersHint": "Messages and AI credits in the last {days} days, space as kept now.",
+      "columns": {
+        "business": "Business",
+        "messages": "Messages",
+        "storage": "Space",
+        "ai": "AI credits"
       }
     },
     "overdue": {

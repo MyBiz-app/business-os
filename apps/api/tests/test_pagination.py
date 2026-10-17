@@ -111,6 +111,8 @@ BOUNDED = {
     "/social/audience": "one row per network",
     "/platform/staff": "the MyBiz team",
     "/platform/usage": "one row per day, at most 366",
+    "/platform/funnel": "one row per sign-up step, nine",
+    "/platform/activity": "one row per day, at most 90",
     "/platform/billing": "one row per month",
     "/platform/broadcasts": "announcements",
     "/platform/businesses/{tenant_id}/invoices": "one row per month",

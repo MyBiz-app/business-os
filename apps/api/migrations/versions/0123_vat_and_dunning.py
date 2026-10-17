@@ -11,8 +11,8 @@
   API enforces, a grace extension from the console, the end of a cancelled subscription (the
   business is kept) and the day a ended one was resumed (earlier months are not billed).
 
-Revision ID: 0122
-Revises: 0121
+Revision ID: 0123
+Revises: 0122
 Create Date: 2026-10-17
 """
 
@@ -22,8 +22,8 @@ from alembic import op
 
 # contract: nothing is dropped on upgrade (only the downgrade drops what this adds), so the previous
 # code keeps working on the new schema.
-revision: str = "0122"
-down_revision: str | None = "0121"
+revision: str = "0123"
+down_revision: str | None = "0122"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
