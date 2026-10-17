@@ -122,6 +122,7 @@ def _email(
         kind="broadcast",
         reply_to=reply_to,
         from_name=brand,
+        list_unsubscribe=link,
     )
 
 

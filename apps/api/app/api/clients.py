@@ -3,7 +3,7 @@ from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -14,6 +14,7 @@ from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_vis
 from app.api.pagination import PageDep
 from app.catalog.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
 from app.core.permissions import Permission
+from app.messaging.consent import request_origin
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -22,13 +23,25 @@ ClientSource = Literal[
     "walk_in", "referral", "instagram", "facebook", "google", "website", "app", "other"
 ]
 
+ConsentSource = Literal[
+    "app_join",
+    "app_profile",
+    "desk_signed",
+    "desk_verbal",
+    "desk_other",
+    "unsubscribe_link",
+    "unsubscribe_email",
+]
+DeskConsentSource = Literal["desk_signed", "desk_verbal", "desk_other"]
+
 ReadDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_READ))]
 WriteDep = Annotated[TenantContext, Depends(require(Permission.CLIENTS_WRITE))]
 
 COLUMNS = (
     "id, first_name, last_name, email, phone, date_of_birth, notes, status, source, "
     "custom_fields, home_location_id, created_at, updated_at, erased_at, "
-    "marketing_consent_at IS NOT NULL AS marketing_consent"
+    "marketing_consent_at IS NOT NULL AS marketing_consent, marketing_consent_at, "
+    "marketing_consent_source, marketing_opted_out_at"
 )
 
 
@@ -92,6 +105,15 @@ class Client(BaseModel):
     marketing_consent: bool = Field(
         default=False,
         description="Agreed to marketing messages; service messages are sent either way",
+    )
+    marketing_consent_at: datetime | None = Field(
+        default=None, description="When the agreement was given"
+    )
+    marketing_consent_source: ConsentSource | None = Field(
+        default=None, description="Where the last consent change came from"
+    )
+    marketing_opted_out_at: datetime | None = Field(
+        default=None, description="Stopped ads with the opt-out link; only the client can undo it"
     )
 
 
@@ -356,26 +378,63 @@ def get_client(client_id: UUID, context: ReadDep) -> Client:
 
 class ClientConsentBody(BaseModel):
     consent: bool
+    source: DeskConsentSource | None = Field(
+        default=None,
+        description="How the client agreed (signed form, said so in person, other); "
+        "required when recording an agreement, so it cannot be ticked without a source",
+    )
+
+
+class ConsentEvent(BaseModel):
+    id: UUID
+    action: Literal["granted", "withdrawn"]
+    source: ConsentSource
+    recorded_by_name: str | None
+    created_at: datetime
 
 
 @router.put("/{client_id}/marketing-consent")
 def set_client_marketing_consent(
-    client_id: UUID, body: ClientConsentBody, context: WriteDep
+    client_id: UUID, body: ClientConsentBody, request: Request, context: WriteDep
 ) -> Client:
-    """Record that the client agreed to (or stopped) marketing messages, e.g. at the desk."""
+    """Record that the client agreed to (or stopped) marketing messages, e.g. at the desk. An
+    agreement needs a source; a client who stopped ads with the opt-out link agrees again only
+    by their own choice, so the desk records it with a source too."""
     ensure_not_erased(context.session, client_id)
-    updated = context.session.execute(
-        text("""
-            UPDATE app.clients
-            SET marketing_consent_at =
-                CASE WHEN :consent THEN COALESCE(marketing_consent_at, now()) END
-            WHERE id = :id
-        """),
-        {"consent": body.consent, "id": client_id},
+    if body.consent and body.source is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="consent_source_required"
+        )
+    address, device = request_origin(request)
+    context.session.execute(
+        text("SELECT app.set_client_consent(:id, :consent, :source, :ip, :ua)"),
+        {
+            "id": client_id,
+            "consent": body.consent,
+            "source": body.source or "desk_other",
+            "ip": address,
+            "ua": device,
+        },
     )
-    if updated.rowcount == 0:
-        raise not_found()
     return get_client(client_id, context)
+
+
+@router.get("/{client_id}/consent-events")
+def client_consent_events(client_id: UUID, context: ReadDep) -> list[ConsentEvent]:
+    """The trail of this client's marketing consent, newest first."""
+    rows = context.session.execute(
+        text("""
+            SELECT e.id, e.action, e.source, e.created_at,
+                   coalesce(nullif(trim(u.full_name), ''), split_part(u.email, '@', 1))
+                       AS recorded_by_name
+            FROM app.consent_events e
+            LEFT JOIN app.users u ON u.id = e.recorded_by
+            WHERE e.client_id = :id
+            ORDER BY e.created_at DESC, e.id LIMIT 50
+        """),
+        {"id": client_id},
+    ).mappings()
+    return [ConsentEvent.model_validate(dict(r)) for r in rows]
 
 
 @router.patch("/{client_id}")

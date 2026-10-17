@@ -9,7 +9,7 @@ from html import escape
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
@@ -20,6 +20,7 @@ from app.api.deps import AnonymousSessionDep, SessionDep
 from app.api.platform import PlatformPermission, require_platform, run_rule
 from app.core.signed_links import verify
 from app.messaging.announcements import _email, content_for
+from app.messaging.consent import request_origin
 from app.messaging.email import load_messages, sender_from_settings
 
 router = APIRouter(tags=["broadcasts"])
@@ -324,32 +325,25 @@ def mark_announcement(
 
 class ConsentBody(BaseModel):
     consent: bool
+    source: Literal["app_join", "app_profile"] = Field(
+        default="app_profile", description="Where the person chose: when joining, or in the profile"
+    )
 
 
 @router.put("/me/marketing-consent", status_code=status.HTTP_204_NO_CONTENT, tags=["account"])
-def set_marketing_consent(body: ConsentBody, db: SessionDep) -> Response:
-    """Agree to (or stop) marketing messages; service messages are sent either way."""
-    db.execute(text("SELECT app.set_marketing_consent(:consent)"), {"consent": body.consent})
+def set_marketing_consent(body: ConsentBody, request: Request, db: SessionDep) -> Response:
+    """Agree to (or stop) marketing messages; service messages are sent either way. Each change
+    is kept with its time, source and device."""
+    address, device = request_origin(request)
+    db.execute(
+        text("SELECT app.set_marketing_consent(:consent, :source, :ip, :ua)"),
+        {"consent": body.consent, "source": body.source, "ip": address, "ua": device},
+    )
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/public/announcements/unsubscribe", response_class=HTMLResponse, tags=["account"])
-def unsubscribe(t: Annotated[str, Query(max_length=600)], db: AnonymousSessionDep) -> HTMLResponse:
-    """The opt-out link in a marketing email (the link is signed; no sign-in needed)."""
-    subject = verify(t)
-    parts = subject.split("|") if subject else []
-    ok = len(parts) == 3 and parts[0] == "unsub"
+def _opt_out_page(ok: bool) -> HTMLResponse:
     messages = load_messages("he")["broadcast"], load_messages("en")["broadcast"]
-    if ok:
-        email, announcement = parts[1], parts[2]
-        try:
-            announcement_id: UUID | None = UUID(announcement)
-        except ValueError:
-            announcement_id = None
-        db.execute(
-            text("SELECT app.marketing_unsubscribe(:email, :announcement)"),
-            {"email": email, "announcement": announcement_id},
-        )
     sections = ""
     for lang, m in zip(("he", "en"), messages, strict=True):
         direction = "rtl" if lang == "he" else "ltr"
@@ -363,3 +357,61 @@ def unsubscribe(t: Annotated[str, Query(max_length=600)], db: AnonymousSessionDe
         f'padding:0 1rem">{sections}</body>'
     )
     return HTMLResponse(page, status_code=200 if ok else 400)
+
+
+def _unsubscribe_signed(t: str, db: Session) -> bool:
+    subject = verify(t)
+    parts = subject.split("|") if subject else []
+    if not (len(parts) == 3 and parts[0] == "unsub"):
+        return False
+    email, announcement = parts[1], parts[2]
+    try:
+        announcement_id: UUID | None = UUID(announcement)
+    except ValueError:
+        announcement_id = None
+    db.execute(
+        text("SELECT app.marketing_unsubscribe(:email, :announcement)"),
+        {"email": email, "announcement": announcement_id},
+    )
+    return True
+
+
+@router.get("/public/announcements/unsubscribe", response_class=HTMLResponse, tags=["account"])
+def unsubscribe(t: Annotated[str, Query(max_length=600)], db: AnonymousSessionDep) -> HTMLResponse:
+    """The opt-out link in a marketing email (the link is signed; no sign-in needed)."""
+    return _opt_out_page(_unsubscribe_signed(t, db))
+
+
+@router.post("/public/announcements/unsubscribe", tags=["account"])
+def unsubscribe_one_click_signed(
+    t: Annotated[str, Query(max_length=600)], db: AnonymousSessionDep
+) -> Response:
+    """The mail app's own "Unsubscribe" button (RFC 8058 one-click) on the same signed link."""
+    ok = _unsubscribe_signed(t, db)
+    return Response(status_code=status.HTTP_204_NO_CONTENT if ok else status.HTTP_400_BAD_REQUEST)
+
+
+@router.get("/u/{token}", response_class=HTMLResponse, tags=["account"])
+def unsubscribe_by_link(token: str, request: Request, db: AnonymousSessionDep) -> HTMLResponse:
+    """The short opt-out link of an ad sent by a business (SMS, WhatsApp, email): one tap, no
+    sign-in. It stops that business's ads for that client and is kept in the consent trail."""
+    if not 8 <= len(token) <= 64:
+        return _opt_out_page(False)
+    address, device = request_origin(request)
+    business = db.execute(
+        text("SELECT app.unsubscribe_by_token(:token, :ip, :ua)"),
+        {"token": token, "ip": address, "ua": device},
+    ).scalar()
+    return _opt_out_page(business is not None)
+
+
+@router.post("/u/{token}", status_code=status.HTTP_204_NO_CONTENT, tags=["account"])
+def unsubscribe_one_click(token: str, request: Request, db: AnonymousSessionDep) -> Response:
+    """The mail app's own "Unsubscribe" button (RFC 8058 one-click)."""
+    if 8 <= len(token) <= 64:
+        address, device = request_origin(request)
+        db.execute(
+            text("SELECT app.unsubscribe_by_token(:token, :ip, :ua)"),
+            {"token": token, "ip": address, "ua": device},
+        )
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
