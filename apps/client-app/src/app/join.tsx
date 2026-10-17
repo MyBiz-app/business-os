@@ -2,7 +2,7 @@ import type { components } from "@business-os/api-client";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Image, Pressable, StyleSheet, View } from "react-native";
+import { Image, Linking, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
@@ -124,6 +124,9 @@ export default function Join() {
           ) : (
             <Text style={[styles.muted, { color: palette.foreground }]}>{t("noApp")}</Text>
           )}
+          {profile.website_url ? (
+            <Button label={t("visitSite")} variant="secondary" palette={palette} onPress={() => void Linking.openURL(profile.website_url!)} />
+          ) : null}
           <Button label={t("otherCode")} variant="secondary" palette={palette} onPress={() => setProfile(null)} />
         </>
       ) : (

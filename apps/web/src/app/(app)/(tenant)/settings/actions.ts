@@ -23,6 +23,7 @@ export async function updateDetails(_state: FormState, formData: FormData): Prom
           weekly_release_weekday: weekly ? Number(releaseWeekday) : null,
           weekly_release_time: weekly ? value("weekly_release_time") : null,
           name: value("name"),
+          website_url: value("website_url").trim() || null,
           locale: value("locale") === "en" ? "en" : "he",
           time_zone: value("time_zone"),
           currency: value("currency"),

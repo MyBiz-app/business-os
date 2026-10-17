@@ -13,6 +13,7 @@ from app.api.settings import MAX_LOGO_BYTES, read_image
 from app.catalog.verticals import CATALOG, VerticalPack
 from app.commerce.modules import MODULES
 from app.core.permissions import Permission
+from app.core.website import normalize_website
 from app.schedule.branch_managers import appoint, step_down
 
 router = APIRouter(tags=["locations"])
@@ -25,7 +26,8 @@ SettingsDep = Annotated[TenantContext, Depends(require(Permission.BUSINESS_SETTI
 LOCATION_COLUMNS = """
     l.id, l.name, l.address, l.active, l.created_at, l.updated_at,
     l.kind, l.manager_user_id, t.vertical AS tenant_vertical,
-    l.primary_color,
+    l.primary_color, l.website_url,
+    coalesce(l.website_url, t.website_url) AS effective_website_url,
     CASE WHEN l.logo IS NULL THEN NULL
          ELSE '/public/locations/' || l.id || '/logo?v='
               || extract(epoch FROM l.logo_updated_at)::bigint END AS logo_url,
@@ -60,10 +62,19 @@ class LocationCreate(BaseModel):
     def strip_name(cls, value: str) -> str:
         return _strip_required(value)
 
+    website_url: str | None = Field(
+        default=None, max_length=300, description="The branch's own website; empty: the business's"
+    )
+
     @field_validator("address", mode="before")
     @classmethod
     def blank_address(cls, value: object) -> object:
         return blank_to_none(value)
+
+    @field_validator("website_url", mode="before")
+    @classmethod
+    def clean_website(cls, value: object) -> object:
+        return normalize_website(value) if isinstance(value, str) else value
 
 
 class LocationUpdate(BaseModel):
@@ -81,10 +92,19 @@ class LocationUpdate(BaseModel):
         description="The branch's own accent color; null falls back to the network's",
     )
 
+    website_url: str | None = Field(
+        default=None, max_length=300, description="The branch's own website; null: the business's"
+    )
+
     @field_validator("address", mode="before")
     @classmethod
     def blank_address(cls, value: object) -> object:
         return blank_to_none(value)
+
+    @field_validator("website_url", mode="before")
+    @classmethod
+    def clean_website(cls, value: object) -> object:
+        return normalize_website(value) if isinstance(value, str) else value
 
 
 class RoomCreate(BaseModel):
@@ -134,6 +154,10 @@ class Location(BaseModel):
     )
     social: str = Field(description="on | off | default_off: friends and participant lists")
     primary_color: str | None = Field(description="The branch's own color, if it set one")
+    website_url: str | None = Field(description="The branch's own website, if it set one")
+    effective_website_url: str | None = Field(
+        description="The branch's website, else the business's, else none"
+    )
     logo_url: str | None = Field(description="The branch's own logo (public path), if it set one")
     effective_primary_color: str | None = Field(
         description="The branch's color, else the network's"
@@ -220,8 +244,8 @@ def create_location(body: LocationCreate, context: WriteDep) -> Location:
     ensure_branch_kind(context.session, body.kind)
     location_id = context.session.execute(
         text("""
-            INSERT INTO app.locations (tenant_id, name, address, kind)
-            VALUES (:tenant_id, :name, :address, :kind) RETURNING id
+            INSERT INTO app.locations (tenant_id, name, address, kind, website_url)
+            VALUES (:tenant_id, :name, :address, :kind, :website_url) RETURNING id
         """),
         {**body.model_dump(), "tenant_id": context.tenant_id},
     ).scalar_one()
@@ -308,14 +332,15 @@ def add_branch(body: BranchSetup, context: SettingsDep) -> Location:
         raise HTTPException(status_code=422, detail="unknown_member")
     location_id = session.execute(
         text("""
-            INSERT INTO app.locations (tenant_id, name, address, kind)
-            VALUES (:tenant_id, :name, :address, :kind) RETURNING id
+            INSERT INTO app.locations (tenant_id, name, address, kind, website_url)
+            VALUES (:tenant_id, :name, :address, :kind, :website_url) RETURNING id
         """),
         {
             "tenant_id": context.tenant_id,
             "name": body.name,
             "address": body.address,
             "kind": body.kind,
+            "website_url": body.website_url,
         },
     ).scalar_one()
     if body.copy_hours_from is not None:

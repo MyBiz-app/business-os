@@ -22,7 +22,7 @@ import { ScreenContextProvider } from "./ai-bubble/screen-context";
 import "./crm-shell.css";
 
 /** The CRM frame (side menu, branch switcher, banners, AI bubble) around whatever page it wraps. */
-export async function CrmFrame({ children }: { children: ReactNode }) {
+export async function CrmFrame({ children, modal }: { children: ReactNode; modal?: ReactNode }) {
   const { tenant, me, branch } = await getTenant();
   const t = await getTranslations();
   const logo = apiAssetUrl(tenant.logo_url);
@@ -128,6 +128,8 @@ export async function CrmFrame({ children }: { children: ReactNode }) {
       </div>
     </div>
     {aiBubble && <AiBubble />}
+    {/* Forms that open as a window over the page (round 7); the slot is empty otherwise. */}
+    {modal}
     </ScreenContextProvider>
     </ScopedMessages>
   );

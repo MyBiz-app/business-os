@@ -43852,6 +43852,19 @@
             "title": "Kind",
             "description": "The branch's sub-category (a catalog key); null: as the business"
           },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The branch's own website; empty: the business's"
+          },
           "copy_hours_from": {
             "anyOf": [
               {
@@ -44113,6 +44126,18 @@
             "type": "boolean",
             "title": "Client App",
             "description": "Whether the business offers the client app"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The business's website, if any"
           },
           "inquiries": {
             "type": "boolean",
@@ -45415,6 +45440,18 @@
             ],
             "title": "Logo Url"
           },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The business's website, if any"
+          },
           "time_zone": {
             "type": "string",
             "title": "Time Zone"
@@ -46138,6 +46175,18 @@
             ],
             "title": "Contact Email",
             "description": "The branch's confirmed main email, else the business's; none if neither set"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The branch's website, else the business's; none if neither set"
           }
         },
         "type": "object",
@@ -54328,6 +54377,30 @@
             "title": "Primary Color",
             "description": "The branch's own color, if it set one"
           },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The branch's own website, if it set one"
+          },
+          "effective_website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Website Url",
+            "description": "The branch's website, else the business's, else none"
+          },
           "logo_url": {
             "anyOf": [
               {
@@ -54380,6 +54453,8 @@
           "schedule_view",
           "social",
           "primary_color",
+          "website_url",
+          "effective_website_url",
           "logo_url",
           "effective_primary_color",
           "effective_logo_url"
@@ -54418,6 +54493,19 @@
             ],
             "title": "Kind",
             "description": "The branch's sub-category (a catalog key); null: as the business"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The branch's own website; empty: the business's"
           }
         },
         "type": "object",
@@ -54518,6 +54606,19 @@
             ],
             "title": "Primary Color",
             "description": "The branch's own accent color; null falls back to the network's"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The branch's own website; null: the business's"
           }
         },
         "type": "object",
@@ -66147,6 +66248,18 @@
             "title": "Business Number",
             "description": "Shown only to people who manage the business's settings"
           },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The business's website (its branches may have their own)"
+          },
           "address_line": {
             "anyOf": [
               {
@@ -67001,6 +67114,19 @@
               }
             ],
             "title": "Address City"
+          },
+          "website_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Website Url",
+            "description": "The business's website; empty clears it"
           },
           "employer_file_number": {
             "anyOf": [

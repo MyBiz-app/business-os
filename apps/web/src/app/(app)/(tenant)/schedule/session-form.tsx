@@ -8,6 +8,7 @@ import { useActionState, useState } from "react";
 import { Field, SelectField, TextAreaField } from "@/components/form/field";
 import { FormError, FormNotice } from "@/components/form/form-message";
 import { SubmitButton } from "@/components/form/submit-button";
+import { ModalMarker } from "@/components/ui/route-modal";
 import { isDay, toApiWeekday, weekdayOf as jsWeekday } from "@/lib/dates";
 
 import type { SessionFormState } from "./actions";
@@ -84,6 +85,7 @@ export function SessionForm({
     <form action={formAction} className="flex flex-col gap-4">
       <FormError message={errorMessage} />
       <FormNotice message={state.saved ? t("common.saved") : undefined} />
+      <ModalMarker saved={state.saved} next={state.next} />
       <fieldset disabled={readOnly} className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <SelectField
@@ -183,7 +185,7 @@ export function SessionForm({
       )}
 
       {!readOnly && (
-        <div className="flex items-center gap-4">
+        <div className="form-actions flex items-center gap-4">
           <SubmitButton>{submitLabel}</SubmitButton>
           <Link href="/schedule" className="text-sm text-muted underline-offset-4 hover:underline">
             {t("common.cancel")}

@@ -55,6 +55,7 @@ class BusinessProfile(BaseModel):
     primary_color: str | None
     logo_url: str | None
     client_app: bool = Field(description="Whether the business offers the client app")
+    website_url: str | None = Field(default=None, description="The business's website, if any")
     inquiries: bool = Field(
         default=False, description="Whether its public inquiry form is open (CRM module)"
     )
@@ -67,6 +68,7 @@ class ClientBusiness(BaseModel):
     locale: Literal["he", "en"]
     primary_color: str | None
     logo_url: str | None
+    website_url: str | None = Field(default=None, description="The business's website, if any")
     time_zone: str
     currency: str
     cancellation_window_minutes: int
@@ -100,6 +102,9 @@ class ClientLocation(BaseModel):
     contact_email: str | None = Field(
         default=None,
         description="The branch's confirmed main email, else the business's; none if neither set",
+    )
+    website_url: str | None = Field(
+        default=None, description="The branch's website, else the business's; none if neither set"
     )
 
 
@@ -196,7 +201,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
     row = (
         session.execute(
             text(f"""
-                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app,
+                SELECT t.id, t.name, t.locale, t.primary_color, t.client_app, t.website_url,
                        {LOGO_URL.format(t="t")} AS logo_url,
                        app.accepts_inquiries(:code) AS inquiries
                 FROM app.business_by_join_code(:code) t
@@ -213,7 +218,7 @@ def business_by_code(code: str, session: AnonymousSessionDep) -> BusinessProfile
 
 BUSINESS_SELECT = f"""
     SELECT t.id, t.name, t.vertical, t.locale, t.primary_color, t.time_zone, t.currency,
-           t.cancellation_window_minutes, t.online_sales, t.resource_payment,
+           t.cancellation_window_minutes, t.online_sales, t.resource_payment, t.website_url,
            {LOGO_URL.format(t="t")} AS logo_url,
            c.id AS client_id, c.first_name, c.last_name, c.phone
     FROM app.clients c JOIN app.tenants t ON t.id = c.tenant_id
@@ -234,6 +239,8 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
     rows = context.session.execute(
         text("""
             SELECT l.id, l.name, l.address, l.kind,
+                   coalesce(l.website_url, (SELECT website_url FROM app.tenants
+                                            WHERE id = l.tenant_id)) AS website_url,
                    coalesce(
                        (SELECT c.email FROM app.contact_emails c
                         WHERE c.tenant_id = l.tenant_id AND c.location_id = l.id

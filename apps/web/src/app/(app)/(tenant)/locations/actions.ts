@@ -21,7 +21,11 @@ export async function createLocation(_state: FormState, formData: FormData): Pro
     id = unwrap(
       await api.POST("/locations", {
         params: scope,
-        body: { name: value(formData, "name"), address: value(formData, "address") },
+        body: {
+          name: value(formData, "name"),
+          address: value(formData, "address"),
+          website_url: value(formData, "website_url").trim() || null,
+        },
       }),
     ).id;
   } catch (error) {
@@ -44,6 +48,7 @@ export async function updateLocation(
         body: {
           name: value(formData, "name"),
           address: value(formData, "address"),
+          website_url: value(formData, "website_url").trim() || null,
           active: formData.get("active") === "on",
           ...(formData.has("kind") ? { kind: value(formData, "kind") || null } : {}),
         },
@@ -153,6 +158,7 @@ export async function addBranch(_state: FormState, formData: FormData): Promise<
         body: {
           name: value(formData, "name"),
           address: value(formData, "address"),
+          website_url: value(formData, "website_url").trim() || null,
           kind: value(formData, "kind") || null,
           copy_hours_from: copyFrom === "" ? null : copyFrom,
           staff_user_ids: formData.getAll("staff_user_ids").map(String),
