@@ -62,6 +62,8 @@ def test_leads_board_is_paged_with_whole_board_counts(
 # nature (services, branches, plans), or rows of one person. A new list endpoint either takes
 # `limit` (see app/api/pagination.py) or is added here with its reason.
 BOUNDED = {
+    # the console's unpaid-invoice list: the function returns at most 500 businesses
+    "/platform/billing/overdue": "capped",
     # a required date window of at most 42 days
     "/sessions": "window",
     "/client/sessions": "window",

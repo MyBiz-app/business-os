@@ -193,7 +193,8 @@ def upgrade() -> None:
             FROM app.platform_invoices i JOIN app.tenants t ON t.id = i.tenant_id
             WHERE i.status = 'open' AND t.closed_at IS NULL
             GROUP BY t.id, t.name, i.currency, t.billing_state, t.billing_grace_until
-            ORDER BY min(i.issued_at);
+            ORDER BY min(i.issued_at)
+            LIMIT 500;
         END
         $$
     """)
