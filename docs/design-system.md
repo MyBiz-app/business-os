@@ -95,6 +95,13 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   `text-red-600`...) in `src/**`. Use tokens. Allowed only in the allow-list in `eslint.config.mjs`
   (each entry has a reason: color math, swatches, logos, product mock-ups, the hero band). Add a
   file there only for content whose color *is* the content.
+- `design-system/no-scroll-jump`: a `Link` that only changes the query of its own page (period, month,
+  page number, filter), or whose address a page file builds with a function, needs `scroll={false}`
+  (or an explicit `scroll={true}` when the jump to the top is meant); `router.push/replace` to the
+  current page passes `{ scroll: false }`. Choices that change what a page shows use
+  `LinkSegmented` (`components/ui/link-segmented.tsx`): the pill slides at once, the page stays
+  put and dots show while the data loads. Heavy pages have a `loading.tsx` built from
+  `components/layout/page-skeletons.tsx` at the page's own `Container` width.
 - `design-system/no-raw-button`: a `<button>` needs `btn-primary`, `btn-secondary`, `btn-ghost`,
   `btn-danger`, `btn-link`, `btn-icon`, `btn-plain` or `control` in its `className`.
 

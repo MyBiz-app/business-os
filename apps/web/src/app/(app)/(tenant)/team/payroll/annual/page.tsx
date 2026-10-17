@@ -35,11 +35,11 @@ export default async function AnnualPayrollPage({ searchParams }: PageProps<"/te
       <BackLink href="/team/payroll" label={t("back")} />
       <PageHeader title={t("title")} description={t("subtitle")} />
       <nav aria-label={t("yearNav")} className="flex flex-wrap items-center gap-3">
-        <Link href={`/team/payroll/annual?year=${year - 1}`} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={`/team/payroll/annual?year=${year - 1}`} className="btn-secondary px-3 py-2 text-sm">
           {t("previous")}
         </Link>
         <h2 className="text-lg font-semibold tabular-nums">{year}</h2>
-        <Link href={`/team/payroll/annual?year=${year + 1}`} className="btn-secondary px-3 py-2 text-sm">
+        <Link scroll={false} href={`/team/payroll/annual?year=${year + 1}`} className="btn-secondary px-3 py-2 text-sm">
           {t("next")}
         </Link>
         <a href={`/team/payroll/annual/export?year=${year}&format=xlsx`} download className="btn-secondary ms-auto px-3 py-2 text-sm">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Ltr } from "@/components/bidi";
 import { EmptyState } from "@/components/empty-state";
 import { Container } from "@/components/layout/container";
+import { LinkSegmented } from "@/components/ui/link-segmented";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pill } from "@/components/pill";
 import { unwrap } from "@/lib/api";
@@ -16,6 +17,7 @@ import { getTenantFor } from "@/lib/tenant";
  * kind gets next. */
 export default async function InvoicesPage({ searchParams }: PageProps<"/invoices">) {
   const t = await getTranslations("invoices");
+  const tc = await getTranslations("common");
   const locale = await getLocale();
   const { tenant, api, scope } = await getTenantFor("sales.manage");
   const raw = (await searchParams).kind;
@@ -42,18 +44,13 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
           </Link>
         }
       />
-      <nav aria-label={t("filter")} className="flex flex-wrap gap-2">
-        {[undefined, ...DOCUMENT_KINDS].map((k) => (
-          <Link
-            key={k ?? "all"}
-            href={k ? `/invoices?kind=${k}` : "/invoices"}
-            aria-current={k === filter ? "page" : undefined}
-            className={`rounded-full border px-3 py-1 text-sm ${k === filter ? "border-primary bg-primary text-on-primary" : "border-border bg-surface"}`}
-          >
-            {k ? t(`kinds.${k}`) : t("all")}
-          </Link>
-        ))}
-      </nav>
+      <LinkSegmented
+        variant="chips"
+        label={t("filter")}
+        loadingLabel={tc("loading")}
+        active={filter ?? "all"}
+        options={[undefined, ...DOCUMENT_KINDS].map((k) => ({ key: k ?? "all", label: k ? t(`kinds.${k}`) : t("all"), href: k ? `/invoices?kind=${k}` : "/invoices" }))}
+      />
       {documents.length === 0 ? (
         <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (

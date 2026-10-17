@@ -78,8 +78,8 @@ export default async function PlatformAuditPage({ searchParams }: PageProps<"/pl
       )}
       {(page > 1 || entries.length === PAGE_SIZE) && (
         <nav aria-label={t("audit.title")} className="flex items-center justify-between text-sm">
-          {page > 1 ? <Link href={`/platform/audit?page=${page - 1}`} className="text-primary-ink">{t("audit.previous")}</Link> : <span />}
-          {entries.length === PAGE_SIZE ? <Link href={`/platform/audit?page=${page + 1}`} className="text-primary-ink">{t("audit.next")}</Link> : <span />}
+          {page > 1 ? <Link scroll={false} href={`/platform/audit?page=${page - 1}`} className="text-primary-ink">{t("audit.previous")}</Link> : <span />}
+          {entries.length === PAGE_SIZE ? <Link scroll={false} href={`/platform/audit?page=${page + 1}`} className="text-primary-ink">{t("audit.next")}</Link> : <span />}
         </nav>
       )}
     </Container>

@@ -324,7 +324,7 @@ export function TimeGrid({ days, timeZone, locale, events, shifts, gaps = [], la
                       const className = "absolute z-[1] flex items-start justify-center rounded-lg border border-dashed border-border bg-surface pt-1 text-xs font-semibold text-muted";
                       const text = labels.more.replace("{count}", String(block.count));
                       return dayHref ? (
-                        <Link key={block.id} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary-ink`} style={style}>
+                        <Link key={block.id} scroll={false} href={dayHref.replace("__day__", day)} className={`${className} hover:border-primary hover:text-primary-ink`} style={style}>
                           {text}
                         </Link>
                       ) : (

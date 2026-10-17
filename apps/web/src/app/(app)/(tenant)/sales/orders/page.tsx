@@ -71,7 +71,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/sales/ord
           </ScrollRegion>
           <p className="text-sm text-muted">{t("orders.showing", { shown: items.length, total })}</p>
           {total > items.length && shown < MAX && (
-            <Link href={`/sales/orders?shown=${shown + STEP}`} className="btn-secondary self-start px-4 py-2 text-sm">
+            <Link scroll={false} href={`/sales/orders?shown=${shown + STEP}`} className="btn-secondary self-start px-4 py-2 text-sm">
               {t("orders.more")}
             </Link>
           )}
