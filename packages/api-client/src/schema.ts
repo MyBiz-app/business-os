@@ -838,6 +838,170 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/payroll/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Payroll Runs
+         * @description The last two years of runs, newest first (everyone's lines add up here).
+         */
+        get: operations["list_payroll_runs"];
+        put?: never;
+        /**
+         * Create Payroll Run
+         * @description Starts the month's run (once) and works out everyone's lines.
+         */
+        post: operations["create_payroll_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Payroll Run */
+        get: operations["get_payroll_run"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Payroll Run
+         * @description Works the lines out again from the latest hours, components and one-off amounts.
+         */
+        post: operations["refresh_payroll_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/lines/{user_id}/typed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Type Payroll Amount
+         * @description Types in the amount of a component for this month (counted "by month", or without an
+         *     automatic rate yet). Only for the person's own active components.
+         */
+        put: operations["type_payroll_amount"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/lines/{user_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Acknowledge Payroll Warning
+         * @description Marks a warning as seen and accepted (errors cannot be acknowledged: they must be fixed).
+         */
+        post: operations["acknowledge_payroll_warning"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Move Payroll Stage
+         * @description Moves the run one stage forward (checked) or back (until it is approved). Approving is for
+         *     the owner only and locks the month.
+         */
+        post: operations["move_payroll_stage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/accountant-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Payroll Accountant Check
+         * @description The owner records that an accountant checked the approved run; payslips stop being drafts.
+         */
+        post: operations["payroll_accountant_check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/payroll/runs/{period}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Payroll Run
+         * @description The month for the accountant: a neutral table, a row per person (payslips marked draft until
+         *     an accountant checks the run).
+         */
+        get: operations["export_payroll_run"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dependents/settings": {
         parameters: {
             query?: never;
@@ -7312,6 +7476,16 @@ export interface components {
              */
             tenant_id: string;
         };
+        /** Acknowledge */
+        Acknowledge: {
+            /** Key */
+            key: string;
+            /**
+             * Acknowledged
+             * @default true
+             */
+            acknowledged: boolean;
+        };
         /** Activity */
         Activity: {
             /**
@@ -10954,42 +11128,6 @@ export interface components {
              */
             location_id: string | null;
         };
-        /**
-         * Hours
-         * @description Hours worked, by pay rate (see `app.schedule.time_clock.Breakdown`).
-         */
-        Hours: {
-            /**
-             * Total
-             * @default 0
-             */
-            total: number;
-            /**
-             * Regular
-             * @default 0
-             */
-            regular: number;
-            /**
-             * Tier1
-             * @default 0
-             */
-            tier1: number;
-            /**
-             * Tier2
-             * @default 0
-             */
-            tier2: number;
-            /**
-             * Rest Day
-             * @default 0
-             */
-            rest_day: number;
-            /**
-             * Weighted
-             * @default 0
-             */
-            weighted: number;
-        };
         /** HoursBlock */
         HoursBlock: {
             /**
@@ -13016,7 +13154,7 @@ export interface components {
             approved: boolean;
             /** Planned Hours */
             planned_hours: number;
-            worked: components["schemas"]["Hours"];
+            worked: components["schemas"]["app__api__time_clock__Hours"];
             /** Days */
             days: {
                 [key: string]: number;
@@ -13035,7 +13173,7 @@ export interface components {
             user_name: string;
             /** Planned Hours */
             planned_hours: number;
-            worked: components["schemas"]["Hours"];
+            worked: components["schemas"]["app__api__time_clock__Hours"];
             /**
              * Missing Shifts
              * @description Past shifts with no clocked time
@@ -14583,6 +14721,35 @@ export interface components {
              */
             rest_weekday: number;
         };
+        /** Run */
+        Run: {
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "hours" | "additions" | "review" | "approved";
+            /** Currency */
+            currency: string;
+            /**
+             * Payslips Draft
+             * @description Payslips stay drafts until an accountant has checked the run
+             */
+            payslips_draft: boolean;
+            /** Approved At */
+            approved_at: string | null;
+            /** Accountant Checked At */
+            accountant_checked_at: string | null;
+            summary: components["schemas"]["RunSummary"];
+            /** Notes */
+            notes: components["schemas"]["RunNote"][];
+            /** Lines */
+            lines: components["schemas"]["RunLine"][];
+        };
         /** RunCard */
         RunCard: {
             /** Id */
@@ -14609,6 +14776,152 @@ export interface components {
             conversation_id: string | null;
             /** Pending Action Ids */
             pending_action_ids: string[];
+        };
+        /** RunCreate */
+        RunCreate: {
+            /**
+             * Period
+             * @description YYYY-MM
+             */
+            period: string;
+        };
+        /** RunItem */
+        RunItem: {
+            /**
+             * Section
+             * @enum {string}
+             */
+            section: "base" | "overtime" | "component" | "adjustment" | "deduction";
+            /** Code */
+            code: string;
+            /** Label */
+            label: string;
+            /** Amount Minor */
+            amount_minor: number;
+            /** Quantity */
+            quantity?: string | null;
+            /** Unit Minor */
+            unit_minor?: number | null;
+            /** Percent */
+            percent?: number | null;
+            /** Source */
+            source?: string | null;
+            /** Taxable */
+            taxable: boolean;
+            /** Social Security Liable */
+            social_security_liable: boolean;
+            /** Pension Base */
+            pension_base: boolean;
+        };
+        /** RunLine */
+        RunLine: {
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Full Name */
+            full_name: string | null;
+            /** Employment Type */
+            employment_type: string;
+            hours: components["schemas"]["app__api__payroll_runs__Hours"];
+            /** Work Days */
+            work_days: number;
+            /** Base Minor */
+            base_minor: number;
+            /** Overtime Minor */
+            overtime_minor: number;
+            /** Components Minor */
+            components_minor: number;
+            /** Adjustments Minor */
+            adjustments_minor: number;
+            /** Deductions Minor */
+            deductions_minor: number;
+            /** Gross Minor */
+            gross_minor: number;
+            /** Taxable Minor */
+            taxable_minor: number;
+            /** Social Security Minor */
+            social_security_minor: number;
+            /** Pension Base Minor */
+            pension_base_minor: number;
+            /** Items */
+            items: components["schemas"]["RunItem"][];
+            /** Warnings */
+            warnings: components["schemas"]["RunWarning"][];
+            /**
+             * Typed
+             * @description Amounts typed in for this month, by component
+             */
+            typed: {
+                [key: string]: number;
+            };
+            /**
+             * Ready
+             * @description No error and every warning acknowledged
+             */
+            ready: boolean;
+        };
+        /** RunNote */
+        RunNote: {
+            /** Code */
+            code: string;
+            /** Names */
+            names: string[];
+        };
+        /** RunRow */
+        RunRow: {
+            /**
+             * Period
+             * Format: date
+             */
+            period: string;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "hours" | "additions" | "review" | "approved";
+            /** Gross Minor */
+            gross_minor: number;
+            /** People */
+            people: number;
+        };
+        /** RunSummary */
+        RunSummary: {
+            /** People */
+            people: number;
+            /** Gross Minor */
+            gross_minor: number;
+            /** Deductions Minor */
+            deductions_minor: number;
+            /** Previous Gross Minor */
+            previous_gross_minor: number | null;
+            /** Open Errors */
+            open_errors: number;
+            /** Open Warnings */
+            open_warnings: number;
+        };
+        /** RunWarning */
+        RunWarning: {
+            /**
+             * Key
+             * @description `code`, or `code:ref` when it concerns one component
+             */
+            key: string;
+            /** Code */
+            code: string;
+            /** Ref */
+            ref?: string | null;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "error" | "warning";
+            /**
+             * Acknowledged
+             * @default false
+             */
+            acknowledged: boolean;
         };
         /** Sale */
         Sale: {
@@ -15580,6 +15893,14 @@ export interface components {
              */
             disabled: boolean;
         };
+        /** StageBody */
+        StageBody: {
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "hours" | "additions" | "review" | "approved";
+        };
         /** StageChange */
         StageChange: {
             /**
@@ -16511,6 +16832,19 @@ export interface components {
             /** Offer Id */
             offer_id: string | null;
         };
+        /** TypedAmount */
+        TypedAmount: {
+            /**
+             * Component Id
+             * Format: uuid
+             */
+            component_id: string;
+            /**
+             * Amount Minor
+             * @description The amount for this month; null takes the typed amount away
+             */
+            amount_minor: number | null;
+        };
         /** UsagePoint */
         UsagePoint: {
             /**
@@ -16856,6 +17190,34 @@ export interface components {
             /** Approve */
             approve: boolean;
         };
+        /** Hours */
+        app__api__payroll_runs__Hours: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Regular
+             * @default 0
+             */
+            regular: number;
+            /**
+             * Tier1
+             * @default 0
+             */
+            tier1: number;
+            /**
+             * Tier2
+             * @default 0
+             */
+            tier2: number;
+            /**
+             * Rest Day
+             * @default 0
+             */
+            rest_day: number;
+        };
         /** Turn */
         app__api__platform_ai__Turn: {
             /**
@@ -16905,6 +17267,42 @@ export interface components {
             members: components["schemas"]["Member"][];
             /** Invitations */
             invitations: components["schemas"]["Invitation"][];
+        };
+        /**
+         * Hours
+         * @description Hours worked, by pay rate (see `app.schedule.time_clock.Breakdown`).
+         */
+        app__api__time_clock__Hours: {
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Regular
+             * @default 0
+             */
+            regular: number;
+            /**
+             * Tier1
+             * @default 0
+             */
+            tier1: number;
+            /**
+             * Tier2
+             * @default 0
+             */
+            tier2: number;
+            /**
+             * Rest Day
+             * @default 0
+             */
+            rest_day: number;
+            /**
+             * Weighted
+             * @default 0
+             */
+            weighted: number;
         };
         /** Decision */
         app__api__time_off_requests__Decision: {
@@ -19179,6 +19577,335 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_payroll_runs: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_payroll_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_payroll_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    refresh_payroll_run: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    type_payroll_amount: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TypedAmount"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    acknowledge_payroll_warning: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Acknowledge"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    move_payroll_stage: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StageBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Run"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    payroll_accountant_check: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_payroll_run: {
+        parameters: {
+            query?: {
+                format?: "csv" | "xlsx";
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                period: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
             };
             /** @description Validation Error */
             422: {

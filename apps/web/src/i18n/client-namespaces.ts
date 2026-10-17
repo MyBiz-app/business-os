@@ -61,6 +61,7 @@ export const CLIENT_NAMESPACES: Record<"root" | "marketing" | "auth" | "app" | "
     "onboarding",
     "organization",
     "payBonuses",
+    "payRun",
     "payroll",
     "permissions",
     "plans",
