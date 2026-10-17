@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 from app.api.deps import SessionDep, UserDep
 from app.api.routes import ensure_profile
-from app.legal.documents import VERSIONS, pending_documents, record_acceptance
+from app.legal.documents import pending_documents, record_acceptance
 
 router = APIRouter(tags=["legal"])
 
@@ -19,12 +19,6 @@ class AcceptRequest(BaseModel):
     documents: dict[str, str] = Field(
         min_length=1, description="Document -> the version being accepted (must be the current)"
     )
-
-
-@router.get("/legal/versions")
-def current_versions() -> dict[str, str]:
-    """The current version of every legal document (public)."""
-    return VERSIONS
 
 
 @router.get("/me/legal")

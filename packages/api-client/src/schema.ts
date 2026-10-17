@@ -53,7 +53,8 @@ export interface paths {
         get: operations["get_me"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete My Account */
+        delete: operations["delete_my_account"];
         options?: never;
         head?: never;
         /**
@@ -2244,6 +2245,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/tenants/current/data-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Exports */
+        get: operations["list_exports"];
+        put?: never;
+        /**
+         * Request Export
+         * @description Starts building the ZIP. One at a time; ask again once it is ready or has failed.
+         */
+        post: operations["request_export"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/tenants/current/data-exports/{export_id}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * New Link
+         * @description A fresh 24-hour link for a ready export (the emailed one may have expired).
+         */
+        post: operations["new_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/leads": {
         parameters: {
             query?: never;
@@ -2834,26 +2876,6 @@ export interface paths {
         patch: operations["update_service"];
         trace?: never;
     };
-    "/legal/versions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Current Versions
-         * @description The current version of every legal document (public).
-         */
-        get: operations["current_versions"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/me/legal": {
         parameters: {
             query?: never;
@@ -2964,6 +2986,23 @@ export interface paths {
         put?: never;
         /** Resend Confirmation */
         post: operations["resend_confirmation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/data-exports/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download Export */
+        get: operations["download_export"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -10628,6 +10667,30 @@ export interface components {
             /** Members */
             members: number;
         };
+        /** DataExport */
+        DataExport: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Status
+             * @description building, ready or failed
+             */
+            status: string;
+            /** Created At */
+            created_at: string;
+            /**
+             * Expires At
+             * @description After this the file is deleted
+             */
+            expires_at: string | null;
+            /** Size */
+            size: number | null;
+            /** File Count */
+            file_count: number | null;
+        };
         /** Declaration */
         Declaration: {
             /**
@@ -10696,6 +10759,14 @@ export interface components {
              * @constant
              */
             accept: true;
+        };
+        /** DeleteAccountRequest */
+        DeleteAccountRequest: {
+            /**
+             * Confirm
+             * @description Must be true: deleting cannot be undone
+             */
+            confirm: boolean;
         };
         /** DeliveryStats */
         DeliveryStats: {
@@ -11235,6 +11306,14 @@ export interface components {
             cancelled_bookings: number;
             /** Removed Health Declarations */
             removed_health_declarations: number;
+        };
+        /** ExportLink */
+        ExportLink: {
+            /**
+             * Url
+             * @description Downloads the ZIP without signing in, for 24 hours
+             */
+            url: string;
         };
         /** FileLink */
         FileLink: {
@@ -18252,6 +18331,37 @@ export interface operations {
             };
         };
     };
+    delete_my_account: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteAccountRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     update_me: {
         parameters: {
             query?: never;
@@ -23743,6 +23853,107 @@ export interface operations {
             };
         };
     };
+    list_exports: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExport"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_export: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataExport"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    new_link: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                export_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExportLink"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_leads: {
         parameters: {
             query?: {
@@ -25258,28 +25469,6 @@ export interface operations {
             };
         };
     };
-    current_versions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        [key: string]: string;
-                    };
-                };
-            };
-        };
-    };
     my_pending_documents: {
         parameters: {
             query?: never;
@@ -25614,6 +25803,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ContactEmails"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
