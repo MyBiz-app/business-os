@@ -7763,7 +7763,10 @@
       "cannot_acknowledge": "An error has to be fixed, it can't be acknowledged.",
       "period_in_future": "This month is too far ahead.",
       "invalid": "Check the details.",
-      "generic": "Something went wrong. Try again."
+      "generic": "Something went wrong. Try again.",
+      "nothing_to_correct": "The lines add up to nothing. Enter an amount that changes the pay.",
+      "negative_net": "This would make the net pay negative. Recover the amount with a deduction in the next run instead.",
+      "run_not_approved": "Only an approved month can be corrected."
     },
     "bankFile": {
       "title": "Bank transfer file",
@@ -7774,6 +7777,46 @@
       "payDate": "Payment date",
       "submit": "Create the bank file",
       "problem": "The file could not be created. Check that every employee has an ID number and a bank account."
+    },
+    "corrections": {
+      "title": "Corrective payslips",
+      "hint": "An approved month is locked. A correction adds a new numbered payslip with the difference to pay (or to recover). It stays marked as a draft for your accountant.",
+      "none": "No corrections for this month.",
+      "version": "Correction {version}",
+      "difference": "Difference: {amount}",
+      "reason": "Reason",
+      "lineLabel": "What changes",
+      "amount": "Amount",
+      "add": "Adds to pay",
+      "deduct": "Takes from pay",
+      "addLine": "Add a line",
+      "removeLine": "Remove the line",
+      "submit": "Issue the corrective payslip",
+      "download": "Payslip, correction {version} (PDF)",
+      "original": "Original payslip (PDF)"
+    },
+    "annual": {
+      "link": "Yearly summary",
+      "title": "Yearly payroll summary",
+      "subtitle": "Each person's approved months of the tax year, the data behind Form 106. Your accountant files the form.",
+      "back": "Payroll run",
+      "previous": "Previous year",
+      "next": "Next year",
+      "yearNav": "Year",
+      "empty": "No approved months in this year yet.",
+      "draft": "Some months are not yet checked by an accountant, or include corrections.",
+      "person": "Person",
+      "months": "Months",
+      "gross": "Gross",
+      "tax": "Income tax",
+      "ni": "National insurance",
+      "health": "Health tax",
+      "pension": "Pension",
+      "net": "Net",
+      "employer": "Employer contributions",
+      "corrected": "{count} corrected",
+      "exportXlsx": "Export to Excel",
+      "exportCsv": "Export CSV"
     }
   },
   "invoices": {

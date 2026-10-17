@@ -268,7 +268,7 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - A correction that would make the net negative is refused (recover it with a deduction in the next run instead).
 - The yearly summary per person is the data behind Form 106 (the latest correction of a month replaces its original). Filing 106, 102 and 126 stays with the accountant.
 - Deferred: leave balances on the payslip (the product has no leave ledger or accrual rules yet; it needs its own slice with the work-days-per-week and seniority rules from spec 3.9) and the pension tax credit (not in the spec; the accountant applies it).
-- Web screen for issuing corrections is not built yet; the API is complete and tested.
+- Web: corrections are issued from the payslip sheet of an approved month (owner only) and the yearly summary is its own page under Team > Payroll.
 
 ## Open
 
