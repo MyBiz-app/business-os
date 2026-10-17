@@ -43,6 +43,9 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     })();
     // Not awaited here: calling Supabase from inside this callback would wait on its own lock.
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      // A new session counts as still loading until the code-step check has answered; otherwise
+      // the gate sees "no session" for a moment right after sign-in and sends the person back.
+      setState((current) => (session && !current.session ? { session, loading: true, mfaPending: false } : current));
       setTimeout(() => void apply(session), 0);
     });
     return () => data.subscription.unsubscribe();
