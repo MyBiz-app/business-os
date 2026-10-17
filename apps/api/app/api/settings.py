@@ -12,6 +12,7 @@ from app.api.common import not_found, set_clause
 from app.api.deps import AnonymousSessionDep, TenantContext, TenantDep, require
 from app.api.routes import load_current_tenant
 from app.api.schemas import Tenant, TenantUpdate
+from app.core.audit import record
 from app.core.identity import check_digit_valid
 from app.core.legal_readiness import Readiness, evaluate
 from app.core.permissions import Permission
@@ -97,6 +98,22 @@ def update_tenant(body: TenantUpdate, context: SettingsDep) -> Tenant:
         text(f"UPDATE app.tenants SET {assignments} WHERE id = app.current_tenant_id()"),
         changes,
     )
+    # The names of what changed, never the values (an address, a business number).
+    record(
+        context.session,
+        "tenant.updated",
+        entity_type="tenant",
+        entity_id=context.tenant_id,
+        fields=sorted(changes),
+    )
+    if "require_mfa_for_staff" in changes:
+        record(
+            context.session,
+            "mfa.team_requirement_set",
+            entity_type="tenant",
+            entity_id=context.tenant_id,
+            required=changes["require_mfa_for_staff"],
+        )
     return load_current_tenant(context.session)
 
 

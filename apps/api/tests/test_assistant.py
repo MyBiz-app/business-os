@@ -168,7 +168,9 @@ def test_booking_is_proposed_then_confirmed_once(
     again = client.post(f"/ai/pending-actions/{card['id']}/confirm", headers=headers)
     assert again.status_code == 409
     with engine.connect() as connection:
-        audit = connection.execute(text("SELECT actor_type, action FROM app.audit_log")).all()
+        audit = connection.execute(
+            text("SELECT actor_type, action FROM app.audit_log WHERE actor_type = 'ai'")
+        ).all()
     assert audit == [("ai", "assistant.book_client")]
 
 
@@ -430,7 +432,10 @@ def test_time_and_billing_tools_in_businesses_that_bill_by_time(
     assert done["status"] == "executed" and len(done["result"]["bills"]) == 1
     with engine.connect() as connection:
         audit = connection.execute(
-            text("SELECT action, entity_type FROM app.audit_log ORDER BY id")
+            text(
+                "SELECT action, entity_type FROM app.audit_log"
+                " WHERE action LIKE 'assistant.%' ORDER BY id"
+            )
         ).all()
     assert audit == [
         ("assistant.log_time", "time_entry"),

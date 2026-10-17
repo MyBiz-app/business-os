@@ -3405,6 +3405,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/me/devices/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Security Event
+         * @description The web app reports that the person turned two-step sign-in on or off, so the businesses
+         *     they work for can see it in their audit log.
+         */
+        post: operations["security_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/me/devices": {
         parameters: {
             query?: never;
@@ -5008,6 +5029,60 @@ export interface paths {
          * @description Books a client into a free time with a staff member (staff may book without a plan).
          */
         post: operations["book_appointment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Audit Log */
+        get: operations["list_audit_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit-log/kinds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Kinds */
+        get: operations["list_kinds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/audit-log/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Export Audit Log
+         * @description The filtered log as CSV (the latest 10,000 entries). The export is itself logged.
+         */
+        get: operations["export_audit_log"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -8467,6 +8542,46 @@ export interface components {
             details: {
                 [key: string]: unknown;
             };
+        };
+        /** AuditLogEntry */
+        AuditLogEntry: {
+            /** Id */
+            id: number;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Actor Type */
+            actor_type: string;
+            /** Actor Id */
+            actor_id: string | null;
+            /** Actor Name */
+            actor_name: string | null;
+            /** Actor Email */
+            actor_email: string | null;
+            /** Action */
+            action: string;
+            /** Category */
+            category: string;
+            /** Entity Type */
+            entity_type: string | null;
+            /** Entity Id */
+            entity_id: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+        };
+        /** AuditLogPage */
+        AuditLogPage: {
+            /** Entries */
+            entries: components["schemas"]["AuditLogEntry"][];
+            /**
+             * Next Cursor
+             * @description Pass as `cursor` for the next (older) page
+             */
+            next_cursor: string | null;
         };
         /**
          * Availability
@@ -15978,6 +16093,14 @@ export interface components {
              * @default 0
              */
             travel_minutes: number;
+        };
+        /** SecurityEventBody */
+        SecurityEventBody: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "mfa_enabled" | "mfa_disabled";
         };
         /** SecurityPolicy */
         SecurityPolicy: {
@@ -26930,6 +27053,37 @@ export interface operations {
             };
         };
     };
+    security_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SecurityEventBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_devices: {
         parameters: {
             query?: never;
@@ -30664,6 +30818,126 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Booking"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_log: {
+        parameters: {
+            query?: {
+                /** @description From a previous page */
+                cursor?: string | null;
+                limit?: number;
+                /** @description Only this person's actions */
+                actor_id?: string | null;
+                /** @description One of the kinds, see /audit-log/kinds */
+                category?: string | null;
+                /** @description From this day (business time) */
+                date_from?: string | null;
+                /** @description Up to and including this day */
+                date_to?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditLogPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_kinds: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_audit_log: {
+        parameters: {
+            query?: {
+                /** @description Only this person's actions */
+                actor_id?: string | null;
+                /** @description One of the kinds, see /audit-log/kinds */
+                category?: string | null;
+                /** @description From this day (business time) */
+                date_from?: string | null;
+                /** @description Up to and including this day */
+                date_to?: string | null;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */

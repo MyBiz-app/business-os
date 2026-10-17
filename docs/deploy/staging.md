@@ -1,7 +1,7 @@
 # Staging deployment
 
 - Web: https://business-os-alpha-drab.vercel.app, also https://mybizapp.click (temporary domain bought 2026-10-16, no auto-renew; replaced by the brand domain at launch)
-- API: https://business-os-api-staging.onrender.com (`/health`, `/docs`)
+- API: https://business-os-api-staging.onrender.com (`/health`, `/health/ready`, `/docs`)
 - Expo apps on the web: https://mybiz-client-app.vercel.app (published by hand with [`deploy-apps-web.yml`](../../.github/workflows/deploy-apps-web.yml); it is in the API's `API_CORS_ORIGINS`). The old mybiz-business-app and mybiz-staff-app addresses only redirect to it
 
 | Part | Provider | Deploys from | Config |
@@ -10,7 +10,7 @@
 | Client app on the web (`apps/client-app`) | Vercel, static site | `main` | [`apps/client-app/vercel.json`](../../apps/client-app/vercel.json), [`apps/client-app/README.md`](../../apps/client-app/README.md) |
 | API (`apps/api`) | Render, Frankfurt, free plan | `main` | [`render.yaml`](../../render.yaml) |
 | Database + Auth | Supabase, Central EU (Frankfurt) | - | Supabase dashboard |
-| Migrations | The API container on start (`alembic upgrade head` before uvicorn), and GitHub Actions | Every deploy; `main` (when migrations change) or by hand | [`Dockerfile`](../../apps/api/Dockerfile), [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
+| Migrations | The API container on start (`RUN_MIGRATIONS_ON_START=true` in `render.yaml`; production runs them as a Render pre-deploy step instead), and GitHub Actions | Every deploy; `main` (when migrations change) or by hand | [`Dockerfile`](../../apps/api/Dockerfile), [`migrate-staging.yml`](../../.github/workflows/migrate-staging.yml) |
 | Demo data | GitHub Actions, by hand | - | [`seed-staging.yml`](../../.github/workflows/seed-staging.yml) |
 
 All server-side parts run in Frankfurt: every page load makes several web → API → database

@@ -1,0 +1,83 @@
+name: Deploy web to production
+
+# PRODUCTION website release. Built as code and kept OFF until production is approved
+# (docs/deploy/production.md). It runs only from a release tag (v1.2.3) pushed on main, or by
+# hand with a tag name; the GitHub environment `production` requires a manual approval and holds
+# its own secrets. Nothing in this workflow reads or needs the database: the production owner
+# connection string lives only on Render (docs/deploy/production.md, "Who can reach what").
+# The release and rollback steps (GL16) hook in at the marked places.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to deploy (for example v1.0.0)"
+        required: true
+
+concurrency:
+  group: deploy-web-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy to production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Required reviewers and the production secrets are set on this environment in GitHub.
+    environment: production
+    env:
+      RELEASE_TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      VERCEL_CLI: vercel@59.26.0
+      # Not secrets: they only name the production Vercel team and project (repository variables
+      # set when production is created).
+      VERCEL_ORG_ID: ${{ vars.PRODUCTION_VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.PRODUCTION_VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+
+      # A release is always something that is already on main.
+      - name: Check the tag is on main
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "$(git rev-parse HEAD)" origin/main; then
+            echo "::error::Tag $RELEASE_TAG is not on main; releases are cut from main only."
+            exit 1
+          fi
+
+      - name: Check the production settings
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::$name is not set (Settings > Environments > production, and repository variables)."
+              exit 1
+            fi
+          done
+
+      # GL16 hook: record the release (tag and commit) here, before the deploy starts.
+
+      # Vercel builds it: the project's environment variables are "sensitive", so they can't be
+      # pulled to this runner, only read by Vercel's own build.
+      - name: Upload, build and deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes "$VERCEL_CLI" deploy --prod --token="$VERCEL_TOKEN"
+
+      # Optional: when the Render deploy hook secret is set, release the same tag's API too.
+      - name: Release the API on Render
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "No RENDER_DEPLOY_HOOK_URL: release the API from the Render dashboard."
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST "${RENDER_DEPLOY_HOOK_URL}&ref=$(git rev-parse HEAD)" > /dev/null
+          echo "Render deploy started for $RELEASE_TAG."
+
+      # GL16 hook: health check after the deploy and automatic rollback go here.
