@@ -179,6 +179,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
         <a href={`/team/payroll/export?month=${month}&format=csv`} download className="btn-ghost px-3 py-2 text-sm">
           {t("actions.exportCsv")}
         </a>
+        {stage === "approved" && canApprove && <BankFileForm month={month} />}
         {stage === "approved" && canApprove && run.payslips_draft && (
           <button type="button" className="btn-secondary px-3 py-2 text-sm" disabled={pending} onClick={() => act(() => markAccountantChecked(month))}>
             {t("accountantMark")}
@@ -273,6 +274,41 @@ function itemLabel(t: ReturnType<typeof useTranslations>, item: Item): string {
 }
 
 /** The side sheet: where one person's gross comes from, line by line. */
+/** The owner creates the Masav file of an approved month; it is only downloaded, never sent. */
+function BankFileForm({ month }: { month: string }) {
+  const t = useTranslations("payRun.bankFile");
+  const id = useId();
+  const field = "w-full rounded-md border border-border bg-surface px-3 py-2 text-sm";
+  return (
+    <details className="card w-full p-3">
+      <summary className="cursor-pointer text-sm font-semibold">{t("title")}</summary>
+      <form method="post" action="/team/payroll/bank-file" className="mt-3 grid gap-3 sm:grid-cols-2">
+        <p className="text-sm text-muted sm:col-span-2">{t("hint")}</p>
+        <input type="hidden" name="month" value={month} />
+        <label htmlFor={`${id}-inst`} className="flex flex-col gap-1 text-sm">
+          {t("institutionCode")}
+          <input id={`${id}-inst`} name="institution_code" required inputMode="numeric" pattern="\d{1,8}" dir="ltr" className={field} />
+        </label>
+        <label htmlFor={`${id}-send`} className="flex flex-col gap-1 text-sm">
+          {t("sendingCode")}
+          <input id={`${id}-send`} name="sending_code" required inputMode="numeric" pattern="\d{1,5}" dir="ltr" className={field} />
+        </label>
+        <label htmlFor={`${id}-name`} className="flex flex-col gap-1 text-sm">
+          {t("institutionName")}
+          <input id={`${id}-name`} name="institution_name" required maxLength={30} className={field} />
+        </label>
+        <label htmlFor={`${id}-date`} className="flex flex-col gap-1 text-sm">
+          {t("payDate")}
+          <input id={`${id}-date`} name="pay_date" type="date" required className={field} />
+        </label>
+        <button type="submit" className="btn-secondary self-start px-3 py-2 text-sm sm:col-span-2">
+          {t("submit")}
+        </button>
+      </form>
+    </details>
+  );
+}
+
 function PaySheet({ line, month, run, locale, canManage, onClose }: { line: Line; month: string; run: Run; locale: string; canManage: boolean; onClose: () => void }) {
   const t = useTranslations("payRun");
   const dialog = useRef<HTMLDialogElement>(null);
@@ -332,6 +368,13 @@ function PaySheet({ line, month, run, locale, canManage, onClose }: { line: Line
               </li>
             ))}
           </ul>
+        )}
+
+        {run.stage === "approved" && (
+          <a href={`/team/payroll/payslip?month=${month}&user=${line.user_id}`} download className="btn-secondary self-start px-3 py-2 text-sm">
+            <Download aria-hidden="true" className="size-4" />
+            {t("actions.payslip")}
+          </a>
         )}
 
         <h3 className="text-base font-semibold">{t("sheet.why")}</h3>

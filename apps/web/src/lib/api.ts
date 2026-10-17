@@ -71,7 +71,7 @@ export async function apiUpload(path: string, file: File, tenantId: string): Pro
 export async function apiFetch(path: string, init: RequestInit, tenantId: string): Promise<Response> {
   return fetch(`${API_URL}${path}`, {
     ...init,
-    headers: { ...(await authHeaders()), ...(tenantId ? { "X-Tenant-Id": tenantId } : {}) },
+    headers: { ...(init.headers as Record<string, string> | undefined), ...(await authHeaders()), ...(tenantId ? { "X-Tenant-Id": tenantId } : {}) },
     cache: "no-store",
   });
 }
