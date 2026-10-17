@@ -9,7 +9,7 @@
 - `app.import_batch_items`: everything a batch created, so an undo removes exactly that.
 
 Revision ID: 0110
-Revises: 0104
+Revises: 0106
 Create Date: 2026-10-17
 """
 
@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0110"
-down_revision: str | None = "0104"
+down_revision: str | None = "0106"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

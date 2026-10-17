@@ -75,6 +75,8 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
 
 type MemberRowProps = {
   userId: string;
+  /** Whether the viewer may open the member's payroll file. */
+  payroll?: boolean;
   allPermissions: string[];
   permissions: string[];
   email: string;
@@ -85,14 +87,17 @@ type MemberRowProps = {
   allowOwner: boolean;
   customRoles: CustomRoleOption[];
   /** The business's active branches (a picker appears when there are several). */
-  branches: { id: string; name: string }[];
+  branches: { id: string; name: string
+  /** Whether the viewer may open the member's payroll file. */
+  payroll?: boolean;
+}[];
   memberBranches: string[];
   homeBranch?: string | null;
   avatar?: string | null;
   title?: string | null;
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions, payroll = false }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -130,6 +135,11 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
         <Link href={`/team/${userId}/hours`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("hours.link")}
         </Link>
+        {payroll && (
+          <Link href={`/team/${userId}/payroll`} className="btn-secondary px-3 py-1.5 text-sm">
+            {t("payroll.open")}
+          </Link>
+        )}
         <Link href={`/team/${userId}/availability`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("availability.link")}
         </Link>

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { avatarSrc } from "@/components/avatar";
 import { unwrap } from "@/lib/api";
-import { canManageTeam } from "@/lib/permissions";
+import { canManageTeam, canReadPayroll } from "@/lib/permissions";
 import { getBranches, getTenant } from "@/lib/tenant";
 
 import { revokeInvitation } from "./actions";
@@ -79,6 +79,7 @@ export default async function TeamPage() {
               title={member.job_title ?? null}
               allPermissions={roles.permissions}
               permissions={member.permissions}
+              payroll={canReadPayroll(tenant)}
             />
           ))}
         </ul>
