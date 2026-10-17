@@ -2,9 +2,9 @@
 
 Erasure keeps the client row (as "Deleted client") so bookings, plans and payments keep their
 history; payments, receipts, quotes and bills must be kept for accounting. It clears the
-personal fields, removes health declarations, notifications, notes, messages (and WhatsApp
-chats with the AI), addresses (and the copies on-site jobs keep), pets and children and
-documents, frees upcoming bookings and unlinks the client app account.
+personal fields, removes health declarations, notifications, notes, messages (and the chats with
+the AI, in the app and on WhatsApp), addresses (and the copies on-site jobs keep), pets and
+children and documents, frees upcoming bookings and unlinks the client app account.
 Both actions are for owners (permission `clients.privacy`) and are written to the audit log."""
 
 import json
@@ -221,6 +221,68 @@ def export_client(client_id: UUID, context: PrivacyDep) -> dict[str, Any]:
             """,
             client_id,
         ),
+        "checkouts": _rows(
+            db,
+            """
+            SELECT amount, list_amount, discount, currency, provider, status, created_at,
+                   completed_at
+            FROM app.checkouts WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "issued_documents": _rows(
+            db,
+            """
+            SELECT kind, number, issued_at, client_name, client_email, client_tax_id, currency,
+                   net, vat, total, payment_method, notes
+            FROM app.issued_documents WHERE client_id = :id ORDER BY issued_at
+            """,
+            client_id,
+        ),
+        "branches": _rows(
+            db,
+            """
+            SELECT l.name AS branch, cl.created_at FROM app.client_locations cl
+            JOIN app.locations l ON l.id = cl.location_id
+            WHERE cl.client_id = :id ORDER BY cl.created_at
+            """,
+            client_id,
+        ),
+        "friends_profile": _rows(
+            db,
+            "SELECT friend_code, visible, created_at FROM app.client_social WHERE client_id = :id",
+            client_id,
+        ),
+        "identity_documents": _rows(
+            db,
+            """
+            SELECT id_type, country, id_last4, created_at
+            FROM app.person_identities WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "retainer": _rows(
+            db,
+            """
+            SELECT monthly_amount, included_minutes, hourly_rate, currency, active
+            FROM app.retainers WHERE client_id = :id
+            """,
+            client_id,
+        ),
+        "whatsapp_offers": _rows(
+            db,
+            """
+            SELECT kind, preview, status, expires_at, decided_at, created_at
+            FROM app.whatsapp_offers WHERE client_id = :id ORDER BY created_at
+            """,
+            client_id,
+        ),
+        "announcements_received": _rows(
+            db, "SELECT * FROM app.client_announcement_deliveries(:id)", client_id
+        ),
+        "app_ai_conversations": _rows(
+            db, "SELECT * FROM app.client_app_ai_conversations(:id)", client_id
+        ),
         "health_declarations": _rows(
             db,
             """
@@ -272,6 +334,10 @@ def erase_client(client_id: UUID, body: EraseRequest, context: PrivacyDep) -> Er
         text("DELETE FROM app.health_declarations WHERE client_id = :id"), {"id": client_id}
     ).rowcount
     db.execute(text("DELETE FROM app.notifications WHERE client_id = :id"), {"id": client_id})
+    # Announcement delivery logs, the friends profile, WhatsApp offers and their chats with the
+    # in-app AI assistant (a database function: the API role can't delete in those tables).
+    db.execute(text("SELECT app.erase_client_traces(:id)"), {"id": client_id})
+    db.execute(text("DELETE FROM app.client_locations WHERE client_id = :id"), {"id": client_id})
     db.execute(text("DELETE FROM app.client_notes WHERE client_id = :id"), {"id": client_id})
     db.execute(text("DELETE FROM app.messages WHERE client_id = :id"), {"id": client_id})
     # Their WhatsApp chats with the AI, and the messages those answered.

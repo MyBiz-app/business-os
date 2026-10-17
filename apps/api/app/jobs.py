@@ -38,7 +38,7 @@ from sqlalchemy import Connection, Engine, create_engine, text
 from app.commerce.billing import bill_businesses
 from app.core.config import get_settings
 from app.core.retention import CLOSED_BUSINESS_GRACE_DAYS
-from app.files import purge_expired_files
+from app.files import forget, purge_expired_files
 from app.messaging import outbox
 from app.messaging.announcements import send_announcements as run_announcements
 from app.messaging.email import (
@@ -397,8 +397,25 @@ def purge_expired(conn: Connection, now: datetime | None = None) -> dict[str, in
         kind: conn.execute(text(sql), {"before": before(kind)}).rowcount
         for kind, sql in statements.items()
     }
+    deleted["data_exports"] = purge_expired_exports(conn)
     deleted["files"] = purge_expired_files(conn)  # e.g. the imports folder keeps files 30 days
     return deleted
+
+
+def purge_expired_exports(conn: Connection) -> int:
+    """Deletes business exports past their 24 hours, from storage too."""
+    rows = conn.execute(
+        text("DELETE FROM app.data_exports WHERE expires_at < now() RETURNING storage_key")
+    ).all()
+    _forget_keys(conn, [key for (key,) in rows if key])
+    return len(rows)
+
+
+def _forget_keys(conn: Connection, keys: list[str]) -> None:
+    storage = None
+    for key in keys:
+        storage = storage or choose(conn, None, "storage").instance
+        forget(storage, key)
 
 
 def delete_closed_businesses(
@@ -435,6 +452,19 @@ def delete_closed_businesses(
                     "closed_at": business["closed_at"],
                 },
             )
+            # The files in the storage provider are not under the tenant row, so they go first.
+            keys = conn.execute(
+                text("""
+                    SELECT storage_key FROM app.client_documents
+                        WHERE tenant_id = :id AND storage_key IS NOT NULL
+                    UNION ALL SELECT storage_key FROM app.business_files
+                        WHERE tenant_id = :id AND storage_key IS NOT NULL
+                    UNION ALL SELECT storage_key FROM app.data_exports
+                        WHERE tenant_id = :id AND storage_key IS NOT NULL
+                """),
+                {"id": business["id"]},
+            ).scalars()
+            _forget_keys(conn, list(keys))
             conn.execute(text("DELETE FROM app.tenants WHERE id = :id"), {"id": business["id"]})
     return {
         "dry_run": 0 if apply else 1,

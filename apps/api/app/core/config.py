@@ -50,6 +50,11 @@ class Settings(BaseSettings):
     # UTC day.
     ai_daily_alert_credits: int = 2000
 
+    # Removing a person's sign-in when they delete their account in the app. Without both, only
+    # their profile is emptied (the sign-in stays at Supabase); set them at go-live.
+    supabase_url: str | None = None
+    supabase_service_key: SecretStr | None = None
+
     # Error monitoring (Sentry). Without a DSN nothing is sent and nothing is loaded.
     sentry_dsn: SecretStr | None = None
     sentry_traces_sample_rate: float = Field(default=0.0, ge=0.0, le=1.0)

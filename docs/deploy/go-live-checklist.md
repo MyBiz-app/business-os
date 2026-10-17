@@ -50,6 +50,14 @@ ClamAV daemon (`clamd`), which is a separate service:
 While it is on, an unreachable scanner refuses uploads (`scan_unavailable`) instead of letting them
 through. Switch it off again with `API_FILE_SCAN_PROVIDER=none`.
 
+## Switching on sign-in removal (account deletion)
+
+"Delete my account" in the apps empties the person's profile and disconnects them. To also delete
+their login at Supabase Auth, set `API_SUPABASE_URL` (the project URL) and
+`API_SUPABASE_SERVICE_KEY` (the service role key, from Supabase, Settings, API) as secrets on
+the API host. Never put the key in the repository or in the apps. Without them the account can
+no longer be used (the API answers `account_deleted`), but the login row stays at Supabase.
+
 ## Still the owner's
 
 Rotate `API_INTERNAL_TOKEN` (Render and Vercel), change the demo passwords, decide the AI credit
