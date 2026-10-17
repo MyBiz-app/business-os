@@ -231,6 +231,14 @@ One engine sends a message to a mix of audiences over several channels; the MyBi
 - Imported cards and memberships hang on an inactive plan named after the file's own plan name, so they do not show up for sale. Expired memberships, empty balances and past appointments are left out and counted as such. Staff are invited (role staff, front desk or manager, never owner), not created; the invitation links are shown once, right after the import.
 - Default chosen: the import runs in one request, not as a background job (a file holds up to 5,000 rows). AI mapping, saved templates for known systems, export guides, ICS and VCF files, the client notice and the concierge service are slices M2 and M3.
 
+### Migration hub: AI column mapping (2026-10-17, round 6 M2)
+
+- Order of preference for a file's column map: a saved template for a known system, then the header synonyms, then the AI. The AI is an explicit button, not automatic, so a move never spends credits without the owner asking; one request is one cheap model call (tier `fast`), up to 20 per move.
+- The model sees headers and one example per column only. Digit runs of 9 or more, and grouped numbers such as `4580 1234 5678 9012` or `050-123-4567`, are blanked, and e-mail addresses are replaced, before anything is sent. Its JSON is validated: unknown fields, a field used twice, a wrong number of columns or a confidence under 0.5 are dropped. Columns recognized by name are never overwritten.
+- The same soft monthly limits as the assistant apply (business, role and person); over the limit the owner maps by hand.
+- Only export formats that are known for sure are saved as templates (Google Contacts CSV, Outlook contacts CSV); another system is a new `Template` entry in `app/migration/templates.py`, not new code. vCard and iCalendar files are turned into the same table as a spreadsheet; an event gets a client only from an attendee name.
+- Default chosen: no migration; the confidence of each column is shown after the AI answer but not stored.
+
 ### AI agent names and faces (2026-10-16, round 6 U2)
 
 - Built-in agent names are international and work in Hebrew and English: Adir, Shiri, Lia, Daniel, Adam, Emma, Noah, Ethan, Sophie. The chief defaults to the owner's own first name.

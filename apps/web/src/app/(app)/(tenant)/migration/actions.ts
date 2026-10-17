@@ -10,6 +10,7 @@ export type MoveSession = components["schemas"]["MigrationSessionOut"];
 export type MoveFile = components["schemas"]["MigrationFileOut"];
 export type MoveReport = components["schemas"]["MoveReport"];
 export type UndoReport = components["schemas"]["MigrationUndoReport"];
+export type AiMap = components["schemas"]["MigrationAiMapOut"];
 export type MoveKind = NonNullable<MoveFile["kind"]>;
 
 export type MoveResult<T> = { data?: T; error?: string };
@@ -65,6 +66,18 @@ export async function updateMoveFile(
       await api.PUT("/migration/sessions/{session_id}/files/{file_id}", {
         params: { ...scope, path: { session_id: sessionId, file_id: fileId } },
         body: change,
+      }),
+    ),
+  );
+}
+
+/** Ask the AI for the columns the names alone did not explain (costs a few AI credits). */
+export async function aiMapMoveFile(sessionId: string, fileId: string): Promise<MoveResult<AiMap>> {
+  const { api, scope } = await getTenantFor(PERMISSION);
+  return call(async () =>
+    unwrap(
+      await api.POST("/migration/sessions/{session_id}/files/{file_id}/ai-map", {
+        params: { ...scope, path: { session_id: sessionId, file_id: fileId } },
       }),
     ),
   );

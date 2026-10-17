@@ -14,11 +14,22 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
+from app.ai import budget
+from app.ai.agents import member_role_keys
+from app.ai.gateway import (
+    LLMProvider,
+    ProviderBusy,
+    ProviderUnavailable,
+    credits,
+    get_provider,
+)
+from app.api.assistant import _month_start
 from app.api.common import not_found
 from app.api.deps import TenantContext, require
-from app.catalog.importing import ImportFileError, read_table
+from app.catalog.importing import ImportFileError
 from app.core.permissions import Permission
 from app.files import store_file, system_folder_id
+from app.migration.ai_mapping import ask, merge
 from app.migration.fields import (
     FIELDS,
     Kind,
@@ -26,6 +37,7 @@ from app.migration.fields import (
     suggest_mapping,
     valid_mapping,
 )
+from app.migration.formats import read_any
 from app.migration.mover import (
     MAX_FILE_BYTES,
     MAX_MOVE_BYTES,
@@ -33,10 +45,15 @@ from app.migration.mover import (
     Mover,
     MoveReport,
 )
+from app.migration.templates import match_template
 
 router = APIRouter(prefix="/migration", tags=["migration"])
 
 ManageDep = Annotated[TenantContext, Depends(require(Permission.MIGRATION_MANAGE))]
+ProviderDep = Annotated[LLMProvider | None, Depends(get_provider)]
+
+# Model calls for column maps in one move, so a stuck page cannot run up the AI bill.
+MAX_AI_MAPS_PER_MOVE = 20
 
 
 def _bad_request(code: str) -> HTTPException:
@@ -193,7 +210,10 @@ def add_move_file(session_id: UUID, file: UploadFile, context: ManageDep) -> Mig
     data = file.file.read(MAX_FILE_BYTES + 1)
     filename = file.filename or "file"
     try:
-        table = read_table(data, filename, MAX_FILE_BYTES)
+        time_zone = context.session.execute(
+            text("SELECT time_zone FROM app.tenants WHERE id = app.current_tenant_id()")
+        ).scalar_one()
+        table = read_any(data, filename, MAX_FILE_BYTES, time_zone)
     except ImportFileError as error:
         raise _bad_request(error.code) from error
     db = context.session
@@ -207,8 +227,13 @@ def add_move_file(session_id: UUID, file: UploadFile, context: ManageDep) -> Mig
     if used + len(data) > MAX_MOVE_BYTES:
         raise _bad_request("move_too_large")
     headers = table[0]
-    kind = guess_kind(headers)
-    mapping = suggest_mapping(kind, headers) if kind else [None] * len(headers)
+    kind: Kind | None
+    known = match_template(headers)  # a saved map for a known system, before any guessing
+    if known:
+        kind, mapping = known[0].kind, known[1]
+    else:
+        kind = guess_kind(headers)
+        mapping = suggest_mapping(kind, headers) if kind else [None] * len(headers)
     stored = store_file(
         db,
         context.tenant_id,
@@ -280,6 +305,105 @@ def update_move_file(
         {"kind": kind, "mapping": json.dumps(mapping), "id": file_id},
     ).one()
     return _file_out(updated)
+
+
+class MigrationAiMapOut(BaseModel):
+    file: MigrationFileOut
+    confidence: list[float | None] = Field(description="0 to 1 per column; null when unmapped")
+    source: list[str | None] = Field(description='Per column: "name", "ai" or null')
+    credits: float = Field(description="AI credits this suggestion used")
+
+
+def _check_ai_budget(context: TenantContext, provider: LLMProvider) -> None:
+    """The same soft monthly limits as the assistant. Demo answers cost nothing."""
+    if getattr(provider, "model", None) == "demo":
+        return
+    db = context.session
+    month_start = _month_start(db)
+    if budget.over_limit(db, month_start):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_limit_reached")
+    user_id = db.execute(text("SELECT app.current_user_id()")).scalar_one()
+    if budget.over_person_limit(db, user_id, member_role_keys(db, context.role), month_start):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="ai_user_limit_reached")
+
+
+@router.post("/sessions/{session_id}/files/{file_id}/ai-map")
+def ai_map_file(
+    session_id: UUID, file_id: UUID, context: ManageDep, provider: ProviderDep
+) -> MigrationAiMapOut:
+    """Ask the AI for the columns the names alone did not explain (and the kind, if unknown).
+    It sees headers and one hidden example per column, never the file; it costs credits from the
+    monthly AI allowance. Columns already recognized are kept; the owner still checks the map."""
+    _draft_session(context, session_id)
+    db = context.session
+    row = db.execute(
+        text("""
+            SELECT id, filename, kind, headers, mapping, row_count FROM app.import_files
+            WHERE id = :id AND session_id = :session
+        """),
+        {"id": file_id, "session": session_id},
+    ).first()
+    if row is None:
+        raise not_found()
+    if provider is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="ai_not_configured"
+        )
+    _check_ai_budget(context, provider)
+    ref = f"import_session:{session_id}"
+    asked = db.execute(
+        text("""
+            SELECT count(*) FROM app.usage_events
+            WHERE meter = 'ai_credits' AND source_ref = :ref
+        """),
+        {"ref": ref},
+    ).scalar_one()
+    if asked >= MAX_AI_MAPS_PER_MOVE:
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="ai_map_limit")
+    columns = row.headers[:60]
+    if len(row.headers) > 60:
+        raise _bad_request("too_many_columns")
+    try:
+        answer, response = ask(provider, columns, row.kind)
+    except ProviderBusy as error:
+        raise HTTPException(status_code=429, detail="ai_busy") from error
+    except ProviderUnavailable as error:
+        raise HTTPException(status_code=502, detail="ai_unavailable") from error
+    cost = credits(response.model, response.usage)
+    db.execute(
+        text("""
+            INSERT INTO app.usage_events (tenant_id, meter, quantity, details, source_ref)
+            VALUES (:t, 'ai_credits', :quantity, CAST(:details AS jsonb), :ref)
+        """),
+        {
+            "t": context.tenant_id,
+            "quantity": cost,
+            "details": json.dumps(
+                {
+                    "model": response.model,
+                    "channel": "migration",
+                    "input_tokens": response.usage.input_tokens,
+                    "output_tokens": response.usage.output_tokens,
+                }
+            ),
+            "ref": ref,
+        },
+    )
+    suggestion = merge(columns, row.kind, row.mapping, answer)
+    updated = db.execute(
+        text("""
+            UPDATE app.import_files SET kind = :kind, mapping = CAST(:mapping AS jsonb)
+            WHERE id = :id
+            RETURNING id, filename, kind, headers, mapping, row_count
+        """),
+        {"kind": suggestion.kind, "mapping": json.dumps(suggestion.mapping), "id": file_id},
+    ).one()
+    return MigrationAiMapOut(
+        file=_file_out(updated),
+        confidence=suggestion.confidence,
+        source=suggestion.source,
+        credits=cost,
+    )
 
 
 @router.delete("/sessions/{session_id}/files/{file_id}", status_code=status.HTTP_204_NO_CONTENT)
