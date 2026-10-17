@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { addDays, addMonths, dayOf, isDay, monthGrid, monthStart, todayIn, toApiWeekday, weekStart } from "../src/dates.ts";
+import { addDays, addMonths, dayOf, isDay, localToInstant, localValue, monthGrid, monthStart, todayIn, toApiWeekday, weekStart } from "../src/dates.ts";
 
 test("today depends on the business time zone, not the server's", () => {
   const instant = new Date("2026-10-11T22:30:00Z"); // Sunday night in UTC, Monday in Israel
@@ -36,4 +36,12 @@ test("months: first day, stepping from a long month and the weeks that show it",
   assert.deepEqual(monthGrid("2026-02-10"), { start: "2026-02-01", days: 28 });
   assert.deepEqual(monthGrid("2026-11-05"), { start: "2026-11-01", days: 35 });
   assert.equal(monthGrid("2027-05-01").days, 42);
+});
+
+test("converts between an instant and a zone's wall clock", () => {
+  // Israel is UTC+3 in summer time and UTC+2 in winter.
+  assert.equal(localToInstant("2026-07-01T09:00", "Asia/Jerusalem"), "2026-07-01T06:00:00.000Z");
+  assert.equal(localToInstant("2026-01-01T09:00", "Asia/Jerusalem"), "2026-01-01T07:00:00.000Z");
+  assert.equal(localValue("2026-07-01T06:00:00.000Z", "Asia/Jerusalem"), "2026-07-01T09:00");
+  assert.equal(localValue(localToInstant("2026-10-12T23:30", "America/New_York"), "America/New_York"), "2026-10-12T23:30");
 });
