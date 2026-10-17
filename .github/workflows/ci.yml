@@ -112,12 +112,11 @@ jobs:
       # Warns only for now (the plan: block after a clean week); the nightly run reports it as an issue.
       - name: Scan the API image (Trivy)
         continue-on-error: true
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: business-os-api:scan
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: "1"
+        env:
+          TRIVY_VERSION: 0.65.0
+        run: |
+          curl -sSfL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" | tar xz trivy
+          ./trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 business-os-api:scan
 
   expo-web-export:
     name: Bundle ${{ matrix.app }} (Expo web)
