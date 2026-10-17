@@ -127,7 +127,7 @@ def check_device(
 
 
 @policy_router.get("")
-def security_policy() -> SecurityPolicy:
+def security_policy(user: UserDep) -> SecurityPolicy:
     """What the apps tell people about two-step sign-in (the banner for owners and managers)."""
     settings = get_settings()
     return SecurityPolicy(
