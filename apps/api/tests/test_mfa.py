@@ -1,7 +1,7 @@
 """Two-step sign-in (GL1): the assurance level in the token, the gates, and new-device emails."""
 
 import datetime as dt
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from uuid import uuid4
 
 import pytest
@@ -102,6 +102,45 @@ def test_owners_need_a_code_for_sensitive_actions(
         "/tenants/current", json={"cancellation_window_minutes": 60}, headers=headers
     )
     assert refused.status_code == 403 and refused.json()["detail"] == "mfa_required"
+
+
+def test_demo_exemption_is_staging_only_and_by_email() -> None:
+    emails = "demo@example.com, Other@Example.com"
+    staging = config.Settings(environment="staging", mfa_demo_exempt_emails=emails)
+    assert staging.mfa_exempt("demo@example.com")
+    assert staging.mfa_exempt("other@example.com")
+    assert not staging.mfa_exempt("someone@example.com")
+    assert not staging.mfa_exempt("")
+    assert not config.Settings(environment="staging").mfa_exempt("demo@example.com")
+    for environment in ("production", "local", "test"):
+        settings = config.Settings(environment=environment, mfa_demo_exempt_emails=emails)
+        assert not settings.mfa_exempt("demo@example.com")
+
+
+def test_an_exempt_demo_owner_is_not_asked_for_a_code(
+    client: TestClient,
+    studio: dict,
+    auth: AuthHeaders,
+    make_token: Callable[..., str],
+    monkeypatch: pytest.MonkeyPatch,
+    mfa_on: None,
+) -> None:
+    owner_id = client.get("/me", headers=studio["headers"]).json()["id"]
+    path, body = "/tenants/current", {"cancellation_window_minutes": 60}
+    exempt = {"Authorization": f"Bearer {make_token(owner_id, email='demo@example.com')}"}
+    exempt["X-Tenant-Id"] = str(studio["tenant_id"])
+
+    # Not on the list: the sensitive action still needs a code.
+    assert client.patch(path, json=body, headers=exempt).status_code == 403
+    monkeypatch.setenv("API_MFA_DEMO_EXEMPT_EMAILS", "demo@example.com")
+    monkeypatch.setattr(
+        config.Settings, "mfa_exempt", lambda _s, email: email == "demo@example.com"
+    )
+    config.get_settings.cache_clear()
+    assert client.patch(path, json=body, headers=exempt).status_code == 200
+    # The same person under another email, or anyone else, is unaffected.
+    other = auth(owner_id, studio["tenant_id"], aal="aal1")
+    assert client.patch(path, json=body, headers=other).json()["detail"] == "mfa_required"
 
 
 class Outbox:
