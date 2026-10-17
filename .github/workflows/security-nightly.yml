@@ -59,7 +59,7 @@ jobs:
         id: trivy
         continue-on-error: true
         env:
-          TRIVY_VERSION: 0.65.0
+          TRIVY_VERSION: 0.69.3
         run: |
           curl -sSfL "https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz" | tar xz trivy
           ./trivy image --severity MEDIUM,HIGH,CRITICAL --exit-code 1 business-os-api:scan
