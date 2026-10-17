@@ -5,8 +5,8 @@ business that keeps failing is visible without stopping the others. A message th
 sent waits longer after every attempt (`next_attempt_at`), and a partial index keeps the outbox
 scan quick when the table holds millions of sent messages.
 
-Revision ID: 0118
-Revises: 0117
+Revision ID: 0119
+Revises: 0118
 Create Date: 2026-10-17
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0118"
-down_revision: str | None = "0117"
+revision: str = "0119"
+down_revision: str | None = "0118"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -34,6 +34,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # contract: only the downgrade drops what this migration added; no earlier version uses it
     op.execute("DROP INDEX app.messages_outbox")
     op.execute("ALTER TABLE app.messages DROP COLUMN next_attempt_at")
     op.execute("ALTER TABLE app.job_runs DROP COLUMN succeeded, DROP COLUMN failed")

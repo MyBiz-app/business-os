@@ -88,6 +88,31 @@ repository variables `PRODUCTION_WEB_URL`, `PRODUCTION_API_URL`. Same names in t
 environment to use **Roll back** there. After the single final deploy to staging, practise one
 rollback and fill the table in releases.md.
 
+## App stores (GL19)
+
+Built and ready: app config, build profiles, listing texts (Hebrew and English), privacy and Data
+safety answers, permission texts, reviewer notes, screenshot list. All in [`docs/store/`](../store/README.md).
+Nothing was built for the stores, submitted or paid for. What waits for you, in order:
+
+| # | Step | Cost | Click by click |
+|---|---|---|---|
+| 1 | Pick the final brand name and app id | Free | Decide the name (#36) and the id (default `app.mybiz.client`, or by the final domain). Tell Claude: it changes `packages/brand/app-ids.json` and `packages/i18n/brand.json`. **Permanent after the first upload** |
+| 2 | Google Play Console account | About $25, once | [play.google.com/console/signup](https://play.google.com/console/signup), personal or organisation account, identity check (a few days). Then Create app → name, language Hebrew, App, Free |
+| 3 | Apple Developer account (only if you want iOS) | About $99 a year | [developer.apple.com/programs/enroll](https://developer.apple.com/programs/enroll/), sign in with your Apple ID, enrol as an individual or organisation (approval 1 to 2 days). Then App Store Connect → My Apps → New App with the same id |
+| 4 | Link the project to Expo | Free | `npx eas-cli login`, then in `apps/client-app`: `npx eas-cli whoami`. The project id is already in `app.json` |
+| 5 | Production values in EAS | Free | expo.dev → the project → Environment variables → environment **production**: `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` (the production ones, see [production.md](production.md) section 7) |
+| 6 | First Android build | Free tier, may queue | In `apps/client-app`: `npx eas-cli build --profile production --platform android`. Result: an `.aab` file. Install-test with the `preview` profile first |
+| 7 | First iOS build | Needs step 3 | `npx eas-cli build --profile production --platform ios`; EAS asks to create the signing certificates, answer yes |
+| 8 | Crash reports with readable stack traces | Free Sentry plan | With the Sentry account ([monitoring.md](../monitoring.md)): add `SENTRY_AUTH_TOKEN` as an EAS secret and the Sentry plugin to `app.json` (Claude does this when the account exists) |
+| 9 | Fill the store forms | Free | Paste from [listing.md](../store/listing.md); Play → Policy → Data safety and Apple → App Privacy from [data-safety.md](../store/data-safety.md); reviewer notes and test login from [review-notes.md](../store/review-notes.md); privacy URL = `<domain>/legal/privacy` |
+| 10 | Screenshots and Play feature graphic | Free | [screenshots.md](../store/screenshots.md) |
+| 11 | Submit to the internal track first | Free | Play → Testing → Internal testing → upload the `.aab`, add your email as a tester. iOS: `npx eas-cli submit --profile production --platform ios` then TestFlight. Only then production review |
+
+Rules to remember: a lawyer should read the privacy policy before the first review (GL10). If a
+Google or Facebook button is ever added to the app, Sign in with Apple must come in the same
+release (Apple rule 4.8). Apple and Google review in 1 to 7 days and may ask questions; answers go in
+the store consoles.
+
 ## Switching on virus scanning
 
 Uploads are already checked by type (the file's own bytes) and size. Scanning for viruses needs a

@@ -200,6 +200,13 @@ def client_fields(context: ReadDep) -> list[ClientFieldDefinition]:
     ]
 
 
+# The text the trigram index `clients_search_trgm_idx` covers (migration 0118), word for word.
+SEARCH_TEXT = (
+    "(coalesce(first_name, '') || ' ' || coalesce(last_name, '') || ' ' || "
+    "coalesce(email, '') || ' ' || coalesce(phone, ''))"
+)
+
+
 def _like_pattern(search: str) -> str:
     escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     return f"%{escaped}%"
@@ -234,7 +241,8 @@ def list_clients(
         END)"""
     params: dict[str, object] = {"limit": page_of.limit, "offset": page_of.offset}
     if search and search.strip():
-        where += """ AND concat_ws(' ', first_name, last_name, email, phone) ILIKE :pattern"""
+        # Through the function: row level security would keep Postgres from using the index.
+        where += " AND id IN (SELECT app.search_client_ids(:pattern))"
         params["pattern"] = _like_pattern(search.strip())
     if client_status:
         where += " AND status = :status"

@@ -5,7 +5,7 @@ from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -18,7 +18,7 @@ from app.api.deps import (
     ensure_client_visible,
     require,
 )
-from app.api.pagination import PageDep
+from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, encode_cursor
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["receipts"])
@@ -67,22 +67,39 @@ def _one(db: Session, receipt_id: UUID) -> Receipt:
 @router.get("/receipts")
 def list_receipts(
     context: ReadDep,
-    page: PageDep,
+    page: KeysetDep,
+    response: Response,
     client_id: Annotated[UUID | None, Query()] = None,
 ) -> list[Receipt]:
-    """Newest first; for one client when `client_id` is given."""
+    """Newest first; for one client when `client_id` is given. The header `X-Next-Cursor`, when
+    present, goes in `after` for the next page."""
     ensure_client_visible(context, client_id)
     visible, visible_params = client_branch_filter(context, "c.home_location_id")
-    rows = context.session.execute(
-        text(f"""
+    rows = (
+        context.session.execute(
+            text(f"""
             {SELECT}
             WHERE (CAST(:client_id AS uuid) IS NULL OR client_id = CAST(:client_id AS uuid))
               AND EXISTS (SELECT 1 FROM app.clients c
                           WHERE c.id = app.receipts.client_id AND {visible})
-            ORDER BY number DESC LIMIT :limit OFFSET :offset
+              AND (CAST(:after_number AS integer) IS NULL
+                   OR number < CAST(:after_number AS integer))
+            ORDER BY number DESC LIMIT :fetch OFFSET :offset
         """),
-        {"client_id": client_id, "limit": page.limit, "offset": page.offset, **visible_params},
-    ).mappings()
+            {
+                "client_id": client_id,
+                "fetch": page.fetch,
+                "offset": page.offset,
+                "after_number": page.after[0] if page.after else None,
+                **visible_params,
+            },
+        )
+        .mappings()
+        .all()
+    )
+    if len(rows) > page.limit:
+        rows = rows[: page.limit]
+        response.headers[NEXT_CURSOR_HEADER] = encode_cursor(rows[-1]["number"])
     return [Receipt.model_validate(dict(row)) for row in rows]
 
 

@@ -27,6 +27,7 @@ from app.api.deps import (
     ensure_client_visible,
     require,
 )
+from app.api.pagination import FullPageDep, Page
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.core.signed_links import sign, verify
@@ -219,13 +220,14 @@ def _file(db: Session, document_id: UUID) -> Response:
     )
 
 
-def _list(db: Session, client_id: UUID) -> list[Document]:
+def _list(db: Session, client_id: UUID, page: Page) -> list[Document]:
     rows = db.execute(
         text(f"""
             SELECT {COLUMNS} FROM app.client_documents WHERE client_id = :id
-            ORDER BY created_at DESC
+            ORDER BY created_at DESC, id
+            LIMIT :limit OFFSET :offset
         """),
-        {"id": client_id},
+        {"id": client_id, "limit": page.limit, "offset": page.offset},
     ).mappings()
     return [Document.model_validate(dict(row)) for row in rows]
 
@@ -244,9 +246,9 @@ def _ensure_document_visible(context: TenantContext, document_id: UUID) -> None:
 
 
 @router.get("/clients/{client_id}/documents")
-def client_documents(client_id: UUID, context: ReadDep) -> list[Document]:
+def client_documents(client_id: UUID, context: ReadDep, page: FullPageDep) -> list[Document]:
     ensure_client_visible(context, client_id)
-    return _list(context.session, client_id)
+    return _list(context.session, client_id, page)
 
 
 @router.post("/clients/{client_id}/documents", status_code=status.HTTP_201_CREATED)
@@ -327,9 +329,9 @@ def delete_document(document_id: UUID, context: WriteDep) -> None:
 
 
 @client_router.get("/documents")
-def my_documents(context: ClientDep) -> list[Document]:
+def my_documents(context: ClientDep, page: FullPageDep) -> list[Document]:
     """What the business shared with me and what I uploaded."""
-    return _list(context.session, context.client_id)
+    return _list(context.session, context.client_id, page)
 
 
 @client_router.post("/documents", status_code=status.HTTP_201_CREATED)
