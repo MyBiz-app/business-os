@@ -15,6 +15,8 @@ from app.api.schemas import Tenant, TenantUpdate
 from app.core.identity import check_digit_valid
 from app.core.legal_readiness import Readiness, evaluate
 from app.core.permissions import Permission
+from app.files import check_space
+from app.files.scan import ensure_clean
 
 router = APIRouter(tags=["settings"])
 
@@ -137,6 +139,8 @@ def upload_logo(file: UploadFile, context: SettingsDep) -> Tenant:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="unsupported_image"
         )
+    ensure_clean(data)
+    check_space(context.session, context.tenant_id, len(data))
     context.session.execute(
         text("""
             UPDATE app.tenants
@@ -165,8 +169,11 @@ MAX_COVER_BYTES = 1536 * 1024
 IMAGE_RESPONSES = {200: {"content": {"image/png": {}, "image/jpeg": {}, "image/webp": {}}}}
 
 
-def read_image(file: UploadFile, limit: int) -> tuple[bytes, str]:
-    """An uploaded picture: at most `limit` bytes and a PNG, JPEG or WebP by its content."""
+def read_image(
+    file: UploadFile, limit: int, context: TenantContext | None = None
+) -> tuple[bytes, str]:
+    """An uploaded picture: at most `limit` bytes and a PNG, JPEG or WebP by its content. With a
+    business `context`, the picture must also fit the business's storage allowance."""
     data = file.file.read(limit + 1)
     if len(data) > limit:
         raise HTTPException(status_code=status.HTTP_413_CONTENT_TOO_LARGE, detail="image_too_large")
@@ -175,6 +182,9 @@ def read_image(file: UploadFile, limit: int) -> tuple[bytes, str]:
         raise HTTPException(
             status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail="unsupported_image"
         )
+    ensure_clean(data)
+    if context is not None:
+        check_space(context.session, context.tenant_id, len(data))
     return data, content_type
 
 
@@ -193,7 +203,7 @@ def image_response(data: bytes, content_type: str) -> Response:
 @router.put("/tenants/current/cover")
 def upload_cover(file: UploadFile, context: SettingsDep) -> Tenant:
     """The workspace's cover image (the dashboard header), seen by the business's team."""
-    data, content_type = read_image(file, MAX_COVER_BYTES)
+    data, content_type = read_image(file, MAX_COVER_BYTES, context)
     context.session.execute(
         text("""
             UPDATE app.tenants

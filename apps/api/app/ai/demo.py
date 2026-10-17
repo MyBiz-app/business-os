@@ -11,6 +11,7 @@ import re
 from typing import Any
 
 from app.ai.gateway import LLMResponse, Usage
+from app.ai.untrusted import unwrap
 
 MODEL = "demo"
 
@@ -198,7 +199,7 @@ class DemoProvider:
         currency = (re.search(r"currency ([A-Z]{3})", context) or [None, "ILS"])[1]
         locale = "he" if re.search(r"[֐-׿]", question) else "en"
         results = [
-            json.loads(block["content"])
+            json.loads(unwrap(block["content"]))
             for message in turn[1:]
             if message["role"] == "user"
             for block in message["content"]

@@ -16,6 +16,8 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | P0-9 | Legal text from a lawyer (privacy policy, terms, DPA, cookie banner); account closure and 90-day deletion | Closure built; text open | Lawyer; real deletion is enabled with `--apply` on `delete-closed-businesses` |
 | B4 | Backups and a restore drill | After P0-1 | Follow `restore-runbook.md` and fill in its drill table |
 | B5 | Test cards refused in production | Done (#191) | Nothing |
+| GL3-a | `simulate-payment` returns 404 in production; uploads are checked by their bytes and by the storage allowance (logo, cover, branch logo, AI agent picture, documents, files area, migration files) | Done | Nothing |
+| GL3-b | Virus scanning of uploads (ClamAV) | Built, **off** (costs about $7 a month for the scanner service) | See "Switching on virus scanning" below |
 
 ## Production settings (the API will not start without the first six)
 
@@ -47,6 +49,22 @@ Steps at go-live: set `WEB_ALLOW_INDEXING=true` on the production project, redep
 subdomains work, set `WEB_HSTS_INCLUDE_SUBDOMAINS=true` and check the `Strict-Transport-Security`
 header; submit the sitemap to Google Search Console. A new outside service the browser must reach
 directly (not through the Next.js server) needs its origin added to `apps/web/src/lib/csp.ts`.
+
+## Switching on virus scanning
+
+Uploads are already checked by type (the file's own bytes) and size. Scanning for viruses needs a
+ClamAV daemon (`clamd`), which is a separate service:
+
+1. Render → New → Private Service → Docker image `clamav/clamav:stable` (about $7 a month; it needs
+   at least 2 GB of memory for the signature database). Note its internal host name; clamd listens
+   on port 3310.
+2. On the API service set `API_FILE_SCAN_PROVIDER=clamav`, `API_FILE_SCAN_HOST=<that host>` and
+   (only if different) `API_FILE_SCAN_PORT=3310`. Redeploy the API.
+3. Upload the EICAR test string as a `.txt` file in the files area: it must be refused with
+   `file_infected`.
+
+While it is on, an unreachable scanner refuses uploads (`scan_unavailable`) instead of letting them
+through. Switch it off again with `API_FILE_SCAN_PROVIDER=none`.
 
 ## Still the owner's
 

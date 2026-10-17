@@ -427,7 +427,7 @@ def update_room(room_id: UUID, body: RoomUpdate, context: WriteDep) -> Room:
 
 @router.put("/locations/{location_id}/logo")
 def upload_location_logo(location_id: UUID, file: UploadFile, context: SettingsDep) -> Location:
-    data, content_type = read_image(file, MAX_LOGO_BYTES)
+    data, content_type = read_image(file, MAX_LOGO_BYTES, context)
     updated = context.session.execute(
         text("""
             UPDATE app.locations
