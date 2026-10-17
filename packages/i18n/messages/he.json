@@ -765,6 +765,9 @@
     }
   },
   "common": {
+    "undo": "בטל",
+    "notifications": "הודעות",
+    "savedShort": "נשמר",
     "dismiss": "סגירת ההודעה",
     "skipToContent": "דלג לתוכן הראשי",
     "loadFailed": "לא הצלחנו לטעון כרגע.",
