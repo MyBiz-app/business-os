@@ -332,7 +332,7 @@ export default async function SchedulePage({ searchParams }: PageProps<"/schedul
           lanes={lanes}
           closed={closed}
           open={open}
-          labels={{ now: t("now"), closed: t("closedDay"), shifts: tAll("shifts.title"), empty: term("noSessions"), more: t.raw("more") as string, onShift: t("onShift"), peopleOnShift: tAll("shifts.peopleOnShift"), coverFrom: tAll.raw("shifts.coverFrom") as string, close: tAll("shifts.close") }}
+          labels={{ now: t("now"), closed: t("closedDay"), grid: t("grid"), shifts: tAll("shifts.title"), empty: term("noSessions"), more: t.raw("more") as string, onShift: t("onShift"), peopleOnShift: tAll("shifts.peopleOnShift"), coverFrom: tAll.raw("shifts.coverFrom") as string, close: tAll("shifts.close") }}
           dayHref={view === "week" ? link({ view: "day", date: "__day__" }) : null}
         />
       )}
