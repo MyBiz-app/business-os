@@ -69,6 +69,15 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
 - Loading: every route group has a `loading.tsx` rendering `components/layout/page-skeleton.tsx`
   (marketing, auth, the business area, the platform console, and the signed-in shell). Copy the
   pattern for a heavy page: a `loading.tsx` next to it with a skeleton of its shape.
+- UI kit (`apps/web/src/components/ui`, round 7): `Modal` (a near full-screen window over the page,
+  a sheet on a phone; Esc, X and backdrop close it, `dirty` asks "Leave without saving?", buttons go
+  in `footer`), `CollapsibleSection` (arrow at the start, state remembered with `storageKey`;
+  use it instead of a bare `<details>`), `SegmentedControl` (the pill slides) with `ContentSwap`
+  (old content fades out in 100ms, new fades in in 150ms), and loading states: `LoadingDots`,
+  `ProgressBar`, `PendingContent` (keeps old content dimmed while new data loads, never a blank
+  page or a jump to the top). Every transition is 200ms or less, never blocks an action and is off
+  under "reduce motion". Styles are the `modal-*`, `section-*`, `segmented-pill`, `content-swap`,
+  `loading-dots`, `progress-bar` and `pending-*` blocks at the end of `globals.css`.
 - Toasts: `useToast()` in `components/toast/toaster.tsx` (web) and `components/toast.tsx` in
   app-kit (apps), same API: `toast("success" | "error" | "info", message, { action })`. A dark
   card in the corner at the reading start (top on a phone), several stack as a pile that opens on

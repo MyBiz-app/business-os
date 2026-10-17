@@ -1607,3 +1607,235 @@ h1[tabindex="-1"]:focus {
     border-end-end-radius: 0;
   }
 }
+
+/* ---- UI kit (components/ui, segmented-control): window, section, pill, loading ------------- */
+
+.modal-dialog {
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: 100%;
+  max-block-size: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  animation: modal-fade 200ms var(--ease-out) both;
+}
+.modal-dialog::backdrop {
+  background: color-mix(in oklab, var(--foreground) 45%, transparent);
+  backdrop-filter: blur(6px);
+  animation: modal-fade 200ms var(--ease-out) both;
+}
+.modal-dialog[data-closing] {
+  animation: modal-fade-out 150ms ease-in both;
+}
+.modal-dialog[data-closing]::backdrop {
+  animation: modal-fade-out 150ms ease-in both;
+}
+.modal-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  inline-size: min(100%, 64rem);
+  max-block-size: 90dvh;
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 24px 64px hsl(var(--shadow-color) / 0.35);
+  overflow: hidden;
+  animation: modal-in 200ms var(--ease-out) both;
+}
+.modal-panel[data-size="sm"] {
+  inline-size: min(100%, 28rem);
+}
+.modal-panel[data-size="md"] {
+  inline-size: min(100%, 44rem);
+}
+.modal-dialog[data-closing] .modal-panel {
+  animation: modal-out 150ms ease-in both;
+}
+.modal-ask {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in oklab, var(--foreground) 40%, transparent);
+}
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes modal-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(8px);
+  }
+}
+@keyframes modal-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+/* A phone: full screen, rising from the bottom. */
+@media (max-width: 40rem) {
+  .modal-dialog {
+    place-items: end stretch;
+  }
+  .modal-panel,
+  .modal-panel[data-size] {
+    inline-size: 100%;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    border-radius: 0;
+    border-inline: 0;
+    animation-name: modal-sheet-in;
+  }
+  .modal-dialog[data-closing] .modal-panel {
+    animation-name: modal-sheet-out;
+  }
+}
+@keyframes modal-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes modal-sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.section-chevron {
+  transition: transform 200ms var(--ease-out);
+  transform: rotate(-90deg);
+}
+.section-chevron[data-open] {
+  transform: rotate(0deg);
+}
+[dir="rtl"] .section-chevron:not([data-open]) {
+  transform: rotate(90deg);
+}
+.section-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms var(--ease-out);
+}
+.section-body[data-open] {
+  grid-template-rows: 1fr;
+}
+
+.segmented-pill {
+  position: absolute;
+  inset-block: 0.125rem;
+  border-radius: 0.6rem;
+  background: var(--surface);
+  box-shadow: 0 1px 2px hsl(var(--shadow-color) / 0.18);
+  transition:
+    transform 200ms var(--ease-out),
+    width 200ms var(--ease-out);
+}
+
+.content-swap {
+  animation: content-in 150ms var(--ease-out) both;
+  transition: opacity 100ms ease-out;
+}
+.content-swap[data-leaving] {
+  opacity: 0;
+  animation: none;
+}
+@keyframes content-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--primary-ink);
+}
+.loading-dots > span:not(.sr-only) {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 9999px;
+  background: currentColor;
+  animation: dots 1.1s ease-in-out infinite both;
+}
+.loading-dots > span:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.loading-dots > span:nth-child(4) {
+  animation-delay: 0.3s;
+}
+@keyframes dots {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.progress-bar {
+  position: relative;
+  block-size: 0.375rem;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--foreground) 10%, transparent);
+  overflow: hidden;
+}
+.progress-bar > span {
+  display: block;
+  block-size: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: inline-size 300ms var(--ease-out);
+}
+.progress-bar[data-indeterminate] > span {
+  position: absolute;
+  inline-size: 40%;
+  animation: progress-slide 1.2s ease-in-out infinite;
+}
+@keyframes progress-slide {
+  from {
+    inset-inline-start: -40%;
+  }
+  to {
+    inset-inline-start: 100%;
+  }
+}
+
+.pending-content {
+  position: relative;
+}
+.pending-content > div {
+  transition: opacity 150ms ease-out;
+}
+.pending-content[data-pending] > div {
+  opacity: 0.45;
+}
+.pending-dots {
+  position: absolute;
+  inset-block-start: 1.5rem;
+  inset-inline-start: 50%;
+  translate: -50% 0;
+}
