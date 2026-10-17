@@ -1,0 +1,72 @@
+name: Roll back
+
+# Goes back to the previous version of the API (Render) and/or the website (Vercel). Started by
+# hand from the Actions tab. The database is not rolled back (docs/deploy/releases.md explains
+# why this is safe: migrations only add first and remove one release later). The `production`
+# environment asks for approval before this runs against production.
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Which environment"
+        type: choice
+        options: [staging, production]
+        default: staging
+      component:
+        description: "What to roll back"
+        type: choice
+        options: [both, api, web]
+        default: both
+      web_deployment:
+        description: "Website: a Vercel deployment address to go back to (empty = the previous production deployment)"
+        required: false
+      api_deploy_id:
+        description: "API: a Render deploy id to go back to (empty = the previous live deploy)"
+        required: false
+
+concurrency:
+  group: rollback-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Roll back ${{ inputs.component }} on ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: ${{ inputs.environment }}
+    env:
+      VERCEL_CLI: vercel@59.26.0
+      # Not secrets: they only name the Vercel team and project.
+      VERCEL_ORG_ID: ${{ inputs.environment == 'production' && vars.PRODUCTION_VERCEL_ORG_ID || 'team_KwKjSLwpf7CxSCUP92Fbx6qK' }}
+      VERCEL_PROJECT_ID: ${{ inputs.environment == 'production' && vars.PRODUCTION_VERCEL_PROJECT_ID || 'prj_85Py3VI8ZWxIAg3s2SpBlUGowJ08' }}
+      # Set in the GitHub environment (secret RENDER_API_KEY, variables RENDER_SERVICE_ID,
+      # HEALTH_API_URL and HEALTH_WEB_URL).
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Roll the API back (Render)
+        if: inputs.component != 'web'
+        run: scripts/release/render-rollback.sh "${{ inputs.api_deploy_id }}"
+
+      - name: Roll the website back (Vercel)
+        if: inputs.component != 'api'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TARGET: ${{ inputs.web_deployment }}
+        run: |
+          [ -n "$VERCEL_TOKEN" ] || { echo "::error::VERCEL_TOKEN is not set in this environment."; exit 1; }
+          npx --yes "$VERCEL_CLI" rollback ${TARGET:+"$TARGET"} --yes --token="$VERCEL_TOKEN"
+
+      - name: Check the API is healthy again
+        if: inputs.component != 'web' && vars.HEALTH_API_URL != ''
+        run: scripts/release/wait-healthy.sh "${{ vars.HEALTH_API_URL }}/health/ready" 300
+
+      - name: Check the website is healthy again
+        if: inputs.component != 'api' && vars.HEALTH_WEB_URL != ''
+        run: scripts/release/wait-healthy.sh "${{ vars.HEALTH_WEB_URL }}" 180
+
+      - name: Remind about the database
+        run: |
+          echo "::notice::The database was not changed. If this release ran a migration, it only added things; the previous version works with it."

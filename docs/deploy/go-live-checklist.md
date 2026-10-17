@@ -78,6 +78,15 @@ directly (not through the Next.js server) needs its origin added to `apps/web/sr
 Two-step sign-in is free and on: turn it on for your own account first (Account → Account security),
 and for every provider account (GitHub, Supabase, Render, Vercel, Google, Apple).
 
+## Releases and rollback (GL16)
+
+Built and free (no paid item). Guide: [releases.md](releases.md). To use it in production add, in the
+GitHub environment `production`: secret `RENDER_API_KEY` (optional, lets rollback and the post-deploy
+check roll the API back), variables `RENDER_SERVICE_ID`, `HEALTH_API_URL`, `HEALTH_WEB_URL`, and the
+repository variables `PRODUCTION_WEB_URL`, `PRODUCTION_API_URL`. Same names in the `staging`
+environment to use **Roll back** there. After the single final deploy to staging, practise one
+rollback and fill the table in releases.md.
+
 ## Switching on virus scanning
 
 Uploads are already checked by type (the file's own bytes) and size. Scanning for viruses needs a

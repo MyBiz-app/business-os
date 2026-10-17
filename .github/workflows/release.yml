@@ -1,0 +1,38 @@
+name: Release notes
+
+# A release is a tag vX.Y.Z on main. This writes the GitHub Release with notes generated from the
+# merged pull requests. It deploys nothing: production deploys from the same tag in
+# deploy-web-production.yml, behind the manual approval of the `production` environment.
+# How to cut one: docs/deploy/releases.md.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  notes:
+    name: Create the GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag is a version on main
+        run: |
+          if ! echo "$GITHUB_REF_NAME" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Tag $GITHUB_REF_NAME is not vMAJOR.MINOR.PATCH."
+            exit 1
+          fi
+          git fetch origin main
+          git merge-base --is-ancestor "$(git rev-parse HEAD)" origin/main \
+            || { echo "::error::Tag $GITHUB_REF_NAME is not on main."; exit 1; }
+
+      - name: Create the release with generated notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME"
