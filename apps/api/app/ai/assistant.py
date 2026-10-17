@@ -65,6 +65,7 @@ def _context_block(
     branches: list[str] | None = None,
     page: str | None = None,
     handoff: str | None = None,
+    website: str | None = None,
 ) -> dict[str, Any]:
     now = dt.datetime.now(ZoneInfo(time_zone))
     lines = [
@@ -72,6 +73,8 @@ def _context_block(
         f"Business: {json.dumps(business, ensure_ascii=False)}, currency {currency}. "
         f"The user's role: {tenant.role}."
     ]
+    if website:
+        lines.append(f"The business's website: {website}.")
     if branches is not None:
         shown = json.dumps(branches, ensure_ascii=False) if branches else "none"
         lines.append(f"Branches you can see: {shown}.")
@@ -165,7 +168,8 @@ def ask(
         db.execute(
             text("""
                 SELECT c.messages, c.agent_key, c.scope, c.page_context, c.handoff_summary,
-                       c.title, t.time_zone, t.name, t.currency, t.vertical, t.locale
+                       c.title, t.time_zone, t.name, t.currency, t.vertical, t.locale,
+                       t.website_url
                 FROM app.ai_conversations c JOIN app.tenants t ON t.id = c.tenant_id
                 WHERE c.id = :id FOR UPDATE OF c
             """),
@@ -219,6 +223,7 @@ def ask(
                         names,
                         row["page_context"],
                         row["handoff_summary"] if first else None,
+                        row["website_url"],
                     ),
                     {"type": "text", "text": question},
                 ],

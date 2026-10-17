@@ -139,7 +139,7 @@ def _tenant(db: Session) -> dict[str, Any]:
             text("""
                 SELECT name, locale, time_zone, primary_color, logo, logo_content_type, currency,
                        legal_entity_type, business_number, address_line, address_city,
-                       employer_file_number, business_license_number,
+                       website_url, employer_file_number, business_license_number,
                        business_license_expires_on,
                        (now() AT TIME ZONE time_zone)::date AS today
                 FROM app.tenants WHERE id = app.current_tenant_id()
@@ -222,6 +222,11 @@ def _logo(tenant: dict[str, Any]) -> str | None:
     return None
 
 
+def _site(url: str | None) -> str:
+    """A website for the issuer block of a PDF: without the scheme, as people say it."""
+    return (url or "").removeprefix("https://").removeprefix("http://").rstrip("/")
+
+
 def document_pdf(
     tenant: dict[str, Any], doc: dict[str, Any], *, copy: bool, reference_number: int | None
 ) -> bytes:
@@ -238,6 +243,7 @@ def document_pdf(
     issuer_lines = [
         ", ".join(p for p in (tenant["address_line"], tenant["address_city"]) if p),
         f"{t['businessNumber']} {tenant['business_number']}" if tenant["business_number"] else "",
+        _site(tenant.get("website_url")),
     ]
     show_vat = kind in issuing.VAT_KINDS
     rate = doc["vat_rate_bp"] / 100
