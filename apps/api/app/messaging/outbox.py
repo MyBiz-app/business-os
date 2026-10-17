@@ -14,6 +14,7 @@ from app.providers.messaging import OutgoingMessage
 
 MAX_ATTEMPTS = 5
 BATCH = 500
+RETRY_MINUTES = 5  # the wait after a failed attempt, doubled with every further attempt
 
 
 def _per_tenant(conn: Connection, capability: str) -> Callable[[UUID], Chosen | None]:
@@ -32,13 +33,25 @@ def _per_tenant(conn: Connection, capability: str) -> Callable[[UUID], Chosen | 
 
 def send_messages(conn: Connection) -> dict[str, int]:
     """Sends queued WhatsApp / SMS messages through each business's messaging provider."""
+    # Fair queue (round-robin): every business's oldest message goes first, then every business's
+    # second one, and so on until the batch is full, so a business with 10,000 queued messages
+    # cannot hold back anyone else's.
     rows = (
         conn.execute(
             text("""
-                SELECT id, tenant_id, channel, to_phone, body, attempts FROM app.messages
-                WHERE status = 'queued' AND attempts < :max
-                ORDER BY created_at LIMIT :batch
-                FOR UPDATE SKIP LOCKED
+                WITH ranked AS (
+                    SELECT id, row_number() OVER (PARTITION BY tenant_id ORDER BY created_at) AS rn
+                    FROM app.messages
+                    WHERE status = 'queued' AND attempts < :max
+                      AND (next_attempt_at IS NULL OR next_attempt_at <= now())
+                ), picked AS (
+                    SELECT ranked.id, ranked.rn FROM ranked
+                    ORDER BY ranked.rn, ranked.id LIMIT :batch
+                )
+                SELECT m.id, m.tenant_id, m.channel, m.to_phone, m.body, m.attempts
+                FROM app.messages m JOIN picked ON picked.id = m.id
+                ORDER BY picked.rn, m.created_at
+                FOR UPDATE OF m SKIP LOCKED
             """),
             {"max": MAX_ATTEMPTS, "batch": BATCH},
         )
@@ -72,12 +85,15 @@ def send_messages(conn: Connection) -> dict[str, int]:
                                   ELSE :status END,
                     provider = :provider, provider_ref = :ref, error = :error,
                     attempts = attempts + 1, simulated = :simulated,
+                    next_attempt_at = CASE WHEN :status = 'queued' AND NOT :final
+                        THEN now() + make_interval(mins => :wait) END,
                     sent_at = CASE WHEN :status = 'sent' THEN now() END
                 WHERE id = :id
             """),
             {
                 "status": status,
                 "final": final,
+                "wait": RETRY_MINUTES * 2 ** row["attempts"],
                 "provider": chosen.info.name,
                 "ref": ref,
                 "error": error,
