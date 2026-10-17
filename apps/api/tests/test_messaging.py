@@ -48,6 +48,7 @@ def test_broadcast_to_a_segment(client: TestClient, studio: dict, engine: Engine
         "recipients": 2,
         "by_channel": {"whatsapp": 2},
         "preview": "Hi Dana, news from Studio Flow!",
+        "warnings": [],
     }
 
     sent = client.post("/messages/campaigns", json=body, headers=headers).json()
@@ -291,3 +292,38 @@ def test_a_member_kept_to_a_branch_cannot_message_another(
     assert response.json()["recipients"] == 1  # by default only their own branch
     other = client.post("/messages/campaigns", json={**body, "location_ids": [south]}, headers=mine)
     assert other.status_code == 422 and other.json()["detail"] == "unknown_branch"
+
+
+def test_placeholders_render_with_fallbacks_and_warnings(client: TestClient, studio: dict) -> None:
+    headers = studio["headers"]
+    with_messaging(client, headers)
+    dana = add_client(client, headers, "Dana", "050-1111111")
+    add_client(client, headers, "Noa", "050-2222222")
+    give_plan(client, studio, dana)
+
+    catalog = client.get("/messages/placeholders", headers=headers).json()
+    assert [g["key"] for g in catalog["groups"]] == ["client", "plan", "booking", "business"]
+    names = {v for g in catalog["groups"] for v in g["variables"]}
+    assert "id_last4" in names and "id_number" not in names
+
+    body = {
+        "audience": "active",
+        "dry_run": True,
+        "body": (
+            "{first_name} {last_name|friend}: {plan_name} / {plan_expires} {unknown|x} {id_number}"
+        ),
+    }
+    result = client.post("/messages/campaigns", json=body, headers=headers).json()
+    # Noa has no plan: plan_name and plan_expires have no fallback, so both are warned about.
+    assert {w["variable"]: w["recipients"] for w in result["warnings"]} == {
+        "plan_name": 1,
+        "plan_expires": 1,
+    }
+    assert "friend" in result["preview"] and "{unknown|x} {id_number}" in result["preview"]
+
+    sent = client.post(
+        "/messages/campaigns", json={**body, "dry_run": False}, headers=headers
+    ).json()
+    log = client.get("/messages", params={"campaign_id": sent["id"]}, headers=headers).json()
+    noa = next(m for m in log if m["body"].startswith("Noa"))
+    assert noa["body"] == "Noa friend:  /  {unknown|x} {id_number}"

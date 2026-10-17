@@ -495,6 +495,186 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/staff/{user_id}/employment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Employment */
+        get: operations["get_employment"];
+        /** Set Employment */
+        put: operations["set_employment"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/employment/bank/reveal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reveal Bank */
+        post: operations["reveal_bank"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/employment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Employment
+         * @description The signed-in team member's own terms (no bank account).
+         */
+        get: operations["my_employment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/form101": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Member Forms */
+        get: operations["member_forms"];
+        put?: never;
+        /** Request Form */
+        post: operations["request_form"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/form101/{tax_year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Member Form */
+        get: operations["member_form"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/form101/{tax_year}/credit-points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Override Points */
+        put: operations["override_points"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/form101": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Forms */
+        get: operations["my_forms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/form101/{tax_year}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Form */
+        get: operations["my_form"];
+        /**
+         * Submit Form
+         * @description The employee fills in and signs (by typing their name) the form for the year. A form
+         *     nobody requested can also be started by the employee. Signing again replaces the answers.
+         */
+        put: operations["submit_form"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/staff/{user_id}/form101/{tax_year}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Member Form File */
+        get: operations["member_form_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/me/form101/{tax_year}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Form File */
+        get: operations["my_form_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/dependents/settings": {
         parameters: {
             query?: never;
@@ -1097,6 +1277,185 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/files/folders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Folders */
+        get: operations["list_folders"];
+        put?: never;
+        /**
+         * Create Folder
+         * @description A folder of the business's own, below one it may open; it keeps the parent's rules.
+         */
+        post: operations["create_folder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/folders/{folder_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Folder
+         * @description Only an empty folder of the business's own goes.
+         */
+        delete: operations["delete_folder"];
+        options?: never;
+        head?: never;
+        /** Rename Folder */
+        patch: operations["rename_folder"];
+        trace?: never;
+    };
+    "/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Files */
+        get: operations["list_files"];
+        put?: never;
+        /** Upload File */
+        post: operations["upload_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Files
+         * @description "My documents": what the business filed for me (payslips, my employment papers).
+         */
+        get: operations["my_files"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{file_id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download File */
+        get: operations["download_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{file_id}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * File Link
+         * @description A short-lived link to open the file on a phone (the browser can't send the sign-in).
+         */
+        post: operations["file_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/files/{file_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete File
+         * @description Deleting is for ordinary files; payslips and accounting papers can only be archived.
+         */
+        delete: operations["delete_file"];
+        options?: never;
+        head?: never;
+        /**
+         * Update File
+         * @description Rename a file, or move it to the archive and back. Archived files stay (and count toward
+         *     the space) but leave the folder's list.
+         */
+        patch: operations["update_file"];
+        trace?: never;
+    };
+    "/files/folders/{folder_id}/zip": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download Zip
+         * @description The folder's current files (and its subfolders') as one ZIP.
+         */
+        get: operations["download_zip"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/public/business-files/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signed Business File */
+        get: operations["signed_business_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/time": {
         parameters: {
             query?: never;
@@ -1493,6 +1852,26 @@ export interface paths {
          * @description Wins the lead: links the client with the same email, or creates the client.
          */
         post: operations["convert_lead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/messages/placeholders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Placeholders
+         * @description The variables a message may use, grouped, with sample values for the live preview.
+         */
+        get: operations["placeholders"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4514,6 +4893,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ai/structure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Structure
+         * @description Saves who reports to whom, the teams and the map positions. The chief stays on top, there
+         *     are no cycles, and an agent the business cannot use (locked) cannot be connected.
+         */
+        put: operations["update_structure"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/agents/{agent_key}": {
         parameters: {
             query?: never;
@@ -6667,6 +7067,14 @@ export interface components {
             location_ids?: string[] | null;
             /** Model Tier */
             model_tier?: ("fast" | "standard" | "strong") | null;
+            /** Reports To */
+            reports_to?: string | null;
+            /** Team Id */
+            team_id?: string | null;
+            /** Map X */
+            map_x?: number | null;
+            /** Map Y */
+            map_y?: number | null;
         };
         /**
          * AgentChange
@@ -7018,6 +7426,15 @@ export interface components {
             /** Reason */
             reason: string | null;
         };
+        /** BankAccount */
+        BankAccount: {
+            /** Bank Code */
+            bank_code: string;
+            /** Branch */
+            branch: string;
+            /** Account */
+            account: string;
+        };
         /** BillPreview */
         BillPreview: {
             /**
@@ -7197,6 +7614,22 @@ export interface components {
              * @default false
              */
             sign_requested: boolean;
+        };
+        /** Body_upload_file */
+        Body_upload_file: {
+            /**
+             * Folder Id
+             * Format: uuid
+             */
+            folder_id: string;
+            /** File */
+            file: string;
+            /** Name */
+            name?: string | null;
+            /** Owner User Id */
+            owner_user_id?: string | null;
+            /** Location Id */
+            location_id?: string | null;
         };
         /** Body_upload_location_logo */
         Body_upload_location_logo: {
@@ -7633,6 +8066,11 @@ export interface components {
              * @description The text as the first recipient gets it
              */
             preview: string | null;
+            /**
+             * Warnings
+             * @description Variables some recipients have no value for (set a fallback with {name|text})
+             */
+            warnings?: components["schemas"]["PlaceholderWarning"][];
         };
         /** Catalog */
         Catalog: {
@@ -7792,6 +8230,23 @@ export interface components {
         CheckoutPaid: {
             checkout: components["schemas"]["Checkout"];
             entitlement: components["schemas"]["Entitlement"];
+        };
+        /** Child */
+        Child: {
+            /** Name */
+            name?: string | null;
+            /** Birth Year */
+            birth_year: number;
+            /**
+             * Receives Allowance
+             * @default false
+             */
+            receives_allowance: boolean;
+            /**
+             * Lives With Me
+             * @default true
+             */
+            lives_with_me: boolean;
         };
         /** Client */
         Client: {
@@ -8775,6 +9230,16 @@ export interface components {
             /** Monthly Credits */
             monthly_credits: number;
         };
+        /** CreditOverride */
+        CreditOverride: {
+            /**
+             * Points
+             * @description Replaces the computed points; null clears it
+             */
+            points?: number | string | null;
+            /** Note */
+            note?: string | null;
+        };
         /** CurrencyRevenue */
         CurrencyRevenue: {
             /** Currency */
@@ -9210,6 +9675,93 @@ export interface components {
             /** Sign Requested */
             sign_requested?: boolean | null;
         };
+        /** Employment */
+        Employment: {
+            /** Exists */
+            exists: boolean;
+            /**
+             * Employment Type
+             * @default global
+             * @enum {string}
+             */
+            employment_type: "global" | "hourly" | "global_overtime";
+            /**
+             * Currency
+             * @default ILS
+             */
+            currency: string;
+            /** Monthly Amount Minor */
+            monthly_amount_minor?: number | null;
+            /** Hourly Rate Minor */
+            hourly_rate_minor?: number | null;
+            /**
+             * Scope Pct
+             * @default 100
+             */
+            scope_pct: string;
+            /** Start Date */
+            start_date?: string | null;
+            /**
+             * Work Days Per Week
+             * @default 5
+             */
+            work_days_per_week: number;
+            /** Job Title */
+            job_title?: string | null;
+            /** Billing Location Id */
+            billing_location_id?: string | null;
+            pension?: components["schemas"]["Pension-Output"] | null;
+            study_fund?: components["schemas"]["StudyFund-Output"] | null;
+            /** Employment Notice Date */
+            employment_notice_date?: string | null;
+            /** Bank Last4 */
+            bank_last4?: string | null;
+            /**
+             * Can Reveal Bank
+             * @default false
+             */
+            can_reveal_bank: boolean;
+        };
+        /** EmploymentBody */
+        EmploymentBody: {
+            /**
+             * Employment Type
+             * @default global
+             * @enum {string}
+             */
+            employment_type: "global" | "hourly" | "global_overtime";
+            /**
+             * Currency
+             * @default ILS
+             */
+            currency: string;
+            /** Monthly Amount Minor */
+            monthly_amount_minor?: number | null;
+            /** Hourly Rate Minor */
+            hourly_rate_minor?: number | null;
+            /**
+             * Scope Pct
+             * @default 100
+             */
+            scope_pct: number | string;
+            /** Start Date */
+            start_date?: string | null;
+            /**
+             * Work Days Per Week
+             * @default 5
+             */
+            work_days_per_week: number;
+            /** Job Title */
+            job_title?: string | null;
+            /** Billing Location Id */
+            billing_location_id?: string | null;
+            pension?: components["schemas"]["Pension-Input"] | null;
+            study_fund?: components["schemas"]["StudyFund-Input"] | null;
+            /** Employment Notice Date */
+            employment_notice_date?: string | null;
+            /** @description Replaces the stored account; leave out to keep it */
+            bank?: components["schemas"]["BankAccount"] | null;
+        };
         /** Entitlement */
         Entitlement: {
             /**
@@ -9363,6 +9915,100 @@ export interface components {
             /** Removed Health Declarations */
             removed_health_declarations: number;
         };
+        /** FileLink */
+        FileLink: {
+            /**
+             * Url
+             * @description Opens the file without signing in, for 10 minutes
+             */
+            url: string;
+        };
+        /** FileOut */
+        FileOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Folder Id
+             * Format: uuid
+             */
+            folder_id: string;
+            /** Name */
+            name: string;
+            /** Content Type */
+            content_type: string;
+            /** Size */
+            size: number;
+            /** Owner User Id */
+            owner_user_id: string | null;
+            /** Owner Name */
+            owner_name?: string | null;
+            /** Location Id */
+            location_id: string | null;
+            /** Archived At */
+            archived_at: string | null;
+            /** Expires At */
+            expires_at: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** FileUpdate */
+        FileUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Archived */
+            archived?: boolean | null;
+        };
+        /** FolderCreate */
+        FolderCreate: {
+            /** Name */
+            name: string;
+            /** Parent Id */
+            parent_id?: string | null;
+        };
+        /** FolderOut */
+        FolderOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Parent Id */
+            parent_id: string | null;
+            /** Name */
+            name: string;
+            /**
+             * System Key
+             * @description Set for the folders every business has
+             */
+            system_key: string | null;
+            /**
+             * Retain
+             * @description Files here are archived, never deleted
+             */
+            retain: boolean;
+            /**
+             * Sensitive
+             * @description Files here are sealed at rest
+             */
+            sensitive: boolean;
+            /** Can Upload */
+            can_upload: boolean;
+            /** File Count */
+            file_count: number;
+            /** Total Size */
+            total_size: number;
+        };
+        /** FolderRename */
+        FolderRename: {
+            /** Name */
+            name: string;
+        };
         /** FollowerPoint */
         FollowerPoint: {
             /**
@@ -9388,6 +10034,133 @@ export interface components {
             questions: components["schemas"]["FormQuestion"][];
             /** Statement */
             statement: string;
+        };
+        /** Form101Answers */
+        Form101Answers: {
+            /** Full Name */
+            full_name: string;
+            /**
+             * Birth Date
+             * Format: date
+             */
+            birth_date: string;
+            /**
+             * Gender
+             * @enum {string}
+             */
+            gender: "female" | "male" | "other";
+            /** Address */
+            address: string;
+            /** Phone */
+            phone?: string | null;
+            /**
+             * Marital Status
+             * @enum {string}
+             */
+            marital_status: "single" | "married" | "divorced" | "widowed" | "separated";
+            /** Spouse Works */
+            spouse_works?: boolean | null;
+            /** Children */
+            children?: components["schemas"]["Child"][];
+            /**
+             * Single Parent
+             * @default false
+             */
+            single_parent: boolean;
+            /**
+             * Resident
+             * @default true
+             */
+            resident: boolean;
+            /** New Immigrant Date */
+            new_immigrant_date?: string | null;
+            /** Discharged Soldier Date */
+            discharged_soldier_date?: string | null;
+            /** Academic Degree Year */
+            academic_degree_year?: number | null;
+            /**
+             * Disability Percent
+             * @default 0
+             */
+            disability_percent: number;
+            /**
+             * Eligible Locality
+             * @default false
+             */
+            eligible_locality: boolean;
+            other_income?: components["schemas"]["OtherIncome"];
+        };
+        /** Form101Detail */
+        Form101Detail: {
+            /** Tax Year */
+            tax_year: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "requested" | "submitted";
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Signed Name */
+            signed_name: string | null;
+            /** Computed Points */
+            computed_points: string | null;
+            /** Override Points */
+            override_points: string | null;
+            /** Override Note */
+            override_note: string | null;
+            /**
+             * Credit Points
+             * @description The override when set, else computed
+             */
+            credit_points: string | null;
+            answers: components["schemas"]["Form101Answers"] | null;
+        };
+        /** Form101Request */
+        Form101Request: {
+            /** Tax Year */
+            tax_year: number;
+        };
+        /** Form101Submit */
+        Form101Submit: {
+            answers: components["schemas"]["Form101Answers"];
+            /** Signed Name */
+            signed_name: string;
+        };
+        /** Form101Summary */
+        Form101Summary: {
+            /** Tax Year */
+            tax_year: number;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "requested" | "submitted";
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Signed Name */
+            signed_name: string | null;
+            /** Computed Points */
+            computed_points: string | null;
+            /** Override Points */
+            override_points: string | null;
+            /** Override Note */
+            override_note: string | null;
+            /**
+             * Credit Points
+             * @description The override when set, else computed
+             */
+            credit_points: string | null;
         };
         /** FormQuestion */
         FormQuestion: {
@@ -11006,6 +11779,20 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** OtherIncome */
+        OtherIncome: {
+            /**
+             * Kind
+             * @default none
+             * @enum {string}
+             */
+            kind: "none" | "salary" | "other";
+            /**
+             * Tax Coordination
+             * @default false
+             */
+            tax_coordination: boolean;
+        };
         /**
          * PaletteColors
          * @description The three colors a person picks for "my own colors" (`#rrggbb`). The app derives every
@@ -11097,6 +11884,46 @@ export interface components {
              * Format: date-time
              */
             starts_at: string;
+        };
+        /** Pension */
+        "Pension-Input": {
+            /** Fund Name */
+            fund_name?: string | null;
+            /**
+             * Employee Pct
+             * @default 6
+             */
+            employee_pct: number | string;
+            /**
+             * Employer Pct
+             * @default 6.5
+             */
+            employer_pct: number | string;
+            /**
+             * Severance Pct
+             * @default 6
+             */
+            severance_pct: number | string;
+        };
+        /** Pension */
+        "Pension-Output": {
+            /** Fund Name */
+            fund_name?: string | null;
+            /**
+             * Employee Pct
+             * @default 6
+             */
+            employee_pct: string;
+            /**
+             * Employer Pct
+             * @default 6.5
+             */
+            employer_pct: string;
+            /**
+             * Severance Pct
+             * @default 6
+             */
+            severance_pct: string;
         };
         /**
          * Person
@@ -11235,6 +12062,48 @@ export interface components {
              * @description Shared classes per class type (friends only)
              */
             by_service: components["schemas"]["SharedByService"][];
+        };
+        /** PlaceholderGroup */
+        PlaceholderGroup: {
+            /** Key */
+            key: string;
+            /** Variables */
+            variables: string[];
+        };
+        /** PlaceholderWarning */
+        PlaceholderWarning: {
+            /** Variable */
+            variable: string;
+            /**
+             * Recipients
+             * @description How many recipients have no value and no fallback
+             */
+            recipients: number;
+        };
+        /** Placeholders */
+        Placeholders: {
+            /** Groups */
+            groups: components["schemas"]["PlaceholderGroup"][];
+            /**
+             * Sample
+             * @description Values of a made-up client, for the preview
+             */
+            sample: {
+                [key: string]: string;
+            };
+        };
+        /** Placement */
+        Placement: {
+            /** Key */
+            key: string;
+            /** Reports To */
+            reports_to?: string | null;
+            /** Team Id */
+            team_id?: string | null;
+            /** Map X */
+            map_x?: number | null;
+            /** Map Y */
+            map_y?: number | null;
         };
         /** Plan */
         Plan: {
@@ -12453,6 +13322,15 @@ export interface components {
             /** Number */
             number: string;
         };
+        /** RevealedBank */
+        RevealedBank: {
+            /** Bank Code */
+            bank_code: string;
+            /** Branch */
+            branch: string;
+            /** Account */
+            account: string;
+        };
         /** Review */
         Review: {
             /** Approve */
@@ -12518,14 +13396,14 @@ export interface components {
             /** Name */
             name: string;
             /** Permissions */
-            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read" | "time.approve")[];
+            permissions: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve")[];
         };
         /** RoleUpdate */
         RoleUpdate: {
             /** Name */
             name?: string | null;
             /** Permissions */
-            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "identity.read" | "time.approve")[] | null;
+            permissions?: ("clients.read" | "clients.write" | "clients.privacy" | "catalog.read" | "catalog.write" | "catalog.delete" | "schedule.read" | "schedule.write" | "bookings.manage" | "sales.manage" | "reports.read" | "ai.use" | "social.read" | "social.manage" | "ai.manage" | "staff.read" | "staff.manage" | "business.settings" | "files.read" | "files.manage" | "identity.read" | "time.approve" | "payroll.read" | "payroll.manage" | "payroll.approve")[] | null;
         };
         /** Roles */
         Roles: {
@@ -13725,6 +14603,47 @@ export interface components {
             /** Status */
             status: ("trial" | "active") | null;
         };
+        /**
+         * StructureUpdate
+         * @description The whole structure at once: every team and where each agent stands. Agents left out keep
+         *     what they have.
+         */
+        StructureUpdate: {
+            /** Teams */
+            teams: components["schemas"]["TeamGroup"][];
+            /** Agents */
+            agents: components["schemas"]["Placement"][];
+        };
+        /** StudyFund */
+        "StudyFund-Input": {
+            /** Fund Name */
+            fund_name?: string | null;
+            /**
+             * Employee Pct
+             * @default 2.5
+             */
+            employee_pct: number | string;
+            /**
+             * Employer Pct
+             * @default 7.5
+             */
+            employer_pct: number | string;
+        };
+        /** StudyFund */
+        "StudyFund-Output": {
+            /** Fund Name */
+            fund_name?: string | null;
+            /**
+             * Employee Pct
+             * @default 2.5
+             */
+            employee_pct: string;
+            /**
+             * Employer Pct
+             * @default 7.5
+             */
+            employer_pct: string;
+        };
         /** SupportAccess */
         SupportAccess: {
             /**
@@ -13875,6 +14794,23 @@ export interface components {
              * @default false
              */
             precise_timing: boolean;
+        };
+        /** TeamGroup */
+        TeamGroup: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /**
+             * Color
+             * @default #6B7280
+             */
+            color: string;
+            /** Lead Key */
+            lead_key?: string | null;
         };
         /** Template */
         Template: {
@@ -14659,6 +15595,11 @@ export interface components {
         app__api__ai_team__Team: {
             /** Agents */
             agents: components["schemas"]["AgentCard"][];
+            /**
+             * Teams
+             * @default []
+             */
+            teams: components["schemas"]["TeamGroup"][];
             /** Credits Used */
             credits_used: number;
             /** Credits Included */
@@ -16294,6 +17235,476 @@ export interface operations {
             };
         };
     };
+    get_employment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employment"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_employment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmploymentBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employment"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reveal_bank: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevealedBank"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_employment: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Employment"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    member_forms: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Summary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_form: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Form101Request"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Summary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    member_form: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+                tax_year: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Detail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    override_points: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+                tax_year: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreditOverride"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Summary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_forms: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Summary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_form: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                tax_year: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Detail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_form: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                tax_year: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Form101Submit"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Form101Detail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    member_form_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                user_id: string;
+                tax_year: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_form_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                tax_year: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     dependent_settings: {
         parameters: {
             query?: never;
@@ -17735,6 +19146,462 @@ export interface operations {
             };
         };
     };
+    list_folders: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_folder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolderCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_folder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                folder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    rename_folder: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                folder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FolderRename"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FolderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_files: {
+        parameters: {
+            query: {
+                folder_id: string;
+                archived?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_upload_file"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_files: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    file_link: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileLink"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_file: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    download_zip: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                folder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    signed_business_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     time_entries: {
         parameters: {
             query?: {
@@ -18802,6 +20669,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeadDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    placeholders: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Placeholders"];
                 };
             };
             /** @description Validation Error */
@@ -26164,6 +28064,43 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["app__api__ai_team__Team"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_structure: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StructureUpdate"];
+            };
+        };
         responses: {
             /** @description Successful Response */
             200: {

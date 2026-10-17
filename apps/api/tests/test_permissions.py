@@ -4,7 +4,7 @@ from app.core.permissions import ROLE_PERMISSIONS, Permission
 EXPECTED = {
     "owner": set(Permission),
     "manager": set(Permission)
-    - {"clients.privacy", "identity.read"},  # has catalog.delete, social.*
+    - {"clients.privacy", "identity.read", "payroll.approve"},  # has catalog.delete, social.*
     "branch_manager": {  # a manager's day-to-day rights; nothing that reaches across the business
         "clients.read",
         "clients.write",

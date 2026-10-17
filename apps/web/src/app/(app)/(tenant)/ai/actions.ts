@@ -7,7 +7,7 @@ import type { components } from "@business-os/api-client";
 import { ApiError, apiUpload, unwrap } from "@/lib/api";
 import { getTenant } from "@/lib/tenant";
 
-import type { Agent } from "./types";
+import type { Agent, Team } from "./types";
 
 export type Conversation = components["schemas"]["app__api__assistant__Conversation"];
 export type ConversationSummary = components["schemas"]["app__api__assistant__ConversationSummary"];
@@ -152,5 +152,20 @@ export async function removeAgentAvatar(agentKey: string): Promise<AgentResult> 
     return { agent };
   } catch (error) {
     return { error: agentError(error) };
+  }
+}
+
+export type StructureResult = { team?: Team; error?: "locked_agent" | "cycle" | "generic" };
+
+/** Saves the whole structure: reporting lines, teams and map places (owner or whoever manages the AI team). */
+export async function saveStructure(body: components["schemas"]["StructureUpdate"]): Promise<StructureResult> {
+  const { api, scope } = await getTenant();
+  try {
+    const team = unwrap(await api.PUT("/ai/structure", { params: scope, body }));
+    revalidatePath("/ai");
+    return { team };
+  } catch (error) {
+    const detail = error instanceof ApiError ? (error.body as { detail?: unknown } | null)?.detail : null;
+    return { error: detail === "locked_agent" || detail === "cycle" ? detail : "generic" };
   }
 }
