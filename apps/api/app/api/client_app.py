@@ -10,7 +10,7 @@ from datetime import datetime, time, timedelta
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query, Response, status
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -25,11 +25,13 @@ from app.api.bookings import (
 from app.api.common import blank_to_none, not_found
 from app.api.deps import AnonymousSessionDep, ClientContext, ClientDep, SessionDep, UserDep
 from app.api.health import ensure_may_book
+from app.api.pagination import FullPageDep
 from app.api.plans import PLAN_COLUMNS, Entitlement, Plan, list_entitlements
 from app.api.routes import ensure_profile
 from app.api.schedule import ClosedDay, JobStatus, ServiceSummary
 from app.api.settings import IMAGE_RESPONSES, image_response
 from app.catalog.verticals import CATALOG
+from app.legal.documents import check_versions, record_acceptance
 from app.schedule.release import load_release
 from app.schedule.scheduling import local_to_utc
 
@@ -125,6 +127,10 @@ class ProfileUpdate(BaseModel):
 
 class JoinRequest(BaseModel):
     code: str = Field(min_length=4, max_length=16)
+    accepted_legal: dict[str, str] | None = Field(
+        default=None,
+        description="Legal documents accepted when joining (document -> version)",
+    )
 
 
 class MyBooking(BaseModel):
@@ -242,8 +248,12 @@ def business_locations(context: ClientDep) -> list[ClientLocation]:
 
 
 @router.post("/businesses", status_code=status.HTTP_201_CREATED)
-def join_business(body: JoinRequest, user: UserDep, session: SessionDep) -> ClientBusiness:
+def join_business(
+    body: JoinRequest, request: Request, user: UserDep, session: SessionDep
+) -> ClientBusiness:
     ensure_profile(session, user.id, user.email)
+    if body.accepted_legal:
+        check_versions(body.accepted_legal)
     offers_app = session.execute(
         text("SELECT client_app FROM app.business_by_join_code(:code)"), {"code": body.code}
     ).scalar()
@@ -259,6 +269,8 @@ def join_business(body: JoinRequest, user: UserDep, session: SessionDep) -> Clie
         .mappings()
         .one()
     )
+    if body.accepted_legal:
+        record_acceptance(session, request, user.id, body.accepted_legal, "client_join", row["id"])
     return _business(row)
 
 
@@ -518,5 +530,5 @@ def business_plans(context: ClientDep) -> list[Plan]:
 
 
 @router.get("/entitlements")
-def my_entitlements(context: ClientDep) -> list[Entitlement]:
-    return list_entitlements(context.session, context.client_id)
+def my_entitlements(context: ClientDep, page: FullPageDep) -> list[Entitlement]:
+    return list_entitlements(context.session, context.client_id, page)

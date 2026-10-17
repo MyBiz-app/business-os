@@ -19,6 +19,7 @@ from app.api.common import (
     set_clause,
 )
 from app.api.deps import TenantContext, require
+from app.api.pagination import MAX_LIMIT, FullPageDep, Page
 from app.core.permissions import Permission
 
 router = APIRouter(tags=["plans"])
@@ -226,14 +227,19 @@ def load_entitlement(db: Session, entitlement_id: UUID) -> Entitlement:
     return to_entitlement(row)
 
 
-def list_entitlements(db: Session, client_id: UUID) -> list[Entitlement]:
+def list_entitlements(db: Session, client_id: UUID, page: Page | None = None) -> list[Entitlement]:
     rows = db.execute(
         text(f"""
             {ENTITLEMENT_SELECT}
             WHERE e.client_id = :client_id
-            ORDER BY e.status = 'cancelled', e.ends_on DESC, e.created_at DESC
+            ORDER BY e.status = 'cancelled', e.ends_on DESC, e.created_at DESC, e.id
+            LIMIT :limit OFFSET :offset
         """),
-        {"client_id": client_id},
+        {
+            "client_id": client_id,
+            "limit": page.limit if page else MAX_LIMIT,
+            "offset": page.offset if page else 0,
+        },
     ).mappings()
     return [to_entitlement(row) for row in rows]
 
@@ -380,8 +386,10 @@ def delete_plan(plan_id: UUID, context: CatalogDeleteDep) -> RemoveResult:
 
 
 @router.get("/clients/{client_id}/entitlements")
-def client_entitlements(client_id: UUID, context: ClientsReadDep) -> list[Entitlement]:
-    return list_entitlements(context.session, client_id)
+def client_entitlements(
+    client_id: UUID, context: ClientsReadDep, page: FullPageDep
+) -> list[Entitlement]:
+    return list_entitlements(context.session, client_id, page)
 
 
 @router.post("/clients/{client_id}/entitlements", status_code=status.HTTP_201_CREATED)

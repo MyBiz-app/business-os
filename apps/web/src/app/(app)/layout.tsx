@@ -2,6 +2,7 @@ import { ScopedMessages } from "@/components/scoped-messages";
 import { signOut } from "@/app/(auth)/actions";
 import { ActivityGuard } from "@/components/activity-guard";
 import { DeviceCheck } from "@/components/device-check";
+import { LegalBanner } from "@/components/legal-banner";
 import { MfaBanner } from "@/components/mfa-banner";
 import { AnnouncementsPopup, type PopupItem } from "@/components/announcements-popup";
 import { AppHeader } from "@/components/app-header";
@@ -48,6 +49,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
           signOut={signOut}
         />
       </AppHeader>
+      <LegalBanner pending={me.legal_pending ?? []} />
       <MfaBanner memberships={me.memberships.map((m) => m.role)} platform={me.platform_admin} />
       {children}
       <ActivityGuard />

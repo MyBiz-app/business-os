@@ -13,6 +13,7 @@ GLOBAL_TABLES = {
     "platform_ai_conversations",
     "push_tokens",
     "login_devices",
+    "legal_acceptances",
     "job_runs",
     "announcement_views",
     "payroll_rates",  # law-driven rates, the same for every business; read-only for the API

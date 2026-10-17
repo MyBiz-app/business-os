@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import SessionDep, UserDep
 from app.api.modules import check_selection
-from app.api.pagination import PageDep
+from app.api.pagination import MAX_LIMIT, FullPageDep, Page, PageDep
 from app.core import metrics
 from app.core.config import get_settings
 from app.core.mfa import require_aal2
@@ -109,8 +109,11 @@ class UsagePoint(BaseModel):
 
 
 @router.get("/businesses")
-def businesses(db: AdminDep) -> list[PlatformBusiness]:
-    rows = db.execute(text("SELECT * FROM app.platform_businesses()")).mappings()
+def businesses(db: AdminDep, page: FullPageDep) -> list[PlatformBusiness]:
+    rows = db.execute(
+        text("SELECT * FROM app.platform_businesses() LIMIT :limit OFFSET :offset"),
+        {"limit": page.limit, "offset": page.offset},
+    ).mappings()
     return [PlatformBusiness.model_validate(dict(row)) for row in rows]
 
 
@@ -265,10 +268,13 @@ class InboxUpdate(BaseModel):
 
 
 @router.get("/contact-requests")
-def contact_requests(db: InboxDep) -> list[ContactRequest]:
+def contact_requests(db: InboxDep, page: FullPageDep) -> list[ContactRequest]:
     """The inbox: requests from the marketing site, complaints from businesses and setup tasks.
     Open ones first, VIP and priority support before standard, then newest."""
-    rows = db.execute(text("SELECT * FROM app.platform_contact_requests()")).mappings()
+    rows = db.execute(
+        text("SELECT * FROM app.platform_contact_requests() LIMIT :limit OFFSET :offset"),
+        {"limit": page.limit, "offset": page.offset},
+    ).mappings()
     return [ContactRequest.model_validate(dict(row)) for row in rows]
 
 
@@ -287,7 +293,7 @@ def update_contact_request(
             "notes": body.notes,
         },
     )
-    return contact_requests(db)
+    return contact_requests(db, Page(limit=MAX_LIMIT, offset=0))
 
 
 class BillingMonth(BaseModel):
@@ -451,7 +457,14 @@ def set_business_modules(tenant_id: UUID, body: ModulesChange, db: BillingDep) -
         "SELECT app.platform_set_modules(:t, CAST(:modules AS jsonb))",
         {"t": tenant_id, "modules": json.dumps(body.modules)},
     )
-    return next(b for b in businesses(db) if b.id == tenant_id)
+    row = (
+        db.execute(
+            text("SELECT * FROM app.platform_businesses() WHERE id = :id"), {"id": tenant_id}
+        )
+        .mappings()
+        .one()
+    )
+    return PlatformBusiness.model_validate(dict(row))
 
 
 @router.post("/invoices/{invoice_id}/void")

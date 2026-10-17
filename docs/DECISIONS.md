@@ -172,6 +172,7 @@ When a decision changes, update the row and note the date - do not delete histor
 | X51 | Round 4, friends (migration 0082): friendship is inside one business (network or branch, by `network_scope`). A client finds a friend only by a personal code (link / QR) or the friend's exact phone / email, never by browsing; the lookup is rate-limited. An invited friend's spot is held for 2 hours (never past the class's cancellation deadline) and counts in the class capacity. Non-friends in a class see first name, photo, status and shared-class count only; a client can hide from participant lists. Friends exist only where the catalog's `social` is `on` (off for clinics, beauty, home services; kids' classes default off). | DECIDED (2026-10-14) |
 | X51 | Round 4, network policy (migration 0081): `tenants.network_scope` is `network` (default; clients shared by all branches) or `branch` (each client has a "my branches" list, `client_locations`; a client on no list belongs to all). A plan valid across a chosen group of branches is a follow-up, not part of B1; no cross-branch price list. | DECIDED (2026-10-14) |
 | X52 | Releases and rollback (go-live GL16): a release is a tag `vX.Y.Z` on `main`; production deploys only from a tag behind the `production` environment approval, staging follows `main`. Rollback is a manual workflow and the database is never rolled back, so migrations expand first and contract one release later (`# contract:` reason required from 0117, checked by a test). The nightly end-to-end run uses the local stack, not staging, to leave demo data alone. | DECIDED (2026-10-17) |
+| X53 | Store readiness without accounts (go-live GL19, 2026-10-17, delegated): the MyBiz app is one store listing (no separate team app); everything that needs no store account is prepared (config, privacy and Data safety answers, permission texts, reviewer notes, screenshot list) and the rest is a click-by-click section in the go-live checklist. The app keeps email or phone one-time-code sign-in only, so Apple rule 4.8 does not apply; any Google or Facebook button added later must ship together with Sign in with Apple. The microphone is blocked on purpose. The final app id stays a placeholder until the brand name and domain are chosen (permanent after first upload). | DECIDED (2026-10-17, delegated) |
 
 ### Apps accessibility preferences (2026-10-12)
 
@@ -293,6 +294,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Idle sign-out: 12 hours on the web, 30 days in the apps, done by the apps themselves (Supabase's server-side timeouts are a paid feature).
 - A sign-in from a new device is emailed; only a hash of the device id is stored.
 - The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
+- Staging demo browsing (2026-10-17): the demo owner `adiredri73@gmail.com` is listed in `API_MFA_DEMO_EXEMPT_EMAILS` (and `MFA_DEMO_EXEMPT_EMAILS` on the web app) so it can read the demo without a code. The API honors the list only when `API_ENVIRONMENT=staging`; production, local and test ignore it. No other account is affected.
 
 ## Open
 

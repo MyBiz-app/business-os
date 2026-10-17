@@ -5,6 +5,11 @@ import brand from "../brand.json";
 
 export const BRAND: { name: string; legal: typeof brand.legal } = brand;
 
+/** Current version of a legal document (also the date of its last change), from brand.json. */
+export function legalVersion(document: keyof typeof brand.legal.versions): string {
+  return brand.legal.versions[document].version;
+}
+
 const WRITTEN = "MyBiz";
 
 /** The messages with the product's name as BRAND.name (the same object while it is "MyBiz"). */

@@ -7771,6 +7771,34 @@
             }
           },
           {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -8569,6 +8597,34 @@
         ],
         "parameters": [
           {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -8629,6 +8685,34 @@
               "format": "uuid",
               "title": "Client Id"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
           },
           {
             "name": "X-Tenant-Id",
@@ -9017,6 +9101,34 @@
           }
         ],
         "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
           {
             "name": "X-Tenant-Id",
             "in": "header",
@@ -9672,6 +9784,34 @@
             }
           },
           {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -9818,6 +9958,34 @@
           }
         ],
         "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
           {
             "name": "X-Tenant-Id",
             "in": "header",
@@ -10308,7 +10476,7 @@
           "time"
         ],
         "summary": "Time Entries",
-        "description": "Time entries, newest day first (up to 500).",
+        "description": "Time entries, newest day first.",
         "operationId": "time_entries",
         "security": [
           {
@@ -10380,6 +10548,34 @@
               "title": "To"
             },
             "description": "Inclusive"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
           },
           {
             "name": "X-Tenant-Id",
@@ -15648,6 +15844,85 @@
             }
           }
         }
+      }
+    },
+    "/me/legal": {
+      "get": {
+        "tags": [
+          "legal"
+        ],
+        "summary": "My Pending Documents",
+        "operationId": "my_pending_documents",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PendingDocument"
+                  },
+                  "type": "array",
+                  "title": "Response My Pending Documents"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "legal"
+        ],
+        "summary": "Accept Documents",
+        "description": "Accepts the current version of the given documents (the banner after a document changed).",
+        "operationId": "accept_documents",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PendingDocument"
+                  },
+                  "type": "array",
+                  "title": "Response Accept Documents"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/location-groups": {
@@ -26284,7 +26559,7 @@
           "bookings"
         ],
         "summary": "List Client Bookings",
-        "description": "A client's bookings, newest session first (a member kept to some branches sees those\nmade at their branches).",
+        "description": "A client's bookings, newest session first (a member kept to some branches sees those\nmade at their branches). The header `X-Next-Cursor`, when present, goes in `after`.",
         "operationId": "list_client_bookings",
         "security": [
           {
@@ -26329,6 +26604,25 @@
               "title": "Offset"
             },
             "description": "Rows to skip"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "After"
+            },
+            "description": "`next_cursor` of the previous page"
           },
           {
             "name": "X-Tenant-Id",
@@ -29148,6 +29442,34 @@
               "format": "uuid",
               "title": "Client Id"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
           },
           {
             "name": "X-Tenant-Id",
@@ -33431,27 +33753,67 @@
         ],
         "summary": "Businesses",
         "operationId": "businesses",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/PlatformBusiness"
                   },
-                  "type": "array",
                   "title": "Response Businesses"
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/platform/usage": {
@@ -33588,27 +33950,67 @@
         "summary": "Contact Requests",
         "description": "The inbox: requests from the marketing site, complaints from businesses and setup tasks.\nOpen ones first, VIP and priority support before standard, then newest.",
         "operationId": "contact_requests",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/ContactRequest"
                   },
-                  "type": "array",
                   "title": "Response Contact Requests"
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/platform/contact-requests/{request_id}": {
@@ -35595,6 +35997,34 @@
         ],
         "parameters": [
           {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Rows per page",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Rows per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 0,
+              "description": "Rows to skip",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Rows to skip"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -36945,6 +37375,25 @@
             "description": "Rows to skip"
           },
           {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "After"
+            },
+            "description": "`next_cursor` of the previous page"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -37226,7 +37675,7 @@
           "documents"
         ],
         "summary": "List Issued",
-        "description": "Newest first.",
+        "description": "Newest first. The header `X-Next-Cursor`, when present, goes in `after` for the next page.",
         "operationId": "list_issued",
         "security": [
           {
@@ -37301,6 +37750,25 @@
               "title": "Offset"
             },
             "description": "Rows to skip"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "After"
+            },
+            "description": "`next_cursor` of the previous page"
           },
           {
             "name": "X-Tenant-Id",
@@ -37655,7 +38123,7 @@
           "receipts"
         ],
         "summary": "List Receipts",
-        "description": "Newest first; for one client when `client_id` is given.",
+        "description": "Newest first; for one client when `client_id` is given. The header `X-Next-Cursor`, when\npresent, goes in `after` for the next page.",
         "operationId": "list_receipts",
         "security": [
           {
@@ -37707,6 +38175,25 @@
               "title": "Offset"
             },
             "description": "Rows to skip"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "After"
+            },
+            "description": "`next_cursor` of the previous page"
           },
           {
             "name": "X-Tenant-Id",
@@ -38199,6 +38686,25 @@
               "title": "Offset"
             },
             "description": "Rows to skip"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 400
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "After"
+            },
+            "description": "`next_cursor` of the previous page"
           },
           {
             "name": "X-Tenant-Id",
@@ -39362,6 +39868,24 @@
           "token"
         ],
         "title": "AcceptInvitation"
+      },
+      "AcceptRequest": {
+        "properties": {
+          "documents": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "minProperties": 1,
+            "title": "Documents",
+            "description": "Document -> the version being accepted (must be the current)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "documents"
+        ],
+        "title": "AcceptRequest"
       },
       "Accepted": {
         "properties": {
@@ -50218,6 +50742,18 @@
             "type": "array",
             "title": "Items",
             "description": "Newest first, one page"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `after` for the next (older) page"
           }
         },
         "type": "object",
@@ -51632,6 +52168,21 @@
             "maxLength": 16,
             "minLength": 4,
             "title": "Code"
+          },
+          "accepted_legal": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Legal",
+            "description": "Legal documents accepted when joining (document -> version)"
           }
         },
         "type": "object",
@@ -52387,6 +52938,24 @@
         "type": "object",
         "title": "LeadUpdate"
       },
+      "LegalPending": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "title": "Document"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "version"
+        ],
+        "title": "LegalPending"
+      },
       "LimitsUpdate": {
         "properties": {
           "limits": {
@@ -52892,6 +53461,14 @@
             "title": "Marketing Consent",
             "description": "Agreed to marketing messages (service messages are sent anyway)",
             "default": false
+          },
+          "legal_pending": {
+            "items": {
+              "$ref": "#/components/schemas/LegalPending"
+            },
+            "type": "array",
+            "title": "Legal Pending",
+            "description": "Legal documents whose current version the person has not accepted yet"
           },
           "palette": {
             "anyOf": [
@@ -54867,6 +55444,18 @@
           "total": {
             "type": "integer",
             "title": "Total"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor",
+            "description": "Pass as `after` for the next (older) page"
           }
         },
         "type": "object",
@@ -55248,6 +55837,26 @@
           "candidates"
         ],
         "title": "PendingConnection"
+      },
+      "PendingDocument": {
+        "properties": {
+          "document": {
+            "type": "string",
+            "title": "Document",
+            "description": "terms, privacy or dpa"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version",
+            "description": "The current version, which is also its date"
+          }
+        },
+        "type": "object",
+        "required": [
+          "document",
+          "version"
+        ],
+        "title": "PendingDocument"
       },
       "PendingReview": {
         "properties": {
@@ -64529,6 +65138,21 @@
             ],
             "title": "Modules",
             "description": "Modules to enable; defaults to the vertical pack's preset"
+          },
+          "accepted_legal": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted Legal",
+            "description": "Legal documents accepted at sign-up (document -> version)"
           }
         },
         "type": "object",

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { deviceLabel, INACTIVITY_LIMIT_MS, isCode, isInactive, needsCodeStep } from "./mfa.ts";
+import { deviceLabel, INACTIVITY_LIMIT_MS, isCode, isInactive, isMfaExempt, needsCodeStep } from "./mfa.ts";
 
 test("a session is idle only after the limit", () => {
   const now = 1_000_000_000_000;
@@ -35,4 +35,11 @@ test("a device is described by browser and system", () => {
     "Safari on iOS",
   );
   assert.equal(deviceLabel(""), "Browser");
+});
+
+test("only listed demo emails skip the code step", () => {
+  assert.equal(isMfaExempt("Demo@example.com", "a@x.com, demo@example.com"), true);
+  assert.equal(isMfaExempt("other@example.com", "demo@example.com"), false);
+  assert.equal(isMfaExempt("demo@example.com", ""), false);
+  assert.equal(isMfaExempt(undefined, "demo@example.com"), false);
 });

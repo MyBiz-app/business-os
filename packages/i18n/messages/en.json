@@ -1190,7 +1190,8 @@
       "firstName": "First name",
       "lastName": "Last name",
       "nameRequired": "Please enter your first name, so the business knows who you are.",
-      "marketing": "Send me offers and news from this business (optional). You can change this any time in your profile."
+      "marketing": "Send me offers and news from this business (optional). You can change this any time in your profile.",
+      "legal": "By joining you agree to the business's terms of use and the privacy policy, which you can read on our website."
     },
     "home": {
       "greeting": "Hi {name}",
@@ -3411,7 +3412,9 @@
       "appsText": "Manage your business from your phone, or clients book from theirs.",
       "storeIos": "App Store",
       "storeAndroid": "Google Play",
-      "comingSoon": "Coming soon"
+      "comingSoon": "Coming soon",
+      "dpa": "Data processing agreement",
+      "subprocessors": "Sub-processors"
     },
     "about": {
       "title": "Building the system small businesses deserve",
@@ -3793,6 +3796,113 @@
             "title": "Updates",
             "p": [
               "We review this statement after significant changes and at least once a year."
+            ]
+          }
+        ],
+        "coordinatorLine": "Accessibility coordinator: {name}, {email}."
+      },
+      "dpa": {
+        "title": "Data processing agreement",
+        "intro": "This agreement applies when a Business uses MyBiz to store and handle personal information about its Clients and team. The Business decides why and how the information is used; MyBiz handles it on the Business's behalf.",
+        "sections": [
+          {
+            "id": "roles",
+            "title": "Roles",
+            "p": [
+              "The Business is the controller of the personal information of its Clients and team. MyBiz is the processor and handles that information only to provide the service and on the Business's documented instructions, which are the settings and actions it takes in the product."
+            ]
+          },
+          {
+            "id": "scope",
+            "title": "What we process",
+            "p": [
+              "Contact details, bookings, plans and payments, health declarations and notes the Business chooses to keep, messages sent through the service, and files the Business uploads. The Business is responsible for having a lawful basis to collect this information and for telling its Clients."
+            ]
+          },
+          {
+            "id": "security",
+            "title": "Security",
+            "p": [
+              "We apply the measures described in the privacy policy, including isolation between businesses, encryption of sensitive fields, access control, audit logging and backups. People with access on our side are bound by confidentiality."
+            ]
+          },
+          {
+            "id": "subprocessors",
+            "title": "Sub-processors",
+            "p": [
+              "The Business agrees that we use the sub-processors listed on the sub-processors page. We update that page before adding or replacing one, so the Business can object."
+            ]
+          },
+          {
+            "id": "rights",
+            "title": "Help with requests",
+            "p": [
+              "We provide tools to export and erase a Client's information and will help the Business answer requests from individuals and from the authorities."
+            ]
+          },
+          {
+            "id": "incidents",
+            "title": "Security incidents",
+            "p": [
+              "We tell the Business without undue delay after we become aware of a breach affecting its information, with what we know and what we are doing about it."
+            ]
+          },
+          {
+            "id": "end",
+            "title": "When the service ends",
+            "p": [
+              "When the account closes, the Business can export its information. We then delete it, apart from records we must keep by law, within the periods stated in the privacy policy."
+            ]
+          }
+        ]
+      },
+      "subprocessors": {
+        "title": "Sub-processors",
+        "intro": "These are the companies that help us run MyBiz and may handle personal information on behalf of our Businesses. Services marked \"when connected\" are used only by a Business that switches them on.",
+        "sections": [
+          {
+            "id": "hosting",
+            "title": "Hosting and database",
+            "p": [
+              "The list below is a draft for review by a lawyer, including the region of each service."
+            ],
+            "items": [
+              "Supabase: database, file storage and sign-in.",
+              "Render: the API and background jobs.",
+              "Vercel: the website and web app."
+            ]
+          },
+          {
+            "id": "ai",
+            "title": "AI",
+            "p": [
+              "Anthropic: processes the text the AI assistants work on, when a Business uses them."
+            ]
+          },
+          {
+            "id": "messaging",
+            "title": "Messages",
+            "p": [
+              "Used only when a Business connects them:"
+            ],
+            "items": [
+              "Meta (WhatsApp Business): WhatsApp messages. When connected.",
+              "Resend: email delivery. When connected.",
+              "Expo: push notifications to the app."
+            ]
+          },
+          {
+            "id": "payments",
+            "title": "Payments and invoicing",
+            "p": [
+              "A payment provider and an invoicing provider will be added here when they are connected. Until then no card or invoice data is handled by MyBiz."
+            ]
+          },
+          {
+            "id": "changes",
+            "title": "Changes",
+            "p": [
+              "We update this page before adding or replacing a sub-processor, and Businesses can object under the data processing agreement."
             ]
           }
         ]
@@ -4767,7 +4877,7 @@
       "trialEnds": "Free until {date}. The first charge is on {date}; you can cancel or change the plan any time before.",
       "monthly": "Monthly total after the trial",
       "today": "Due today",
-      "terms": "I agree to the <terms>terms of service</terms> and the <privacy>privacy policy</privacy>.",
+      "terms": "I agree to the <terms>terms of service</terms>, the <privacy>privacy policy</privacy> and the <dpa>data processing agreement</dpa>.",
       "termsRequired": "Please agree to the terms to continue.",
       "cta": "Create my account",
       "haveAccount": "Already have a MyBiz account?",
@@ -8059,6 +8169,17 @@
       "unknownDevice": "Unknown device",
       "when": "When"
     }
+  },
+  "legalUpdate": {
+    "title": "We updated our terms",
+    "text": "Our legal documents were updated. Please read and accept:",
+    "accept": "I accept",
+    "documents": {
+      "terms": "Terms of use",
+      "privacy": "Privacy policy",
+      "dpa": "Data processing agreement"
+    },
+    "failed": "We couldn't save your answer. Try again."
   },
   "auditLog": {
     "title": "Audit log",

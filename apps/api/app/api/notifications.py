@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import text
 
 from app.api.deps import ClientDep
-from app.api.pagination import DEFAULT_LIMIT, Page, PageDep
+from app.api.pagination import DEFAULT_LIMIT, KeysetDep, KeysetPage, encode_cursor
 
 router = APIRouter(prefix="/client", tags=["client"])
 
@@ -43,33 +43,54 @@ class Notification(BaseModel):
 class Inbox(BaseModel):
     unread: int
     items: list[Notification] = Field(description="Newest first, one page")
+    next_cursor: str | None = Field(
+        default=None, description="Pass as `after` for the next (older) page"
+    )
 
 
 class MarkRead(BaseModel):
     ids: list[UUID] | None = Field(default=None, description="Omit to mark all as read")
 
 
-def _inbox(context: ClientDep, page: Page) -> Inbox:
+def _inbox(context: ClientDep, page: KeysetPage) -> Inbox:
     db = context.session
-    rows = db.execute(
-        text("""
+    after = page.after or [None, None]
+    rows = list(
+        db.execute(
+            text("""
             SELECT id, kind, payload, created_at, read_at FROM app.notifications
             WHERE client_id = app.current_client_id()
-            ORDER BY created_at DESC LIMIT :limit OFFSET :offset
+              AND (CAST(:after_at AS timestamptz) IS NULL
+                   OR (created_at, id) < (CAST(:after_at AS timestamptz), CAST(:after_id AS uuid)))
+            ORDER BY created_at DESC, id DESC LIMIT :fetch OFFSET :offset
         """),
-        {"limit": page.limit, "offset": page.offset},
-    ).mappings()
+            {
+                "fetch": page.fetch,
+                "offset": page.offset,
+                "after_at": after[0],
+                "after_id": after[1] if len(after) > 1 else None,
+            },
+        ).mappings()
+    )
+    more = len(rows) > page.limit
+    rows = rows[: page.limit]
     unread = db.execute(
         text("""
             SELECT count(*) FROM app.notifications
             WHERE client_id = app.current_client_id() AND read_at IS NULL
         """)
     ).scalar_one()
-    return Inbox(unread=unread, items=[Notification.model_validate(dict(row)) for row in rows])
+    return Inbox(
+        unread=unread,
+        items=[Notification.model_validate(dict(row)) for row in rows],
+        next_cursor=encode_cursor(rows[-1]["created_at"].isoformat(), rows[-1]["id"])
+        if more
+        else None,
+    )
 
 
 @router.get("/notifications")
-def my_notifications(context: ClientDep, page: PageDep) -> Inbox:
+def my_notifications(context: ClientDep, page: KeysetDep) -> Inbox:
     return _inbox(context, page)
 
 
@@ -83,4 +104,4 @@ def mark_read(body: MarkRead, context: ClientDep) -> Inbox:
         """),
         {"ids": [str(i) for i in body.ids] if body.ids is not None else None},
     )
-    return _inbox(context, Page(limit=DEFAULT_LIMIT, offset=0))
+    return _inbox(context, KeysetPage(limit=DEFAULT_LIMIT, offset=0, after=None))

@@ -5,8 +5,8 @@ the latest run of each background job (app.job_runs has no grant), the queues of
 notifications still waiting, and the database size. Only the MyBiz team with the usage permission
 may call it.
 
-Revision ID: 0117
-Revises: 0116
+Revision ID: 0119
+Revises: 0118
 Create Date: 2026-10-17
 """
 
@@ -14,8 +14,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0117"
-down_revision: str | None = "0116"
+revision: str = "0119"
+down_revision: str | None = "0118"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

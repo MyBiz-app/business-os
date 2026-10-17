@@ -31,10 +31,16 @@ and branches on one sign-in.
 
 מלא: המלווה של בעל העסק והצוות לאתר MyBiz. רואים את המפגשים של היום, את סידור העבודה והמשמרות, לקוחות ולידים, הצעות מחיר ומכירות. העובדים מעדכנים זמינות ורואים את המשמרות שלהם; בעלי העסק בוחרים צבע מותג שצובע גם את אפליקציית הלקוחות. כמה עסקים וסניפים בכניסה אחת.
 
-## MyBiz team app
+## One app, three areas
 
-Internal: not listed publicly at first. Ship through TestFlight and Play's internal track, or
-private distribution, until the team grows beyond a few people.
+MyBiz is a single store listing. After sign-in the person lands in the area that fits: a client
+sees bookings, plans and receipts; staff and owners see the business area; the MyBiz team sees its
+own area. There is no separate team app to publish. Ship first through TestFlight and Play's
+internal track.
+
+Categories: Business (Play), Business (Apple; secondary Lifestyle). Age rating: 4+ / Everyone, no
+user-generated public content, messages are only between a client and the business. Contains ads:
+no. Price: free (businesses pay on the website, not in the app, so no in-app purchase is declared).
 
 ## What's new (first release)
 

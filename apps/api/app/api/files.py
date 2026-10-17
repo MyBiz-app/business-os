@@ -29,6 +29,7 @@ from app.api.deps import (
     require,
 )
 from app.api.documents import TYPES
+from app.api.pagination import FullPageDep, Page
 from app.core.config import get_settings
 from app.core.permissions import Permission
 from app.core.signed_links import sign, verify
@@ -259,7 +260,7 @@ def _visible_branches(context: TenantContext) -> list[UUID] | None:
     return None if context.branches is None else list(context.branches)
 
 
-def _list_files(context: TenantContext, where: str, params: dict) -> list[FileOut]:
+def _list_files(context: TenantContext, where: str, params: dict, page: Page) -> list[FileOut]:
     rows = context.session.execute(
         text(f"""
             SELECT {", ".join(f"f.{c.strip()}" for c in FILE_COLUMNS.split(","))},
@@ -269,25 +270,33 @@ def _list_files(context: TenantContext, where: str, params: dict) -> list[FileOu
             WHERE {where}
               AND (CAST(:branches AS uuid[]) IS NULL OR f.location_id IS NULL
                    OR f.location_id = ANY(CAST(:branches AS uuid[])))
-            ORDER BY f.created_at DESC
+            ORDER BY f.created_at DESC, f.id
+            LIMIT :limit OFFSET :offset
         """),
-        {**params, "branches": _visible_branches(context)},
+        {
+            **params,
+            "branches": _visible_branches(context),
+            "limit": page.limit,
+            "offset": page.offset,
+        },
     ).mappings()
     return [FileOut.model_validate(dict(row)) for row in rows]
 
 
 @router.get("")
-def list_files(context: MemberDep, folder_id: UUID, archived: bool = False) -> list[FileOut]:
+def list_files(
+    context: MemberDep, folder_id: UUID, page: FullPageDep, archived: bool = False
+) -> list[FileOut]:
     _folder(context, folder_id)
     where = "f.folder_id = :folder AND (f.archived_at IS NOT NULL) = :archived"
-    return _list_files(context, where, {"folder": folder_id, "archived": archived})
+    return _list_files(context, where, {"folder": folder_id, "archived": archived}, page)
 
 
 @router.get("/mine")
-def my_files(context: MemberDep) -> list[FileOut]:
+def my_files(context: MemberDep, page: FullPageDep) -> list[FileOut]:
     """ "My documents": what the business filed for me (payslips, my employment papers)."""
     where = "f.owner_user_id = app.current_user_id() AND f.archived_at IS NULL"
-    return _list_files(context, where, {})
+    return _list_files(context, where, {}, page)
 
 
 def _file_row(context: TenantContext, file_id: UUID) -> dict:
@@ -438,7 +447,7 @@ def update_file(file_id: UUID, body: FileUpdate, context: MemberDep) -> FileOut:
             """),
             {"archived": body.archived, "id": file_id},
         )
-    return _list_files(context, "f.id = :id", {"id": file_id})[0]
+    return _list_files(context, "f.id = :id", {"id": file_id}, Page(limit=1, offset=0))[0]
 
 
 @router.delete("/{file_id}", status_code=status.HTTP_204_NO_CONTENT)

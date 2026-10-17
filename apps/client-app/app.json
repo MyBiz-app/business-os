@@ -8,7 +8,10 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +20,10 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,7 +43,8 @@
         "expo-image-picker",
         {
           "photosPermission": "Allow MyBiz to use your photos for your profile picture.",
-          "cameraPermission": "Allow MyBiz to use the camera to take your profile picture."
+          "cameraPermission": "Allow MyBiz to use the camera to take your profile picture.",
+          "microphonePermission": false
         }
       ],
       [

@@ -62,10 +62,9 @@ def get_current_user(
             audience=get_settings().jwt_audience,
             options={"require": ["sub", "exp", "aud"]},
         )
-        return CurrentUser(
-            id=UUID(claims["sub"]),
-            email=claims.get("email", ""),
-            aal=claims.get("aal", "aal1"),
-        )
+        email = claims.get("email", "")
+        # Staging demo accounts named in API_MFA_DEMO_EXEMPT_EMAILS browse without a code.
+        aal = "aal2" if get_settings().mfa_exempt(email) else claims.get("aal", "aal1")
+        return CurrentUser(id=UUID(claims["sub"]), email=email, aal=aal)
     except (jwt.PyJWTError, ValueError) as error:
         raise UNAUTHORIZED from error
