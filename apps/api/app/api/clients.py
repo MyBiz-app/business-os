@@ -13,6 +13,7 @@ from app.api.common import blank_to_none, ensure_not_erased, not_found, set_clau
 from app.api.deps import TenantContext, ensure_branch_allowed, ensure_branch_visible, require
 from app.api.pagination import PageDep
 from app.catalog.verticals import VERTICAL_PACKS, VerticalPack, clean_client_fields
+from app.core import events
 from app.core.permissions import Permission
 from app.messaging.consent import request_origin
 
@@ -325,6 +326,7 @@ def create_client(body: ClientCreate, context: WriteDep) -> Client:
     except IntegrityError as error:
         raise _email_taken(error) or error from error
     _join_home_branch(context.session, row["id"], row["home_location_id"])
+    events.record(context.session, "first_client", once=True)
     return Client.model_validate(dict(row))
 
 

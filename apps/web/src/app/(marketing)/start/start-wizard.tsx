@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { oauthSignIn } from "@/app/(auth)/actions";
+
+import { reportSignupStep } from "./actions";
 import { Container } from "@/components/layout/container";
 import { PROVIDER_MARKS } from "@/components/auth/provider-marks";
 import { ModuleIcon } from "@/components/modules/module-icon";
@@ -135,6 +137,23 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
     if (moved.current) heading.current?.focus();
     moved.current = true;
   }, [stepIndex, category]);
+
+  // Tell MyBiz which step this visit reached (a random id for the tab, no personal data), so the
+  // console shows where people stop. The add-on screens count as one "extras" step.
+  useEffect(() => {
+    try {
+      let visit = sessionStorage.getItem("mybiz-signup-visit");
+      if (!visit) {
+        visit = crypto.randomUUID();
+        sessionStorage.setItem("mybiz-signup-visit", visit);
+        void reportSignupStep(visit, "signup_started");
+      }
+      const group = (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step;
+      void reportSignupStep(visit, "signup_step", group as Parameters<typeof reportSignupStep>[2]);
+    } catch {
+      // Storage can be blocked; the sign-up works the same without the beacon.
+    }
+  }, [step]);
 
   // On a phone the choices swipe sideways: open each screen on the chosen (or suggested) one.
   useEffect(() => {

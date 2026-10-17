@@ -19,6 +19,7 @@ from app.api.health import HEALTH_STATE_SQL, HealthState
 from app.api.pagination import NEXT_CURSOR_HEADER, KeysetDep, WidePageDep, encode_cursor
 from app.api.plans import usable_entitlement
 from app.catalog.verticals import CATALOG, VerticalPack
+from app.core import events
 from app.core.permissions import Permission
 from app.messaging.notifications import notify_booking
 
@@ -191,7 +192,7 @@ def place_booking(
     booked, _ = session_counts(db, session_id)
     full = booked >= session["capacity"]
     try:
-        return db.execute(
+        booking_id = db.execute(
             text("""
                 INSERT INTO app.bookings
                     (tenant_id, session_id, client_id, dependent_id, entitlement_id, status,
@@ -212,6 +213,8 @@ def place_booking(
         ).scalar_one()
     except IntegrityError as error:
         raise HTTPException(status_code=422, detail="invalid_reference") from error
+    events.record(db, "first_booking", once=True)
+    return booking_id
 
 
 def ensure_dependent(

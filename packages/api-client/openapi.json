@@ -34036,6 +34036,182 @@
         }
       }
     },
+    "/platform/funnel": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Signup Funnel",
+        "description": "People who reached each step of the sign-up journey, in order, and how many finished.",
+        "operationId": "signup_funnel",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FunnelStep"
+                  },
+                  "title": "Response Signup Funnel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/activity": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Activity",
+        "operationId": "activity",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityDay"
+                  },
+                  "title": "Response Activity"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/platform/top-consumers": {
+      "get": {
+        "tags": [
+          "platform"
+        ],
+        "summary": "Top Consumers",
+        "description": "The businesses using the most messages, space and AI.",
+        "operationId": "top_consumers",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 365,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 10,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Consumer"
+                  },
+                  "title": "Response Top Consumers"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/platform/ai-spend": {
       "get": {
         "tags": [
@@ -39728,6 +39904,41 @@
           }
         }
       }
+    },
+    "/public/events": {
+      "post": {
+        "tags": [
+          "public"
+        ],
+        "summary": "Report Signup Step",
+        "description": "A step of the sign-up journey was reached.",
+        "operationId": "report_signup_step",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignupStep"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -40220,6 +40431,32 @@
           "note"
         ],
         "title": "ActivityCreate"
+      },
+      "ActivityDay": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "active_day": {
+            "type": "integer",
+            "title": "Active Day",
+            "description": "Businesses with any activity that day"
+          },
+          "active_week": {
+            "type": "integer",
+            "title": "Active Week",
+            "description": "Businesses with any activity in the 7 days up to it"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "active_day",
+          "active_week"
+        ],
+        "title": "ActivityDay"
       },
       "Address": {
         "properties": {
@@ -46698,6 +46935,40 @@
         ],
         "title": "ConsentEvent"
       },
+      "Consumer": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "messages": {
+            "type": "number",
+            "title": "Messages"
+          },
+          "ai_credits": {
+            "type": "number",
+            "title": "Ai Credits"
+          },
+          "storage_bytes": {
+            "type": "integer",
+            "title": "Storage Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id",
+          "name",
+          "messages",
+          "ai_credits",
+          "storage_bytes"
+        ],
+        "title": "Consumer"
+      },
       "ContactCreate": {
         "properties": {
           "name": {
@@ -50370,6 +50641,25 @@
           "visible"
         ],
         "title": "FriendSettingsUpdate"
+      },
+      "FunnelStep": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key",
+            "description": "started, a wizard step, or completed"
+          },
+          "visitors": {
+            "type": "integer",
+            "title": "Visitors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "visitors"
+        ],
+        "title": "FunnelStep"
       },
       "GettingStarted": {
         "properties": {
@@ -58458,6 +58748,26 @@
         ],
         "title": "QuestionnaireIn"
       },
+      "QuotaAlert": {
+        "properties": {
+          "meter": {
+            "type": "string",
+            "title": "Meter",
+            "description": "messages or storage"
+          },
+          "threshold": {
+            "type": "integer",
+            "title": "Threshold",
+            "description": "Percent of the bundle passed: 80 or 100"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meter",
+          "threshold"
+        ],
+        "title": "QuotaAlert"
+      },
       "Quote": {
         "properties": {
           "id": {
@@ -63476,6 +63786,50 @@
         ],
         "title": "Signature"
       },
+      "SignupStep": {
+        "properties": {
+          "visitor_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Visitor Id",
+            "description": "Random id the browser made for this visit"
+          },
+          "event": {
+            "type": "string",
+            "enum": [
+              "signup_started",
+              "signup_step"
+            ],
+            "title": "Event"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "account",
+                  "industry",
+                  "business",
+                  "base",
+                  "extras",
+                  "services",
+                  "summary"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          }
+        },
+        "type": "object",
+        "required": [
+          "visitor_id",
+          "event"
+        ],
+        "title": "SignupStep"
+      },
       "Slot": {
         "properties": {
           "starts_at": {
@@ -67312,6 +67666,14 @@
             "title": "Ai Extra Minor",
             "description": "Pay-as-you-go: this month's extra AI use, minor units",
             "default": 0
+          },
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/QuotaAlert"
+            },
+            "type": "array",
+            "title": "Alerts",
+            "description": "Marks (80 and 100 percent) the month's messages and space have passed"
           }
         },
         "type": "object",

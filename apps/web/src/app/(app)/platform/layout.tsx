@@ -16,6 +16,7 @@ export default async function PlatformLayout({ children }: LayoutProps<"/platfor
     { href: "/platform/broadcasts", label: t("nav.broadcasts"), icon: "broadcasts", show: can("broadcasts.manage") },
     { href: "/platform/incidents", label: t("nav.incidents"), icon: "incidents", show: can("broadcasts.manage") },
     { href: "/platform/billing", label: t("nav.billing"), icon: "billing", show: can("billing.manage") },
+    { href: "/platform/growth", label: t("nav.growth"), icon: "reports", show: can("usage.read") },
     { href: "/platform/ai", label: t("nav.ai"), icon: "assistant", show: can("usage.read") },
     { href: "/platform/health", label: t("nav.health"), icon: "health", show: can("usage.read") },
     { href: "/platform/team", label: t("nav.team"), icon: "team", show: can("staff.manage") },
