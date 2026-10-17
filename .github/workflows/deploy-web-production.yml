@@ -5,7 +5,8 @@ name: Deploy web to production
 # hand with a tag name; the GitHub environment `production` requires a manual approval and holds
 # its own secrets. Nothing in this workflow reads or needs the database: the production owner
 # connection string lives only on Render (docs/deploy/production.md, "Who can reach what").
-# The release and rollback steps (GL16) hook in at the marked places.
+# Release record, post-deploy health check and automatic rollback are in this file (GL16);
+# a manual rollback is .github/workflows/rollback.yml.
 on:
   push:
     tags: ["v*"]
@@ -33,6 +34,10 @@ jobs:
       # set when production is created).
       VERCEL_ORG_ID: ${{ vars.PRODUCTION_VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.PRODUCTION_VERCEL_PROJECT_ID }}
+      # Optional: with them the API is released and rolled back from here too.
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ vars.RENDER_SERVICE_ID }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,7 +64,12 @@ jobs:
             fi
           done
 
-      # GL16 hook: record the release (tag and commit) here, before the deploy starts.
+      - name: Record the release
+        run: |
+          {
+            echo "### Release $RELEASE_TAG"
+            echo "Commit: \`$(git rev-parse HEAD)\`"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       # Vercel builds it: the project's environment variables are "sensitive", so they can't be
       # pulled to this runner, only read by Vercel's own build.
@@ -80,4 +90,26 @@ jobs:
           curl --fail --silent --show-error -X POST "${RENDER_DEPLOY_HOOK_URL}&ref=$(git rev-parse HEAD)" > /dev/null
           echo "Render deploy started for $RELEASE_TAG."
 
-      # GL16 hook: health check after the deploy and automatic rollback go here.
+      # Health checks need the addresses (repository variables PRODUCTION_WEB_URL and
+      # PRODUCTION_API_URL). When the website is not healthy it goes back to the previous deployment;
+      # the API goes back too when the Render API key is set. Migrations only add first, so a
+      # previous version always runs on the migrated database (docs/deploy/releases.md).
+      - name: Check the website after the deploy
+        id: web_health
+        if: vars.PRODUCTION_WEB_URL != ''
+        run: scripts/release/wait-healthy.sh "${{ vars.PRODUCTION_WEB_URL }}" 180
+
+      - name: Check the API after the deploy
+        id: api_health
+        if: ${{ !cancelled() && vars.PRODUCTION_API_URL != '' && env.RENDER_DEPLOY_HOOK_URL != '' }}
+        run: scripts/release/wait-healthy.sh "${{ vars.PRODUCTION_API_URL }}/health/ready" 600
+
+      - name: Roll the website back
+        if: failure() && steps.web_health.outcome == 'failure'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes "$VERCEL_CLI" rollback --yes --token="$VERCEL_TOKEN"
+
+      - name: Roll the API back
+        if: ${{ failure() && steps.api_health.outcome == 'failure' && env.RENDER_API_KEY != '' }}
+        run: scripts/release/render-rollback.sh
