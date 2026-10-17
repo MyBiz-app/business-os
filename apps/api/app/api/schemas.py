@@ -54,6 +54,9 @@ class Me(BaseModel):
     email_roster: bool = Field(
         default=True, description="Email the person when their roster is published"
     )
+    marketing_consent: bool = Field(
+        default=False, description="Agreed to marketing messages (service messages are sent anyway)"
+    )
     palette: Palette | None = Field(
         default=None, description="The person's color palette (none: the MyBiz default)"
     )

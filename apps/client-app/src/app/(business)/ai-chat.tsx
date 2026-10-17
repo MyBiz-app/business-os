@@ -132,7 +132,7 @@ export default function AiChat() {
 
   return (
     <SafeAreaView edges={["top", "left", "right", "bottom"]} style={{ flex: 1, backgroundColor: palette.background }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1, width: "100%", maxWidth: 720, alignSelf: "center" }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <View style={{ paddingHorizontal: 16, paddingTop: 8, gap: 8 }}>
           <BackBar label={t("back")} palette={palette} onPress={() => (router.canGoBack() ? router.back() : router.replace("/ai"))} />
           {agent && (

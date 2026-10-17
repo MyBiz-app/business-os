@@ -118,7 +118,7 @@ export default function Pay() {
               { backgroundColor: palette.success, transform: [{ scale: pop.interpolate({ inputRange: [0, 1], outputRange: [0.4, 1] }) }] },
             ]}
           >
-            <Ionicons name="checkmark" size={56} color="#ffffff" />
+            <Ionicons name="checkmark" size={56} color={palette.onPrimary} />
           </Animated.View>
           <Text accessibilityRole="header" accessibilityLiveRegion="polite" style={[local.doneTitle, { color: palette.foreground }]}>
             {t("success")}
@@ -142,7 +142,7 @@ export default function Pay() {
     <Screen palette={palette}>
       <Heading palette={palette}>{t("title")}</Heading>
       {checkout?.simulated && (
-        <View style={[local.banner, { backgroundColor: tint("#b45309", 0.12), borderColor: tint("#b45309", 0.4) }]}>
+        <View style={[local.banner, { backgroundColor: tint(palette.warning, 0.12), borderColor: tint(palette.warning, 0.4) }]}>
           <Ionicons name="flask-outline" size={18} color={palette.foreground} />
           <Text style={[local.bannerText, { color: palette.foreground }]}>{t("testMode")}</Text>
         </View>
@@ -154,12 +154,12 @@ export default function Pay() {
         accessibilityLabel={`${t("testCard")}: 4242 4242 4242 4242`}
         style={[local.card, elevation.raised, { backgroundColor: palette.primary }]}
       >
-        <View aria-hidden style={[local.cardOrb, { backgroundColor: tint("#ffffff", 0.14) }]} />
+        <View aria-hidden style={[local.cardOrb, { backgroundColor: tint(palette.onPrimary, 0.14) }]} />
         <View style={local.cardTop}>
           <Text style={[local.cardLabel, { color: palette.onPrimary }]}>{business.name}</Text>
           <Text style={[local.cardBadge, { color: palette.onPrimary, borderColor: palette.onPrimary }]}>TEST</Text>
         </View>
-        <View style={[local.chip, { backgroundColor: tint("#ffffff", 0.55) }]} />
+        <View style={[local.chip, { backgroundColor: tint(palette.onPrimary, 0.55) }]} />
         <Text style={[local.cardNumber, { color: palette.onPrimary }]}>4242  4242  4242  4242</Text>
         <View style={local.cardTop}>
           <Text style={[local.cardLabel, { color: palette.onPrimary }]}>{t("testCard")}</Text>

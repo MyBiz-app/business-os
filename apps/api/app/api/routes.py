@@ -226,7 +226,8 @@ def get_me(user: UserDep, session: SessionDep) -> Me:
         session.execute(
             text("""
                 SELECT id, email, full_name, locale, app.is_platform_admin() AS platform_admin,
-                       phone, birth_date, address_line, city, postal_code, email_roster, palette,
+                       phone, birth_date, address_line, city, postal_code, email_roster,
+                       marketing_consent_at IS NOT NULL AS marketing_consent, palette,
                        CASE WHEN palette_background IS NULL THEN NULL
                             ELSE jsonb_build_object('background', palette_background,
                                                     'text', palette_text,

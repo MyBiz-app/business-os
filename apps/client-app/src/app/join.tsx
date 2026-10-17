@@ -1,7 +1,8 @@
 import type { components } from "@business-os/api-client";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, View } from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Image, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "@business-os/app-kit/components/text";
 import { useTranslations } from "use-intl";
 
@@ -31,6 +32,8 @@ export default function Join() {
   const known = businesses?.[0];
   const [firstName, setFirstName] = useState(known?.first_name ?? "");
   const [lastName, setLastName] = useState(known?.last_name ?? "");
+  // Marketing messages are opt-in: off until the person ticks it.
+  const [marketing, setMarketing] = useState(false);
   const palette = brandPalette(basePalette, profile?.primary_color);
 
   const lookUp = async (value: string) => {
@@ -64,6 +67,8 @@ export default function Join() {
         params: { header: { "X-Tenant-Id": joined.id } },
         body: { first_name: firstName.trim(), last_name: lastName.trim() || joined.last_name || null, phone: joined.phone ?? known?.phone ?? null },
       }).then(unwrap);
+      // A failure here must not undo the join; the person can still choose on their profile.
+      if (marketing) await apiClient().PUT("/me/marketing-consent", { body: { consent: true } }).catch(() => undefined);
       await refresh();
       router.replace("/home");
     } catch {
@@ -98,6 +103,18 @@ export default function Join() {
             <>
               <Field label={t("firstName")} palette={palette} value={firstName} onChangeText={setFirstName} autoComplete="given-name" textContentType="givenName" />
               <Field label={t("lastName")} palette={palette} value={lastName} onChangeText={setLastName} autoComplete="family-name" textContentType="familyName" />
+              <Pressable
+                role="checkbox"
+                aria-checked={marketing}
+                accessibilityLabel={t("marketing")}
+                onPress={() => setMarketing((on) => !on)}
+                style={local.consent}
+              >
+                <View style={[local.box, { borderColor: marketing ? palette.primary : palette.border, backgroundColor: marketing ? palette.primary : palette.surface }]}>
+                  {marketing ? <Ionicons name="checkmark" size={18} color={palette.onPrimary} /> : null}
+                </View>
+                <Text style={[local.consentText, { color: palette.foreground }]}>{t("marketing")}</Text>
+              </Pressable>
             </>
           )}
           <ErrorText message={error} palette={palette} />
@@ -133,6 +150,9 @@ export default function Join() {
 }
 
 const local = StyleSheet.create({
+  consent: { flexDirection: "row", alignItems: "center", gap: 12, minHeight: 44 },
+  box: { width: 26, height: 26, borderRadius: 8, borderWidth: 2, alignItems: "center", justifyContent: "center" },
+  consentText: { flex: 1, fontSize: 15 },
   brand: { flexDirection: "row", alignItems: "center", gap: 12 },
   logo: { width: 56, height: 56, borderRadius: 14 },
   name: { fontSize: 22, fontWeight: "700", flexShrink: 1, textAlign: "left" },
