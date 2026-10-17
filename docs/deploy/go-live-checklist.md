@@ -36,6 +36,22 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | `API_RATE_LIMIT_REDIS_URL` | Optional; only when running more than one API instance (**off**) |
 | `API_ANTHROPIC_API_KEY`, `API_EMAIL_*` | Optional until the AI assistant and real email are wanted |
 
+## Website headers (slice GL5)
+
+Set on the Vercel project that serves the website. The defaults are the safe ones for staging.
+
+| Variable | Value | When |
+|---|---|---|
+| `WEB_ALLOW_INDEXING` | `true` | **Production only.** Without it every page sends `noindex` and `robots.txt` blocks all crawlers. Leave it unset on staging and previews |
+| `WEB_HSTS_INCLUDE_SUBDOMAINS` | `true` | Only after the real domain is live and **every** subdomain (app, api, mail, any test site) serves valid HTTPS. It cannot be undone from the server: browsers remember it for two years |
+| `WEB_CSP_MODE` | `report-only` | Emergency switch only: if a page is found broken by the Content-Security-Policy, set this to stop enforcing it while the cause is fixed (violations still go to `/api/csp-report`). Remove it afterwards |
+
+Steps at go-live: set `WEB_ALLOW_INDEXING=true` on the production project, redeploy, and check
+`https://<domain>/robots.txt` and that a page has no `X-Robots-Tag` header; after the domain and its
+subdomains work, set `WEB_HSTS_INCLUDE_SUBDOMAINS=true` and check the `Strict-Transport-Security`
+header; submit the sitemap to Google Search Console. A new outside service the browser must reach
+directly (not through the Next.js server) needs its origin added to `apps/web/src/lib/csp.ts`.
+
 ## Switch-on steps that need a paid plan (GL1)
 
 | Item | State | To switch on |
@@ -61,6 +77,14 @@ ClamAV daemon (`clamd`), which is a separate service:
 
 While it is on, an unreachable scanner refuses uploads (`scan_unavailable`) instead of letting them
 through. Switch it off again with `API_FILE_SCAN_PROVIDER=none`.
+
+## Switching on sign-in removal (account deletion)
+
+"Delete my account" in the apps empties the person's profile and disconnects them. To also delete
+their login at Supabase Auth, set `API_SUPABASE_URL` (the project URL) and
+`API_SUPABASE_SERVICE_KEY` (the service role key, from Supabase, Settings, API) as secrets on
+the API host. Never put the key in the repository or in the apps. Without them the account can
+no longer be used (the API answers `account_deleted`), but the login row stays at Supabase.
 
 ## Still the owner's
 

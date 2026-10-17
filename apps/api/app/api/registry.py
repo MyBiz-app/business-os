@@ -6,6 +6,7 @@
 from fastapi import APIRouter
 
 from app.api import (
+    account_deletion,
     ai_tasks,
     ai_team,
     appointments,
@@ -24,6 +25,7 @@ from app.api import (
     clients,
     closure,
     contact_emails,
+    data_export,
     dependents,
     devices,
     documents,
@@ -114,6 +116,8 @@ ROUTERS: list[APIRouter] = [
     client_notes.router,
     privacy.router,
     closure.router,
+    account_deletion.router,
+    data_export.router,
     leads.router,
     messaging.router,
     migration.router,
@@ -124,6 +128,7 @@ ROUTERS: list[APIRouter] = [
     location_groups.router,
     contact_emails.router,
     contact_emails.public_router,
+    data_export.public_router,
     locations.router,
     staff.router,
     people.router,

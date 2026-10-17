@@ -10,6 +10,7 @@ import { getTenant } from "@/lib/tenant";
 
 import { CloseSection } from "./close-section";
 import { ContactEmails } from "./contact-emails";
+import { ExportSection } from "./export-section";
 import { LegalReadiness } from "./legal-readiness";
 import { removeCover, removeLogo } from "./actions";
 import { BrandColorForm, CoverForm, DetailsForm, IdentityForm, LogoForm } from "./settings-forms";
@@ -128,6 +129,7 @@ export default async function SettingsPage() {
           <CoverForm key={tenant.cover_url ?? "none"} />
         </div>
       </section>
+      {tenant.role === "owner" && <ExportSection context={context} />}
       {tenant.role === "owner" && <SupportSection context={context} />}
       <WriteToMyBiz />
       {tenant.role === "owner" && <CloseSection name={tenant.name} />}
