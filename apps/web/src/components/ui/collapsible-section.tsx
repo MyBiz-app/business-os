@@ -1,0 +1,83 @@
+"use client";
+
+import { ChevronDown } from "lucide-react";
+import { type ReactNode, useEffect, useId, useState } from "react";
+
+const PREFIX = "section:";
+
+function remembered(key: string | undefined): boolean | null {
+  if (!key) return null;
+  try {
+    const value = window.localStorage.getItem(PREFIX + key);
+    return value === null ? null : value === "1";
+  } catch {
+    return null;
+  }
+}
+
+/** One foldable section: a title, an optional description line and an arrow at the start that
+ * folds and unfolds it. With `storageKey` the choice is remembered per browser (the first section
+ * is open by default, the rest as the person left them). Replaces the bare `<details>` blocks. */
+export function CollapsibleSection({
+  title,
+  description,
+  children,
+  defaultOpen = false,
+  storageKey,
+  actions,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+  defaultOpen?: boolean;
+  storageKey?: string;
+  /** Buttons shown at the end of the header line (not part of the fold button). */
+  actions?: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const panel = useId();
+
+  useEffect(() => {
+    const saved = remembered(storageKey);
+    // Read after mount so the server and first client render agree.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (saved !== null) setOpen(saved);
+  }, [storageKey]);
+
+  function toggle() {
+    const next = !open;
+    setOpen(next);
+    if (!storageKey) return;
+    try {
+      window.localStorage.setItem(PREFIX + storageKey, next ? "1" : "0");
+    } catch {
+      // Private mode or blocked storage: the section still works, it just is not remembered.
+    }
+  }
+
+  return (
+    <section className="card overflow-hidden">
+      <div className="flex items-center gap-3 pe-4">
+        <button
+          type="button"
+          className="btn-plain flex min-w-0 flex-1 items-start gap-3 px-5 py-4 text-start"
+          aria-expanded={open}
+          aria-controls={panel}
+          onClick={toggle}
+        >
+          <ChevronDown aria-hidden="true" className="section-chevron mt-0.5 size-5 shrink-0 text-muted" data-open={open || undefined} />
+          <span className="min-w-0">
+            <span className="block font-semibold">{title}</span>
+            {description ? <span className="mt-0.5 block text-sm text-muted">{description}</span> : null}
+          </span>
+        </button>
+        {actions}
+      </div>
+      <div id={panel} className="section-body" data-open={open || undefined} inert={!open}>
+        <div className="min-h-0 overflow-hidden">
+          <div className="border-t border-border px-5 py-5">{children}</div>
+        </div>
+      </div>
+    </section>
+  );
+}
