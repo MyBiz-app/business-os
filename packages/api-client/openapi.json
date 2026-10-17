@@ -8020,6 +8020,78 @@
         }
       }
     },
+    "/quotes/summary": {
+      "get": {
+        "tags": [
+          "quotes"
+        ],
+        "summary": "Quotes Summary",
+        "description": "How many quotes and how much money per status and currency, over every visible quote.",
+        "operationId": "quotes_summary",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteStatusTotal"
+                  },
+                  "title": "Response Quotes Summary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/quotes/{quote_id}": {
       "get": {
         "tags": [
@@ -59991,6 +60063,43 @@
           "total"
         ],
         "title": "QuoteOut"
+      },
+      "QuoteStatusTotal": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "sent",
+              "accepted",
+              "declined",
+              "expired"
+            ],
+            "title": "Status",
+            "description": "expired: sent and past its date"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total",
+            "description": "Minor units"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "currency",
+          "count",
+          "total"
+        ],
+        "title": "QuoteStatusTotal"
       },
       "QuoteSummary": {
         "properties": {

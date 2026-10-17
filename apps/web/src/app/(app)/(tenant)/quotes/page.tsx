@@ -1,3 +1,4 @@
+import type { components } from "@business-os/api-client";
 import { FileSignature, Plus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
@@ -14,6 +15,9 @@ import { getTenantFor } from "@/lib/tenant";
 import { STATUS_TONE } from "./status";
 import { EmptyState } from "@/components/empty-state";
 
+const PAGE_SIZE = 50;
+const MAX_SHOWN = 1000;
+const CHUNK = 200; // the API's largest page
 const FILTERS = ["all", "draft", "sent", "accepted", "declined", "expired"] as const;
 
 /** Quotes (#44): newest first, by status. */
@@ -24,17 +28,32 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
   const { tenant, api, scope } = await getTenantFor("clients.read");
   const raw = (await searchParams).status;
   const filter = FILTERS.find((f) => f === raw) ?? "all";
-  // The tiles count every quote; the list below is the same set narrowed to the chosen status.
-  const everything = unwrap(await api.GET("/quotes", { params: scope }));
-  const quotes = filter === "all" ? everything : everything.filter((quote) => quote.status === filter);
+  // The tiles count every quote (a summary query); the list is one status, a page at a time.
+  const summary = unwrap(await api.GET("/quotes/summary", { params: scope }));
+  const shown = Math.min(MAX_SHOWN, Math.max(PAGE_SIZE, Number((await searchParams).shown) || PAGE_SIZE));
+  // One more than shown tells whether a next page exists.
+  const quotes: components["schemas"]["QuoteSummary"][] = [];
+  while (quotes.length <= shown) {
+    const take = Math.min(CHUNK, shown + 1 - quotes.length);
+    const chunk = unwrap(
+      await api.GET("/quotes", {
+        params: { ...scope, query: { status: filter === "all" ? undefined : filter, limit: take, offset: quotes.length } },
+      }),
+    );
+    quotes.push(...chunk);
+    if (chunk.length < take) break;
+  }
+  const hasMore = quotes.length > shown;
+  const visibleQuotes = quotes.slice(0, shown);
   const tiles = (["draft", "sent", "accepted", "declined"] as const).map((status) => {
-    const rows = everything.filter((quote) => (status === "declined" ? ["declined", "expired"].includes(quote.status) : quote.status === status));
-    const currencies = new Set(rows.map((quote) => quote.currency));
+    const rows = summary.filter((row) => (status === "declined" ? ["declined", "expired"].includes(row.status) : row.status === status));
+    const currencies = new Set(rows.map((row) => row.currency));
+    const count = rows.reduce((sum, row) => sum + row.count, 0);
     return {
       key: status,
       label: t(`tiles.${status}`),
-      value: rows.length,
-      hint: rows.length > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, quote) => sum + quote.total, 0), [...currencies][0], locale) : undefined,
+      value: count,
+      hint: count > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, row) => sum + row.total, 0), [...currencies][0], locale) : undefined,
       href: `/quotes?status=${status}`,
       active: filter === status,
     };
@@ -71,11 +90,11 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
         options={FILTERS.map((f) => ({ key: f, label: t(`filters.${f}`), href: f === "all" ? "/quotes" : `/quotes?status=${f}` }))}
       />
       <SummaryTiles label={t("tiles.label")} tiles={tiles} />
-      {quotes.length === 0 ? (
+      {visibleQuotes.length === 0 ? (
         <EmptyState variant="list">{t("none")}</EmptyState>
       ) : (
         <ul className="flex flex-col divide-y divide-border card">
-          {quotes.map((quote) => (
+          {visibleQuotes.map((quote) => (
             <li key={quote.id}>
               <Link href={`/quotes/${quote.id}`} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 hover:bg-foreground/[0.03]">
                 <span className="flex min-w-0 flex-col gap-0.5">
@@ -95,6 +114,15 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
             </li>
           ))}
         </ul>
+      )}
+      {hasMore && shown < MAX_SHOWN && (
+        <Link
+          scroll={false}
+          href={`/quotes?${filter === "all" ? "" : `status=${filter}&`}shown=${shown + PAGE_SIZE}`}
+          className="btn-secondary self-center px-4 py-2"
+        >
+          {t("loadMore")}
+        </Link>
       )}
     </Container>
   );
