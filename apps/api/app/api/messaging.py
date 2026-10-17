@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from app.api.common import not_found
 from app.api.deps import TenantContext, ensure_branch_allowed, has_module, require
 from app.core.permissions import Permission
+from app.messaging.consent import promotional_text
 from app.messaging.placeholders import (
     GROUPS,
     SAMPLE,
@@ -52,6 +53,7 @@ AUDIENCES: tuple[Audience, ...] = (
 )
 INACTIVE_DAYS = 14
 MAX_BODY = 1000
+AD_AFFIX = 120  # room for the "Ad" mark and the opt-out link of an SMS / WhatsApp ad
 
 
 def _messaging(permission: Permission):
@@ -283,13 +285,16 @@ def _people(
         ).mappings()
         return [Recipient.model_validate(dict(r)) for r in rows]
     consent = (
-        """AND (c.marketing_consent_at IS NOT NULL OR EXISTS (
+        """AND c.marketing_opted_out_at IS NULL
+               AND (c.marketing_consent_at IS NOT NULL OR EXISTS (
                  SELECT 1 FROM app.users cu
                  WHERE cu.id = c.user_id AND cu.marketing_consent_at IS NOT NULL))"""
         if promotional
         else ""
     )
     if audience == "open_leads":
+        if promotional:
+            return []  # a lead has no recorded agreement, so it never gets an ad
         rows = db.execute(
             text("""
                 SELECT id AS lead_id, first_name, phone FROM app.leads
@@ -421,9 +426,12 @@ def _send(
     channel: PhoneChannel,
     body: str,
     campaign_id: UUID | None,
+    promotional: bool = False,
 ) -> None:
     db = context.session
     business = _business(db)
+    tokens = _unsubscribe_tokens(db, [r.client_id for r in recipients if r.client_id])
+    locale = _locale(db)
     rows = [
         {
             "tenant_id": context.tenant_id,
@@ -432,7 +440,7 @@ def _send(
             "lead_id": r.lead_id,
             "channel": channel,
             "to_phone": (r.phone or "").strip(),
-            "body": render(body, values),
+            "body": _final_text(render(body, values), promotional, locale, tokens.get(r.client_id)),
         }
         for r, values in zip(
             recipients, _values(db, context.tenant_id, recipients, business), strict=True
@@ -475,6 +483,27 @@ def _send(
             "ref": str(campaign_id) if campaign_id else None,
         },
     )
+
+
+def _locale(db: Session) -> str:
+    return db.execute(
+        text("SELECT locale FROM app.tenants WHERE id = app.current_tenant_id()")
+    ).scalar_one()
+
+
+def _unsubscribe_tokens(db: Session, client_ids: list[UUID]) -> dict[UUID, str]:
+    if not client_ids:
+        return {}
+    rows = db.execute(
+        text("SELECT id, unsubscribe_token FROM app.clients WHERE id = ANY(CAST(:ids AS uuid[]))"),
+        {"ids": client_ids},
+    ).all()
+    return {row[0]: row[1] for row in rows}
+
+
+def _final_text(body: str, promotional: bool, locale: str, token: str | None) -> str:
+    """An ad is marked as one and carries the opt-out link; a service message is sent as is."""
+    return promotional_text(body, locale, token) if promotional else body
 
 
 def _unreachable(detail: str) -> HTTPException:
@@ -532,11 +561,24 @@ def send_campaign(body: CampaignCreate, context: SendAnyDep) -> CampaignResult:
         if not net:
             raise _unreachable("staff_channels")
         channels, phone = net, []
+    if body.promotional and phone and len(body.body) > MAX_BODY - AD_AFFIX:
+        raise _unreachable("ad_too_long")
     scope = _scope(context, body.location_ids)
     people = _people(db, body.audience, channels, scope, body.promotional)
     business = _business(db)
     values = _values(db, context.tenant_id, people, business)
-    preview = render(body.body, values[0]) if people else None
+    preview = (
+        _final_text(
+            render(body.body, values[0]),
+            body.promotional,
+            _locale(db),
+            _unsubscribe_tokens(db, [people[0].client_id] if people[0].client_id else []).get(
+                people[0].client_id
+            ),
+        )
+        if people
+        else None
+    )
     warnings = [
         PlaceholderWarning(variable=name, recipients=n)
         for name, n in missing_counts(body.body, values).items()
@@ -570,7 +612,7 @@ def send_campaign(body: CampaignCreate, context: SendAnyDep) -> CampaignResult:
     ).scalar_one()
     for channel in phone:
         reachable = [p for p in people if p.phone and p.phone.strip()]
-        _send(context, reachable, channel, body.body, campaign_id)
+        _send(context, reachable, channel, body.body, campaign_id, body.promotional)
     if net:
         _announce(context, people, net, body, scope, business)
     return CampaignResult(

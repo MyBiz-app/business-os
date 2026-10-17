@@ -735,7 +735,23 @@
       "hint": "Service messages (reminders, receipts) are sent either way. Record consent only when the client gave it.",
       "toggleOn": "Record consent",
       "toggleOff": "Withdraw consent",
-      "error": "Could not save. Try again."
+      "error": "Could not save. Try again.",
+      "optedOut": "This client stopped ads with the opt-out link. Record consent again only if they agree again.",
+      "source": "How did the client agree?",
+      "sourcePick": "Choose how",
+      "sourceRequired": "Choose how the client agreed.",
+      "history": "History",
+      "granted": "Agreed",
+      "withdrawn": "Withdrew",
+      "sources": {
+        "desk_signed": "Signed form",
+        "desk_verbal": "Said so in person",
+        "desk_other": "Other",
+        "app_join": "Joined in the app",
+        "app_profile": "App profile",
+        "unsubscribe_link": "Opt-out link",
+        "unsubscribe_email": "Opt-out link in an email"
+      }
     }
   },
   "common": {

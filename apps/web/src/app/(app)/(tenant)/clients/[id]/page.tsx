@@ -73,6 +73,9 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
     await api.GET("/clients/{client_id}/bookings", { params: { ...scope, path: { client_id: id } } }),
   );
   const { upcoming, past } = splitByNow(bookings);
+  const consentEvents = unwrap(
+    await api.GET("/clients/{client_id}/consent-events", { params: { ...scope, path: { client_id: id } } }),
+  );
   const reviews = unwrap(await api.GET("/reviews", { params: { ...scope, query: { client_id: id } } }));
   const tReviews = await getTranslations("reviews");
   const dateFormat = new Intl.DateTimeFormat(locale, {
@@ -276,7 +279,7 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
 
           <ProfileSection clientId={client.id} values={client.custom_fields} context={context} locked={erased} />
 
-          {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} canWrite={canWriteClients(tenant)} />}
+          {!erased && <ConsentSection clientId={client.id} consent={client.marketing_consent} optedOut={client.marketing_opted_out_at != null} events={consentEvents} canWrite={canWriteClients(tenant)} />}
 
           {!erased && tenant.client_id_number !== "off" && <IdentitySection clientId={client.id} />}
 
