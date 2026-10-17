@@ -11,7 +11,13 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from app.api.common import not_found
-from app.api.deps import ClientDep, TenantContext, require
+from app.api.deps import (
+    ClientDep,
+    TenantContext,
+    client_branch_filter,
+    ensure_client_visible,
+    require,
+)
 from app.api.pagination import PageDep
 from app.core.permissions import Permission
 
@@ -65,13 +71,17 @@ def list_receipts(
     client_id: Annotated[UUID | None, Query()] = None,
 ) -> list[Receipt]:
     """Newest first; for one client when `client_id` is given."""
+    ensure_client_visible(context, client_id)
+    visible, visible_params = client_branch_filter(context, "c.home_location_id")
     rows = context.session.execute(
         text(f"""
             {SELECT}
-            WHERE CAST(:client_id AS uuid) IS NULL OR client_id = CAST(:client_id AS uuid)
+            WHERE (CAST(:client_id AS uuid) IS NULL OR client_id = CAST(:client_id AS uuid))
+              AND EXISTS (SELECT 1 FROM app.clients c
+                          WHERE c.id = app.receipts.client_id AND {visible})
             ORDER BY number DESC LIMIT :limit OFFSET :offset
         """),
-        {"client_id": client_id, "limit": page.limit, "offset": page.offset},
+        {"client_id": client_id, "limit": page.limit, "offset": page.offset, **visible_params},
     ).mappings()
     return [Receipt.model_validate(dict(row)) for row in rows]
 
@@ -137,7 +147,9 @@ def sales(context: SalesDep, start: date, end: date) -> Sales:
 
 @router.get("/receipts/{receipt_id}")
 def get_receipt(receipt_id: UUID, context: ReadDep) -> Receipt:
-    return _one(context.session, receipt_id)
+    receipt = _one(context.session, receipt_id)
+    ensure_client_visible(context, receipt.client_id)
+    return receipt
 
 
 @client_router.get("/receipts")
