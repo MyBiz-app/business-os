@@ -79,3 +79,7 @@ Israel first (Hebrew), then US/EU (American English). Industries are categories 
 5. **Usage is measurable**: every billable usage (AI, messages, storage) emits a usage event.
 6. **Vertical-agnostic core**: vertical-specific behavior lives in vertical packs (config), not in
    `if vertical == ...` branches.
+7. **Migrations expand first, contract later**: a rollback restores the previous code on the newer
+   database. Add tables and columns in one release; drop, rename or retype only what no running version
+   uses, one release later, and say why in a `# contract: ...` line (checked by a test). See
+   `docs/deploy/releases.md`.

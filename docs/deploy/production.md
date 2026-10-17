@@ -73,9 +73,12 @@ log shows the migration finishing before the service goes live.
    restrict it to tags `v*` ("Deployment branches and tags").
 2. Secrets in this environment only:
    - `VERCEL_TOKEN`: a token that can deploy the production project only.
+   - `RENDER_API_KEY` (optional): lets the release and rollback workflows roll the API back.
    - `RENDER_DEPLOY_HOOK_URL` (optional): the service's Deploy Hook from Render, Settings. When set,
      the release workflow starts the API deploy for the same tag.
-3. Repository variables (not secret): `PRODUCTION_VERCEL_ORG_ID`, `PRODUCTION_VERCEL_PROJECT_ID`.
+3. Repository variables (not secret): `PRODUCTION_VERCEL_ORG_ID`, `PRODUCTION_VERCEL_PROJECT_ID`,
+   `PRODUCTION_WEB_URL`, `PRODUCTION_API_URL`; in the environment: `RENDER_SERVICE_ID`,
+   `HEALTH_API_URL`, `HEALTH_WEB_URL` (see [releases.md](releases.md)).
 4. **Do not add any database connection string to GitHub for production.** The production jobs and
    the migrations run on Render, where the owner connection already lives. The GitHub `staging`
    environment keeps `STAGING_DATABASE_URL` for staging only. A test
@@ -101,16 +104,20 @@ log shows the migration finishing before the service goes live.
 The API refuses to start in production if the first group of settings is missing or still points at
 localhost (`missing_production_settings` in `apps/api/app/core/config.py`).
 
-## 6. Releases (hooks for slice GL16)
+## 6. Releases and rollback
+
+Full guide: [releases.md](releases.md).
 
 - A release is a tag on `main`: `git tag v1.0.0 && git push origin v1.0.0`.
-- [`deploy-web-production.yml`](../../.github/workflows/deploy-web-production.yml) runs from that
-  tag only, waits for your approval in the `production` environment, deploys the website and, when
-  the hook secret exists, starts the API deploy for the same commit. It refuses a tag that is not
-  on `main`.
-- Rollback today is manual: Render, the service, Events, redeploy the previous successful deploy;
-  Vercel, the previous deployment, Promote. The workflow has marked places for the release record
-  and the automatic post-deploy check and rollback (GL16).
+- [`release.yml`](../../.github/workflows/release.yml) writes the GitHub Release notes.
+  [`deploy-web-production.yml`](../../.github/workflows/deploy-web-production.yml) runs from that
+  tag only, waits for your approval in the `production` environment, records the release, deploys
+  the website and, when the hook secret exists, starts the API deploy for the same commit. It
+  refuses a tag that is not on `main`, checks the health addresses afterwards and rolls back when
+  they fail.
+- Rollback: Actions, **Roll back** ([`rollback.yml`](../../.github/workflows/rollback.yml)), or by
+  hand in the Render and Vercel dashboards. The database is not rolled back; migrations expand
+  first and contract one release later.
 - Alert hooks (slice GL13): the uptime monitor points at `/health/ready` and at the web home page;
   the Render health check already uses `/health/ready`. See [on-call.md](on-call.md).
 
