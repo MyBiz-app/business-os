@@ -1,7 +1,7 @@
 """The AI team: the built-in agents (a catalog in code) and the business's overrides of them.
 
 An agent is a persona (name, colour, role) with instructions, a toolbox (tool domains, see
-`TOOL_DOMAINS` in app/ai/tools.py), a branch scope, the roles that may use it and a model tier.
+`TOOL_DOMAINS` in app/ai/tools/), a branch scope, the roles that may use it and a model tier.
 The catalog lives here; the database row of a built-in agent (app.ai_agents) only holds what the
 owner changed. Custom agents are full rows with `builtin_key` null.
 
