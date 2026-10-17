@@ -20,8 +20,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import SessionDep, UserDep
 from app.api.modules import check_selection
 from app.api.pagination import MAX_LIMIT, FullPageDep, Page, PageDep
-from app.core import events
-from app.core import metrics
+from app.core import events, metrics
 from app.core.config import get_settings
 from app.core.mfa import require_aal2
 from app.jobs import MAX_HOURS

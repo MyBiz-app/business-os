@@ -59,6 +59,13 @@ def upgrade() -> None:
         USING (tenant_id = app.current_tenant_id())
         WITH CHECK (tenant_id = app.current_tenant_id())
     """)
+    # app_api has no privilege on the table, so this policy only states the rule (the row security
+    # test wants one on every tenant table); the functions below do the work.
+    op.execute("""
+        CREATE POLICY product_events_tenant ON app.product_events TO app_api
+        USING (tenant_id = app.current_tenant_id())
+        WITH CHECK (tenant_id = app.current_tenant_id())
+    """)
     # Nothing reads or writes the table directly: events go in through the functions below (a
     # business's own, a client's, a visitor's sign-up steps) and the console reads aggregates.
     op.execute("""
