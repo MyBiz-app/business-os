@@ -432,7 +432,8 @@
     },
     "content": "Content & creative",
     "files": "Files",
-    "migration": "Move to MyBiz"
+    "migration": "Move to MyBiz",
+    "invoices": "Invoices"
   },
   "terms": {
     "fitness": {
@@ -7406,13 +7407,20 @@
       },
       "rights": "I confirm I have the right to transfer this information to MyBiz.",
       "privacy": "Your business owns this data and MyBiz only holds it for you. The files you upload are deleted after 30 days. ID numbers in a file go straight to encrypted storage.",
-      "begin": "Start"
+      "begin": "Start",
+      "guideTitle": "How to get your data out",
+      "guides": {
+        "spreadsheet": "Save the sheet as CSV or Excel (File, Save as). Keep the header row at the top. One file per kind of record works best.",
+        "google": "Google Contacts: Export, choose Google CSV or vCard (.vcf). Google Calendar: Settings, Import & export, Export gives an .ics file.",
+        "other_system": "Look for Export or Reports in your system and export clients, memberships, services and staff as CSV or Excel. If you cannot find it, use the concierge option and we will help.",
+        "notebook": "On your phone, export your contacts as a vCard (.vcf) file, or type the list into a spreadsheet. Photos of a notebook cannot be read yet."
+      }
     },
     "files": {
       "title": "Your files",
-      "hint": "Add the files you exported (CSV or Excel, up to 10 MB each, 20 MB in total). Say what each file holds and which column is which field.",
+      "hint": "Add the files you exported (CSV, Excel, vCard or calendar .ics, up to 10 MB each, 20 MB in total). Say what each file holds and which column is which field.",
       "add": "Add a file",
-      "fileHint": "CSV or Excel. One file per kind of record.",
+      "fileHint": "CSV, Excel, vCard or ICS. One file per kind of record.",
       "rows": "{count, plural, one {# row} other {# rows}}",
       "kind": "What this file holds",
       "unknownKind": "Choose what it holds",
@@ -7420,7 +7428,10 @@
       "noHeader": "Column {number}",
       "example": "For example: {value}",
       "fieldFor": "Field for {column}",
-      "ignore": "Ignore this column"
+      "ignore": "Ignore this column",
+      "aiMap": "Map the columns with AI",
+      "aiHint": "The AI sees only the column names and one example per column, with ID, card and phone numbers hidden. It uses a few AI credits.",
+      "aiChose": "AI chose this ({percent}% sure)"
     },
     "kinds": {
       "clients": "Clients",
@@ -7530,7 +7541,14 @@
       "session_closed": "This move was already imported.",
       "undo_closed": "This import can no longer be undone.",
       "invalid_mapping": "Each field can be used by one column only.",
-      "kind_required": "Choose what the file holds."
+      "kind_required": "Choose what the file holds.",
+      "ai_not_configured": "The AI is not available right now.",
+      "ai_limit_reached": "The monthly AI allowance is used up. You can still map the columns by hand.",
+      "ai_user_limit_reached": "Your personal AI limit for this month is used up.",
+      "ai_busy": "The AI is busy. Try again in a moment.",
+      "ai_unavailable": "The AI could not be reached. Try again later.",
+      "ai_map_limit": "You used the AI mapping many times in this move. Map the rest by hand.",
+      "too_many_columns": "A file can have up to 60 columns."
     }
   },
   "payRun": {
@@ -7691,5 +7709,77 @@
       "submit": "Create the bank file",
       "problem": "The file could not be created. Check that every employee has an ID number and a bank account."
     }
+  },
+  "invoices": {
+    "title": "Invoices and documents",
+    "subtitle": "Tax invoices, credit notes, quotes and transaction invoices, each with its own running number and a PDF in your brand.",
+    "new": "New document",
+    "newCredit": "New credit note",
+    "back": "All documents",
+    "all": "All",
+    "filter": "Filter by kind",
+    "none": "No documents issued yet.",
+    "nextNumbers": "Next number of each kind",
+    "kinds": {
+      "tax_invoice_receipt": "Tax invoice-receipt",
+      "tax_invoice": "Tax invoice",
+      "credit_note": "Credit note",
+      "quote": "Quote",
+      "transaction_invoice": "Transaction invoice"
+    },
+    "kind": "Kind",
+    "client": "Client",
+    "noClient": "Someone else (type a name)",
+    "clientName": "Name on the document",
+    "clientNameHint": "Needed when you don't pick a client.",
+    "clientEmail": "Email",
+    "clientTaxId": "Client's business or ID number",
+    "clientTaxIdHint": "Optional. Shown on the document.",
+    "lines": "What's included",
+    "pricesWithVat": "Prices include VAT. The document shows the net amount and the VAT.",
+    "pricesNoVat": "This kind of document does not charge VAT.",
+    "lineDescription": "Item {number}",
+    "description": "Description",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "amount": "Amount",
+    "addLine": "Add an item",
+    "removeLine": "Remove item {number}",
+    "total": "Total",
+    "net": "Before VAT",
+    "vat": "VAT {rate}%",
+    "paymentMethod": "Payment method",
+    "methods": {
+      "card": "Credit card",
+      "cash": "Cash",
+      "transfer": "Bank transfer",
+      "other": "Other"
+    },
+    "dueDate": "Pay by",
+    "validUntil": "Valid until",
+    "paymentTerms": "Payment terms",
+    "notes": "Notes",
+    "issue": "Issue the document",
+    "issueHint": "Once issued, a document cannot be edited. A mistake is fixed with a credit note.",
+    "creditFor": "A credit note for {number}, issued to {client}.",
+    "issueCredit": "Issue a credit note",
+    "exemptNote": "An exempt dealer issues receipts, quotes and transaction invoices, not tax documents.",
+    "taxNotReady": "Tax documents need the business number and address to be filled in.",
+    "completeDetails": "Complete the details",
+    "reasons": {
+      "exempt_dealer_no_tax_invoice": "An exempt dealer cannot issue a tax document.",
+      "legal_details_missing": "Fill in the business number and address in settings before issuing a tax document.",
+      "credit_exceeds_invoice": "The credit notes together cannot exceed the invoice.",
+      "unknown_invoice": "That invoice was not found.",
+      "unknown_client": "That client was not found."
+    },
+    "issuedAt": "Issued",
+    "downloadOriginal": "Download the original",
+    "downloadCopy": "Download a copy",
+    "sampleNote": "Sample document: the invoicing provider is not connected yet, so this is not a tax document.",
+    "allocationPending": "Allocation number pending",
+    "allocationNumber": "Allocation number",
+    "allocationNote": "This invoice is above the allocation threshold. Its allocation number from the tax authority is still to come.",
+    "fingerprint": "Fingerprint of the stored file (sha256):"
   }
 }

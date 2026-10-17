@@ -13426,6 +13426,94 @@
         }
       }
     },
+    "/migration/sessions/{session_id}/files/{file_id}/ai-map": {
+      "post": {
+        "tags": [
+          "migration"
+        ],
+        "summary": "Ai Map File",
+        "description": "Ask the AI for the columns the names alone did not explain (and the kind, if unknown).\nIt sees headers and one hidden example per column, never the file; it costs credits from the\nmonthly AI allowance. Columns already recognized are kept; the owner still checks the map.",
+        "operationId": "ai_map_file",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Id"
+            }
+          },
+          {
+            "name": "file_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "File Id"
+            }
+          },
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MigrationAiMapOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/migration/sessions/{session_id}/preview": {
       "post": {
         "tags": [
@@ -50692,6 +50780,56 @@
           "higher_is_better"
         ],
         "title": "MetricValue"
+      },
+      "MigrationAiMapOut": {
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/MigrationFileOut"
+          },
+          "confidence": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Confidence",
+            "description": "0 to 1 per column; null when unmapped"
+          },
+          "source": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Source",
+            "description": "Per column: \"name\", \"ai\" or null"
+          },
+          "credits": {
+            "type": "number",
+            "title": "Credits",
+            "description": "AI credits this suggestion used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "confidence",
+          "source",
+          "credits"
+        ],
+        "title": "MigrationAiMapOut"
       },
       "MigrationBatchOut": {
         "properties": {
