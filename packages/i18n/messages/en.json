@@ -716,6 +716,7 @@
     "homeBranch": "Home branch",
     "allBranches": "All branches",
     "profile": {
+      "emailUnreachable": "This email address bounced or reported spam, so no emails are sent to it. Update the address to reach the client by email.",
       "contact": "Contact",
       "call": "Call",
       "email": "Email",
@@ -2739,6 +2740,37 @@
         "storage": "Space",
         "ai": "AI credits"
       }
+    },
+    "overdue": {
+      "title": "Businesses with unpaid invoices",
+      "hint": "The oldest first. A grace extension lifts read-only or suspension right away and holds off the next one.",
+      "empty": "No business has an unpaid invoice.",
+      "business": "Business",
+      "owner": "Owner",
+      "open": "Open",
+      "since": "Oldest invoice",
+      "state": "State",
+      "action": "Action",
+      "states": {
+        "active": "Active",
+        "read_only": "Read-only",
+        "suspended": "Suspended"
+      },
+      "grace": "Extend by days",
+      "extend": "Extend",
+      "graceUntil": "Grace until {date}",
+      "days": "Days"
+    },
+    "dunning": {
+      "title": "Collection steps",
+      "hint": "What happens to a business with an unpaid invoice. Days count from the day the invoice is issued.",
+      "enabled": "Run the collection steps",
+      "reminderDays": "Email reminders on these days (comma separated)",
+      "readOnlyAfter": "Read-only after (days)",
+      "suspendAfter": "Suspended after (days)",
+      "save": "Save",
+      "saved": "Saved",
+      "invalid": "Check the numbers: suspension must come after read-only."
     }
   },
   "permissions": {
@@ -4336,7 +4368,55 @@
       "alerts": "You passed {percent}% of this month's AI credits.",
       "needModule": "Choose an AI plan to use extra credits."
     },
-    "download": "Download PDF"
+    "download": "Download PDF",
+    "dunningEmail": {
+      "greeting": "Hi,",
+      "footer": "The MyBiz team",
+      "subject": {
+        "reminder": "Your MyBiz invoice is unpaid",
+        "readOnly": "{business} is now read-only",
+        "suspended": "{business} is suspended"
+      },
+      "body": {
+        "reminder": "Your MyBiz invoice no. {number} for {amount} is still unpaid.\n\nYou can pay it under Settings, Billing. If it stays unpaid, {business} becomes read-only on {readOnlyDate}: you will still see everything but won't be able to add or change anything.",
+        "readOnly": "Invoice no. {number} for {amount} is still unpaid, so {business} is read-only: you can see everything but can't add or change anything.\n\nPay the invoice under Settings, Billing to restore full access straight away. Otherwise the business is suspended on {suspendDate}. Your data is safe.",
+        "suspended": "Invoice no. {number} for {amount} is still unpaid, so {business} is suspended and nobody can sign in to it.\n\nPay the invoice to bring it back. Your data is kept and nothing has been deleted."
+      },
+      "details": {
+        "invoice": "Invoice",
+        "amount": "Amount"
+      }
+    },
+    "subtotal": "Total before VAT",
+    "vat": "VAT ({rate}%)",
+    "payNow": "Pay now",
+    "collection": {
+      "overdue": "You have an unpaid invoice. Pay it by {date} or your account turns read-only (you can see everything but not change anything).",
+      "readOnly": "Your account is read-only because an invoice is unpaid. Pay it to restore full access straight away. On {date} the business is suspended.",
+      "grace": "MyBiz gave you extra time to pay, until {date}.",
+      "banner": "This business is read-only because a MyBiz invoice is unpaid. You can see everything, but you can't add or change anything.",
+      "bannerOwner": "Pay the invoice"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "hint": "Cancel anytime. The subscription runs to the end of the period you paid for, nothing is billed after that, and your business and data are kept.",
+      "cancel": "Cancel subscription",
+      "cancelConfirm": "Yes, cancel at the end of the period",
+      "keep": "Keep my subscription",
+      "cancelling": "Your subscription ends on {date}. Until then everything works as usual.",
+      "resume": "Keep my subscription",
+      "ended": "Your subscription has ended. Your business and data are kept; resume to use them again."
+    },
+    "suspended": {
+      "title": "This business is suspended",
+      "unpaid": "An unpaid MyBiz invoice kept this business from being used. Pay it and everything comes back as it was. Nothing was deleted.",
+      "ended": "The subscription of this business ended. Resume it and everything comes back as it was. Nothing was deleted.",
+      "notOwner": "{name} is suspended. Ask the owner to open this page and settle the subscription.",
+      "owed": "Open invoices: {amount}",
+      "noCard": "Add a payment method under Billing once the business is back, or pay with the test card below.",
+      "addCard": "Add a test card and pay",
+      "resume": "Resume the subscription"
+    }
   },
   "visitNotes": {
     "body": "What was done / worth remembering?",

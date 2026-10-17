@@ -245,15 +245,19 @@ def get_tenant_context(
     )
     if allowed is not None and not allowed:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="no_branches")
-    if (
-        not request.url.path.startswith(
-            ("/tenants/current/closure", "/tenants/current/data-exports")
-        )
-        and session.execute(
-            text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = app.current_tenant_id()")
-        ).scalar()
+    if not request.url.path.startswith(
+        ("/tenants/current/closure", "/tenants/current/data-exports")
     ):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
+        closed, billing_state = session.execute(
+            text("""
+                SELECT closed_at IS NOT NULL,
+                       CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END
+                FROM app.tenants WHERE id = app.current_tenant_id()
+            """)
+        ).one()
+        if closed:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
+        check_billing_state(request, billing_state)
     if (
         user.aal != "aal2"
         and get_settings().mfa_on
@@ -272,6 +276,24 @@ def get_tenant_context(
         branches=allowed,
         aal=user.aal,
     )
+
+
+# What a business can still do while its MyBiz subscription is restricted: pay, read invoices,
+# cancel or resume, and take its data (GL20).
+BILLING_OPEN_PREFIXES = ("/billing/",)
+SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+
+
+def check_billing_state(request: Request, billing_state: str) -> None:
+    """Read-only (unpaid invoices for 14 days): everything can be seen, nothing changed.
+    Suspended (30 days, or a subscription that ended): only the billing page works."""
+    path = request.url.path
+    if billing_state == "active" or path == "/billing" or path.startswith(BILLING_OPEN_PREFIXES):
+        return
+    if billing_state == "suspended":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="billing_suspended")
+    if request.method not in SAFE_METHODS:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="billing_read_only")
 
 
 TenantDep = Annotated[TenantContext, Depends(get_tenant_context)]
@@ -323,10 +345,18 @@ def get_client_context(
     client_id = session.execute(text("SELECT app.current_client_id()")).scalar()
     if client_id is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="not_a_client")
-    if session.execute(
-        text("SELECT closed_at IS NOT NULL FROM app.tenants WHERE id = :id"), {"id": tenant_id}
-    ).scalar():
+    closed, billing_state = session.execute(
+        text("""
+            SELECT closed_at IS NOT NULL,
+                   CASE WHEN cancel_at <= now() THEN 'suspended' ELSE billing_state END
+            FROM app.tenants WHERE id = :id
+        """),
+        {"id": tenant_id},
+    ).one()
+    if closed:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="business_closed")
+    if billing_state == "suspended":  # clients can't use a suspended business's app either
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="billing_suspended")
     if not has_module(session, "client_app"):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="module_disabled")
     count_tenant_request(request, tenant_id)

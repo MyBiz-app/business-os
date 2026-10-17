@@ -12,7 +12,7 @@ import { formatMoney } from "@/lib/money";
 import { canManageSettings } from "@/lib/permissions";
 import { getTenant } from "@/lib/tenant";
 
-import { addTestCard, payInvoice, removeCard } from "./actions";
+import { addTestCard, cancelSubscription, payInvoice, removeCard, resumeSubscription } from "./actions";
 import { AiSpend } from "./ai-spend";
 import { DetailsForm } from "./details-form";
 import { Container } from "@/components/layout/container";
@@ -36,6 +36,7 @@ export default async function BillingPage() {
   const money = (amount: number, currency = billing.estimate.currency) => formatMoney(amount, currency, locale);
   const day = (value: string) => formatDay(value, locale, { day: "numeric", month: "long", year: "numeric" });
   const method = billing.payment_method;
+  const collection = billing.collection;
   const usage = billing.usage;
   const number = new Intl.NumberFormat(locale);
   const bytes = (value: number) =>
@@ -103,6 +104,21 @@ export default async function BillingPage() {
         {billing.balance_due > 0 && (
           <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-2 text-sm font-medium">
             {t("balanceDue", { amount: money(billing.balance_due) })}
+          </p>
+        )}
+        {collection.state === "read_only" && collection.suspend_on && (
+          <p role="alert" className="rounded-xl border border-danger/40 bg-danger/10 px-4 py-2 text-sm font-medium">
+            {t("collection.readOnly", { date: day(collection.suspend_on) })}
+          </p>
+        )}
+        {collection.state === "active" && collection.read_only_on && !collection.grace_until && (
+          <p role="status" className="rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">
+            {t("collection.overdue", { date: day(collection.read_only_on) })}
+          </p>
+        )}
+        {collection.grace_until && new Date(collection.grace_until) > new Date() && (
+          <p role="status" className="rounded-xl border border-border px-4 py-2 text-sm">
+            {t("collection.grace", { date: day(collection.grace_until) })}
           </p>
         )}
       </section>
@@ -210,6 +226,31 @@ export default async function BillingPage() {
       <section aria-labelledby="details-heading" className="card flex flex-col gap-4 p-6">
         <h2 id="details-heading" className="text-lg font-semibold">{t("details")}</h2>
         <DetailsForm details={billing.details} />
+      </section>
+
+      <section aria-labelledby="subscription-heading" className="card flex flex-col gap-4 p-6">
+        <h2 id="subscription-heading" className="text-lg font-semibold">{t("subscription.title")}</h2>
+        {collection.cancel_at ? (
+          <>
+            <p className="text-sm">{t("subscription.cancelling", { date: day(collection.cancel_at) })}</p>
+            <form action={resumeSubscription}>
+              <SubmitButton>{t("subscription.resume")}</SubmitButton>
+            </form>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted">{t("subscription.hint")}</p>
+            {/* No script needed: the confirmation is a native disclosure. */}
+            <details className="text-sm">
+              <summary className="btn-link cursor-pointer font-medium text-danger underline-offset-4 hover:underline">
+                {t("subscription.cancel")}
+              </summary>
+              <form action={cancelSubscription} className="mt-3">
+                <SubmitButton>{t("subscription.cancelConfirm")}</SubmitButton>
+              </form>
+            </details>
+          </>
+        )}
       </section>
 
       <section aria-labelledby="invoices-heading" className="card flex flex-col gap-4 p-6">

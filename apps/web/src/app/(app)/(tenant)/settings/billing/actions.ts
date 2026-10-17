@@ -61,3 +61,17 @@ export async function saveAiSpend(formData: FormData): Promise<void> {
   );
   revalidatePath("/settings/billing");
 }
+
+/** The owner ends the subscription at the end of the paid period; the business is kept. */
+export async function cancelSubscription(): Promise<void> {
+  const { api, scope } = await getTenant();
+  unwrap(await api.POST("/billing/cancel", { params: scope }));
+  revalidatePath("/settings/billing");
+}
+
+/** Takes a cancellation back. */
+export async function resumeSubscription(): Promise<void> {
+  const { api, scope } = await getTenant();
+  unwrap(await api.DELETE("/billing/cancel", { params: scope }));
+  revalidatePath("/", "layout");
+}

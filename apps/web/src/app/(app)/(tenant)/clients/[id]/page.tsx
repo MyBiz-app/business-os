@@ -188,6 +188,11 @@ export default async function ClientPage({ params }: PageProps<"/clients/[id]">)
             </nav>
           )}
         </div>
+        {!erased && client.email_suppressed && (
+          <p role="status" className="rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-muted">
+            {t("profile.emailUnreachable")}
+          </p>
+        )}
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           {stats.map(({ key, Icon, value }) => (
             <li key={key} className="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3">

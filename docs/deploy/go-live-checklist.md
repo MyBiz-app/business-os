@@ -16,6 +16,7 @@ Tick items here as they are done (and record cost decisions in `docs/DECISIONS.m
 | P0-8 | Supabase Auth settings applied from CI | Built | Add `SUPABASE_ACCESS_TOKEN` to the GitHub environment; see `auth-settings.md` |
 | P0-9 | Legal text from a lawyer (privacy policy, terms, DPA, cookie banner); account closure and 90-day deletion | Closure built; text open | Lawyer; real deletion is enabled with `--apply` on `delete-closed-businesses` |
 | B4 | Backups and a restore drill | After P0-1 | Follow `restore-runbook.md` and fill in its drill table |
+| GL22 | Emails that reach the inbox: SPF, DKIM, DMARC on the sending domain; bounces and spam complaints stop further sends | Built, **off** until a domain and a Resend account exist (free up to 3,000 emails a month, domain about $15 a year) | Owner task A6: follow [email-domain.md](email-domain.md) (DNS records, API variables, Resend webhook, Supabase SMTP), then check 10/10 on mail-tester |
 | GL15 | Second backup (encrypted database dump + files to Cloudflare R2, 30 days) and quarterly restore drill | Built, **off** (free) | Owner task A2: follow "Switching it on" in `restore-runbook.md` (Cloudflare account, bucket, token, age key, GitHub secrets, then variable `OFFSITE_BACKUP_ENABLED=true`) and run the drill |
 | GL23 | Incident banners (console, web, app) and the Amendment 13 papers in `docs/legal/` | Built | Owner tasks in "Incident response and Amendment 13 (GL23)" below |
 | B5 | Test cards refused in production | Done (#191) | Nothing |
@@ -90,6 +91,19 @@ check roll the API back), variables `RENDER_SERVICE_ID`, `HEALTH_API_URL`, `HEAL
 repository variables `PRODUCTION_WEB_URL`, `PRODUCTION_API_URL`. Same names in the `staging`
 environment to use **Roll back** there. After the single final deploy to staging, practise one
 rollback and fill the table in releases.md.
+
+## Subscription billing: VAT and collection (GL20)
+
+Built and running on the simulated card; no real charge exists anywhere. The payment provider (#46)
+stays an off adapter. What waits for you, when the business really operates:
+
+| # | Step | Cost | Click by click |
+|---|---|---|---|
+| 1 | Check the VAT rate and your company details with your accountant | Free | The rate lives in the table `app.vat_rates` (18% for ILS from 2025-01-01). If it changes, tell Claude: a new row with the new `valid_from` date is added, old invoices keep their rate. The company name, number and VAT number printed on invoices come from `packages/i18n/brand.json` (`legal`), currently the fictitious ones |
+| 2 | Decide the collection days | Free | Console → Billing → "Collection steps": reminder days (default 0, 3, 7), read-only (14), suspension (30). The switch turns the whole sequence off |
+| 3 | Switch the daily job on in production | Free | The `dunning` job runs after `bill-businesses` in the daily jobs. In the production jobs setup add `uv run python -m app.jobs dunning` right after `bill-businesses`; check-jobs reports it as late if it stops |
+| 4 | Real card payments | Provider fees | Needs the payment provider (#46): create the account, then ask Claude to turn on the adapter. Until then paying a late invoice only works with the test card |
+| 5 | Allocation numbers for MyBiz's own invoices | Free | Israel's tax authority may require an allocation number on invoices above a threshold; ask your accountant, and if needed connect the invoicing provider (#47) |
 
 ## App stores (GL19)
 
