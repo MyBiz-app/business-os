@@ -49,6 +49,7 @@ table.lines td { padding: 3mm 0; border-bottom: 1px solid var(--line); vertical-
 {% if watermark %}
 .watermark { position: fixed; top: 105mm; left: 0; right: 0; text-align: center; font-size: 56pt; font-weight: 700; color: rgba(17, 24, 39, 0.06); transform: rotate(-28deg); }
 {% endif %}
+{% block extra_style %}{% endblock %}
 </style>
 </head>
 <body>

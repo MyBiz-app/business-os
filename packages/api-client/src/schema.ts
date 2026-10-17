@@ -6459,6 +6459,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/issued-documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Issued
+         * @description Newest first.
+         */
+        get: operations["list_issued"];
+        put?: never;
+        /**
+         * Issue
+         * @description Takes the next number of the kind, renders the PDF and stores both in one transaction.
+         */
+        post: operations["issue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issued-documents/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Series
+         * @description The number each kind will get next.
+         */
+        get: operations["series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issued-documents/{document_id}.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Issued File
+         * @description The stored original, byte for byte; `copy=true` renders a copy marked as such.
+         */
+        get: operations["issued_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/issued-documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Issued */
+        get: operations["get_issued"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/client/receipts/{receipt_id}.pdf": {
         parameters: {
             query?: never;
@@ -10827,6 +10908,124 @@ export interface components {
             /** Paid At */
             paid_at: string | null;
         };
+        /** IssueRequest */
+        IssueRequest: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice";
+            /** Client Id */
+            client_id?: string | null;
+            /** Client Name */
+            client_name?: string | null;
+            /** Client Email */
+            client_email?: string | null;
+            /** Client Tax Id */
+            client_tax_id?: string | null;
+            /** Lines */
+            lines: components["schemas"]["LineIn"][];
+            /** Payment Method */
+            payment_method?: ("card" | "cash" | "transfer" | "other") | null;
+            /** Due Date */
+            due_date?: string | null;
+            /** Valid Until */
+            valid_until?: string | null;
+            /** Payment Terms */
+            payment_terms?: string | null;
+            /** Notes */
+            notes?: string | null;
+            /**
+             * Reference Id
+             * @description The invoice a credit note credits
+             */
+            reference_id?: string | null;
+            /**
+             * Allocation Number
+             * @description From the tax authority, via the provider
+             */
+            allocation_number?: string | null;
+        };
+        /** IssuedDocument */
+        IssuedDocument: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice";
+            /** Number */
+            number: number;
+            /**
+             * Issued At
+             * Format: date-time
+             */
+            issued_at: string;
+            /**
+             * Language
+             * @enum {string}
+             */
+            language: "he" | "en";
+            /** Client Id */
+            client_id: string | null;
+            /** Client Name */
+            client_name: string;
+            /** Client Email */
+            client_email: string | null;
+            /** Client Tax Id */
+            client_tax_id: string | null;
+            /** Currency */
+            currency: string;
+            /** Lines */
+            lines: components["schemas"]["IssuedLine"][];
+            /** Vat Rate Bp */
+            vat_rate_bp: number;
+            /** Net */
+            net: number;
+            /** Vat */
+            vat: number;
+            /**
+             * Total
+             * @description Minor units, VAT included
+             */
+            total: number;
+            /** Payment Method */
+            payment_method: ("card" | "cash" | "transfer" | "other") | null;
+            /** Due Date */
+            due_date: string | null;
+            /** Valid Until */
+            valid_until: string | null;
+            /** Payment Terms */
+            payment_terms: string | null;
+            /** Notes */
+            notes: string | null;
+            /** Reference Id */
+            reference_id: string | null;
+            /** Allocation Required */
+            allocation_required: boolean;
+            /** Allocation Number */
+            allocation_number: string | null;
+            /**
+             * Content Hash
+             * @description sha256 of the stored PDF
+             */
+            content_hash: string;
+        };
+        /** IssuedLine */
+        IssuedLine: {
+            /** Description */
+            description: string;
+            /** Quantity */
+            quantity: number;
+            /** Unit Price */
+            unit_price: number;
+            /** Amount */
+            amount: number;
+        };
         /**
          * Job
          * @description One on-site job in a technician's day.
@@ -11098,6 +11297,21 @@ export interface components {
         LimitsUpdate: {
             /** Limits */
             limits: components["schemas"]["CreditLimit"][];
+        };
+        /** LineIn */
+        LineIn: {
+            /** Description */
+            description: string;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
+            /**
+             * Unit Price
+             * @description Minor units, VAT included
+             */
+            unit_price: number;
         };
         /** Location */
         Location: {
@@ -13796,6 +14010,16 @@ export interface components {
              * @description Later sessions kept because clients are booked
              */
             kept: number;
+        };
+        /** SeriesRow */
+        SeriesRow: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice";
+            /** Next Number */
+            next_number: number;
         };
         /** SeriesUpdate */
         SeriesUpdate: {
@@ -31172,6 +31396,189 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_issued: {
+        parameters: {
+            query?: {
+                kind?: ("tax_invoice_receipt" | "tax_invoice" | "credit_note" | "quote" | "transaction_invoice") | null;
+                client_id?: string | null;
+                /** @description Rows per page */
+                limit?: number;
+                /** @description Rows to skip */
+                offset?: number;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedDocument"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issue: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IssueRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedDocument"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    series: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    issued_file: {
+        parameters: {
+            query?: {
+                /** @description A copy, rendered again from the stored data */
+                copy?: boolean;
+            };
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_issued: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedDocument"];
                 };
             };
             /** @description Validation Error */

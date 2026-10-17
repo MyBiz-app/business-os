@@ -1,0 +1,10 @@
+{% extends "_document.html" %}
+{% block kind_style %}
+h1 { font-size: 34pt; }
+.valid { font-size: 12pt; }
+{% endblock %}
+{% block before_meta %}{% if valid_text %}<div class="callout valid">{{ valid_text }}</div>{% endif %}{% endblock %}
+{% block after_total %}
+{% if payment_terms %}<p class="note"><b>{{ t.paymentTerms }}:</b> <span style="unicode-bidi: plaintext">{{ payment_terms }}</span></p>{% endif %}
+<div class="sign"><div>{{ t.signature }}</div></div>
+{% endblock %}
