@@ -75,18 +75,17 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
         }
       />
 
-<<<<<<< HEAD
       <PeriodProvider>
       <div className="flex flex-wrap items-center justify-between gap-3 card px-4 py-3">
         {free ? (
           <p className="text-lg font-semibold">{title}</p>
         ) : (
           <nav aria-label={title} className="flex flex-1 items-center justify-between gap-3 sm:justify-start sm:gap-4">
-            <Link href={`/sales?month=${previous}`} aria-label={t("previous")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
+            <Link scroll={false} href={`/sales?month=${previous}`} aria-label={t("previous")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
               <ChevronRight aria-hidden="true" className="size-5 ltr:rotate-180" />
             </Link>
             <p className="text-lg font-semibold">{title}</p>
-            <Link href={`/sales?month=${next}`} aria-label={t("next")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
+            <Link scroll={false} href={`/sales?month=${next}`} aria-label={t("next")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
               <ChevronLeft aria-hidden="true" className="size-5 ltr:rotate-180" />
             </Link>
           </nav>
@@ -102,18 +101,6 @@ export default async function SalesPage({ searchParams }: PageProps<"/sales">) {
         />
       </div>
       <PendingArea className="flex flex-col gap-6">
-=======
-      <nav aria-label={title} className="flex items-center justify-between gap-3 card px-4 py-3">
-        <Link scroll={false} href={`/sales?month=${previous}`} aria-label={t("previous")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
-          <ChevronRight aria-hidden="true" className="size-5 ltr:rotate-180" />
-        </Link>
-        <p className="text-lg font-semibold">{title}</p>
-        <Link scroll={false} href={`/sales?month=${next}`} aria-label={t("next")} className="flex size-9 items-center justify-center rounded-lg hover:bg-foreground/5">
-          <ChevronLeft aria-hidden="true" className="size-5 ltr:rotate-180" />
-        </Link>
-      </nav>
-
->>>>>>> origin/main
       <div className="grid gap-4 md:grid-cols-[1fr_2fr]">
         <Link href={`${linkTo({})}#receipts-heading`} className="contents">
         <section aria-labelledby="total-heading" className="card-accent card-hover flex flex-col gap-2 p-6">
