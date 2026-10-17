@@ -6,6 +6,9 @@ it. It is MyBiz's own table (no tenant, no API access, RLS with no policy): the 
 through SECURITY DEFINER functions that need the broadcasts permission, and everybody (also before
 sign-in) reads the open ones through `app.active_incidents()`, which holds no personal data.
 
+# contract: the only DROP is in downgrade() and removes the table and functions this migration
+# added; no earlier API version reads them, so a rollback of the code never touches them.
+
 Revision ID: 0119
 Revises: 0118
 Create Date: 2026-10-17
