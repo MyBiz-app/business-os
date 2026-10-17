@@ -18,7 +18,7 @@ import { Container } from "@/components/layout/container";
 import { PageHeader } from "@/components/layout/page-header";
 
 import { SupportSection } from "./support-section";
-import { WriteToMyBiz } from "./write-to-mybiz";
+import { WriteToSupport } from "./write-to-support";
 
 export default async function SettingsPage() {
   const t = await getTranslations("settings");
@@ -131,7 +131,7 @@ export default async function SettingsPage() {
       </section>
       {tenant.role === "owner" && <ExportSection context={context} />}
       {tenant.role === "owner" && <SupportSection context={context} />}
-      <WriteToMyBiz />
+      <WriteToSupport />
       {tenant.role === "owner" && <CloseSection name={tenant.name} />}
     </Container>
   );

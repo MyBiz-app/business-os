@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { BRAND } from "@business-os/i18n/brand";
 import { apiClient, unwrap } from "@business-os/app-kit/lib/api";
 import { areaHome, buildAreas, pickArea, type Area, type AreaKind } from "@business-os/app-kit/lib/areas";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
@@ -51,7 +52,7 @@ export function AreaProvider({ children }: { children: React.ReactNode }) {
   }, [userId]);
 
   const areas = useMemo(
-    () => (identity && businesses ? buildAreas({ ...identity, businesses }) : null),
+    () => (identity && businesses ? buildAreas({ ...identity, businesses, platformName: BRAND.name }) : null),
     [identity, businesses],
   );
   const active = useMemo(() => (areas ? pickArea(areas, storedKey, READY_AREAS) : null), [areas, storedKey]);

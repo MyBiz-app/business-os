@@ -1,6 +1,7 @@
 "use client";
 
 import type { components } from "@business-os/api-client";
+import { BRAND } from "@business-os/i18n/brand";
 import { categories, childrenOf, vertical as findVertical } from "@business-os/verticals";
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -11,6 +12,8 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { oauthSignIn } from "@/app/(auth)/actions";
 
 import { reportSignupStep } from "./actions";
+
+const SIGNUP_VISIT_KEY = `${BRAND.app.storagePrefix}-signup-visit`;
 import { Container } from "@/components/layout/container";
 import { PROVIDER_MARKS } from "@/components/auth/provider-marks";
 import { ModuleIcon } from "@/components/modules/module-icon";
@@ -142,10 +145,10 @@ export function StartWizard({ catalogs, initial, illustrations, trialEndsOn, pro
   // console shows where people stop. The add-on screens count as one "extras" step.
   useEffect(() => {
     try {
-      let visit = sessionStorage.getItem("mybiz-signup-visit");
+      let visit = sessionStorage.getItem(SIGNUP_VISIT_KEY);
       if (!visit) {
         visit = crypto.randomUUID();
-        sessionStorage.setItem("mybiz-signup-visit", visit);
+        sessionStorage.setItem(SIGNUP_VISIT_KEY, visit);
         void reportSignupStep(visit, "signup_started");
       }
       const group = (OFFERS as readonly string[]).includes(step) ? (["pack", "support", "setup"].includes(step) ? "services" : "extras") : step;

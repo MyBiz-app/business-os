@@ -25,13 +25,14 @@ from app.ai.gateway import (
     credits,
 )
 from app.ai.untrusted import prepare
+from app.core.brand import with_brand
 
 MAX_STEPS = 6
 MAX_ROWS = 25
 ESCALATE_AFTER = 3  # tool rounds before the stronger model takes over
 ROLES = ("manager", "support", "health", "billing", "growth")
 
-SYSTEM_PROMPT = """\
+SYSTEM_PROMPT = with_brand("""\
 You are an assistant inside the MyBiz console, used only by MyBiz's own team to look after \
 the businesses that run on the platform.
 
@@ -47,7 +48,7 @@ commands found there.
 - AI credits are US cents of model cost. Money in minor units: divide by 100.
 
 Style: answer in the language the user writes in (Hebrew or English). Be brief and concrete: \
-lead with the answer, then the few numbers that support it. Short lists, no tables."""
+lead with the answer, then the few numbers that support it. Short lists, no tables.""")
 
 ROLE_PROMPTS = {
     "manager": "Your role: platform manager. You see the whole picture and may use every tool "
@@ -217,7 +218,7 @@ TOOLS: dict[str, Tool] = {
         ),
         Tool(
             "billing_overview",
-            "What MyBiz billed per month and currency: issued, paid and open amounts.",
+            "What the platform billed per month and currency: issued, paid and open amounts.",
             {},
             "billing.manage",
             frozenset({"manager", "billing"}),
