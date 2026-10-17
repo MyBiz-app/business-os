@@ -28,7 +28,8 @@ No tracking and no ads. Sign-in and session tokens are kept in the phone's secur
   storage), the API host, email, WhatsApp, payments and AI providers where a business turns them on.
 - Encrypted in transit: yes. Deletion: yes, by the business's erasure tool and by closing a
   business (deleted 90 days later, X20).
-- Account deletion URL: required by Play; see the open item in [`README.md`](README.md).
+- Account deletion: in the apps, Me, "Delete my account" (`DELETE /me`); a web page for people
+  without a business is still to do (open item in [`README.md`](README.md)).
 
 ## Apple: App Privacy labels
 

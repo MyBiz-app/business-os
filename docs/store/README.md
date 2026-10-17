@@ -27,7 +27,7 @@ brand name comes from `packages/i18n/brand.json`; the app display name is in eac
 | Privacy policy URL | `/legal/privacy` on the web app |
 | Terms | `/legal/terms` |
 | Support URL and email | `/contact`, and [`docs/deploy/support.md`](../deploy/support.md) |
-| Account deletion (Play requires an in-app path and a web path) | In the business app: Me → close the business (owner). Clients ask the business to erase them (owner-only privacy tool); a web page for clients without a business is still to do |
+| Account deletion (Play requires an in-app path and a web path) | In every app: Me → "Delete my account" (an owner closes the business first). Clients also ask the business to erase them (owner-only privacy tool); a web page for clients without a business is still to do |
 
 ## Assets
 

@@ -1,10 +1,12 @@
 import { locales } from "@business-os/i18n";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Alert, View } from "react-native";
 import { useTranslations } from "use-intl";
 
 import { authenticate, isAppLockSupported, loadAppLock, loadLockTimeout, LOCK_TIMEOUTS, saveAppLock, saveLockTimeout, type LockTimeout } from "../lib/app-lock";
+import { ApiError, apiClient } from "../lib/api";
+import { confirm } from "../lib/confirm";
 import { unregisterPushToken } from "../lib/push";
 import { supabase } from "../lib/supabase";
 import type { Palette } from "../lib/theme";
@@ -38,6 +40,25 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
     if (on && !(await authenticate(tLock("prompt"), tLock("cancel")))) return;
     await saveAppLock(on);
     setLockOn(on);
+  };
+
+  const tDelete = useTranslations("accountDeletion");
+  // Store rule (Apple and Google): an account made in the app can be deleted in the app.
+  const deleteAccount = async () => {
+    if (!(await confirm(tDelete("confirmTitle"), tDelete("confirmBody"), tDelete("yes"), tDelete("no")))) return;
+    try {
+      const result = await apiClient().DELETE("/me", { body: { confirm: true } });
+      if (result.error !== undefined) {
+        throw new ApiError(result.response.status, (result.error as { detail?: string }).detail);
+      }
+    } catch (error) {
+      Alert.alert(tDelete(error instanceof ApiError && error.detail === "owns_business" ? "ownsBusiness" : "failed"));
+      return;
+    }
+    await unregisterPushToken().catch(() => undefined);
+    await saveAppLock(false);
+    await supabase.auth.signOut();
+    router.replace("/sign-in");
   };
 
   return (
@@ -118,6 +139,7 @@ export function PreferencesCard({ palette, signOutVariant = "secondary" }: { pal
             .then(() => router.replace("/sign-in"))
         }
       />
+      <Button label={tDelete("button")} variant="secondary" palette={palette} onPress={() => void deleteAccount()} />
     </>
   );
 }
