@@ -9,7 +9,7 @@
   time and name are kept with the form.
 
 Revision ID: 0106
-Revises: 0111
+Revises: 0104
 Create Date: 2026-10-16
 """
 
@@ -18,7 +18,7 @@ from collections.abc import Sequence
 from alembic import op
 
 revision: str = "0106"
-down_revision: str | None = "0111"
+down_revision: str | None = "0104"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

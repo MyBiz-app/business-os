@@ -25,6 +25,8 @@ class Permission(StrEnum):
     STAFF_READ = "staff.read"
     STAFF_MANAGE = "staff.manage"
     BUSINESS_SETTINGS = "business.settings"
+    FILES_READ = "files.read"  # open the business's files area (some folders need more)
+    FILES_MANAGE = "files.manage"  # add, archive and organize files and folders
     IDENTITY_READ = "identity.read"  # reveal people's ID numbers (always logged); owners only
     PAYROLL_READ = "payroll.read"  # see employment terms and Form 101 of the team
     PAYROLL_MANAGE = "payroll.manage"  # set employment terms, request and correct Form 101
@@ -54,6 +56,8 @@ ROLE_PERMISSIONS: dict[str, frozenset[Permission]] = {
             Permission.BUSINESS_SETTINGS,
             Permission.PAYROLL_READ,
             Permission.PAYROLL_MANAGE,
+            Permission.FILES_READ,
+            Permission.FILES_MANAGE,
         }
     ),
     # A manager at their own branches only (the API keeps them to `location_ids`): everything a

@@ -39,3 +39,15 @@ def decrypt(blob: bytes | None) -> dict[str, str]:
         return json.loads(_fernet().decrypt(bytes(blob)))
     except InvalidToken as error:  # the key changed: the business connects again
         raise SecretsKeyMissing("stored secrets cannot be read with the current key") from error
+
+
+def encrypt_bytes(content: bytes) -> bytes:
+    """Seals a file's bytes (payslips, employee papers) before they are stored."""
+    return _fernet().encrypt(content)
+
+
+def decrypt_bytes(blob: bytes) -> bytes:
+    try:
+        return _fernet().decrypt(bytes(blob))
+    except InvalidToken as error:
+        raise SecretsKeyMissing("a stored file cannot be read with the current key") from error
