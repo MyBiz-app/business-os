@@ -10,6 +10,7 @@ import re
 import smtplib
 import ssl
 import urllib.request
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from email.message import EmailMessage
@@ -347,7 +348,39 @@ def send_emails(
     return counts | {"pushed": pushed} if push else counts
 
 
+class SuppressingSender:
+    """Never mails an address the provider reported as bounced or as a spam complaint."""
+
+    def __init__(self, inner: Sender, is_suppressed: Callable[[str], bool]) -> None:
+        self.inner = inner
+        self.is_suppressed = is_suppressed
+
+    def send(self, email: Email) -> None:
+        if self.is_suppressed(email.to):
+            print(f"email to {email.to} skipped: address is suppressed")
+            return
+        self.inner.send(email)
+
+
+def _is_suppressed(address: str) -> bool:
+    """Fails open: a database hiccup must not stop sign-in codes and receipts."""
+    from app.core.db import get_engine
+
+    try:
+        with get_engine().connect() as conn:
+            query = text("SELECT app.email_is_suppressed(:a)")
+            return bool(conn.execute(query, {"a": address}).scalar())
+    except Exception as error:
+        print(f"suppression check failed, sending anyway: {error}")
+        return False
+
+
 def sender_from_settings() -> Sender | None:
+    sender = _provider_sender()
+    return SuppressingSender(sender, _is_suppressed) if sender is not None else None
+
+
+def _provider_sender() -> Sender | None:
     from app.core.config import get_settings
 
     settings = get_settings()
