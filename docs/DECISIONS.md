@@ -369,6 +369,16 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - **"I grew" is automatic**: inviting the first employee or adding a second branch moves `solo` to `small` on the server (`app/core/business_size.py`); other sizes are the owner's own answer and never change by themselves. Settings → Business also has a button that opens everything at once.
 - **The 129 solo price is not built**: billing sums module prices and has no bundle discount, so showing 129 would promise a charge the system does not make. It needs its own decision on how a bundle discount appears on the invoice.
 
+### Round 7 final fold-ins (2026-10-18, slice R20)
+
+- **Team cost on the branches map is gross pay only.** There is no expense ledger yet, so the "Team cost" figure is the gross pay of the latest payroll month, and the screen says so (employer contributions and other expenses are not in it). Revisit when an expense ledger exists.
+- **Editing a promo code** changes the validity dates, the plan, the use limit and the on/off state at any time. The discount amount (percent or fixed) changes only before the first paid use, so a paid checkout keeps the meaning it was paid with. The code text never changes. Needs one grant-only migration (the API role could update only `active`).
+- **No monthly summary email exists yet**, so the R25b line about "My website" in it is not built. When a monthly email is added, it carries one line, once, for a business without a website order. The marketing agent's suggestion (no website, many leads from social networks) is built.
+- **OpenAI and Gemini prices** stay placeholders for the disabled adapters. They were checked only against third-party tables on 2026-10-18 (the vendors' pages were unreachable); confirm on the vendors' pages before switching either on.
+- **The R33 cancellation text needs a lawyer.** The cancellation wording and the policy page are drafts. Do not publish them before a lawyer reviews them.
+- **The 129 "solo" price needs its own decision**: billing sums module prices and has no bundle discount, so the solo bundle cannot show a discounted total on the invoice yet. Choose how a bundle discount appears on the invoice, then build it.
+- **Not touched here, to avoid colliding with open slices:** the subscription-cancel confirmation (R33 replaces that screen with its own cancel flow) and the demo data for the cancellation policy, solo mode and freeze extras (R18 owns the seed files).
+
 ## Open
 
 | # | Question |

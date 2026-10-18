@@ -41,7 +41,10 @@ _INSTRUCTIONS = {
     SUGGESTIONS: (
         "Look at the business for chances worth acting on this week: clients who stopped coming, "
         "sessions that are far from full, leads nobody followed up, an unusual drop or rise in "
-        "revenue. Use your read tools. Report at most three suggestions, each one line with the "
+        "revenue. If the context shows the business has no website and many recent leads came from "
+        "Instagram or other social networks, one suggestion may be to order a website from "
+        "My website (/website), so those leads have somewhere to land. Use your read tools. "
+        "Report at most three suggestions, each one line with the "
         "reason. For a suggestion you can act on with a tool, prepare it as a card so the person "
         "can approve it, and never act without a card. If there is nothing worth suggesting, say "
         "so in one line."

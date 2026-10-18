@@ -32,7 +32,11 @@ class ModelInfo:
 
 
 # Anthropic prices are the platform's real ones. OpenAI and Gemini rows are placeholders for
-# the disabled adapters: check them against the vendor's price list before enabling.
+# the disabled adapters. Checked 2026-10-18 against third-party price tables only (the vendors'
+# own pages were not reachable): base input/output rates match; Gemini Pro cache read is the
+# 0.125 figure most sources give. Gemini Pro above 200K tokens costs more (2.50 / 15.00), and
+# OpenAI now also sells newer models (GPT-5.5, GPT-5.4 mini). Confirm on the vendor's page
+# before enabling; unknown models are priced as the dearest one in the meantime.
 MODELS: dict[str, ModelInfo] = {
     m.id: m
     for m in (
@@ -42,7 +46,7 @@ MODELS: dict[str, ModelInfo] = {
         ModelInfo("gpt-5-mini", "openai", "fast", (0.25, 2.0, 0.025, 0.25), 400_000),
         ModelInfo("gpt-5", "openai", "standard", (1.25, 10.0, 0.125, 1.25), 400_000),
         ModelInfo("gemini-2.5-flash", "gemini", "fast", (0.30, 2.5, 0.03, 0.30), 1_000_000),
-        ModelInfo("gemini-2.5-pro", "gemini", "standard", (1.25, 10.0, 0.31, 1.25), 1_000_000),
+        ModelInfo("gemini-2.5-pro", "gemini", "standard", (1.25, 10.0, 0.125, 1.25), 1_000_000),
         ModelInfo("demo", "demo", "fast", (0.0, 0.0, 0.0, 0.0), 0, supports_tools=False),
     )
 }

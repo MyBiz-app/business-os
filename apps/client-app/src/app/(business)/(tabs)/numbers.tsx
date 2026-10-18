@@ -23,7 +23,7 @@ const KEYS = ["revenue", "active_clients", "attendance", "occupancy", "no_show_r
 const GO = {
   revenue: { web: "/sales" },
   active_clients: { clients: "valid" },
-  new_clients: { clients: "all" },
+  new_clients: { clients: "new" },
   attendance: { today: true },
   occupancy: { web: "/reports" },
   no_show_rate: { clients: "absent" },
@@ -102,7 +102,11 @@ export default function Numbers() {
     const target: Record<string, string | boolean> = GO[key];
     if (typeof target.web === "string") void Linking.openURL(`${WEB_URL}${target.web}`);
     else if (target.today) router.push("/today");
-    else if (typeof target.clients === "string") router.push({ pathname: "/clients", params: { filter: target.clients } });
+    else if (typeof target.clients === "string") router.push({
+        pathname: "/clients",
+        // "New" carries the period on screen, so the list matches the number tapped.
+        params: target.clients === "new" && data ? { filter: "new", from: data.period.start, to: data.period.end } : { filter: target.clients },
+      });
   };
   const trendUnit = trend === "revenue" ? "money" : "count";
 

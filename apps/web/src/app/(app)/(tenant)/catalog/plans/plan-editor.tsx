@@ -42,5 +42,5 @@ export async function PlanEditor({ id, modal }: { id: string; modal: boolean }) 
       }
     />
   );
-  return modal ? <RouteModal title={plan.name}>{form}</RouteModal> : <CatalogPage title={<bdi dir="auto">{plan.name}</bdi>} backHref={BACK}>{form}</CatalogPage>;
+  return modal ? <RouteModal title={plan.name} transitionName={`plan-${id}`}>{form}</RouteModal> : <CatalogPage title={<bdi dir="auto">{plan.name}</bdi>} backHref={BACK}>{form}</CatalogPage>;
 }

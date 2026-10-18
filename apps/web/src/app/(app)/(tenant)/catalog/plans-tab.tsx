@@ -10,6 +10,7 @@ import { canWriteCatalog } from "@/lib/permissions";
 import { getTenantFor } from "@/lib/tenant";
 
 import { catalogHref, type CatalogShow } from "./tabs";
+import { CardTransition } from "@/components/ui/page-transition";
 
 /** Memberships and punch cards: tiles that filter, then the cards. Each card opens in a window. */
 export async function PlansTab({ show }: { show: CatalogShow }) {
@@ -53,6 +54,7 @@ export async function PlansTab({ show }: { show: CatalogShow }) {
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {plans.map((plan) => (
             <li key={plan.id}>
+              <CardTransition name={`plan-${plan.id}`}>
               <Link
                 href={`/catalog/plans/${plan.id}`}
                 scroll={false}
@@ -89,6 +91,7 @@ export async function PlansTab({ show }: { show: CatalogShow }) {
                   </span>
                 </span>
               </Link>
+              </CardTransition>
             </li>
           ))}
         </ul>

@@ -62,6 +62,12 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
     const currencies = new Set(rows.map((row) => row.currency));
     return rows.length > 0 && currencies.size === 1 ? formatMoney(rows.reduce((sum, row) => sum + row.total, 0), [...currencies][0], locale) : undefined;
   };
+  const monthRows = summary.filter((row) => row.status === "accepted" && row.month_count > 0);
+  const monthCurrencies = new Set(monthRows.map((row) => row.currency));
+  const acceptedMonthHint =
+    monthRows.length > 0 && monthCurrencies.size === 1
+      ? formatMoney(monthRows.reduce((sum, row) => sum + row.month_total, 0), [...monthCurrencies][0], locale)
+      : undefined;
   const won = countOf(rowsOf("accepted"));
   const lost = countOf(rowsOf("declined", "expired"));
   const decided = won + lost;
@@ -69,6 +75,14 @@ export default async function QuotesPage({ searchParams }: PageProps<"/quotes">)
     { key: "draft", label: t("tiles.draft"), value: countOf(rowsOf("draft")), hint: totalOf(rowsOf("draft")), href: "/quotes?status=draft", active: view === "quotes" && filter === "draft" },
     { key: "sent", label: t("tiles.sent"), value: countOf(rowsOf("sent")), hint: totalOf(rowsOf("sent")), href: "/quotes?status=sent", active: view === "quotes" && filter === "sent" },
     { key: "accepted", label: t("tiles.accepted"), value: countOf(rowsOf("accepted")), hint: totalOf(rowsOf("accepted")), href: "/quotes?status=accepted", active: view === "quotes" && filter === "accepted" },
+    {
+      key: "acceptedMonth",
+      label: t("tiles.acceptedMonth"),
+      value: monthRows.reduce((sum, row) => sum + row.month_count, 0),
+      hint: acceptedMonthHint,
+      href: "/quotes?status=accepted",
+      active: false,
+    },
     {
       key: "closeRate",
       label: t("tiles.closeRate"),
