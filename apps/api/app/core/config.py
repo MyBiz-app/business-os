@@ -64,6 +64,11 @@ class Settings(BaseSettings):
     sentry_traces_sample_rate: float = Field(default=0.0, ge=0.0, le=1.0)
     sentry_release: str | None = None  # defaults to the commit Render deployed (RENDER_GIT_COMMIT)
 
+    # Turning a branch's address into a point on the map (R34): "nominatim" (OpenStreetMap, free,
+    # one request per saved address) or "none". Tests and local work run with "none".
+    geocoder: str = "nominatim"
+    geocoder_user_agent: str = f"{BRAND_NAME} business-os geocoder"
+
     # Email (used by the send-emails job). "none" sends nothing; "log" prints instead.
     email_provider: str = "none"  # none | log | resend | gmail | smtp
     push_provider: str = "expo"  # expo | log | off: push notifications to staff phones

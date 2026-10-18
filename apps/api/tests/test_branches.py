@@ -6,6 +6,7 @@ from sqlalchemy import Engine, text
 
 from tests.conftest import STUDIO, AuthHeaders, add_member, local_today
 from tests.test_bookings import new_client
+from tests.test_geo_addresses import tel_aviv_address
 from tests.test_plans import sell
 
 
@@ -273,7 +274,12 @@ def test_adding_a_branch_states_the_charge_and_sets_it_up(
     assert preview["chargeable"] and preview["monthly_extra_now"] == 0
     assert preview["monthly_extra_after"] == preview["extra_branch_price"] > 0
 
-    body = {"name": "Ashdod", "copy_hours_from": main, "staff_user_ids": [str(colleague)]}
+    body = {
+        "name": "Ashdod",
+        "copy_hours_from": main,
+        "staff_user_ids": [str(colleague)],
+        **tel_aviv_address(client, headers),  # a new branch needs a real address (R34)
+    }
     refused = client.post("/locations/new-branch", json=body, headers=headers)
     assert refused.status_code == 409 and refused.json()["detail"] == "charge_not_accepted"
     assert len(client.get("/locations", headers=headers).json()) == 1

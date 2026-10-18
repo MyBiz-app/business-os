@@ -299,6 +299,13 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - The leaked-password check is built and off until a paid Supabase plan (`go-live-checklist.md`).
 - Staging demo browsing (2026-10-17): the demo owner `adiredri73@gmail.com` is listed in `API_MFA_DEMO_EXEMPT_EMAILS` (and `MFA_DEMO_EXEMPT_EMAILS` on the web app) so it can read the demo without a code. The API honors the list only when `API_ENVIRONMENT=staging`; production, local and test ignore it. No other account is affected.
 
+### Cities, streets and branch coordinates (2026-10-18, round 7 R34, migration 0129)
+
+- Cities and streets come from the official data.gov.il lists (free), kept as a compressed snapshot in the code and loaded into shared read-only tables; yearly refresh by script. A faithful copy of the same two datasets was used to build the first snapshot because the build environment could not reach data.gov.il; the next refresh should run the script against data.gov.il itself.
+- An address is city (list), street (list, or typed and flagged for review), house number, free details. The old free-text column is kept in step, so reports, messages and documents keep working. Choosing from the lists is enforced by the API for branches added to a running business; older free-text addresses stay valid until edited. The United States keeps free text for now.
+- A branch's map point is looked up once per saved address through Nominatim (OpenStreetMap), never blocking the save; the pin can be placed by hand through the API (the draggable-pin screen is part of the branches map slice, R35).
+- Home addresses of people stay visible only to the person (existing row policy); a team member without a full home address sees a reminder line until they fill it in (nobody is locked out).
+
 ## Open
 
 | # | Question |

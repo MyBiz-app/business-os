@@ -22,6 +22,8 @@ GLOBAL_TABLES = {
     "platform_series",  # MyBiz's invoice counter; system only
     "dunning_events",  # reminders sent per MyBiz invoice; system only
     "platform_incidents",
+    "geo_cities",  # the official city list, the same for every business; read-only for the API
+    "geo_streets",  # the official street list; read-only for the API
     "payroll_rates",  # law-driven rates, the same for every business; read-only for the API
 }
 # Tables whose tenant_id only says which business a row is about: they are MyBiz's own, have no

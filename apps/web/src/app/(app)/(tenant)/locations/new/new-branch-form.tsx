@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState } from "react";
 
+import { AddressPicker } from "@/components/address-picker";
 import { CheckboxField, Field, SelectField } from "@/components/form/field";
 import { FormFeedback } from "@/components/form/form-feedback";
 import { SubmitButton } from "@/components/form/submit-button";
@@ -27,7 +28,10 @@ export function NewBranchForm({ action, chargeable, branches, people, kindOption
       <fieldset className="grid gap-4 sm:grid-cols-2">
         <legend className="sr-only">{t("locations.addBranch.details")}</legend>
         <Field label={t("locations.name")} name="name" required maxLength={120} />
-        <Field label={t("locations.address")} name="address" maxLength={300} />
+        <fieldset className="flex flex-col gap-3 sm:col-span-2">
+          <legend className="mb-1 text-sm font-medium">{t("locations.address")}</legend>
+          <AddressPicker required />
+        </fieldset>
         <Field label={t("locations.website")} hint={t("locations.websiteHint")} name="website_url" inputMode="url" maxLength={300} dir="ltr" autoComplete="off" placeholder="www.example.com" />
         {kindOptions.length > 1 && (
           <SelectField label={t("locations.kind")} name="kind" defaultValue="" options={kindOptions} />
