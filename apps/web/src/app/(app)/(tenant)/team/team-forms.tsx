@@ -10,6 +10,7 @@ import { FormError, FormNotice } from "@/components/form/form-message";
 import { IdentityEditor } from "@/components/identity-editor";
 import { Modal } from "@/components/ui/modal";
 import { PermissionList } from "@/components/permission-list";
+import { CardTransition } from "@/components/ui/page-transition";
 import { SubmitButton } from "@/components/form/submit-button";
 
 import { changeRole, inviteMember, removeMember, setBranches, type TeamState } from "./actions";
@@ -75,6 +76,8 @@ export function InviteForm({ allowOwner }: { allowOwner: boolean }) {
 }
 
 type MemberRowProps = {
+  /** Where the name and "open" go: the card as a window over the list (`/team?open=<id>`). */
+  openHref?: string;
   userId: string;
   allPermissions: string[];
   permissions: string[];
@@ -93,7 +96,7 @@ type MemberRowProps = {
   title?: string | null;
 };
 
-export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions }: MemberRowProps) {
+export function MemberRow({ userId, email, name, role, customRoleId, isSelf, allowOwner, customRoles, branches, memberBranches, homeBranch = null, avatar = null, title = null, allPermissions, permissions, openHref }: MemberRowProps) {
   const t = useTranslations();
   const [roleState, roleAction] = useActionState<TeamState, FormData>(changeRole.bind(null, userId), {});
   const [removeState, removeAction] = useActionState<TeamState, FormData>(removeMember.bind(null, userId), {});
@@ -105,13 +108,14 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
   const current = customRoleId ? `custom:${customRoleId}` : role;
 
   return (
+    <CardTransition name={`member-${userId}`}>
     <li className="flex flex-col gap-2 border-t border-border px-5 py-4 transition-colors first:border-t-0 hover:bg-primary/4">
       <TeamError state={roleState.error ? roleState : removeState} />
       <div className="flex flex-wrap items-center gap-3">
         <Avatar id={userId} name={name ?? email} src={avatar} />
         {/* The name keeps its own line on phones; the actions wrap below it. */}
         <span className="flex min-w-48 flex-1 flex-col">
-          <Link href={`/team/${userId}`} className="w-fit max-w-full truncate font-medium hover:text-primary-ink hover:underline" dir="auto">
+          <Link scroll={false} href={openHref ?? `/team/${userId}`} className="w-fit max-w-full truncate font-medium hover:text-primary-ink hover:underline" dir="auto">
             {name ?? email} {isSelf && <span className="font-normal text-muted">{t("team.you")}</span>}
           </Link>
           {title && (
@@ -128,7 +132,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
         {branches.length > 1 && <MemberBranches userId={userId} email={email} branches={branches} selected={memberBranches} home={homeBranch} />}
         <MemberPermissions email={email} all={allPermissions} allowed={permissions} />
         <MemberIdentity userId={userId} name={name ?? email} />
-        <Link href={`/team/${userId}`} className="btn-secondary px-3 py-1.5 text-sm">
+        <Link scroll={false} href={openHref ?? `/team/${userId}`} className="btn-secondary px-3 py-1.5 text-sm">
           {t("staffCard.open")}
         </Link>
         <form action={roleAction}>
@@ -162,6 +166,7 @@ export function MemberRow({ userId, email, name, role, customRoleId, isSelf, all
         )}
       </div>
     </li>
+    </CardTransition>
   );
 }
 

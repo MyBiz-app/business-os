@@ -38,7 +38,7 @@ export default async function PlatformBillingPage() {
   });
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader titleId="billing-heading" title={t("billing")} description={t("billingHint")} />
       <section aria-labelledby="overdue-heading" className="flex flex-col gap-3">
         <h2 id="overdue-heading" className="text-lg font-semibold">{t("overdue.title")}</h2>

@@ -71,7 +71,7 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
   pattern for a heavy page: a `loading.tsx` next to it with a skeleton of its shape.
 - UI kit (`apps/web/src/components/ui`, round 7): `Modal` (a near full-screen window over the page,
   a sheet on a phone; Esc, X and backdrop close it, `dirty` asks "Leave without saving?", buttons go
-  in `footer`), `CollapsibleSection` (arrow at the start, state remembered with `storageKey`;
+  in `footer`), `CollapsibleSection` (`variant="inline"` is a bare arrow and title for a show-all, an add form or a danger zone; a raw `<details>` is banned by a test except the two popovers; arrow at the start, state remembered with `storageKey`;
   use it instead of a bare `<details>`), `SegmentedControl` (the pill slides) with `ContentSwap`
   (old content fades out in 100ms, new fades in in 150ms), and loading states: `LoadingDots`,
   `ProgressBar`, `PendingContent` (keeps old content dimmed while new data loads, never a blank
@@ -130,7 +130,11 @@ Checked at 390, 1440, 1920 and 2560 px. More columns, never longer lines.
 | Client / staff card | Content + side column; from 1920px (`min-[120rem]`) the side column becomes two columns (client card) or the overview grid gets three (staff card). |
 | Long text (policies, help) | `prose`, 44rem, unchanged. |
 
-`src/lib/wide-screens.test.ts` keeps these in place.
+The console follows the same rule: form-like pages (billing, team, inbox, broadcasts, AI board) are `settings`; tables and boards (overview, businesses, audit, health, integrations, website orders) are `full`. The account page is `settings` with `form-columns`. `src/lib/wide-screens.test.ts` keeps these in place and `e2e/wide_screens.py` measures them in a real browser at all four widths.
+
+### Record card as a window (`?open=`)
+
+The team list opens a person's card as a window over the list with `?open=<userId>` (`lib/open-window.ts`, `StaffCardWindow`), the same way clients and sessions do. The page `/team/<userId>` still exists for links and refresh and renders the same `StaffCardBody`. Each block of the card folds and remembers its state per person.
 
 ## Lint rules (CI: `pnpm turbo run lint`)
 

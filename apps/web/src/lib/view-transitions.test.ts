@@ -35,16 +35,17 @@ describe("card to window transitions (R29)", () => {
   });
 
   it("covers leads, clients, quotes, invoices, receipts, sessions and the catalog", () => {
-    for (const name of ["lead", "client", "quote", "invoice", "receipt", "session", "service", "plan", "promo"]) {
+    for (const name of ["lead", "client", "quote", "invoice", "receipt", "session", "member", "service", "plan", "promo"]) {
       assert.ok(cards.has(name), name);
     }
   });
 
-  it("opens clients and sessions with ?open= (a dynamic intercepting route would also catch /clients/join, /schedule/closed and /schedule/waitlist)", () => {
+  it("opens clients, sessions and team members with ?open= (a dynamic intercepting route would also catch /clients/join, /schedule/closed and /team/shifts)", () => {
     const tenant = join(SRC, "app/(app)/(tenant)");
     for (const [page, window] of [
       ["clients/page.tsx", "ClientWindow"],
       ["schedule/page.tsx", "SessionWindow"],
+      ["team/page.tsx", "StaffCardWindow"],
     ]) {
       const source = readFileSync(join(tenant, page), "utf8");
       assert.ok(source.includes(window) && source.includes("openedId"), page);
@@ -52,6 +53,7 @@ describe("card to window transitions (R29)", () => {
     for (const folder of ["(.)clients", "(.)schedule"]) {
       assert.ok(!readdirSync(join(tenant, "@modal", folder)).includes("[id]"), `${folder} must not have a dynamic [id] window`);
     }
+    assert.ok(!readdirSync(join(tenant, "@modal")).includes("(.)team"));
   });
 
   it("has an intercepted window route where the list links to an id with no static sibling", () => {

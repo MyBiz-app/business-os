@@ -27,7 +27,7 @@ export default async function PlatformAiPage() {
   const trend = (now: number, before: number) => (before === 0 ? (now === 0 ? "" : "↑") : now > before * 1.2 ? "↑" : now < before * 0.8 ? "↓" : "→");
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-8 py-8 sm:py-10">
       <PageHeader titleId="ai-heading" title={t("title")} description={t("hint")} />
 
       {settings.kill_all && (

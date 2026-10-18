@@ -24,6 +24,7 @@ import {
 import { CalcAddonCard } from "./calc-addon-card";
 import { CalcIndustry } from "./calc-industry";
 import { CalcReceipt } from "./calc-receipt";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 /** The add-ons a visitor can try out here (the same ones the sign-up journey offers). */
 const OFFERS: Offer[] = ["client_app", "ai", "crm", "whatsapp"];
@@ -171,9 +172,8 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
           </ul>
         </div>
 
-        <details className="rounded-xl border border-border p-4">
-          <summary className="cursor-pointer font-semibold">{t("todayTitle")}</summary>
-          <div className="mt-3 flex flex-col gap-3">
+        <CollapsibleSection variant="inline" className="rounded-xl border border-border p-4" triggerClassName="font-semibold text-primary-ink" title={t("todayTitle")}>
+          <div className="flex flex-col gap-3">
             <p className="text-sm text-muted">{t("todayHint")}</p>
             {TODAY_ROWS.map((row) => (
               <label key={row} className="flex items-center justify-between gap-3 text-sm">
@@ -197,7 +197,7 @@ export function PricingCalculator({ catalog, compact = false }: { catalog: Catal
               </p>
             )}
           </div>
-        </details>
+        </CollapsibleSection>
       </div>
 
       <aside aria-live="polite" className="card-accent hidden flex-col gap-4 self-start p-6 lg:sticky lg:top-24 lg:flex">

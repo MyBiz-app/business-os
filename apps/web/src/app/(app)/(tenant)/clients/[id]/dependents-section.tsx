@@ -8,6 +8,7 @@ import type { getTenant } from "@/lib/tenant";
 
 import { setDependentActive } from "./dependents-actions";
 import { DependentForm } from "./dependents-forms";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 type Context = Awaited<ReturnType<typeof getTenant>>;
 type Props = { clientId: string; context: Context; locked: boolean };
@@ -82,26 +83,22 @@ export async function DependentsSection({ clientId, context, locked }: Props) {
               {facts.length > 0 && <p className="text-sm text-muted">{facts.join(" · ")}</p>}
               {dependent.notes && <p dir="auto" className="whitespace-pre-line text-sm">{dependent.notes}</p>}
               {writable && (
-                <details>
-                  <summary className="cursor-pointer text-sm text-primary-ink">{t("edit", { name: dependent.name })}</summary>
+                <CollapsibleSection variant="inline" title={t("edit", { name: dependent.name })}>
                   <div className="pt-3">
                     <DependentForm clientId={clientId} kind={kind} fields={settings.fields} dependent={dependent} />
                   </div>
-                </details>
+                </CollapsibleSection>
               )}
             </li>
           );
         })}
       </ul>
       {writable && (
-        <details className="rounded-xl bg-foreground/[0.03] p-3">
-          <summary className="flex cursor-pointer items-center gap-1 text-sm font-medium text-primary-ink">
-            <Plus aria-hidden="true" className="size-4" /> {t(`add.${kind}`)}
-          </summary>
+        <CollapsibleSection variant="inline" className="rounded-xl bg-foreground/[0.03] p-3" triggerClassName="font-medium text-primary-ink" title={<><Plus aria-hidden="true" className="size-4" /> {t(`add.${kind}`)}</>}>
           <div className="pt-3">
             <DependentForm clientId={clientId} kind={kind} fields={settings.fields} />
           </div>
-        </details>
+        </CollapsibleSection>
       )}
     </section>
   );
