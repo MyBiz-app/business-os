@@ -9622,7 +9622,13 @@
       "factorLabel": "Authenticator {number}",
       "requiredTeam": "Everyone on the MyBiz team must use two-step sign-in. Turn it on to continue.",
       "requiredBusiness": "This business requires two-step sign-in. Turn it on to continue.",
-      "requiredSoon": "Owners and managers will have to use two-step sign-in from {date}. Turn it on now."
+      "warning": "Two-step sign-in is off for your account. We strongly recommend turning it on: without it, anyone who learns your password can reach your business data.",
+      "warningAcknowledged": "Two-step sign-in is still off. Turn it on to protect your business.",
+      "riskTitle": "Working without two-step sign-in",
+      "riskBody": "Two-step sign-in is your choice, but we strongly recommend it. Without it, anyone who learns your password can see client data, pay details and settings, and act in your name. By continuing without it you confirm that you understand this risk and that keeping your account secure is your responsibility.",
+      "riskConfirm": "I understand the risk, continue without it",
+      "riskDone": "Saved. You can turn on two-step sign-in at any time.",
+      "requiredAck": "To continue, turn on two-step sign-in or confirm that you understand the risk of working without it."
     },
     "challenge": {
       "title": "Enter your code",
@@ -9646,6 +9652,7 @@
     "errors": {
       "invalid_code": "The code is wrong or expired. Try the current code from the app.",
       "mfa_required": "This needs two-step sign-in. Turn it on in your account settings.",
+      "mfa_risk_ack_required": "Confirm that you understand the risk of working without two-step sign-in, or turn it on.",
       "needs_recent_code": "Enter a fresh code from the app first.",
       "generic": "Something went wrong. Try again."
     },
@@ -9716,6 +9723,7 @@
       "mfa_team_requirement_set": "Changed the two-step requirement for the team",
       "mfa_enabled": "Turned on two-step sign-in",
       "mfa_disabled": "Turned off two-step sign-in",
+      "mfa_risk_acknowledged": "Confirmed the risk of working without two-step sign-in",
       "login_new_device": "Signed in from a new device",
       "export_audit_log": "Downloaded the audit log",
       "clients_export": "Exported a client's data",

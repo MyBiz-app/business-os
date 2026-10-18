@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Header
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 
@@ -15,6 +15,7 @@ from app.api.deps import SessionDep, UserDep
 from app.api.routes import ensure_profile
 from app.core.audit import record_everywhere
 from app.core.config import get_settings
+from app.core.mfa import RISK_VERSION, has_acknowledged_risk, record_risk_acknowledgement
 from app.messaging.email import Email, Sender, load_all_messages, sender_from_settings
 
 router = APIRouter(prefix="/me/devices", tags=["account"])
@@ -52,9 +53,14 @@ class LoginDevice(BaseModel):
 class SecurityPolicy(BaseModel):
     mfa_enforced: bool = Field(description="Two-step sign-in is enforced on this server")
     mfa_required_from: dt.date | None = Field(
-        description="From this day owners and managers need a code for sensitive actions"
+        description="Deprecated: always empty, two-step sign-in is optional for owners and managers"
     )
-    mfa_required_now: bool = Field(description="Owners and managers need a code already")
+    mfa_required_now: bool = Field(
+        description="Deprecated: always false, see mfa_risk_acknowledged"
+    )
+    mfa_risk_acknowledged: bool = Field(
+        description="The person confirmed they understand the risk of working without a code"
+    )
 
 
 def device_hash(device_id: str) -> str:
@@ -142,15 +148,23 @@ def security_event(body: SecurityEventBody, user: UserDep, session: SessionDep) 
 
 
 @policy_router.get("")
-def security_policy(user: UserDep) -> SecurityPolicy:
+def security_policy(user: UserDep, session: SessionDep) -> SecurityPolicy:
     """What the apps tell people about two-step sign-in (the banner for owners and managers)."""
-    settings = get_settings()
     return SecurityPolicy(
-        mfa_enforced=settings.mfa_on,
-        mfa_required_from=settings.mfa_required_from,
-        mfa_required_now=settings.mfa_required_from is None
-        or dt.date.today() >= settings.mfa_required_from,
+        mfa_enforced=get_settings().mfa_on,
+        mfa_required_from=None,
+        mfa_required_now=False,
+        mfa_risk_acknowledged=has_acknowledged_risk(session),
     )
+
+
+@policy_router.post("/mfa-risk-acknowledgement", status_code=204)
+def acknowledge_mfa_risk(user: UserDep, session: SessionDep, request: Request) -> None:
+    """The person read the warning about working without two-step sign-in and understands the
+    risk. Kept with the time and address, and shown in the audit log of their businesses."""
+    ensure_profile(session, user.id, user.email)
+    record_risk_acknowledgement(session, request, user.id)
+    record_everywhere(session, "mfa.risk_acknowledged", version=RISK_VERSION)
 
 
 @router.get("")

@@ -105,7 +105,6 @@ log shows the migration finishing before the service goes live.
 | `API_SECRETS_KEY`, `API_SECRETS_KEYS`, `API_ID_HASH_KEY` | Render (API and both jobs) | see section 0 and [key-rotation.md](../runbooks/key-rotation.md); set `API_SECRETS_KEYS` to the same single key at first |
 | `API_INTERNAL_TOKEN` | Render and Vercel | the same value in both |
 | `API_WEB_URL`, `API_API_URL`, `API_CORS_ORIGINS` | Render | the public addresses; the origins as a JSON list, no localhost |
-| `API_MFA_REQUIRED_FROM` | Render | a date 14 days after go-live (`YYYY-MM-DD`) |
 | `API_ANTHROPIC_API_KEY`, `API_SUPABASE_URL`, `API_SUPABASE_SERVICE_KEY`, `API_SENTRY_DSN` | Render, optional | when the feature is wanted (see the go-live checklist) |
 | `WEB_ALLOW_INDEXING`, `WEB_HSTS_INCLUDE_SUBDOMAINS` | Vercel | section 3 |
 | `EXPO_PUBLIC_API_URL`, `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_KEY` | EAS environment `production` | section 7 |

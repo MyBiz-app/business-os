@@ -176,9 +176,10 @@ class Settings(BaseSettings):
         return self.environment not in ("local", "test")
 
     # Two-step sign-in (app/core/mfa.py). Off in local development and tests like the rate
-    # limits; on everywhere else unless set. Owners' and managers' sensitive actions need a code
-    # from `mfa_required_from` on (none: from the start), the MyBiz team and businesses that
-    # require it of their team always do.
+    # limits; on everywhere else unless set. The MyBiz team and businesses that require it of
+    # their team always need a code. For owners and managers it is optional: without a code they
+    # confirm a warning first. `mfa_required_from` is no longer read (kept so a deployed
+    # environment that still sets it keeps starting; remove it one release later).
     mfa_enforced: bool | None = None
     mfa_required_from: dt.date | None = None
     # Comma-separated emails of demo owners who may browse staging without a code. Only read on

@@ -10,7 +10,7 @@ from sqlalchemy import Engine, text
 
 from app.api.devices import get_sender
 from app.core import config
-from app.core.mfa import sensitive_action_needs_mfa
+from app.core.mfa import RISK_VERSION
 from app.main import create_app  # noqa: F401  (the client fixture builds the app)
 from app.messaging.email import Email
 from tests.conftest import AuthHeaders, add_member, make_staff
@@ -75,33 +75,55 @@ def test_a_business_can_require_a_code_of_its_team(
     assert allowed.status_code == 200
 
 
-def test_sensitive_actions_wait_for_the_grace_period(
-    monkeypatch: pytest.MonkeyPatch,
+def test_owners_must_confirm_the_risk_before_a_sensitive_action(
+    client: TestClient, studio: dict, auth: AuthHeaders, engine: Engine, mfa_on: None
 ) -> None:
-    monkeypatch.setenv("API_MFA_ENFORCED", "true")
-    monkeypatch.setenv("API_MFA_REQUIRED_FROM", "2026-11-01")
-    config.get_settings.cache_clear()
-    try:
-        assert not sensitive_action_needs_mfa("aal1", dt.date(2026, 10, 31))
-        assert sensitive_action_needs_mfa("aal1", dt.date(2026, 11, 1))
-        assert not sensitive_action_needs_mfa("aal2", dt.date(2026, 11, 1))
-    finally:
-        monkeypatch.undo()
-        config.get_settings.cache_clear()
+    owner_id = client.get("/me", headers=studio["headers"]).json()["id"]
+    headers = auth(owner_id, studio["tenant_id"], aal="aal1")
+    body = {"cancellation_window_minutes": 60}
+    # Everyday work needs no code ...
+    assert client.get("/services", headers=headers).status_code == 200
+    # ... settings need a code or the confirmed warning.
+    refused = client.patch("/tenants/current", json=body, headers=headers)
+    assert refused.status_code == 403 and refused.json()["detail"] == "mfa_risk_ack_required"
+    assert client.get("/me/security", headers=headers).json()["mfa_risk_acknowledged"] is False
+
+    assert client.post("/me/security/mfa-risk-acknowledgement", headers=headers).status_code == 204
+    assert client.post("/me/security/mfa-risk-acknowledgement", headers=headers).status_code == 204
+    assert client.get("/me/security", headers=headers).json()["mfa_risk_acknowledged"] is True
+    assert client.patch("/tenants/current", json=body, headers=headers).status_code == 200
+
+    with engine.connect() as connection:  # one row per person and version, with the time
+        rows = connection.execute(
+            text("SELECT version FROM app.mfa_risk_acknowledgements WHERE user_id = :user"),
+            {"user": owner_id},
+        ).all()
+    assert [row.version for row in rows] == [RISK_VERSION]
+    # Someone else's confirmation does not count for this person.
+    other = uuid4()
+    add_member(engine, studio["tenant_id"], other, "manager")
+    stranger = auth(other, studio["tenant_id"], aal="aal1")
+    assert client.patch("/tenants/current", json=body, headers=stranger).status_code == 403
 
 
-def test_owners_need_a_code_for_sensitive_actions(
+def test_a_code_needs_no_confirmation(
+    client: TestClient, studio: dict, auth: AuthHeaders, mfa_on: None
+) -> None:
+    owner_id = client.get("/me", headers=studio["headers"]).json()["id"]
+    headers = auth(owner_id, studio["tenant_id"], aal="aal2")
+    body = {"cancellation_window_minutes": 60}
+    assert client.patch("/tenants/current", json=body, headers=headers).status_code == 200
+
+
+def test_the_confirmation_is_in_the_audit_log(
     client: TestClient, studio: dict, auth: AuthHeaders, mfa_on: None
 ) -> None:
     owner_id = client.get("/me", headers=studio["headers"]).json()["id"]
     headers = auth(owner_id, studio["tenant_id"], aal="aal1")
-    # Everyday work needs no code ...
-    assert client.get("/services", headers=headers).status_code == 200
-    # ... settings do.
-    refused = client.patch(
-        "/tenants/current", json={"cancellation_window_minutes": 60}, headers=headers
-    )
-    assert refused.status_code == 403 and refused.json()["detail"] == "mfa_required"
+    client.post("/me/security/mfa-risk-acknowledgement", headers=headers)
+    log = client.get("/audit-log", headers=headers)
+    assert log.status_code == 200, log.text
+    assert "mfa.risk_acknowledged" in [entry["action"] for entry in log.json()["entries"]]
 
 
 def test_demo_exemption_is_staging_only_and_by_email() -> None:
@@ -140,7 +162,7 @@ def test_an_exempt_demo_owner_is_not_asked_for_a_code(
     assert client.patch(path, json=body, headers=exempt).status_code == 200
     # The same person under another email, or anyone else, is unaffected.
     other = auth(owner_id, studio["tenant_id"], aal="aal1")
-    assert client.patch(path, json=body, headers=other).json()["detail"] == "mfa_required"
+    assert client.patch(path, json=body, headers=other).json()["detail"] == "mfa_risk_ack_required"
 
 
 class Outbox:
