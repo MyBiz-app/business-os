@@ -6,7 +6,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir uv==0.8.17
+# setuptools ships with the base image and lags behind its security fixes; upgrade it here.
+RUN pip install --no-cache-dir --upgrade uv==0.11.15 "setuptools>=83"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \

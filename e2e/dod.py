@@ -12,8 +12,8 @@ from playwright.sync_api import expect, sync_playwright
 import helpers as h
 from helpers import APP, login, otp
 
-# A session on the schedule grid links to /schedule/<id>; the other /schedule/... links are pages (new, closed, ...).
-SESSION_LINK = 'main a[href^="/schedule/"]:not([href*="?"]):not([href="/schedule/closed"])'
+# A session on the schedule grid links to /schedule/<id>; the other /schedule/... links are pages (new, closed, waitlist, ...).
+SESSION_LINK = 'main a[href^="/schedule/"]:not([href*="?"]):not([href="/schedule/closed"]):not([href="/schedule/waitlist"])'
 ADMIN = sys.argv[1]  # a platform admin's email (see README)
 pathlib.Path(h.OUT).mkdir(parents=True, exist_ok=True)
 stamp = time.time_ns()
