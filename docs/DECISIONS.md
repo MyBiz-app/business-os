@@ -330,7 +330,7 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
 - Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
 
-### Sign-up tracks and business size (2026-10-18, round 7 R25a, migration 0134)
+### Sign-up tracks and business size (2026-10-18, round 7 R25a, migration 0135)
 
 - **Two columns on the business**: `product_track` (`full`, the default, or `website_only`) and `business_size` (`solo`, `small` 2-5, `medium` 6-20, `network`). A website-only business is a normal business with no modules; adding the system (`POST /website/add-system`) gives it its kind of business's starting modules and flips the track to `full`, with no new sign-up. Its website price is the stand-alone one until then (the hook R24 left in `website_orders._with_system`).
 - **Business size is derived, not asked twice**: the journey already asks staff and branches, so the size is `network` for more than one branch, otherwise `solo` for one person, `small` up to 5, `medium` up to 20, `network` above. It was asked and thrown away before; now it is kept, and the "I grew" and independent-mode slice (R28) reads it.
