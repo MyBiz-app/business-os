@@ -9,6 +9,7 @@ from sqlalchemy import text
 
 from app.api.deps import TenantContext, require
 from app.core.permissions import Permission
+from app.reports.branch_insights import client_origins, staff_cost_by_branch
 from app.reports.metrics import (
     METRICS,
     Dimension,
@@ -203,3 +204,66 @@ def compare_branches(
     finally:
         db.execute(text("SELECT set_config('app.location_id', :id, true)"), {"id": previous or ""})
     return result
+
+
+class ClientOriginOut(BaseModel):
+    city_code: int
+    city_name: str
+    clients: int
+    latitude: float | None = Field(description="The city's centre, when it could be found")
+    longitude: float | None
+
+
+class BranchInsight(BaseModel):
+    location_id: str
+    origins: list[ClientOriginOut] = Field(
+        description="Cities of the clients who booked there in the period, most first"
+    )
+    staff_cost_minor: int | None = Field(
+        description="The branch's share of the latest payroll month's gross pay (needs payroll "
+        "access; people who did not clock in are not counted)"
+    )
+
+
+class BranchInsights(BaseModel):
+    staff_cost_period: dt.date | None = Field(description="The payroll month the cost is from")
+    branches: list[BranchInsight]
+
+
+@router.get("/branch-insights")
+def branch_insights(
+    context: ReportsDep,
+    start: Annotated[dt.date, Query(description="First local date")],
+    end: Annotated[dt.date, Query(description="Last local date (inclusive)")],
+) -> BranchInsights:
+    """What the branches map shows beyond the metrics: where each branch's clients come from
+    and what its team costs. Only branches the person may see."""
+    _check_period(start, end)
+    db = context.session
+    ids = [
+        row.id
+        for row in db.execute(
+            text("""
+                SELECT id::text AS id FROM app.locations
+                WHERE active AND app.in_branch(id) ORDER BY created_at, name
+            """)
+        )
+    ]
+    period, costs = (
+        staff_cost_by_branch(db) if Permission.PAYROLL_READ in context.permissions else (None, {})
+    )
+    can_see_cost = Permission.PAYROLL_READ in context.permissions
+    return BranchInsights(
+        staff_cost_period=period,
+        branches=[
+            BranchInsight(
+                location_id=location_id,
+                origins=[
+                    ClientOriginOut(**vars(origin))
+                    for origin in client_origins(db, location_id, start, end)
+                ],
+                staff_cost_minor=costs.get(location_id, 0) if can_see_cost and period else None,
+            )
+            for location_id in ids
+        ],
+    )
