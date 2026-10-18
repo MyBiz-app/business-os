@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.api.billing import Collection, _collection, _invoices
 from app.api.closure import OwnerDep
 from app.commerce.billing import MAX_PAUSE_MONTHS, PAUSE_FEE, add_months
+from app.core.audit import record
 from app.core.logging import log
 from app.messaging.email import Email, load_all_messages, sender_from_settings
 
@@ -201,6 +202,7 @@ def cancel_subscription(context: OwnerDep, body: CancelRequest | None = None) ->
     db.execute(text("SELECT app.set_subscription_cancel(:at)"), {"at": end})
     body = body or CancelRequest()
     _record(db, "cancelled", body.reason, body.note, end, tenant.currency, invoice_id, refund)
+    record(db, "tenant.subscription_canceled", entity_type="tenant", ends_at=end)
     _confirm(db, tenant, "cancelled", end, refund)
     return _collection(db, _invoices(db), tenant.time_zone)
 
@@ -210,6 +212,7 @@ def resume_subscription(context: OwnerDep) -> Collection:
     """Takes a cancellation back, and brings a business back whose subscription had ended."""
     db = context.session
     db.execute(text("SELECT app.set_subscription_cancel(NULL)"))
+    record(db, "tenant.subscription_resumed", entity_type="tenant")
     db.execute(
         text("""
             UPDATE app.subscription_cancellations SET resumed_at = now()

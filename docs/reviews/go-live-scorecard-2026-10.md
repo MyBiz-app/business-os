@@ -31,7 +31,7 @@ nothing in production was touched.
 | 2 | Two-step sign-in | 🟡 | #386 | Owner turns it on for their own accounts; staging already requires it |
 | 2 | Password policy | 🟡 | #386 | 10 characters, letters and digits applied; leaked-password check needs Supabase Pro |
 | 2 | Roles and permissions | ✅ | - | Existing, with matrix tests |
-| 2 | Sessions | ✅ | #386 | Idle sign-out; "sign out everywhere" listed as later in the ASVS check |
+| 2 | Sessions | ✅ | #386 | Idle sign-out; "Sign out of all devices" is on the web (Account, Account security); the app has no button yet (ASVS 3.6) |
 | 2 | Break-in attempts | ✅ | #392 | Audit log of sign-ins and sensitive actions |
 | 3 | Row security on every table | ✅ | - | `test_tenant_matrix.py`, `test_database_security.py` |
 | 3 | Branch separation | ✅ | #387 | Client notes, documents, health, dependents, receipts, quotes |
@@ -42,7 +42,7 @@ nothing in production was touched.
 | 4 | Access to production | 🟡 | #396, #407 | Two-step sign-in on Supabase, Render, Vercel, GitHub: owner |
 | 5 | Production server | 🟡 | #396 | Written as code, off. Render Starter and Supabase Pro at go-live: owner approves |
 | 5 | Indexes | ✅ | #403 | Trigram index for client search; index tests |
-| 5 | Connection pooling | ✅ | #405 | Sized in `production.md` |
+| 5 | Connection pooling | ✅ | #405 | Worst case 60 connections worked out in `production.md` section 1; compare with the Supabase compute limit at go-live |
 | 5 | Load tests | ✅ | #405 | k6 parallel run in CI (50 to 200 users) |
 | 5 | Paging of lists | ✅ | #403 | Keyset paging; known gap: the CRM quotes list shows the first 200 and has no "load more" |
 | 5 | Autoscaling | 🟡 | #405 | Second instance after the Key Value limiter store (paid, later) |

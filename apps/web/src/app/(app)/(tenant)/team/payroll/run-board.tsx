@@ -4,11 +4,13 @@ import { formatMoney, minorDigits, toMajorUnits, toMinorUnits } from "@business-
 import { AlertTriangle, Check, Download, Plus, RefreshCw, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, useTransition } from "react";
+import { useEffect, useId, useState, useTransition } from "react";
 
 import type { components } from "@business-os/api-client";
 import { EmptyState } from "@/components/empty-state";
 import { Pill } from "@/components/pill";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { Modal } from "@/components/ui/modal";
 
 import { acknowledgeWarning, type Correction, issueCorrection, listCorrections, markAccountantChecked, moveStage, refreshRun, startRun, type RunError, type RunResult, type RunStage, typeAmount } from "./actions";
 
@@ -114,7 +116,7 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
       <Stepper stage={stage} />
       <p className="text-sm text-muted">{t(`stageHint.${stage}`)}</p>
 
-      <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="card p-4">
           <dt className="text-sm text-muted">{t("summary.gross")}</dt>
           <dd className="text-2xl font-semibold tabular-nums">
@@ -131,6 +133,13 @@ export function RunBoard({ run, month, locale, canManage, canApprove }: { run: R
           <dd className="text-2xl font-semibold tabular-nums">
             <bdi>{money(summary.deductions_minor)}</bdi>
           </dd>
+        </div>
+        <div className="card p-4">
+          <dt className="text-sm text-muted">{t("summary.employerCost")}</dt>
+          <dd className="text-2xl font-semibold tabular-nums">
+            <bdi>{money(summary.employer_cost_minor)}</bdi>
+          </dd>
+          <dd className="text-xs text-muted">{t("summary.employerCostNote")}</dd>
         </div>
         <div className="card p-4">
           <dt className="text-sm text-muted">{t("summary.people")}</dt>
@@ -281,9 +290,8 @@ function BankFileForm({ month }: { month: string }) {
   const id = useId();
   const field = "w-full rounded-md border border-border bg-surface px-3 py-2 text-sm";
   return (
-    <details className="card w-full p-3">
-      <summary className="cursor-pointer text-sm font-semibold">{t("title")}</summary>
-      <form method="post" action="/team/payroll/bank-file" className="mt-3 grid gap-3 sm:grid-cols-2">
+    <CollapsibleSection title={t("title")} storageKey="payroll-bank-file">
+      <form method="post" action="/team/payroll/bank-file" className="grid gap-3 sm:grid-cols-2">
         <p className="text-sm text-muted sm:col-span-2">{t("hint")}</p>
         <input type="hidden" name="month" value={month} />
         <label htmlFor={`${id}-inst`} className="flex flex-col gap-1 text-sm">
@@ -306,18 +314,14 @@ function BankFileForm({ month }: { month: string }) {
           {t("submit")}
         </button>
       </form>
-    </details>
+    </CollapsibleSection>
   );
 }
 
 function PaySheet({ line, month, run, locale, canManage, canApprove, onClose }: { line: Line; month: string; run: Run; locale: string; canManage: boolean; canApprove: boolean; onClose: () => void }) {
   const t = useTranslations("payRun");
-  const dialog = useRef<HTMLDialogElement>(null);
   const { error, pending, run: act } = useAction();
   const money = (amount: number) => formatMoney(amount, run.currency, locale);
-  useEffect(() => {
-    dialog.current?.showModal();
-  }, []);
 
   const explain = (item: Item): string | null => {
     if (item.quantity && item.unit_minor != null) {
@@ -331,24 +335,8 @@ function PaySheet({ line, month, run, locale, canManage, canApprove, onClose }: 
   const needsAmount = new Map(line.warnings.filter((w) => w.ref && (w.code === "typed_amount_missing" || w.code === "automatic_rate_missing")).map((w) => [w.ref as string, w]));
 
   return (
-    <dialog
-      ref={dialog}
-      onClose={onClose}
-      onClick={(event) => {
-        if (event.target === dialog.current) dialog.current?.close();
-      }}
-      aria-labelledby="pay-sheet-title"
-      className="me-0 ms-auto mb-0 mt-0 h-dvh max-h-none w-[min(30rem,100vw)] border-s border-border bg-surface p-0 text-foreground shadow-2xl backdrop:bg-black/40"
-    >
-      <div className="flex flex-col gap-5 p-6">
-        <div className="flex items-start justify-between gap-3">
-          <h2 id="pay-sheet-title" dir="auto" className="text-lg font-semibold">
-            {t("sheet.title", { name: line.full_name ?? "" })}
-          </h2>
-          <button type="button" onClick={() => dialog.current?.close()} aria-label={t("sheet.close")} className="btn-ghost size-8">
-            <X aria-hidden="true" className="size-4" />
-          </button>
-        </div>
+    <Modal title={t("sheet.title", { name: line.full_name ?? "" })} size="md" onClose={onClose}>
+      <div className="flex flex-col gap-5">
         {error && (
           <p role="alert" className="text-sm text-danger">
             {t(`errors.${error}`)}
@@ -446,7 +434,7 @@ function PaySheet({ line, month, run, locale, canManage, canApprove, onClose }: 
           </div>
         </dl>
       </div>
-    </dialog>
+    </Modal>
   );
 }
 

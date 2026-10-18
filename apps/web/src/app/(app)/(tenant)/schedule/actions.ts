@@ -146,6 +146,18 @@ export async function bookClient(sessionId: string, clientId: string, dependentI
   await placeBooking(sessionId, clientId, dependentId, false);
 }
 
+/** "Add me" in a class roster: the signed-in team member becomes a client (if not yet) and is booked. */
+export async function bookMyself(sessionId: string): Promise<void> {
+  const { api, scope } = await getTenant();
+  let clientId: string;
+  try {
+    clientId = unwrap(await api.POST("/clients/me", { params: scope })).id;
+  } catch (error) {
+    redirect(`/schedule/${sessionId}?error=${bookingError(error)}`);
+  }
+  await placeBooking(sessionId, clientId, undefined, false);
+}
+
 /** Adds a client to a full class beyond its capacity (owners and managers; the API checks). */
 export async function bookClientOverCapacity(sessionId: string, clientId: string): Promise<void> {
   await placeBooking(sessionId, clientId, undefined, true);
@@ -183,6 +195,23 @@ export async function setBookingStatus(
       await api.PATCH("/bookings/{booking_id}", {
         params: { ...scope, path: { booking_id: bookingId } },
         body: { status },
+      }),
+    );
+  } catch (error) {
+    redirect(`/schedule/${sessionId}?error=${bookingError(error)}`);
+  }
+  refreshSession(sessionId);
+}
+
+/** Gives the visit back to a client whose late cancellation or no-show used it up (an exception;
+ * the reason is required and kept with who and when). */
+export async function waiveBooking(sessionId: string, bookingId: string, formData: FormData): Promise<void> {
+  const { api, scope } = await getTenant();
+  try {
+    unwrap(
+      await api.POST("/bookings/{booking_id}/waive", {
+        params: { ...scope, path: { booking_id: bookingId } },
+        body: { reason: String(formData.get("reason") ?? "").trim() },
       }),
     );
   } catch (error) {

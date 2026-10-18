@@ -13,7 +13,7 @@ it is a new provider class, or a different choice in settings.
 | Messaging | `messaging.py`: `MessageProvider` - `send`; a WhatsApp provider also implements `parse_inbound` (verify the notification, return `IncomingMessage`s) to feed the AI replies via `/webhooks/whatsapp/{provider}/{tenant_id}` | `simulated` | each business, else `API_MESSAGING_PROVIDER` |
 | Email | `email.py` (senders in `app/messaging/email.py`) | `log` | the platform: `API_EMAIL_PROVIDER` |
 | Push notifications | `app/messaging/push.py` (Expo push; phones register via `PUT /me/push-tokens`) | `expo` | the platform: `API_PUSH_PROVIDER` (`expo` / `log` / `off`), optional `API_EXPO_ACCESS_TOKEN` |
-| AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_ANTHROPIC_API_KEY` |
+| AI | `ai.py` (`app/ai/gateway.py`) | `demo` | the platform: `API_AI_PROVIDER` (`anthropic` / `openai` / `gemini`), the vendor's key, and `API_AI_ENABLED_VENDORS` for non-Anthropic vendors |
 | Storage | `storage.py`: `StorageProvider` - `put`, `get`, `delete`, `signed_url` | `database` (also `supabase`: Supabase Storage, T80) | the platform: `API_STORAGE_PROVIDER` |
 
 - `registry.py`: `@register(capability, name, label, fields=…)` and `SettingField`.
@@ -132,3 +132,13 @@ second); if branch saves ever become frequent, host Nominatim or switch the clas
   (each payment, receipt and message keeps the provider that handled it).
 - **The platform default**: change `API_<CAPABILITY>_PROVIDER` (and `API_<CAPABILITY>_SETTINGS`,
   a JSON object of its settings) in the environment and restart the API.
+
+## Branches map (OpenFreeMap)
+
+The branches map and the branch pin use MapLibre with free OpenFreeMap vector tiles
+(`tiles.openfreemap.org`, OpenStreetMap data, no key, no sign-up, credit shown on the map). The
+library loads only on the map page, the dashboard map card and the branch editor. The browser
+fetches tiles itself, so `connect-src` and `img-src` in `apps/web/src/lib/csp.ts` list that host
+(`MAP_ORIGIN`) and `worker-src` allows blobs. To switch provider (for example MapTiler, free up
+to 100,000 loads a month), change the two style URLs in `components/branch-map/map-core.ts` and
+`MAP_ORIGIN`.

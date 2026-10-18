@@ -28,11 +28,18 @@ export default async function LocationsPage() {
         title={t("locations.title")}
         description={t("locations.subtitle")}
         actions={
-          canWriteCatalog(tenant) && (
-            <Link href="/locations/new" className="btn-primary px-4 py-2.5">
-              {t("locations.add")}
-            </Link>
-          )
+          <>
+            {tenant.permissions.includes("reports.read") && locations.some((l) => l.active && l.latitude !== null) && (
+              <Link href="/locations/map" className="btn-secondary px-4 py-2.5">
+                {t("branchMap.title")}
+              </Link>
+            )}
+            {canWriteCatalog(tenant) && (
+              <Link href="/locations/new" className="btn-primary px-4 py-2.5">
+                {t("locations.add")}
+              </Link>
+            )}
+          </>
         }
       />
 

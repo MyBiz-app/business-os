@@ -102,6 +102,19 @@ and on their own tint. A business's brand color is already made AA-safe by `lib/
 - Skip link: every page has one `<main id="main">`. `Container as="main"` sets the id for you;
   a bare `<main>` needs `id="main"`.
 
+## Page widths on wide screens (R15)
+
+Checked at 390, 1440, 1920 and 2560 px. More columns, never longer lines.
+
+| Page kind | Rule |
+|---|---|
+| Lists, boards, dashboard | `Container size="full"`; card grids add columns (dashboard: 6 tiles in one row from `2xl`, charts side by side). |
+| Forms and settings | `Container size="settings"` (up to 1600px) plus the `form-columns` class on the page's section stack: one column, two columns once the room itself is 56rem wide (a container query, so the side menus are counted). The settings room is the `@container`. |
+| Client / staff card | Content + side column; from 1920px (`min-[120rem]`) the side column becomes two columns (client card) or the overview grid gets three (staff card). |
+| Long text (policies, help) | `prose`, 44rem, unchanged. |
+
+`src/lib/wide-screens.test.ts` keeps these in place.
+
 ## Lint rules (CI: `pnpm turbo run lint`)
 
 `apps/web/eslint-rules/design-system.mjs`, wired in `apps/web/eslint.config.mjs`:

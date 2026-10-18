@@ -488,6 +488,26 @@ h3,
   padding-block: clamp(4.5rem, 9vw, 8rem);
 }
 
+/* Wide-screen policy (docs/design-system.md, "Page widths"): the sections of a form room or a
+   record card flow into two columns once the room itself is wide enough (a container query, so
+   the app's side menu and the settings menu are accounted for). Long text keeps 44rem. */
+.form-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@container (min-width: 56rem) {
+  .form-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .form-columns > header:first-child,
+  .form-columns > .form-span {
+    grid-column: 1 / -1;
+  }
+}
+
 /* ---- Direction (Hebrew and English mixed) -------------------------------------------------
  * Addresses and secrets are always typed left to right; free text follows its first letters.
  * Form fields (components/form/field.tsx) also set `dir`; this covers plain inputs. */
@@ -1862,6 +1882,66 @@ h1[tabindex="-1"]:focus {
   inset-block-start: 1.5rem;
   inset-inline-start: 50%;
   translate: -50% 0;
+}
+
+/* The branches map (R35): a dot per branch, sized and tinted by the chosen number. The color is
+   the brand color mixed toward the muted one, so it follows the palette and dark mode. */
+.branch-dot {
+  --dot-size: 20px;
+  --dot-weight: 60%;
+  position: relative;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  background: color-mix(in srgb, var(--primary) var(--dot-weight), var(--muted));
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+  transition:
+    width 500ms var(--ease-out),
+    height 500ms var(--ease-out),
+    background-color 500ms var(--ease-out);
+}
+.origin-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+  background: var(--brand-to);
+  opacity: 0.85;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  cursor: default;
+}
+.branch-dot[data-selected="true"] {
+  outline: 3px solid var(--primary-ink);
+  outline-offset: 2px;
+}
+.branch-dot[data-live="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  border: 2px solid var(--primary);
+  animation: branch-pulse 2.4s ease-out infinite;
+}
+@keyframes branch-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .branch-dot[data-live="true"]::after {
+    animation: none;
+    opacity: 0.5;
+  }
+  .branch-dot {
+    transition: none;
+  }
 }
 
 /* ---- Page transitions (view transitions; see docs/design-system.md) ------------------------ */

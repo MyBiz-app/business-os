@@ -12,6 +12,7 @@ from app.api.deps import TenantContext, ensure_branch_visible, require
 from app.api.settings import MAX_LOGO_BYTES, read_image
 from app.catalog.verticals import CATALOG, VerticalPack
 from app.commerce.modules import MODULES
+from app.core.business_size import grow_from_solo
 from app.core.permissions import Permission
 from app.core.website import normalize_website
 from app.geo.addresses import AddressFields
@@ -307,13 +308,21 @@ def _insert_location(context: TenantContext, body: LocationCreate) -> UUID:
         values["address"] = body.address
     columns = ", ".join(values)
     placeholders = ", ".join(f":{key}" for key in values)
-    return context.session.execute(
+    location_id = context.session.execute(
         text(
             f"INSERT INTO app.locations (tenant_id, {columns}) "
             f"VALUES (:tenant_id, {placeholders}) RETURNING id"
         ),
         {**values, "tenant_id": context.tenant_id},
     ).scalar_one()
+    if (
+        context.session.execute(
+            text("SELECT count(*) FROM app.locations WHERE active")
+        ).scalar_one()
+        > 1
+    ):
+        grow_from_solo(context.session, context.tenant_id)  # the second branch ends solo mode
+    return location_id
 
 
 def _new_branch_preview(session: Session) -> NewBranchPreview:

@@ -38,6 +38,17 @@ class Settings(BaseSettings):
     anthropic_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("API_ANTHROPIC_API_KEY", "ANTHROPIC_API_KEY")
     )
+    # Other vendors (OpenAI, Gemini) are built but off. Switching one on takes all three: the
+    # vendor in API_AI_ENABLED_VENDORS, its key, and API_AI_PROVIDER naming it
+    # (docs/deploy/go-live-checklist.md).
+    ai_provider: str = "anthropic"  # anthropic | openai | gemini
+    ai_enabled_vendors: str = ""  # comma separated extras, e.g. "openai,gemini"
+    openai_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_OPENAI_API_KEY", "OPENAI_API_KEY")
+    )
+    gemini_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("API_GEMINI_API_KEY", "GEMINI_API_KEY")
+    )
     # Everyday questions run on the cheap model; a turn that needs many tool calls escalates to
     # the stronger one (P0-6). Prices live in app/ai/gateway.py.
     ai_model: str = "claude-haiku-5-5"

@@ -35,14 +35,15 @@ from app.api.time_clock import _clock_rules, _month_bounds, _time_zone, _worked,
 from app.core.permissions import Permission
 from app.files import store_file, system_folder_id
 from app.payroll.components import Flags
+from app.payroll.gate import require_open
 from app.payroll.gross import Adjustment, Component, Gross, Terms, compute_gross
 from app.schedule.time_clock import Breakdown
 
 router = APIRouter(tags=["payroll"])
 
 ReadDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_READ))]
-ManageDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_MANAGE))]
-ApproveDep = Annotated[TenantContext, Depends(require(Permission.PAYROLL_APPROVE))]
+ManageDep = Annotated[TenantContext, Depends(require_open(Permission.PAYROLL_MANAGE))]
+ApproveDep = Annotated[TenantContext, Depends(require_open(Permission.PAYROLL_APPROVE))]
 PeriodPath = Annotated[str, Path(pattern=r"^\d{4}-\d{2}$")]
 
 STAGES = ("hours", "additions", "review", "approved")
@@ -126,6 +127,9 @@ class RunSummary(BaseModel):
     people: int
     gross_minor: int
     deductions_minor: int
+    employer_cost_minor: int = Field(
+        description="Gross pay plus what the employer pays on top (pension, severance, insurance)"
+    )
     previous_gross_minor: int | None
     open_errors: int
     open_warnings: int
@@ -566,6 +570,22 @@ def _lines(context: TenantContext, run_id: UUID) -> list[RunLine]:
     return result
 
 
+def _employer_cost(context: TenantContext, row: Any, lines: list[RunLine]) -> int:
+    """What the month costs the employer: the gross of the lines the reader may see plus the
+    employer-side pension, severance, study fund and insurance worked out on them."""
+    from app.api.payslips import _all_nets  # payslips imports this module
+
+    nets = _all_nets(context.session, context.tenant_id, row)
+    visible = {line.user_id for line in lines}
+    extra = sum(
+        item["amount_minor"]
+        for user_id, (net, _frozen) in nets.items()
+        if user_id in visible
+        for item in net["employer"]
+    )
+    return sum(line.gross_minor for line in lines) + extra
+
+
 def _present(context: TenantContext, first: dt.date, notes: list[RunNote] | None = None) -> Run:
     row = _run_row(context.session, first)
     lines = _lines(context, row["id"])
@@ -588,6 +608,7 @@ def _present(context: TenantContext, first: dt.date, notes: list[RunNote] | None
             people=len(lines),
             gross_minor=sum(line.gross_minor for line in lines),
             deductions_minor=sum(line.deductions_minor for line in lines),
+            employer_cost_minor=_employer_cost(context, row, lines),
             previous_gross_minor=int(previous) if previous is not None else None,
             open_errors=sum(w.severity == "error" for line in lines for w in line.warnings),
             open_warnings=sum(
@@ -842,10 +863,11 @@ def move_payroll_stage(
         {"stage": body.stage, "user": user.id, "id": run["id"]},
     )
     if body.stage == "approved":
-        from app.api.payslips import freeze_net
+        from app.api.payslips import file_payslips, freeze_net
 
         freeze_net(session, context.tenant_id, run)
         _store_export(context, run["id"], first)
+        file_payslips(session, context.tenant_id, _run_row(session, first))
     _audit(
         session, context.tenant_id, "payroll.run_stage", "payroll_run", run["id"], stage=body.stage
     )
@@ -867,6 +889,9 @@ def payroll_accountant_check(period: PeriodPath, context: ApproveDep, user: User
         """),
         {"user": user.id, "id": run["id"]},
     )
+    from app.api.payslips import file_payslips
+
+    file_payslips(context.session, context.tenant_id, _run_row(context.session, first), final=True)
     _audit(
         context.session, context.tenant_id, "payroll.accountant_checked", "payroll_run", run["id"]
     )

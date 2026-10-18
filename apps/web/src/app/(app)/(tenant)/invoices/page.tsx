@@ -13,6 +13,7 @@ import { unwrap } from "@/lib/api";
 import { DOCUMENT_KINDS } from "@/lib/issued-documents";
 import { formatMoney } from "@/lib/money";
 import { getTenantFor } from "@/lib/tenant";
+import { CardTransition } from "@/components/ui/page-transition";
 
 /** The documents the business has issued to its clients, newest first, with the number each
  * kind gets next. */
@@ -77,7 +78,8 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
         <ul className="flex flex-col divide-y divide-border card">
           {documents.map((doc) => (
             <li key={doc.id}>
-              <Link href={`/invoices/${doc.id}`} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 hover:bg-foreground/[0.03]">
+              <CardTransition name={`invoice-${doc.id}`}>
+<Link href={`/invoices/${doc.id}`} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 hover:bg-foreground/[0.03]">
                 <span className="flex min-w-0 flex-col gap-0.5">
                   <span className="font-semibold">
                     {t(`kinds.${doc.kind}`)} <Ltr className="tabular-nums text-muted">#{doc.number}</Ltr>
@@ -93,6 +95,7 @@ export default async function InvoicesPage({ searchParams }: PageProps<"/invoice
                   </span>
                 </span>
               </Link>
+</CardTransition>
             </li>
           ))}
         </ul>

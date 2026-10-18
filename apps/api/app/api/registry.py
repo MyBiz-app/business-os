@@ -19,6 +19,7 @@ from app.api import (
     bookings,
     broadcasts,
     businesses,
+    cancellation,
     checkouts,
     client_app,
     client_import,
@@ -33,6 +34,7 @@ from app.api import (
     documents,
     employment,
     files,
+    freeze_requests,
     friends,
     geo,
     identities,
@@ -85,6 +87,7 @@ from app.api import (
     time_clock,
     time_off_requests,
     tours,
+    waitlist,
     webhooks,
     website_orders,
     welcome,
@@ -94,12 +97,14 @@ from app.api import health as health_declarations
 from app.api import settings as business_settings
 from app.api.routes import router
 from app.mcp import oauth as mcp_oauth
+from app.mcp import requests as mcp_requests
 from app.mcp import server as mcp_server
 
 ROUTERS: list[APIRouter] = [
     router,
     mcp_oauth.router,
     mcp_oauth.hidden,
+    mcp_requests.router,
     mcp_server.router,
     ai_tasks.router,
     internal.router,
@@ -171,9 +176,15 @@ ROUTERS: list[APIRouter] = [
     appointments.router,
     audit.router,
     appointments.client_router,
+    waitlist.router,
+    waitlist.client_router,
     resources.router,
     resources.client_router,
     plans.router,
+    freeze_requests.router,
+    freeze_requests.client_router,
+    cancellation.router,
+    cancellation.client_router,
     promo_codes.router,
     reports.router,
     reviews.router,

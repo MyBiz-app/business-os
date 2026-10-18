@@ -13,8 +13,8 @@
   "emails": {
     "support": "support@mybizapp.click",
     "billing": "billing@mybizapp.click",
-    "sender": "no-reply@example.com",
-    "noReply": "no-reply@example.com"
+    "sender": "no-reply@mybizapp.click",
+    "noReply": "no-reply@mybizapp.click"
   },
   "social": {
     "linkedin": "https://www.linkedin.com/company/mybiz",

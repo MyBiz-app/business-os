@@ -3,10 +3,13 @@
  * topic, add it to that topic's page (for example `business/page.tsx`); the menu does not change. */
 export const SETTINGS_TOPICS = [
   { key: "business", href: "/settings/business", group: "business" },
+  { key: "memberships", href: "/settings/memberships", group: "business" },
+  { key: "bookings", href: "/settings/bookings", group: "business" },
   { key: "branding", href: "/settings/branding", group: "look" },
   { key: "modules", href: "/settings/modules", group: "plan" },
   { key: "billing", href: "/settings/billing", group: "plan" },
   { key: "integrations", href: "/settings/integrations", group: "connections" },
+  { key: "aiConnections", href: "/settings/ai-connections", group: "connections" },
   { key: "audit", href: "/settings/audit", group: "security", roles: ["owner", "manager"] },
   { key: "data", href: "/settings/data", group: "data", roles: ["owner"] },
   { key: "help", href: "/settings/help", group: "help" },

@@ -24,8 +24,11 @@ the request id (also in the logs and the `X-Request-ID` header) and, in the API,
 3. Redeploy. Where: `apps/api/app/core/monitoring.py`, `apps/web/src/instrumentation*.ts` and
    `apps/web/src/lib/monitoring.ts`, `packages/app-kit/src/lib/monitoring.ts`.
 
-Readable stack traces for native builds need source-map upload (Sentry's Expo plugin with an auth
-token); add it with the first store build.
+Readable stack traces need source-map upload. It is built and stays off until a build has
+`SENTRY_AUTH_TOKEN`: the website build (`apps/web/next.config.ts`, `withSentryConfig`) and the app
+build (`apps/client-app/app.config.js`, Sentry's Expo plugin) both read `SENTRY_AUTH_TOKEN`,
+`SENTRY_ORG` and `SENTRY_PROJECT`. Without the token nothing changes. Set them as Vercel
+environment variables (website) and EAS secrets (app).
 
 ## Alerts to your phone
 

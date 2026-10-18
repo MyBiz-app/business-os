@@ -25,6 +25,7 @@ from app.ai.tools.reading import (
     list_sessions,
     logged_time,
     open_balances,
+    suggest_freeze,
 )
 from app.ai.tools.social import (
     audience_summary,
@@ -123,6 +124,16 @@ TOOLS: dict[str, Tool] = {
             {"days": {"type": "integer"}},
             Permission.CLIENTS_READ,
             inactive_members,
+        ),
+        Tool(
+            "suggest_freeze",
+            "Suggest freezing a member's plan instead of letting them leave (they are away, "
+            "injured, or stopped coming): for the local dates (inclusive) it shows, per "
+            "membership, the new end date, how the next charge moves and why the business would "
+            "refuse. Only a suggestion: nothing is frozen; the client asks in the app.",
+            {"client_id": ID, "start_date": DATE, "end_date": DATE},
+            Permission.CLIENTS_READ,
+            suggest_freeze,
         ),
         Tool(
             "lead_pipeline",
@@ -349,6 +360,7 @@ TOOL_DOMAINS: dict[str, str] = {
     "find_clients": "clients",
     "get_client": "clients",
     "inactive_members": "clients",
+    "suggest_freeze": "clients",
     "list_sessions": "schedule",
     "free_courts": "schedule",
     "get_session_roster": "bookings",
@@ -381,15 +393,14 @@ TOOL_DOMAINS: dict[str, str] = {
 BRANCH_BLIND: frozenset[str] = frozenset({"lead_pipeline"})
 
 
-# What an AI connector (MCP, round 7 R37a) may use: the tools that only read. Anything that
-# proposes a change (book, cancel, bill, publish, schedule) stays with the built-in assistant
-# until connectors get actions that wait for approval (R37b). A test runs every one of these in a
-# read-only transaction.
+# What an AI connector (MCP, round 7 R37a) may use: the tools that only read. A test runs every
+# one of these in a read-only transaction.
 MCP_READ_TOOLS: frozenset[str] = frozenset(
     {
         "find_clients",
         "get_client",
         "inactive_members",
+        "suggest_freeze",
         "list_sessions",
         "free_courts",
         "get_session_roster",
@@ -405,6 +416,15 @@ MCP_READ_TOOLS: frozenset[str] = frozenset(
         "audience_summary",
         "list_drafts",
     }
+)
+
+
+# What a connector may also propose (R37b), when the person allowed it: the tools that only create
+# a pending action. The connector never changes anything; the person approves each request in
+# MyBiz, where it is checked again (app/ai/actions.py). Publishing and scheduled tasks stay with
+# the built-in assistant.
+MCP_ACTION_TOOLS: frozenset[str] = frozenset(
+    {"book_client", "cancel_booking", "log_time", "bill_month"}
 )
 
 
@@ -435,13 +455,16 @@ def tools_for(
 
 
 def mcp_tools_for(
-    permissions: frozenset[str], modules: set[str], narrowed: bool = False
+    permissions: frozenset[str],
+    modules: set[str],
+    narrowed: bool = False,
+    propose: bool = False,
 ) -> list[Tool]:
-    """The read tools a connection's person may use in their business."""
+    """The tools a connection's person may use in their business: the read tools, and the ones
+    that propose a change when the connection was allowed to."""
+    names = MCP_READ_TOOLS | MCP_ACTION_TOOLS if propose else MCP_READ_TOOLS
     return [
-        tool
-        for tool in tools_for(permissions, modules, narrowed=narrowed)
-        if tool.name in MCP_READ_TOOLS
+        tool for tool in tools_for(permissions, modules, narrowed=narrowed) if tool.name in names
     ]
 
 
