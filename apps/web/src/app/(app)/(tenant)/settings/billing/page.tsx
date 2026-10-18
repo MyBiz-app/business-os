@@ -52,7 +52,7 @@ export default async function BillingPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
 
       <p role="note" className="flex items-center gap-2 rounded-xl border border-warning/50 bg-warning/10 px-4 py-2 text-sm">

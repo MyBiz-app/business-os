@@ -17,7 +17,7 @@ export default async function SettingsLayout({ children }: LayoutProps<"/setting
   const items = topicsFor(tenant.role).map(({ key, href, group }) => ({ key, href, group }));
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:py-0">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10 print:max-w-none print:py-0">
       <SettingsRoom items={items} title={t("title")} description={t("subtitle")}>
         {children}
       </SettingsRoom>

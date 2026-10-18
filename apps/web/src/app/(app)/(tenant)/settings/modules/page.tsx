@@ -19,7 +19,7 @@ export default async function ModulesPage() {
   ]);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle", { count: current.active_clients })} />
       <section className="card p-6">
         <ModulesForm catalog={catalog} selection={current.modules} activeClients={current.active_clients} />

@@ -25,7 +25,7 @@ export default async function IntegrationsPage() {
   const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: tenant.time_zone });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("title")} description={t("subtitle")} />
       {integrations.map((integration) => {
         const Icon = ICONS[integration.capability];

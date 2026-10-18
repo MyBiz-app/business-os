@@ -1,11 +1,13 @@
 import type { ElementType, ReactNode } from "react";
 
 /** How wide a page's content may grow. All sizes keep fluid side gutters (`page-gutter`). */
-export type ContainerSize = "wide" | "default" | "narrow" | "prose" | "full";
+export type ContainerSize = "wide" | "settings" | "default" | "narrow" | "prose" | "full";
 
 const SIZES: Record<ContainerSize, string> = {
   /** Up to 1440px: marketing pages and wide grids. */
   wide: "max-w-[90rem]",
+  /** Up to 1600px: a form room with its own menu (settings) and record cards; sections flow into columns. */
+  settings: "max-w-[100rem]",
   /** Up to 1200px: forms with side panels, settings. */
   default: "max-w-[75rem]",
   /** Up to 880px: a single column such as a wizard step. */

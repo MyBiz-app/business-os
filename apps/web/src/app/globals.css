@@ -488,6 +488,26 @@ h3,
   padding-block: clamp(4.5rem, 9vw, 8rem);
 }
 
+/* Wide-screen policy (docs/design-system.md, "Page widths"): the sections of a form room or a
+   record card flow into two columns once the room itself is wide enough (a container query, so
+   the app's side menu and the settings menu are accounted for). Long text keeps 44rem. */
+.form-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+@container (min-width: 56rem) {
+  .form-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+  .form-columns > header:first-child,
+  .form-columns > .form-span {
+    grid-column: 1 / -1;
+  }
+}
+
 /* ---- Direction (Hebrew and English mixed) -------------------------------------------------
  * Addresses and secrets are always typed left to right; free text follows its first letters.
  * Form fields (components/form/field.tsx) also set `dir`; this covers plain inputs. */

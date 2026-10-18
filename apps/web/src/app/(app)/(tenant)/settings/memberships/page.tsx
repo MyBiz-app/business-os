@@ -16,7 +16,7 @@ export default async function MembershipSettingsPage() {
   const rules = unwrap(await api.GET("/freeze-rules", { params: scope }));
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="form-columns">
       <TopicHeader title={t("freezeRules.title")} description={t("nav.hints.memberships")} />
       <FreezeRulesForm key={JSON.stringify(rules)} rules={rules} currency={tenant.currency} />
     </div>
