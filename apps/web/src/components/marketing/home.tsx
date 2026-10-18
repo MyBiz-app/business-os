@@ -213,6 +213,20 @@ export async function AboutTeaser() {
   );
 }
 
+/** A short pointer from the home page to the websites page. */
+export async function WebsitesTeaser() {
+  const t = await getTranslations("marketing.home.websitesTeaser");
+  return (
+    <Section aria-labelledby="websites-teaser-heading" tone="muted" spacing="compact" innerClassName="flex flex-col items-center gap-3 text-center">
+      <Reveal className="flex flex-col items-center gap-3">
+        <h2 id="websites-teaser-heading" className="text-3xl font-extrabold tracking-tight sm:text-4xl">{t("title")}</h2>
+        <p className="max-w-xl text-lg text-muted">{t("text")}</p>
+        <Link href="/websites" className="btn-secondary rounded-full px-6 py-2.5">{t("link")}</Link>
+      </Reveal>
+    </Section>
+  );
+}
+
 /** The looping product tour ("a live video"): see components/marketing/demo-stage.tsx. */
 export async function DemoSection() {
   const t = await getTranslations("marketing.home.demo");
