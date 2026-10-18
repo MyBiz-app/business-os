@@ -177,6 +177,29 @@ The banner is built and free; the rest is decisions only you can make.
 5. **Book a lawyer for one session** with `docs/legal/README.md` ("What the lawyer is asked to decide" lists the seven questions). Then replace every `{placeholder}` and the fictitious company details (`packages/i18n/brand.json`).
 6. **Diary dates:** quarterly restore drill and report, yearly procedure review, vendor review and team training (the tables at the end of the legal files are the log).
 
+## Switching on a live AI provider (and the live simulation, R19)
+
+Built and **off**; nothing here runs or costs money until the owner says "connect". Anthropic stays
+the default (`API_ANTHROPIC_API_KEY` on Render, caps 400/1200 credits unchanged). OpenAI and
+Gemini have tested adapters (`app/ai/vendors.py`) that stay unreachable until all three are set:
+
+1. The vendor's key: `API_OPENAI_API_KEY` or `API_GEMINI_API_KEY` (the owner pastes it, never in chat).
+2. The vendor is named in `API_AI_ENABLED_VENDORS` (for example `openai`). Until then the
+   console model picker shows it as disabled and `get_provider()` falls back to demo.
+3. `API_AI_PROVIDER=openai` (or `gemini`) to make it the platform's assistant. Tiers map to the
+   first registry model of that tier (`app/ai/models.py`); check the placeholder prices there
+   against the vendor's price list first (an unknown model is priced as the dearest).
+
+A business can also connect its own key (settings, Integrations, AI). Another vendor is one adapter
+in `vendors.py`, one row per model in `MODELS`, and one `@register("ai", ...)` entry in
+`app/providers/ai.py`. Switching back is removing `API_AI_PROVIDER`.
+
+**Live simulation (R19).** Only after the owner confirms the API account has a balance of $5-10:
+`AI_LIVE_SIM_APPROVED=yes uv run python -m app.ai.live_sim --approved --max-usd 2 --out report.md`
+in `apps/api` with the provider's key set. It asks about 60 questions of three weights, stops at
+the cap, needs no passwords, and prints credits, seconds and errors per kind. Without both guards
+it refuses; on the demo provider it is a free dry run.
+
 ## Firewall in front of the website and API (WAF)
 
 The API already limits requests per address and per business, but nothing filters traffic before it

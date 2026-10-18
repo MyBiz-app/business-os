@@ -8,6 +8,7 @@ from datetime import UTC, datetime
 
 import pytest
 
+from app.core.config import get_settings
 from app.providers import choice  # noqa: F401  (imports every provider module)
 from app.providers.invoicing import DocumentLine, InvoiceDocument
 from app.providers.messaging import OutgoingMessage
@@ -55,10 +56,16 @@ def test_provider_declares_itself_clearly(info: ProviderInfo) -> None:
 
 
 @pytest.mark.parametrize("info", PROVIDERS, ids=lambda p: f"{p.capability}/{p.name}")
-def test_provider_builds_from_its_settings_and_keeps_the_contract(info: ProviderInfo) -> None:
+def test_provider_builds_from_its_settings_and_keeps_the_contract(
+    info: ProviderInfo, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Off-by-default AI vendors refuse to build; switch them on for the contract check only.
+    monkeypatch.setenv("API_AI_ENABLED_VENDORS", "openai,gemini")
+    get_settings.cache_clear()
     instance = info.factory(dummy_settings(info))
     missing = [name for name in CONTRACT[info.capability] if not hasattr(instance, name)]
     assert not missing, f"{info.capability}/{info.name} lacks {missing}"
+    get_settings.cache_clear()
 
 
 def test_builtin_providers_behave() -> None:

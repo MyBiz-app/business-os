@@ -178,7 +178,10 @@ def _settings(db: Session) -> AISettings:
         defaults=defaults,
         choices=[
             ModelChoice(
-                id=m.id, tier=m.tier, vendor=m.vendor, enabled=m.vendor in ai_models.ENABLED_VENDORS
+                id=m.id,
+                tier=m.tier,
+                vendor=m.vendor,
+                enabled=m.vendor in ai_models.enabled_vendors(),
             )
             for m in ai_models.MODELS.values()
             if m.vendor != "demo"
@@ -206,7 +209,7 @@ def change_ai_settings(body: AISettingsChange, db: BillingDep) -> AISettings:
         if model is None:
             continue
         info = ai_models.MODELS.get(model)
-        if info is None or info.vendor not in ai_models.ENABLED_VENDORS or info.vendor == "demo":
+        if info is None or info.vendor not in ai_models.enabled_vendors() or info.vendor == "demo":
             raise HTTPException(status_code=422, detail="model_not_available")
         if info.tier != tier:
             raise HTTPException(status_code=422, detail="model_wrong_tier")
