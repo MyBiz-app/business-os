@@ -313,6 +313,14 @@ Defaults of go-live spec sections 7.1 to 7.3, taken as stated in the spec (the o
 - A branch's map point is looked up once per saved address through Nominatim (OpenStreetMap), never blocking the save; the pin can be placed by hand through the API (the draggable-pin screen is part of the branches map slice, R35).
 - Home addresses of people stay visible only to the person (existing row policy); a team member without a full home address sees a reminder line until they fill it in (nobody is locked out).
 
+### AI connectors: Claude and ChatGPT through MCP (2026-10-18, round 7 R37a, migration 0133)
+
+- MyBiz runs its own small OAuth 2.1 server instead of Supabase's. Supabase's OAuth server for MCP could not be checked from the build environment and would tie sign-in to a beta feature; ours is a few hundred lines, needs no paid plan, and keeps a business's connections in the business's own table with row level security. Apps register themselves (public clients, no secrets, PKCE S256 required); redirect addresses must be https or local http.
+- The MCP endpoint is hand-written JSON-RPC over HTTP (initialize, ping, tools/list, tools/call; no sessions, no streaming) rather than the MCP Python library: four methods, no new dependency, and every request is authenticated and scoped by us.
+- Connectors read through the assistant's own tools, a fixed list (`MCP_READ_TOOLS`), so permissions, branches and modules behave exactly as in the app. Anything that proposes a change stays out until R37b adds actions that wait for approval in the CRM.
+- Reads run in a READ ONLY transaction and results are wrapped as untrusted data. Usage is the meter `mcp_calls` (one per call); the ceiling is 600 per business per rolling 24 hours, a setting.
+- Tokens: access 60 minutes, refresh 90 days and rotated on use, code 5 minutes; only SHA-256 hashes are stored. Connection lookups by hash are SECURITY DEFINER functions because the token endpoint knows no business yet.
+
 ## Open
 
 | # | Question |

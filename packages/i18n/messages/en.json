@@ -8835,6 +8835,22 @@
       "cta": "Create your first code"
     }
   },
+  "mcpConnect": {
+    "title": "Connect an AI app",
+    "body": "{app} asks to read the data of the business you choose, as you and with your permissions.",
+    "reads": [
+      "Clients and their profiles",
+      "The schedule and bookings",
+      "Plans, punch cards and open balances",
+      "Metrics and reports"
+    ],
+    "returns": "The app can only read; it cannot change anything. You can disconnect it at any time. After you approve you return to {host}.",
+    "business": "Business",
+    "approve": "Approve the connection",
+    "deny": "Cancel",
+    "invalid": "This connection link is not valid. Start again from the app.",
+    "noBusiness": "You have no business in MyBiz yet. Create one and try again."
+  },
   "website": {
     "title": "My website",
     "subtitle": "A branded landing page for your business, built by the MyBiz team and connected to your system.",

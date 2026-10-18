@@ -102,6 +102,87 @@ export interface paths {
         patch: operations["update_tenant"];
         trace?: never;
     };
+    "/mcp-oauth/clients/{client_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Info
+         * @description What the approval screen shows the signed-in person about the app asking (its self-chosen
+         *     name: untrusted text, shown with the address it returns to).
+         */
+        get: operations["mcp_client_info"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-oauth/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve
+         * @description The signed-in person lets the app read the business they are working in.
+         */
+        post: operations["mcp_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Connections
+         * @description The AI apps the signed-in person connected to this business.
+         */
+        get: operations["list_mcp_connections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-connections/{connection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Revoke Connection
+         * @description Cuts an app off at once: its tokens stop working.
+         */
+        delete: operations["revoke_mcp_connection"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/tasks": {
         parameters: {
             query?: never;
@@ -9222,6 +9303,28 @@ export interface components {
             /** Name */
             name: string;
         };
+        /** Approval */
+        Approval: {
+            /** Client Id */
+            client_id: string;
+            /** Redirect Uri */
+            redirect_uri: string;
+            /** Code Challenge */
+            code_challenge: string;
+            /**
+             * State
+             * @default
+             */
+            state: string;
+        };
+        /** ApprovalResult */
+        ApprovalResult: {
+            /**
+             * Redirect To
+             * @description Send the browser here: back to the app, with the code
+             */
+            redirect_to: string;
+        };
         /** AttentionItem */
         AttentionItem: {
             /**
@@ -10805,6 +10908,16 @@ export interface components {
              * @description off, optional or required: whether this business asks
              */
             mode: string;
+        };
+        /** ClientInfo */
+        ClientInfo: {
+            /** Client Name */
+            client_name: string;
+            /**
+             * Redirect Host
+             * @description Where the person is sent back to after approving
+             */
+            redirect_host: string;
         };
         /**
          * ClientListItem
@@ -14256,6 +14369,25 @@ export interface components {
              * @description Omit to mark all as read
              */
             ids?: string[] | null;
+        };
+        /** McpConnection */
+        McpConnection: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Client Name */
+            client_name: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Last Used At */
+            last_used_at: string | null;
+            /** Calls */
+            calls: number;
         };
         /** Me */
         Me: {
@@ -20509,6 +20641,142 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Tenant"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mcp_client_info: {
+        parameters: {
+            query: {
+                redirect_uri: string;
+            };
+            header?: never;
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mcp_approve: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Approval"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApprovalResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_mcp_connections: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["McpConnection"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    revoke_mcp_connection: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

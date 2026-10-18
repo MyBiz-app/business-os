@@ -152,6 +152,12 @@ class Settings(BaseSettings):
     # the business ceiling off. Counted in the same store as the address limits.
     tenant_rate_limit_per_minute: int = 600
 
+    # AI connectors (MCP): calls per business in a rolling 24 hours, over every connection (R37a);
+    # 0 turns the ceiling off. How long a token lives.
+    mcp_daily_calls_per_business: int = 600
+    mcp_access_token_minutes: int = 60
+    mcp_refresh_token_days: int = 90
+
     @property
     def rate_limits_on(self) -> bool:
         if self.rate_limits is not None:
