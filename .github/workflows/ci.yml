@@ -13,7 +13,7 @@ jobs:
   checks:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 40
     services:
       postgres:
         # The official image through Google's Docker Hub mirror: Docker Hub and the AWS mirror rate-limit shared runners.

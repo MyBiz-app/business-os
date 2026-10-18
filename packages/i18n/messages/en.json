@@ -3426,7 +3426,8 @@
       "close": "Close",
       "dashboard": "Go to dashboard",
       "guide": "Getting started guide",
-      "websites": "Websites"
+      "websites": "Websites",
+      "aiTeam": "AI team"
     },
     "intro": {
       "eyebrow": "Everything in one place",
@@ -4286,7 +4287,8 @@
       "about": "About",
       "contact": "Contact",
       "industries": "Industries",
-      "websites": "Websites"
+      "websites": "Websites",
+      "aiTeam": "AI team · MyBiz"
     },
     "branches": {
       "eyebrow": "Chains and branches",
@@ -4530,6 +4532,187 @@
             "a": "Yes. Request a change from your account and the monthly price covers small updates."
           }
         ]
+      }
+    },
+    "aiTeam": {
+      "home": {
+        "eyebrow": "A team working for you 24/7",
+        "title": "Nine agents. Each one an expert in their field.",
+        "subtitle": "Chief of staff, secretary, marketing, sales, finance, team, care, data and creative. They prepare the work, and you approve.",
+        "more": "Meet the whole team"
+      },
+      "page": {
+        "eyebrow": "AI team",
+        "title": "A whole team working for you, even at night",
+        "subtitle": "Every agent knows your business, sees only what it needs and proposes actions. Nothing happens without your approval.",
+        "ctaPrimary": "Start free",
+        "ctaSecondary": "See them at work",
+        "teamTitle": "Meet the team",
+        "teamSubtitle": "What each agent does, and what you can ask it.",
+        "exampleLabel": "You can ask",
+        "hireTitle": "Hire your own agent",
+        "hireText": "Need an agent for a field the team does not cover? Give it a name, a role, a face and working rules, and choose what it may see and do. It joins the team like any other agent.",
+        "hirePoints": [
+          "A name, role and face of your choice",
+          "Limited to the branches and topics you pick",
+          "It also waits for your approval before every action"
+        ],
+        "costTitle": "And what does it cost?",
+        "costText": "The team is part of the system. Usage is measured in AI credits: plans of 400 or 1,200 credits a month per business, enough for the conversations, drafts and summaries of a small business.",
+        "costPoints": [
+          "No set-up fee and no commitment",
+          "An alert at 80% of the allowance",
+          "Pause any agent at any moment"
+        ]
+      },
+      "org": {
+        "label": "Team structure",
+        "modeLabel": "Team view",
+        "single": "One business",
+        "network": "Branch network",
+        "chiefNote": "The agents work with the chief of staff, who routes every question to whoever knows it best.",
+        "branchesTitle": "A manager agent for every branch",
+        "branchesNote": "In a network, each branch gets an agent that runs its day and reports to the chief of staff.",
+        "branchManager": "Branch manager",
+        "branches": [
+          {
+            "city": "Tel Aviv",
+            "name": "Dorit"
+          },
+          {
+            "city": "Haifa",
+            "name": "Asaf"
+          },
+          {
+            "city": "Beer Sheva",
+            "name": "Noa"
+          }
+        ]
+      },
+      "sim": {
+        "eyebrow": "At work",
+        "title": "What a morning with the team looks like",
+        "subtitle": "Four short scenes. In each one the agent prepares, and you approve.",
+        "scenesLabel": "Choose a scene",
+        "pause": "Pause the demo",
+        "play": "Play the demo",
+        "waiting": "Waiting for your approval",
+        "approve": "Approve",
+        "decline": "Not now",
+        "note": "A recorded demo. In the product every sensitive action waits for your approval.",
+        "scenes": {
+          "secretary": {
+            "tab": "Shiri",
+            "caption": "Shiri arranges an appointment and reminds the client.",
+            "message": "Dana asked to move her Wednesday appointment. I found Thursday at 10:30 and will prepare a reminder for her.",
+            "card": "Move Dana's appointment to Thursday 10:30 and send a reminder"
+          },
+          "marketing": {
+            "tab": "Lia",
+            "caption": "Lia proposes a campaign for clients who went quiet.",
+            "message": "12 clients have not visited in over 45 days. I drafted a warm message with a free trial class.",
+            "card": "Send the message to 12 clients who went quiet"
+          },
+          "finance": {
+            "tab": "Adam",
+            "caption": "Adam flags an open balance.",
+            "message": "There is an open balance of $480 for 21 days. I prepared a friendly reminder with a payment link.",
+            "card": "Send a payment reminder for $480"
+          },
+          "chief": {
+            "tab": "Adir",
+            "caption": "Adir, the chief of staff, sums up the morning.",
+            "message": "Good morning. 14 appointments today, two clients at risk of leaving, and two actions waiting for you.",
+            "card": "2 actions waiting for your approval"
+          }
+        }
+      },
+      "line": {
+        "label": "Your agent for this field",
+        "more": "Meet the whole team"
+      },
+      "agents": {
+        "chief": {
+          "name": "Adir",
+          "role": "Chief of staff",
+          "does": "Sums up what is urgent today, answers cross-cutting questions and hands you to the right agent.",
+          "examples": [
+            "What is urgent today across all branches?",
+            "Give me a morning summary."
+          ]
+        },
+        "secretary": {
+          "name": "Shiri",
+          "role": "Personal secretary",
+          "does": "Arranges appointments, waiting lists and reminders, and finds free slots.",
+          "examples": [
+            "Move Dana's appointment to Thursday.",
+            "Who is on the waiting list for the 6 PM class?"
+          ]
+        },
+        "marketing": {
+          "name": "Lia",
+          "role": "Marketing and leads",
+          "does": "Tracks leads, wins back clients who went quiet and drafts campaigns.",
+          "examples": [
+            "Who has not visited in over 45 days?",
+            "Draft a win-back message with an offer."
+          ]
+        },
+        "sales": {
+          "name": "Daniel",
+          "role": "Sales",
+          "does": "Watches revenue, renewals and open quotes, and suggests upgrades.",
+          "examples": [
+            "Which plans end this month?",
+            "How many quotes are still open?"
+          ]
+        },
+        "finance": {
+          "name": "Adam",
+          "role": "Finance",
+          "does": "Flags open balances, prepares payment reminders and follows monthly billing.",
+          "examples": [
+            "Who owes us money?",
+            "Prepare a friendly payment reminder."
+          ]
+        },
+        "team": {
+          "name": "Emma",
+          "role": "Team and shifts",
+          "does": "Spots roster gaps, handles swaps and time off, and prepares hours for payroll.",
+          "examples": [
+            "Who is free to cover Saturday?",
+            "How many hours did everyone work this month?"
+          ]
+        },
+        "care": {
+          "name": "Leo",
+          "role": "Customer care",
+          "does": "Answers the inbox and WhatsApp, and follows reviews and clients at risk.",
+          "examples": [
+            "Draft a reply to an unhappy client.",
+            "Who is at risk of leaving?"
+          ]
+        },
+        "analyst": {
+          "name": "Ethan",
+          "role": "Data analyst",
+          "does": "Compares branches and periods, spots anomalies and prepares the weekly report.",
+          "examples": [
+            "Which branch grew the most?",
+            "What changed this week?"
+          ]
+        },
+        "creative": {
+          "name": "Sophie",
+          "role": "Content and creative",
+          "does": "Writes posts, newsletters and story scripts, and advises on social media.",
+          "examples": [
+            "Write a post for the new term.",
+            "What worked for us on Instagram?"
+          ]
+        }
       }
     }
   },

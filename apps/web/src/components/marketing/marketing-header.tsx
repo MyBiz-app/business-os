@@ -16,6 +16,7 @@ const LINKS = [
   { href: "/features", key: "features" },
   { href: "/industries/fitness", key: "industries", match: "/industries" },
   { href: "/websites", key: "websites" },
+  { href: "/ai-team", key: "aiTeam" },
   { href: "/pricing", key: "pricing" },
   { href: "/about", key: "about" },
   { href: "/contact", key: "contact" },
