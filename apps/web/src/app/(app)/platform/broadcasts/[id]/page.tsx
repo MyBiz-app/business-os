@@ -32,7 +32,7 @@ export default async function BroadcastPage({ params }: PageProps<"/platform/bro
   const subject = item.content.he?.subject || item.content.en?.subject || "";
 
   return (
-    <Container as="main" size="default" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="settings" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <Link href="/platform/broadcasts" className="text-sm font-medium text-primary-ink hover:underline">
         {t("back")}
       </Link>

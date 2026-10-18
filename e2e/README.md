@@ -59,6 +59,8 @@ CI runs `dod.py` in the "End-to-end" workflow (after each merge to main, or by h
 
 `round6.py`: round 6 on the curated demo - the time clock with approved hours, the month's payroll run walked to approval with a payslip PDF and export, the "Move to MyBiz" Excel file (check, import, undo) and an issued quote with its PDF.
 
+`wide_screens.py <console owner email>`: the account page and the console at 390, 1440, 1920 and 2560 pixels - no sideways scroll, form rooms stay within the 1600px cap, table pages use the whole screen.
+
 `crawl.py <owner email with data>`: visits every page of the business app on a phone and a wide screen, in Hebrew/light and English/dark, and reports accessibility issues, console errors, overflow and screenshots.
 
 `client_crawl.py <owner email with data>` (needs `pnpm dev:app`): a new client joins that owner's newest business, gives a name, and visits every screen of the client app on a phone in Hebrew/light and English/dark; reports accessibility issues, overflow and console errors, with screenshots.

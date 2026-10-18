@@ -19,7 +19,7 @@ export default async function WebsiteOrdersPage() {
   const orders = unwrap(await api.GET("/platform/website-orders"));
 
   return (
-    <Container as="main" size="wide" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
+    <Container as="main" size="full" className="enter flex flex-1 flex-col gap-6 py-8 sm:py-10">
       <PageHeader title={t("title")} description={t("hint")} />
       {orders.length === 0 ? (
         <EmptyState variant="list">{t("empty")}</EmptyState>
