@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import type { Palette } from "@/components/palette";
 import type { PaletteColors } from "@/lib/palette-colors";
+import { addressFromForm } from "@/lib/address";
 import { apiFetch, apiUpload, getApi, unwrap } from "@/lib/api";
 import { errorState, type FormState } from "@/lib/form-state";
 
@@ -16,8 +17,7 @@ export async function saveProfile(_state: FormState, formData: FormData): Promis
           phone: String(formData.get("phone") ?? ""),
           // An empty date field clears the date of birth.
           birth_date: String(formData.get("birth_date") ?? "") || null,
-          address_line: String(formData.get("address_line") ?? ""),
-          city: String(formData.get("city") ?? ""),
+          ...addressFromForm(formData),
           postal_code: String(formData.get("postal_code") ?? ""),
         },
       }),

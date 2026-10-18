@@ -17792,6 +17792,151 @@
         }
       }
     },
+    "/geo/cities": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "summary": "List Cities",
+        "description": "Cities and towns whose name contains the letters, names starting with them first.",
+        "operationId": "list_cities",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 60,
+              "description": "Letters from the name; empty: all",
+              "default": "",
+              "title": "Q"
+            },
+            "description": "Letters from the name; empty: all"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/City"
+                  },
+                  "title": "Response List Cities"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/geo/cities/{city_code}/streets": {
+      "get": {
+        "tags": [
+          "geo"
+        ],
+        "summary": "List Streets",
+        "description": "Streets of one city whose name (or an alternative spelling) contains the letters.",
+        "operationId": "list_streets",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "city_code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "City Code"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 60,
+              "description": "Letters from the name; empty: all",
+              "default": "",
+              "title": "Q"
+            },
+            "description": "Letters from the name; empty: all"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Street"
+                  },
+                  "title": "Response List Streets"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/staff": {
       "get": {
         "tags": [
@@ -41070,6 +41215,74 @@
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "From the official city list, when chosen there"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted"
+          },
+          "street_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Name",
+            "description": "The chosen street's own name"
           }
         },
         "type": "object",
@@ -41082,12 +41295,79 @@
           "details",
           "notes",
           "active",
-          "created_at"
+          "created_at",
+          "city_code",
+          "street_code",
+          "house_number",
+          "address_details",
+          "street_unlisted"
         ],
         "title": "Address"
       },
       "AddressCreate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "label": {
             "anyOf": [
               {
@@ -41101,15 +41381,29 @@
             "title": "Label"
           },
           "street": {
-            "type": "string",
-            "maxLength": 200,
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Street"
           },
           "city": {
-            "type": "string",
-            "maxLength": 80,
-            "minLength": 1,
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "City"
           },
           "details": {
@@ -41138,14 +41432,72 @@
           }
         },
         "type": "object",
-        "required": [
-          "street",
-          "city"
-        ],
         "title": "AddressCreate"
       },
       "AddressUpdate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "label": {
             "anyOf": [
               {
@@ -43982,6 +44334,68 @@
       },
       "BranchSetup": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "name": {
             "type": "string",
             "maxLength": 120,
@@ -45154,6 +45568,48 @@
           "birth_year"
         ],
         "title": "Child"
+      },
+      "City": {
+        "properties": {
+          "code": {
+            "type": "integer",
+            "title": "Code"
+          },
+          "name_he": {
+            "type": "string",
+            "title": "Name He"
+          },
+          "name_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name En"
+          },
+          "region_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name_he",
+          "name_en",
+          "region_name"
+        ],
+        "title": "City"
       },
       "Client": {
         "properties": {
@@ -54477,6 +54933,108 @@
             ],
             "title": "Address"
           },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "The branch's city, from the official list"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street typed because it is not on the list"
+          },
+          "city_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Name"
+          },
+          "street_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Name"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The branch's point on the map, if known"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
           "active": {
             "type": "boolean",
             "title": "Active"
@@ -54616,6 +55174,15 @@
           "id",
           "name",
           "address",
+          "city_code",
+          "street_code",
+          "house_number",
+          "address_details",
+          "street_unlisted",
+          "city_name",
+          "street_name",
+          "latitude",
+          "longitude",
           "active",
           "created_at",
           "updated_at",
@@ -54636,6 +55203,68 @@
       },
       "LocationCreate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "name": {
             "type": "string",
             "maxLength": 120,
@@ -54718,6 +55347,68 @@
       },
       "LocationUpdate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "name": {
             "anyOf": [
               {
@@ -54779,6 +55470,33 @@
             ],
             "title": "Primary Color",
             "description": "The branch's own accent color; null falls back to the network's"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "The pin, moved by hand (with longitude)"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
           },
           "website_url": {
             "anyOf": [
@@ -54953,6 +55671,80 @@
               }
             ],
             "title": "Postal Code"
+          },
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "Home city, from the official list"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted"
+          },
+          "street_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Name",
+            "description": "The home street's name"
+          },
+          "address_complete": {
+            "type": "boolean",
+            "title": "Address Complete",
+            "description": "City, street and house number are all filled in",
+            "default": false
           },
           "email_roster": {
             "type": "boolean",
@@ -65550,6 +66342,32 @@
         "title": "StoredAudience",
         "description": "An audience as stored: every key is present."
       },
+      "Street": {
+        "properties": {
+          "code": {
+            "type": "integer",
+            "title": "Code"
+          },
+          "name_he": {
+            "type": "string",
+            "title": "Name He"
+          },
+          "aliases": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Aliases"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name_he",
+          "aliases"
+        ],
+        "title": "Street"
+      },
       "StructureUpdate": {
         "properties": {
           "teams": {
@@ -68822,6 +69640,68 @@
       },
       "app__api__routes__ProfileUpdate": {
         "properties": {
+          "city_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City Code",
+            "description": "A city from /geo/cities"
+          },
+          "street_code": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Code",
+            "description": "A street of that city, from /geo/cities/{code}/streets"
+          },
+          "house_number": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "House Number"
+          },
+          "address_details": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address Details",
+            "description": "Apartment, floor, entrance"
+          },
+          "street_unlisted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street Unlisted",
+            "description": "A street that is not on the list, as typed"
+          },
           "full_name": {
             "anyOf": [
               {

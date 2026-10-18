@@ -1,3 +1,4 @@
+import { AddressReminder } from "@/components/address-reminder";
 import { ScopedMessages } from "@/components/scoped-messages";
 import { signOut } from "@/app/(auth)/actions";
 import { ActivityGuard } from "@/components/activity-guard";
@@ -74,6 +75,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       </AppHeader>
       <IncidentBanner items={banners} />
       <LegalBanner pending={me.legal_pending ?? []} />
+      <AddressReminder show={me.memberships.length > 0 && !me.address_complete} />
       <MfaBanner memberships={me.memberships.map((m) => m.role)} platform={me.platform_admin} />
       {children}
       <ActivityGuard />

@@ -3212,6 +3212,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/geo/cities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Cities
+         * @description Cities and towns whose name contains the letters, names starting with them first.
+         */
+        get: operations["list_cities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/geo/cities/{city_code}/streets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Streets
+         * @description Streets of one city whose name (or an alternative spelling) contains the letters.
+         */
+        get: operations["list_streets"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/staff": {
         parameters: {
             query?: never;
@@ -8419,15 +8459,55 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /**
+             * City Code
+             * @description From the official city list, when chosen there
+             */
+            city_code: number | null;
+            /** Street Code */
+            street_code: number | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /** Street Unlisted */
+            street_unlisted: string | null;
+            /**
+             * Street Name
+             * @description The chosen street's own name
+             */
+            street_name?: string | null;
         };
         /** AddressCreate */
         AddressCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Label */
             label?: string | null;
             /** Street */
-            street: string;
+            street?: string | null;
             /** City */
-            city: string;
+            city?: string | null;
             /** Details */
             details?: string | null;
             /** Notes */
@@ -8435,6 +8515,28 @@ export interface components {
         };
         /** AddressUpdate */
         AddressUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Label */
             label?: string | null;
             /** Street */
@@ -9494,6 +9596,28 @@ export interface components {
         };
         /** BranchSetup */
         BranchSetup: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name: string;
             /** Address */
@@ -9970,6 +10094,17 @@ export interface components {
              * @default true
              */
             lives_with_me: boolean;
+        };
+        /** City */
+        City: {
+            /** Code */
+            code: number;
+            /** Name He */
+            name_he: string;
+            /** Name En */
+            name_en: string | null;
+            /** Region Name */
+            region_name: string | null;
         };
         /** Client */
         Client: {
@@ -13486,6 +13621,33 @@ export interface components {
             name: string;
             /** Address */
             address: string | null;
+            /**
+             * City Code
+             * @description The branch's city, from the official list
+             */
+            city_code: number | null;
+            /** Street Code */
+            street_code: number | null;
+            /** House Number */
+            house_number: string | null;
+            /** Address Details */
+            address_details: string | null;
+            /**
+             * Street Unlisted
+             * @description A street typed because it is not on the list
+             */
+            street_unlisted: string | null;
+            /** City Name */
+            city_name: string | null;
+            /** Street Name */
+            street_name: string | null;
+            /**
+             * Latitude
+             * @description The branch's point on the map, if known
+             */
+            latitude: number | null;
+            /** Longitude */
+            longitude: number | null;
             /** Active */
             active: boolean;
             /**
@@ -13558,6 +13720,28 @@ export interface components {
         };
         /** LocationCreate */
         LocationCreate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name: string;
             /** Address */
@@ -13590,6 +13774,28 @@ export interface components {
         };
         /** LocationUpdate */
         LocationUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Name */
             name?: string | null;
             /** Address */
@@ -13606,6 +13812,13 @@ export interface components {
              * @description The branch's own accent color; null falls back to the network's
              */
             primary_color?: string | null;
+            /**
+             * Latitude
+             * @description The pin, moved by hand (with longitude)
+             */
+            latitude?: number | null;
+            /** Longitude */
+            longitude?: number | null;
             /**
              * Website Url
              * @description The branch's own website; null: the business's
@@ -13673,6 +13886,30 @@ export interface components {
             city?: string | null;
             /** Postal Code */
             postal_code?: string | null;
+            /**
+             * City Code
+             * @description Home city, from the official list
+             */
+            city_code?: number | null;
+            /** Street Code */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /** Address Details */
+            address_details?: string | null;
+            /** Street Unlisted */
+            street_unlisted?: string | null;
+            /**
+             * Street Name
+             * @description The home street's name
+             */
+            street_name?: string | null;
+            /**
+             * Address Complete
+             * @description City, street and house number are all filled in
+             * @default false
+             */
+            address_complete: boolean;
             /**
              * Email Roster
              * @description Email the person when their roster is published
@@ -17826,6 +18063,15 @@ export interface components {
             /** Status */
             status: ("trial" | "active") | null;
         };
+        /** Street */
+        Street: {
+            /** Code */
+            code: number;
+            /** Name He */
+            name_he: string;
+            /** Aliases */
+            aliases: string[];
+        };
         /**
          * StructureUpdate
          * @description The whole structure at once: every team and where each agent stands. Agents left out keep
@@ -19144,6 +19390,28 @@ export interface components {
         };
         /** ProfileUpdate */
         app__api__routes__ProfileUpdate: {
+            /**
+             * City Code
+             * @description A city from /geo/cities
+             */
+            city_code?: number | null;
+            /**
+             * Street Code
+             * @description A street of that city, from /geo/cities/{code}/streets
+             */
+            street_code?: number | null;
+            /** House Number */
+            house_number?: string | null;
+            /**
+             * Address Details
+             * @description Apartment, floor, entrance
+             */
+            address_details?: string | null;
+            /**
+             * Street Unlisted
+             * @description A street that is not on the list, as typed
+             */
+            street_unlisted?: string | null;
             /** Full Name */
             full_name?: string | null;
             /** Phone */
@@ -27426,6 +27694,74 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Location"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_cities: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["City"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_streets: {
+        parameters: {
+            query?: {
+                /** @description Letters from the name; empty: all */
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                city_code: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Street"][];
                 };
             };
             /** @description Validation Error */
