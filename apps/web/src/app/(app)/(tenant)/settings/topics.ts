@@ -7,6 +7,7 @@ export const SETTINGS_TOPICS = [
   { key: "modules", href: "/settings/modules", group: "plan" },
   { key: "billing", href: "/settings/billing", group: "plan" },
   { key: "integrations", href: "/settings/integrations", group: "connections" },
+  { key: "aiConnections", href: "/settings/ai-connections", group: "connections" },
   { key: "audit", href: "/settings/audit", group: "security", roles: ["owner", "manager"] },
   { key: "data", href: "/settings/data", group: "data", roles: ["owner"] },
   { key: "help", href: "/settings/help", group: "help" },

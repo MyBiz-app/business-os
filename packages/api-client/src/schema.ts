@@ -183,6 +183,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/mcp-info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Info */
+        get: operations["mcp_info"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/mcp-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Requests
+         * @description The changes AI apps proposed to the signed-in person: the ones waiting first, then what
+         *     happened to the recent ones. Only the person the app acted for sees and decides them.
+         */
+        get: operations["list_mcp_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/ai/tasks": {
         parameters: {
             query?: never;
@@ -7274,6 +7312,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/platform/ai/connectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ai Connectors
+         * @description Who uses the AI connectors (Claude, ChatGPT): per business, the apps, the calls and what
+         *     became of the changes they proposed.
+         */
+        get: operations["ai_connectors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/platform/ai/settings": {
         parameters: {
             query?: never;
@@ -9316,6 +9375,12 @@ export interface components {
              * @default
              */
             state: string;
+            /**
+             * Propose
+             * @description Also let the app propose changes; each one waits for this person's approval
+             * @default false
+             */
+            propose: boolean;
         };
         /** ApprovalResult */
         ApprovalResult: {
@@ -11473,6 +11538,69 @@ export interface components {
             accounts: components["schemas"]["SocialAccount"][];
             /** Authorize Url */
             authorize_url?: string | null;
+        };
+        /** ConnectorBoard */
+        ConnectorBoard: {
+            /** Days */
+            days: number;
+            /**
+             * Daily Limit
+             * @description Calls per business per rolling 24 hours
+             */
+            daily_limit: number;
+            /** Businesses */
+            businesses: components["schemas"]["ConnectorUse"][];
+        };
+        /** ConnectorInfo */
+        ConnectorInfo: {
+            /**
+             * Name
+             * @description What to call the connector in the AI app
+             */
+            name: string;
+            /**
+             * Url
+             * @description The address to paste into the AI app
+             */
+            url: string;
+        };
+        /** ConnectorUse */
+        ConnectorUse: {
+            /**
+             * Tenant Id
+             * Format: uuid
+             */
+            tenant_id: string;
+            /** Name */
+            name: string;
+            /**
+             * Connections
+             * @description AI apps connected now
+             */
+            connections: number;
+            /** Apps */
+            apps: string[];
+            /**
+             * Calls
+             * @description Calls in the window
+             */
+            calls: number;
+            /** Last Call */
+            last_call: string | null;
+            /**
+             * Proposed
+             * @description Changes the apps proposed in the window
+             */
+            proposed: number;
+            /** Executed */
+            executed: number;
+            /** Rejected */
+            rejected: number;
+            /**
+             * Waiting
+             * @description Proposals waiting for approval now
+             */
+            waiting: number;
         };
         /** ConsentBody */
         ConsentBody: {
@@ -14388,6 +14516,49 @@ export interface components {
             last_used_at: string | null;
             /** Calls */
             calls: number;
+            /**
+             * Can Propose
+             * @description May also propose changes, which wait for approval
+             */
+            can_propose: boolean;
+        };
+        /** McpRequest */
+        McpRequest: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Tool Name */
+            tool_name: string;
+            /** Preview */
+            preview: {
+                [key: string]: unknown;
+            };
+            /**
+             * Client Name
+             * @description The AI app that asked
+             */
+            client_name: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "rejected" | "expired" | "executed" | "failed";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            } | null;
         };
         /** Me */
         Me: {
@@ -20777,6 +20948,72 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    mcp_info: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorInfo"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_mcp_requests: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["McpRequest"][];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -37498,6 +37735,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AICostBoard"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_connectors: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorBoard"];
                 };
             };
             /** @description Validation Error */
