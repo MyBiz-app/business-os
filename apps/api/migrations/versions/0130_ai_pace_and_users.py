@@ -39,5 +39,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # contract: only the downgrade drops the three new columns, which no earlier release reads.
     op.execute("ALTER TABLE app.tenant_ai_settings DROP COLUMN extra_ai_users")
     op.execute("ALTER TABLE app.tenant_members DROP COLUMN ai_daily_percent, DROP COLUMN ai_access")
