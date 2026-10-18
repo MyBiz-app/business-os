@@ -11,6 +11,7 @@ import { ApiError, unwrap } from "@business-os/app-kit/lib/api";
 import { AreaSwitcher } from "@/components/area-switcher";
 import { BrandColorCard } from "@/components/brand-color-card";
 import { StaffIdentityCard } from "@/components/identity-card";
+import { useBusiness } from "@/providers/business-provider";
 import { useStaff } from "@/providers/staff-provider";
 import { useSession } from "@business-os/app-kit/providers/session-provider";
 
@@ -26,6 +27,8 @@ export default function Me() {
   const tDocuments = useTranslations("business.myDocuments");
   const { palette, tenant, api, refresh, branches, branch, selectBranch, can } = useStaff();
   const { session } = useSession();
+  const { businesses, joinOwn } = useBusiness();
+  const [signedUp, setSignedUp] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [name, setName] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [emailRoster, setEmailRoster] = useState<boolean | null>(null);
@@ -65,6 +68,19 @@ export default function Me() {
       setCloseError(tClosure(detail === "name_mismatch" || detail === "already_closed" || detail === "owner_only" ? `errors.${detail}` : "errors.generic"));
     } finally {
       setClosing(false);
+    }
+  };
+
+  // A team member can also be a client of their own business, one tap, no join code (R36).
+  const alreadyClient = !!tenant && !!businesses?.some((b) => b.id === tenant.id);
+  const signUpAsClient = async () => {
+    if (!tenant) return;
+    setSignedUp("busy");
+    try {
+      await joinOwn(tenant.id);
+      setSignedUp("done");
+    } catch {
+      setSignedUp("error");
     }
   };
 
@@ -151,6 +167,24 @@ export default function Me() {
           />
           <Text style={[styles.muted, { color: palette.muted }]}>{t("rosterEmailsHint")}</Text>
         </Card>
+      )}
+
+      {tenant && businesses && !alreadyClient && (
+        <Card palette={palette}>
+          <Text style={{ color: palette.foreground, fontWeight: "600" }}>{t("signUpClientTitle")}</Text>
+          <Text style={[styles.muted, { color: palette.muted }]}>{t("signUpClientHint")}</Text>
+          <ErrorText message={signedUp === "error" ? t("signUpClientError") : null} palette={palette} />
+          <Button
+            label={t("signUpClientButton")}
+            variant="secondary"
+            palette={palette}
+            busy={signedUp === "busy"}
+            onPress={() => void signUpAsClient()}
+          />
+        </Card>
+      )}
+      {signedUp === "done" && (
+        <Text style={[styles.muted, { color: palette.muted }]}>{t("signUpClientDone")}</Text>
       )}
 
       <AreaSwitcher palette={palette} />

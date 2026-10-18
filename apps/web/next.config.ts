@@ -9,6 +9,17 @@ const nextConfig: NextConfig = {
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
   poweredByHeader: false,
   // The Content-Security-Policy (per-request nonce), HSTS and X-Robots-Tag are set in src/proxy.ts.
+  // The catalog replaced the services and plans pages; old links and bookmarks still arrive.
+  async redirects() {
+    return [
+      { source: "/services", destination: "/catalog?tab=services", permanent: true },
+      { source: "/services/new", destination: "/catalog/services/new", permanent: true },
+      { source: "/services/:id", destination: "/catalog/services/:id", permanent: true },
+      { source: "/plans", destination: "/catalog?tab=plans", permanent: true },
+      { source: "/plans/new", destination: "/catalog/plans/new", permanent: true },
+      { source: "/plans/:id", destination: "/catalog/plans/:id", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

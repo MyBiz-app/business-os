@@ -455,6 +455,7 @@
     "business": "Business",
     "openDetails": "Open the details",
     "kpis": "Key numbers",
+    "withoutStaff": "Without team members",
     "period": "Period",
     "lastDays": "Last {count} days",
     "vsPrevious": "vs. the previous period",
@@ -541,7 +542,9 @@
     "migration": "Move to MyBiz",
     "invoices": "Invoices",
     "sidebarLight": "Use a light sidebar",
-    "sidebarDark": "Use a dark sidebar"
+    "sidebarDark": "Use a dark sidebar",
+    "quotesEvents": "Quotes and events",
+    "catalog": "Catalog"
   },
   "terms": {
     "fitness": {
@@ -809,6 +812,14 @@
     },
     "absentFilter": "Last visit",
     "absentAny": "Any time",
+    "staffFilter": "Team members",
+    "staffAny": "Everyone",
+    "staffOptions": {
+      "only": "Team members only",
+      "exclude": "Without team members"
+    },
+    "staffBadge": "Team",
+    "addMe": "Add me",
     "absentDays": "Not in {days} days",
     "homeBranch": "Home branch",
     "allBranches": "All branches",
@@ -891,7 +902,8 @@
     "loading": "Loading…",
     "chooseFile": "Choose a file",
     "noFile": "No file chosen",
-    "edit": "Edit"
+    "edit": "Edit",
+    "close": "Close"
   },
   "services": {
     "title": "Services",
@@ -926,7 +938,8 @@
     "stats": {
       "sessions": "{count, plural, =0 {No sessions in 30 days} one {One session in 30 days} other {# sessions in 30 days}}",
       "occupancy": "{value} full"
-    }
+    },
+    "created": "Service created."
   },
   "address": {
     "city": "City",
@@ -1786,7 +1799,8 @@
     "stats": {
       "holders": "{count, plural, =0 {No current holders} one {One client holds it now} other {# clients hold it now}}",
       "sold": "{count, plural, =0 {Not sold in 30 days} one {Sold once in 30 days} other {Sold # times in 30 days}}"
-    }
+    },
+    "created": "Plan created."
   },
   "metrics": {
     "revenue": "Revenue",
@@ -4827,7 +4841,14 @@
       "invalid": "Some details aren't valid.",
       "code_taken": "That code already exists.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "new": "New discount code",
+    "removed": "The code was deleted.",
+    "deleteConfirm": "Delete the code {code}?",
+    "usesLabel": "Uses",
+    "givenLabel": "Discount given",
+    "statusLabel": "Status",
+    "activeNow": "Working"
   },
   "start": {
     "meta": {
@@ -5430,7 +5451,9 @@
       "image_too_large": "The picture is larger than 512 KB. Choose a smaller one.",
       "unsupported_image": "Choose a PNG, JPEG or WebP picture."
     },
-    "nav": { "label": "Profile sections" },
+    "nav": {
+      "label": "Profile sections"
+    },
     "profileTitle": "Profile",
     "detailsTitle": "Personal details",
     "birthDate": "Date of birth",
@@ -5637,6 +5660,11 @@
       "allBranches": "All branches",
       "rosterEmails": "Email me about my shifts",
       "rosterEmailsHint": "When your roster is published, and when a shift of yours changes or is removed.",
+      "signUpClientTitle": "Join as a client too",
+      "signUpClientHint": "Get your own client card in this business, so you can book and pay like any client. You switch between the two areas below.",
+      "signUpClientButton": "Sign me up as a client",
+      "signUpClientDone": "Done. Switch to the client area below.",
+      "signUpClientError": "Could not sign you up. Try again.",
       "colors": "My colors",
       "colorsHint": "Pick your brand color. It colors your clients' app, your web app and this app.",
       "colorHex": "Color code (#rrggbb)",
@@ -6802,7 +6830,41 @@
       "draft": "Drafts",
       "sent": "Waiting for an answer",
       "accepted": "Accepted",
-      "declined": "Declined or expired"
+      "declined": "Declined or expired",
+      "closeRate": "Close rate",
+      "closeRateHint": "{won} of {decided} decided"
+    },
+    "titleEvents": "Quotes and events",
+    "subtitleEvents": "Send a quote, the client accepts it with one tap and pays the deposit. Accepted quotes with a date become events.",
+    "views": {
+      "label": "View",
+      "quotes": "Quotes",
+      "events": "Events"
+    },
+    "eventsMonth": "Events in {month}",
+    "monthPrev": "Previous month",
+    "monthNext": "Next month",
+    "calendar": {
+      "closed": "Closed",
+      "more": "+{count} more",
+      "empty": "No events this month."
+    },
+    "empty": {
+      "title": "Your first quote in three steps",
+      "step1": "Create a quote",
+      "step1Body": "Pick a client, list what is included and the price.",
+      "step2": "Send it by link",
+      "step2Body": "The client opens a private page, no sign-in needed.",
+      "step3": "They accept and pay the deposit",
+      "step3Body": "You see the answer here and the event lands in the calendar.",
+      "first": "Create the first quote",
+      "example": "Try with an example"
+    },
+    "example": {
+      "title": "Example: full-day service",
+      "line1": "Full-day service",
+      "line2": "Travel and set-up",
+      "notes": "This is an example: change the items, prices and terms before you send it."
     }
   },
   "bills": {
@@ -8633,6 +8695,55 @@
       "documents": "Documents",
       "ai": "AI",
       "permissions": "Permissions"
+    }
+  },
+  "catalog": {
+    "title": "Catalog",
+    "subtitle": "What you sell: services, memberships and punch cards, and discount codes.",
+    "tabs": {
+      "label": "Catalog sections",
+      "services": "Services",
+      "plans": "Memberships and punch cards",
+      "codes": "Discount codes"
+    },
+    "add": {
+      "services": "Add service",
+      "plans": "Add plan",
+      "codes": "Add code"
+    },
+    "tiles": {
+      "label": "Catalog numbers",
+      "services": {
+        "all": "All services",
+        "active": "Open for booking",
+        "paused": "Hidden"
+      },
+      "plans": {
+        "all": "All plans",
+        "active": "On sale",
+        "paused": "Not on sale"
+      },
+      "codes": {
+        "all": "All codes",
+        "active": "Working now",
+        "paused": "Paused"
+      }
+    },
+    "soldLast30": "{count, plural, =0 {None sold in 30 days} one {One sold in 30 days} other {# sold in 30 days}}",
+    "servicesEmpty": {
+      "title": "No services yet",
+      "body": "A service is what clients book: a class, a personal appointment or a court by the hour. Add your first one and it shows on the schedule and in the client app.",
+      "cta": "Create your first service"
+    },
+    "plansEmpty": {
+      "title": "Nothing here yet",
+      "body": "Memberships and punch cards let clients pay once and come again and again. They are optional: businesses that charge per visit can skip them.",
+      "cta": "Create your first plan"
+    },
+    "codesEmpty": {
+      "title": "No discount codes yet",
+      "body": "A code gives a percent or a fixed amount off a plan. Share it in a message or a post and clients enter it when they buy.",
+      "cta": "Create your first code"
     }
   }
 }

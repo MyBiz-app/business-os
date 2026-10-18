@@ -1291,6 +1291,28 @@
             }
           },
           {
+            "name": "staff",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "only",
+                    "exclude"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "only: team members who are also clients; exclude: leave them out",
+              "title": "Staff"
+            },
+            "description": "only: team members who are also clients; exclude: leave them out"
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -1423,6 +1445,74 @@
             }
           }
         },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Client"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/clients/me": {
+      "post": {
+        "tags": [
+          "clients"
+        ],
+        "summary": "Add Me As Client",
+        "description": "\"Add me\": the signed-in team member becomes a client of this business (an owner can book\na table for themselves, a coach can join a class).",
+        "operationId": "add_me_as_client",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Tenant-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "X-Tenant-Id"
+            }
+          },
+          {
+            "name": "X-Location-Id",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The current branch (none: all branches)",
+              "title": "X-Location-Id"
+            },
+            "description": "The current branch (none: all branches)"
+          }
+        ],
         "responses": {
           "201": {
             "description": "Successful Response",
@@ -30534,6 +30624,18 @@
             }
           },
           {
+            "name": "exclude_staff",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out clients who are also team members",
+              "default": false,
+              "title": "Exclude Staff"
+            },
+            "description": "Leave out clients who are also team members"
+          },
+          {
             "name": "X-Tenant-Id",
             "in": "header",
             "required": true,
@@ -30658,6 +30760,18 @@
               "default": "week",
               "title": "Grain"
             }
+          },
+          {
+            "name": "exclude_staff",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Leave out clients who are also team members",
+              "default": false,
+              "title": "Exclude Staff"
+            },
+            "description": "Leave out clients who are also team members"
           },
           {
             "name": "X-Tenant-Id",
@@ -36259,6 +36373,53 @@
             }
           }
         }
+      }
+    },
+    "/client/businesses/self": {
+      "post": {
+        "tags": [
+          "client"
+        ],
+        "summary": "Join Own Business",
+        "description": "\"Sign up as a client too\": a team member joins their own business without a code (R36).",
+        "operationId": "join_own_business",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberJoinRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientBusiness"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/client/profile": {
@@ -45654,6 +45815,12 @@
             "title": "Email Suppressed",
             "description": "The address bounced or reported spam: no emails are sent to it",
             "default": false
+          },
+          "is_staff": {
+            "type": "boolean",
+            "title": "Is Staff",
+            "description": "Also a team member of this business (shown as a badge)",
+            "default": false
           }
         },
         "type": "object",
@@ -46523,6 +46690,12 @@
             "type": "boolean",
             "title": "Email Suppressed",
             "description": "The address bounced or reported spam: no emails are sent to it",
+            "default": false
+          },
+          "is_staff": {
+            "type": "boolean",
+            "title": "Is Staff",
+            "description": "Also a team member of this business (shown as a badge)",
             "default": false
           },
           "plan_name": {
@@ -55954,6 +56127,20 @@
           "location_ids"
         ],
         "title": "MemberBranches"
+      },
+      "MemberJoinRequest": {
+        "properties": {
+          "tenant_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tenant Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tenant_id"
+        ],
+        "title": "MemberJoinRequest"
       },
       "MemberOrganization": {
         "properties": {
