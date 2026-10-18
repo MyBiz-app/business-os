@@ -341,7 +341,7 @@ def test_managers_and_owners_are_never_kept_to_branches(
     client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict, branches: dict
 ) -> None:
     # A manager listed against one branch still works across all of them.
-    manager = member_at_north(client, auth, engine, studio, branches, role="manager")
+    manager = member_at_north(client, auth, engine, studio, branches)
     assert client.get(f"/sessions/{branches['south_session']}", headers=manager).status_code == 200
     assert client.get(f"/clients/{branches['south_client']}", headers=manager).status_code == 200
     assert {b["id"] for b in client.get("/locations", headers=manager).json()} == {
@@ -448,7 +448,7 @@ def test_client_sub_routes_added_for_gl2_follow_the_clients_branch(
     client: TestClient, auth: AuthHeaders, engine: Engine, studio: dict, branches: dict
 ) -> None:
     """Consent trail, addresses, retainer and entitlements (export/erase are owner-only)."""
-    mine = member_at_north(client, auth, engine, studio, branches, role="manager")
+    mine = member_at_north(client, auth, engine, studio, branches)
     south = branches["south_client"]
 
     hidden = [
