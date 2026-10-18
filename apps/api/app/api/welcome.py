@@ -108,7 +108,7 @@ def preview_welcome(context: SettingsDep) -> WelcomeEmail:
 
 setup_router = APIRouter(prefix="/tenants/current/getting-started", tags=["tenants"])
 
-SetupStep = Literal["branding", "services", "schedule", "team", "clients", "card"]
+SetupStep = Literal["branding", "services", "policy", "schedule", "team", "clients", "card"]
 
 
 class SetupItem(BaseModel):
@@ -131,6 +131,9 @@ def getting_started(context: SettingsDep) -> GettingStarted:
                 SELECT
                     (t.logo IS NOT NULL OR t.primary_color IS NOT NULL) AS branding,
                     EXISTS (SELECT 1 FROM app.services x WHERE x.tenant_id = t.id) AS services,
+                    EXISTS (SELECT 1 FROM app.cancellation_policies x
+                            WHERE x.tenant_id = t.id AND x.scope = 'business' AND x.confirmed)
+                        AS policy,
                     (EXISTS (SELECT 1 FROM app.sessions x WHERE x.tenant_id = t.id)
                      OR EXISTS (SELECT 1 FROM app.staff_hours x WHERE x.tenant_id = t.id))
                         AS schedule,

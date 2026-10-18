@@ -23,7 +23,8 @@
       "waitlist_spot_open": "התפנה מקום: {service} ב-{when}",
       "waitlist_spot_taken": "מישהו הקדים אותך: {service} ב-{when}",
       "freeze_approved": "ההקפאה אושרה: {from} עד {date}",
-      "freeze_rejected": "לגבי בקשת ההקפאה שלך"
+      "freeze_rejected": "לגבי בקשת ההקפאה שלך",
+      "credit_returned": "החזרנו לך את השיעור: {service} ב-{when}"
     },
     "body": {
       "waitlist_promoted": "התפנה מקום ונרשמת ל{service} ב-{when}. אם לא יתאפשר לך להגיע, כדאי לבטל באפליקציה כדי שמישהו אחר יוכל לבוא.",
@@ -41,7 +42,8 @@
       "waitlist_spot_open": "התפנה מקום ל{service} ב-{when}, ומי שתופס ראשון לוקח. אפשר לתפוס באפליקציה.",
       "waitlist_spot_taken": "מישהו תפס את המקום ב{service} ב-{when} רגע לפניך. אתה עדיין ברשימת ההמתנה, ונעדכן אם יתפנה מקום נוסף.",
       "freeze_approved": "{business} אישר להקפיא את ה{plan} שלך מ-{from} עד {date}. תאריך הסיום זז באותו מספר ימים.",
-      "freeze_rejected": "{business} לא יכול היה לאשר הקפאה של ה{plan} שלך מ-{from} עד {date}."
+      "freeze_rejected": "{business} לא יכול היה לאשר הקפאה של ה{plan} שלך מ-{from} עד {date}.",
+      "credit_returned": "{business} החזיר לך את השיעור {service} ב-{when}. הוא כבר לא נחשב כניצול."
     },
     "welcome": {
       "subject": "ברוכים הבאים ל-MyBiz, {business}! 🎉",
@@ -349,6 +351,32 @@
     "expired": "תוקף ההצעה פג. שאלו שוב ואבדוק מה פנוי.",
     "failed": "מצטערים, לא הצלחתי לקבוע את זה. שאלו שוב ואבדוק מה פנוי.",
     "unavailable": "אין לי אפשרות לענות כרגע. הצוות יחזור אליכם בהקדם."
+  },
+  "cancellationPolicy": {
+    "units": {
+      "none": "עד רגע לפני",
+      "day": "יום",
+      "days": "{n} ימים",
+      "hour": "שעה",
+      "hours": "{n} שעות",
+      "minutes": "{n} דקות"
+    },
+    "free": "אפשר לבטל ללא עלות עד {time} לפני המועד.",
+    "freeFor": "אפשר לבטל {kind} ללא עלות עד {time} לפני.",
+    "kinds": {
+      "group": "שיעור קבוצתי",
+      "personal": "שיעור אישי או תור",
+      "resource": "מגרש או חדר"
+    },
+    "late": {
+      "counts": "ביטול מאוחר נחשב כניצול של הביקור.",
+      "recorded": "ביטול מאוחר נרשם, אבל לא נחשב כניצול של ביקור."
+    },
+    "noShow": {
+      "counts": "אם לא מגיעים, הביקור נחשב כניצול.",
+      "recorded": "אם לא מגיעים, זה נרשם, אבל לא נחשב כניצול של ביקור."
+    },
+    "limit": "אחרי {n} אי-הגעות בחודש, ההזמנה מהאפליקציה נעצרת עד שתיצרו קשר עם העסק."
   },
   "verticals": {
     "fitness": {

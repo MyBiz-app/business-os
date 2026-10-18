@@ -32,6 +32,7 @@ SalesDep = Annotated[TenantContext, Depends(require(Permission.SALES_MANAGE))]
 
 PlanKind = Literal["membership", "punch_card"]
 BillingCycle = Literal["monthly", "quarterly", "yearly", "custom"]
+PeriodUnit = Literal["week", "month"]
 MAX_FREEZE_DAYS = 90
 # The length of a plan with a billing cycle: what the entitlement is valid for before the next
 # charge (a custom cycle says its own days).
@@ -39,7 +40,8 @@ CYCLE_VALIDITY_DAYS = {"monthly": 30, "quarterly": 91, "yearly": 365}
 
 PLAN_COLUMNS = (
     "id, name, description, kind, price_amount, price_currency, validity_days, credits, active, "
-    "billing_cycle, billing_cycle_days, auto_renew, created_at, updated_at"
+    "billing_cycle, billing_cycle_days, auto_renew, period_quota, period_unit, created_at, "
+    "updated_at"
 )
 
 
@@ -71,6 +73,13 @@ class PlanCreate(PlanFields):
         default=None, ge=1, le=1095, description="Only for the custom cycle"
     )
     auto_renew: bool = Field(default=False, description="Needs a billing cycle")
+    period_quota: int | None = Field(
+        default=None,
+        ge=1,
+        le=100,
+        description="Memberships only: visits allowed per period (for example 2 per week)",
+    )
+    period_unit: PeriodUnit | None = Field(default=None, description="With period_quota")
 
     @field_validator("name")
     @classmethod
@@ -83,6 +92,10 @@ class PlanCreate(PlanFields):
     def credits_match_kind(self) -> "PlanCreate":
         if (self.kind == "punch_card") != (self.credits is not None):
             raise ValueError("punch cards need credits; memberships must not have credits")
+        if (self.period_quota is None) != (self.period_unit is None):
+            raise ValueError("period_quota and period_unit go together")
+        if self.period_quota is not None and self.kind != "membership":
+            raise ValueError("only memberships have a quota per period")
         if self.billing_cycle is None:
             if self.billing_cycle_days is not None or self.auto_renew:
                 raise ValueError("a billing cycle is needed for renewing or cycle days")
@@ -103,6 +116,17 @@ class PlanUpdate(PlanFields):
     validity_days: int | None = Field(default=None, ge=1, le=1095)
     active: bool | None = None
     auto_renew: bool | None = Field(default=None, description="Needs a billing cycle")
+    period_quota: int | None = Field(default=None, ge=1, le=100, description="Memberships only")
+    period_unit: PeriodUnit | None = None
+
+    @model_validator(mode="after")
+    def quota_goes_with_unit(self) -> "PlanUpdate":
+        fields = self.model_fields_set
+        if ("period_quota" in fields) != ("period_unit" in fields) or (
+            (self.period_quota is None) != (self.period_unit is None)
+        ):
+            raise ValueError("period_quota and period_unit go together (both or neither)")
+        return self
 
 
 class Plan(BaseModel):
@@ -118,6 +142,8 @@ class Plan(BaseModel):
     billing_cycle: BillingCycle | None
     billing_cycle_days: int | None
     auto_renew: bool
+    period_quota: int | None = Field(description="Visits allowed per period, if limited")
+    period_unit: PeriodUnit | None
     created_at: datetime
     updated_at: datetime
 
@@ -172,6 +198,9 @@ class Entitlement(BaseModel):
         description="What the next charge will be after freeze credits and fees (minor units)"
     )
     freezable: bool = Field(description="A membership that is not over, cancelled or used up")
+    period_quota: int | None = Field(description="Visits allowed per week or month, if limited")
+    period_unit: PeriodUnit | None
+    period_used: int | None = Field(description="Visits counted in the current week or month")
 
 
 PaymentMethod = Literal["card", "cash", "transfer", "other"]
@@ -201,13 +230,18 @@ class FreezeCreate(BaseModel):
 
 
 # Bookings that use up a credit: everything except a cancellation made in time.
-CREDIT_USED = "(b.status <> 'cancelled' OR b.late_cancel)"
+# A visit given back by a manager, or a late cancellation or no-show the business only records
+# (migration 0136), is not used up.
+CREDIT_USED = "((b.status <> 'cancelled' OR b.late_cancel) AND NOT b.credit_released)"
 
 ENTITLEMENT_SELECT = f"""
     SELECT e.id, e.client_id, e.plan_id, e.name, e.kind, e.credits, e.starts_on, e.ends_on,
            e.status, e.price_amount, e.price_currency, e.created_at,
            e.billing_cycle, e.billing_cycle_days, e.auto_renew, e.next_billing_on,
-           e.billing_adjustment, used.count AS credits_used,
+           e.billing_adjustment, e.period_quota, e.period_unit, used.count AS credits_used,
+           CASE WHEN e.period_unit IS NOT NULL THEN
+               app.quota_used(e.id, (now() AT TIME ZONE t.time_zone)::date)
+           END AS period_used,
            (now() AT TIME ZONE t.time_zone)::date AS today,
            coalesce((
                SELECT json_agg(json_build_object(
@@ -323,11 +357,36 @@ def usable_entitlement(db: Session, client_id: UUID, session_id: UUID) -> UUID |
                   SELECT count(*) FROM app.bookings b
                   WHERE b.entitlement_id = e.id AND {CREDIT_USED}
               ))
+              AND (e.period_quota IS NULL OR e.period_quota > app.quota_used(e.id, day.value))
             ORDER BY e.credits IS NOT NULL, e.ends_on, e.created_at
             LIMIT 1
         """),
         {"client_id": client_id, "session_id": session_id},
     ).scalar()
+
+
+def quota_reached(db: Session, client_id: UUID, session_id: UUID) -> bool:
+    """The client has a plan valid for this session's day whose visits for the week or month
+    are all used (so the booking cannot use it, though the plan itself is fine)."""
+    return bool(
+        db.execute(
+            text("""
+                WITH day AS (
+                    SELECT (s.starts_at AT TIME ZONE t.time_zone)::date AS value
+                    FROM app.sessions s JOIN app.tenants t ON t.id = s.tenant_id
+                    WHERE s.id = :session_id
+                )
+                SELECT EXISTS (
+                    SELECT 1 FROM app.entitlements e, day
+                    WHERE e.client_id = :client_id AND e.status = 'active'
+                      AND day.value BETWEEN e.starts_on AND e.ends_on
+                      AND e.period_quota IS NOT NULL
+                      AND e.period_quota <= app.quota_used(e.id, day.value)
+                )
+            """),
+            {"client_id": client_id, "session_id": session_id},
+        ).scalar()
+    )
 
 
 # --- Plans ------------------------------------------------------------------------------------
@@ -376,10 +435,12 @@ def create_plan(body: PlanCreate, context: CatalogWriteDep) -> Plan:
             text(f"""
                 INSERT INTO app.plans
                     (tenant_id, name, description, kind, price_amount, price_currency,
-                     validity_days, credits, active, billing_cycle, billing_cycle_days, auto_renew)
+                     validity_days, credits, active, billing_cycle, billing_cycle_days, auto_renew,
+                     period_quota, period_unit)
                 SELECT :tenant_id, :name, :description, :kind, :price_amount,
                        coalesce(:price_currency, t.currency), :validity_days, :credits, :active,
-                       :billing_cycle, :billing_cycle_days, :auto_renew
+                       :billing_cycle, :billing_cycle_days, :auto_renew, :period_quota,
+                       :period_unit
                 FROM app.tenants t WHERE t.id = :tenant_id
                 RETURNING {PLAN_COLUMNS}
             """),
@@ -411,8 +472,14 @@ def update_plan(plan_id: UUID, body: PlanUpdate, context: CatalogWriteDep) -> Pl
     changes = {
         key: value
         for key, value in body.model_dump(exclude_unset=True).items()
-        if value is not None or key == "description"
+        if value is not None or key in ("description", "period_quota", "period_unit")
     }
+    if changes.get("period_quota") is not None:
+        kind = context.session.execute(
+            text("SELECT kind FROM app.plans WHERE id = :id"), {"id": plan_id}
+        ).scalar()
+        if kind is not None and kind != "membership":
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="not_a_membership")
     if changes.get("auto_renew"):
         has_cycle = context.session.execute(
             text("SELECT billing_cycle IS NOT NULL FROM app.plans WHERE id = :id"), {"id": plan_id}

@@ -6456,6 +6456,147 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/cancellation-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Policy */
+        get: operations["get_policy"];
+        /** Set Policy */
+        put: operations["set_policy"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/services/{service_id}/cancellation-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Service Policy
+         * @description This service uses its own terms instead of the business's.
+         */
+        put: operations["set_service_policy"];
+        post?: never;
+        /** Clear Service Policy */
+        delete: operations["clear_service_policy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/plans/{plan_id}/cancellation-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Plan Policy
+         * @description Bookings that use this plan follow its terms (the most specific layer).
+         */
+        put: operations["set_plan_policy"];
+        post?: never;
+        /** Clear Plan Policy */
+        delete: operations["clear_plan_policy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bookings/{booking_id}/waive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Waive
+         * @description An exception: the client keeps the visit a late cancellation or a no-show used up. Needs
+         *     a reason; who and when are kept, and the client is told.
+         */
+        post: operations["waive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/clients/{client_id}/waivers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Client Waivers
+         * @description The visits given back to a client, and how many this year, so it does not become a habit.
+         */
+        get: operations["client_waivers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/cancellation-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My Policy
+         * @description The business's rules in words, for the business page and the first sign-up.
+         */
+        get: operations["my_policy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/client/bookings/{booking_id}/cancel-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Cancel Preview
+         * @description What cancelling this booking now would do, shown before the client confirms.
+         */
+        get: operations["cancel_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/promo-codes": {
         parameters: {
             query?: never;
@@ -10529,6 +10670,16 @@ export interface components {
             over_capacity_at?: string | null;
             /** Late Cancel */
             late_cancel: boolean;
+            /**
+             * Credit Released
+             * @description The visit is not used up: the policy only records the late cancellation or no-show, or a manager gave it back
+             */
+            credit_released: boolean;
+            /**
+             * Waived At
+             * @description When a manager gave the visit back
+             */
+            waived_at: string | null;
             /** Checked In At */
             checked_in_at: string | null;
             /** Cancelled At */
@@ -10869,6 +11020,85 @@ export interface components {
              */
             questions_left: number | null;
         };
+        /** BusinessPolicy */
+        BusinessPolicy: {
+            /**
+             * Late Outcome
+             * @description Cancelling inside the window: a used visit (counts) or only noted (recorded)
+             * @default counts
+             * @enum {string}
+             */
+            late_outcome: "counts" | "recorded";
+            /**
+             * No Show Outcome
+             * @description Not coming: a used visit (counts) or only noted (recorded)
+             * @default counts
+             * @enum {string}
+             */
+            no_show_outcome: "counts" | "recorded";
+            /**
+             * No Show Limit
+             * @description No-shows in 30 days after which the app stops booking the client; empty: off
+             */
+            no_show_limit?: number | null;
+            /**
+             * Group Minutes
+             * @description Free cancellation before a group class
+             */
+            group_minutes: number;
+            /**
+             * Personal Minutes
+             * @description ... before a personal session or appointment
+             */
+            personal_minutes: number;
+            /**
+             * Resource Minutes
+             * @description ... before a court or room reservation
+             */
+            resource_minutes: number;
+        };
+        /** BusinessPolicyView */
+        BusinessPolicyView: {
+            /**
+             * Late Outcome
+             * @description Cancelling inside the window: a used visit (counts) or only noted (recorded)
+             * @default counts
+             * @enum {string}
+             */
+            late_outcome: "counts" | "recorded";
+            /**
+             * No Show Outcome
+             * @description Not coming: a used visit (counts) or only noted (recorded)
+             * @default counts
+             * @enum {string}
+             */
+            no_show_outcome: "counts" | "recorded";
+            /**
+             * No Show Limit
+             * @description No-shows in 30 days after which the app stops booking the client; empty: off
+             */
+            no_show_limit?: number | null;
+            /**
+             * Group Minutes
+             * @description Free cancellation before a group class
+             */
+            group_minutes: number;
+            /**
+             * Personal Minutes
+             * @description ... before a personal session or appointment
+             */
+            personal_minutes: number;
+            /**
+             * Resource Minutes
+             * @description ... before a court or room reservation
+             */
+            resource_minutes: number;
+            /**
+             * Configured
+             * @description False until the business saves its policy (the category's suggestion, or its one old window, applies until then)
+             */
+            configured: boolean;
+        };
         /**
          * BusinessProfile
          * @description What anyone holding a join code may see before signing in.
@@ -11043,6 +11273,47 @@ export interface components {
              * @description Variables some recipients have no value for (set a fallback with {name|text})
              */
             warnings?: components["schemas"]["PlaceholderWarning"][];
+        };
+        /** CancelPreview */
+        CancelPreview: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /**
+             * Free Until
+             * Format: date-time
+             * @description Cancelling before this moment is free
+             */
+            free_until: string;
+            /**
+             * Late
+             * @description Cancelling now is inside the window
+             */
+            late: boolean;
+            /**
+             * Outcome
+             * @description What cancelling now does: nothing, uses a visit, or is only noted
+             * @enum {string}
+             */
+            outcome: "free" | "counts" | "recorded";
+            /** Plan Name */
+            plan_name: string | null;
+            /** Plan Kind */
+            plan_kind: ("membership" | "punch_card") | null;
+            /**
+             * Period Quota
+             * @description Visits per week or month the plan allows
+             */
+            period_quota: number | null;
+            /** Period Unit */
+            period_unit: ("week" | "month") | null;
+            /**
+             * Period Used
+             * @description Visits already counted in that period
+             */
+            period_used: number | null;
         };
         /** Catalog */
         Catalog: {
@@ -11413,6 +11684,11 @@ export interface components {
              * @description The client's review of the visit
              */
             rating?: number | null;
+            /**
+             * Free Cancel Until
+             * @description Upcoming bookings: cancelling before this moment is free
+             */
+            free_cancel_until?: string | null;
         };
         /** ClientBookingCreate */
         ClientBookingCreate: {
@@ -11794,6 +12070,10 @@ export interface components {
             items: components["schemas"]["ClientListItem"][];
             /** Total */
             total: number;
+        };
+        /** ClientPolicy */
+        ClientPolicy: {
+            text: components["schemas"]["PolicyText"];
         };
         /** ClientQuote */
         ClientQuote: {
@@ -13366,6 +13646,18 @@ export interface components {
              * @description A membership that is not over, cancelled or used up
              */
             freezable: boolean;
+            /**
+             * Period Quota
+             * @description Visits allowed per week or month, if limited
+             */
+            period_quota: number | null;
+            /** Period Unit */
+            period_unit: ("week" | "month") | null;
+            /**
+             * Period Used
+             * @description Visits counted in the current week or month
+             */
+            period_used: number | null;
         };
         /** Entry */
         Entry: {
@@ -16395,10 +16687,10 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite" | "freeze_approved" | "freeze_rejected" | "waitlist_spot_open" | "waitlist_spot_taken";
+            kind: "waitlist_promoted" | "booked_by_studio" | "booking_cancelled_by_studio" | "session_cancelled" | "session_moved" | "health_approved" | "health_rejected" | "session_reminder" | "plan_ending" | "friend_request" | "class_invite" | "freeze_approved" | "freeze_rejected" | "waitlist_spot_open" | "waitlist_spot_taken" | "credit_returned";
             /**
              * Payload
-             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note; waitlist_spot_open: session_id, service_name, starts_at, ends_at
+             * @description session_id, service_name, starts_at (and previous_starts_at, status or note, by kind); plan_ending: plan_name, ends_on; friend_request: from_name; class_invite: from_name, invite_id, session_id, service_name, starts_at; freeze_approved, freeze_rejected: plan_name, starts_on, ends_on, note; waitlist_spot_open: session_id, service_name, starts_at, ends_at; credit_returned: session_id, service_name, starts_at
              */
             payload: {
                 [key: string]: unknown;
@@ -16652,6 +16944,33 @@ export interface components {
             billing_state: "active" | "read_only" | "suspended";
             /** Grace Until */
             grace_until: string | null;
+        };
+        /** OverridePolicy */
+        OverridePolicy: {
+            /**
+             * Late Outcome
+             * @description Cancelling inside the window: a used visit (counts) or only noted (recorded)
+             * @default counts
+             * @enum {string}
+             */
+            late_outcome: "counts" | "recorded";
+            /**
+             * No Show Outcome
+             * @description Not coming: a used visit (counts) or only noted (recorded)
+             * @default counts
+             * @enum {string}
+             */
+            no_show_outcome: "counts" | "recorded";
+            /**
+             * No Show Limit
+             * @description No-shows in 30 days after which the app stops booking the client; empty: off
+             */
+            no_show_limit?: number | null;
+            /**
+             * Free Minutes
+             * @description Free cancellation before the session
+             */
+            free_minutes: number;
         };
         /**
          * PaletteColors
@@ -17171,6 +17490,13 @@ export interface components {
             /** Auto Renew */
             auto_renew: boolean;
             /**
+             * Period Quota
+             * @description Visits allowed per period, if limited
+             */
+            period_quota: number | null;
+            /** Period Unit */
+            period_unit: ("week" | "month") | null;
+            /**
              * Created At
              * Format: date-time
              */
@@ -17230,6 +17556,16 @@ export interface components {
              * @default false
              */
             auto_renew: boolean;
+            /**
+             * Period Quota
+             * @description Memberships only: visits allowed per period (for example 2 per week)
+             */
+            period_quota?: number | null;
+            /**
+             * Period Unit
+             * @description With period_quota
+             */
+            period_unit?: ("week" | "month") | null;
         };
         /**
          * PlanListItem
@@ -17267,6 +17603,13 @@ export interface components {
             /** Auto Renew */
             auto_renew: boolean;
             /**
+             * Period Quota
+             * @description Visits allowed per period, if limited
+             */
+            period_quota: number | null;
+            /** Period Unit */
+            period_unit: ("week" | "month") | null;
+            /**
              * Created At
              * Format: date-time
              */
@@ -17283,6 +17626,17 @@ export interface components {
             holders: number;
             /** Sold Last 30 Days */
             sold_last_30_days: number;
+        };
+        /** PlanOverride */
+        PlanOverride: {
+            /**
+             * Plan Id
+             * Format: uuid
+             */
+            plan_id: string;
+            /** Name */
+            name: string;
+            policy: components["schemas"]["OverridePolicy"] | null;
         };
         /**
          * PlanUpdate
@@ -17304,6 +17658,13 @@ export interface components {
              * @description Needs a billing cycle
              */
             auto_renew?: boolean | null;
+            /**
+             * Period Quota
+             * @description Memberships only
+             */
+            period_quota?: number | null;
+            /** Period Unit */
+            period_unit?: ("week" | "month") | null;
         };
         /** PlannedShift */
         PlannedShift: {
@@ -17420,6 +17781,25 @@ export interface components {
             bucket: string;
             /** Value */
             value: number;
+        };
+        /** PolicyOverview */
+        PolicyOverview: {
+            business: components["schemas"]["BusinessPolicyView"];
+            /** @description The default for this kind of business */
+            suggested: components["schemas"]["BusinessPolicy"];
+            /** Services */
+            services: components["schemas"]["ServiceOverride"][];
+            /** Plans */
+            plans: components["schemas"]["PlanOverride"][];
+            /** @description What clients are told, from the saved policy */
+            text: components["schemas"]["PolicyText"];
+        };
+        /** PolicyText */
+        PolicyText: {
+            /** He */
+            he: string;
+            /** En */
+            en: string;
         };
         /** Preview */
         Preview: {
@@ -19401,6 +19781,17 @@ export interface components {
             /** Capacity */
             capacity: number;
         };
+        /** ServiceOverride */
+        ServiceOverride: {
+            /**
+             * Service Id
+             * Format: uuid
+             */
+            service_id: string;
+            /** Name */
+            name: string;
+            policy: components["schemas"]["OverridePolicy"] | null;
+        };
         /** ServiceSummary */
         ServiceSummary: {
             /**
@@ -19509,7 +19900,7 @@ export interface components {
              * Key
              * @enum {string}
              */
-            key: "branding" | "services" | "schedule" | "team" | "clients" | "card";
+            key: "branding" | "services" | "policy" | "schedule" | "team" | "clients" | "card";
             /** Done */
             done: boolean;
         };
@@ -21296,6 +21687,51 @@ export interface components {
              * @description The most wanted services
              */
             services: components["schemas"]["WaitlistServiceCount"][];
+        };
+        /** WaiveBody */
+        WaiveBody: {
+            /**
+             * Reason
+             * @description Required; kept with who/when
+             */
+            reason: string;
+        };
+        /** Waiver */
+        Waiver: {
+            /**
+             * Booking Id
+             * Format: uuid
+             */
+            booking_id: string;
+            /** Service Name */
+            service_name: string;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Waived At
+             * Format: date-time
+             */
+            waived_at: string;
+            /** Waived By Name */
+            waived_by_name: string | null;
+            /** Reason */
+            reason: string | null;
+        };
+        /** WaiverSummary */
+        WaiverSummary: {
+            /**
+             * This Year
+             * @description Visits given back to this client in the current year
+             */
+            this_year: number;
+            /**
+             * Items
+             * @description Newest first, at most 50
+             */
+            items: components["schemas"]["Waiver"][];
         };
         /** WebsiteOrder */
         WebsiteOrder: {
@@ -37211,6 +37647,364 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Entitlement"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessPolicy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_service_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OverridePolicy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_service_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                service_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    set_plan_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OverridePolicy"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clear_plan_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                plan_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PolicyOverview"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    waive: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WaiveBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: boolean;
+                    };
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    client_waivers: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+                /** @description The current branch (none: all branches) */
+                "X-Location-Id"?: string | null;
+            };
+            path: {
+                client_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WaiverSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    my_policy: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClientPolicy"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_preview: {
+        parameters: {
+            query?: never;
+            header: {
+                "X-Tenant-Id": string;
+            };
+            path: {
+                booking_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CancelPreview"];
                 };
             };
             /** @description Validation Error */
