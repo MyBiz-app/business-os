@@ -1,6 +1,5 @@
 """Two-step sign-in (GL1): the assurance level in the token, the gates, and new-device emails."""
 
-import datetime as dt
 from collections.abc import Callable, Iterator
 from uuid import uuid4
 
