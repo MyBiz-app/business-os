@@ -4,8 +4,8 @@ Expand step, grants only: `app_api` could update just `active` on `app.promo_cod
 may now also update the discount, the plan, the dates and the use limit. The code text and the
 tenant stay fixed. The API refuses a new discount amount once a paid checkout used the code.
 
-Revision ID: 0141
-Revises: 0138
+Revision ID: 0140
+Revises: 0139
 Create Date: 2026-10-18
 """
 
@@ -13,8 +13,8 @@ from collections.abc import Sequence
 
 from alembic import op
 
-revision: str = "0141"
-down_revision: str | None = "0138"
+revision: str = "0140"
+down_revision: str | None = "0139"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
