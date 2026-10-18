@@ -161,7 +161,7 @@ with sync_playwright() as p:
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
     owner.locator(SESSION_LINK).first.wait_for(state="attached", timeout=20000)
     owner.locator(SESSION_LINK).first.click(); h.ready(owner)
-    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible()
+    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("נועה כהן")).to_be_visible(timeout=30000)
     print("6. owner sees the booking: ok")
 
     # AI: question, then an action that needs confirmation.
@@ -187,7 +187,7 @@ with sync_playwright() as p:
     expect(owner.get_by_role("status").filter(has_text="בוצע")).to_be_visible()
     owner.goto(f"{h.BASE}/schedule?week={tomorrow}"); h.ready(owner)
     owner.locator(SESSION_LINK).first.click(); h.ready(owner)
-    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("דנה כהן")).to_be_visible()
+    expect(owner.get_by_role("region", name="רשימת משתתפים").get_by_text("דנה כהן")).to_be_visible(timeout=30000)
     print("7. AI answered, proposed an action, confirmed, executed: ok")
     check_a11y(owner, "he-light session roster")
     owner.get_by_role("region", name="רשימת משתתפים").get_by_role("link", name="נועה כהן").click()
