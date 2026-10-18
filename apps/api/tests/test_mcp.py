@@ -14,6 +14,7 @@ from sqlalchemy import Engine, text
 from app.ai.tools import MCP_READ_TOOLS, TOOL_DOMAINS, TOOLS
 from app.ai.untrusted import unwrap
 from app.core import config
+from app.core.brand import NAME
 from app.mcp.access import AccessDenied, authenticate, count_call, tenant_context
 from app.mcp.tokens import hash_token
 from tests.conftest import STUDIO, AuthHeaders, add_member
@@ -193,7 +194,7 @@ def test_sign_in_gives_tokens_the_endpoint_accepts(client: TestClient, studio: d
     initialized = rpc(
         client, tokens["access_token"], "initialize", {"protocolVersion": "2025-06-18"}
     )
-    assert initialized.json()["result"]["serverInfo"]["name"] == "mybiz"
+    assert initialized.json()["result"]["serverInfo"]["name"] == NAME
     assert initialized.json()["result"]["protocolVersion"] == "2025-06-18"
     assert rpc(client, tokens["access_token"], "ping").json()["result"] == {}
     notified = client.post(

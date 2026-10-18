@@ -12,6 +12,7 @@ from sqlalchemy import Engine, text
 from sqlalchemy.orm import Session
 
 from app.api.deps import ALL_BRANCH_ROLES, BRANCH_BOUND_ROLES, TenantContext, set_branch
+from app.core.brand import NAME
 from app.core.config import get_settings
 from app.core.db import open_session, session_scope, set_tenant
 from app.core.permissions import effective_permissions
@@ -75,7 +76,7 @@ def tenant_context(engine: Engine, connection: Connection) -> Iterator[TenantCon
         if closed:
             raise AccessDenied("This business is closed.")
         if suspended:
-            raise AccessDenied("This business's MyBiz subscription is suspended.")
+            raise AccessDenied(f"This business's {NAME} subscription is suspended.")
         allowed = (
             frozenset(member.location_ids)
             if (member.location_ids or member.role in BRANCH_BOUND_ROLES)

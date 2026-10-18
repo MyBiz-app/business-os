@@ -25,6 +25,7 @@ from sqlalchemy import text
 
 from app.api.deps import SessionDep, TenantDep
 from app.core import audit
+from app.core.brand import NAME
 from app.core.config import get_settings
 from app.core.db import EngineDep
 from app.mcp.access import anonymous_session
@@ -77,7 +78,7 @@ def protected_resource() -> dict[str, Any]:
         "authorization_servers": [_api()],
         "scopes_supported": [SCOPE],
         "bearer_methods_supported": ["header"],
-        "resource_name": "MyBiz",
+        "resource_name": NAME,
     }
 
 
